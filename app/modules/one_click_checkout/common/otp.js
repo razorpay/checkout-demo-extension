@@ -15,7 +15,11 @@ import {
   isNumericalString,
 } from 'one_click_checkout/common/utils';
 import { INVALID_OTP_LABEL } from 'ui/labels/otp';
-import { RESEND_OTP_INTERVAL } from 'one_click_checkout/otp/constants';
+import {
+  OTP_TEMPLATES,
+  RESEND_OTP_INTERVAL,
+} from 'one_click_checkout/otp/constants';
+import { getDefaultOtpTemplate } from 'checkoutframe/sms_template';
 
 let customer;
 
@@ -30,6 +34,7 @@ export const askForOTP = (otp_reason) => {
   routesConfig[views.OTP].props = {
     ...routesConfig[views.OTP].props,
     ...routesConfig[get(currentView)].otpProps,
+    otpReason: OTP_TEMPLATES[otp_reason],
   };
 
   routesConfig[views.OTP].otpParams = {
@@ -53,51 +58,19 @@ export const askForOTP = (otp_reason) => {
     ),
   };
   const otpParams = routesConfig[views.OTP].otpParams;
-  const currentScreen = get(currentView);
   screensHistory.push(views.OTP);
 
   updateOTPStore(otpParams.loading);
-  if (currentScreen !== views.ADDRESS) {
-    Events.Track(otpEvents.OTP_LOAD, {
-      otp_skip_visible: get(OtpScreenStore.allowSkip),
-      otp_reason,
+  Events.Track(otpEvents.OTP_LOAD, {
+    otp_skip_visible: get(OtpScreenStore.allowSkip),
+    otp_reason,
+  });
+  createOTP(() => {
+    updateOTPStore({
+      ...otpParams.sent,
+      digits: new Array(get(OtpScreenStore.maxlength)),
     });
-    createOTP(() => {
-      updateOTPStore({
-        ...otpParams.sent,
-        digits: new Array(get(OtpScreenStore.maxlength)),
-      });
-    });
-  } else {
-    // TODO: don't call if already have the status
-    const sms_hash = customer.r.get('sms_hash');
-    const params = { skip_otp: true };
-    if (sms_hash) {
-      params.sms_hash = sms_hash;
-    }
-    customer.checkStatus(
-      function () {
-        if (customer.saved_address && !customer.logged) {
-          Events.Track(otpEvents.OTP_LOAD, {
-            otp_skip_visible: get(OtpScreenStore.allowSkip),
-            otp_reason,
-          });
-
-          createOTP(() => {
-            updateOTPStore({
-              ...otpParams.sent,
-              resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
-              digits: new Array(get(OtpScreenStore.maxlength)),
-            });
-          });
-        } else {
-          screensHistory.replace(views.ADD_ADDRESS);
-        }
-      },
-      params,
-      customer.contact
-    );
-  }
+  });
 };
 
 /**
@@ -201,13 +174,21 @@ export const resendOTPHandle = () => {
   });
 };
 
-export const createOTP = (cb, resendTimeout = Date.now() + 30 * 1000) => {
+export const createOTP = (
+  cb,
+  resendTimeout = Date.now() + RESEND_OTP_INTERVAL
+) => {
   const customer = getCustomerDetails();
+  const otp_reason = getDefaultOtpTemplate();
 
-  customer.createOTP((data) => {
-    updateOTPStore({
-      resendTimeout,
-    });
-    cb(data);
-  });
+  customer.createOTP(
+    (data) => {
+      updateOTPStore({
+        resendTimeout,
+      });
+      cb(data);
+    },
+    null,
+    otp_reason
+  );
 };

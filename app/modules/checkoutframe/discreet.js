@@ -124,6 +124,8 @@ import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface'
 import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
+import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
+import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 
 export default {
   RazorpayConfig,
@@ -267,4 +269,6 @@ export default {
   views,
 
   CardViews,
+  OTP_TEMPLATES,
+  OtpTemplatesHelper,
 };

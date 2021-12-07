@@ -14,7 +14,10 @@ import { savedAddresses } from 'one_click_checkout/address/store';
 import { views } from 'one_click_checkout/routing/constants';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
-import { RESEND_OTP_INTERVAL } from 'one_click_checkout/otp/constants';
+import {
+  RESEND_OTP_INTERVAL,
+  OTP_TEMPLATES,
+} from 'one_click_checkout/otp/constants';
 
 const hasSavedAddresses =
   (redirect, check_status = true, reason) =>
@@ -40,6 +43,7 @@ const hasSavedAddresses =
       history.config[views.OTP].props = {
         ...history.config[views.OTP].props,
         ...props,
+        otpReason: OTP_TEMPLATES.access_address,
       };
       history.config[views.OTP].otpParams = {
         loading: {
@@ -66,13 +70,17 @@ const hasSavedAddresses =
               otp_reason: reason,
             });
 
-            createOTP(() => {
-              updateOTPStore({
-                ...history.config[views.OTP].otpParams.sent,
-                resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
-                digits: new Array(get(OtpScreenStore.maxlength)),
-              });
-            });
+            createOTP(
+              () => {
+                updateOTPStore({
+                  ...history.config[views.OTP].otpParams.sent,
+                  resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
+                  digits: new Array(get(OtpScreenStore.maxlength)),
+                });
+              },
+              null,
+              OTP_TEMPLATES.access_address
+            );
           } else {
             history.push(redirect);
           }

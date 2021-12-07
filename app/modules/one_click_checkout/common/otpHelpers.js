@@ -1,5 +1,6 @@
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
+import { RESEND_OTP_INTERVAL } from 'one_click_checkout/otp/constants';
 
 /**
  * Method to update the otp store
@@ -13,13 +14,21 @@ export const updateOTPStore = (props) => {
   });
 };
 
-export const createOTP = (cb, resendTimeout = Date.now() + 30 * 1000) => {
+export const createOTP = (
+  cb,
+  resendTimeout = Date.now() + RESEND_OTP_INTERVAL,
+  otp_reason
+) => {
   const customer = getCustomerDetails();
 
-  customer.createOTP((data) => {
-    updateOTPStore({
-      resendTimeout,
-    });
-    cb(data);
-  });
+  customer.createOTP(
+    (data) => {
+      updateOTPStore({
+        resendTimeout,
+      });
+      cb(data);
+    },
+    null,
+    otp_reason
+  );
 };
