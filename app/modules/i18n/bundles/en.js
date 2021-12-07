@@ -284,6 +284,7 @@ export default {
   cardless_emi: {
     providers: {
       bajaj: 'Bajaj Finserv',
+      barb:  'Bank of Baroda',
       cards: 'EMI on Cards',
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
