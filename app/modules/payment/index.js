@@ -651,6 +651,20 @@ Payment.prototype = {
       return;
     }
 
+    /**
+     * For cards tokenization, for custom checkout(razorpayjs) we need to collect consent on an intermediate page
+     * which is only application on create/checkout ( response can be HTML )
+     * Hence avoid ajax route for such calls
+     * razorpayjs + (card |emi ) + (save:1 | token )
+     */
+    if (
+      Track.props.library === 'razorpayjs' &&
+      ['card', 'emi'].includes(data.method) &&
+      (Number(data.save) === 1 || data.token)
+    ) {
+      return;
+    }
+
     // else make ajax request
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
 
