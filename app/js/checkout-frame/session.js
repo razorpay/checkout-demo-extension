@@ -2223,11 +2223,16 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.getCurrentCustomer().createOTP(function (message) {
-        // TODO: check how message is being consumed. Possible bug.
-        askOTP(self.otpView, message, true, { phone: getPhone() });
-        self.updateCustomerInStore();
-      });
+      var otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
+      this.getCurrentCustomer().createOTP(
+        function (message) {
+          // TODO: check how message is being consumed. Possible bug.
+          askOTP(self.otpView, message, true, { phone: getPhone() });
+          self.updateCustomerInStore();
+        },
+        null,
+        otpTemplate
+      );
     }
   },
 
@@ -3398,6 +3403,11 @@ Session.prototype = {
     var params = {};
     if (smsHash) {
       params.sms_hash = smsHash;
+    }
+    if (discreet.RazorpayHelper.isOneClickCheckout()) {
+      params.otp_reason = discreet.RazorpayHelper.isOneClickCheckout()
+        ? discreet.OTP_TEMPLATES.access_card
+        : '';
     }
     customer.checkStatus(function () {
       /**
@@ -5318,9 +5328,14 @@ Session.prototype = {
           phone: getPhone(),
         });
         askOTP(this.otpView, undefined, true, { phone: getPhone() });
-        this.getCurrentCustomer().createOTP(function () {
-          session.updateCustomerInStore();
-        });
+        var otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
+        this.getCurrentCustomer().createOTP(
+          function () {
+            session.updateCustomerInStore();
+          },
+          null,
+          otpTemplate
+        );
         return;
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';

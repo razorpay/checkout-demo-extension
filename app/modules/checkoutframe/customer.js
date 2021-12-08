@@ -182,7 +182,13 @@ Customer.prototype = {
     });
   },
 
-  createOTP: function (callback, queryParams) {
+  /**
+   *
+   * @param {function} callback callback to be executed after response is received.
+   * @param {object} queryParams additional query params to be sent with the request.
+   * @param {string} otp_reason template name which is sent in payload to BE.
+   */
+  createOTP: function (callback, queryParams, otp_reason = '') {
     let url = 'otp/create';
 
     if (queryParams) {
@@ -193,6 +199,7 @@ Customer.prototype = {
       url: makeAuthUrl(this.r, url),
       data: {
         contact: this.contact,
+        otp_reason,
       },
       callback: function (data) {
         OtpService.markOtpSent('razorpay');
