@@ -1026,6 +1026,7 @@ export default {
       icic: 'ICICI Bank PayLater',
       hdfc: 'FlexiPay by HDFC Bank',
       lazypay: 'LazyPay',
+      kkbk: 'Kotak Mahindra Bank',
     },
     select_option_title: 'Select an option',
   },
