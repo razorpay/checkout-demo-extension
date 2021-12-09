@@ -50,6 +50,7 @@ import {
   getDevice,
   isMobile,
   android,
+  AndroidWebView,
 } from 'common/useragent';
 
 import {
@@ -521,6 +522,7 @@ const UPI_METHODS = {
     !isRecurring() &&
     !isPayout() &&
     !global.CheckoutBridge &&
+    !AndroidWebView &&
     !isFacebookWebView() &&
     getMerchantMethods().upi_intent &&
     intentEnabledInOption() &&
