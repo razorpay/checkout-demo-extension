@@ -6,7 +6,7 @@ export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');
 export const cardName = writable('');
-export const remember = writable(get(isIndianCustomer));
+export const remember = writable(true);
 export const authType = writable('c3ds');
 export const selectedCard = writable(null);
 export const selectedApp = writable(null);
@@ -53,3 +53,21 @@ export const currentAuthType = writable('');
 export const internationalCurrencyCalloutNeeded = writable(false);
 
 export const hitCREDEligibility = writable(true);
+
+/**
+Before isIndianCustomer, `remember` default value was true
+After isIndianCustomer, `remember` default value is value of isIndianCustomer
+
+What is isIndianCustomer?: Its a derived store value from contact, checks if its +91( indian ) contact
+
+But when this is introduced in system, we found a bug where
+`remember` is always false irrespective of isIndianCustomer/contact changed
+Reason: 
+When store is being initialized, contact is not present (rendering didn't complete or no-prefill present).
+This results in isIndianCustomer and remember to be undefined.
+When contact is captured, it only updates the isIndianCustomer (due to derived state influence)
+But it won'r update remember value as its already initialized and handler to present. 
+
+Fix: Revert remember default value to true, and update using subscription on isIndianCustomer
+ */
+isIndianCustomer?.subscribe(remember.set);

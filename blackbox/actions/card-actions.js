@@ -367,6 +367,11 @@ async function selectCurrency(context, code) {
   await context.page.click('.search-curtain .list-item');
 }
 
+async function selectAddNewCard(context) {
+  await context.page.waitForSelector('#show-add-card');
+  await context.page.click('#show-add-card');
+}
+
 async function expectDCCParametersInRequest(
   context,
   currency = 'USD',
@@ -410,7 +415,15 @@ async function selectSavedCardAndTypeCvv(context) {
 async function assertConsentCollectorForTokenization(context) {
   expect(await context.page.$eval('.secure-card-block', visible)).toEqual(true);
 }
+async function assertSaveCardCheckbox(context, state = true) {
+  const el = await page.$('#should-save-card');
+  expect(!!el).toBe(state);
+}
 
+async function verifySavedCardCheckbox(context, state) {
+  const _state = await context.page.$('input#save.checkbox--square:checked');
+  expect(!!_state).toEqual(state);
+}
 async function selectConsentCollectorForTokenization(context) {
   const checkboxLabel = await context.page.$('#should-save-card');
   await checkboxLabel.click();
@@ -664,4 +677,7 @@ module.exports = {
   expectAVSParametersInRequest,
   assertConsentCollectorForTokenization,
   selectConsentCollectorForTokenization,
+  selectAddNewCard,
+  assertSaveCardCheckbox,
+  verifySavedCardCheckbox,
 };
