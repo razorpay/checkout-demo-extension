@@ -190,6 +190,7 @@ export default {
       'This payment might fail because {instrument} is facing technical difficulties',
     downtime_callout_cards:
       'This payment might fail because {instrument} cards are facing technical difficulties',
+    timer_callout: 'This page will timeout in {minutes} minutes',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -263,7 +264,7 @@ export default {
       'All saved cards are compliant with the latest security guidelines',
 
     save_card_know_more_add_card_modal_title:
-      'Save cards securely for future payments',
+      'Save card securely for future payments',
     save_card_know_more_add_card_modal_content1:
       'Your card will be stored securely as a saved payment method as per RBI’s latest guidelines.',
 

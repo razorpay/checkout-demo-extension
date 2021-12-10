@@ -91,7 +91,13 @@
   class:secure-card-block-saved-cards={Boolean(savedcard)}
 >
   <!-- do not modify the id of label tag, this id has a multiple bug fixes in session -->
-  <label class="first" for={name} id="should-save-card" tabIndex="0">
+  <label
+    class="first save_card_label_text"
+    for={name}
+    id="should-save-card"
+    tabIndex="0"
+    class:save_card_label_text={modalType === 'add-new-card'}
+  >
     <input
       type="checkbox"
       class="checkbox--square"
@@ -180,5 +186,16 @@
 
   .cusor-pointer {
     cursor: pointer;
+  }
+
+  .save_card_label_text {
+    display: block;
+    margin-bottom: 5px;
+    float: left;
+    margin-left: 30px;
+  }
+
+  .save_card_label_text .checkbox {
+    margin-left: -30px;
   }
 </style>

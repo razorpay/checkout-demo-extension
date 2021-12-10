@@ -1,5 +1,9 @@
 <script>
   import { onDestroy } from 'svelte';
+  import { locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import { TIMER_CALLOUT } from 'ui/labels/callouts';
   // how long should timer be displayed
   export let expiry;
   export let onExpire;
@@ -30,5 +34,12 @@
 </script>
 
 <div id="timeout">
-  <i>&#x2139</i> This page will timeout in {displayTime} minutes
+  <i>&#x2139</i>
+  <FormattedText
+    text={formatTemplateWithLocale(
+      TIMER_CALLOUT,
+      { minutes: displayTime },
+      $locale
+    )}
+  />
 </div>
