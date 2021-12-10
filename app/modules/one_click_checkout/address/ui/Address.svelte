@@ -39,7 +39,7 @@
   import Resource from 'one_click_checkout/address/resource';
   import { views } from 'one_click_checkout/routing/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
-  import { screensHistory } from 'one_click_checkout/routing/History';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
   // props
   export let currentView;
@@ -60,7 +60,7 @@
     const shouldNavigateToBilling = !$isBillingSameAsShipping;
 
     if (shouldNavigateToBilling) {
-      screensHistory.push(views.SAVED_BILLING_ADDRESS);
+      navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
       return;
     }
     postSubmit();
@@ -93,11 +93,11 @@
     Events.Track(AddressEvents.ACCESS_SAVED_ADDRESS);
 
     address.currentView.setCurrentView(addressViews.SAVED_ADDRESSES);
-    screensHistory.push(
-      Resource[ADDRESS_TYPES.SHIPPING_ADDRESS].routes[
+    navigator.navigateTo({
+      path: Resource[ADDRESS_TYPES.SHIPPING_ADDRESS].routes[
         addressViews.SAVED_ADDRESSES
-      ]
-    );
+      ],
+    });
   }
 
   onMount(() => {

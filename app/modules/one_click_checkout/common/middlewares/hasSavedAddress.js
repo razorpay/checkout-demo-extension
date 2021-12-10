@@ -21,10 +21,10 @@ import {
 
 const hasSavedAddresses =
   (redirect, check_status = true, reason) =>
-  (view, history) => {
+  (route, history, navigator) => {
     const customer = getCustomerDetails();
-    const labels = history.config[view].otpLabels;
-    const props = history.config[view].otpProps;
+    const labels = route.otpLabels;
+    const props = route.otpProps;
 
     const loggedIn = isUserLoggedIn();
 
@@ -82,13 +82,13 @@ const hasSavedAddresses =
               OTP_TEMPLATES.access_address
             );
           } else {
-            history.push(redirect);
+            navigator.navigateTo({ path: redirect });
           }
         },
         params,
         customer.contact
       );
-      return views.OTP;
+      return { path: views.OTP, props: history.config[views.OTP].props };
     }
   };
 

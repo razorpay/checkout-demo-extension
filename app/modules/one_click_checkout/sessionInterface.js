@@ -3,10 +3,11 @@ import { getSession } from 'sessionmanager';
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 // store imports
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'razorpay';
-import { history, currentView } from 'one_click_checkout/routing/store';
+import { history } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,
   isBillingSameAsShipping,
@@ -34,7 +35,6 @@ import {
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
 
-import { screensHistory } from 'one_click_checkout/routing/History';
 import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 
 export const historyExists = () => get(history).length;
@@ -43,12 +43,13 @@ export const historyExists = () => get(history).length;
  * Method called, when back action is triggered.
  */
 export const handleBack = () => {
-  if (get(history).length === 1) {
-    const session = getSession();
+  const session = getSession();
+  const currHistory = get(history);
+  if (currHistory.length === 1) {
     session.closeModal();
     return;
   }
-  screensHistory.pop();
+  navigator.navigateBack();
 };
 
 export function getLandingView() {
@@ -61,7 +62,7 @@ export function getLandingView() {
 export function handleEditContact(logoutFlow = false) {
   if (!isOneClickCheckout()) return;
   Events.TrackBehav(MiscEvents.EDIT_CONTACT_CLICK, {
-    screen_name: get(currentView),
+    screen_name: navigator.currentActiveRoute?.name,
   });
   const session = getSession();
   if (session.tab !== 'home-1cc') {
@@ -70,11 +71,10 @@ export function handleEditContact(logoutFlow = false) {
   if (logoutFlow) {
     resetOrder(true);
     isLogoutFlow.set(true);
-    screensHistory.initialize(views.DETAILS);
   } else {
     isEditContactFlow.set(true);
-    screensHistory.push(views.DETAILS);
   }
+  navigator.navigateTo({ path: views.DETAILS });
 }
 
 export function getIcons() {
@@ -92,7 +92,10 @@ export function getTheme() {
  * Redirecting the flow from 1cc to payment screens
  */
 export function redirectToPaymentMethods(
-  { shouldNotPush, showSnackbar } = { shouldNotPush: false, showSnackbar: true }
+  { shouldUpdateOrder, showSnackbar } = {
+    shouldUpdateOrder: true,
+    showSnackbar: true,
+  }
 ) {
   const customer = getCustomerDetails();
   const session = getSession();
@@ -116,52 +119,56 @@ export function redirectToPaymentMethods(
   Analytics.setMeta(MetaProperties.SHIPPING_ADDRESS_CONTACT, address.contact);
 
   if (address.cod) showCodLoader.set(true);
-
-  thirdWatchCodServiceability(address).then((res) => {
-    if (isCodForced()) {
-      showCodLoader.set(false);
-      return;
-    }
-
-    if (addressType === 'saved') {
-      const newAddresses = get(savedAddresses).map((item) => {
-        if (item.id === address.id && item.cod) {
-          item.cod = res?.cod;
-        }
-        return item;
-      });
-      savedAddresses.set(newAddresses);
-    } else {
-      const newAddressServiceability = get(newUserAddress).cod && res?.cod;
-      newUserAddress.set({
-        ...get(newUserAddress),
-        cod: newAddressServiceability,
-      });
-    }
-    showCodLoader.set(false);
-    session.homeTab.codActions();
-  });
-
-  updateOrder(address, billing_address)
-    .then(() => {
-      session.oneClickCheckoutRedirection(showSnackbar);
-      if (!shouldNotPush) {
-        screensHistory.push('methods');
+  // If navigating from methods->details->methods we need not to update the order
+  if (shouldUpdateOrder) {
+    thirdWatchCodServiceability(address).then((res) => {
+      if (isCodForced()) {
+        showCodLoader.set(false);
+        return;
       }
-    })
-    .catch(() => {
-      session.updateOrderFailure();
-      const currhis = get(history);
-      const savedAddIndex = currhis.indexOf(views.SAVED_ADDRESSES);
-      if (savedAddIndex >= 0) {
-        screensHistory.popUntil(views.SAVED_ADDRESSES);
-      } else if (get(savedAddresses)?.length) {
-        screensHistory.popUntil(views.ADD_ADDRESS);
-        screensHistory.replace(views.SAVED_ADDRESSES);
+
+      if (addressType === 'saved') {
+        const newAddresses = get(savedAddresses).map((item) => {
+          if (item.id === address.id && item.cod) {
+            item.cod = res?.cod;
+          }
+          return item;
+        });
+        savedAddresses.set(newAddresses);
       } else {
-        screensHistory.popUntil(views.ADD_ADDRESS);
+        const newAddressServiceability = get(newUserAddress).cod && res?.cod;
+        newUserAddress.set({
+          ...get(newUserAddress),
+          cod: newAddressServiceability,
+        });
       }
+      showCodLoader.set(false);
+      session.homeTab.codActions();
     });
+
+    updateOrder(address, billing_address)
+      .then(() => {
+        session.oneClickCheckoutRedirection(showSnackbar);
+        navigator.navigateTo({ path: views.METHODS });
+      })
+      .catch((e) => {
+        session.updateOrderFailure();
+        const currhis = get(history);
+        const savedAddArr = currhis.find(
+          (item) => item.name === views.SAVED_ADDRESSES
+        );
+        if (savedAddArr && Object.keys(savedAddArr).length > 0) {
+          navigator.navigateBack(views.SAVED_ADDRESSES);
+        } else if (get(savedAddresses)?.length) {
+          navigator.navigateBack(views.ADD_ADDRESS);
+          navigator.replace(views.SAVED_ADDRESSES);
+        } else {
+          navigator.navigateBack(views.ADD_ADDRESS);
+        }
+      });
+  } else {
+    session.oneClickCheckoutRedirection(showSnackbar);
+  }
 }
 
 /**

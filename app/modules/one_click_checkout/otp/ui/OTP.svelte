@@ -57,7 +57,6 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
-  import { onMount } from 'svelte';
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 

@@ -1,8 +1,8 @@
 import { get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
 import { views } from 'one_click_checkout/routing/constants';
-import { screensHistory } from 'one_click_checkout/routing/History';
 import { history } from 'one_click_checkout/routing/store';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { isLoginMandatory, shouldShowCoupons } from 'one_click_checkout/store';
 import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { askForOTP } from 'one_click_checkout/common/otp';
@@ -23,18 +23,20 @@ const handleContactFlow = (prevContact) => {
   const prevCustomer = getCustomerByContact(prevContact);
   if (get(contact) === prevContact) {
     isEditContactFlow.set(false);
-    const historyStore = get(history);
-    const isCurrentTabHome =
-      historyStore[historyStore.length - 2] === 'methods';
+    const isCurrentTabHome = navigator.isRedirectionFromMethods();
     if (isCurrentTabHome) {
-      redirectToPaymentMethods({ shouldNotPush: true, showSnackbar: false });
-    } else {
-      screensHistory.pop();
+      redirectToPaymentMethods({
+        shouldUpdateOrder: false,
+        showSnackbar: false,
+      });
     }
+    // If navigating from methods->details (edit contact)
+    // history stack is: [1cc screens, methods, details] since we dont need details on back poping it up
+    navigator.navigateBack();
     return false;
   }
   resetOrder(true);
-  screensHistory.initialize(views.DETAILS);
+  navigator.navigateTo({ path: views.DETAILS, initialize: true });
   if (prevCustomer?.logged) {
     prevCustomer.logout(false);
   }
@@ -47,7 +49,7 @@ export const handleDetailsNext = (prevContact) => {
     continueNext = handleContactFlow(prevContact);
   } else if (get(isLogoutFlow)) {
     isLogoutFlow.set(false);
-    screensHistory.initialize(determineLandingView());
+    navigator.navigateTo({ path: determineLandingView(), initialize: true });
     return;
   }
   if (continueNext) {
@@ -68,7 +70,7 @@ export const handleDetailsNext = (prevContact) => {
     }
 
     isEditContactFlow.set(false);
-    screensHistory.push(view);
+    navigator.navigateTo({ path: view });
   }
 };
 
@@ -88,13 +90,13 @@ export const handleDetailsOTP = () => {
   return {
     successHandler: function () {
       if (shouldShowCoupons()) {
-        screensHistory.replace(views.COUPONS);
+        navigator.replace(views.COUPONS);
       } else {
-        screensHistory.push(views.ADDRESS);
+        navigator.navigateTo({ path: views.ADDRESS });
       }
     },
     skipOTPHandle: function () {
-      screensHistory.push(views.ADD_ADDRESS);
+      navigator.navigateTo({ path: views.ADD_ADDRESS });
     },
   };
 };

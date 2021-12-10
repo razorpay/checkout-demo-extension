@@ -50,7 +50,6 @@
     cartDiscount,
     amount,
   } from 'one_click_checkout/charges/store';
-  import { screensHistory } from 'one_click_checkout/routing/History';
 
   import {
     nextView,
@@ -62,6 +61,7 @@
 
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
   import { views } from 'one_click_checkout/routing/constants';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
   let showCta = true;
   const currency = getCurrency();
@@ -76,7 +76,7 @@
     if (!$isCouponApplied) {
       removeCouponInStore();
     }
-    screensHistory.push(views.SAVED_ADDRESSES);
+    navigator.navigateTo({ path: views.SAVED_ADDRESSES });
     showAmountInTopBar();
   }
 

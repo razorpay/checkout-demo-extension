@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import { savedAddresses } from 'one_click_checkout/address/store';
-import { currentView } from 'one_click_checkout/routing/store';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
@@ -33,7 +33,7 @@ export const askForOTP = (otp_reason) => {
   const routesConfig = screensHistory.config;
   routesConfig[views.OTP].props = {
     ...routesConfig[views.OTP].props,
-    ...routesConfig[get(currentView)].otpProps,
+    ...navigator.currentActiveRoute.otpProps,
     otpReason: OTP_TEMPLATES[otp_reason],
   };
 
@@ -42,23 +42,27 @@ export const askForOTP = (otp_reason) => {
       templateData: { phone: customer.contact },
       ...mergeObjOnKey(
         OTP_PARAMS,
-        routesConfig[get(currentView)].otpLabels,
+        navigator.currentActiveRoute.otpLabels,
         'loading'
       ),
     },
     sent: mergeObjOnKey(
       OTP_PARAMS,
-      routesConfig[get(currentView)].otpLabels,
+      navigator.currentActiveRoute.otpLabels,
       'sent'
     ),
     verifying: mergeObjOnKey(
       OTP_PARAMS,
-      routesConfig[get(currentView)].otpLabels,
+      navigator.currentActiveRoute.otpLabels,
       'verifying'
     ),
   };
   const otpParams = routesConfig[views.OTP].otpParams;
-  screensHistory.push(views.OTP);
+  const currentScreen = navigator.currentActiveRoute.name;
+  navigator.navigateTo({
+    path: views.OTP,
+    props: routesConfig[views.OTP].props,
+  });
 
   updateOTPStore(otpParams.loading);
   Events.Track(otpEvents.OTP_LOAD, {
@@ -88,7 +92,7 @@ const postSubmit = (msg, data) => {
     if (data && data.addresses) {
       savedAddresses.set(data.addresses);
     }
-    routesConfig[get(currentView)].props.successHandler(data);
+    screensHistory.config.otp.props.successHandler(data);
   }
 };
 

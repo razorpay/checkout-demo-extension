@@ -31,7 +31,7 @@
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 
   import { Events, MiscEvents } from 'analytics';
-  import { currentView } from 'one_click_checkout/routing/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
   import { views } from 'one_click_checkout/routing/constants';
 
   const session = getSession();
@@ -164,7 +164,10 @@
   }
 
   function handleUserDetailsClick() {
-    if (logged || (isOneClickCheckout() && $currentView !== views.DETAILS)) {
+    if (
+      logged ||
+      (isOneClickCheckout() && $activeRoute.name !== views.DETAILS)
+    ) {
       logoutDropdownShown = !logoutDropdownShown;
     }
   }
@@ -175,7 +178,7 @@
       handleOneClickCheckoutEditContact.bind(null, true)
     );
     Events.Track(MiscEvents.LOGOUT_CLICKED, {
-      current_screen: $currentView,
+      current_screen: $activeRoute.name,
     });
     logoutDropdownShown = false;
   }
@@ -186,7 +189,7 @@
       handleOneClickCheckoutEditContact.bind(null, true)
     );
     Events.Track(MiscEvents.LOGOUT_CLICKED, {
-      current_screen: $currentView,
+      current_screen: $activeRoute.name,
     });
     logoutDropdownShown = false;
   }
@@ -220,7 +223,7 @@
     class="theme-secondary-highlight"
     transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
   >
-    {#if $isContactPresent && userDetailsShown && $currentView !== views.DETAILS}
+    {#if $isContactPresent && userDetailsShown && $activeRoute.name !== views.DETAILS}
       <div
         id="top-right"
         class:logged

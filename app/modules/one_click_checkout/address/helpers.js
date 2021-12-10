@@ -9,10 +9,11 @@ import {
   GENERIC_ERROR_LABEL,
 } from 'one_click_checkout/address/i18n/labels';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
-import { screensHistory } from 'one_click_checkout/routing/History';
 import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { postCustomerAddress } from 'one_click_checkout/address/service';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
 /**
  * Checks for the address form if there are any errors and returns the obj
  * @returns Object
@@ -45,9 +46,9 @@ export const validateInput = (elementId = 'addressForm') => {
  */
 export function successHandler(data) {
   if (!data.addresses?.length) {
-    screensHistory.push(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
+    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.ADD_ADDRESS });
   } else {
-    screensHistory.push(ONE_CC_HOME_VIEWS.SAVED_ADDRESSES);
+    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
   }
 }
 
@@ -67,7 +68,7 @@ export function addressSaveOTPSuccessHandler(service) {
  * Method called when user skips OTP on address save screen.
  */
 export function addressSaveOTPSkipHandler() {
-  screensHistory.pop();
+  navigator.navigateBack();
   redirectToPaymentMethods();
 }
 
@@ -75,7 +76,7 @@ export function addressSaveOTPSkipHandler() {
  * Method called when user skips otp for accessing saved address.
  */
 export const skipOTPHandle = () => {
-  screensHistory.replace(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
+  navigator.replace(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
 };
 
 /**

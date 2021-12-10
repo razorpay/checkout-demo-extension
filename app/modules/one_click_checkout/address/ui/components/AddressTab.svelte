@@ -1,31 +1,31 @@
 <script>
-  import CTA from 'ui/elements/CTA.svelte';
+  // svelte imports
   import { get } from 'svelte/store';
-
+  // UI imports
+  import CTA from 'ui/elements/CTA.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
-
+  // i18n imports
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
-
+  // analytics imports
   import { Events } from 'analytics';
-
+  import AddressEvents from 'one_click_checkout/address/analytics';
+  // store imports
   import {
     savedAddresses,
     isBillingSameAsShipping,
   } from 'one_click_checkout/address/store';
+  // helpers imports
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
-
-  import { screensHistory } from 'one_click_checkout/routing/History';
+  // constants imports
   import Resource from 'one_click_checkout/address/resource';
-
   import {
     views as addressViews,
     ADDRESS_TYPES,
   } from 'one_click_checkout/address/constants';
-
-  import AddressEvents from 'one_click_checkout/address/analytics';
 
   export let error;
   export let onSubmitCallback;
@@ -50,7 +50,9 @@
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
     selectedAddressId.set('');
     currentView = addressViews.ADD_ADDRESS;
-    screensHistory.push(Resource[addressType].routes[addressViews.ADD_ADDRESS]);
+    navigator.navigateTo({
+      path: Resource[addressType].routes[addressViews.ADD_ADDRESS],
+    });
   }
 
   export function setCurrentView(view) {

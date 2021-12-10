@@ -32,8 +32,8 @@
   import { saveNewAddress } from 'one_click_checkout/address/helpers';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
   import { askForOTP } from 'one_click_checkout/common/otp';
-  import { screensHistory } from 'one_click_checkout/routing/History';
   import Resource from 'one_click_checkout/address/resource';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
   export let currentView;
 
@@ -74,15 +74,15 @@
         address_screen: ADDRESS_TYPES.BILLING_ADDRESS,
       });
       $shouldSaveBillingAddress = false;
-      screensHistory.pop();
-      const view = screensHistory.peek();
+      navigator.navigateBack();
+      const view = navigator.currentActiveRoute.name;
       if (
         view ===
         Resource[ADDRESS_TYPES.BILLING_ADDRESS].routes[
           addressViews.SAVED_ADDRESSES
         ]
       ) {
-        screensHistory.pop();
+        navigator.navigateBack();
       }
     } else {
       Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_UNCHECKED, {

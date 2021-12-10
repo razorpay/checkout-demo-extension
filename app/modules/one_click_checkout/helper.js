@@ -5,11 +5,11 @@ import {
 } from 'one_click_checkout/store';
 import { otpReasons } from 'one_click_checkout/otp/constants';
 import { views } from 'one_click_checkout/routing/constants';
-import { screensHistory } from 'one_click_checkout/routing/History';
 import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { askForOTP } from 'one_click_checkout/common/otp';
 import { tick } from 'svelte';
 import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 /**
  * Determines where a user should be if
@@ -36,7 +36,8 @@ export function determineLandingView() {
     if (!isContactValid || !isEmailValid) {
       return DETAILS;
     } else {
-      screensHistory.initialize(views.DETAILS);
+      // Done to add details screen into history to have it while navigating back.
+      navigator.navigateTo({ path: views.DETAILS, initialize: true });
       return ADDRESS;
     }
   }

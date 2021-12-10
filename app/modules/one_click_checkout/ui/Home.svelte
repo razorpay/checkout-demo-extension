@@ -5,28 +5,26 @@
   import Loader from 'one_click_checkout/loader/Loader.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import Router from 'one_click_checkout/routing/component/Router.svelte';
   // Store imports
-  import { currentView, resetRouting } from 'one_click_checkout/routing/store';
+  import { resetRouting } from 'one_click_checkout/routing/store';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
   // Constants import
-  import { routesConfig } from 'one_click_checkout/routing/config';
+  import routes from 'one_click_checkout/routing/routes';
   import { views } from 'one_click_checkout/routing/constants';
   // Helpers import
-  import { screensHistory } from 'one_click_checkout/routing/History';
   import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
   import { destroySummaryModal } from 'one_click_checkout/summary_modal';
-
   // svelte imports
   import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 
   let topbar;
-  let Component;
   let isBackEnabled;
-  let props;
   let handleBack;
 
   setContact(getPrefilledContact());
@@ -48,11 +46,7 @@
       target: discreet._Doc.querySelector('#one-cc-loader'),
     });
     const view = determineLandingView();
-    if (screensHistory.isInitilized) {
-      screensHistory.push(view);
-    } else {
-      screensHistory.initialize(view);
-    }
+    navigator.navigateTo({ path: view });
     contact.subscribe(updateTopBar);
   });
 
@@ -61,7 +55,9 @@
     if (!isBackEnabled) {
       topbar.hide();
     } else {
-      const title = routesConfig[$currentView]?.tabTitle || $currentView;
+      const title =
+        navigator.currentActiveRoute?.tabTitle ||
+        navigator.currentActiveRoute?.name;
       topbar.setTab(title);
       topbar && topbar.setContact(getCustomerDetails().contact);
       topbar.setLogged(true);
@@ -71,10 +67,8 @@
   }
 
   $: {
-    Component = routesConfig[$currentView]?.component;
-    props = routesConfig[$currentView]?.props;
-    isBackEnabled = routesConfig[$currentView]?.isBackEnabled;
-    handleBack = routesConfig[$currentView]?.props?.handleBack;
+    isBackEnabled = navigator.currentActiveRoute?.isBackEnabled;
+    handleBack = navigator.currentActiveRoute?.props?.handleBack;
   }
   $: {
     tick().then(() => {
@@ -92,8 +86,8 @@
     if (handleBack) {
       handleBack();
     }
-    screensHistory.pop();
-    if ($currentView === views.METHODS) {
+    navigator.navigateBack();
+    if (navigator.currentActiveRoute.name === views.METHODS) {
       /* During on tab switch the destroy method on replaceNode function acts as async and showing CTA
        * even after switching tab to avoid this we added setTimeout to hide the CTA  */
       setTimeout(function () {
@@ -115,16 +109,14 @@
   pad={false}
   resetMargin="true"
 >
-  {#if $currentView !== ''}
-    <TopBar bind:this={topbar} on:back={onBack} isFixed={true} />
-    <div style={cssVarStyles} class="container">
-      <svelte:component this={Component} {...props} />
-    </div>
-    {#if $currentView === views.COUPONS || $currentView === views.DETAILS}
-      <Bottom tab="home-1cc">
-        <SecuredMessage />
-      </Bottom>
-    {/if}
+  <TopBar bind:this={topbar} on:back={onBack} isFixed={true} />
+  <div style={cssVarStyles} class="container">
+    <Router {routes} />
+  </div>
+  {#if navigator.currentActiveRoute.name === views.COUPONS || navigator.currentActiveRoute.name === views.DETAILS}
+    <Bottom tab="home-1cc">
+      <SecuredMessage />
+    </Bottom>
   {/if}
 </Tab>
 

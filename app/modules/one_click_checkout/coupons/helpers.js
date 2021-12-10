@@ -16,8 +16,8 @@ import {
   couponAppliedIndex,
 } from 'one_click_checkout/coupons/store';
 import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
-import { screensHistory } from 'one_click_checkout/routing/History';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -81,9 +81,9 @@ export function applyCouponCode(code) {
 export function successHandler() {
   fetchCoupons();
   applyCouponCode();
-  screensHistory.replace(views.COUPONS);
+  navigator.replace(views.COUPONS);
 }
 
 export function skipCouponOTP() {
-  screensHistory.replace(views.COUPONS);
+  navigator.replace(views.COUPONS);
 }

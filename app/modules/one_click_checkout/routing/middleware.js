@@ -13,18 +13,23 @@ const config = {
   ],
 };
 
-export function runMiddlewares(view, history) {
-  const middlewares = config[view] ? [...config[view]] : [];
+export function runMiddlewares(route, history, navigator) {
+  if (!route) {
+    return;
+  }
+  const middlewares = config[route.name] ? [...config[route.name]] : [];
 
   let nextView;
 
   nextView = middlewares.reduce((_, middleware) => {
-    const next = middleware(view, history);
+    const next = middleware(route, history, navigator);
     if (next) {
       middlewares.splice(1);
     }
     return next;
-  }, view);
-
-  return nextView || view;
+  }, route.name);
+  return {
+    path: nextView?.path ? nextView.path : nextView || route.name,
+    props: nextView?.props,
+  };
 }

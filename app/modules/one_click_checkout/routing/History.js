@@ -1,63 +1,45 @@
-import { history, currentView } from 'one_click_checkout/routing/store';
+import { activeRoute, history } from 'one_click_checkout/routing/store';
 import { get } from 'svelte/store';
 import { views } from 'one_click_checkout/routing/constants';
-import { runMiddlewares } from 'one_click_checkout/routing/middleware';
 
 export const screensHistory = {
-  isInitilized: false,
+  isInitialized: false,
   config: null,
   previousRoute: function () {
     const index = get(history).length - 1;
-    return get(history)[index];
+    return index >= 0 ? get(history)[index].name : null;
   },
-  peek: function () {
-    const last = get(history).length - 1;
-    return get(history)[last];
-  },
-  pop: function (changeView = true) {
+  pop: function (currentView) {
     const newHistory = get(history);
-    if (get(currentView) !== views.OTP) {
+    if (currentView !== views.OTP) {
       newHistory.pop();
     }
-    if (changeView) {
-      const view = newHistory[newHistory.length - 1];
-      this.temp(newHistory, view);
-    }
+    const view = newHistory[newHistory.length - 1];
+    history.set(newHistory);
+    return view;
   },
-  push: function (view) {
-    const nextView = runMiddlewares(view, this);
+  push: function (nextView) {
     const newHistory = get(history);
 
     if (nextView !== views.OTP) {
       newHistory.push(nextView);
     }
-    this.temp(newHistory, nextView);
+    history.set(newHistory);
   },
-  popAll: function () {
-    const newHistory = [];
-    const view = views.COUPONS;
-    this.temp(newHistory, view);
-  },
-  replace: function (newView) {
+  replace: function (newView, history) {
     this.pop();
-    this.push(newView);
+    this.push(newView, history);
   },
   initialize: function (view) {
-    const history = [];
-    history.push(view);
-    this.temp(history, view);
-    this.isInitilized = true;
-  },
-  // TODO: better name
-  temp: function (newHistory, view) {
+    const newHistory = [view];
     history.set(newHistory);
-    currentView.set(view);
+    this.isInitialized = true;
   },
   setConfig: function (config) {
     this.config = config;
   },
   popUntil: function (view) {
-    while (view !== get(currentView)) {
+    while (view !== get(activeRoute).name) {
       this.pop();
     }
   },
