@@ -38,6 +38,10 @@ const config = {
     headless: false,
     fee_bearer_customer: false,
   },
+  barb: {
+    name: 'Bank of Baroda Cardless EMI',
+    headless: false,
+  },
   fdrl: {
     name: 'Federal Bank Cardless EMI',
     headless: false,
