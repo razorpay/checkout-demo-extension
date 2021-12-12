@@ -68,7 +68,6 @@ export function addressSaveOTPSuccessHandler(service) {
  * Method called when user skips OTP on address save screen.
  */
 export function addressSaveOTPSkipHandler() {
-  navigator.navigateBack();
   redirectToPaymentMethods();
 }
 

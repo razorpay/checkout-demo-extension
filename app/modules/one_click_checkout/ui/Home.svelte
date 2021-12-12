@@ -7,7 +7,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Router from 'one_click_checkout/routing/component/Router.svelte';
   // Store imports
-  import { resetRouting } from 'one_click_checkout/routing/store';
+  import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
@@ -67,8 +67,8 @@
   }
 
   $: {
-    isBackEnabled = navigator.currentActiveRoute?.isBackEnabled;
-    handleBack = navigator.currentActiveRoute?.props?.handleBack;
+    isBackEnabled = $activeRoute?.isBackEnabled;
+    handleBack = $activeRoute?.props?.handleBack;
   }
   $: {
     tick().then(() => {
@@ -113,7 +113,7 @@
   <div style={cssVarStyles} class="container">
     <Router {routes} />
   </div>
-  {#if navigator.currentActiveRoute.name === views.COUPONS || navigator.currentActiveRoute.name === views.DETAILS}
+  {#if $activeRoute.name === views.COUPONS || $activeRoute.name === views.DETAILS}
     <Bottom tab="home-1cc">
       <SecuredMessage />
     </Bottom>
