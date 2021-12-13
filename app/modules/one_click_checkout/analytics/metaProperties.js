@@ -16,6 +16,7 @@ export default {
   ADDRESS_SCREEN_TYPE: 'address_screen_type',
   SAVED_ADDRESS_COUNT: 'saved_address_count',
   IS_USER_LOGGED_IN: 'is_user_logged_in',
+  SELECTED_ADDRESS_TYPE: 'selected_address_type',
   SELECTED_ADDRESS_COUNTRY: 'selected_address_country',
   SELECTED_ADDRESS_STATE: 'selected_address_state',
   SELECTED_ADDRESS_CITY: 'selected_address_city',

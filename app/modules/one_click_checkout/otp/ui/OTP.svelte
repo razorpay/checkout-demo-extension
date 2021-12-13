@@ -59,8 +59,11 @@
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
+  import { screensHistory } from 'one_click_checkout/routing/History';
 
   const { edit_phone } = getTheme().icons;
+
+  const { otpReason } = screensHistory.config[views.OTP].props;
 
   // Props
   export let on = {};
@@ -219,7 +222,7 @@
             <ResendButton
               id="otp-resend"
               on:resend={(event) => {
-                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
+                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
                 if (resendOTPHandle) {
                   resendOTPHandle();
                 } else {
@@ -232,7 +235,7 @@
             <LinkButton
               id="otp-sec"
               on:click={(event) => {
-                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK);
+                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
                 if (skipOTPHandle) {
                   skipOTPHandle();
                 } else {

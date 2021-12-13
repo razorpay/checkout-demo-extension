@@ -90,7 +90,7 @@
           address_valid: false,
           is_saved_address: false,
           is_billing_same_as_shipping: $isBillingSameAsShipping,
-          opted_for_save_address: $shouldSaveAddress,
+          opted_to_save_address: !!$shouldSaveAddress,
         });
         return;
       }
@@ -104,7 +104,7 @@
       address_valid: true,
       is_saved_address: currentView === addressViews.SAVED_ADDRESSES,
       is_billing_same_as_shipping: $isBillingSameAsShipping,
-      opted_to_save_address: $shouldSaveAddress,
+      opted_to_save_address: !!$shouldSaveAddress,
     });
     onSubmitCallback(addressCompleted);
   }

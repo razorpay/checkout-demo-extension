@@ -88,6 +88,8 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
         Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END, {
           time: addressApiTimer(),
           addressSaved: response.status_code === 200,
+          failure_reason: response?.error?.description,
+          address_id: response?.shipping_address?.id,
         });
         if (response.error) {
           reject(response.error);

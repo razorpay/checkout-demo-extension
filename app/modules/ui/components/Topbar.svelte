@@ -177,8 +177,10 @@
       session.getCurrentCustomer(),
       handleOneClickCheckoutEditContact.bind(null, true)
     );
+    const current_screen =
+      session.tab === 'home-1cc' ? $activeRoute.name : session.tab || 'methods';
     Events.Track(MiscEvents.LOGOUT_CLICKED, {
-      current_screen: $activeRoute.name,
+      current_screen,
     });
     logoutDropdownShown = false;
   }
@@ -188,8 +190,10 @@
       session.getCurrentCustomer(),
       handleOneClickCheckoutEditContact.bind(null, true)
     );
+    const current_screen =
+      session.tab === 'home-1cc' ? $activeRoute.name : session.tab || 'methods';
     Events.Track(MiscEvents.LOGOUT_CLICKED, {
-      current_screen: $activeRoute.name,
+      current_screen,
     });
     logoutDropdownShown = false;
   }

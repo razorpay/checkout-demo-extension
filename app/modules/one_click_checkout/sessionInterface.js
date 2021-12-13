@@ -122,6 +122,7 @@ export function redirectToPaymentMethods(
   // If navigating from methods->details->methods we need not to update the order
   if (shouldUpdateOrder) {
     thirdWatchCodServiceability(address).then((res) => {
+      session.homeTab.codActions();
       if (isCodForced()) {
         showCodLoader.set(false);
         return;
@@ -143,7 +144,6 @@ export function redirectToPaymentMethods(
         });
       }
       showCodLoader.set(false);
-      session.homeTab.codActions();
     });
 
     updateOrder(address, billing_address)

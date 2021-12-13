@@ -118,6 +118,7 @@ export const submitOTP = () => {
   const customer = getCustomerDetails();
 
   const { verifying } = routesConfig[views.OTP].otpParams;
+  const { otpReason } = routesConfig[views.OTP].props;
   const otp = get(OtpScreenStore.otp) || get(OtpScreenStore.digits).join('');
   if (!isValidOtp(otp)) {
     updateOTPStore({ errorMessage: INVALID_OTP_LABEL });
@@ -131,14 +132,16 @@ export const submitOTP = () => {
 
   updateOTPStore(verifying);
   customer.submitOTP(submitPayload, postSubmit);
-  Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK);
+  Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK, { otpReason });
 };
 
 /**
  * Method to reset otp store if user goes back in the flow
  */
 export const handleBack = () => {
-  Events.TrackBehav(otpEvents.OTP_BACK_CLICK);
+  const routesConfig = screensHistory.config;
+  const { otpReason } = routesConfig[views.OTP].props;
+  Events.TrackBehav(otpEvents.OTP_BACK_CLICK, { otpReason });
   updateOTPStore({
     mode: '',
     resendTimeout: null,

@@ -88,6 +88,7 @@
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
+    isMethodEnabled,
   } from 'checkoutstore/methods';
 
   import {
@@ -713,7 +714,9 @@
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
     });
-    Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
+    if (isMethodEnabled('cod')) {
+      Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
+    }
   }
 
   export function addressNext(showSnackbar) {

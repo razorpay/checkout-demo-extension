@@ -25,6 +25,8 @@ export default {
   /** Store Saved Card Count {Number} */
   SAVED_CARD_COUNT: 'count.savedCards',
 
+  HAS_SAVED_ADDRESSES: 'has.savedAddresses',
+
   /** does user have saved card - added during status check API {Boolean} */
   HAS_SAVED_CARDS_STATUS_CHECK: 'hasSavedCards',
   /** AVS FORM DATA */
