@@ -226,6 +226,7 @@ export default {
     card_tokenization_deadline_callout:
       'Card will not be saved on Razorpay after Dec 31, 2021.',
     saved_card_label: 'Card ending with <b>{last4}<b>',
+    saved_card_checkbox_tooltip: 'Required for recurring payments',
     subscription_callout:
       'This card will be linked to the subscription and future payments will be charged automatically.',
     subscription_refund_callout:
@@ -264,10 +265,19 @@ export default {
       'All saved cards are compliant with the latest security guidelines',
 
     save_card_know_more_add_card_modal_title:
-      'Save card securely for future payments',
+      'Save cards securely for future payments',
+    save_card_know_more_add_card_modal_subtitle_caw:
+      '{merchantName} can automatically charge up to after authorisation for any recurring payment.',
+    save_card_know_more_add_card_modal_subtitle_subscription:
+      '{merchantName} can charge your card automatically for future payments on this subscription',
     save_card_know_more_add_card_modal_content1:
       'Your card will be stored securely as a saved payment method as per RBI’s latest guidelines.',
-
+    save_card_know_more_add_card_modal_content_recurring:
+      'Your card will be stored securely as a saved payment method on Razorpay for {merchantName} as per RBI’s latest guidelines.',
+    save_card_know_more_add_card_modal_recurring_content:
+      'This is required to automatically charge your card for recurring payments.',
+    save_card_know_more_add_card_modal_subscription_content:
+      'This is required to automatically charge your card for future payments on this subscription.',
     ...cardLang,
   },
   card_subtext: {
@@ -285,7 +295,7 @@ export default {
   cardless_emi: {
     providers: {
       bajaj: 'Bajaj Finserv',
-      barb:  'Bank of Baroda',
+      barb: 'Bank of Baroda',
       cards: 'EMI on Cards',
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
@@ -673,8 +683,6 @@ export default {
       'Full Amount of {amount} will be deducted from your card account, which will be converted into EMI by your issuer in 4-5 days.',
     icici_debit_description_convenience:
       'A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on ICICI Bank Credit Card',
-
-
   },
   emi_details: {
     effective_interest_info:
