@@ -34,12 +34,13 @@
   </span>
 
   <!-- LABEL: Only limited cards support recurring payments due to new payment regulations by RBI. -->
-  <span>{$t(RECURRING_CARDS_LIMITED_SUPPORT)}</span>
-
-  <!-- LABEL: View Supported cards -->
-  <a on:click|preventDefault={showSupportedCardsOverlay}
-    >{$t(RECURRING_CARDS_VIEW_SUPPORTED_CARDS)}</a
-  >
+  <span>
+    {$t(RECURRING_CARDS_LIMITED_SUPPORT)}
+    <!-- LABEL: View Supported cards -->
+    <a on:click|preventDefault={showSupportedCardsOverlay}>
+      {$t(RECURRING_CARDS_VIEW_SUPPORTED_CARDS)}
+    </a>
+  </span>
 </p>
 
 <style>
