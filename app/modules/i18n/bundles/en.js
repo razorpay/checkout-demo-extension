@@ -175,7 +175,7 @@ export default {
       debit_only_callout:
         'Only debit cards from {issuers} are supported for this payment.',
       limited_card_support_recurring:
-        'Only limited cards support recurring payments due to new payment regulations by RBI.',
+        "Only limited cards support recurring payments as per RBI's new regulations.",
       view_supported_cards: 'View supported cards',
     },
     subscriptions: {
