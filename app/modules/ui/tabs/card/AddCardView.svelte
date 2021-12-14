@@ -498,7 +498,7 @@
 
 <div class="pad" id="add-card-container" class:faded>
   <div class="page-header">
-    <span class="card-title">{$t(ADD_NEW_CARD)}</span>
+    <!-- Removed Add New Card title as per new design -->
     <span class="emi-plans-label">
       {#if tab === 'emi'}
         <div id="view-emi-plans" on:click={showEmiPlans}>
