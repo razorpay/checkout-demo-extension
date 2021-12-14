@@ -13,7 +13,6 @@
   // Export Statements
   export let onClick, modalType;
   export let name = getOption('name');
-  debugger;
   // i18n labels
   import {
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE,
@@ -44,22 +43,28 @@
     {#if modalType === 'add-new-card'}
       <!-- If recurring -->
       {#if isRecurring()}
-        <p>
-          <Icon icon={shield()} />
-          {formatTemplateWithLocale(
-            'card.save_card_know_more_add_card_modal_content1',
-            { merchantName: name },
-            $locale
-          )}
-        </p>
+        <div class="recurring-know-more-container">
+          <div class="recurring-shield">
+            <Icon icon={shield()} />
+          </div>
+          <div>
+            <p>
+              {formatTemplateWithLocale(
+                'card.save_card_know_more_add_card_modal_content_recurring',
+                { merchantName: name },
+                $locale
+              )}
+            </p>
 
-        {#if isSubscription()}
-          <!-- If recurring and subscription -->
-          <p>{$t(SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT)}</p>
-        {:else}
-          <!-- If recurring and !subscription i.e caw-->
-          <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
-        {/if}
+            {#if isSubscription()}
+              <!-- If recurring and subscription -->
+              <p>{$t(SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT)}</p>
+            {:else}
+              <!-- If recurring and !subscription i.e caw-->
+              <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
+            {/if}
+          </div>
+        </div>
       {:else}
         <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1)}</p>
       {/if}
@@ -86,7 +91,12 @@
     text-align: start;
     padding: 20px;
   }
-
+  .recurring-know-more-container {
+    display: flex;
+  }
+  .recurring-shield {
+    margin: 14px 6px 0px 0px;
+  }
   .secure-card-know-more-header {
     display: flex;
     justify-content: space-between;
