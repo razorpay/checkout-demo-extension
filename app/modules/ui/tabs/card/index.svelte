@@ -17,6 +17,7 @@
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
+  import RewardCallout from './RewardCallout.svelte';
 
   // Store
   import {
@@ -25,6 +26,7 @@
     cardName,
     cardNumber,
     remember,
+    userConsentForTokenization,
     selectedCard,
     selectedApp,
     newCardInputFocused,
@@ -40,6 +42,7 @@
     defaultDCCCurrency,
     cardCountry,
   } from 'checkoutstore/screens/card';
+  import { reward } from 'checkoutstore/rewards';
 
   import {
     methodInstrument,
@@ -105,7 +108,10 @@
     MetaProperties,
   } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
-  import { sortBasedOnTokenization } from 'ui/tabs/card/utils';
+  import {
+    sortBasedOnTokenization,
+    filterSavedCardsForTokenizationIncentiveFlow,
+  } from 'ui/tabs/card/utils';
 
   import {
     getIin,
@@ -151,6 +157,14 @@
   const icons = session.themeMeta.icons;
   let isSavedCardsEnabled = shouldRememberCustomer();
 
+  //#region cards-tokenization-incentivisation
+  let isTokenizationIncetiveFlowEnabled = session.get(
+    'tokenization_incentive_flow_enabled'
+  );
+  let hideSavedCardsForTokenizationIncetiveFlow =
+    session.get('hide_saved_cards');
+  //#endregion
+
   $: {
     AVSInfo = [
       {
@@ -179,6 +193,20 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+
+  //#region cards-tokenization-incentivisation
+  let rewardsVisible = false;
+
+  $: {
+    if (isTokenizationIncetiveFlowEnabled) {
+      if (currentView === Views.ADD_CARD) {
+        rewardsVisible = $remember;
+      } else if (currentView === Views.SAVED_CARDS) {
+        rewardsVisible = $userConsentForTokenization;
+      }
+    }
+  }
+  //#endregion
 
   /**
    * tabVisible {Boolean}
@@ -353,6 +381,13 @@
   function getSavedCardsForDisplay(allSavedCards, tab) {
     if (isRecurring()) {
       return filterSavedCardsForRecurring(allSavedCards);
+    }
+
+    if (isTokenizationIncetiveFlowEnabled) {
+      return filterSavedCardsForTokenizationIncentiveFlow(
+        allSavedCards,
+        hideSavedCardsForTokenizationIncetiveFlow
+      );
     }
 
     if (tab === 'emi') {
@@ -642,6 +677,10 @@
 
   export function isOnSavedCardsScreen() {
     return currentView === Views.SAVED_CARDS;
+  }
+
+  export function isOnAddCardScreen() {
+    return currentView === Views.ADD_CARD;
   }
 
   export function isOnAVSScreen() {
@@ -986,6 +1025,7 @@
             {downtimeInstrument}
             {delayOTPExperiment}
             {isCardSupportedForRecurring}
+            {isTokenizationIncetiveFlowEnabled}
           />
           {#if showEmiCta}
             <EmiActions
@@ -1054,6 +1094,7 @@
               cards={savedCards}
               on:viewPlans={handleViewPlans}
               {showFirstNonTokenizedCard}
+              {isTokenizationIncetiveFlowEnabled}
             />
           </div>
           <div
@@ -1129,6 +1170,9 @@
             {$t(SUBSCRIPTION_CALLOUT)}
           {/if}
         </Callout>
+      {/if}
+      {#if isTokenizationIncetiveFlowEnabled && rewardsVisible && $reward?.reward_id}
+        <RewardCallout reward={$reward} />
       {/if}
     </Bottom>
   </Screen>

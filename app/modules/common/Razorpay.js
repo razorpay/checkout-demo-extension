@@ -216,7 +216,18 @@ var razorpayPayment = (Razorpay.payment = {
     });
   },
 
-  getRewards: function (data, callback) {
+  getRewards: function (data, callback, r = {}) {
+    //#region cards-tokenization-incentivisation
+    const isTokenizationIncetiveFlowEnabled = r.get(
+      'tokenization_incentive_flow_enabled'
+    );
+    const rewardFromCheckoutOptions = r.get('reward_config');
+
+    if (isTokenizationIncetiveFlowEnabled && rewardFromCheckoutOptions) {
+      return callback([rewardFromCheckoutOptions]);
+    }
+    //#endregion
+
     const rewardsApiTimer = _.timer();
     Analytics.track('rewards:start', {
       type: AnalyticsTypes.METRIC,

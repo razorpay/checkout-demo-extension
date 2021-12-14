@@ -306,7 +306,8 @@ function fetchRewards(session) {
           Events.setMeta(MetaProperties.REWARD_EXP_VARIANT, variant);
         }
       }
-    }
+    },
+    session.r
   );
 }
 

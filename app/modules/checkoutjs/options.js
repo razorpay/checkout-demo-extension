@@ -16,6 +16,14 @@ RazorpayDefaults.is_donation_checkout = false;
 // to identify the merchant for keyless auth
 RazorpayDefaults.keyless_header = '';
 
+//#region cards-tokenization-incentivisation
+// TEMP: Remove after Dec 31, 2021
+// For manage saved card on flash checkout
+RazorpayDefaults.tokenization_incentive_flow_enabled = false;
+RazorpayDefaults.reward_config = null;
+RazorpayDefaults.hide_saved_cards = false;
+//#endregion
+
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 RazorpayDefaults.partial_payment = {
   min_amount_label: '',

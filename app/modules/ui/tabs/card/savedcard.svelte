@@ -57,6 +57,7 @@
   export let tab;
   export let isTokenised;
   export let autoSelect;
+  export let isTokenizationIncetiveFlowEnabled;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
@@ -157,6 +158,7 @@
 <div
   class="saved-card"
   class:checked={selected}
+  class:tokenization-flow={isTokenizationIncetiveFlowEnabled}
   on:click={(event) => handleClick(event)}
   tabIndex="0"
   {...attributes}
@@ -207,6 +209,7 @@
         modalType="existing-card"
         cvvRef={cvvInput}
         network={card.network}
+        {isTokenizationIncetiveFlowEnabled}
       />
     </div>
   {/if}
@@ -331,5 +334,9 @@
     padding-left: 48px;
     margin-top: -10px;
     margin-bottom: 5px;
+  }
+
+  .tokenization-flow {
+    padding: 0 12px 10px 24px !important;
   }
 </style>

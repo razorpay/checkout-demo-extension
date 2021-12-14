@@ -91,6 +91,7 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
+  export let isTokenizationIncetiveFlowEnabled;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
@@ -582,6 +583,7 @@
           bind:checked={$remember}
           on:change={trackRememberChecked}
           modalType="add-new-card"
+          {isTokenizationIncetiveFlowEnabled}
         />
       {/if}
     </div>
