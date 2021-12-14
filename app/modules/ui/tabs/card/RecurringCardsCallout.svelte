@@ -33,7 +33,7 @@
     <Icon icon={warningIcon} />
   </span>
 
-  <!-- LABEL: Only limited cards support recurring payments due to new payment regulations by RBI. -->
+  <!-- LABEL: Only limited cards support recurring payments as per RBI's new regulations -->
   <span>
     {$t(RECURRING_CARDS_LIMITED_SUPPORT)}
     <!-- LABEL: View Supported cards -->
