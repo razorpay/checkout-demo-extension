@@ -90,6 +90,10 @@
     if (network) {
       checked = true;
     }
+    // In case of recurring flow, we need explicit user consent to save card, hence default will be unchecked
+    if (isRecurring()) {
+      checked = false;
+    }
   });
 </script>
 
