@@ -1114,7 +1114,7 @@
           isAVS={currentView === Views.AVS}
         />
       {/if}
-      {#if isRecurring()}
+      {#if isRecurring() && currentView !== Views.ADD_CARD}
         <Callout>
           {#if !session.subscription}
             <!-- LABEL: Future payments on this card will be charged automatically. -->
