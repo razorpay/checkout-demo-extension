@@ -31,6 +31,7 @@
     COD_CHARGES_DESCRIPTION,
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
 
   import { onMount } from 'svelte';
 
@@ -132,7 +133,9 @@
 </script>
 
 <SlottedOption
-  className="new-method has-tooltip"
+  className={`new-method has-tooltip ${
+    $selectedInstrumentId === instrument.id && 'selected'
+  }`}
   defaultStyles={false}
   on:click={select}
   attributes={{ method }}
