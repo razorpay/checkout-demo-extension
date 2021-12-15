@@ -4,12 +4,18 @@
   import { t, locale } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import Razorpay from 'common/Razorpay';
+  import { getSession } from 'sessionmanager';
 
   import { Events, CardEvents } from 'analytics/index';
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import { showSavedCardTooltip } from 'checkoutstore/screens/card';
   let secureCardKnowMoreView;
-  import { isRecurring, getOption, isSubscription } from 'razorpay';
+  import {
+    isRecurring,
+    getOption,
+    isSubscription,
+    getPreferences,
+  } from 'razorpay';
   import { formatTemplateWithLocale } from 'i18n';
 
   //i18n
@@ -26,6 +32,9 @@
   export let modalType;
   export let name = 'save';
   export let merchantName = getOption('name');
+  export let maxAmount = getSession().formatAmountWithCurrency(
+    getPreferences('order.max_amount')
+  );
   export let cvvRef;
   export let network;
   // Function for hiding the modal
@@ -159,7 +168,7 @@
                 <div class="save-card-subtext">
                   {formatTemplateWithLocale(
                     'card.save_card_know_more_add_card_modal_subtitle_caw',
-                    { merchantName },
+                    { merchantName, maxAmount },
                     $locale
                   )}
                 </div>

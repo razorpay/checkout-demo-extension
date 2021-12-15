@@ -267,7 +267,7 @@ export default {
     save_card_know_more_add_card_modal_title:
       'Save cards securely for future payments',
     save_card_know_more_add_card_modal_subtitle_caw:
-      '{merchantName} can automatically charge up to after authorisation for any recurring payment.',
+      '{merchantName} can automatically charge up to {maxAmount} after authorisation for any recurring payment.',
     save_card_know_more_add_card_modal_subtitle_subscription:
       '{merchantName} can charge your card automatically for future payments on this subscription',
     save_card_know_more_add_card_modal_content1:
