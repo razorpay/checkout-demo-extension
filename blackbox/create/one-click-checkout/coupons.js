@@ -8,15 +8,24 @@ const {
   verifyInValidCoupon,
   handleAvailableCouponReq,
   handleRemoveCoupon,
+  applyCoupon,
+  handleApplyCouponReq,
+  handleFillUserDetails,
 } = require('../../actions/one-click-checkout/coupons');
 const {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
   handleThirdWatchReq,
   handleFeeSummary,
+  handleCreateOTPReq,
+  handleVerifyOTPReq,
+  handleTypeOTP,
 } = require('../../actions/one-click-checkout/common');
 const { selectPaymentMethod } = require('../../tests/homescreen/actions');
-const { fillUserAddress } = require('../../actions/one-click-checkout/address');
+const {
+  fillUserAddress,
+  handleShippingInfo,
+} = require('../../actions/one-click-checkout/address');
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
@@ -41,6 +50,9 @@ module.exports = function (testFeatures) {
     availableCoupons,
     removeCoupon,
     serviceable,
+    couponCode,
+    personalised,
+    discountAmount,
     isSaveAddress,
   } = features;
 
@@ -59,21 +71,42 @@ module.exports = function (testFeatures) {
 
       await handleAvailableCouponReq(context, availableCoupons);
 
-      if (couponValid || availableCoupons) {
-        await verifyValidCoupon(context, features);
+      if (personalised) {
+        await applyCoupon(context, couponCode);
+        await delay(200);
+        await handleApplyCouponReq(
+          context,
+          false,
+          discountAmount,
+          personalised
+        );
+        await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
+        await handleCreateOTPReq(context);
+        await handleTypeOTP(context);
+        await proceed(context);
+        await handleVerifyOTPReq(context);
+        await handleAvailableCouponReq(context, availableCoupons);
+        await handleApplyCouponReq(context, true, discountAmount);
+        await handleAvailableCouponReq(context, availableCoupons);
+        await context.page.click('#footer');
+        await handleShippingInfo(context, false, true);
       } else {
-        await verifyInValidCoupon(context, amount);
-      }
+        if (couponValid || availableCoupons) {
+          await verifyValidCoupon(context, features);
+        } else {
+          await verifyInValidCoupon(context, amount);
+        }
 
-      if (removeCoupon) {
-        await handleRemoveCoupon(context, amount);
-      }
+        if (removeCoupon) {
+          await handleRemoveCoupon(context, amount);
+        }
 
-      await proceed(context);
-      await fillUserDetails(context);
-      await proceed(context);
-      await handleCustomerStatusReq(context);
-      await fillUserAddress(context, { isSaveAddress, serviceable });
+        await proceed(context);
+        await fillUserDetails(context);
+        await proceed(context);
+        await handleCustomerStatusReq(context);
+        await fillUserAddress(context, { isSaveAddress, serviceable });
+      }
       await proceed(context);
       await handleThirdWatchReq(context);
       await handleUpdateOrderReq(context, options.order_id);

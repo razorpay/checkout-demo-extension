@@ -1,6 +1,12 @@
 const { delay } = require('../../util');
 
-function getCouponResponse(isValidCoupon, discountAmount) {
+function getCouponResponse(isValidCoupon, discountAmount, personalised) {
+  if (personalised) {
+    return {
+      failure_reason: 'User email is required',
+      failure_code: 'LOGIN_REQUIRED',
+    };
+  }
   const successResp = {
     promotions: [
       {
@@ -36,13 +42,18 @@ async function applyAvailableCoupon(context) {
   await context.page.click('button.theme-highlight');
 }
 
-async function handleApplyCouponReq(context, isValidCoupon, discountAmount) {
+async function handleApplyCouponReq(
+  context,
+  isValidCoupon,
+  discountAmount,
+  personalised
+) {
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('coupon/apply');
   const status = isValidCoupon ? 200 : 400;
   await context.respondJSON(
-    getCouponResponse(isValidCoupon, discountAmount),
+    getCouponResponse(isValidCoupon, discountAmount, personalised),
     status
   );
 }
@@ -132,9 +143,19 @@ async function handleRemoveCoupon(context, amount) {
   expect(total).toEqual(`₹ ${amount / 100}`);
 }
 
+async function handleFillUserDetails(context, contact, email) {
+  await context.page.waitForSelector('.details-container');
+  await context.page.type('#overlay-wrap #contact', contact);
+  await context.page.type('#overlay-wrap #email', email);
+  await context.page.click('.button.details-verify-button');
+}
+
 module.exports = {
   verifyValidCoupon,
   verifyInValidCoupon,
   handleAvailableCouponReq,
   handleRemoveCoupon,
+  applyCoupon,
+  handleApplyCouponReq,
+  handleFillUserDetails,
 };
