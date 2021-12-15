@@ -1,0 +1,140 @@
+const { delay } = require('../../util');
+
+function getCouponResponse(isValidCoupon, discountAmount) {
+  const successResp = {
+    promotions: [
+      {
+        reference_id: 'WELCOME10',
+        type: 'percentage',
+        code: 'WELCOME10',
+        value: discountAmount,
+        value_type: 'number',
+        description:
+          'Apply code WELCOME10 & get 10% off on your first Rowdy purchase',
+      },
+    ],
+  };
+
+  const failureResp = {
+    failure_code: 'INVALID_PROMOTION',
+    failure_reason: 'Coupon code is not valid',
+  };
+
+  return isValidCoupon ? successResp : failureResp;
+}
+
+async function applyCoupon(context, code = 'WELCOME10') {
+  await context.page.waitForSelector('#coupon-input');
+  await context.page.type('#coupon-input', code);
+  await context.page.click('.coupon-apply-btn');
+}
+
+async function applyAvailableCoupon(context) {
+  await context.page.waitForSelector('.coupons-available-container');
+  await context.page.click('.coupons-available-container');
+  await context.page.waitForSelector('.available-coupons-container');
+  await context.page.click('button.theme-highlight');
+}
+
+async function handleApplyCouponReq(context, isValidCoupon, discountAmount) {
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('coupon/apply');
+  const status = isValidCoupon ? 200 : 400;
+  await context.respondJSON(
+    getCouponResponse(isValidCoupon, discountAmount),
+    status
+  );
+}
+
+async function getOrderSummary(context, isValidCoupon) {
+  const orderInfo = await context.page.$eval(
+    '.coupon-order-summary',
+    (element, isValidCoupon) => {
+      const priceEle = element.getElementsByClassName('row')[0];
+      const price = priceEle.getElementsByTagName('p')[1].innerText;
+      if (isValidCoupon) {
+        const couponEle = element.getElementsByClassName('row')[1];
+        const discountPrice = couponEle.getElementsByTagName('p')[1].innerText;
+        const totalEle = element.getElementsByClassName('row')[2];
+        const total = totalEle.getElementsByTagName('p')[1].innerText;
+        return { price, discountPrice, total };
+      } else {
+        const totalEle = element.getElementsByClassName('row')[1];
+        const total = totalEle.getElementsByTagName('p')[1].innerText;
+        return { price, total };
+      }
+    },
+    isValidCoupon
+  );
+
+  return orderInfo;
+}
+
+async function verifyValidCoupon(context, features) {
+  const { amount, discountAmount, availableCoupons, couponCode } = features;
+  if (availableCoupons) {
+    applyAvailableCoupon(context);
+  } else {
+    applyCoupon(context, couponCode);
+  }
+  await delay(200);
+  handleApplyCouponReq(context, true, discountAmount);
+  await context.page.waitForSelector('#success-message');
+  expect(
+    await context.page.$eval('#success-message', (el) => el.innerText)
+  ).toEqual('Coupon applied');
+  const { price, discountPrice, total } = await getOrderSummary(context, true);
+  expect(price).toEqual(`₹ ${amount / 100}`);
+  expect(discountPrice).toEqual(`₹ ${discountAmount / 100}`);
+  const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
+  expect(total).toEqual(`₹ ${calcTotalAmount}`);
+}
+
+async function verifyInValidCoupon(context, amount) {
+  applyCoupon(context);
+  await delay(200);
+  handleApplyCouponReq(context);
+  await context.page.waitForSelector('#error-feedback');
+  expect(
+    await context.page.$eval('#error-feedback', (el) => el.innerText)
+  ).toEqual('Coupon code is not valid');
+  const { price, total } = await getOrderSummary(context);
+  expect(price).toEqual(`₹ ${amount / 100}`);
+  expect(total).toEqual(`₹ ${amount / 100}`);
+}
+
+async function handleAvailableCouponReq(context, availableCoupons = []) {
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('merchant/coupons');
+  await context.respondJSON({ promotions: availableCoupons });
+}
+
+async function handleRemoveCouponReq(context) {
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('coupon/remove');
+  await context.respondJSON([]);
+}
+
+async function removeCoupon(context) {
+  await context.page.waitForSelector('.coupon-input-group');
+  await context.page.click('.close-button');
+}
+
+async function handleRemoveCoupon(context, amount) {
+  removeCoupon(context);
+  await delay(200);
+  handleRemoveCouponReq(context);
+  const { price, total } = await getOrderSummary(context);
+  expect(price).toEqual(`₹ ${amount / 100}`);
+  expect(total).toEqual(`₹ ${amount / 100}`);
+}
+
+module.exports = {
+  verifyValidCoupon,
+  verifyInValidCoupon,
+  handleAvailableCouponReq,
+  handleRemoveCoupon,
+};

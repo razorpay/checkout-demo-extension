@@ -18,6 +18,7 @@ const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
 const app = require('./app.js');
 const internationalPaypal = require('./international/paypal.js');
+const oneClickCheckout = require('./one-click-checkout');
 
 module.exports = {
   netbanking: netbanking,
@@ -40,4 +41,5 @@ module.exports = {
   'upi-otm': upiOtm,
   app: app,
   'international-paypal': internationalPaypal,
+  'one-click-checkout': oneClickCheckout,
 };
