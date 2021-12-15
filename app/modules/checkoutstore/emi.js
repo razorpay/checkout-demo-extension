@@ -7,6 +7,8 @@ export const newCardEmiDuration = writable('');
 export const selectedTokenId = writable(null);
 export const selectedPlan = writable();
 export const emiDurations = writable({});
+export const bajajTCAccepted = writable(true);
+export const bajajTCAcceptedConsent = writable(false);
 
 export const savedCardEmiDuration = derived(
   [selectedTokenId, emiDurations],
@@ -28,4 +30,12 @@ export function setEmiDurationForSavedCard(duration) {
   $emiDurations[$selectedToken] = duration;
 
   emiDurations.set($emiDurations);
+}
+
+export function getBajajTCAccepted() {
+  return get(bajajTCAccepted);
+}
+
+export function setBajajTCAcceptedConsent() {
+  bajajTCAcceptedConsent.set(true);
 }

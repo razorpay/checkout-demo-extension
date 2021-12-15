@@ -16,6 +16,8 @@
     CALLOUT,
   } from 'ui/labels/bajaj-emi';
 
+  import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';
+
   import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
 
   // Utils imports
@@ -78,6 +80,12 @@
     emiText = text;
     emiDuration = duration;
   }
+
+  function handleCheckboxConsent() {
+    if ($bajajTCAccepted === true) {
+      $bajajTCAcceptedConsent = false;
+    }
+  }
 </script>
 
 <div class="pad">
@@ -137,13 +145,85 @@
           />
         </div>
       </div>
+      <div class="elem-wrap">
+        <label id="bajaj">
+          <input
+            type="checkbox"
+            id="bajaj"
+            bind:checked={$bajajTCAccepted}
+            on:change={handleCheckboxConsent}
+          />
+          <span class="checkbox" />
+          {#if $bajajTCAcceptedConsent && !$bajajTCAccepted}
+            <div class="bajaj-tooltip">Required</div>
+          {/if}
+          I agree to the
+          <span class="tc-text ">
+            <a
+              href="https://www.bajajfinserv.in/all-fees-and-charges-new#ec"
+              target="_blank"
+            >
+              Terms and Conditions
+            </a>
+          </span>
+        </label>
+      </div>
     </div>
   </div>
 </div>
-<div class="pad recurring-message">
+<div class="pad recurring-message callout-message">
   <span>&#x2139;</span>
   <!-- LABEL: You need to have a
   <strong>Bajaj Finserv issued card</strong>
   to continue. -->
   <FormattedText text={$t(CALLOUT)} />
 </div>
+
+<style>
+  .bajaj-tooltip {
+    transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+    transform: translateY(-10px);
+    color: #fff;
+    position: absolute;
+    line-height: 16px;
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #555;
+    box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
+    z-index: 3;
+    border-radius: 2px;
+    bottom: 26px;
+    pointer-events: none;
+  }
+  .bajaj-tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #555;
+    bottom: 100%;
+    left: 15px;
+    margin: 0 0 -1px -10px;
+  }
+
+  .tc-text {
+    cursor: pointer;
+    color: #3684d6;
+  }
+
+  .bajaj .checked .checkbox::after,
+  :not(.checkbox--square):checked + .checkbox::after {
+    content: '';
+    width: 7px;
+    height: 3px;
+    position: absolute;
+    top: 4px;
+    left: 3px;
+    border: 1px solid #fff;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+  }
+</style>
