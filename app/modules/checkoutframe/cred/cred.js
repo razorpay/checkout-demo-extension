@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 import BrowserStorage from 'browserstorage';
 import { getSession } from 'sessionmanager';
 import { getAgentPayload, isCREDEnabled } from 'checkoutstore/methods';

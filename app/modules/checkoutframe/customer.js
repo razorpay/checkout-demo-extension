@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 import Analytics, {
   Track,
   Events,

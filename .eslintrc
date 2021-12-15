@@ -9,7 +9,8 @@
     "_Obj": true,
     "_El": true,
     "_Arr": true,
-    "_": true
+    "_": true,
+    "__SIFT_BEACON_KEY__": true
   },
   "parser": "babel-eslint",
   "parserOptions": {
