@@ -4558,7 +4558,6 @@ Session.prototype = {
       if (screen === 'card') {
         // AVS check
         var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
-        var isAddCardCardScreen = this.svelteCardTab.isOnAddCardScreen();
         var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
         var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
         /**
@@ -4620,28 +4619,6 @@ Session.prototype = {
             return $('.checked .saved-cvv input').focus();
           }
         }
-
-        //#region cards-tokenization-incentivisation
-        if (this.get('tokenization_incentive_flow_enabled')) {
-          var user_consent_taken_for_tokenization = false;
-
-          // If consent is not taken in saved card screen or add new
-          // card screen then don't proceed with payment
-          if (isSavedCardScreen) {
-            user_consent_taken_for_tokenization = discreet.storeGetter(
-              CardScreenStore.userConsentForTokenization
-            );
-          } else if (isAddCardCardScreen) {
-            user_consent_taken_for_tokenization = discreet.storeGetter(
-              CardScreenStore.remember
-            );
-          }
-
-          if (!user_consent_taken_for_tokenization) {
-            return Form.shake();
-          }
-        }
-        //#endregion
 
         if (screen === 'card') {
           if (tab === 'emi') {

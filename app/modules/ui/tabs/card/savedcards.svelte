@@ -24,7 +24,6 @@
   export let cards = [];
   export let tab;
   export let showFirstNonTokenizedCard;
-  export let isTokenizationIncetiveFlowEnabled;
 
   $selectedCard = null; // Refresh selection when landing again
 
@@ -72,7 +71,6 @@
   <SavedCard
     card={card.card}
     isTokenised={isCardTokenized(card)}
-    {isTokenizationIncetiveFlowEnabled}
     debitPin={card.debitPin}
     token={card.token}
     cvvDigits={card.cvvDigits}

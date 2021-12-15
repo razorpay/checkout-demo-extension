@@ -22,7 +22,6 @@
   export let name = 'save';
   export let cvvRef;
   export let network;
-  export let isTokenizationIncetiveFlowEnabled = false;
   // Function for hiding the modal
   const hidSecureCardKnowMoreDialog = () => {
     if (secureCardKnowMoreView) {
@@ -84,10 +83,6 @@
     if (network) {
       checked = true;
     }
-
-    if (isTokenizationIncetiveFlowEnabled) {
-      checked = true;
-    }
   });
 </script>
 
@@ -116,9 +111,6 @@
     />
     <span class="checkbox" />
     <!-- LABEL: Keep card saved for future payments -->
-    {#if isTokenizationIncetiveFlowEnabled && !checked}
-      <div class="tokenization-tooltip">Required</div>
-    {/if}
     <span
       class="saved-card-text"
       class:saved-card-text-saved-card-screen={Boolean(savedcard)}
@@ -144,9 +136,6 @@
 </div>
 
 <style>
-  #should-save-card {
-    position: relative;
-  }
   .secure-card-block {
     margin-left: 5 px;
     margin-top: 10 px;
@@ -208,38 +197,5 @@
 
   .save_card_label_text .checkbox {
     margin-left: -30px;
-  }
-
-  .save_card_label_text .tokenization-tooltip {
-    margin-left: -30px;
-  }
-
-  .tokenization-tooltip {
-    transition: 0.25s ease-in transform, 0.16s ease-in opacity;
-    transform: translateY(-10px);
-    color: #fff;
-    position: absolute;
-    line-height: 16px;
-    padding: 6px 12px;
-    font-size: 12px;
-    background: #555;
-    box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
-    z-index: 3;
-    border-radius: 2px;
-    bottom: -48px;
-    pointer-events: none;
-  }
-
-  .tokenization-tooltip::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #555;
-    bottom: 100%;
-    left: 15px;
-    margin: 0 0 -1px -10px;
   }
 </style>
