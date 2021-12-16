@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 
 import { toTitleCase } from 'lib/utils';
 

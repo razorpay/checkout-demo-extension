@@ -1,6 +1,6 @@
 import { isDynamicFeeBearer } from 'razorpay/index';
 import RazorpayConfig from 'common/RazorpayConfig';
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 

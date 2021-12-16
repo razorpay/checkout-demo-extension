@@ -5499,6 +5499,10 @@ Session.prototype = {
             tab: 'emi',
             screen: 'emi',
           };
+          if (EmiStore.getBajajTCAccepted() === false) {
+            EmiStore.setBajajTCAcceptedConsent();
+            return;
+          }
         } else if (isHDFCDebitEMI) {
           // Skip Native OTP for EMI with HDFC Debit Cards
           shouldUseNativeOTP = true;

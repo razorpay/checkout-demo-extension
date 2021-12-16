@@ -46,6 +46,9 @@ function getOptions(module) {
       if (warning.code === 'THIS_IS_UNDEFINED') {
         return;
       }
+      if (warning.code === 'CIRCULAR_DEPENDENCY') {
+        throw new Error('FIX CIRCULAR_DEPENDENCY');
+      }
       console.error(warning.message);
     },
   };

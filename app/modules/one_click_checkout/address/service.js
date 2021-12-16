@@ -1,7 +1,7 @@
 // api calls
 import { makeAuthUrl } from 'checkoutstore';
 import { getOrderId } from 'razorpay';
-import { makeUrl } from 'common/Razorpay';
+import { makeUrl } from 'common/helper';
 import {
   getCustomerAddressApiPayload,
   getServiceabilityPayload,

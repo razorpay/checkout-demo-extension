@@ -9,7 +9,7 @@ import RazorpayStore, {
   isOneClickCheckout,
 } from 'razorpay/index';
 
-import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
 
 let razorpayInstance, preferences;
 

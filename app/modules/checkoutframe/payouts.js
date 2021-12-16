@@ -1,6 +1,5 @@
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';
-import { getCurrentLocale } from 'i18n';
 
 const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',

@@ -4,7 +4,7 @@ import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { getAmount } from 'checkoutstore';
 
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';
 
 import Analytics from 'analytics';

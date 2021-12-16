@@ -1,4 +1,5 @@
-import { makeUrl, makePrefParams } from 'common/Razorpay';
+import { makePrefParams } from 'common/Razorpay';
+import { makeUrl } from 'common/helper';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
 import Analytics, { Track } from 'analytics';
