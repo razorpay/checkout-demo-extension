@@ -6,7 +6,6 @@ import { entityWithAmount } from './constant';
 import { displayAmount } from 'common/currency';
 import { get } from 'utils/object';
 import { getSession } from 'sessionmanager';
-import { isASubscription } from 'checkoutstore';
 
 /**
  * Helper methods
@@ -64,7 +63,12 @@ export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
 export function isSubscription() {
-  return isRecurring() && isASubscription() && getSession().subscription;
+  debugger;
+  return (
+    isRecurring() &&
+    RazorpayStore.preferences.subscription &&
+    getSession().subscription
+  );
 }
 /**
  * Offers related helper function
