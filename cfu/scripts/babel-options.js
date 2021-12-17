@@ -15,9 +15,7 @@ module.exports = {
       require('@babel/preset-env'),
       {
         loose: true,
-        targets: {
-          ie: 11,
-        },
+        targets: 'last 2 versions and not dead and >0.5%, ie >= 11',
       },
     ],
   ],

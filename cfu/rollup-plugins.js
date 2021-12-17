@@ -1,3 +1,4 @@
+const typescript = require('@rollup/plugin-typescript');
 const argv = require('yargs-parser')(process.argv.slice(2));
 const globals = require('./scripts/rollup-injects');
 const include = require('rollup-plugin-includepaths');
@@ -77,6 +78,7 @@ const getPlugins = ({ lint = true, src }) => {
       __TRAFFIC_ENV__: process.env.TRAFFIC_ENV,
       __SIFT_BEACON_KEY__: JSON.stringify('4dbbb1f7b6'),
     }),
+    typescript({ sourceMap: !isProd }),
 
     include({
       paths,

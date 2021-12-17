@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   /* global showOverlay, gel, Event */
 
   // UI Imports

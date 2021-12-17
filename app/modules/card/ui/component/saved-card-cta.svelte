@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getSession } from 'sessionmanager';
 
   // i18n
@@ -10,7 +10,7 @@
   } from 'card/i18n/labels';
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const icons: { [x: string]: any } = session.themeMeta.icons;
 
   export let showSubTitle = true;
 </script>
