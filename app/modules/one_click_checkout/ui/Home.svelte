@@ -77,6 +77,7 @@
           isBackEnabled = isBackEnabled();
         }
       }
+      updateTopBar();
     });
   }
 

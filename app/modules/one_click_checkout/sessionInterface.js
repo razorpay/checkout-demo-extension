@@ -68,13 +68,15 @@ export function handleEditContact(logoutFlow = false) {
   if (session.tab !== 'home-1cc') {
     session.switchTab('home-1cc');
   }
+  const params = { path: views.DETAILS };
   if (logoutFlow) {
     resetOrder(true);
     isLogoutFlow.set(true);
+    params.initialize = true;
   } else {
     isEditContactFlow.set(true);
   }
-  navigator.navigateTo({ path: views.DETAILS });
+  navigator.navigateTo(params);
 }
 
 export function getIcons() {

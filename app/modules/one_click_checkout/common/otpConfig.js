@@ -3,7 +3,7 @@ import {
   resendOTPHandle,
   handleBack,
 } from 'one_click_checkout/common/otp';
-import OTP from 'ui/tabs/otp/index.svelte';
+import OTP from 'one_click_checkout/otp/ui/OTP.svelte';
 import { views } from 'one_click_checkout/routing/constants';
 
 const otp = {
