@@ -14,10 +14,10 @@ if [ $1 ];then
   exit 0
 fi
 
-fileList=$(git diff --diff-filter=d --cached --name-only | grep -E '\.(js|svelte)$')
+fileList=$(git diff --diff-filter=d --cached --name-only | grep -E '\.(js|svelte|ts)$')
 
 if [ ${#fileList} -lt 1 ]; then
-    echo -e "${YELLOW} You have no staged .js or .svelte files to test\n"
+    echo -e "${YELLOW} You have no staged .js, .ts or .svelte files to test\n"
     exit
 fi
 

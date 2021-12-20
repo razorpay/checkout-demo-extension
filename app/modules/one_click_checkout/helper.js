@@ -18,7 +18,7 @@ import { navigator } from 'one_click_checkout/routing/helpers/routing';
  * @returns {string} view
  */
 export function determineLandingView() {
-  const { DETAILS, ADDRESS, COUPONS } = views;
+  const { DETAILS, SAVED_ADDRESSES, COUPONS } = views;
 
   const [isContactValid, isEmailValid] = validateEmailAndContact();
   if (isLoginMandatory() && !isUserLoggedIn()) {
@@ -36,9 +36,8 @@ export function determineLandingView() {
     if (!isContactValid || !isEmailValid) {
       return DETAILS;
     } else {
-      // Done to add details screen into history to have it while navigating back.
       navigator.navigateTo({ path: views.DETAILS, initialize: true });
-      return ADDRESS;
+      return SAVED_ADDRESSES;
     }
   }
 }

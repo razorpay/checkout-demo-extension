@@ -10,7 +10,7 @@ const globalInjects = globalContents
 
 let injects = {
   // this is rollup option, not an inject
-  include: ['**/*.js', '**/*.svelte'],
+  include: ['**/*.js', '**/*.ts', '**/*.svelte'],
 
   // injects
   fetch: 'fe/implicit/fetch',

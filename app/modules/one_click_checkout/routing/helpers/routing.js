@@ -29,7 +29,7 @@ export const navigator = {
     }
     activeRoute.set(route);
     if (nextView === 'otp') return;
-    if (screensHistory.isInitialized || !initialize) {
+    if (screensHistory.isInitialized && !initialize) {
       screensHistory.push(route);
     } else {
       screensHistory.initialize(route);

@@ -218,7 +218,7 @@ var responseTypes = {
         this.tryPopup();
         this.writePopup();
       }
-      request.method = 'post';
+      request.method = request.http_method || 'post';
     }
     var direct = request.method === 'direct';
     var content = request.content;

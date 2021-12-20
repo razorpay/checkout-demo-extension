@@ -2,8 +2,9 @@ module.exports = {
   transform: {
     '^.+\\.svelte$': ['svelte-jester', { preprocess: true }],
     '^.+\\.js$': 'babel-jest',
+    '^.+\\.(ts)$': 'ts-jest',
   },
-  moduleFileExtensions: ['js', 'svelte'],
+  moduleFileExtensions: ['js', 'svelte', 'ts'],
   roots: ['<rootDir>/app/modules'],
   modulePaths: ['<rootDir>/app/modules'],
   moduleDirectories: ['node_modules', 'app/modules'],
