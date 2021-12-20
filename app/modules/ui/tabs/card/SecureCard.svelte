@@ -158,7 +158,9 @@
               {#if isSubscription()}
                 <div class="save-card-subtext">
                   {formatTemplateWithLocale(
-                    'card.save_card_know_more_add_card_modal_subtitle_subscription',
+                    merchantName
+                      ? 'card.save_card_know_more_add_card_modal_subtitle_subscription'
+                      : 'card.save_card_know_more_add_card_modal_subtitle_subscription_without_merchant_name',
                     { merchantName },
                     $locale
                   )}
@@ -167,7 +169,9 @@
                 <!-- For caw links message is different -->
                 <div class="save-card-subtext">
                   {formatTemplateWithLocale(
-                    'card.save_card_know_more_add_card_modal_subtitle_caw',
+                    !merchantName || !maxAmount
+                      ? 'card.save_card_know_more_add_card_modal_subtitle_caw_without_merchant_name'
+                      : 'card.save_card_know_more_add_card_modal_subtitle_caw',
                     { merchantName, maxAmount },
                     $locale
                   )}

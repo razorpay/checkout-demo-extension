@@ -50,7 +50,9 @@
           <div>
             <p>
               {formatTemplateWithLocale(
-                'card.save_card_know_more_add_card_modal_content_recurring',
+                merchantName
+                  ? 'card.save_card_know_more_add_card_modal_content_recurring'
+                  : 'card.save_card_know_more_add_card_modal_content_recurring_without_merchant_name',
                 { merchantName },
                 $locale
               )}

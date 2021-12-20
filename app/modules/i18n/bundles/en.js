@@ -268,12 +268,18 @@ export default {
       'Save cards securely for future payments',
     save_card_know_more_add_card_modal_subtitle_caw:
       '{merchantName} can automatically charge up to {maxAmount} after authorisation for any recurring payment.',
+    save_card_know_more_add_card_modal_subtitle_caw_without_merchant_name:
+      'Your card will be charged automatically after authorisation for any recurring payment.',
     save_card_know_more_add_card_modal_subtitle_subscription:
       '{merchantName} can charge your card automatically for future payments on this subscription',
+    save_card_know_more_add_card_modal_subtitle_subscription_without_merchant_name:
+      'Your card will be charged automatically for future payments on this subscription',
     save_card_know_more_add_card_modal_content1:
       'Your card will be stored securely as a saved payment method as per RBI’s latest guidelines.',
     save_card_know_more_add_card_modal_content_recurring:
       'Your card will be stored securely as a saved payment method on Razorpay for {merchantName} as per RBI’s latest guidelines.',
+    save_card_know_more_add_card_modal_content_recurring_without_merchant_name:
+      'Your card will be stored securely as a saved payment method on Razorpay as per RBI’s latest guidelines.',
     save_card_know_more_add_card_modal_recurring_content:
       'This is required to automatically charge your card for recurring payments.',
     save_card_know_more_add_card_modal_subscription_content:
