@@ -12,13 +12,8 @@
 
   // Export Statements
   export let onClick, modalType;
-  let merchantName = getOption('name');
-  export let stringTemplate =
-    'card.save_card_know_more_add_card_modal_content_recurring_without_merchant_name';
-  if (merchantName) {
-    stringTemplate =
-      'card.save_card_know_more_add_card_modal_content_recurring';
-  }
+  export let merchantName = getOption('name');
+
   // i18n labels
   import {
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE,
