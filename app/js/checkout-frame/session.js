@@ -4723,9 +4723,11 @@ Session.prototype = {
         discreet.storeGetter(Store.isIndianCustomer) &&
         !discreet.storeGetter(CardScreenStore.remember)
       ) {
-        let showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
+        var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
         Form.shake();
-        showSavedCardTooltip.update(() => true);
+        showSavedCardTooltip.update(function () {
+          return true;
+        });
         return;
       }
     } else if (selectedInstrument) {
