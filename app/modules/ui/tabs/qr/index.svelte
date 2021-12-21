@@ -87,6 +87,7 @@
     view = 'error';
     error = data.error.description;
     loading = false;
+    getSession().errorHandler(data);
   }
 
   function createPaymentWithFees(event) {
