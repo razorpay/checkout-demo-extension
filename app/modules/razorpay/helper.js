@@ -63,11 +63,7 @@ export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
 export function isSubscription() {
-  return (
-    isRecurring() &&
-    RazorpayStore.preferences.subscription &&
-    getSession().subscription
-  );
+  return isRecurring() && getSession().subscription;
 }
 /**
  * Offers related helper function
