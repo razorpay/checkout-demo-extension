@@ -41,15 +41,34 @@
 
   function handleRadioClick(id, index) {
     selectedAddressId.set(id);
-    if (checkServiceability) {
+    if (!checkServiceability) return;
+
+    const { zipcode } = $selectedAddress;
+    const payload = [{ zipcode }];
+    postServiceability(payload).then((res) => {
+      hydrateSamePincodeAddresses(res, zipcode);
       isAddressServiceable = $selectedAddress.serviceability;
-    }
-    dispatchServiceability(id, index);
-    Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
-      id,
-      index,
-      serviceable: isAddressServiceable,
+      dispatchServiceability(id, index);
+      Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
+        id,
+        index,
+        serviceable: isAddressServiceable,
+      });
     });
+  }
+
+  function hydrateSamePincodeAddresses(data, zipcode) {
+    const newAddresses = $addresses.map((item) => {
+      if (item.zipcode === zipcode) {
+        return {
+          ...item,
+          ...data[item.zipcode],
+        };
+      }
+
+      return item;
+    });
+    addresses.set(newAddresses);
   }
 
   onMount(() => {
@@ -58,14 +77,10 @@
       dispatchServiceability();
     }
     if (checkServiceability) {
-      postServiceability($addresses, true).then((res) => {
-        const newAddresses = $addresses.map((item) => {
-          return {
-            ...item,
-            ...res[item.zipcode],
-          };
-        });
-        addresses.set(newAddresses);
+      const { zipcode } = $selectedAddress;
+      const payload = [{ zipcode }];
+      postServiceability(payload, true).then((res) => {
+        hydrateSamePincodeAddresses(res, zipcode);
         isAddressServiceable = $selectedAddress.serviceability;
         dispatchServiceability();
         setShippingForSelectedAddress();
@@ -134,7 +149,8 @@
                   {`Phone no: ${s_address['contact']}`}
                 </div>
               {/if}
-              {#if !s_address['serviceability'] && checkServiceability}
+              <!-- s_address['serviceability'] will be null for unknown serviceability -->
+              {#if s_address['serviceability'] === false && checkServiceability}
                 <div class="address-serviceability-error">
                   {$t(NON_SERVICEABLE_LABEL)}
                 </div>

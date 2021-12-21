@@ -2,7 +2,7 @@
 import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
-import { savedAddresses } from 'one_click_checkout/address/store';
+import { setSavedAddresses } from 'one_click_checkout/address/sessionInterface';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
@@ -90,7 +90,7 @@ const postSubmit = (msg, data) => {
     updateOTPStore({ errorMessage: msg, ...otpParams.sent });
   } else {
     if (data && data.addresses) {
-      savedAddresses.set(data.addresses);
+      setSavedAddresses(data.addresses);
     }
     screensHistory.config.otp.props.successHandler(data);
   }
