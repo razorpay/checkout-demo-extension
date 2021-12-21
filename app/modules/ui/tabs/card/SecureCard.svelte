@@ -271,10 +271,12 @@
 
   :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-bottom.tooltip-right) {
     opacity: 0.9;
-    width: max-content;
+    width: auto;
+    white-space: nowrap;
   }
   :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-top.tooltip-right) {
     opacity: 0.9;
-    width: max-content;
+    width: auto;
+    white-space: nowrap;
   }
 </style>
