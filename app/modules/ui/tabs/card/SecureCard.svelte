@@ -211,10 +211,12 @@
     line-height: 12px;
     color: #373737;
   }
+
   .saved-card-text-for-add-card {
     font-size: 14px;
     line-height: 14px;
   }
+
   .saved-card-text-for-add-card.saved-card-text-for-recurring {
     font-size: 12px;
   }
@@ -232,14 +234,17 @@
     text-decoration: underline;
     cursor: pointer;
   }
+
   .know-more-text-add-card {
     font-size: 14px;
     line-height: 14px;
     margin-left: 30px;
   }
+
   .know-more-text-add-card.know-more-text-recurring {
     font-size: 12px;
   }
+
   .know-more-text-saved-cards {
     top: -12px;
     position: relative;
@@ -257,12 +262,14 @@
   .cusor-pointer {
     cursor: pointer;
   }
+
   .save_card_label_text {
     display: block;
     margin-bottom: 5px;
     float: left;
     margin-left: 30px;
   }
+
   .save_card_label_text.save-card-label-recurring {
     margin-bottom: 2px;
   }
@@ -286,6 +293,7 @@
     width: auto;
     white-space: nowrap;
   }
+
   :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-top.tooltip-right) {
     opacity: 0.9;
     width: auto;
