@@ -117,6 +117,7 @@
     id="should-save-card"
     tabIndex="0"
     class:save_card_label_text={modalType === 'add-new-card'}
+    class:save-card-label-recurring={Boolean(isRecurring())}
   >
     <div class="save-card-container">
       <div>
@@ -149,6 +150,7 @@
           class="saved-card-text"
           class:saved-card-text-saved-card-screen={Boolean(savedcard)}
           class:saved-card-text-for-add-card={modalType === 'add-new-card'}
+          class:saved-card-text-for-recurring={Boolean(isRecurring())}
         >
           {#if modalType === 'add-new-card'}
             {$t(SAVE_CARD_TEXT_NEW_CARD)}
@@ -189,6 +191,7 @@
     class="know-more-text"
     class:know-more-text-saved-cards={Boolean(savedcard)}
     class:know-more-text-add-card={modalType === 'add-new-card'}
+    class:know-more-text-recurring={Boolean(isRecurring())}
   >
     <span on:click={showSecureCardKnowMoreDialog} class="cusor-pointer">
       {$t(KNOW_MORE)}
@@ -209,16 +212,20 @@
     color: #373737;
   }
   .saved-card-text-for-add-card {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 14px;
   }
+  .saved-card-text-for-add-card.saved-card-text-for-recurring {
+    font-size: 12px;
+  }
+
   .saved-card-text-saved-card-screen {
     margin-left: 5px;
   }
 
   .know-more-text {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 11px;
     margin-left: 25px;
     color: #3f71d7;
@@ -226,11 +233,13 @@
     cursor: pointer;
   }
   .know-more-text-add-card {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 14px;
     margin-left: 30px;
   }
-
+  .know-more-text-add-card.know-more-text-recurring {
+    font-size: 12px;
+  }
   .know-more-text-saved-cards {
     top: -12px;
     position: relative;
@@ -250,9 +259,12 @@
   }
   .save_card_label_text {
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 5px;
     float: left;
     margin-left: 30px;
+  }
+  .save_card_label_text.save-card-label-recurring {
+    margin-bottom: 2px;
   }
 
   .save_card_label_text .checkbox {
