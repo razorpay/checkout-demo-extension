@@ -10,6 +10,7 @@ import ErrorEvents from './errors/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
 import Analytics, { Track } from './base-analytics';
+import { trackAvailabilty } from './availability';
 
 let Events = getTrackMethods();
 Events = addAnalyticsMethods(Events);
@@ -29,4 +30,5 @@ export {
   P13NEvents,
   Track,
   CredEvents,
+  trackAvailabilty,
 };

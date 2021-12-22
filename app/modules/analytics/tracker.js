@@ -1,5 +1,5 @@
 import { getExperimentsFromStorage } from 'experiments';
-
+import { trackAvailabilty } from './availability';
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -100,6 +100,17 @@ const flushEvents = (mode) => {
   if (!EVT_Q.length || RZP_MODE !== 'live') {
     return;
   }
+
+  EVT_Q.forEach((eventData) => {
+    // open event will trigger for standard checkout
+    // submit event in case of custom checkout
+    if (
+      eventData.event === 'open' ||
+      (eventData.event === 'submit' && Track.props.library === 'razorpayjs')
+    ) {
+      trackAvailabilty('session_created');
+    }
+  });
 
   // Use sendBeacon if supported.
   const useBeacon = _Obj.hasProp(navigator, 'sendBeacon');

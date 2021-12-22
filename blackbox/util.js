@@ -3,10 +3,10 @@ const URL = require('url');
 const querystring = require('querystring');
 
 const {
-  testDir,
   cdnUrl,
   bundleUrl,
   lumberjackUrl,
+  lumerjackDevURL,
   zestMoneyLoanAgreementUrl,
 } = require('./const');
 
@@ -259,6 +259,7 @@ const util = (module.exports = {
         url.startsWith('data') ||
         (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
+        url.startsWith(lumerjackDevURL) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes('html2pdf.bundle.js');
       if (ignoredUrl || (pattern && !pattern.test(url))) {

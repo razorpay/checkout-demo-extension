@@ -1,6 +1,6 @@
 import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
-import Analytics, { ErrorEvents } from 'analytics/index';
+import Analytics, { ErrorEvents, trackAvailabilty } from 'analytics/index';
 
 /**
  * @param {String|Error|Object} error -
@@ -21,7 +21,9 @@ export const capture = (
      * Defaulting to 'js_error' till we move to the new system of analytics events
      */
     const eventName = typeof event === 'string' ? event : ErrorEvents.JS_ERROR;
-
+    if (severity === SEVERITY_LEVELS.S0 || severity === SEVERITY_LEVELS.S1) {
+      trackAvailabilty('session_errored', severity);
+    }
     Analytics.track(eventName, {
       data: {
         ...(typeof data === 'object' ? data : {}),
