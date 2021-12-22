@@ -1,3 +1,4 @@
+import { getOption, getPreferences } from 'razorpay';
 const SESSION_CREATED = 'session_created';
 const SESSION_ERRORED = 'session_errored';
 let sessionCreated = false;
@@ -48,6 +49,10 @@ function trackAvailabilty(event, severity) {
         |> encodeURIComponent,
     },
   };
+  const key = getPreferences('merchant_key') || getOption('key') || '';
+  if (key && key.indexOf('test_') > -1) {
+    return;
+  }
   if (
     (!sessionCreated && event === SESSION_CREATED) ||
     (!sessionErrored && event === SESSION_ERRORED)
