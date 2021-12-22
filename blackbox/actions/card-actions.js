@@ -680,4 +680,5 @@ module.exports = {
   selectAddNewCard,
   assertSaveCardCheckbox,
   verifySavedCardCheckbox,
+  getCardCurrencies,
 };

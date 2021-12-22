@@ -224,7 +224,10 @@ var responseTypes = {
     var content = request.content;
     var popup = this.popup;
 
-    if (this.data && this.data.wallet === 'amazonpay') {
+    if (
+      (this.data && this.data.wallet === 'amazonpay') ||
+      (this.data.method === 'app' && this.data.provider === 'trustly')
+    ) {
       request.content = {};
     }
     if (this.nativeotp) {

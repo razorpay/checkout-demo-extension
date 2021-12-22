@@ -16,6 +16,7 @@ const {
 } = require('./mocks/personalisation');
 const { getStatus } = require('./mocks/status');
 const { getFees } = require('./mocks/fees');
+const { countries, states } = require('./mocks/countriesAndStates');
 
 router.get('/v1/preferences', function (request, response) {
   const preferences = getPreferences(
@@ -152,6 +153,14 @@ router.post('/v1/otp/create', (request, response) => {
   response.send({
     success: 1,
   });
+});
+
+router.get('/v1/countries', (req, res) => {
+  res.json(countries);
+});
+
+router.get('/v1/states/:countryCode', (req, res) => {
+  res.json(states[req.query.countryCode || 'gb']);
 });
 
 module.exports = router;

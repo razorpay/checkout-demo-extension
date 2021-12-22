@@ -31,7 +31,8 @@
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
   :global(#form-emiplans.drishy ~ #bottom .bottom[tab='emiplans']),
   :global(#form-qr.drishy ~ #bottom .bottom[tab='qr']),
-  :global(#form-wallet.drishy ~ #bottom .bottom[tab='wallet']) {
+  :global(#form-wallet.drishy ~ #bottom .bottom[tab='wallet']),
+  :global(#form-international.drishy ~ #bottom .bottom[tab='international']) {
     display: block;
   }
 </style>

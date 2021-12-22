@@ -6,7 +6,7 @@ import {
 
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
-import { returnAsIs } from 'lib/utils';
+import { returnAsIs, toTitleCase } from 'lib/utils';
 import { submitForm } from 'common/form';
 
 import { Track } from 'analytics';
@@ -230,6 +230,10 @@ export default function Payment(data, params = {}, r) {
       avoidPopup = true;
       if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
         // CRED collect flow for razorpay.js
+        avoidPopup = false;
+      }
+      if (data.provider === 'trustly') {
+        // Trustly app only works with popup
         avoidPopup = false;
       }
     }
@@ -1197,6 +1201,10 @@ function getCurrencyData(payload) {
     requestPayload.wallet = payload.wallet;
   }
 
+  if (payload.provider) {
+    requestPayload.provider = payload.provider;
+  }
+
   const existingRequest = CardCurrencyRequests[entityWithAmount];
   if (existingRequest) {
     return existingRequest;
@@ -1283,6 +1291,11 @@ razorpayProto.getCurrencies = function (payload) {
       ...payload,
       entity: payload.walletCode,
       wallet: payload.walletCode,
+    });
+  } else if (payload.provider) {
+    return getCurrencyData.call(this, {
+      ...payload,
+      entity: payload.provider,
     });
   }
   return null;

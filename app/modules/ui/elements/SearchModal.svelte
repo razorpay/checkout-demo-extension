@@ -48,7 +48,7 @@
   };
 
   onMount(() => {
-    document.querySelector('#modal-inner').appendChild(containerRef);
+    document.querySelector('#modal-inner')?.appendChild(containerRef);
   });
 
   const dispatch = createEventDispatcher();

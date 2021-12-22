@@ -31,4 +31,6 @@ export default {
   HAS_SAVED_CARDS_STATUS_CHECK: 'hasSavedCards',
   /** AVS FORM DATA */
   AVS_FORM_DATA: 'avsFormData',
+  /** NVS FORM DATA */
+  NVS_FORM_DATA: 'nvsFormData',
 };

@@ -165,8 +165,12 @@ export function showAmountInCta() {
           session.dccPayload.currencyPayload &&
           session.dccPayload.currencyPayload.all_currencies
         ) {
-          amount =
-            session.dccPayload.currencyPayload.all_currencies[currency].amount;
+          let dccAmount =
+            session.dccPayload.currencyPayload.all_currencies[currency];
+
+          if (dccAmount) {
+            amount = dccAmount.amount;
+          }
         }
       }
       setView(CtaViews.AMOUNT, false, {

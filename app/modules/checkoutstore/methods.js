@@ -293,6 +293,12 @@ const ALL_METHODS = {
       isOneClickCheckout()
     );
   },
+
+  international() {
+    // TODO: add international payment method
+    // && isInternational()
+    return isApplicationEnabled('trustly');
+  },
 };
 
 export function isZestMoneyEnabled() {
@@ -411,6 +417,7 @@ export function getSingleMethod() {
     'wallet',
     'paypal',
     'bank_transfer',
+    'international',
   ];
 
   if (getOrderMethod()) {
@@ -607,6 +614,12 @@ export function isApplicationEnabled(app) {
       return isGpayMergedFlowEnabled() && allCardApps.includes('google_pay');
     case 'cred':
       return isCREDEnabled();
+    case 'trustly':
+      /**
+       * Trustly is an international app, will come under international payment methods
+       * @returns boolean
+       */
+      return merchantMethods.app?.trustly;
   }
 
   return false;
@@ -1134,4 +1147,31 @@ export function shouldUseVernacular() {
     !isPayout() &&
     !isMethodEnabled('nach')
   );
+}
+
+/**
+ * Get all international app providers i.e. Trustly, Poli
+ * @returns [providers]
+ */
+export function getInternationalProviders() {
+  const method = 'international';
+
+  if (!isMethodEnabled(method)) {
+    return [];
+  }
+
+  const disableAllApps = storeGetter(HiddenMethodsStore).includes(method);
+  const disabledInstruments = storeGetter(HiddenInstrumentsStore)
+    .filter((instrument) => instrument.method === method)
+    .map((instrument) => instrument.method);
+
+  if (disableAllApps || disabledInstruments.includes(method)) {
+    return [];
+  }
+
+  const apps = getAppsForMethod(method).filter((provider) =>
+    isApplicationEnabled(provider.code)
+  );
+
+  return apps;
 }

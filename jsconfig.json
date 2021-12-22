@@ -2,5 +2,10 @@
   "compilerOptions": {
     "baseUrl": "app/modules"
   },
-  "exclude": ["app/js/generated", "coverage", "app/dist"]
+  "exclude": [
+    "app/js/generated",
+    "coverage",
+    "app/dist",
+    "node_modules"
+  ]
 }

@@ -16,6 +16,10 @@ export default {
         name: 'Google Pay',
         subtext: ' ',
       },
+      trustly: {
+        name: 'Trustly',
+        subtext: ' ',
+      },
     },
   },
   bajaj_finserv: {
@@ -246,11 +250,11 @@ export default {
     avs_info_title: 'Help us verify the transaction',
     avs_heading: 'Verify your billing address linked to the bank',
     avs_info_message_1:
-      'This is the address on your bank’s record and is used to send your account statements',
+      'This is the address on your bank’s record and is used to send your account statements.',
     avs_info_message_2:
-      'The billing address verification helps us protect you from fraud transactions',
+      'The billing address verification helps us protect you from fraud transactions.',
     avs_info_message_3:
-      'Your address is used only for verification and is securely processed via encrypted servers',
+      'Your address is used only for verification and is securely processed via encrypted servers.',
     avs_country_all: 'All Countries',
     avs_state_all: 'All States',
     avs_form_input_required: 'This field is required',
@@ -809,6 +813,7 @@ export default {
       cod_charge: '{charge} extra charge applicable.',
       cod_charge_applied: '{charge} cash on delivery charge added',
       cod_charge_removed: '{charge} cash on delivery charge removed',
+      international: 'Trustly & POLI',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -828,6 +833,7 @@ export default {
       upi_otm: 'UPI OTM',
       wallet: 'Wallets',
       cod: 'COD',
+      international: 'International',
     },
     titles: {
       bank_transfer: 'Bank Transfer',
@@ -853,6 +859,7 @@ export default {
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
+      international: 'International Payments',
     },
   },
   misc: {
@@ -1102,6 +1109,7 @@ export default {
     coupons: 'Back',
     details: 'Back',
     billingAddress: 'Address',
+    international: 'International Payments',
   },
   upi: {
     cancel_reason_back_action: 'Back',
@@ -1285,5 +1293,9 @@ export default {
   summary_modal,
   cod: {
     disabled_label: 'Not available',
+  },
+  international: {
+    nvs_first_name: 'First Name*',
+    nvs_last_name: 'Last Name*',
   },
 };

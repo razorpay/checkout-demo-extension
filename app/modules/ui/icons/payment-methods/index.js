@@ -24,6 +24,7 @@ import lock from './lock';
 import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
+import internationalIcon from './international';
 import close from 'one_click_checkout/coupons/icons/close';
 import offers from 'one_click_checkout/coupons/icons/offers';
 import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
@@ -158,6 +159,9 @@ function getIconFn(iconName) {
       return rzpLogo;
     case 'edit_phone':
       return edit_phone;
+
+    case 'international':
+      return internationalIcon;
   }
 }
 

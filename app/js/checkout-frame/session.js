@@ -1324,6 +1324,14 @@ Session.prototype = {
     this.svelteCardTab = new cardTab.render();
   },
 
+  setInternationalTab: function (props) {
+    this.internationalTab = new discreet.internationalTab.render(props);
+  },
+
+  showInternationalTab: function () {
+    this.setScreen('international');
+  },
+
   setSvelteComponents: function () {
     this.setUpiCancelReasonPicker();
     this.setNbCancelReasonPicker();
@@ -2986,6 +2994,10 @@ Session.prototype = {
       type: AnalyticsTypes.BEHAV,
     });
 
+    var isNVSFormHomeScreenView = discreet.storeGetter(
+      discreet.InternationalStores.isNVSFormHomeScreenView
+    );
+
     if (
       this.screen === 'otp' &&
       thisTab !== 'card' &&
@@ -3054,6 +3066,18 @@ Session.prototype = {
     } else if (this.tab === 'emandate') {
       if (this.emandateView.onBack()) {
         return;
+      }
+    } else if (this.tab === 'international') {
+      if (
+        this.internationalTab &&
+        this.internationalTab.onBack() &&
+        !isNVSFormHomeScreenView
+      ) {
+        return;
+      } else {
+        // destroy the international tab view
+        discreet.internationalTab.destroy();
+        this.internationalTab = null;
       }
     } else if (!this.tab) {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
@@ -3269,6 +3293,9 @@ Session.prototype = {
     if (tab === 'wallet') {
       discreet.walletTab.render();
     }
+    if (tab === 'international') {
+      this.setInternationalTab(payload);
+    }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
@@ -3298,6 +3325,10 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
+    }
+
+    if (tab === 'international') {
+      this.showInternationalTab();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -3842,6 +3873,7 @@ Session.prototype = {
             '#form-wallet',
             '#form-emandate',
             '#form-upi_otm',
+            '#form-international',
           ],
           activeForm
         )
@@ -4449,6 +4481,10 @@ Session.prototype = {
     };
   },
 
+  isOnNVSForm: function () {
+    return this.internationalTab && this.internationalTab.isOnNVSForm();
+  },
+
   /**
    * Attempts a payment
    * @param {Event} e
@@ -4524,6 +4560,16 @@ Session.prototype = {
     var AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
     var isOnAVSScreen = AVSData.isOnAVSScreen;
     var isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
+
+    // NVS (Name address Verification System)
+    var NVSRequired = false;
+    var NVSEntities =
+      discreet.storeGetter(discreet.InternationalStores.NVSEntities) || {};
+    var isOnNVSForm = this.isOnNVSForm();
+    var isNVSFormHomeScreenView = discreet.storeGetter(
+      discreet.InternationalStores.isNVSFormHomeScreenView
+    );
+
     var tpv = MethodStore.getTPV();
     if (tpv && tpv.invalid && this.homeTab && this.homeTab.validateTPVOrder) {
       return this.homeTab.validateTPVOrder(tpv, true);
@@ -4554,7 +4600,11 @@ Session.prototype = {
         }
       }
       // from home page to AVS screen transition set screen = card
-    } else if (screen && !isAVSScreenFromHomeScreen) {
+    } else if (
+      screen &&
+      !isAVSScreenFromHomeScreen &&
+      !isNVSFormHomeScreenView
+    ) {
       if (screen === 'card') {
         // AVS check
         var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
@@ -4694,6 +4744,15 @@ Session.prototype = {
         }
       }
 
+      if (screen === 'international') {
+        var selectedInternationalProvider = discreet.storeGetter(
+          discreet.InternationalStores.selectedInternationalProvider
+        );
+        if (selectedInternationalProvider) {
+          NVSRequired = NVSEntities[selectedInternationalProvider];
+        }
+      }
+
       // perform the actual validation
       if (screen === 'upi' || screen === 'upi_otm') {
         // Event triggered when user enters UPI ID and clicks submit
@@ -4754,6 +4813,24 @@ Session.prototype = {
         discreet.OneClickCheckoutInterface.showOrderSummary();
         return;
       }
+
+      // check for NVS form validations
+      if (
+        isOnNVSForm &&
+        isNVSFormHomeScreenView &&
+        this.checkInvalid('#form-international')
+      ) {
+        return;
+      }
+      if (
+        !isOnNVSForm &&
+        discreet.isTrustlyInPreferredMethod(selectedInstrument)
+      ) {
+        NVSRequired = NVSEntities[selectedInstrument.providers[0]];
+        this.switchTab('international', {
+          directlyToNVS: NVSRequired,
+        });
+      }
     } else if (data.method === 'paypal') {
       // Let method=paypal payments go through directly
     } else {
@@ -4781,11 +4858,18 @@ Session.prototype = {
     if (!isOnAVSScreen) {
       CardScreenStore.isAVSEnabledForEntity.set(AVSRequiredForEntity);
     }
+
     // meta for tracking AVS
     if (AVSRequired || isOnAVSScreen) {
       Analytics.setMeta('avs', true);
     } else {
       Analytics.removeMeta('avs');
+    }
+    // meta for tracking NVS
+    if (NVSRequired || isOnNVSForm) {
+      Analytics.setMeta('nvs', true);
+    } else {
+      Analytics.removeMeta('nvs');
     }
     if (!isOnAVSScreen && AVSRequired) {
       var directlyToAVS = false;
@@ -4796,6 +4880,11 @@ Session.prototype = {
       }
       // verify AVS needed
       this.svelteCardTab.showAVSView(directlyToAVS);
+    } else if (!isOnNVSForm && NVSRequired && this.internationalTab) {
+      if (screen !== 'international') {
+        this.showInternationalTab();
+      }
+      this.internationalTab.showNVSForm(screen !== 'international');
     } else if (!downtimeInstrument) {
       this.submit();
     } else {
@@ -4961,6 +5050,14 @@ Session.prototype = {
 
     var AVSRequired = avsEntity ? Boolean(AVSMap[avsEntity]) : false;
 
+    var NVSEntity = discreet.storeGetter(
+      discreet.InternationalStores.selectedInternationalProvider
+    );
+
+    var isNVSFormHomeScreenView = discreet.storeGetter(
+      discreet.InternationalStores.isNVSFormHomeScreenView
+    );
+
     /**
      * If user selects the card from p13n user will be auto-redirected to saved cards screen
      * And in both cases i.e, p13n card selection and saved card selection both will have
@@ -5007,13 +5104,19 @@ Session.prototype = {
       }
     }
 
-    if (!this.screen || isAVSScreenFromHomeScreen) {
+    if (!this.screen || isAVSScreenFromHomeScreen || isNVSFormHomeScreenView) {
       if (selectedInstrument) {
         data = Instruments.addInstrumentToPaymentData(
           selectedInstrument,
           data,
           this.getCustomer(getPhone())
         );
+
+        NVSEntity =
+          this.screen === 'international' && isNVSFormHomeScreenView
+            ? data.provider
+            : null;
+
         /** This logic is intended for cards tokenization feature and
          * can be removed after 31st December 2021 once whole rzp saved cards
          * are undergoing tokenization by default
@@ -5367,11 +5470,17 @@ Session.prototype = {
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
-    // for paypal dcc enable is not required
+
+    if (data.method === 'international' && NVSEntity) {
+      data.provider = NVSEntity;
+    }
+
+    // for paypal and trustly dcc enable is not required
     if (
       discreet.storeGetter(CardScreenStore.currencyRequestId) &&
       ((data.method === 'card' && Store.isDCCEnabled()) ||
-        (data.method === 'wallet' && data.wallet === 'paypal'))
+        (data.method === 'wallet' && data.wallet === 'paypal') ||
+        (data.method === 'international' && data.provider === NVSEntity))
     ) {
       data.currency_request_id = discreet.storeGetter(
         CardScreenStore.currencyRequestId
@@ -5406,6 +5515,33 @@ Session.prototype = {
         Analytics.track('card:avsdata', {
           data: AVSData,
         });
+      }
+    }
+
+    if (data.method === 'international') {
+      data.method = 'app';
+      if (this.isOnNVSForm() && NVSEntity) {
+        var NVSEntitiesMap =
+          discreet.storeGetter(discreet.InternationalStores.NVSEntities) || {};
+        var NVSFormData =
+          discreet.storeGetter(discreet.InternationalStores.NVSFormData) || {};
+        var NVSRequired = NVSEntitiesMap[NVSEntity];
+
+        /**
+         * International method namespace is only used on frontend. On backend it is treated as "app".
+         */
+
+        if (NVSRequired && NVSFormData) {
+          if (NVSFormData._country) {
+            // onretry we already updated the payload
+            NVSFormData.country = NVSFormData._country;
+            delete NVSFormData._country;
+          }
+          data.billing_address = NVSFormData;
+          Analytics.track('card:nvsformdata', {
+            data: NVSFormData,
+          });
+        }
       }
     }
 
@@ -5735,6 +5871,11 @@ Session.prototype = {
       var appName = 'app';
       if (data.provider === 'cred') {
         appName = 'CRED app';
+      }
+
+      if (data.provider === 'trustly') {
+        // Show goto payment popup link in loader
+        sub_link.html(I18n.format('misc.go_to_payment'));
       }
 
       var locale = I18n.getCurrentLocale();

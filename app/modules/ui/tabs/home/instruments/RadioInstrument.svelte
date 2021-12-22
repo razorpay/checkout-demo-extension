@@ -224,6 +224,9 @@
 
       case 'app':
         return getDetailsForAppInstrument(instrument, locale);
+
+      case 'international':
+        return getDetailsForAppInstrument(instrument, locale);
     }
   }
 

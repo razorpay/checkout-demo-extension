@@ -7,7 +7,7 @@
     <span>
       <img
         alt={item.label}
-        src={`https://cdn.razorpay.com/country-flag/${item._key}.svg`}
+        src={`https://cdn.razorpay.com/country-flags/${item._key}.svg`}
       />
     </span>
   {/if}
@@ -22,5 +22,7 @@
 
   .list-data img {
     margin-right: 10px;
+    width: 20px;
+    vertical-align: middle;
   }
 </style>

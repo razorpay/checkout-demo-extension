@@ -18,6 +18,7 @@ const sessions = {
     validateOffers: jest.fn(),
     tab: 'cards',
     screen: 'saved-cards',
+    getAppliedOffer: jest.fn(),
     setRawAmountInHeader: jest.fn(),
     updateAmountInHeader: jest.fn(),
     getCurrentCustomer,

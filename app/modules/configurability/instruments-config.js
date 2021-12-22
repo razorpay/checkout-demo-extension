@@ -429,6 +429,25 @@ const config = {
     isValid: (instrument) =>
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
+  international: {
+    properties: ['providers'],
+    payment: ['provider'],
+    groupedToIndividual: (grouped) => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
+
+      return _Arr.map(grouped.providers || [], (provider) => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+    isValid: (instrument) =>
+      Boolean(instrument.providers) && instrument.providers.length > 0,
+  },
   // TODO: Pending methods: emi
 };
 

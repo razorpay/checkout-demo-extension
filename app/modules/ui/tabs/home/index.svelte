@@ -143,7 +143,11 @@
   } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
-  import { setBlocks } from 'ui/tabs/home/instruments';
+  import {
+    setBlocks,
+    isTrustlyInPreferredMethod,
+    updateTrustlyUnderInternationalMethod,
+  } from 'ui/tabs/home/instruments';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
@@ -177,6 +181,8 @@
 
   const trustedBadgeHighlights = getTrustedBadgeHighlights();
   let expSourceSet = false;
+
+  let dccView = 'home-screen';
 
   setContact(getPrefilledContact());
   setEmail(getPrefilledEmail());
@@ -263,6 +269,9 @@
     }
 
     view = HOME_VIEWS.DETAILS;
+
+    // Reset DCC component
+    dccView = 'home-screen';
 
     setDetailsCta();
 
@@ -555,7 +564,7 @@
     const blocksThatWereSet = setBlocks(
       {
         showPreferredLoader,
-        preferred: preferredInstruments,
+        preferred: updateTrustlyUnderInternationalMethod(preferredInstruments),
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
       },
@@ -963,6 +972,7 @@
 
   function deselectInstrument() {
     $selectedInstrumentId = null;
+    dccView = 'home-screen';
   }
 
   function showSnackbar(isCodApplied) {
@@ -1065,8 +1075,6 @@
       !isOneClickCheckout();
   }
 
-  let dccView = 'home-screen';
-
   export function onSelectInstrument(event) {
     const instrument = event.detail;
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
@@ -1077,6 +1085,8 @@
     $selectedInstrumentId = instrument.id;
     if (instrument.method === 'wallet' && instrument.wallets?.length > 0) {
       dccView = instrument.wallets[0];
+    } else if (isTrustlyInPreferredMethod(instrument)) {
+      dccView = 'trustly';
     } else {
       dccView = 'home-screen';
     }
@@ -1185,7 +1195,7 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if (isDCCEnabled() || dccView === 'paypal') && !isDynamicFeeBearer()}
+      {#if (isDCCEnabled() || ['paypal', 'trustly'].includes(dccView)) && !isDynamicFeeBearer()}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}

@@ -26,6 +26,8 @@
     setAppropriateCtaText,
   } from 'checkoutstore/cta';
 
+  import { updateNVSEntities } from 'checkoutstore/screens/international';
+
   // i18n
   import { t } from 'svelte-i18n';
   import {
@@ -64,6 +66,7 @@
     ADD_CARD: 'add-card',
     HOME_SCREEN: 'home-screen',
     PAYPAL_WALLET: 'paypal',
+    TRUSTLY_PROVIDER: 'trustly',
     AVS: 'avs-card',
   };
 
@@ -87,6 +90,11 @@
   let forexRate;
   let fee;
   let AVSRequired = false;
+
+  /**
+   * We call updateAmountInHeaderAndCTA function on component destroyed which show the Proceed CTA. To avoid such case we are using this isDestroyed fn.
+   */
+  let isDestroyed = false;
 
   // Props
   export let classes = [];
@@ -146,6 +154,8 @@
       }
     } else if (view === Views.PAYPAL_WALLET) {
       prop = { walletCode: 'paypal' };
+    } else if (view === Views.TRUSTLY_PROVIDER) {
+      prop = { provider: 'trustly' };
     } else {
       prop = null;
     }
@@ -153,7 +163,8 @@
 
   $: {
     if (prop) {
-      entity = prop.iin || prop.tokenId || prop.walletCode || null;
+      entity =
+        prop.iin || prop.tokenId || prop.walletCode || prop.provider || null;
     } else {
       entity = null;
     }
@@ -176,6 +187,7 @@
    * It will only trigger in case of wallet as parent gets destroyed on back
    */
   onDestroy(() => {
+    isDestroyed = true;
     updateAmountInHeaderAndCTA();
     setDCCPayload({ view });
   });
@@ -213,8 +225,10 @@
      * as this component get destroyed with state
      */
     if (
-      session?.dccPayload?.view === Views.PAYPAL_WALLET &&
-      session?.dccPayload?.currency
+      (session?.dccPayload?.view === Views.PAYPAL_WALLET &&
+        session?.dccPayload?.currency) ||
+      (session?.dccPayload?.view === Views.TRUSTLY_PROVIDER &&
+        session?.dccPayload?.currency)
     ) {
       selectedCurrency = session.dccPayload.currency;
     }
@@ -305,12 +319,15 @@
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
-  $: AVSRequired = currencyConfig?.avs_required;
+  $: AVSRequired =
+    currencyConfig?.avs_required || currencyConfig?.address_name_required;
   $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency =
     currencyConfig &&
-    (currencyConfig.card_currency || currencyConfig.wallet_currency);
+    (currencyConfig.card_currency ||
+      currencyConfig.wallet_currency ||
+      currencyConfig.app_currency);
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
   $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
   $: dccAmount = currencies?.[selectedCurrency]?.amount || '';
@@ -318,14 +335,20 @@
 
   $: {
     if (entity) {
-      AVSScreenMap.update((value) => ({ ...value, [entity]: AVSRequired }));
+      if (view === Views.TRUSTLY_PROVIDER) {
+        updateNVSEntities(entity, AVSRequired);
+      } else {
+        AVSScreenMap.update((value) => ({ ...value, [entity]: AVSRequired }));
+      }
     }
   }
 
   $: {
     $defaultDCCCurrency =
       currencyConfig &&
-      (currencyConfig.card_currency || currencyConfig.wallet_currency);
+      (currencyConfig.card_currency ||
+        currencyConfig.wallet_currency ||
+        currencyConfig.app_currency);
   }
 
   $: {
@@ -334,7 +357,10 @@
     }
   }
   $: fee =
-    (currencies && currencies[selectedCurrency].conversion_percentage) || 0;
+    (currencies &&
+      selectedCurrency &&
+      currencies[selectedCurrency].conversion_percentage) ||
+    0;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
@@ -359,7 +385,9 @@
         session.updateAmountInHeader(updated_amount);
       }
       if (AVSRequired) {
-        showProceed();
+        if (!isDestroyed) {
+          showProceed();
+        }
         AVSDccPayload.set({
           header: displayAmount,
           cta: ctaAmount,

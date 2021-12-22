@@ -360,6 +360,9 @@ const getAjax = (body) => {
   if (body.method === 'cod') {
     return ajax.cod;
   }
+  if (body.method === 'app' && body.provider === 'trustly') {
+    return ajax.hdfc_first;
+  }
   return {
     error: {
       description: 'Unsupported payload/method',

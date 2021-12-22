@@ -8,6 +8,7 @@ export const getCurrencies = ({
   cardNumber,
   walletCode,
   amount,
+  provider,
 }) => {
   return getCurrenciesData({
     iin,
@@ -16,5 +17,6 @@ export const getCurrencies = ({
     walletCode,
     amount: amount || get(amountAfterOffer),
     currency: getCurrency(), // Entity currency
+    provider,
   });
 };

@@ -183,8 +183,8 @@ export const getPrefilledName = getOption('prefill.name', true);
 export const getPrefilledCardNumber = getOption('prefill.card[number]', true);
 export const getPrefilledVPA = getOption('prefill.vpa', true);
 
-export const getPrefillBillingAddress = () => {
-  return {
+export const getPrefillBillingAddress = (nvs = false) => {
+  const prefill = {
     line1: getOption('prefill.billing_address[line1]'),
     line2: getOption('prefill.billing_address[line2]'),
     state: getOption('prefill.billing_address[state]'),
@@ -192,6 +192,13 @@ export const getPrefillBillingAddress = () => {
     country: getOption('prefill.billing_address[country]'),
     postal_code: getOption('prefill.billing_address[postal_code]'),
   };
+
+  if (nvs) {
+    prefill.first_name = getOption('prefill.billing_address[first_name]');
+    prefill.last_name = getOption('prefill.billing_address[last_name]');
+  }
+
+  return prefill;
 };
 
 // formatting

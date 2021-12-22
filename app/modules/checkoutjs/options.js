@@ -59,6 +59,8 @@ RazorpayDefaults.prefill = {
   'billing_address[city]': '',
   'billing_address[country]': '',
   'billing_address[state]': '',
+  'billing_address[first_name]': '',
+  'billing_address[last_name]': '',
 
   /* eMandate options */
   bank: '',

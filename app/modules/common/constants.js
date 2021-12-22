@@ -91,6 +91,7 @@ export const AVAILABLE_METHODS = [
   'app',
   'emandate',
   'cod',
+  'international',
 ];
 
 /* VPA regex, copied from API */

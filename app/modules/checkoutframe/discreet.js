@@ -89,6 +89,8 @@ import * as walletTab from 'checkoutframe/components/wallet';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as Confirm from 'checkoutframe/components/confirm';
 import * as FeeLabel from 'checkoutframe/components/fee';
+import * as internationalTab from 'checkoutframe/components/international';
+import * as InternationalStores from 'checkoutstore/screens/international';
 
 import showTimer from 'checkoutframe/timer';
 import * as es6components from 'checkoutframe/components';
@@ -106,7 +108,10 @@ import * as NBHandlers from 'handlers/netbanking';
 import * as CommonHandlers from 'handlers/common';
 
 import * as Instruments from 'configurability/instruments';
-import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+import {
+  getInstrumentMeta,
+  isTrustlyInPreferredMethod,
+} from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
 
@@ -271,4 +276,10 @@ export default {
   CardViews,
   OTP_TEMPLATES,
   OtpTemplatesHelper,
+
+  // international payment method
+  internationalTab,
+  InternationalStores,
+
+  isTrustlyInPreferredMethod,
 };
