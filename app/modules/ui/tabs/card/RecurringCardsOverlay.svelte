@@ -151,6 +151,7 @@
     flex-direction: inherit;
     flex-grow: 2;
     padding-left: 4px;
+    align-items: center;
   }
 
   .recurring-provider {
@@ -183,7 +184,9 @@
   .recurring-card-networks {
     display: flex;
     justify-content: flex-start;
-    padding: 4px;
+    padding: 0 4px;
+    line-height: 30px;
+    align-items: center;
   }
   .recurring-card-type {
     min-width: 70px;
