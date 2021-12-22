@@ -3,6 +3,9 @@ export const PINCODE_LABEL = 'address.pincode_label';
 export const CITY_LABEL = 'address.city_label';
 export const STATE_LABEL = 'address.state_label';
 export const COUNTRY_LABEL = 'address.country_label';
+export const INTERNATIONAL_STATE_LABEL = 'address.international_state_label';
+export const INTERNATIONAL_PINCODE_LABEL =
+  'address.international_pincode_label';
 export const HOUSE_LABEL = 'address.house_label';
 export const AREA_LABEL = 'address.area_label';
 export const LANDMARK_LABEL = 'address.landmark_label';
@@ -26,3 +29,5 @@ export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
 export const UNSERVICEABLE_LABEL = 'address.unserviceable_label';
 export const SERVICEABLE_LABEL = 'address.serviceable_label';
 export const ORDER_UPDATE_FAILURE = 'address.order_update_failure';
+export const STATE_SEARCH_ALL = 'address.state_search_all';
+export const STATE_SEARCH_PLACEHOLDER = 'address.state_search_placeholder';

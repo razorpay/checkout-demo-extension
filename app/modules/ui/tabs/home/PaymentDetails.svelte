@@ -18,6 +18,7 @@
     pincode,
     state,
     multiTpvOption,
+    countryISOCode,
   } from 'checkoutstore/screens/home';
 
   // Transitions
@@ -108,6 +109,11 @@
     });
     onSubmit(userContact);
   }
+
+  function handleCountrySelect(countryInfo) {
+    const { country } = countryInfo.detail;
+    $countryISOCode = country;
+  }
 </script>
 
 <div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
@@ -122,6 +128,7 @@
           bind:phone={$phone}
           isOptional={isContactOptional()}
           on:blur={trackContactFilled}
+          on:countrySelect={handleCountrySelect}
         />
       </div>
     {/if}

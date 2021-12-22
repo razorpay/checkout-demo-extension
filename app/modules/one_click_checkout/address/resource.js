@@ -11,12 +11,14 @@ import {
   selectedAddressId as selectedShippingAddress,
   addressCompleted as shippingAddressCompleted,
   shouldSaveAddress as shouldSaveShippingAddress,
+  selectedCountryISO as selectedShippingCountryISO,
 } from 'one_click_checkout/address/shipping_address/store';
 import {
   newUserAddress as newBillingAddress,
   selectedAddressId as selectedBillingAddress,
   addressCompleted as billingAddressCompleted,
   shouldSaveAddress as shouldSaveBillingAddress,
+  selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
 
 /**
@@ -37,6 +39,7 @@ export default {
       selectedAddressId: selectedShippingAddress,
       addressCompleted: shippingAddressCompleted,
       shouldSaveAddress: shouldSaveShippingAddress,
+      selectedCountryISO: selectedShippingCountryISO,
     },
     type: ADDRESS_TYPES.SHIPPING_ADDRESS,
     formId: 'addressForm',
@@ -56,6 +59,7 @@ export default {
       selectedAddressId: selectedBillingAddress,
       addressCompleted: billingAddressCompleted,
       shouldSaveAddress: shouldSaveBillingAddress,
+      selectedCountryISO: selectedBillingCountryISO,
     },
     type: ADDRESS_TYPES.BILLING_ADDRESS,
     formId: 'addressForm',

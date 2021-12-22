@@ -73,6 +73,7 @@ export const INITIAL_ADDRESS = {
   line2: '',
   landmark: '',
   tag: '',
+  country_name: '',
 };
 
 export const ZIPCODE_REQUIRED_LENGTH = 6;

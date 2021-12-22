@@ -13,6 +13,7 @@
     showSavedAddressCta,
   } from 'one_click_checkout/address/shipping_address/store';
   import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
+  import { isIndianCustomer } from 'checkoutstore';
   import { contact } from 'checkoutstore/screens/home';
   // interface imports
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
@@ -69,7 +70,8 @@
   function postSubmit() {
     if (
       !$shouldSaveAddress ||
-      routeMap[currentView] === addressViews.SAVED_ADDRESSES
+      routeMap[currentView] === addressViews.SAVED_ADDRESSES ||
+      !$isIndianCustomer
     ) {
       redirectToPaymentMethods();
       return;
