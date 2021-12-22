@@ -892,6 +892,7 @@ export default {
     search_results_label: 'Results',
     select_another_method: 'Please select another method.',
     one_card: 'OneCard',
+    slice: 'Slice',
   },
   nach: {
     allowed_formats_info:

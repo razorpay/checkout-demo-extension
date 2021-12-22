@@ -24,6 +24,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'HSBC'}        | ${true}  | ${false} | ${false}
       ${'Karur Vysya'} | ${true}  | ${true}  | ${false}
       ${'OneCard'}     | ${true}  | ${false} | ${false}
+      ${'Slice'}       | ${false} | ${false} | ${true}
     `(
       '$bankName, supports credit card - $isCredit, debit card - $isDebit, super cards - $isSuperCard',
       ({ bankName, isCredit, isDebit, isSuperCard }) => {
@@ -55,6 +56,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'HSBC'}        | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
       ${'Karur Vysya'} | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
       ${'OneCard'}     | ${['Visa']}               | ${[]}                     | ${[]}
+      ${'Slice'}       | ${[]}                     | ${[]}                     | ${['Visa']}
     `(
       '$bankName, supports this networks - In debit - $debitCards, In Credit - ${creditCards}, and in Super Cards - ${superCards}',
       ({ bankName, creditCards, debitCards, superCards }) => {
