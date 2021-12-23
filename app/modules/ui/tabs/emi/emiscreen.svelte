@@ -145,7 +145,7 @@
           />
         </div>
       </div>
-      <div class="elem-wrap">
+      <div class="elem-wrap elem-wrap-bajaj-tc">
         <label id="bajaj">
           <input
             type="checkbox"
@@ -158,7 +158,7 @@
             <div class="bajaj-tooltip">Required</div>
           {/if}
           I agree to the
-          <span class="tc-text ">
+          <span class="tc-text">
             <a
               href="https://www.bajajfinserv.in/all-fees-and-charges-new#ec"
               target="_blank"
@@ -225,5 +225,14 @@
     border-top: none;
     border-right: none;
     transform: rotate(-45deg);
+  }
+
+  .elem-wrap {
+    height: 60px;
+  }
+
+  .elem-wrap-bajaj-tc {
+    height: 32px;
+    margin-top: 5px;
   }
 </style>
