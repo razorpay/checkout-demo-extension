@@ -156,6 +156,7 @@
 
   .recurring-provider {
     line-height: 30px;
+    color: #132644;
   }
   .recurring-cards-title {
     line-height: 32px;
@@ -166,6 +167,8 @@
     white-space: nowrap;
     background-color: #f7f7f7;
     color: #5d6d86;
+    font-weight: bold;
+    text-transform: capitalize;
   }
 
   .recurring-cards-row {
@@ -211,7 +214,7 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 26%;
+    min-width: 38%;
   }
 
   .recurring-cards-col ~ * {
@@ -230,6 +233,6 @@
     height: auto;
     line-height: 1;
     top: 15px;
-    right: 10px;
+    right: 20px;
   }
 </style>
