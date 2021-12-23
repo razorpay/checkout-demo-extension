@@ -13,6 +13,10 @@ export const SHIPPING_ADDRESS_LABEL = 'address.shipping_address_label';
 export const SAVE_LABEL = 'address.save_label';
 export const CTA_LABEL = 'address.cta_label';
 export const SAVE_ADDRESS_CONSENT = 'address.save_consent_label';
+export const SAVE_ADDRESS_CONSENT_TNC = 'address.save_consent_label_tnc';
+export const SAVE_ADDRESS_CONSENT_PRIVACY =
+  'address.save_consent_label_privacy';
+export const SAVE_ADDRESS_CONSENT_AND = 'address.save_consent_label_and';
 export const INPUT_ERROR_LABEL = 'address.input_error_label';
 export const HOUSE_ERROR_LABEL = 'address.house_error_label';
 export const AREA_ERROR_LABEL = 'address.area_error_label';

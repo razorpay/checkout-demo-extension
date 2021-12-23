@@ -17,12 +17,19 @@
     SAVE_ADDRESS_CONSENT,
     UNSERVICEABLE_LABEL,
     SERVICEABLE_LABEL,
+    SAVE_ADDRESS_CONSENT_TNC,
+    SAVE_ADDRESS_CONSENT_PRIVACY,
+    SAVE_ADDRESS_CONSENT_AND,
     INTERNATIONAL_STATE_LABEL,
     INTERNATIONAL_PINCODE_LABEL,
     STATE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
-  import { tagLabels } from 'one_click_checkout/address/constants';
+  import {
+    tagLabels,
+    TNC_LINK,
+    PRIVACY_LINK,
+  } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   // store import
   import {
@@ -377,7 +384,16 @@
           checked={$shouldSaveAddress}
           id="address-consent-checkbox"
         />
-        <span>{$t(SAVE_ADDRESS_CONSENT)}</span>
+        <span>
+          {$t(SAVE_ADDRESS_CONSENT)}
+          <a href={TNC_LINK} class="address-consent-links" target="_blank">
+            {$t(SAVE_ADDRESS_CONSENT_TNC)}
+          </a>
+          {$t(SAVE_ADDRESS_CONSENT_AND)}
+          <a href={PRIVACY_LINK} class="address-consent-links" target="_blank">
+            {$t(SAVE_ADDRESS_CONSENT_PRIVACY)}
+          </a>
+        </span>
       </div>
       {#if $shouldSaveAddress}
         <div class="address-save">
@@ -414,5 +430,8 @@
     display: flex;
     margin-top: 4px;
     font-size: 13px;
+  }
+  .address-consent-links {
+    color: #551a8b;
   }
 </style>

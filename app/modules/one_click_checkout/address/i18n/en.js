@@ -15,7 +15,11 @@ export default {
   shipping_address_label: 'Shipping Address',
   save_label: 'Save As',
   cta_label: 'Continue',
-  save_consent_label: 'Save this address for next time',
+  save_consent_label:
+    "I agree to save my address for future use according to Razorpay's",
+  save_consent_label_tnc: 'T&C',
+  save_consent_label_privacy: 'Privacy Policy',
+  save_consent_label_and: 'and',
   input_error_label: 'Please enter your {field}',
   house_error_label: 'Enter a minimum of 10 characters',
   area_error_label: 'Enter a minimum of 5 characters',
