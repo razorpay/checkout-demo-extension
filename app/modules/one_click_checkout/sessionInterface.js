@@ -15,7 +15,6 @@ import {
 import {
   selectedAddress as selectedShippingAddress,
   selectedAddressId as selectedShippingAddressId,
-  selectedCountryISO as selectedShippingCountryISO,
   newUserAddress,
   showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
@@ -24,10 +23,7 @@ import {
   isLogoutFlow,
   isCodForced,
 } from 'one_click_checkout/store';
-import {
-  selectedAddress as selectedBillingAddress,
-  selectedCountryISO as selectedBillingCountryISO,
-} from 'one_click_checkout/address/billing_address/store';
+import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
@@ -110,7 +106,6 @@ export function redirectToPaymentMethods(
   let billing_address = get(selectedBillingAddress);
   if (get(isBillingSameAsShipping)) {
     billing_address = address;
-    selectedBillingCountryISO.set(get(selectedShippingCountryISO));
   }
 
   Analytics.setMeta(MetaProperties.IS_USER_LOGGED_IN, customer.logged);

@@ -499,7 +499,4 @@
     height: 18px;
     width: 18px;
   }
-  .hide {
-    display: none;
-  }
 </style>

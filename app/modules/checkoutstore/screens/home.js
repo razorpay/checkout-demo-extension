@@ -6,14 +6,12 @@ import {
   CONTACT_REGEX,
   EMAIL_REGEX,
   INDIA_COUNTRY_CODE,
-  INDIA_COUNTRY_ISO_CODE,
-  US_COUNTRY_ISO_CODE,
 } from 'common/constants';
 import {
   isInstrumentGrouped,
   isInstrumentForEntireMethod,
 } from 'configurability/instruments';
-import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
+
 import { findCountryCode } from 'common/countrycodes';
 
 export const getCustomerDetails = () => {
@@ -48,7 +46,6 @@ export const getCustomerDetails = () => {
 
 export const country = writable('');
 export const phone = writable('');
-export const countryISOCode = writable('');
 export const contact = derived([country, phone], ([$country, $phone]) => {
   if ($phone) {
     return $country + $phone;
@@ -78,17 +75,6 @@ phone.subscribe((phone) => {
   proxyPhone.set(phone);
 });
 
-const getCountryISOCode = (countryContactCode) => {
-  const rows = Object.entries(COUNTRY_TO_CODE_MAP);
-  for (const [iso, code] of rows) {
-    // For similar country code like +1 instead of Canada always we returning US
-    if (countryContactCode === '1') {
-      return US_COUNTRY_ISO_CODE;
-    } else if (countryContactCode === code) {
-      return iso;
-    }
-  }
-};
 /**
  * Sets $country, $phone, and in turn $contact
  * @param {string} value contact
@@ -98,10 +84,8 @@ export function setContact(value) {
 
   if (parsedContact.code) {
     country.set(`+${parsedContact.code}`);
-    countryISOCode.set(getCountryISOCode(parsedContact.code));
   } else {
     country.set(INDIA_COUNTRY_CODE);
-    countryISOCode.set(INDIA_COUNTRY_ISO_CODE);
   }
 
   phone.set(parsedContact.phone);

@@ -34,17 +34,15 @@ let serviceabilityCache = {};
  *   state_code: String (KA)
  * }
  **/
-export function getCityState(pincode, country) {
+export function getCityState(pincode) {
   const cityStateApiTimer = timer();
   const cachedAddress = addressCache[pincode];
-  loaderLabel.set('');
-  showLoader.set(true);
   Events.TrackMetric(AddressEvents.CITY_STATE_START);
 
   return new Promise((resolve, reject) => {
     if (!cachedAddress) {
       fetch({
-        url: makeAuthUrl(`locations/country/${country}/pincode/${pincode}`),
+        url: makeAuthUrl(`1cc/pincodes/${pincode}`),
         callback: (response) => {
           Events.TrackMetric(AddressEvents.CITY_STATE_END, {
             time: cityStateApiTimer(),
@@ -215,21 +213,6 @@ export function updateOrder(shipping_address, billing_address) {
           return;
         }
         showLoader.set(false);
-        resolve(response);
-      },
-    });
-  });
-}
-
-export function getStatesList(country) {
-  return new Promise((resolve, reject) => {
-    fetch({
-      url: makeAuthUrl(`locations/countries/${country}/states`),
-      callback: (response) => {
-        if (response.error) {
-          reject(response.error);
-          return;
-        }
         resolve(response);
       },
     });

@@ -2,16 +2,20 @@
   // Utils
   import { isContactReadOnly } from 'checkoutstore';
   import { createEventDispatcher } from 'svelte';
+  import { findCountryCode } from 'common/countrycodes';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
-  import CountrySearchModal from 'ui/components/CountrySearchModal.svelte';
+  import SearchModal from 'ui/elements/SearchModal.svelte';
+  import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
+  import { Track } from 'analytics';
 
   import {
     COUNTRY_CODE_PATTERN,
     PHONE_PATTERN,
     PHONE_PATTERN_INDIA,
   } from 'common/constants';
+  import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 
   // i18n
   import {
@@ -20,9 +24,12 @@
     CONTACT_HELP_TEXT,
     COUNTRY_LABEL,
     COUNTRY_HELP_TEXT,
+    COUNTRY_SEARCH_ALL,
+    COUNTRY_SEARCH_PLACEHOLDER,
   } from 'ui/labels/home';
 
   import { t } from 'svelte-i18n';
+  import { formatMessageWithLocale } from 'i18n';
 
   // Refs
   let countryField;
@@ -37,6 +44,7 @@
   const dispatch = createEventDispatcher();
 
   const COUNTRY_CODE_REGEX = isOptional ? '.*' : COUNTRY_CODE_PATTERN;
+  const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
 
   let contactRegex = isOptional ? '.*' : PHONE_PATTERN;
   $: {
@@ -50,6 +58,9 @@
       }
     }
   }
+
+  let countryCodesList;
+  $: $t, (countryCodesList = generateCountryCodesList());
 
   let searchModalOpen = false;
 
@@ -80,6 +91,54 @@
 
   function closeSearch() {
     searchModalOpen = false;
+  }
+
+  function generateCountryCodesList() {
+    let list = [];
+
+    _Obj.loop(COUNTRY_TO_CODE_MAP, (code, country) => {
+      const i18nLabel = `countries.${country}`;
+      const originalName = formatMessageWithLocale(i18nLabel, 'en');
+      const translatedName = $t(i18nLabel);
+
+      list.push({
+        country,
+        _key: country,
+        original: originalName,
+        name: translatedName,
+        country_code: code,
+      });
+    });
+
+    // Sort countries using this order
+    const orderOfCountries = ['IN', 'US', 'GB', 'CA', 'AU'];
+
+    list = list.sort((a, b) => {
+      const countryA = a.country;
+      const countryB = b.country;
+
+      const hasA = _Arr.contains(orderOfCountries, countryA);
+      const hasB = _Arr.contains(orderOfCountries, countryB);
+
+      if (hasA && hasB) {
+        const indexA = orderOfCountries.indexOf(countryA);
+        const indexB = orderOfCountries.indexOf(countryB);
+
+        if (indexA < indexB) {
+          return -1; // a comes first
+        } else {
+          return 1; // b comes first
+        }
+      } else if (hasA) {
+        return -1; // a comes first
+      } else if (hasB) {
+        return 1; // b comes first
+      } else {
+        return 0; // leave unchanged
+      }
+    });
+
+    return list;
   }
 
   function downArrowHandler(event) {
@@ -170,7 +229,13 @@
 
 <!-- LABEL: Search a country -->
 <!-- LABEL: All countries -->
-<CountrySearchModal
+<SearchModal
+  identifier={searchIdentifier}
+  placeholder={$t(COUNTRY_SEARCH_PLACEHOLDER)}
+  all={$t(COUNTRY_SEARCH_ALL)}
+  items={countryCodesList}
+  keys={['country_code', 'country', 'name', 'original']}
+  component={CountryCodeSearchItem}
   bind:open={searchModalOpen}
   on:close={closeSearch}
   on:select={({ detail }) => {

@@ -4,10 +4,7 @@
   import Field from 'ui/components/Field.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import ContactField from 'ui/components/ContactField.svelte';
-  import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
-  import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
   import { SERVICEABLE_LABEL } from 'one_click_checkout/address/i18n/labels';
-  import { phoneObj } from 'one_click_checkout/address/store';
 
   export let INPUT_FORM;
   export let formData;
@@ -15,7 +12,6 @@
   export let id;
   export let error;
   export let forceStopDispatch = false;
-  export let pinIndex;
 
   let countryCode = $country;
   let phoneNum = $phone;
@@ -27,8 +23,11 @@
     if (error?.id === id) {
       error.text = '';
     }
-    phoneObj.set({ countryCode, phoneNum });
-    value.extra ? onUpdate(id, value.val, value.extra) : onUpdate(id, value);
+    dispatch('addressInputUpdate', {
+      id,
+      value,
+    });
+    onUpdate(id, value);
   };
 
   const onBlur = (id) => {
@@ -46,37 +45,28 @@
     <div class="form-input">
       {#if Array.isArray(input)}
         {#each input as subInput (subInput.id)}
-          {#if subInput.id === 'state'}
-            <StateSearchField
-              items={subInput.items}
-              onChange={handleInput}
-              stateName={formData[subInput.id]}
-              label={subInput.label}
-            />
-          {:else}
-            <Field
-              id={subInput.id}
-              name={subInput.id}
-              type={subInput.type || 'text'}
-              required={subInput.required}
-              pattern={subInput.pattern || ''}
-              maxlength={subInput.length || ''}
-              formatter={subInput.formatter || ''}
-              icon={subInput.type === 'search' ? '' : false}
-              value={formData[subInput.id]}
-              on:blur={() => onBlur(subInput.id)}
-              label={`${subInput.label}${subInput.required ? '*' : ''}`}
-              on:input={(e) => handleInput(subInput.id, e.target.value)}
-              {forceStopDispatch}
-              placeholder={subInput.placeholder}
-              loader={subInput.loader}
-              validationText={error?.id === subInput.id ? error.text : ''}
-              labelClasses="address-label"
-              elemClasses={'address-elem'}
-              handleInput
-              autocomplete={subInput.autofillToken ?? 'off'}
-            />
-          {/if}
+          <Field
+            id={subInput.id}
+            name={subInput.id}
+            type={subInput.type || 'text'}
+            required={subInput.required}
+            pattern={subInput.pattern || ''}
+            maxlength={subInput.length || ''}
+            formatter={subInput.formatter || ''}
+            icon={subInput.type === 'search' ? '' : false}
+            value={formData[subInput.id]}
+            on:blur={() => onBlur(subInput.id)}
+            label={`${subInput.label}${subInput.required ? '*' : ''}`}
+            on:input={(e) => handleInput(subInput.id, e.target.value)}
+            {forceStopDispatch}
+            placeholder={subInput.placeholder}
+            loader={subInput.loader}
+            validationText={error?.id === subInput.id ? error.text : ''}
+            labelClasses="address-label"
+            elemClasses={'address-elem'}
+            handleInput
+            autocomplete={subInput.autofillToken ?? 'off'}
+          />
         {/each}
       {:else if input.id === 'contact'}
         <ContactField
@@ -85,17 +75,6 @@
           isOptional={!input.required}
           bind:phone={phoneNum}
           inAddress
-        />
-      {:else if input.id === 'country_name'}
-        <CountryField
-          onChange={handleInput}
-          extraLabel={INPUT_FORM[pinIndex]?.unserviceableText}
-          showExtraLabel={!INPUT_FORM[pinIndex]?.required}
-          {formData}
-          extraLabelClass={INPUT_FORM[pinIndex]?.unserviceableText ===
-          SERVICEABLE_LABEL
-            ? 'successText'
-            : 'failureText'}
         />
       {:else}
         <Field
@@ -115,15 +94,9 @@
           loader={input.loader}
           validationText={error?.id === input.id ? error.text : ''}
           labelClasses="address-label"
-          extraLabel={formData[input.id] &&
-            INPUT_FORM[pinIndex]?.required &&
-            input.unserviceableText}
-          elemClasses={`address-elem ${
-            input.id === 'zipcode' && INPUT_FORM[pinIndex]?.hide && 'hide'
-          }`}
-          extraLabelClass={input.unserviceableText === SERVICEABLE_LABEL &&
-          INPUT_FORM[pinIndex]?.required &&
-          formData[input.id]
+          extraLabel={input.unserviceableText}
+          elemClasses={'address-elem'}
+          extraLabelClass={input.unserviceableText === SERVICEABLE_LABEL
             ? 'successText'
             : 'failureText'}
           autocomplete={input.autofillToken ?? 'off'}

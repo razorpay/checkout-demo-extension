@@ -41,7 +41,6 @@
       addressCompleted,
       shouldSaveAddress,
       newUserAddress,
-      selectedCountryISO,
     },
   } = Resource[addressType];
 
@@ -176,7 +175,6 @@
         {error}
         {shouldSaveAddress}
         {addressType}
-        {selectedCountryISO}
       />
     {/if}
     <slot name="inner-footer" />

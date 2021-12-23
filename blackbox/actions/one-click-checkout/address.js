@@ -1,49 +1,5 @@
 const { setState, delay } = require('../../util');
 
-async function handleStateReq(context, country = 'in') {
-  const req = await context.expectRequest();
-  expect(req.method).toBe('GET');
-  expect(req.url).toContain(`countries/${country}/states`);
-  await context.respondJSON([
-    { name: 'Andaman and Nicobar Islands', state_code: 'AN' },
-    { name: 'Andhra Pradesh', state_code: 'AP' },
-    { name: 'Arunachal Pradesh', state_code: 'AR' },
-    { name: 'Assam', state_code: 'AS' },
-    { name: 'Bihar', state_code: 'BR' },
-    { name: 'Chandigarh', state_code: 'CH' },
-    { name: 'Chhattisgarh', state_code: 'CT' },
-    { name: 'Dadra and Nagar Haveli and Daman and Diu', state_code: 'DH' },
-    { name: 'Delhi', state_code: 'DL' },
-    { name: 'Goa', state_code: 'GA' },
-    { name: 'Gujarat', state_code: 'GJ' },
-    { name: 'Haryana', state_code: 'HR' },
-    { name: 'Himachal Pradesh', state_code: 'HP' },
-    { name: 'Jammu and Kashmir', state_code: 'JK' },
-    { name: 'Jharkhand', state_code: 'JH' },
-    { name: 'Karnataka', state_code: 'KA' },
-    { name: 'Kerala', state_code: 'KL' },
-    { name: 'Ladakh', state_code: 'LA' },
-    { name: 'Lakshadweep', state_code: 'LD' },
-    { name: 'Madhya Pradesh', state_code: 'MP' },
-    { name: 'Maharashtra', state_code: 'MH' },
-    { name: 'Manipur', state_code: 'MN' },
-    { name: 'Meghalaya', state_code: 'ML' },
-    { name: 'Mizoram', state_code: 'MZ' },
-    { name: 'Nagaland', state_code: 'NL' },
-    { name: 'Odisha', state_code: 'OR' },
-    { name: 'Puducherry', state_code: 'PY' },
-    { name: 'Punjab', state_code: 'PB' },
-    { name: 'Rajasthan', state_code: 'RJ' },
-    { name: 'Sikkim', state_code: 'SK' },
-    { name: 'Tamil Nadu', state_code: 'TN' },
-    { name: 'Telangana', state_code: 'TG' },
-    { name: 'Tripura', state_code: 'TR' },
-    { name: 'Uttar Pradesh', state_code: 'UP' },
-    { name: 'Uttarakhand', state_code: 'UT' },
-    { name: 'West Bengal', state_code: 'WB' },
-  ]);
-}
-
 function getShippingInfoResponse({
   isCODEligible,
   serviceable = true,
@@ -114,7 +70,7 @@ async function handleShippingInfo(context, options) {
 async function handlePincodes(context) {
   const req = await context.expectRequest();
   expect(req.method).toBe('GET');
-  expect(req.url).toContain('locations/country');
+  expect(req.url).toContain('1cc/pincodes');
   await context.respondJSON({
     city: 'Bengaluru',
     state: 'Karnataka',
@@ -134,9 +90,6 @@ async function fillUserAddress(
   }
 ) {
   await context.page.waitForSelector('.address-new');
-  if (!diffBillShipAddr) {
-    await handleStateReq(context);
-  }
   await context.page.type('#name', 'Test');
   await context.page.type('#zipcode', '560001');
   if (!showSavedAddress && !diffBillShipAddr) {

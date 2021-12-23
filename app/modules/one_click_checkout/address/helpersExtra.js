@@ -1,7 +1,5 @@
 import { contact, email } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
-import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
-import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -10,37 +8,20 @@ import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_check
  * format the added address to send it to the api
  */
 export const formatAddress = (
-  {
-    name,
-    line1,
-    line2,
-    landmark,
-    zipcode,
-    city,
-    state,
-    tag,
-    contact = '',
-    country,
-  },
+  { name, line1, line2, landmark, zipcode, city, state, tag, contact = '' },
   type = 'shipping_address'
 ) => {
-  const countryName =
-    country ||
-    (type === 'shipping_address'
-      ? storeGetter(selectedShippingCountryISO)
-      : storeGetter(selectedBillingCountryISO));
-
   return {
     name,
     type,
     line1,
     line2,
-    zipcode: zipcode || countryName,
+    zipcode,
     city,
     state,
     tag,
     landmark,
-    country: countryName,
+    country: 'in',
     contact,
   };
 };
@@ -83,12 +64,12 @@ export const getCustomerAddressApiPayload = ({
  */
 export const getServiceabilityPayload = (addresses, cache = {}) => {
   let zipcodesProcessed = {};
-  let addPayload = addresses.reduce((acc, { zipcode, country }) => {
+  let addPayload = addresses.reduce((acc, { zipcode }) => {
     if (!cache[zipcode] && !zipcodesProcessed[zipcode]) {
       zipcodesProcessed[zipcode] = true;
       return acc.concat({
         zipcode,
-        country,
+        country: 'in',
       });
     }
     return acc;

@@ -11,6 +11,7 @@
     NAME_LABEL,
     PINCODE_LABEL,
     CITY_LABEL,
+    STATE_LABEL,
     HOUSE_LABEL,
     AREA_LABEL,
     LANDMARK_LABEL,
@@ -20,40 +21,28 @@
     SAVE_ADDRESS_CONSENT_TNC,
     SAVE_ADDRESS_CONSENT_PRIVACY,
     SAVE_ADDRESS_CONSENT_AND,
-    INTERNATIONAL_STATE_LABEL,
-    INTERNATIONAL_PINCODE_LABEL,
-    STATE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
   import {
     tagLabels,
     TNC_LINK,
     PRIVACY_LINK,
+    ZIPCODE_REQUIRED_LENGTH,
   } from 'one_click_checkout/address/constants';
-  import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   // store import
   import {
     getCityState,
     postServiceability,
-    getStatesList,
   } from 'one_click_checkout/address/service';
   import {
     codChargeAmount,
     shippingCharge,
   } from 'one_click_checkout/charges/store';
-  import { availableStateList } from 'one_click_checkout/address/store';
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import { isIndianCustomer } from 'checkoutstore';
-  import { savedAddresses, phoneObj } from 'one_click_checkout/address/store';
-  import { toTitleCase } from 'lib/utils';
-  import {
-    PHONE_PATTERN,
-    INDIA_COUNTRY_CODE,
-    PHONE_REGEX_INDIA,
-    INDIA_COUNTRY_ISO_CODE,
-  } from 'common/constants';
+  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // props
   export let formData;
@@ -62,18 +51,12 @@
   export let id = 'addressForm';
   export let shouldSaveAddress;
   export let addressType;
-  export let selectedCountryISO;
 
   let selectedTag = '';
   let called = false;
   let pinIndex = -1;
-  let stateIndex = -1;
-  let stateSubIndex = -1;
-  let pinPattern;
-  let selectedCountry;
-  let phonePattern = new RegExp(PHONE_PATTERN);
 
-  let INPUT_FORM = [
+  let INITIAL_INPUT_FORM = [
     {
       id: 'name',
       label: $t(NAME_LABEL),
@@ -85,19 +68,18 @@
       required: true,
     },
     {
-      id: 'country_name',
-      label: 'Country',
-      required: true,
-      autofillToken: 'none',
-    },
-    {
       id: 'zipcode',
       label: $t(PINCODE_LABEL),
       required: true,
       unserviceableText: '',
+      pattern: '[0-9]{6}',
+      formatter: { type: 'number' },
+      length: 6,
       autofillToken: 'postal-code',
-      hide: false,
     },
+  ];
+
+  let NEXT_INPUT_FORM = [
     [
       {
         id: 'city',
@@ -107,9 +89,8 @@
       },
       {
         id: 'state',
-        label: `${$t(STATE_LABEL)}*`,
+        label: $t(STATE_LABEL),
         required: true,
-        items: [],
       },
     ],
     {
@@ -135,22 +116,15 @@
 
   const dispatch = createEventDispatcher();
 
+  let INPUT_FORM = [...INITIAL_INPUT_FORM, ...NEXT_INPUT_FORM];
+
   const isFormComplete = () => {
     let completed = false;
-    const { countryCode, phoneNum } = $phoneObj;
     for (let key in $formData) {
-      if (
-        ['landmark', 'tag', 'cod'].includes(key) ||
-        (key === 'zipcode' && !INPUT_FORM[pinIndex]?.required)
-      ) {
+      if (['landmark', 'tag', 'cod'].includes(key)) {
         continue;
       }
-      if (
-        key === 'contact' &&
-        ((countryCode === INDIA_COUNTRY_CODE &&
-          !PHONE_REGEX_INDIA.test(phoneNum)) ||
-          (countryCode !== INDIA_COUNTRY_CODE && !phonePattern.test(phoneNum)))
-      ) {
+      if (key === 'contact' && $formData[key]?.length < 13) {
         completed = false;
         return completed;
       }
@@ -169,79 +143,7 @@
     return true;
   };
 
-  function handleCountrySelect(name, iso) {
-    $selectedCountryISO = iso.toLowerCase();
-    pinPattern = new RegExp(COUNTRY_POSTALS_MAP[iso].pattern);
-    INPUT_FORM[pinIndex].pattern = COUNTRY_POSTALS_MAP[iso].pattern;
-    if (!INPUT_FORM[pinIndex].pattern) {
-      INPUT_FORM[pinIndex].required = false;
-      INPUT_FORM[pinIndex].hide = true;
-      const pincodeEle = document.getElementById('zipcode').parentNode;
-      pincodeEle.classList.remove('invalid');
-      const payload = [
-        {
-          zipcode: $selectedCountryISO,
-          country: $selectedCountryISO,
-        },
-      ];
-
-      if (checkServiceability) {
-        postServiceability(payload)
-          .then((res) => {
-            if (res && res[$selectedCountryISO]?.serviceability) {
-              codChargeAmount.set(res[$selectedCountryISO].cod_fee);
-              shippingCharge.set(res[$selectedCountryISO].shipping_fee);
-              INPUT_FORM[pinIndex].unserviceableText = SERVICEABLE_LABEL;
-            } else {
-              INPUT_FORM[pinIndex].unserviceableText = UNSERVICEABLE_LABEL;
-            }
-            $formData.cod = res[$selectedCountryISO]?.cod;
-          })
-          .catch(() => {
-            INPUT_FORM[pinIndex].unserviceableText = UNSERVICEABLE_LABEL;
-          });
-      }
-    } else {
-      INPUT_FORM[pinIndex].required = true;
-      INPUT_FORM[pinIndex].hide = false;
-      const pincodeEle = document.getElementById('zipcode').parentNode;
-      pincodeEle.classList.add('invalid');
-    }
-    if ($availableStateList[iso]) {
-      INPUT_FORM[stateIndex][stateSubIndex].items = $availableStateList[iso];
-    } else {
-      getStatesList($selectedCountryISO).then((res) => {
-        availableStateList.update((currentStateList) => {
-          const state = {
-            ...currentStateList,
-            [iso]: res,
-          };
-          return state;
-        });
-        INPUT_FORM[stateIndex][stateSubIndex].items = res;
-      });
-    }
-  }
-
-  const changePincodeStateLabel = () => {
-    const { countryCode } = $phoneObj;
-    if (
-      countryCode !== INDIA_COUNTRY_CODE ||
-      $selectedCountryISO?.toUpperCase() !== INDIA_COUNTRY_ISO_CODE
-    ) {
-      INPUT_FORM[pinIndex].label = $t(INTERNATIONAL_PINCODE_LABEL);
-      INPUT_FORM[stateIndex][stateSubIndex].label = `${$t(
-        INTERNATIONAL_STATE_LABEL
-      )}*`;
-      $shouldSaveAddress = false;
-    } else {
-      INPUT_FORM[pinIndex].label = $t(PINCODE_LABEL);
-      INPUT_FORM[stateIndex][stateSubIndex].label = `${$t(STATE_LABEL)}*`;
-      $shouldSaveAddress = true;
-    }
-  };
-
-  export function onUpdate(key, value, extra) {
+  export function onUpdate(key, value) {
     // checks if pincode has been filled and autofills city, state for the same
     if (key === 'zipcode' && checkServiceability) {
       // Hack to prevent api being called twice, will remove and look for a better solution
@@ -249,11 +151,10 @@
       if (!called) {
         return;
       }
-      if (pinPattern.test(value)) {
+      if (value.length === ZIPCODE_REQUIRED_LENGTH) {
         const payload = [
           {
             zipcode: value,
-            country: $selectedCountryISO,
           },
         ];
 
@@ -263,8 +164,8 @@
               codChargeAmount.set(res[value].cod_fee);
               shippingCharge.set(res[value].shipping_fee);
               INPUT_FORM[pinIndex].unserviceableText = SERVICEABLE_LABEL;
-              onUpdate('city', toTitleCase(res[value].city) || '');
-              onUpdate('state', toTitleCase(res[value].state) || '');
+              onUpdate('city', res[value].city || '');
+              onUpdate('state', res[value].state || '');
             } else {
               INPUT_FORM[pinIndex].unserviceableText = UNSERVICEABLE_LABEL;
             }
@@ -279,28 +180,13 @@
     } else if (
       !checkServiceability &&
       key === 'zipcode' &&
-      pinPattern.test(value)
+      value.length === ZIPCODE_REQUIRED_LENGTH
     ) {
-      getCityState(value, $selectedCountryISO).then((response) => {
-        onUpdate('city', toTitleCase(response.city) || '');
-        onUpdate('state', toTitleCase(response.state) || '');
+      getCityState(value).then((response) => {
+        onUpdate('city', response.city || '');
+        onUpdate('state', response.state || '');
       });
     }
-
-    if (key === 'country_name' && value !== selectedCountry) {
-      selectedCountry = value;
-      handleCountrySelect(value, extra);
-      changePincodeStateLabel();
-      if (value !== $formData.country_name) {
-        $formData.state = '';
-        $formData.zipcode = '';
-      }
-    }
-
-    if (key === 'contact' && pinIndex !== -1) {
-      changePincodeStateLabel();
-    }
-
     $formData = {
       ...$formData,
       [key]: value,
@@ -331,21 +217,6 @@
     Events.Track(AddressEvents[`INPUT_ENTERED_${id}`]);
   };
 
-  const initialiseStateIndex = () => {
-    for (let index = 0; index < INPUT_FORM.length; index++) {
-      if (Array.isArray(INPUT_FORM[index])) {
-        stateSubIndex = INPUT_FORM[index].findIndex(
-          (field) => field.id === 'state'
-        );
-        if (stateSubIndex) {
-          stateIndex = index;
-          break;
-        }
-      }
-    }
-    return;
-  };
-
   onMount(() => {
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
@@ -357,8 +228,6 @@
 
     pinIndex = INPUT_FORM.findIndex((field) => field.id === 'zipcode');
 
-    initialiseStateIndex();
-    changePincodeStateLabel();
     const el = document.querySelector(
       '#addressForm > div:nth-child(1) > div > #name'
     );
@@ -374,10 +243,10 @@
       {onUpdate}
       formData={$formData}
       {INPUT_FORM}
-      {pinIndex}
+      on:addressInputUpdate
       on:blur={onInputFieldBlur}
     />
-    {#if $isIndianCustomer && $phoneObj?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
+    {#if $isIndianCustomer}
       <div class="address-save-consent">
         <Checkbox
           on:change={handleSaveConsentChange}
@@ -395,17 +264,17 @@
           </a>
         </span>
       </div>
-      {#if $shouldSaveAddress}
-        <div class="address-save">
-          {#each tagLabels as label}
-            <Tag
-              onSelect={() => updateTag(label)}
-              {label}
-              selected={label === selectedTag}
-            />
-          {/each}
-        </div>
-      {/if}
+    {/if}
+    {#if $isIndianCustomer && $shouldSaveAddress}
+      <div class="address-save">
+        {#each tagLabels as label}
+          <Tag
+            onSelect={() => updateTag(label)}
+            {label}
+            selected={label === selectedTag}
+          />
+        {/each}
+      </div>
     {/if}
   </div>
 </div>

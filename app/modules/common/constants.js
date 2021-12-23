@@ -113,7 +113,3 @@ export const COLORS = {
   TEXT_COLOR_BLACK: 'rgba(0, 0, 0, 0.85)',
   TEXT_COLOR_WHITE: '#FFFFFF',
 };
-
-export const INDIA_COUNTRY_ISO_CODE = 'IN';
-
-export const US_COUNTRY_ISO_CODE = 'US';

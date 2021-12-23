@@ -40,7 +40,7 @@
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "start": "NODE_ENV=dev gulp watch",
-    "dev-start": "API_SERVER=localhost nodemon server & npm start",
+    "dev-start": "API_SERVER=https://api-web.func.razorpay.in nodemon server & npm start",
     "live-start": "API_SERVER=https://api.razorpay.com nodemon server & npm start",
     "start:no-reload": "gulp watch",
     "build": "rollup -c --environment prod && gulp && npm run testC",

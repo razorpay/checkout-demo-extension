@@ -19,8 +19,6 @@
   // analytics import
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
-  // constant imports
-  import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
 
   export let addresses = savedAddresses;
   export let checkServiceability = true;
@@ -45,8 +43,8 @@
     selectedAddressId.set(id);
     if (!checkServiceability) return;
 
-    const { zipcode, country } = $selectedAddress;
-    const payload = [{ zipcode, country }];
+    const { zipcode } = $selectedAddress;
+    const payload = [{ zipcode }];
     postServiceability(payload).then((res) => {
       hydrateSamePincodeAddresses(res, zipcode);
       isAddressServiceable = $selectedAddress.serviceability;
@@ -61,15 +59,6 @@
 
   function hydrateSamePincodeAddresses(data, zipcode) {
     const newAddresses = $addresses.map((item) => {
-      if (
-        item.zipcode === item.country &&
-        data[item.zipcode]?.hasOwnProperty('city') &&
-        data[item.zipcode]?.hasOwnProperty('state')
-      ) {
-        delete data[item.zipcode].city;
-        delete data[item.zipcode].state;
-      }
-
       if (item.zipcode === zipcode) {
         return {
           ...item,
@@ -88,8 +77,8 @@
       dispatchServiceability();
     }
     if (checkServiceability) {
-      const { zipcode, country } = $selectedAddress;
-      const payload = [{ zipcode, country }];
+      const { zipcode } = $selectedAddress;
+      const payload = [{ zipcode }];
       postServiceability(payload, true).then((res) => {
         hydrateSamePincodeAddresses(res, zipcode);
         isAddressServiceable = $selectedAddress.serviceability;
@@ -108,14 +97,6 @@
   const setShippingForSelectedAddress = () => {
     shippingCharge.set($selectedAddress.shipping_fee);
     codChargeAmount.set($selectedAddress.cod_fee);
-  };
-  const getCountryName = (countryISO) => {
-    const rows = Object.entries(COUNTRY_POSTALS_MAP);
-    for (const [iso, countryInfo] of rows) {
-      if (countryISO && countryISO.toUpperCase() === iso) {
-        return countryInfo.name;
-      }
-    }
   };
 </script>
 
@@ -156,15 +137,7 @@
                   .replace(/(^,)|(,$)/g, '')}
               </div>
               <div>
-                {s_address['zipcode'] !== s_address['country']
-                  ? `${s_address['city']}, ${
-                      s_address['state']
-                    }, ${getCountryName(s_address['country'])}, ${
-                      s_address['zipcode']
-                    }`
-                  : `${s_address['city']}, ${
-                      s_address['state']
-                    }, ${getCountryName(s_address['country'])}`}
+                {`${s_address['city']}, ${s_address['state']}, ${s_address['zipcode']}`}
               </div>
               {#if s_address['landmark']}
                 <div class="address-font--12">
