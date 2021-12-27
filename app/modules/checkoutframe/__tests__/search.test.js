@@ -19,8 +19,8 @@ const BANKS = [
   },
 ];
 
-test('Module: checkoutframe/search', (t) => {
-  test('Search.search', (t) => {
+describe('Module: checkoutframe/search', () => {
+  test('Search.search', () => {
     const cache = Search.createCache();
 
     const codeResults = Search.search('sbin', BANKS, ['code', 'name'], {
@@ -30,14 +30,10 @@ test('Module: checkoutframe/search', (t) => {
       threshold: 0,
     });
 
-    t.deepEqual(
-      codeResults.results[0].ref,
-      {
-        code: 'SBIN',
-        name: 'State Bank of India',
-      },
-      'searches properly using "sbin"'
-    );
+    expect(codeResults.results[0].ref).toEqual({
+      code: 'SBIN',
+      name: 'State Bank of India',
+    });
 
     const nameResults = Search.search(
       'state bank of india',
@@ -51,17 +47,9 @@ test('Module: checkoutframe/search', (t) => {
       }
     );
 
-    t.deepEqual(
-      nameResults.results[0].ref,
-      {
-        code: 'SBIN',
-        name: 'State Bank of India',
-      },
-      'searches properly using "state"'
-    );
-
-    t.end();
+    expect(nameResults.results[0].ref).toEqual({
+      code: 'SBIN',
+      name: 'State Bank of India',
+    });
   });
-
-  t.end();
 });

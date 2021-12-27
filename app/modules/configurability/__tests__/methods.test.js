@@ -1,8 +1,8 @@
 import * as Methods from 'configurability/methods';
 
-test('Module: configurability/methods', (t) => {
-  test('Methods.createMethodBlock', (t) => {
-    test('Creates a method block', (t) => {
+describe('Module: configurability/methods', () => {
+  describe('Methods.createMethodBlock', () => {
+    test('Creates a method block', () => {
       let method, expected, found;
 
       method = 'card';
@@ -16,16 +16,12 @@ test('Module: configurability/methods', (t) => {
 
       found = Methods.createMethodBlock(method);
 
-      t.deepEqual(found, expected, 'Creates a method block');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
 
-  test('Methods.clusterRazorpayBlocks', (t) => {
-    test('Clusters blocks properly', (t) => {
+  describe('Methods.clusterRazorpayBlocks', () => {
+    test('Clusters blocks properly', () => {
       let blocks, expected, found;
 
       blocks = [
@@ -415,13 +411,7 @@ test('Module: configurability/methods', (t) => {
 
       found = Methods.clusterRazorpayBlocks(blocks);
 
-      t.deepEqual(found, expected, 'Clusters blocks properly');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
-
-  t.end();
 });

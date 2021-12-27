@@ -160,6 +160,7 @@ export default {
       UTIB_C: 'Axis Corporate',
       VIJB: 'Vijaya Bank',
       YESB: 'Yes',
+      HSBC: 'HSBC',
     },
   },
   callouts: {

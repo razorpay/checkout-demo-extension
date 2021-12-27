@@ -1,8 +1,8 @@
 import * as Sequence from 'configurability/sequence';
 
-test('Module: configurability/sequence', (t) => {
-  test('Sequence.getSequencedBlocks', (t) => {
-    test('Sequences blocks properly with default blocks', (t) => {
+describe('Module: configurability/sequence', () => {
+  describe('Sequence.getSequencedBlocks', () => {
+    test('Sequences blocks properly with default blocks', () => {
       let params, expected, found;
 
       params = {
@@ -206,16 +206,10 @@ test('Module: configurability/sequence', (t) => {
 
       found = Sequence.getSequencedBlocks(params);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Sequences blocks properly with default block'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Sequences blocks properly without default blocks', (t) => {
+    test('Sequences blocks properly without default blocks', () => {
       let params, expected, found;
 
       params = {
@@ -355,17 +349,7 @@ test('Module: configurability/sequence', (t) => {
 
       found = Sequence.getSequencedBlocks(params);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Sequences blocks properly without default blocks'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
-
-  t.end();
 });

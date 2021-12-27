@@ -15,4 +15,17 @@ module.exports = {
   testEnvironment: 'jsdom',
   timers: 'legacy',
   clearMocks: true, // Automatically clear mock calls and instances before every test.
+  collectCoverageFrom: collectCoverageFrom(),
+  coverageReporters: ['html-spa', 'text-summary'],
 };
+
+function collectCoverageFrom() {
+  if (process.env.__SVELTE_COVERAGE__) {
+    return ['<rootDir>/app/modules/**/*.*'];
+  }
+
+  // use the jest's default mechanism for collecting coverage,
+  // which ever file gets resolved during test execution,
+  // will be considered for coverage
+  return undefined;
+}

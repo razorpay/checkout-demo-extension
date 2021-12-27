@@ -11,6 +11,8 @@ global.beforeEach(() => {
   initI18n();
 });
 
+global.matchMedia = jest.fn(() => ({ matches: false }));
+
 /**
  * Make these functions globally available for jest.
  * rollup-injects.js does the injection for application code

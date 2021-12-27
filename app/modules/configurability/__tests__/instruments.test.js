@@ -1,9 +1,9 @@
 import * as Instruments from 'configurability/instruments';
 
-test('Module: configurability/instruments', (t) => {
-  test('Instruments.createInstrument', (t) => {
-    test('Fails to create an instrument without a method', (t) => {
-      let config, expected, found;
+describe('Module: configurability/instruments', () => {
+  describe('Instruments.createInstrument', () => {
+    test('Fails to create an instrument without a method', () => {
+      let config, found;
 
       config = {
         types: ['credit'],
@@ -11,16 +11,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.createInstrument(config);
 
-      t.notOk(
-        found,
-        expected,
-        'Fails to create an instrument without a method'
-      );
-
-      t.end();
+      expect(found).toBeUndefined();
     });
 
-    test('Creates instrument of type=instrument with instrument keys', (t) => {
+    test('Creates instrument of type=instrument with instrument keys', () => {
       let config, expected, found;
 
       config = {
@@ -36,16 +30,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.createInstrument(config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates instrument of type=instrument with instrument keys'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Creates instrument of type=method without instrument keys', (t) => {
+    test('Creates instrument of type=method without instrument keys', () => {
       let config, expected, found;
 
       config = {
@@ -59,16 +47,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.createInstrument(config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates instrument of type=method without instrument keys'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Transforms UPI app name', (t) => {
+    test('Transforms UPI app name', () => {
       let config, expected, found;
 
       config = {
@@ -86,17 +68,13 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.createInstrument(config);
 
-      t.deepEqual(found, expected, 'Transforms UPI app name');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
 
-  test('Instruments.validateKeysAndCreateInstrument', (t) => {
-    test('Fails to create an instrument without a method', (t) => {
-      let config, expected, found;
+  describe('Instruments.validateKeysAndCreateInstrument', () => {
+    test('Fails to create an instrument without a method', () => {
+      let config, found;
 
       config = {
         types: ['credit'],
@@ -104,16 +82,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.notOk(
-        found,
-        expected,
-        'Fails to create an instrument without a method'
-      );
-
-      t.end();
+      expect(found).toBeUndefined();
     });
 
-    test('Creates instrument of type=instrument with instrument keys', (t) => {
+    test('Creates instrument of type=instrument with instrument keys', () => {
       let config, expected, found;
 
       config = {
@@ -129,16 +101,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates instrument of type=instrument with instrument keys'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Creates instrument of type=method without instrument keys', (t) => {
+    test('Creates instrument of type=method without instrument keys', () => {
       let config, expected, found;
 
       config = {
@@ -152,16 +118,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates instrument of type=method without instrument keys'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Transforms UPI app name', (t) => {
+    test('Transforms UPI app name', () => {
       let config, expected, found;
 
       config = {
@@ -179,12 +139,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.deepEqual(found, expected, 'Transforms UPI app name');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Fails to create instrument for unexpected keys', (t) => {
+    test('Fails to create instrument for unexpected keys', () => {
       let config, expected, found;
 
       config = {
@@ -197,12 +155,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.deepEqual(found, expected, 'Does not create instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Fails to create instrument for expected keys as non-array', (t) => {
+    test('Fails to create instrument for expected keys as non-array', () => {
       let config, expected, found;
 
       config = {
@@ -215,16 +171,12 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.validateKeysAndCreateInstrument(config);
 
-      t.deepEqual(found, expected, 'Does not create instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
 
-  test('Instruments.isInstrumentForEntireMethod', (t) => {
-    test('Identifies instrument with keys as not a method instrument', (t) => {
+  describe('Instruments.isInstrumentForEntireMethod', () => {
+    test('Identifies instrument with keys as not a method instrument', () => {
       let instrument, found;
 
       instrument = {
@@ -234,15 +186,10 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.isInstrumentForEntireMethod(instrument);
 
-      t.false(
-        found,
-        'Identifies instrument with keys as not a method instrument'
-      );
-
-      t.end();
+      expect(found).toBe(false);
     });
 
-    test('Identifies instrument without keys as a method instrument', (t) => {
+    test('Identifies instrument without keys as a method instrument', () => {
       let instrument, found;
 
       instrument = {
@@ -251,16 +198,7 @@ test('Module: configurability/instruments', (t) => {
 
       found = Instruments.isInstrumentForEntireMethod(instrument);
 
-      t.true(
-        found,
-        'Identifies instrument without keys as a method instrument'
-      );
-
-      t.end();
+      expect(found).toBe(true);
     });
-
-    t.end();
   });
-
-  t.end();
 });

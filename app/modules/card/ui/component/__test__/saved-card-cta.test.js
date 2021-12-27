@@ -28,7 +28,9 @@ describe('Saved Card CTA', () => {
       showSubTitle: false,
     });
     expect(getByText('Pay With Your Saved Card')).toBeInTheDocument();
-    expect(container.querySelector('.saved-text-subtitle')).toBeFalsy();
+    expect(
+      container.querySelector('.saved-text-subtitle')
+    ).not.toBeInTheDocument();
   });
 
   test('Click Action', async () => {

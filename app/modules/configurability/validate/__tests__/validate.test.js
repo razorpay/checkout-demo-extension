@@ -1,8 +1,8 @@
 import * as Validate from 'configurability/validate';
 
-test('Module: configurability/validate', (t) => {
-  test('Validate.isInstrumentValidForPayment', (t) => {
-    test('method=netbanking', (t) => {
+describe('Module: configurability/validate', () => {
+  describe('Validate.isInstrumentValidForPayment', () => {
+    test('method=netbanking', async () => {
       let payment;
 
       payment = {
@@ -10,31 +10,26 @@ test('Module: configurability/validate', (t) => {
         bank: 'ICIC',
       };
 
-      let tests = [
-        Validate.isInstrumentValidForPayment(
-          { method: 'netbanking' },
-          payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'netbanking' }, payment)
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'netbanking', banks: ['HDFC', 'ICIC'] },
           payment
-        ).then((valid) =>
-          t.ok(valid, 'Instrument with expected bank is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'netbanking', banks: ['HDFC', 'UTIB'] },
           payment
-        ).then((valid) =>
-          t.notOk(valid, 'Instrument without expected bank is invalid')
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=wallet', (t) => {
+    test('method=wallet', async () => {
       let payment;
 
       payment = {
@@ -42,31 +37,26 @@ test('Module: configurability/validate', (t) => {
         wallet: 'freecharge',
       };
 
-      let tests = [
-        Validate.isInstrumentValidForPayment(
-          { method: 'wallet' },
-          payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'wallet' }, payment)
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'wallet', wallets: ['olamoney', 'freecharge'] },
           payment
-        ).then((valid) =>
-          t.ok(valid, 'Instrument with expected wallet is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'wallet', wallets: ['olamoney', 'amazonpay'] },
           payment
-        ).then((valid) =>
-          t.notOk(valid, 'Instrument without expected wallet is invalid')
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=cardless_emi', (t) => {
+    test('method=cardless_emi', async () => {
       let payment;
 
       payment = {
@@ -74,31 +64,29 @@ test('Module: configurability/validate', (t) => {
         provider: 'earlysalary',
       };
 
-      let tests = [
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi' },
           payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi', providers: ['zestmoney', 'earlysalary'] },
           payment
-        ).then((valid) =>
-          t.ok(valid, 'Instrument with expected provider is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi', providers: ['zestmoney', 'flexmoney'] },
           payment
-        ).then((valid) =>
-          t.notOk(valid, 'Instrument without expected provider is invalid')
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=paylater', (t) => {
+    test('method=paylater', async () => {
       let payment;
 
       payment = {
@@ -106,31 +94,26 @@ test('Module: configurability/validate', (t) => {
         provider: 'epaylater',
       };
 
-      let tests = [
-        Validate.isInstrumentValidForPayment(
-          { method: 'paylater' },
-          payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'paylater' }, payment)
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'paylater', providers: ['epaylater', 'icic'] },
           payment
-        ).then((valid) =>
-          t.ok(valid, 'Instrument with expected provider is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'paylater', providers: ['getsimpl', 'icic'] },
           payment
-        ).then((valid) =>
-          t.notOk(valid, 'Instrument without expected provider is invalid')
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=upi', (t) => {
+    test('method=upi', async () => {
       const vpaPayment = {
         method: 'upi',
         vpa: 'test@rzp',
@@ -153,100 +136,79 @@ test('Module: configurability/validate', (t) => {
         '_[app]': 'some.random.app',
       };
 
-      let tests = [
-        Validate.isInstrumentValidForPayment(
-          { method: 'upi' },
-          vpaPayment
-        ).then((valid) =>
-          t.ok(valid, 'VPA Payment: Method instrument is valid')
-        ),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'upi' }, vpaPayment)
+      ).resolves.toBe(true);
 
-        Validate.isInstrumentValidForPayment(
-          { method: 'upi' },
-          tokenPayment
-        ).then((valid) =>
-          t.ok(valid, 'Token Payment: Method instrument is valid')
-        ),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'upi' }, tokenPayment)
+      ).resolves.toBe(true);
 
-        Validate.isInstrumentValidForPayment({ method: 'upi' }, qrPayment).then(
-          (valid) => t.ok(valid, 'QR Payment: Method instrument is valid')
-        ),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'upi' }, qrPayment)
+      ).resolves.toBe(true);
 
-        Validate.isInstrumentValidForPayment(
-          { method: 'upi' },
-          intentPayment
-        ).then((valid) =>
-          t.ok(valid, 'Intent Payment: Method instrument is valid')
-        ),
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'upi' }, intentPayment)
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           vpaPayment
-        ).then((valid) =>
-          t.ok(valid, 'VPA Payment: Instrument with expected flow is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'intent'] },
           vpaPayment
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'VPA Payment: Instrument without expected flow is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           tokenPayment
-        ).then((valid) =>
-          t.ok(valid, 'Token Payment: Instrument with expected flow is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'intent'] },
           tokenPayment
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Token Payment: Instrument without expected flow is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           qrPayment
-        ).then((valid) =>
-          t.ok(valid, 'QR Payment: Instrument with expected flow is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['intent', 'collect'] },
           qrPayment
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'QR Payment: Instrument without expected flow is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['intent', 'collect'] },
           intentPayment
-        ).then((valid) =>
-          t.ok(valid, 'Intent Payment: Instrument with expected flow is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           intentPayment
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Intent Payment: Instrument without expected flow is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           {
             method: 'upi',
@@ -254,10 +216,10 @@ test('Module: configurability/validate', (t) => {
             apps: ['some.random.app', 'another.random.app'],
           },
           intentPayment
-        ).then((valid) =>
-          t.ok(valid, 'Intent Payment: Instrument with expected app is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           {
             method: 'upi',
@@ -265,18 +227,11 @@ test('Module: configurability/validate', (t) => {
             apps: ['first.random.app', 'another.random.app'],
           },
           intentPayment
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Intent Payment: Instrument without expected app is invalid'
-          )
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=card', (t) => {
+    test('method=card', async () => {
       const tokens = [
         {
           id: 'token_1',
@@ -361,120 +316,98 @@ test('Module: configurability/validate', (t) => {
         token: 'tkn_two',
       };
 
-      let tests = [
+      await expect(
         Validate.isInstrumentValidForPayment({ method: 'card' }, payment, {
           tokens,
-        }).then((valid) => t.ok(valid, 'Method instrument is valid')),
+        })
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', issuers: ['HDFC', 'UTIB'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.ok(valid, 'Saved Card: Instrument with expected issuers is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', issuers: ['ICIC', 'UTIB'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Saved Card: Instrument without expected issuers is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', networks: ['MasterCard', 'Visa'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.ok(valid, 'Saved Card: Instrument with expected networks is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', networks: ['American Express', 'Visa'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Saved Card: Instrument without expected networks is invalid'
-          )
-        ),
+        )
+      ).resolves.toBe(false);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', types: ['credit', 'debit'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.ok(valid, 'Saved Card: Instrument with expected types is valid')
-        ),
+        )
+      ).resolves.toBe(true);
 
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', types: ['debit'] },
           payment,
           {
             tokens,
           }
-        ).then((valid) =>
-          t.notOk(
-            valid,
-            'Saved Card: Instrument without expected types is invalid'
-          )
-        ),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(false);
     });
 
-    test('method=bank_transfer', (t) => {
+    test('method=bank_transfer', async () => {
       let payment;
 
       payment = {
         method: 'bank_transfer',
       };
 
-      let tests = [
+      await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'bank_transfer' },
           payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+        )
+      ).resolves.toBe(true);
     });
 
-    test('method=paypal', (t) => {
+    test('method=paypal', async () => {
       let payment;
 
       payment = {
         method: 'paypal',
       };
 
-      let tests = [
-        Validate.isInstrumentValidForPayment(
-          { method: 'paypal' },
-          payment
-        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
-      ];
-
-      Promise.all(tests).finally(() => t.end());
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'paypal' }, payment)
+      ).resolves.toBe(true);
     });
-
-    t.end();
   });
-
-  t.end();
 });

@@ -55,7 +55,7 @@ describe('#tryOpeningIntentUrl', () => {
         const canProceed = tryOpeningIntentUrl(intentUrl);
         finishTimeout();
 
-        await expect(canProceed).resolves.toBeTruthy();
+        await expect(canProceed).resolves.toBe(true);
       });
     });
 
@@ -70,7 +70,7 @@ describe('#tryOpeningIntentUrl', () => {
         const canProceed = tryOpeningIntentUrl(intentUrl);
         finishTimeout();
 
-        await expect(canProceed).resolves.toBeFalsy();
+        await expect(canProceed).resolves.toBe(false);
       });
 
       it('should close the popup', async () => {
@@ -96,7 +96,7 @@ describe('#tryOpeningIntentUrl', () => {
       const canProceed = tryOpeningIntentUrl(intentUrl);
       finishTimeout();
 
-      await expect(canProceed).resolves.toBeTruthy();
+      await expect(canProceed).resolves.toBe(true);
     });
   });
 });

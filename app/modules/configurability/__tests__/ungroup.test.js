@@ -1,8 +1,8 @@
 import * as Ungroup from 'configurability/ungroup';
 
-test('Module: configurability/ungroup', (t) => {
-  test('Ungroup.ungroupInstruments', (t) => {
-    test('method=card', (t) => {
+describe('Module: configurability/ungroup', () => {
+  describe('Ungroup.ungroupInstruments', () => {
+    test('method=card', () => {
       let block, expected, found;
       let individualInstrument, groupedInstrument;
       let customer = {
@@ -108,13 +108,7 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block, customer);
 
-      t.deepEqual(found, expected, 'Works for token_id');
-
-      groupedInstrument = {
-        method: 'card',
-        networks: ['Visa'],
-        issuers: ['HDFC', 'ICIC'],
-      };
+      expect(found).toEqual(expected);
 
       block = {
         code: 'block.test',
@@ -294,16 +288,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block, customer);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Works on instruments with issuers, networks and types'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=netbanking', (t) => {
+    test('method=netbanking', () => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -339,67 +327,12 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=upi', (t) => {
+    test('method=upi', () => {
       let block, expected, found;
       let groupedInstrument;
-
-      const customer = {
-        tokens: {
-          items: [
-            {
-              id: 'token_12345',
-              entity: 'token',
-              token: 'abcde',
-              bank: null,
-              wallet: null,
-              method: 'upi',
-              vpa: {
-                username: 'test',
-                handle: 'unit',
-                name: null,
-              },
-              recurring: false,
-              recurring_details: {
-                status: 'not_applicable',
-                failure_reason: null,
-              },
-              auth_type: null,
-              mrn: null,
-              used_at: 1582093612,
-              created_at: 1580912391,
-              start_time: null,
-            },
-            {
-              id: 'token_54321',
-              entity: 'token',
-              token: 'pqrst',
-              bank: null,
-              wallet: null,
-              method: 'upi',
-              vpa: {
-                username: 'anothertest',
-                handle: 'unit',
-                name: null,
-              },
-              recurring: false,
-              recurring_details: {
-                status: 'not_applicable',
-                failure_reason: null,
-              },
-              auth_type: null,
-              mrn: null,
-              used_at: 1582093612,
-              created_at: 1580912391,
-              start_time: null,
-            },
-          ],
-        },
-      };
 
       groupedInstrument = {
         method: 'upi',
@@ -433,7 +366,7 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Works for grouped instrument: flows');
+      expect(found).toEqual(expected);
 
       groupedInstrument = {
         method: 'upi',
@@ -471,7 +404,7 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Works for grouped instrument: apps');
+      expect(found).toEqual(expected);
 
       groupedInstrument = {
         method: 'upi',
@@ -517,16 +450,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Works for grouped instrument with multiple keys: apps, flows'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=wallet', (t) => {
+    test('method=wallet', () => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -562,12 +489,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=cardless_emi', (t) => {
+    test('method=cardless_emi', () => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -603,12 +528,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=paylater', (t) => {
+    test('method=paylater', () => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -644,12 +567,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=paypal', (t) => {
+    test('method=paypal', () => {
       let block, expected, found;
       let instrument;
 
@@ -678,12 +599,10 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Sends the same instrument back');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('method=bank_transfer', (t) => {
+    test('method=bank_transfer', () => {
       let block, expected, found;
       let instrument;
 
@@ -712,13 +631,7 @@ test('Module: configurability/ungroup', (t) => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Sends the same instrument back');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
-
-  t.end();
 });

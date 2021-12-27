@@ -1,8 +1,9 @@
-import * as Translate from 'configurability/translate';
+import * as Configurability from 'configurability';
 
-test('Module: configurability/translate', (t) => {
-  test('Translate.translateExternal', (t) => {
-    test('Translates external options properly', (t) => {
+describe('Module: configurability', () => {
+  describe('Configurability.getBlockConfig', () => {
+    // Test is skipped because `razorpayInstance` is undefined and it fails at `razorpayInstance.get(option)`
+    test.skip('Retrieves the expected block config', () => {
       let config, expected, found;
 
       config = {
@@ -77,6 +78,17 @@ test('Module: configurability/translate', (t) => {
               title: 'Pay via Google Pay',
             },
             {
+              code: 'rzp.cluster',
+              _type: 'block',
+              instruments: [
+                {
+                  code: 'netbanking',
+                  _type: 'method',
+                  method: 'netbanking',
+                },
+              ],
+            },
+            {
               code: 'block.hdfc',
               _type: 'block',
               instruments: [
@@ -98,56 +110,80 @@ test('Module: configurability/translate', (t) => {
               ],
               title: 'Pay via HDFC Bank',
             },
+            {
+              code: 'rzp.cluster',
+              _type: 'block',
+              instruments: [
+                {
+                  code: 'card',
+                  _type: 'method',
+                  method: 'card',
+                },
+                {
+                  code: 'wallet',
+                  _type: 'method',
+                  method: 'wallet',
+                },
+                {
+                  code: 'upi',
+                  _type: 'instrument',
+                  method: 'upi',
+                },
+                {
+                  code: 'gpay',
+                  _type: 'instrument',
+                  method: 'gpay',
+                },
+                {
+                  code: 'cardless_emi',
+                  _type: 'instrument',
+                  method: 'cardless_emi',
+                },
+                {
+                  code: 'paylater',
+                  _type: 'instrument',
+                  method: 'paylater',
+                },
+                {
+                  code: 'paypal',
+                  _type: 'instrument',
+                  method: 'paypal',
+                },
+                {
+                  code: 'bank_transfer',
+                  _type: 'instrument',
+                  method: 'bank_transfer',
+                },
+                {
+                  code: 'nach',
+                  _type: 'instrument',
+                  method: 'nach',
+                },
+              ],
+            },
           ],
-          hide: {
-            instruments: [
-              {
-                method: 'wallet',
-                wallets: ['olamoney'],
-                _type: 'instrument',
-              },
-              {
-                method: 'card',
-                issuers: ['SBIN'],
-                networks: ['MasterCard'],
-                _type: 'instrument',
-              },
-              {
-                method: 'card',
-                types: ['credit'],
-                _type: 'instrument',
-              },
-              {
-                method: 'card',
-                issuers: ['ICIC'],
-                types: ['debit'],
-                _type: 'instrument',
-              },
-            ],
-            methods: [],
-          },
-          sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
-          preferences: {},
-        },
 
-        restrictions: {
-          allow: {
-            code: 'rzp.restrict_allow',
-            _type: 'block',
-            instruments: [],
-          },
+          sequence: [
+            'block.gpay',
+            'netbanking',
+            'block.hdfc',
+            'card',
+            'wallet',
+            'upi',
+            'gpay',
+            'emi',
+            'cardless_emi',
+            'paylater',
+            'paypal',
+            'bank_transfer',
+            'nach',
+          ],
         },
       };
 
-      found = Translate.translateExternal(config);
+      found = Configurability.getBlockConfig(config);
 
-      t.deepEqual(found, expected, 'Translates external options properly');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
-
-  t.end();
 });

@@ -102,9 +102,9 @@ const testDataForDuplicateConfigValidation = [
   },
 ];
 
-test('Module: configurability/blocks', (t) => {
-  test('Blocks.createBlock', (t) => {
-    test('Instrument and name', (t) => {
+describe('Module: configurability/blocks', () => {
+  describe('Blocks.createBlock', () => {
+    test('Instrument and name', () => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -152,16 +152,10 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.createBlock(code, config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates a block with instruments and a name'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Without instruments', (t) => {
+    test('Without instruments', () => {
       let code, config, expected, found;
 
       code = 'block.netbanking';
@@ -178,12 +172,10 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.createBlock(code, config);
 
-      t.deepEqual(found, expected, 'Creates a block without instruments');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Without name', (t) => {
+    test('Without name', () => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -229,12 +221,10 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.createBlock(code, config);
 
-      t.deepEqual(found, expected, 'Creates a block without a name');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
 
-    test('Keeps invalid instruments', (t) => {
+    test('Keeps invalid instruments', () => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -282,16 +272,12 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.createBlock(code, config);
 
-      t.deepEqual(found, expected, 'Creates a block with invalid instruments');
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
 
-  test('Blocks.validateAndCreateBlock', (t) => {
-    test('Keeps only valid instruments', (t) => {
+  describe('Blocks.validateAndCreateBlock', () => {
+    test('Keeps only valid instruments', () => {
       let code, config, expected, found;
       code = 'block.hdfc';
       config = {
@@ -333,18 +319,11 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.validateAndCreateBlock(code, config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates a block with only valid instruments'
-      );
-
-      t.end();
+      expect(found).toEqual(expected);
     });
-
-    t.end();
   });
-  test('Blocks.validateAndCreateBlock', (t) => {
+
+  test('Blocks.validateAndCreateBlock', () => {
     testDataForDuplicateConfigValidation.forEach(({ input, output }) => {
       let code, config, expected, found;
       code = 'block.hdfc';
@@ -363,13 +342,7 @@ test('Module: configurability/blocks', (t) => {
 
       found = Blocks.validateAndCreateBlock(code, config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates a block with only valid instruments'
-      );
+      expect(found).toEqual(expected);
     });
-    t.end();
   });
-  t.end();
 });
