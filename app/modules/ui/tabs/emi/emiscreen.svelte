@@ -154,9 +154,6 @@
             on:change={handleCheckboxConsent}
           />
           <span class="checkbox" />
-          {#if $bajajTCAcceptedConsent && !$bajajTCAccepted}
-            <div class="bajaj-tooltip">Required</div>
-          {/if}
           I agree to the
           <span class="tc-text">
             <a
@@ -167,6 +164,9 @@
             </a>
           </span>
         </label>
+        {#if $bajajTCAcceptedConsent && !$bajajTCAccepted}
+          <div class="bajaj-tooltip">Required</div>
+        {/if}
       </div>
     </div>
   </div>
@@ -192,7 +192,7 @@
     box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
     z-index: 3;
     border-radius: 2px;
-    bottom: 26px;
+    bottom: -33px;
     pointer-events: none;
   }
   .bajaj-tooltip::after {
@@ -234,5 +234,6 @@
   .elem-wrap-bajaj-tc {
     height: 32px;
     margin-top: 5px;
+    position: relative;
   }
 </style>
