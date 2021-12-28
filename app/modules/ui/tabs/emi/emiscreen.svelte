@@ -168,15 +168,14 @@
           <div class="bajaj-tooltip">Required</div>
         {/if}
       </div>
+      <div class="elem-wrap elem-wrap-bajaj-tc mandatory-note-margin-bottom">
+        <span class="mandatory-check">
+          <span class="mandatory-check-note"> Note: </span> You need to have a Bajaj
+          Finserv issued card to continue with this emi option
+        </span>
+      </div>
     </div>
   </div>
-</div>
-<div class="pad recurring-message callout-message">
-  <span>&#x2139;</span>
-  <!-- LABEL: You need to have a
-  <strong>Bajaj Finserv issued card</strong>
-  to continue. -->
-  <FormattedText text={$t(CALLOUT)} />
 </div>
 
 <style>
@@ -235,5 +234,18 @@
     height: 32px;
     margin-top: 5px;
     position: relative;
+  }
+
+  .mandatory-check {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .mandatory-check-note {
+    color: #7d7d7d;
+  }
+
+  .mandatory-note-margin-bottom {
+    margin-bottom: 10px;
   }
 </style>

@@ -23,8 +23,6 @@ export default {
     },
   },
   bajaj_finserv: {
-    callout:
-      'You need to have a <strong>Bajaj Finserv issued card<strong> to continue.',
     card_details_header: 'Enter Card Details',
     card_number_help: 'Please enter a valid Bajaj Finserv issued card number',
     card_number_label: 'Card Number',
