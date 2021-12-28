@@ -50,6 +50,7 @@ RazorpayDefaults.prefill = {
   contact: '',
   email: '',
   vpa: '',
+  coupon_code: '',
   'card[number]': '',
   'card[expiry]': '',
   'card[cvv]': '',

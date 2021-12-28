@@ -250,3 +250,5 @@ export const isOneClickCheckout = () =>
   getPreferences('features.one_click_checkout') &&
   getMerchantOrder()?.line_items_total &&
   getOption('one_click_checkout');
+
+export const getPrefilledCouponCode = () => getOption('prefill.coupon_code');

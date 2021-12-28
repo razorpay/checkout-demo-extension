@@ -7,7 +7,7 @@
   import Screen from 'ui/layouts/Screen.svelte';
 
   // store imports
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, getPrefilledCouponCode } from 'razorpay';
   import {
     appliedCoupon,
     isCouponApplied,
@@ -52,7 +52,6 @@
   } from 'one_click_checkout/charges/store';
 
   import {
-    nextView,
     fetchCoupons,
     applyCouponCode,
   } from 'one_click_checkout/coupons/helpers';
@@ -65,6 +64,7 @@
 
   let showCta = true;
   const currency = getCurrency();
+  const prefilledCoupon = getPrefilledCouponCode();
 
   function onSubmit() {
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
@@ -105,6 +105,9 @@
   onMount(() => {
     hideAmountInTopBar();
     fetchCoupons();
+    if (prefilledCoupon) {
+      applyCouponCode(prefilledCoupon);
+    }
   });
 </script>
 
