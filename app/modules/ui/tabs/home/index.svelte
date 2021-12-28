@@ -997,21 +997,8 @@
     Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
       method,
     });
-    if (method === 'cod') {
-      if ($codChargeAmount) {
-        showSnackbar(true);
-      }
-      $isCodAddedToAmount = true;
-      return;
-    }
-
-    if ($isCodAddedToAmount) {
-      $isCodAddedToAmount = false;
-      if ($codChargeAmount) {
-        showSnackbar(false);
-      }
-    }
-
+    showCODCharges(method);
+    if (method === 'cod') return;
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -1034,6 +1021,20 @@
       // other code to run and perform validations.
       session.switchTab(method);
     });
+  }
+
+  function showCODCharges(method) {
+    if (method === 'cod') {
+      if ($codChargeAmount) {
+        showSnackbar(true);
+      }
+      $isCodAddedToAmount = true;
+    } else if ($isCodAddedToAmount) {
+      $isCodAddedToAmount = false;
+      if ($codChargeAmount) {
+        showSnackbar(false);
+      }
+    }
   }
 
   export function shouldGoNext() {
@@ -1102,6 +1103,7 @@
       const domElement = _Doc.querySelector(
         `.home-methods .methods-block [data-id="${instrument.id}"]`
       );
+      showCODCharges(instrument.method);
 
       if (domElement && !isElementCompletelyVisibleInTab(domElement)) {
         domElement.scrollIntoView({
