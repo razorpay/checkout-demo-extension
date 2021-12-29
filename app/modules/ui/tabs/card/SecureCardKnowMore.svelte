@@ -2,7 +2,7 @@
   // Utils imports
   import Icon from 'ui/elements/Icon.svelte';
   import padlock from 'card/icons/padlock';
-  import shield from 'card/icons/shield';
+  import circleTick from 'card/icons/circle-tick';
   // reusing the existing one
   import close from 'one_click_checkout/coupons/icons/close.js';
   // i18n
@@ -14,9 +14,9 @@
   // i18n labels
   import {
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE,
-    SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT1,
-    SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT2,
+    SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1,
+    SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
   } from 'ui/labels/card';
@@ -39,14 +39,19 @@
     {#if modalType === 'add-new-card'}
       <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1)}</p>
     {:else}
-      <p>{$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT1)}</p>
-      <p>{$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT2)}</p>
+      <p>{$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT)}</p>
 
       <ul>
         <li>
-          <span class="know-more-modal-icon"><Icon icon={shield()} /></span>
+          <span class="know-more-modal-icon"><Icon icon={circleTick()} /></span>
           <span>
             {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1)}
+          </span>
+        </li>
+        <li>
+          <span class="know-more-modal-icon"><Icon icon={circleTick()} /></span>
+          <span>
+            {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2)}
           </span>
         </li>
       </ul>
@@ -96,12 +101,12 @@
   }
 
   .secure-card-know-more-content li {
-    padding-left: 12px;
-    text-indent: -0.7rem;
-    padding-bottom: 5px;
+    display: inline-flex;
+    padding: 8px 0px;
   }
 
   .know-more-modal-icon {
     padding-right: 5px;
+    padding-top: 2px;
   }
 </style>

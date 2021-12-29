@@ -57,12 +57,8 @@ export const AVS_FORM_INPUT_REQUIRED = 'card.avs_form_input_required';
 
 export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE =
   'card.save_card_know_more_existing_card_modal_title';
-export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT1 =
-  'card.save_card_know_more_existing_card_modal_content1';
-export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT2 =
-  'card.save_card_know_more_existing_card_modal_content2';
-export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT3 =
-  'card.save_card_know_more_existing_card_modal_content3';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT =
+  'card.save_card_know_more_existing_card_modal_content';
 export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1 =
   'card.save_card_know_more_existing_card_modal_content_bullet1';
 export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2 =

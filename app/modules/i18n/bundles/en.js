@@ -259,12 +259,12 @@ export default {
     avs_form_input_required: 'This field is required',
     save_card_know_more_existing_card_modal_title:
       'Keep card saved for future payments',
-    save_card_know_more_existing_card_modal_content1:
-      'As per RBI’s latest guidelines, your permission is required to continue keeping this card saved securely for future payments on Razorpay.',
-    save_card_know_more_existing_card_modal_content2:
-      'If you do not allow this, your card will no longer be saved after Dec 31, 2021 on Razorpay and you will be required to enter details for every payment.',
+    save_card_know_more_existing_card_modal_content:
+      'As per RBI guidelines, your permission is required to continue keeping this card saved securely on Razorpay.',
     save_card_know_more_existing_card_modal_content_bullet1:
-      'All saved cards are compliant with the latest security guidelines',
+      'Skip entering card details everytime for a faster experience',
+    save_card_know_more_existing_card_modal_content_bullet2:
+      'Protect sensitive card information & increase security',
 
     save_card_know_more_add_card_modal_title:
       'Save card securely for future payments',
