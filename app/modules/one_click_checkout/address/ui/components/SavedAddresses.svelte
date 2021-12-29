@@ -46,14 +46,7 @@
     const { zipcode } = $selectedAddress;
     const payload = [{ zipcode }];
     postServiceability(payload).then((res) => {
-      hydrateSamePincodeAddresses(res, zipcode);
-      isAddressServiceable = $selectedAddress.serviceability;
-      dispatchServiceability(id, index);
-      Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
-        id,
-        index,
-        serviceable: isAddressServiceable,
-      });
+      postAddressSelection(res, zipcode, id, index);
     });
   }
 
@@ -71,6 +64,18 @@
     addresses.set(newAddresses);
   }
 
+  function postAddressSelection(res, zipcode, id, index) {
+    hydrateSamePincodeAddresses(res, zipcode);
+    isAddressServiceable = $selectedAddress.serviceability;
+    dispatchServiceability(id, index);
+    setShippingForSelectedAddress();
+    Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
+      id,
+      index,
+      serviceable: isAddressServiceable,
+    });
+  }
+
   onMount(() => {
     if ($addresses.length > 0) {
       selectedAddressId.set($addresses[0].id);
@@ -80,10 +85,7 @@
       const { zipcode } = $selectedAddress;
       const payload = [{ zipcode }];
       postServiceability(payload, true).then((res) => {
-        hydrateSamePincodeAddresses(res, zipcode);
-        isAddressServiceable = $selectedAddress.serviceability;
-        dispatchServiceability();
-        setShippingForSelectedAddress();
+        postAddressSelection(res, zipcode, $addresses[0].id, 0);
       });
     } else {
       dispatchServiceability();
