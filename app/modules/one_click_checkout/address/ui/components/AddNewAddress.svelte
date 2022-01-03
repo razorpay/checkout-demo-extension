@@ -59,7 +59,7 @@
   let INITIAL_INPUT_FORM = [
     {
       id: 'name',
-      label: $t(NAME_LABEL),
+      label: NAME_LABEL,
       required: true,
       autofillToken: 'name',
     },
@@ -69,7 +69,7 @@
     },
     {
       id: 'zipcode',
-      label: $t(PINCODE_LABEL),
+      label: PINCODE_LABEL,
       required: true,
       unserviceableText: '',
       pattern: '[0-9]{6}',
@@ -83,33 +83,33 @@
     [
       {
         id: 'city',
-        label: $t(CITY_LABEL),
+        label: CITY_LABEL,
         required: true,
         autofillToken: 'none',
       },
       {
         id: 'state',
-        label: $t(STATE_LABEL),
+        label: STATE_LABEL,
         required: true,
       },
     ],
     {
       id: 'line1',
-      label: $t(HOUSE_LABEL),
+      label: HOUSE_LABEL,
       required: true,
       pattern: '^.{1,255}$',
       autofillToken: 'address-line1',
     },
     {
       id: 'line2',
-      label: $t(AREA_LABEL),
+      label: AREA_LABEL,
       required: true,
       pattern: '^.{1,255}$',
       autofillToken: 'address-line2',
     },
     {
       id: 'landmark',
-      label: $t(LANDMARK_LABEL),
+      label: LANDMARK_LABEL,
       pattern: '^.{2,32}$',
     },
   ];

@@ -1,5 +1,6 @@
 <script>
   // i18n
+  import { t } from 'svelte-i18n';
   import { country, phone } from 'checkoutstore/screens/home';
   import Field from 'ui/components/Field.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
@@ -56,7 +57,7 @@
             icon={subInput.type === 'search' ? '' : false}
             value={formData[subInput.id]}
             on:blur={() => onBlur(subInput.id)}
-            label={`${subInput.label}${subInput.required ? '*' : ''}`}
+            label={`${$t(subInput.label)}${subInput.required ? '*' : ''}`}
             on:input={(e) => handleInput(subInput.id, e.target.value)}
             {forceStopDispatch}
             placeholder={subInput.placeholder}
@@ -88,7 +89,7 @@
           formatter={input.formatter || ''}
           value={formData[input.id]}
           {forceStopDispatch}
-          label={`${input.label}${input.required ? '*' : ''}`}
+          label={`${$t(input.label)}${input.required ? '*' : ''}`}
           on:input={(e) => handleInput(input.id, e.target.value)}
           placeholder={input.placeholder}
           loader={input.loader}
