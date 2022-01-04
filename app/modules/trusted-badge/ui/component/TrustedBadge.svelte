@@ -4,25 +4,34 @@
   import { onMount } from 'svelte';
 
   // Components
-  import TrustedBadgeIcon from 'ui/components/TrustedBadgeIcon.svelte';
-
+  import TrustedBadgeIcon from './TrustedBadgeIcon.svelte';
   //Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-
+  import {
+    getTrustedBadgeHighlights,
+    getTrustedBadgeAnaltyicsPayload,
+  } from 'trusted-badge/helper';
   //i18n
   import {
     TRUSTED_BADGE_HEADER,
     TRUSTED_BADGE_HIGHLIGHT1,
     TRUSTED_BADGE_HIGHLIGHT2,
     TRUSTED_BADGE_HIGHLIGHT3,
-  } from 'ui/labels/trusted-badge';
+  } from 'trusted-badge/i18n/labels';
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
+  import { RTB } from 'checkoutstore/rtb';
 
+  $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
   onMount(() => {
     Analytics.track('RTB:show', {
       type: AnalyticsTypes.RENDER,
+      data: getTrustedBadgeAnaltyicsPayload(),
+    });
+    Analytics.track('RTB_experiment_variant', {
+      type: AnalyticsTypes.METRIC,
+      data: getTrustedBadgeAnaltyicsPayload(),
     });
   });
 
@@ -44,50 +53,55 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         highlightsVisible: isInfoVisible,
+        ...getTrustedBadgeAnaltyicsPayload(),
       },
     });
   }
 </script>
 
-<trusted-badge>
-  <div class="trusted-badge-wrapper">
-    <div
-      class="trusted-badge-header-section"
-      class:active={isInfoVisible}
-      on:click={handleInfoClicked}
-    >
-      <i slot="icon">
-        <TrustedBadgeIcon />
-      </i>
-      <div class="trusted-badge-full-width">
-        <div class="trusted-badge-header-labels">
-          <div><b>{$t(TRUSTED_BADGE_HEADER)}</b></div>
-        </div>
-        <div class="trusted-badge-arrow">
-          <i
-            class="arrow"
-            class:arrow-down={!isInfoVisible}
-            class:arrow-up={isInfoVisible}
-          />
-        </div>
-      </div>
-    </div>
-    {#if isInfoVisible}
-      <div class="trusted-badge-info-section" in:fade out:fade>
-        {#each list as point, i}
-          <div class="trusted-badge-list-item">
-            <div
-              class="trusted-badge-list-text"
-              class:trusted-badge-border-top={i === 0}
-            >
-              <div class="trusted-badge-list-point">{point}</div>
+<div>
+  {#if trustedBadgeHighlights}
+    <trusted-badge>
+      <div class="trusted-badge-wrapper">
+        <div
+          class="trusted-badge-header-section"
+          class:active={isInfoVisible}
+          on:click={handleInfoClicked}
+        >
+          <i slot="icon">
+            <TrustedBadgeIcon />
+          </i>
+          <div class="trusted-badge-full-width">
+            <div class="trusted-badge-header-labels">
+              <div><b>{$t(TRUSTED_BADGE_HEADER)}</b></div>
+            </div>
+            <div class="trusted-badge-arrow">
+              <i
+                class="arrow"
+                class:arrow-down={!isInfoVisible}
+                class:arrow-up={isInfoVisible}
+              />
             </div>
           </div>
-        {/each}
+        </div>
+        {#if isInfoVisible}
+          <div class="trusted-badge-info-section" in:fade out:fade>
+            {#each list as point, i}
+              <div class="trusted-badge-list-item">
+                <div
+                  class="trusted-badge-list-text"
+                  class:trusted-badge-border-top={i === 0}
+                >
+                  <div class="trusted-badge-list-point">{point}</div>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
-    {/if}
-  </div>
-</trusted-badge>
+    </trusted-badge>
+  {/if}
+</div>
 
 <style>
   .trusted-badge-info-section {
