@@ -3,7 +3,6 @@ import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { getAmount } from 'checkoutstore';
-import { setTrustedBadgeVariant } from 'trusted-badge/helper';
 
 import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';
@@ -119,7 +118,6 @@ function getInstrumentsFromApi(customer) {
         }
 
         const data = response.preferred_methods || {};
-        setTrustedBadgeVariant(response.rtb_experiment || {});
         trackP13nMeta(data);
         // default instruments may be provided based on the merchant and amount details
 
@@ -133,6 +131,7 @@ function getInstrumentsFromApi(customer) {
         if (customer && customer.contact) {
           apiInstrumentsData = data[customer.contact] || apiInstrumentsData;
         }
+
         const apiInstruments = removeDuplicateApiInstruments(
           apiInstrumentsData.instruments
         );

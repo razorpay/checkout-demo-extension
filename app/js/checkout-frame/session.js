@@ -1267,17 +1267,14 @@ Session.prototype = {
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
-      data: _Obj.extend(
-        {
-          embedded: this.embedded,
-          meta: {
-            first_screen: RazorpayHelper.isOneClickCheckout()
-              ? discreet.OneClickCheckoutInterface.getLandingView()
-              : this.homeTab.getCurrentView(),
-          },
+      data: {
+        embedded: this.embedded,
+        meta: {
+          first_screen: RazorpayHelper.isOneClickCheckout()
+            ? discreet.OneClickCheckoutInterface.getLandingView()
+            : this.homeTab.getCurrentView(),
         },
-        discreet.TrustedBadgeHelper.getTrustedBadgeAnaltyicsPayload()
-      ),
+      },
     });
     updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
@@ -6349,10 +6346,7 @@ Session.prototype = {
 
       customer.customer_id = saved_customer.customer_id;
     }
-    // Setting rtb_experiment based on prefs call for logged in users
-    discreet.TrustedBadgeHelper.setTrustedBadgeVariant(
-      preferences.rtb_experiment || {}
-    );
+
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },

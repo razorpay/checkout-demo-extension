@@ -253,6 +253,10 @@ export function getMerchantConfig() {
   };
 }
 
+export function getTrustedBadgeHighlights() {
+  return preferences.rtb;
+}
+
 export const isIndianCustomer = derived([contact], ([$contact]) =>
   $contact.startsWith('+91')
 );

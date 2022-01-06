@@ -15,13 +15,16 @@
   import { getSession } from 'sessionmanager';
   import { getInstrumentMeta } from 'ui/tabs/home/instruments';
   import { getAnimationOptions } from 'svelte-utils';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+
   // Store
   import {
     selectedInstrument,
     selectedInstrumentId,
     blocks,
   } from 'checkoutstore/screens/home';
+
+  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+  import { isDynamicFeeBearer } from 'checkoutstore/index';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -57,7 +60,6 @@
         instrument,
         index,
         instrumentMeta: getInstrumentMeta(instrument),
-        ...getTrustedBadgeAnaltyicsPayload(),
       },
     });
   }

@@ -9,7 +9,7 @@
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
+  import TrustedBadge from 'ui/components/TrustedBadge.svelte';
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
@@ -40,6 +40,7 @@
   import { getOption, isOneClickCheckout } from 'razorpay';
   import {
     isDCCEnabled,
+    getTrustedBadgeHighlights,
     isDynamicFeeBearer,
     isIndianCustomer,
   } from 'checkoutstore';
@@ -178,6 +179,7 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
+  const trustedBadgeHighlights = getTrustedBadgeHighlights();
   let expSourceSet = false;
 
   let dccView = 'home-screen';
@@ -1132,8 +1134,9 @@
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
-          <TrustedBadge />
-
+          {#if trustedBadgeHighlights}
+            <TrustedBadge />
+          {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix

@@ -24,7 +24,6 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
 
   // Store imports
   import {
@@ -32,10 +31,9 @@
     COD_CHARGES_DESCRIPTION,
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
-  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
 
   import { onMount } from 'svelte';
-  import { RTB } from 'checkoutstore/rtb';
 
   // Props
   export let method = null; // Name of the method
@@ -114,7 +112,6 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method,
-        ...getTrustedBadgeAnaltyicsPayload(),
       },
     });
 
