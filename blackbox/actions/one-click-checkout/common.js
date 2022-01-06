@@ -87,28 +87,39 @@ async function getSummaryInfo(context, isValidCoupon, codFee) {
   const orderInfo = await context.page.$eval(
     '.summary-modal',
     (element, isValidCoupon, codFee) => {
-      const priceEle = element.getElementsByClassName('summary-row')[0];
-      const price = priceEle.getElementsByTagName('div')[1].innerText;
-      const shippingEle = element.getElementsByClassName('summary-row')[1];
-      const shippingAmount =
-        shippingEle.getElementsByTagName('div')[1].innerText;
-      if (isValidCoupon) {
-        const couponEle = element.getElementsByClassName('summary-row')[2];
-        const couponText = couponEle.getElementsByTagName('div')[0].innerText;
-        const discountPrice =
-          couponEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
+      const getElemTextByIndex = (element, index, subIndex = 1) => {
+        const itemElement =
+          element.getElementsByClassName('summary-row')[index];
+        const item =
+          itemElement.getElementsByTagName('div')[subIndex].innerText;
+        return item;
+      };
+      const price = getElemTextByIndex(element, 0);
+      const shippingAmount = getElemTextByIndex(element, 1);
+      if (isValidCoupon && codFee) {
+        const codAmount = getElemTextByIndex(element, 2);
+        const couponText = getElemTextByIndex(element, 3, 0);
+        const discountPrice = getElemTextByIndex(element, 3);
+        const total = getElemTextByIndex(element, 4);
+        return {
+          price,
+          codAmount,
+          total,
+          shippingAmount,
+          couponText,
+          discountPrice,
+        };
+      } else if (isValidCoupon) {
+        const couponText = getElemTextByIndex(element, 2, 0);
+        const discountPrice = getElemTextByIndex(element, 2);
+        const total = getElemTextByIndex(element, 3);
         return { price, discountPrice, total, couponText, shippingAmount };
       } else if (codFee) {
-        const codEle = element.getElementsByClassName('summary-row')[2];
-        const codAmount = codEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
+        const codAmount = getElemTextByIndex(element, 2);
+        const total = getElemTextByIndex(element, 3);
         return { price, codAmount, total, shippingAmount };
       } else {
-        const totalEle = element.getElementsByClassName('summary-row')[2];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
+        const total = getElemTextByIndex(element, 2);
         return { price, total, shippingAmount };
       }
     },
@@ -135,7 +146,27 @@ async function handleFeeSummary(context, features) {
   }
   await context.page.waitForSelector('.summary-modal');
   const { shippingFee, codFee } = context.state;
-  if (couponValid && !removeCoupon) {
+  if (couponValid && isSelectCOD) {
+    const {
+      price,
+      discountPrice,
+      total,
+      couponText,
+      shippingAmount,
+      codAmount,
+    } = await getSummaryInfo(context, couponValid, codFee);
+    if (!shippingFee) {
+      expect('FREE').toEqual(shippingAmount);
+    }
+    expect(price).toEqual(`₹ ${amount / 100}`);
+    expect(codAmount).toEqual(`₹ ${codFee / 100}`);
+    expect(`Coupon (${couponCode})`).toEqual(couponText);
+    expect(discountPrice).toEqual(`-₹ ${discountAmount / 100}`);
+    const calcTotalAmount = Math.abs(
+      amount / 100 + codFee / 100 - discountAmount / 100
+    );
+    expect(total).toEqual(`₹ ${calcTotalAmount}`);
+  } else if (couponValid && !removeCoupon) {
     const { price, discountPrice, total, couponText, shippingAmount } =
       await getSummaryInfo(context, couponValid);
     if (!shippingFee) {

@@ -37,12 +37,7 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
-module.exports = function (testFeatures) {
-  const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'one-click-checkout',
-    testFeatures
-  );
-
+async function addressTestCases(context, features) {
   const {
     isSaveAddress,
     addAddress,
@@ -53,7 +48,126 @@ module.exports = function (testFeatures) {
     showSavedAddress,
     isCODEligible,
     inValidOTP,
+    unsaveAddress,
+    isPersonalisedCoupon,
+    unserviceable,
   } = features;
+
+  if (!isPersonalisedCoupon) {
+    await handleCustomerStatusReq(context, isSaveAddress || skipOTP);
+  }
+  if (unsaveAddress) {
+    await fillUserAddress(context, {
+      isSaveAddress: false,
+      isCODEligible: true,
+      serviceable: true,
+      codFee: 5000,
+    });
+  }
+  if (unserviceable) {
+    await fillUserAddress(context, {
+      isSaveAddress,
+      isCODEligible,
+      showSavedAddress,
+      serviceable: false,
+    });
+    await delay(200);
+    await handleCheckUnserviceable(context);
+    return;
+  }
+  if (serviceable && !isSaveAddress && !skipOTP) {
+    await fillUserAddress(context, {
+      isSaveAddress: isSaveAddress || false,
+      isCODEligible: true,
+      codFee: 5000,
+    });
+  }
+  if (diffBillShipAddr) {
+    await unCheckBillAddress(context);
+    await delay(200);
+    await proceed(context);
+    await delay(400);
+    await fillUserAddress(context, {
+      isSaveAddress: false,
+      isCODEligible: true,
+      showSavedAddress,
+      serviceable,
+      diffBillShipAddr,
+      codFee: 5000,
+    });
+  }
+  if (sameBillShipAddr) {
+    await unCheckBillAddress(context);
+    await delay(200);
+    await proceed(context);
+    await delay(400);
+    await unCheckBillAddress(context);
+  }
+  if (isSaveAddress && skipOTP) {
+    await handleCreateOTPReq(context);
+    await handleSkipOTP(context);
+    await fillUserAddress(context, {
+      isSaveAddress,
+      isCODEligible: true,
+      serviceable,
+      codFee: 5000,
+    });
+    await proceed(context);
+    await delay(200);
+    await handleCreateOTPReq(context);
+    await handleTypeOTP(context);
+  }
+  if (isSaveAddress && !skipOTP) {
+    await handleCreateOTPReq(context);
+    await handleTypeOTP(context);
+    await proceed(context);
+    await handleVerifyOTPReq(context, inValidOTP);
+    if (inValidOTP) {
+      await checkInvalidOTP(context);
+      return;
+    }
+    await handleShippingInfo(context, {
+      isCODEligible: true,
+      codFee: 5000,
+    });
+  }
+  if (addAddress) {
+    await delay(400);
+    await handleAddAddress(context);
+    await fillUserAddress(context, {
+      isSaveAddress,
+      isCODEligible,
+      showSavedAddress,
+    });
+  }
+  if (!isSaveAddress && skipOTP) {
+    await handleCreateOTPReq(context);
+    await handleSkipOTP(context);
+    await fillUserAddress(context, { isSaveAddress: true });
+    await proceed(context);
+    await delay(200);
+    await handleCreateOTPReq(context);
+    await handleSkipOTP(context);
+  } else {
+    await proceed(context);
+  }
+  if (isSaveAddress && skipOTP) {
+    await delay(200);
+    await handleVerifyOTPReq(context);
+    await handleCustomerAddressReq(context);
+  }
+  if (addAddress) {
+    await handleCustomerAddressReq(context);
+  }
+}
+
+function createAddressTest(testFeatures) {
+  const { features, preferences, options, title } = makeOptionsAndPreferences(
+    'one-click-checkout',
+    testFeatures
+  );
+
+  const { inValidOTP, serviceable } = features;
 
   describe.each(
     getTestData(title, {
@@ -73,90 +187,22 @@ module.exports = function (testFeatures) {
 
       await fillUserDetails(context);
       await proceed(context);
-      await handleCustomerStatusReq(context, isSaveAddress || skipOTP);
-      if (!serviceable) {
-        await fillUserAddress(context, {
-          isSaveAddress,
-          isCODEligible,
-          showSavedAddress,
-          serviceable,
-        });
-        await delay(200);
-        await handleCheckUnserviceable(context);
-        return;
-      }
-      if (serviceable && !isSaveAddress && !skipOTP) {
-        await fillUserAddress(context, { isSaveAddress });
-      }
-      if (diffBillShipAddr) {
-        await unCheckBillAddress(context);
-        await delay(200);
-        await proceed(context);
+      await addressTestCases(context, features);
+      if (!inValidOTP && serviceable) {
+        await handleThirdWatchReq(context);
+        await handleUpdateOrderReq(context, options.order_id);
+        await selectPaymentMethod(context, 'netbanking');
         await delay(400);
-        await fillUserAddress(context, {
-          isSaveAddress,
-          isCODEligible,
-          showSavedAddress,
-          serviceable,
-          diffBillShipAddr,
-        });
+        await selectBank(context, 'SBIN');
+        await submit(context, false);
+        await passRequestNetbanking(context);
+        await handleMockSuccessDialog(context);
       }
-      if (isSaveAddress && skipOTP) {
-        await handleCreateOTPReq(context);
-        await handleSkipOTP(context);
-        await fillUserAddress(context, { isSaveAddress });
-        await proceed(context);
-        await delay(200);
-        await handleCreateOTPReq(context);
-        await handleTypeOTP(context);
-      }
-      if (isSaveAddress && !skipOTP) {
-        await handleCreateOTPReq(context);
-        await handleTypeOTP(context);
-        await proceed(context);
-        await handleVerifyOTPReq(context, inValidOTP);
-        if (inValidOTP) {
-          await checkInvalidOTP(context);
-          return;
-        }
-        await handleShippingInfo(context, { isCODEligible });
-      }
-      if (addAddress) {
-        await delay(400);
-        await handleAddAddress(context);
-        await fillUserAddress(context, {
-          isSaveAddress,
-          isCODEligible,
-          showSavedAddress,
-        });
-      }
-      if (!isSaveAddress && skipOTP) {
-        await handleCreateOTPReq(context);
-        await handleSkipOTP(context);
-        await fillUserAddress(context, { isSaveAddress: true });
-        await proceed(context);
-        await delay(200);
-        await handleCreateOTPReq(context);
-        await handleSkipOTP(context);
-      } else {
-        await proceed(context);
-      }
-      if (isSaveAddress && skipOTP) {
-        await delay(200);
-        await handleVerifyOTPReq(context);
-        await handleCustomerAddressReq(context);
-      }
-      if (addAddress) {
-        await handleCustomerAddressReq(context);
-      }
-      await handleThirdWatchReq(context);
-      await handleUpdateOrderReq(context, options.order_id);
-      await selectPaymentMethod(context, 'netbanking');
-      await delay(400);
-      await selectBank(context, 'SBIN');
-      await submit(context, false);
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
     });
   });
+}
+
+module.exports = {
+  createAddressTest,
+  addressTestCases,
 };

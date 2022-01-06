@@ -1,4 +1,6 @@
-const createAddressTest = require('../../../create/one-click-checkout/address');
+const {
+  createAddressTest,
+} = require('../../../create/one-click-checkout/address');
 
 // Test case: Skip all the OTP's and checking as guest user.
 createAddressTest({

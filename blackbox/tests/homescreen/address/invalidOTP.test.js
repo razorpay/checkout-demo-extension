@@ -1,4 +1,6 @@
-const createAddressTest = require('../../../create/one-click-checkout/address');
+const {
+  createAddressTest,
+} = require('../../../create/one-click-checkout/address');
 
 // Test case: Checking for Entering Invalid OTP.
 createAddressTest({

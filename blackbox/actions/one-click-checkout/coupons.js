@@ -1,7 +1,11 @@
 const { delay } = require('../../util');
 
-function getCouponResponse(isValidCoupon, discountAmount, personalised) {
-  if (personalised) {
+function getCouponResponse(
+  isValidCoupon,
+  discountAmount,
+  isPersonalisedCoupon
+) {
+  if (isPersonalisedCoupon) {
     return {
       failure_reason: 'User email is required',
       failure_code: 'LOGIN_REQUIRED',
@@ -46,14 +50,15 @@ async function handleApplyCouponReq(
   context,
   isValidCoupon,
   discountAmount,
-  personalised
+  isPersonalisedCoupon
 ) {
+  await context.getRequest('/v1/merchant/coupon/apply');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('coupon/apply');
   const status = isValidCoupon ? 200 : 400;
   await context.respondJSON(
-    getCouponResponse(isValidCoupon, discountAmount, personalised),
+    getCouponResponse(isValidCoupon, discountAmount, isPersonalisedCoupon),
     status
   );
 }
@@ -83,11 +88,19 @@ async function getOrderSummary(context, isValidCoupon) {
 }
 
 async function verifyValidCoupon(context, features) {
-  const { amount, discountAmount, availableCoupons, couponCode } = features;
-  if (availableCoupons) {
-    applyAvailableCoupon(context);
-  } else {
-    applyCoupon(context, couponCode);
+  const {
+    amount,
+    discountAmount,
+    availableCoupons,
+    couponCode,
+    prefillCoupon,
+  } = features;
+  if (!prefillCoupon) {
+    if (availableCoupons) {
+      applyAvailableCoupon(context);
+    } else {
+      applyCoupon(context, couponCode);
+    }
   }
   await delay(200);
   handleApplyCouponReq(context, true, discountAmount);
@@ -116,6 +129,7 @@ async function verifyInValidCoupon(context, amount) {
 }
 
 async function handleAvailableCouponReq(context, availableCoupons = []) {
+  await context.getRequest('/v1/merchant/coupons');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('merchant/coupons');

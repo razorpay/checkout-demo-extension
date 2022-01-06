@@ -38,23 +38,66 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
-module.exports = function (testFeatures) {
-  const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'one-click-checkout',
-    testFeatures
-  );
-
+async function couponTestCases(context, features) {
   const {
     couponValid,
     amount,
     availableCoupons,
     removeCoupon,
-    serviceable,
     couponCode,
-    personalised,
+    isPersonalisedCoupon,
     discountAmount,
-    isSaveAddress,
   } = features;
+
+  await handleAvailableCouponReq(context, availableCoupons);
+
+  if (isPersonalisedCoupon) {
+    await applyCoupon(context, couponCode);
+    await delay(200);
+    await handleApplyCouponReq(
+      context,
+      false,
+      discountAmount,
+      isPersonalisedCoupon
+    );
+    await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
+    await handleCreateOTPReq(context);
+    await handleTypeOTP(context);
+    await proceed(context);
+    await handleVerifyOTPReq(context);
+    await handleAvailableCouponReq(context, availableCoupons);
+    await handleApplyCouponReq(context, true, discountAmount);
+    await handleAvailableCouponReq(context, availableCoupons);
+    await context.page.click('#footer');
+    await handleShippingInfo(context, {
+      isCODEligible: true,
+      serviceable: true,
+      codFee: 5000,
+    });
+  } else {
+    if (couponValid || availableCoupons) {
+      await verifyValidCoupon(context, features);
+    } else {
+      await verifyInValidCoupon(context, amount);
+    }
+
+    if (removeCoupon) {
+      await handleRemoveCoupon(context, amount);
+    }
+
+    await proceed(context);
+    await fillUserDetails(context);
+    await proceed(context);
+  }
+}
+
+function createCouponsTest(testFeatures) {
+  const { features, preferences, options, title } = makeOptionsAndPreferences(
+    'one-click-checkout',
+    testFeatures
+  );
+
+  const { serviceable, isPersonalisedCoupon, isSaveAddress } = features;
 
   describe.each(
     getTestData(title, {
@@ -69,41 +112,9 @@ module.exports = function (testFeatures) {
         preferences,
       });
 
-      await handleAvailableCouponReq(context, availableCoupons);
+      await couponTestCases(context, features);
 
-      if (personalised) {
-        await applyCoupon(context, couponCode);
-        await delay(200);
-        await handleApplyCouponReq(
-          context,
-          false,
-          discountAmount,
-          personalised
-        );
-        await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
-        await handleCreateOTPReq(context);
-        await handleTypeOTP(context);
-        await proceed(context);
-        await handleVerifyOTPReq(context);
-        await handleAvailableCouponReq(context, availableCoupons);
-        await handleApplyCouponReq(context, true, discountAmount);
-        await handleAvailableCouponReq(context, availableCoupons);
-        await context.page.click('#footer');
-        await handleShippingInfo(context, false, true);
-      } else {
-        if (couponValid || availableCoupons) {
-          await verifyValidCoupon(context, features);
-        } else {
-          await verifyInValidCoupon(context, amount);
-        }
-
-        if (removeCoupon) {
-          await handleRemoveCoupon(context, amount);
-        }
-
-        await proceed(context);
-        await fillUserDetails(context);
-        await proceed(context);
+      if (!isPersonalisedCoupon) {
         await handleCustomerStatusReq(context);
         await fillUserAddress(context, { isSaveAddress, serviceable });
       }
@@ -119,4 +130,9 @@ module.exports = function (testFeatures) {
       await handleMockSuccessDialog(context);
     });
   });
+}
+
+module.exports = {
+  createCouponsTest,
+  couponTestCases,
 };

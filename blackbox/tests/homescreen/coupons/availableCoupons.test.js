@@ -1,4 +1,6 @@
-const createCouponsTest = require('../../../create/one-click-checkout/coupons');
+const {
+  createCouponsTest,
+} = require('../../../create/one-click-checkout/coupons');
 
 // test case: Selects a coupon from available coupons
 createCouponsTest({
