@@ -7,7 +7,11 @@ import { contact } from 'checkoutstore/screens/home';
 const TRUSTED_BADGE_EXPERIMENT_VARIANTS = ['not_applicable', 'rtb_show'];
 
 export function getTrustedBadgeHighlights(data) {
-  return getPreferences('rtb') && checkTrustedBadgeAvailbility(data);
+  if (getPreferences('rtb') && checkTrustedBadgeAvailbility(data)) {
+    return getPreferences('rtb') && checkTrustedBadgeAvailbility(data);
+  } else if (getPreferences('rtb') && !data.experiment) {
+    return getPreferences('rtb');
+  }
 }
 function checkTrustedBadgeAvailbility(rtb) {
   return (
@@ -25,7 +29,7 @@ export function setTrustedBadgeVariant(exp) {
     } else if (getPreferences('rtb') && checkTrustedBadgeAvailbility(exp)) {
       rtb = exp;
     } else {
-      rtb = {};
+      rtb = exp;
     }
     RTB.update((val) => ({ ...val, ...rtb }));
   }
