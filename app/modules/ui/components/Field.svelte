@@ -51,6 +51,7 @@
   export let loader = false;
   export let leftImage = null;
   export let dir;
+  export let disabled = false;
   /**
    * To show prediction as dropdown
    */
@@ -325,6 +326,7 @@
     {autocorrect}
     {spellcheck}
     {dir}
+    {disabled}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}

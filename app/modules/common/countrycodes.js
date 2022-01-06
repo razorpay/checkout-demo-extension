@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 // @ts-check
 
 export const COUNTRY_TO_CODE_MAP = {
@@ -430,3 +431,987 @@ function getCountryCodeFromNumber(number) {
 
   return;
 }
+
+export const COUNTRY_POSTALS_MAP = {
+  AF: {
+    pattern: '^[0-9]{4}$',
+    name: 'Afghanistan',
+  },
+  AL: {
+    pattern: null,
+    name: 'Albania',
+  },
+  AN: {
+    pattern: null,
+    name: 'Netherlands Antilles',
+  },
+  AQ: {
+    pattern: null,
+    name: 'Antarctica',
+  },
+  AX: {
+    pattern: null,
+    name: 'Åland Islands',
+  },
+  CC: {
+    pattern: null,
+    name: 'Cocos Islands',
+  },
+  CX: {
+    pattern: null,
+    name: 'Christmas Island',
+  },
+  EH: {
+    pattern: null,
+    name: 'Western Sahara',
+  },
+  DZ: {
+    pattern: '^[0-9]{5}$',
+    name: 'Algeria',
+  },
+  AS: {
+    pattern: null,
+    name: 'American Samoa',
+  },
+  AD: {
+    pattern: '^AD ?[0-9]{3}$',
+    name: 'Andorra',
+  },
+  AO: {
+    pattern: null,
+    name: 'Angola',
+  },
+  AI: {
+    pattern: null,
+    name: 'Anguilla',
+  },
+  AG: {
+    pattern: null,
+    name: 'Antigua and Barbuda',
+  },
+  AR: {
+    pattern: '^[A-Z]{1}[0-9]{4}[A-Z]{3}$',
+    name: 'Argentina',
+  },
+  AM: {
+    pattern: '^[0-9]{4}$',
+    name: 'Armenia',
+  },
+  AW: {
+    pattern: null,
+    name: 'Aruba',
+  },
+  AU: {
+    pattern: '^[0-9]{4}$',
+    name: 'Australia',
+  },
+  AT: {
+    pattern: '^[0-9]{4}$',
+    name: 'Austria',
+  },
+  AZ: {
+    pattern: '^[0-9]{4}$',
+    name: 'Azerbaijan',
+  },
+  BS: {
+    pattern: null,
+    name: 'Bahamas',
+  },
+  BH: {
+    pattern: null,
+    name: 'Bahrain',
+  },
+  BD: {
+    pattern: '^[0-9]{4}$',
+    name: 'Bangladesh',
+  },
+  BB: {
+    pattern: '^BB[0-9]{5}$',
+    name: 'Barbados',
+  },
+  BY: {
+    pattern: '^[0-9]{6}$',
+    name: 'Belarus',
+  },
+  BE: {
+    pattern: '^[0-9]{4}$',
+    name: 'Belgium',
+  },
+  BZ: {
+    pattern: null,
+    name: 'Belize',
+  },
+  BJ: {
+    pattern: null,
+    name: 'Benin',
+  },
+  BM: {
+    pattern: '^[A-Z]{2}[0-9]{2}$',
+    name: 'Bermuda',
+  },
+  BT: {
+    pattern: '^[0-9]{5}$',
+    name: 'Bhutan',
+  },
+  BO: {
+    pattern: null,
+    name: 'Bolivia',
+  },
+  BA: {
+    pattern: null,
+    name: 'Bosnia and Herzegovina',
+  },
+  BW: {
+    pattern: null,
+    name: 'Botswana',
+  },
+  BR: {
+    pattern: '^[0-9]{5}-[0-9]{3}$',
+    name: 'Brazil',
+  },
+  BN: {
+    pattern: '^[A-Z]{2}[0-9]{4}$',
+    name: 'Brunei',
+  },
+  BG: {
+    pattern: '^[0-9]{4}$',
+    name: 'Bulgaria',
+  },
+  BF: {
+    pattern: null,
+    name: 'Burkina Faso',
+  },
+  BI: {
+    pattern: null,
+    name: 'Burundi',
+  },
+  KH: {
+    pattern: '^[0-9]{5}$',
+    name: 'Cambodia',
+  },
+  CM: {
+    pattern: null,
+    name: 'Cameroon',
+  },
+  CA: {
+    pattern: '^[A-Z][0-9][A-Z] ?[0-9][A-Z][0-9]$',
+    name: 'Canada',
+  },
+  CV: {
+    pattern: null,
+    name: 'Cape Verde',
+  },
+  KY: {
+    pattern: '^[A-Z]{2}[0-9]-[0-9]{4}$',
+    name: 'Cayman Islands',
+  },
+  CF: {
+    pattern: null,
+    name: 'Central African Republic',
+  },
+  TD: {
+    pattern: null,
+    name: 'Chad',
+  },
+  CL: {
+    pattern: '^[0-9]{7}$',
+    name: 'Chile',
+  },
+  CN: {
+    pattern: '^[0-9]{6}$',
+    name: "China, People's Republic",
+  },
+  CO: {
+    pattern: '^[0-9]{6}$',
+    name: 'Colombia',
+  },
+  KM: {
+    pattern: null,
+    name: 'Comoros',
+  },
+  CG: {
+    pattern: null,
+    name: 'Congo',
+  },
+  CD: {
+    pattern: null,
+    name: 'Congo, The Democratic Republic of',
+  },
+  CK: {
+    pattern: null,
+    name: 'Cook Islands',
+  },
+  CR: {
+    pattern: '^[0-9]{5}$',
+    name: 'Costa Rica',
+  },
+  HR: {
+    pattern: '^[0-9]{5}$',
+    name: 'Croatia',
+  },
+  CU: {
+    pattern: '^[0-9]{5}$',
+    name: 'Cuba',
+  },
+  CW: {
+    pattern: null,
+    name: 'Curacao',
+  },
+  CY: {
+    pattern: '^[0-9]{4}$',
+    name: 'Cyprus',
+  },
+  CZ: {
+    pattern: '^[0-9]{3} [0-9]{2}$',
+    name: 'Czech Republic',
+  },
+  DK: {
+    pattern: '^[0-9]{4}$',
+    name: 'Denmark',
+  },
+  DJ: {
+    pattern: null,
+    name: 'Djibouti',
+  },
+  DM: {
+    pattern: null,
+    name: 'Dominica',
+  },
+  DO: {
+    pattern: null,
+    name: 'Dominican Republic',
+  },
+  TL: {
+    pattern: null,
+    name: 'East Timor',
+  },
+  EC: {
+    pattern: '^[0-9]{6}$',
+    name: 'Ecuador',
+  },
+  EG: {
+    pattern: '^[0-9]{5}$',
+    name: 'Egypt',
+  },
+  SV: {
+    pattern: null,
+    name: 'El Salvador',
+  },
+  ER: {
+    pattern: null,
+    name: 'Eritrea',
+  },
+  EE: {
+    pattern: '^[0-9]{5}$',
+    name: 'Estonia',
+  },
+  ET: {
+    pattern: '^[0-9]{4}$',
+    name: 'Ethiopia',
+  },
+  FK: {
+    pattern: null,
+    name: 'Falkland Islands',
+  },
+  FO: {
+    pattern: null,
+    name: 'Faroe Islands',
+  },
+  FJ: {
+    pattern: null,
+    name: 'Fiji',
+  },
+  FI: {
+    pattern: '^[0-9]{5}$',
+    name: 'Finland',
+  },
+  FR: {
+    pattern: '^[0-9]{5}$',
+    name: 'France',
+  },
+  PF: {
+    pattern: null,
+    name: 'French Polynesia',
+  },
+  GA: {
+    pattern: null,
+    name: 'Gabon',
+  },
+  GM: {
+    pattern: null,
+    name: 'Gambia',
+  },
+  GE: {
+    pattern: null,
+    name: 'Georgia',
+  },
+  DE: {
+    pattern: '^[0-9]{5}$',
+    name: 'Germany',
+  },
+  GH: {
+    pattern: null,
+    name: 'Ghana',
+  },
+  GI: {
+    pattern: null,
+    name: 'Gibraltar',
+  },
+  GR: {
+    pattern: '^[0-9]{3} ?[0-9]{2}$',
+    name: 'Greece',
+  },
+  GL: {
+    pattern: null,
+    name: 'Greenland',
+  },
+  GD: {
+    pattern: null,
+    name: 'Grenada',
+  },
+  GP: {
+    pattern: null,
+    name: 'Guadeloupe',
+  },
+  GU: {
+    pattern: null,
+    name: 'Guam',
+  },
+  FM: {
+    pattern: null,
+    name: 'Micronesia',
+  },
+  GT: {
+    pattern: null,
+    name: 'Guatemala',
+  },
+  IM: {
+    pattern: null,
+    name: 'Isle of Man',
+  },
+  IO: {
+    pattern: null,
+    name: 'British Indian Ocean Territory',
+  },
+  MF: {
+    pattern: '^97150$',
+    name: 'Saint Martin',
+  },
+  NF: {
+    pattern: null,
+    name: 'Norfolk Island',
+  },
+  PM: {
+    pattern: null,
+    name: 'Saint Pierre and Miquelon',
+  },
+  PN: {
+    pattern: null,
+    name: 'Pitcairn',
+  },
+  GG: {
+    pattern: null,
+    name: 'Guernsey',
+  },
+  PS: {
+    pattern: null,
+    name: 'Palestine',
+  },
+  GW: {
+    pattern: '^[0-9]{4}$',
+    name: 'Guinea-Bissau',
+  },
+  GQ: {
+    pattern: null,
+    name: 'Guinea-Equatorial',
+  },
+  GN: {
+    pattern: '^[0-9]{3}$',
+    name: 'Guinea Republic',
+  },
+  GY: {
+    pattern: null,
+    name: 'Guyana (British)',
+  },
+  GF: {
+    pattern: null,
+    name: 'Guyana (French)',
+  },
+  HT: {
+    pattern: '^[0-9]{4}$',
+    name: 'Haiti',
+  },
+  HN: {
+    pattern: null,
+    name: 'Honduras',
+  },
+  HK: {
+    pattern: null,
+    name: 'Hong Kong',
+  },
+  HU: {
+    pattern: '^[0-9]{4}$',
+    name: 'Hungary',
+  },
+  IS: {
+    pattern: '^[0-9]{3}$',
+    name: 'Iceland',
+  },
+  IN: {
+    pattern: '^[1-9][0-9]{5}$',
+    name: 'India',
+  },
+  ID: {
+    pattern: '^[0-9]{5}$',
+    name: 'Indonesia',
+  },
+  IR: {
+    pattern: 'null',
+    name: 'Iran',
+  },
+  IQ: {
+    pattern: '^[0-9]{5}$',
+    name: 'Iraq',
+  },
+  IE: {
+    pattern: '(?:^[AC-FHKNPRTV-Y][0-9]{2}|D6W)[ -]?[0-9AC-FHKNPRTV-Y]{4}$',
+    name: 'Ireland, Republic of',
+  },
+  IL: {
+    pattern: '^[0-9]{5}|[0-9]{7}$',
+    name: 'Israel',
+  },
+  IT: {
+    pattern: '^[0-9]{5}$',
+    name: 'Italy',
+  },
+  SJ: {
+    pattern: null,
+    name: 'Svalbard and Jan Mayen',
+  },
+  SM: {
+    pattern: null,
+    name: 'San Marino',
+  },
+  CI: {
+    pattern: null,
+    name: 'Ivory Coast',
+  },
+  JM: {
+    pattern: '(JM)[A-Z]{3}[0-9]{2}$',
+    name: 'Jamaica',
+  },
+  JP: {
+    pattern: '^[0-9]{3}-?[0-9]{4}$',
+    name: 'Japan',
+  },
+  JE: {
+    pattern: null,
+    name: 'Jersey',
+  },
+  JO: {
+    pattern: '^[0-9]{5}$',
+    name: 'Jordan',
+  },
+  KZ: {
+    pattern: '^[0-9]{6}$',
+    name: 'Kazakhstan',
+  },
+  TJ: {
+    pattern: '^[0-9]{6}$',
+    name: 'Tajikistan',
+  },
+  TK: {
+    pattern: null,
+    name: 'Tokelau',
+  },
+  KE: {
+    pattern: '^[0-9]{5}$',
+    name: 'Kenya',
+  },
+  KI: {
+    pattern: null,
+    name: 'Kiribati',
+  },
+  KR: {
+    pattern: '^[0-9]{3}[-][0-9]{3}$',
+    name: 'Korea, Republic of',
+  },
+  KP: {
+    pattern: null,
+    name: 'Korea, The D.P.R of',
+  },
+  XK: {
+    pattern: null,
+    name: 'Kosovo',
+  },
+  KW: {
+    pattern: '^[0-9]{5}$',
+    name: 'Kuwait',
+  },
+  KG: {
+    pattern: '^[0-9]{6}$',
+    name: 'Kyrgyzstan',
+  },
+  LA: {
+    pattern: '^[0-9]{5}$',
+    name: 'Laos',
+  },
+  LV: {
+    pattern: '^[0-9]{4}$',
+    name: 'Latvia',
+  },
+  LB: {
+    pattern: '^[0-9]{4} ?[0-9]{4}$',
+    name: 'Lebanon',
+  },
+  LS: {
+    pattern: '^[0-9]{3}$',
+    name: 'Lesotho',
+  },
+  LR: {
+    pattern: '^[0-9]{4}$',
+    name: 'Liberia',
+  },
+  LY: {
+    pattern: null,
+    name: 'Libya',
+  },
+  LI: {
+    pattern: null,
+    name: 'Liechtenstein',
+  },
+  LT: {
+    pattern: '^LT-[0-9]{5}$',
+    name: 'Lithuania',
+  },
+  LU: {
+    pattern: '^[0-9]{4}$',
+    name: 'Luxembourg',
+  },
+  MO: {
+    pattern: null,
+    name: 'Macau',
+  },
+  MK: {
+    pattern: null,
+    name: 'Macedonia, Republic of',
+  },
+  MG: {
+    pattern: '^[0-9]{3}$',
+    name: 'Madagascar',
+  },
+  MW: {
+    pattern: null,
+    name: 'Malawi',
+  },
+  MY: {
+    pattern: '^[0-9]{5}$',
+    name: 'Malaysia',
+  },
+  MV: {
+    pattern: '^[0-9]{5}$',
+    name: 'Maldives',
+  },
+  ML: {
+    pattern: null,
+    name: 'Mali',
+  },
+  MT: {
+    pattern: null,
+    name: 'Malta',
+  },
+  MH: {
+    pattern: null,
+    name: 'Marshall Islands',
+  },
+  MQ: {
+    pattern: null,
+    name: 'Martinique',
+  },
+  MR: {
+    pattern: null,
+    name: 'Mauritania',
+  },
+  MU: {
+    pattern: '^[0-9]{5}$',
+    name: 'Mauritius',
+  },
+  YT: {
+    pattern: null,
+    name: 'Mayotte',
+  },
+  MX: {
+    pattern: '^[0-9]{5}$',
+    name: 'Mexico',
+  },
+  MD: {
+    pattern: '^MD-?[0-9]{4}$',
+    name: 'Moldova, Republic of',
+  },
+  MC: {
+    pattern: null,
+    name: 'Monaco',
+  },
+  MN: {
+    pattern: '^[0-9]{5}$',
+    name: 'Mongolia',
+  },
+  ME: {
+    pattern: null,
+    name: 'Montenegro',
+  },
+  MS: {
+    pattern: '^MSR ?[0-9]{4}$',
+    name: 'Montserrat',
+  },
+  MA: {
+    pattern: '^[0-9]{5}$',
+    name: 'Morocco',
+  },
+  MZ: {
+    pattern: '^[0-9]{4}$',
+    name: 'Mozambique',
+  },
+  MM: {
+    pattern: '^[0-9]{5}$',
+    name: 'Myanmar',
+  },
+  NA: {
+    pattern: null,
+    name: 'Namibia',
+  },
+  NR: {
+    pattern: null,
+    name: 'Nauru',
+  },
+  NP: {
+    pattern: '^[0-9]{5}$',
+    name: 'Nepal',
+  },
+  NL: {
+    pattern: '^(?:NL-)?([0-9]{4}) ?([A-Za-z]{2})$',
+    name: 'Netherlands',
+  },
+  NC: {
+    pattern: null,
+    name: 'New Caledonia',
+  },
+  NZ: {
+    pattern: '^[0-9]{4}$',
+    name: 'New Zealand',
+  },
+  NI: {
+    pattern: null,
+    name: 'Nicaragua',
+  },
+  NE: {
+    pattern: '^[0-9]{4}$',
+    name: 'Niger',
+  },
+  NG: {
+    pattern: '^[0-9]{6}$',
+    name: 'Nigeria',
+  },
+  NU: {
+    pattern: null,
+    name: 'Niue',
+  },
+  MP: {
+    pattern: null,
+    name: 'Northern Mariana Islands',
+  },
+  NO: {
+    pattern: '^[0-9]{4}$',
+    name: 'Norway',
+  },
+  OM: {
+    pattern: '^[0-9]{3}$',
+    name: 'Oman',
+  },
+  PK: {
+    pattern: null,
+    name: 'Pakistan',
+  },
+  PW: {
+    pattern: null,
+    name: 'Palau',
+  },
+  PA: {
+    pattern: '^[0-9]{4}$',
+    name: 'Panama',
+  },
+  PG: {
+    pattern: '^[0-9]{3}$',
+    name: 'Papua New Guinea',
+  },
+  PY: {
+    pattern: '^[0-9]{4}$',
+    name: 'Paraguay',
+  },
+  PE: {
+    pattern: '^[0-9]{5}$',
+    name: 'Peru',
+  },
+  PH: {
+    pattern: '^[0-9]{4}$',
+    name: 'Philippines',
+  },
+  PL: {
+    pattern: '^[0-9]{2}-[0-9]{3}$',
+    name: 'Poland',
+  },
+  PT: {
+    pattern: '^[0-9]{4}-[0-9]{3}$',
+    name: 'Portugal',
+  },
+  PR: {
+    pattern: null,
+    name: 'Puerto Rico',
+  },
+  QA: {
+    pattern: null,
+    name: 'Qatar',
+  },
+  RE: {
+    pattern: null,
+    name: 'Réunion',
+  },
+  RO: {
+    pattern: '^[0-9]{6}$',
+    name: 'Romania',
+  },
+  RU: {
+    pattern: '^[0-9]{6}$',
+    name: 'Russian Federation',
+  },
+  RW: {
+    pattern: null,
+    name: 'Rwanda',
+  },
+  WS: {
+    pattern: null,
+    name: 'Samoa',
+  },
+  ST: {
+    pattern: null,
+    name: 'Sao Tome and Principe',
+  },
+  SA: {
+    pattern: '^[0-9]{5}(-[0-9]{4})?$',
+    name: 'Saudi Arabia',
+  },
+  SN: {
+    pattern: '^[0-9]{5}$',
+    name: 'Senegal',
+  },
+  RS: {
+    pattern: '^[0-9]{5}$',
+    name: 'Serbia',
+  },
+  SC: {
+    pattern: null,
+    name: 'Seychelles',
+  },
+  SL: {
+    pattern: null,
+    name: 'Sierra Leone',
+  },
+  SG: {
+    pattern: '^[0-9]{6}$',
+    name: 'Singapore',
+  },
+  SK: {
+    pattern: '^[0-9]{3} ?[0-9]{2}$',
+    name: 'Slovakia',
+  },
+  SI: {
+    pattern: '^[0-9]{4}$',
+    name: 'Slovenia',
+  },
+  SB: {
+    pattern: null,
+    name: 'Solomon Islands',
+  },
+  SO: {
+    pattern: null,
+    name: 'Somalia',
+  },
+  ZA: {
+    pattern: '^[0-9]{4}$',
+    name: 'South Africa',
+  },
+  SS: {
+    pattern: null,
+    name: 'South Sudan',
+  },
+  ES: {
+    pattern: '^[0-9]{5}$',
+    name: 'Spain',
+  },
+  LK: {
+    pattern: '^[0-9]{5}$',
+    name: 'Sri Lanka',
+  },
+  BL: {
+    pattern: null,
+    name: 'St. Barthélemy',
+  },
+  SH: {
+    pattern: null,
+    name: 'St. Helena',
+  },
+  KN: {
+    pattern: '^[A-Z]{2}[0-9]{4}$',
+    name: 'St. Kitts and Nevis',
+  },
+  LC: {
+    pattern: '^[A-Z]{2}[0-9]{2} ?[0-9]{3}$',
+    name: 'St. Lucia',
+  },
+  SX: {
+    pattern: null,
+    name: 'St. Maarten',
+  },
+  VC: {
+    pattern: '^VC[0-9]{4}$',
+    name: 'St. Vincent and the Grenadines',
+  },
+  SD: {
+    pattern: '^[0-9]{5}$',
+    name: 'Sudan',
+  },
+  SR: {
+    pattern: null,
+    name: 'Suriname',
+  },
+  SZ: {
+    pattern: '^[A-Z]{1}[0-9]{3}$',
+    name: 'Swaziland',
+  },
+  SE: {
+    pattern: '^[0-9]{3} ?[0-9]{2}$',
+    name: 'Sweden',
+  },
+  CH: {
+    pattern: '^[0-9]{4}$',
+    name: 'Switzerland',
+  },
+  SY: {
+    pattern: null,
+    name: 'Syria',
+  },
+  TW: {
+    pattern: '^[0-9]{3}(-[0-9]{2})?$',
+    name: 'Taiwan',
+  },
+  TZ: {
+    pattern: '^[0-9]{5}$',
+    name: 'Tanzania',
+  },
+  TH: {
+    pattern: '^[0-9]{5}$',
+    name: 'Thailand',
+  },
+  TG: {
+    pattern: null,
+    name: 'Togo',
+  },
+  TO: {
+    pattern: null,
+    name: 'Tonga',
+  },
+  TT: {
+    pattern: '^[0-9]{6}$',
+    name: 'Trinidad and Tobago',
+  },
+  TN: {
+    pattern: '^[0-9]{4}$',
+    name: 'Tunisia',
+  },
+  TR: {
+    pattern: '^[0-9]{5}$',
+    name: 'Turkey',
+  },
+  TM: {
+    pattern: '^[0-9]{6}$',
+    name: 'Turkmenistan',
+  },
+  TC: {
+    pattern: '^TKCA ?1ZZ$',
+    name: 'Turks and Caicos Islands',
+  },
+  TV: {
+    pattern: null,
+    name: 'Tuvalu',
+  },
+  UG: {
+    pattern: null,
+    name: 'Uganda',
+  },
+  UA: {
+    pattern: '^[0-9]{5}$',
+    name: 'Ukraine',
+  },
+  AE: {
+    pattern: null,
+    name: 'United Arab Emirates',
+  },
+  GB: {
+    pattern:
+      '^([Gg][Ii][Rr] ?0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) ?[0-9][A-Za-z]{2})$',
+    name: 'United Kingdom',
+  },
+  US: {
+    pattern: '^[0-9]{5}(?:[-s][0-9]{4})?$',
+    name: 'United States of America',
+  },
+  UY: {
+    pattern: '^[0-9]{5}$',
+    name: 'Uruguay',
+  },
+  UZ: {
+    pattern: '^[0-9]{6}$',
+    name: 'Uzbekistan',
+  },
+  WF: {
+    pattern: null,
+    name: 'Wallis and Futuna',
+  },
+  VA: {
+    pattern: null,
+    name: 'Vatican',
+  },
+  VU: {
+    pattern: null,
+    name: 'Vanuatu',
+  },
+  VE: {
+    pattern: '^[0-9]{4}(-[A-Z]{1})?$',
+    name: 'Venezuela',
+  },
+  VN: {
+    pattern: '^[0-9]{6}$',
+    name: 'Vietnam',
+  },
+  VG: {
+    pattern: null,
+    name: 'British Virgin Islands',
+  },
+  VI: {
+    pattern: null,
+    name: 'U.S. Virgin Islands',
+  },
+  YE: {
+    pattern: null,
+    name: 'Yemen',
+  },
+  ZM: {
+    pattern: '^[0-9]{5}$',
+    name: 'Zambia',
+  },
+  ZW: {
+    pattern: null,
+    name: 'Zimbabwe',
+  },
+};

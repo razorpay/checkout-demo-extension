@@ -65,7 +65,10 @@ export const ADDRESS_TYPES = {
 
 export const INITIAL_ADDRESS = {
   name: '',
-  contact: '',
+  contact: {
+    countryCode: '',
+    phoneNum: '',
+  },
   zipcode: '',
   city: '',
   state: '',
@@ -73,6 +76,7 @@ export const INITIAL_ADDRESS = {
   line2: '',
   landmark: '',
   tag: '',
+  country_name: '',
 };
 
 export const ZIPCODE_REQUIRED_LENGTH = 6;

@@ -8,6 +8,8 @@ export const newUserAddress = writable(INITIAL_ADDRESS);
 
 export const addressCompleted = writable(false);
 
+export const selectedCountryISO = writable('');
+
 export const selectedAddress = derived(
   [selectedAddressId, savedAddresses, newUserAddress],
   ([$selectedAddressId, $savedAddresses, $newUserAddress]) => {

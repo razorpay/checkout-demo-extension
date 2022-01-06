@@ -6,6 +6,8 @@ export default {
   pincode_label: 'Pincode',
   city_label: 'City',
   state_label: 'State',
+  international_pincode_label: 'Pincode/Zipcode',
+  international_state_label: 'State/Province',
   country_label: 'Country',
   house_label: 'House Number/House Name/Apartment/Floor',
   area_label: 'Area/Colony/Street/Sector',
@@ -32,5 +34,7 @@ export default {
   unserviceable_label: 'Unserviceable',
   serviceable_label: 'Serviceable',
   order_update_failure: 'We could not proceed due to some technical error.',
+  state_search_all: 'All states',
+  state_search_placeholder: 'Search a state',
   ...billingAddressLabels,
 };
