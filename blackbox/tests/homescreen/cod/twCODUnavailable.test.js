@@ -1,4 +1,4 @@
-const { createCODTest } = require('../../../create/one-click-checkout/cod');
+const createCODTest = require('../../../create/one-click-checkout/cod');
 
 createCODTest({
   amount: 200 * 100,

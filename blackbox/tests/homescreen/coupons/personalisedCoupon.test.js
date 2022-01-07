@@ -1,6 +1,4 @@
-const {
-  createCouponsTest,
-} = require('../../../create/one-click-checkout/coupons');
+const createCouponsTest = require('../../../create/one-click-checkout/coupons');
 
 // test case: Personalised Coupon flow
 createCouponsTest({
@@ -9,5 +7,5 @@ createCouponsTest({
   discountAmount: 100 * 100,
   couponCode: 'PERSON50',
   serviceable: true,
-  isPersonalisedCoupon: true,
+  personalised: true,
 });

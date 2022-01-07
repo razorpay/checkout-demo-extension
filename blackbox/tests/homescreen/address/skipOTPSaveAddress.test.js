@@ -1,6 +1,4 @@
-const {
-  createAddressTest,
-} = require('../../../create/one-click-checkout/address');
+const createAddressTest = require('../../../create/one-click-checkout/address');
 
 // Test case: Skip the Initial OTP and save address on Address screen.
 createAddressTest({

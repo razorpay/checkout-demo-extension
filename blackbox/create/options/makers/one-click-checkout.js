@@ -1,13 +1,6 @@
 function makeOptions(features, options) {
-  const {
-    showCoupons,
-    showAddress,
-    mandatoryLogin,
-    forceCOD,
-    orderId,
-    prefillCoupon,
-    couponCode,
-  } = features;
+  const { showCoupons, showAddress, mandatoryLogin, forceCOD, orderId } =
+    features;
 
   options = {
     one_click_checkout: true,
@@ -17,15 +10,6 @@ function makeOptions(features, options) {
     force_cod: forceCOD,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
-
-  if (prefillCoupon) {
-    options = {
-      prefill: {
-        coupon_code: couponCode || 'WELCOME10',
-      },
-      ...options,
-    };
-  }
 
   return options;
 }
@@ -39,8 +23,8 @@ function makePreferences(features, preferences) {
   };
 
   preferences.order = {
-    amount: amount || 2000,
-    line_items_total: amount || 2000,
+    amount,
+    line_items_total: amount,
     partial_payment: false,
   };
 

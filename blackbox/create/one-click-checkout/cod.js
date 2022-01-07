@@ -25,53 +25,19 @@ const {
   checkDisabledCOD,
 } = require('../../actions/one-click-checkout/cod');
 
-async function codTestCases(context, features, options) {
-  const {
-    isCODEligible,
-    isThirdWatchEligible,
-    couponValid,
-    removeCoupon,
-    inValidCoupon,
-    availableCoupons,
-    isPersonalisedCoupon,
-  } = features;
-
-  await handleThirdWatchReq(context, isThirdWatchEligible);
-  await handleUpdateOrderReq(context, options.order_id);
-  await delay(200);
-  if (couponValid || availableCoupons || isPersonalisedCoupon) {
-    await handleFeeSummary(context, {
-      amount: 2000,
-      discountAmount: 1000,
-      couponValid: true,
-      couponCode: 'WELCOME10',
-    });
-  } else if (removeCoupon || inValidCoupon) {
-    await handleFeeSummary(context, { amount: 2000 });
-  } else {
-    await handleFeeSummary(context, features);
-  }
-  if (isCODEligible) {
-    features.isSelectCOD = true;
-    features.couponValid =
-      couponValid || availableCoupons || isPersonalisedCoupon;
-    await delay(200);
-    await selectPaymentMethod(context, 'cod');
-    await submit(context, false);
-    await handleFeeSummary(context, features);
-    await handleCODPayment(context);
-  } else {
-    await checkDisabledCOD(context);
-  }
-}
-
-function createCODTest(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
   );
 
-  const { isSaveAddress, isCODEligible, serviceable, codFee } = features;
+  const {
+    isSaveAddress,
+    isCODEligible,
+    serviceable,
+    codFee,
+    isThirdWatchEligible,
+  } = features;
   describe.each(
     getTestData(title, {
       options,
@@ -99,12 +65,20 @@ function createCODTest(testFeatures) {
         codFee,
       });
       await proceed(context);
-      await codTestCases(context, features, options);
+      await handleThirdWatchReq(context, isThirdWatchEligible);
+      await handleUpdateOrderReq(context, options.order_id);
+      await delay(200);
+      await handleFeeSummary(context, features);
+      if (isCODEligible) {
+        features.isSelectCOD = true;
+        await delay(200);
+        await selectPaymentMethod(context, 'cod');
+        await submit(context, false);
+        await handleFeeSummary(context, features);
+        await handleCODPayment(context);
+      } else {
+        await checkDisabledCOD(context);
+      }
     });
   });
-}
-
-module.exports = {
-  createCODTest,
-  codTestCases,
 };

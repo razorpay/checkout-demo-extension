@@ -1,6 +1,4 @@
-const {
-  createAddressTest,
-} = require('../../../create/one-click-checkout/address');
+const createAddressTest = require('../../../create/one-click-checkout/address');
 
 // Test case: Add the new Address.
 createAddressTest({
