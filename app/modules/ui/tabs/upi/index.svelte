@@ -29,7 +29,7 @@
     intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-
+  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
   import { getName, isASubscription } from 'checkoutstore';
 
   // UI imports
@@ -397,6 +397,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method: 'qr',
+        ...getTrustedBadgeAnaltyicsPayload(),
       },
     });
 

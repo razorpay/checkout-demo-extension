@@ -4,7 +4,7 @@ import loader from 'one_click_checkout/loader/i18n/en';
 import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
-
+import trustedBadgeLang from 'trusted-badge/i18n/en';
 export default {
   app: {
     providers: {
@@ -1263,12 +1263,7 @@ export default {
     super_cards: 'Super Cards',
     yes: 'Yes',
   },
-  trusted_badge: {
-    header: 'Razorpay Trusted Business',
-    highlight1: 'KYC verified and background checks done',
-    highlight2: 'Excellent track record with Razorpay',
-    highlight3: 'Regularly accepts payments online',
-  },
+  trusted_badge: trustedBadgeLang,
   downtime_alert: {
     highlight1: 'There is a high chance this payment might fail',
     card_highlight2:

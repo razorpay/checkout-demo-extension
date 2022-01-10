@@ -131,7 +131,7 @@ import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
-
+import * as TrustedBadgeHelper from 'trusted-badge/helper';
 export default {
   RazorpayConfig,
   updateScore,
@@ -195,6 +195,7 @@ export default {
   OffersStore,
   Cta,
   dynamicFeeObject,
+  TrustedBadgeHelper,
 
   Customer,
   getCustomer,
