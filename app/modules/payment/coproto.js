@@ -693,6 +693,7 @@ var responseTypes = {
     } else {
       Analytics.setMeta('headless', true);
       this.otpurl = fullResponse.submit_url;
+      this.resendOtpUrl = fullResponse.resend_url;
       this.gotoBankUrl = fullResponse.redirect;
       this.emit('otp.required', fullResponse);
     }

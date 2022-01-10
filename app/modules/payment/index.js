@@ -1092,7 +1092,9 @@ razorpayProto.submitOTP = function (otp) {
 
 razorpayProto.resendOTP = function (callback) {
   var payment = this._payment;
-  var url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
+  var url =
+    payment.resendOtpUrl ||
+    makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
 
   payment.ajax = fetch.post({
     url,
