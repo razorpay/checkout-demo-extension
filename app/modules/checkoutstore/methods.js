@@ -295,9 +295,7 @@ const ALL_METHODS = {
   },
 
   international() {
-    // TODO: add international payment method
-    // && isInternational()
-    return isApplicationEnabled('trustly');
+    return isApplicationEnabled('trustly') || isApplicationEnabled('poli');
   },
 };
 
@@ -620,6 +618,12 @@ export function isApplicationEnabled(app) {
        * @returns boolean
        */
       return merchantMethods.app?.trustly;
+    case 'poli':
+      /**
+       * Poli is an international app, will come under international payment methods
+       * @returns boolean
+       */
+      return merchantMethods.app?.poli;
   }
 
   return false;

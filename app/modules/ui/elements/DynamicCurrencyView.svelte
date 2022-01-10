@@ -59,6 +59,11 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
+  import {
+    DCC_VIEW_FOR_PROVIDERS,
+    INTERNATIONAL_PROVIDERS,
+  } from 'ui/tabs/international/constants';
+
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
   const Views = {
@@ -67,6 +72,7 @@
     HOME_SCREEN: 'home-screen',
     PAYPAL_WALLET: 'paypal',
     TRUSTLY_PROVIDER: 'trustly',
+    POLI_PROVIDER: 'poli',
     AVS: 'avs-card',
   };
 
@@ -154,8 +160,8 @@
       }
     } else if (view === Views.PAYPAL_WALLET) {
       prop = { walletCode: 'paypal' };
-    } else if (view === Views.TRUSTLY_PROVIDER) {
-      prop = { provider: 'trustly' };
+    } else if (INTERNATIONAL_PROVIDERS.includes(view)) {
+      prop = { provider: view };
     } else {
       prop = null;
     }
@@ -225,10 +231,8 @@
      * as this component get destroyed with state
      */
     if (
-      (session?.dccPayload?.view === Views.PAYPAL_WALLET &&
-        session?.dccPayload?.currency) ||
-      (session?.dccPayload?.view === Views.TRUSTLY_PROVIDER &&
-        session?.dccPayload?.currency)
+      DCC_VIEW_FOR_PROVIDERS.includes(session?.dccPayload?.view) &&
+      session?.dccPayload?.currency
     ) {
       selectedCurrency = session.dccPayload.currency;
     }
@@ -335,7 +339,7 @@
 
   $: {
     if (entity) {
-      if (view === Views.TRUSTLY_PROVIDER) {
+      if (INTERNATIONAL_PROVIDERS.includes(view)) {
         updateNVSEntities(entity, AVSRequired);
       } else {
         AVSScreenMap.update((value) => ({ ...value, [entity]: AVSRequired }));

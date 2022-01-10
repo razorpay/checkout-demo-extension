@@ -108,12 +108,10 @@ import * as NBHandlers from 'handlers/netbanking';
 import * as CommonHandlers from 'handlers/common';
 
 import * as Instruments from 'configurability/instruments';
-import {
-  getInstrumentMeta,
-  isTrustlyInPreferredMethod,
-} from 'ui/tabs/home/instruments';
+import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
+import { isInternationalInPreferredInstrument } from 'ui/tabs/international/helper';
 
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 import * as UTILS from 'lib/utils.js';
@@ -282,5 +280,5 @@ export default {
   internationalTab,
   InternationalStores,
 
-  isTrustlyInPreferredMethod,
+  isInternationalInPreferredInstrument,
 };

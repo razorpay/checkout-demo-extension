@@ -1,10 +1,16 @@
 import { getCurrentCustomer } from 'tests/setupPreferences';
 
+const noop = () => {};
+
+/**
+ * Don't use jest.fn() to mock any function into session object.
+ * @typedef {Object} Session
+ */
 const sessions = {
   0: {
     id: Math.random(),
-    showOverlay: jest.fn(),
-    get: jest.fn(),
+    showOverlay: noop,
+    get: noop,
     themeMeta: {
       icons: {
         user_protect: '',
@@ -15,17 +21,17 @@ const sessions = {
     r: {
       isLiveMode: () => false,
     },
-    validateOffers: jest.fn(),
+    validateOffers: noop,
     tab: 'cards',
     screen: 'saved-cards',
-    getAppliedOffer: jest.fn(),
-    setRawAmountInHeader: jest.fn(),
-    updateAmountInHeader: jest.fn(),
+    getAppliedOffer: noop,
+    setRawAmountInHeader: noop,
+    updateAmountInHeader: noop,
     getCurrentCustomer,
-    showEmiPlansForSavedCard: jest.fn(),
-    setScreen: jest.fn(),
-    switchTab: jest.fn(),
-    askOTPForSavedCard: jest.fn(),
+    showEmiPlansForSavedCard: noop,
+    setScreen: noop,
+    switchTab: noop,
+    askOTPForSavedCard: noop,
   },
 };
 

@@ -360,7 +360,7 @@ const getAjax = (body) => {
   if (body.method === 'cod') {
     return ajax.cod;
   }
-  if (body.method === 'app' && body.provider === 'trustly') {
+  if (body.method === 'app' && ['trustly', 'poli'].includes(body.provider)) {
     return ajax.hdfc_first;
   }
   return {

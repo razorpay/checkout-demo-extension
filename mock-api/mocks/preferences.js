@@ -5991,13 +5991,14 @@ const preferences = {
             method: 'card',
             consent_taken: false,
             card: {
+              country: 'US',
               entity: 'card',
               name: 'Nanda',
               last4: '7369',
               network: 'Visa',
               type: 'debit',
               issuer: 'ICIC',
-              international: false,
+              international: true,
               emi: true,
               sub_type: 'consumer',
               expiry_month: 12,
@@ -11547,6 +11548,29 @@ const preferences = {
       },
     },
     show_donation: false,
+  },
+  internationalTests: {
+    options: {
+      theme: { colors: '#528FF0' },
+      image: null,
+      remember_customer: true,
+    },
+    customer: {
+      email: 'ravi.dhiman@razorpay.com',
+      contact: '+918888888888',
+      tokens: {
+        entity: 'collection',
+        count: 0,
+        items: [],
+      },
+      customer_id: 'cust_FrRYGeH37AL4sU',
+    },
+    methods: {
+      app: {
+        trustly: 1,
+        poli: 1,
+      },
+    },
   },
 };
 

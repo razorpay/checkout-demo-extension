@@ -232,8 +232,8 @@ export default function Payment(data, params = {}, r) {
         // CRED collect flow for razorpay.js
         avoidPopup = false;
       }
-      if (data.provider === 'trustly') {
-        // Trustly app only works with popup
+      if (['trustly', 'poli'].includes(data.provider)) {
+        // Trustly & Poli app only works with popup
         avoidPopup = false;
       }
     }

@@ -20,6 +20,10 @@ export default {
         name: 'Trustly',
         subtext: ' ',
       },
+      poli: {
+        name: 'Poli',
+        subtext: ' ',
+      },
     },
   },
   bajaj_finserv: {

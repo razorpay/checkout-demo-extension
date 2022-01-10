@@ -20,7 +20,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import Analytics from 'analytics';
+  import { Events } from 'analytics';
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -87,7 +87,7 @@
       }
     }
 
-    Analytics.track(EVENTS.PROVIDER_SELECT, {
+    Events.Track(EVENTS.PROVIDER_SELECT, {
       type: AnalyticsTypes.BEHAV,
       data: {
         provider: $selectedInternationalProvider,
@@ -99,11 +99,9 @@
   const setView = (view) => {
     lastView = currentView;
     currentView = view;
-    Analytics.track(EVENTS.SWITCH_VIEW, {
-      data: {
-        lastView,
-        currentView,
-      },
+    Events.Track(EVENTS.SWITCH_VIEW, {
+      lastView,
+      currentView,
     });
   };
 
@@ -128,7 +126,7 @@
     if (
       !directlyToNVS &&
       !$selectedInternationalProvider &&
-      filteredProviders.length === 1
+      filteredProviders.length
     ) {
       onProviderSelection(filteredProviders[0].code);
     }
@@ -179,10 +177,8 @@
     directlyToNVS = direct;
     setView(VIEWS_MAP.NVS_FORM);
 
-    Analytics.track(EVENTS.DIRECT_NVS, {
-      data: {
-        directlyToNVS,
-      },
+    Events.Track(EVENTS.DIRECT_NVS, {
+      directlyToNVS,
     });
   }
 
@@ -196,12 +192,10 @@
    * @returns {boolean} will tab handle back
    */
   export function onBack() {
-    Analytics.track(EVENTS.ON_BACK, {
-      data: {
-        lastView,
-        currentView,
-        isOnNVSForm: isOnNVSForm(),
-      },
+    Events.Track(EVENTS.ON_BACK, {
+      lastView,
+      currentView,
+      isOnNVSForm: isOnNVSForm(),
     });
 
     if (isOnNVSForm()) {
@@ -217,7 +211,7 @@
   }
 
   onMount(() => {
-    Analytics.track(EVENTS.SCREEN_LOAD);
+    Events.Track(EVENTS.SCREEN_LOAD);
   });
 </script>
 

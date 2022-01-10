@@ -19,7 +19,7 @@ const payouts = require('./payouts.js');
 const app = require('./app.js');
 const internationalPaypal = require('./international/paypal.js');
 const oneClickCheckout = require('./one-click-checkout');
-const internationalTrustly = require('./international/trustly');
+const internationalProviders = require('./international');
 
 module.exports = {
   netbanking: netbanking,
@@ -43,5 +43,5 @@ module.exports = {
   app: app,
   'international-paypal': internationalPaypal,
   'one-click-checkout': oneClickCheckout,
-  'international-trustly': internationalTrustly,
+  'international-providers': internationalProviders,
 };

@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
-  import { Events, MetaProperties } from 'analytics';
+  import Analytics, { Events, MetaProperties } from 'analytics';
+  import EVENT_NAMES from 'ui/tabs/international/events';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -78,7 +79,10 @@
         }
       }
     });
-    // TODO: add analytics
+
+    Events.Track(EVENT_NAMES.NVS_FORM_ERRORS, {
+      errors: formErrors,
+    });
   };
 
   const openSearchModal = (id) => {
@@ -160,10 +164,14 @@
     if (footerCta) {
       footerCta.addEventListener('click', checkFormErrors);
     }
+
+    Events.Track(EVENT_NAMES.NVS_SHOW);
+
     return () => {
       if (footerCta) {
         footerCta.removeEventListener('click', checkFormErrors);
       }
+      Events.removeMeta(MetaProperties.NVS_FORM_DATA);
     };
   });
 </script>

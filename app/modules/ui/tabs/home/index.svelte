@@ -142,11 +142,13 @@
   } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
+  import { setBlocks } from 'ui/tabs/home/instruments';
+
   import {
-    setBlocks,
-    isTrustlyInPreferredMethod,
-    updateTrustlyUnderInternationalMethod,
-  } from 'ui/tabs/home/instruments';
+    isInternationalInPreferredInstrument,
+    getInternationalProviderName,
+    updateInternationalProviders,
+  } from 'ui/tabs/international/helper';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
@@ -155,6 +157,7 @@
   import { formatTemplateWithLocale } from 'i18n';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
+  import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -562,7 +565,7 @@
     const blocksThatWereSet = setBlocks(
       {
         showPreferredLoader,
-        preferred: updateTrustlyUnderInternationalMethod(preferredInstruments),
+        preferred: updateInternationalProviders(preferredInstruments),
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
       },
@@ -1084,8 +1087,8 @@
     $selectedInstrumentId = instrument.id;
     if (instrument.method === 'wallet' && instrument.wallets?.length > 0) {
       dccView = instrument.wallets[0];
-    } else if (isTrustlyInPreferredMethod(instrument)) {
-      dccView = 'trustly';
+    } else if (isInternationalInPreferredInstrument(instrument)) {
+      dccView = getInternationalProviderName(instrument);
     } else {
       dccView = 'home-screen';
     }
@@ -1194,7 +1197,7 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if (isDCCEnabled() || ['paypal', 'trustly'].includes(dccView)) && !isDynamicFeeBearer()}
+      {#if (isDCCEnabled() || DCC_VIEW_FOR_PROVIDERS.includes(dccView)) && !isDynamicFeeBearer()}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}

@@ -533,27 +533,3 @@ function addDowntimeToBlock(block) {
   }
   return block;
 }
-
-/**
- * Check trustly is selected on home screen from preferred methods.
- * @param {*} instrument
- * @returns boolean
- */
-export const isTrustlyInPreferredMethod = (instrument = {}) => {
-  const { method, providers = [] } = instrument;
-  return (
-    (method === 'app' || method === 'international') &&
-    providers.length > 0 &&
-    providers.includes('trustly')
-  );
-};
-
-export const updateTrustlyUnderInternationalMethod = (instruments) => {
-  return instruments.map((instrument) => {
-    if (isTrustlyInPreferredMethod(instrument)) {
-      instrument.method = 'international';
-    }
-
-    return instrument;
-  });
-};

@@ -4827,7 +4827,7 @@ Session.prototype = {
       }
       if (
         !isOnNVSForm &&
-        discreet.isTrustlyInPreferredMethod(selectedInstrument)
+        discreet.isInternationalInPreferredInstrument(selectedInstrument)
       ) {
         NVSRequired = NVSEntities[selectedInstrument.providers[0]];
         this.switchTab('international', {

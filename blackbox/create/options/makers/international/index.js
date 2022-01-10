@@ -22,14 +22,24 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  if (!features.disabledTrustly) {
-    preferences.methods = {
-      ...preferences.methods,
-      app: {
-        trustly: 1,
-      },
-    };
+  let app = {};
+
+  if (features.testPoli) {
+    app.poli = 1;
   }
+
+  if (features.testTrustly) {
+    app.trustly = 1;
+  }
+
+  preferences.methods = {
+    ...preferences.methods,
+    wallet: {
+      paypal: true,
+    },
+    card: true,
+    app,
+  };
 
   return preferences;
 }

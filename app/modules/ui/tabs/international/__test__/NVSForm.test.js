@@ -1,16 +1,19 @@
 import { render, cleanup } from '@testing-library/svelte';
+import Analytics from 'analytics';
 import NVSForm from '../NVSForm.svelte';
+
+const razorpayInstance = {
+  id: 'id',
+  key: 'rzp_test_key',
+  get: (arg) => arg,
+  getMode: () => 'test',
+};
 
 jest.mock('sessionmanager', () => {
   return {
     getSession: () => ({
       get: jest.fn(),
-      r: {
-        id: 'id',
-        key: 'rzp_test_key',
-        get: (arg) => arg,
-        getMode: jest.fn(),
-      },
+      r: razorpayInstance,
     }),
   };
 });
@@ -37,25 +40,32 @@ let statesResponse = {
 };
 
 global.fetch = jest.fn((options) => {
-  let response = {
-    error: {
-      message: 'Invalid country code',
-    },
-  };
-  let countryCode = 'CA';
-  if (options.url.includes('countries')) {
-    response = countriesResponse.map((obj) => ({ ...obj }));
-  }
-  if (options.url.includes(`states/${countryCode}`)) {
-    response = {
-      ...statesResponse[countryCode],
-      states: statesResponse[countryCode].states.map((obj) => ({ ...obj })),
+  return new Promise((resolve) => {
+    let response = {
+      error: {
+        message: 'Invalid country code',
+      },
     };
-  }
-  options.callback(response);
+    let countryCode = 'CA';
+    if (options.url.includes('countries')) {
+      response = countriesResponse.map((obj) => ({ ...obj }));
+    }
+    if (options.url.includes(`states/${countryCode}`)) {
+      response = {
+        ...statesResponse[countryCode],
+        states: statesResponse[countryCode].states.map((obj) => ({ ...obj })),
+      };
+    }
+    options.callback(response);
+    resolve(response);
+  });
 });
 
 describe('Test NVSForm', () => {
+  beforeEach(() => {
+    fetch.mockClear();
+    Analytics.setR(razorpayInstance);
+  });
   afterEach(() => {
     cleanup();
   });
@@ -75,5 +85,9 @@ describe('Test NVSForm', () => {
       return input.getAttribute('required') !== null;
     });
     expect(requiredFields).toHaveLength(7);
+  });
+  test('should call getAllCountries api on mount', async () => {
+    render(NVSForm);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

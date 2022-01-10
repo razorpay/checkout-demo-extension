@@ -8,6 +8,7 @@ const {
   assertNVSFormData,
   respondCountries,
   respondStates,
+  clickProvider,
 } = require('../../actions/international');
 
 const {
@@ -17,17 +18,19 @@ const {
 
 const { submit } = require('../../actions/common');
 
-describe('Trustly under international payment method', () => {
+describe('Poli under international payment method', () => {
   test('International payment method should not be render', async () => {
-    const { context } = await createCheckoutForInternational();
+    const { context } = await createCheckoutForInternational({
+      testPoli: false,
+    });
     const methods = await getHomescreenMethods(context);
     const rendered =
       methods.find((method) => method === 'international') !== undefined;
     expect(rendered).toStrictEqual(false);
   });
-  test('International payment method should be render if trustly app enabled', async () => {
+  test('International payment method should be render if poli app enabled', async () => {
     const { context, preferences } = await createCheckoutForInternational({
-      testTrustly: true,
+      testPoli: true,
     });
     const methods = await getHomescreenMethods(context);
     const rendered =
@@ -36,22 +39,22 @@ describe('Trustly under international payment method', () => {
     expect(preferences).toMatchObject({
       methods: {
         app: {
-          trustly: 1,
+          poli: 1,
         },
       },
     });
   });
-  test('Trustly should be rendered under international payment method', async () => {
+  test('Poli should be rendered under international payment method', async () => {
     const { context } = await createCheckoutForInternational({
-      testTrustly: true,
+      testPoli: true,
     });
     await selectPaymentMethod(context, 'international');
-    await assertInternationalPage(context);
+    await assertInternationalPage(context, 'div#international-radio-poli');
   });
   test('Should show DCC UI if DCC flag is enabled', async () => {
     const { context } = await createCheckoutForInternational({
       dcc: true,
-      testTrustly: true,
+      testPoli: true,
     });
     await clickPaymentMethod(context);
     await assertMultiCurrenciesAndAmount({
@@ -62,7 +65,7 @@ describe('Trustly under international payment method', () => {
   test('Should show DCC UI if DCC flag is disabled', async () => {
     const { context } = await createCheckoutForInternational({
       dcc: false,
-      testTrustly: true,
+      testPoli: true,
     });
     await clickPaymentMethod(context);
     await assertMultiCurrenciesAndAmount({
@@ -72,7 +75,7 @@ describe('Trustly under international payment method', () => {
   });
   test('Should not show billing address screen if address_name_required flag is false', async () => {
     const { context } = await createCheckoutForInternational({
-      testTrustly: true,
+      testPoli: true,
     });
     await clickPaymentMethod(context);
     await assertMultiCurrenciesAndAmount({
@@ -85,7 +88,7 @@ describe('Trustly under international payment method', () => {
   });
   test('Should show billing address screen with first and last name', async () => {
     const { context } = await createCheckoutForInternational({
-      testTrustly: true,
+      testPoli: true,
     });
     await clickPaymentMethod(context);
     await assertMultiCurrenciesAndAmount({
@@ -98,9 +101,11 @@ describe('Trustly under international payment method', () => {
   });
   test('Should validate all required fields on billing address screen', async () => {
     const { context } = await createCheckoutForInternational({
+      testPoli: true,
       testTrustly: true,
     });
     await clickPaymentMethod(context);
+    await clickProvider(context, 'poli');
     await assertMultiCurrenciesAndAmount({
       context,
       addressNameRequired: true,

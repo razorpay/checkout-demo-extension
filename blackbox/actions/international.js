@@ -38,6 +38,14 @@ const clickPaymentMethod = (context) => {
   });
 };
 
+const clickProvider = async (context, provider) => {
+  expect(
+    await context.page.$eval(`#international-radio-${provider}`, visible)
+  ).toBeTruthy();
+
+  await context.page.click(`#international-radio-${provider}`);
+};
+
 const clickTrustly = (context) => {
   return context.page.evaluate(() => {
     var instrumentList = document.querySelectorAll(
@@ -59,10 +67,11 @@ const clickTrustly = (context) => {
   });
 };
 
-const assertInternationalPage = async (context) => {
-  expect(
-    await context.page.$eval('div#international-radio-trustly', visible)
-  ).toEqual(true);
+const assertInternationalPage = async (
+  context,
+  el = 'div#international-radio-trustly'
+) => {
+  expect(await context.page.$eval(el, visible)).toBeTruthy();
 };
 
 const respondCurrencies = async (context, addressNameRequired = true) => {
@@ -201,4 +210,5 @@ module.exports = {
   assertNVSFormDataInRequest,
   respondCountries,
   respondStates,
+  clickProvider,
 };
