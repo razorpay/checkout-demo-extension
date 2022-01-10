@@ -29,10 +29,6 @@
       type: AnalyticsTypes.RENDER,
       data: getTrustedBadgeAnaltyicsPayload(),
     });
-    Analytics.track('RTB_experiment_variant', {
-      type: AnalyticsTypes.METRIC,
-      data: getTrustedBadgeAnaltyicsPayload(),
-    });
   });
 
   let list;

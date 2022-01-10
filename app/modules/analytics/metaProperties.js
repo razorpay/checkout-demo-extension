@@ -33,4 +33,5 @@ export default {
   AVS_FORM_DATA: 'avsFormData',
   /** NVS FORM DATA */
   NVS_FORM_DATA: 'nvsFormData',
+  RTB_EXPERIMENT_VARIANT: 'rtb_experiment_variant',
 };
