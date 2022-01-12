@@ -29,10 +29,15 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy to Prod Environment
+        env:
+          PROD_CDN_BUCKET: checkout-live
+          DIR_PATH_IN_REPO: cdn
         run: |
-          if [ "$(ls -A cdn)" ]; then
+          if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
               echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
-              aws s3 cp cdn s3://checkout-live/ --recursive
+              echo "pushing repo/$DIR_PATH_IN_REPO content to $PROD_CDN_BUCKET location and invalidating cache"
+              aws s3 cp $DIR_PATH_IN_REPO s3://$PROD_CDN_BUCKET/ --recursive
+              aws cloudfront create-invalidation --distribution-id ${{ secrets.PROD_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
           fi
 
       - name: Mark Deployment Success on GitHub

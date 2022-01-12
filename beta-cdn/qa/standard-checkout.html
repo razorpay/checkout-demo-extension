@@ -34,6 +34,7 @@
                 Razorpay: {
                     config: {
                         frame: 'https://api-dark.razorpay.com/v1/checkout/public',
+                        api: "https://api-dark.razorpay.com/"
                     },
                 },
             },
@@ -48,6 +49,7 @@
                     config: {
                         frame:
                             'https://api.razorpay.com/v1/checkout/public/canary?canary=1',
+                        api: "https://api.razorpay.com/"
                     },
                 },
             },
@@ -66,10 +68,28 @@
                 Razorpay: {
                     config: {
                         frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: "https://api-3.qa.razorpay.in/"
                     },
                 },
             },
-
+            qa2: {
+                domain: 'checkout-2.qa.razorpay.in',
+                Razorpay: {
+                    config: {
+                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: "https://api-3.qa.razorpay.in/"
+                    },
+                },
+            },
+            qa3: {
+                domain: 'checkout-3.qa.razorpay.in',
+                Razorpay: {
+                    config: {
+                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: "https://api-3.qa.razorpay.in/"
+                    },
+                },
+            },
             stage: {
                 domain: 'checkout.stage.razorpay.in',
                 Razorpay: {

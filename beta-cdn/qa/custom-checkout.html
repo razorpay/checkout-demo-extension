@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Lives at https://betacdn.razorpay.com/qa/index.html -->
 <html>
 
 <head>
@@ -7,7 +6,44 @@
 </head>
 
 <body>
+    <div>
+        <div>
+            <h2>Custom Checkout Test Page</h2>
+            <form>
+                <button type="submit">Pay</button>
+            </form>
+        </div>
+        <section>
+            <div>
+                <h4>Query Parameters Passed</h4>
+                <div id="query-params-block">
+                </div>
+            </div>
+            <div>
+                <h4>Payment Payload Passed</h4>
+                <div id="read-only-data-block">
+                </div>
+            </div>
+            <div>
+                <h4>Success Response</h4>
+                <div id="success-block">
+                </div>
+            </div>
+            <div>
+                <h4>Failure Response</h4>
+                <div id="error-block">
+                </div>
+            </div>
+        </section>
+
+    </div>
     <script>
+        function prettyPrint(divId, data) {
+            const params = document.createElement('pre');
+            params.textContent = JSON.stringify(data, undefined, 2);
+            document.getElementById(divId).appendChild(params);
+        }
+
         var defaultParams = {
             env: 'prod',
             key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -28,21 +64,35 @@
                 }
                 return map;
             }, {});
+        prettyPrint('query-params-block', queryParams)
 
         // Env <-> Config map
         var configMap = {
             dark: {
                 domain: 'checkout-dark.razorpay.com',
-                Razorpay: {},
+                Razorpay: {
+                    config: {
+                        api: "https://api-dark.razorpay.com/"
+                    }
+                },
             },
 
             prod: {
                 domain: 'checkout.razorpay.com',
+                Razorpay: {
+                    config: {
+                        api: "https://api.razorpay.com/"
+                    }
+                }
             },
 
             canary: {
                 domain: 'prod-checkout-canary.razorpay.com',
-                Razorpay: {},
+                Razorpay: {
+                    config: {
+                        api: "https://api.razorpay.com/"
+                    }
+                }
             },
 
             func: {
@@ -55,6 +105,25 @@
                 Razorpay: {
                     config: {
                         frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: 'https://api-3.qa.razorpay.in/'
+                    },
+                }
+            },
+            qa2: {
+                domain: 'checkout-2.qa.razorpay.in',
+                Razorpay: {
+                    config: {
+                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: 'https://api-3.qa.razorpay.in/'
+                    },
+                }
+            },
+            qa3: {
+                domain: 'checkout-3.qa.razorpay.in',
+                Razorpay: {
+                    config: {
+                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                        api: 'https://api-3.qa.razorpay.in/'
                     },
                 }
             },
@@ -72,20 +141,15 @@
         //     'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
         // });
 
-        if (queryParams.api) {
-            var Razorpay = {
-                config: {
-                    api: queryParams.api,
-                },
-            };
-        }
+        // if (queryParams.api) {
+        //     console.log('ref')
+        //     var Razorpay = {
+        //         config: {
+        //             api: queryParams.api,
+        //         },
+        //     };
+        // }
     </script>
-
-    <div>
-        <form>
-            <button type="submit">Pay</button>
-        </form>
-    </div>
 
     <script>
         // Load Checkout from the given domain
@@ -120,9 +184,9 @@
 
         // Get the Razorpay config
         if (config.Razorpay) {
-            window.Razorpay = {
-                ...Razorpay,
-                ...config.Razorpay
+            window.Razorpay = config.Razorpay;
+            if (queryParams.api) {
+                window.Razorpay.config.api = queryParams.api
             }
         }
 
@@ -153,9 +217,13 @@
             var rp = new Razorpay(initParams)
                 .on('payment.error', function (resp) {
                     console.log(resp);
+                    prettyPrint('error-block', resp)
+
                 })
                 .on('payment.success', function (resp) {
                     console.log(resp);
+                    prettyPrint('success-block', resp)
+
                 });
             window.rp = rp;
             delete params.key;
@@ -167,6 +235,7 @@
                 }
             }
             var paymentParams = getPaymentParams(params);
+            prettyPrint('read-only-data-block', paymentParams)
             rp.createPayment(paymentParams);
 
         };

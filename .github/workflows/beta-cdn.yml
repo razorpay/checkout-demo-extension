@@ -24,15 +24,22 @@ jobs:
       - name: Configure AWS credentials For saving the artifacts to stage bucket
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET }}
+          aws-access-key-id: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.STAGE_AWS_SECRET_KEY }}
           aws-region: ap-south-1
 
-      - name: Deploy to Beta Environment
+      - name: Deploy to BetaCDN Environment
+        env:
+          STAGE_CDN_BUCKET: rzp-1018-nonprod-betacdn
+          DIR_PATH_IN_REPO: beta-cdn
+          PARENT_DIR_IN_CDN: checkout
         run: |
-          if [ "$(ls -A beta-cdn)" ]; then
-              echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
-              aws s3 cp beta-cdn s3://betacdn/_checkout --recursive
+          if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
+            echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
+            echo "pushing repo/$DIR_PATH_IN_REPO content to rzp-1018-nonprod-betacdn/$PARENT_DIR_IN_CDN location"
+            aws s3 cp $DIR_PATH_IN_REPO s3://$STAGE_CDN_BUCKET/$PARENT_DIR_IN_CDN/ --recursive
+            aws cloudfront create-invalidation --distribution-id ${{ secrets.STAGE_AWS_BETACDN_ID }} --paths "/$PARENT_DIR_IN_CDN/*"
+            echo "Cache Invalidated, STAGE_CDN_BUCKET: $STAGE_CDN_BUCKET, DIR_PATH_IN_REPO: $DIR_PATH_IN_REPO, PARENT_DIR_IN_CDN: $PARENT_DIR_IN_CDN"
           fi
 
       - name: Mark Deployment Success on GitHub
