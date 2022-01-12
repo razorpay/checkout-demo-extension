@@ -4,7 +4,8 @@ import { getSession } from 'sessionmanager';
 import { getAgentPayload, isCREDEnabled } from 'checkoutstore/methods';
 import { getCustomerDetails } from 'checkoutstore/screens/home';
 import { hasFeature, isContactOptional } from 'razorpay';
-import { CredEvents, Events } from 'analytics';
+import { CredEvents, Events, Track } from 'analytics';
+import { isEligibilityCheckInProgress } from './store';
 import {
   CRED_EXPERIMENTAL_OFFER_ID,
   CRED_EXPERIMENT_LOCAL_KEY,
@@ -37,10 +38,12 @@ let CRED_ELIGIBILITY_CACHE = undefined;
  * @param {Offer} offer
  */
 const setCREDEligibility = (contact, value, offer) => {
-  CRED_ELIGIBILITY_CACHE[contact] = {
-    eligible: value,
-    offer,
-  };
+  if (CRED_ELIGIBILITY_CACHE) {
+    CRED_ELIGIBILITY_CACHE[contact] = {
+      eligible: value,
+      offer,
+    };
+  }
 };
 
 /**
@@ -150,7 +153,6 @@ const addReadOnlyOffers = (
     if (!experiment || experiment !== CRED_OFFER_EXPERIMENTS.SUBTEXT) {
       preferences.offers.push(offer);
     }
-
     if (preferences.methods.app_meta?.cred?.offer) {
       preferences.methods.app_meta.cred.offer.description = offer.display_text;
     } else {
@@ -234,12 +236,12 @@ const setupExperimentForCRED = (preferences) => {
  * Hence call this method after necessary checks
  * @returns {Promise<Object>}
  */
-export const checkCREDEligibility = (contact) => {
+export const checkCREDEligibility = function (contact) {
   const session = getSession();
   const agentPayload = getAgentPayload({ cred: true }) || {};
-
-  const url = _.appendParamsToUrl(
-    makeAuthUrl(session.r, 'payments/validate/account')
+  const url = makeAuthUrl(
+    (session && session.r) || this,
+    'payments/validate/account'
   );
 
   const promise = new Promise((resolve, reject) => {
@@ -251,7 +253,10 @@ export const checkCREDEligibility = (contact) => {
       data: {
         entity: 'cred',
         value: contact,
-        '_[checkout_id]': session?.id,
+        '_[checkout_id]': session?.id || this?.id,
+        '_[build]': __BUILD_NUMBER__ || 0,
+        '_[library]': Track.props.library,
+        '_[platform]': Track.props.platform,
         ...agentPayload,
       },
       callback: (response) => {
@@ -319,6 +324,7 @@ export const checkCREDEligibilityForUpdatedContact = (currentContact) => {
   if (!isCREDEnabled()) {
     return;
   }
+  isEligibilityCheckInProgress.set(true);
   const session = getSession();
   const contact = getValidContact(currentContact, session);
 
@@ -338,9 +344,11 @@ export const checkCREDEligibilityForUpdatedContact = (currentContact) => {
       })
       .finally(function () {
         updatePreferencesAndSession(contact);
+        isEligibilityCheckInProgress.set(false);
       });
   } else {
     updatePreferencesAndSession(contact);
+    isEligibilityCheckInProgress.set(false);
   }
   // current contact is available cache hence no warning etc are needed
   return null;

@@ -3880,4 +3880,23 @@ module.exports = {
       action: 'TOPUP',
     },
   }),
+  credEligibleResponse: () => ({
+    success: true,
+    data: {
+      state: 'ELIGIBLE',
+      tracking_id: '21ed6080-aa2b-4b76-8ed7-a19219a36b46',
+      offer: { description: 'get upto 10% off using CRED coins' },
+    },
+  }),
+  credInEligibleResponse: () => ({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description:
+        "You're currently not a CRED member. Become a CRED member to pay via CRED Pay and earn special perks. To proceed for now, try a different payment method.",
+      source: 'NA',
+      step: 'NA',
+      reason: 'NA',
+      metadata: {},
+    },
+  }),
 };

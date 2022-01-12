@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
 
   // UI imports
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
@@ -32,6 +32,7 @@
     isContactRequiredForInstrument,
   } from 'checkoutstore/methods';
   import { getUPIIntentApps } from 'checkoutstore/native';
+  import { isEligibilityCheckInProgress } from 'checkoutframe/cred';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -230,7 +231,7 @@
     }
   }
 
-  $: {
+  function updateDetailsForInstrument() {
     const details = getDetailsForInstrument(individualInstrument, $locale);
     if (details) {
       title = details.title;
@@ -240,6 +241,21 @@
     }
   }
 
+  const unsubscribeForCredUpdates =
+    individualInstrument?.provider === 'cred' &&
+    isEligibilityCheckInProgress.subscribe((status) => {
+      if (!status) {
+        updateDetailsForInstrument();
+      }
+    });
+
+  $: updateDetailsForInstrument();
+
+  onDestroy(() => {
+    if (unsubscribeForCredUpdates) {
+      unsubscribeForCredUpdates();
+    }
+  });
   /**
    * If the instrument is selected, and the user
    * presses enter, mark this as a submission
