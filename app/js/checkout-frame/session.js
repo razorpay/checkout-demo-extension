@@ -101,7 +101,8 @@ var preferences,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
   dynamicFeeObject = discreet.dynamicFeeObject,
   views = discreet.views,
-  CardViews = discreet.CardViews;
+  CardViews = discreet.CardViews,
+  SecurityUtils = discreet.SecurityUtils;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -937,6 +938,7 @@ Session.prototype = {
         Store: Store,
         RazorpayHelper: RazorpayHelper,
         MethodStore: MethodStore,
+        SecurityUtils: SecurityUtils,
         cta: storeGetter(Cta.getStore()),
       });
       this.el = div.firstChild;

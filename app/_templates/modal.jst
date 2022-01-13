@@ -2,6 +2,7 @@
 var params = arguments[1];
 var Store = params.Store;
 var RazorpayHelper = params.RazorpayHelper;
+var SecurityUtils = params.SecurityUtils;
 var MethodStore = params.MethodStore;
 var isMethodEnabled = MethodStore.isMethodEnabled;
 var emiBanks = MethodStore.getEMIBanks();
@@ -66,9 +67,9 @@ else
           </div>
           <div id="language-dropdown"></div>
           `? o('theme.branding') === 'payzapp'`
-            <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/`=o('theme.branding')`.png')"></div>
+            <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/`=SecurityUtils.sanitizeHTML(o('theme.branding'))`.png')"></div>
           `?? o('theme.branding')`
-            <div id="cob-image" style="background-image: url('`=o('theme.branding')`')">
+            <div id="cob-image" style="background-image: url('`=SecurityUtils.sanitizeHTML(o('theme.branding'))`')">
             </div>
           `?`
         </div>

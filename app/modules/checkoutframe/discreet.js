@@ -130,6 +130,8 @@ import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as TrustedBadgeHelper from 'trusted-badge/helper';
+
+import * as SecurityUtils from 'utils/security';
 export default {
   RazorpayConfig,
   updateScore,
@@ -281,4 +283,6 @@ export default {
   InternationalStores,
 
   isInternationalInPreferredInstrument,
+
+  SecurityUtils,
 };
