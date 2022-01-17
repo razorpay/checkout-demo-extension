@@ -38,6 +38,7 @@
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isOneClickCheckout } from 'razorpay';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import {
     isDCCEnabled,
     isDynamicFeeBearer,
@@ -157,6 +158,10 @@
   import { formatTemplateWithLocale } from 'i18n';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
+  import {
+    ACTIONS,
+    CATEGORIES,
+  } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
 
   const cardOffer = getCardOffer();
@@ -724,6 +729,13 @@
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
     });
+    merchantAnalytics({
+      event: ACTIONS.PAGE_VIEW,
+      category: CATEGORIES.PAYMENT_METHODS,
+      params: {
+        page_title: CATEGORIES.PAYMENT_METHODS,
+      },
+    });
     if (isMethodEnabled('cod')) {
       Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
     }
@@ -997,6 +1009,11 @@
   export function selectMethod(method) {
     Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
       method,
+    });
+    merchantAnalytics({
+      event: ACTIONS.PAYMENT_METHOD_SELECT,
+      category: CATEGORIES.PAYMENT_METHODS,
+      params: { method },
     });
     showCODCharges(method);
     if (method === 'cod') return;

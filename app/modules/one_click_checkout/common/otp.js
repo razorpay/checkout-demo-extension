@@ -20,6 +20,11 @@ import {
   RESEND_OTP_INTERVAL,
 } from 'one_click_checkout/otp/constants';
 import { getDefaultOtpTemplate } from 'checkoutframe/sms_template';
+import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+import {
+  CATEGORIES,
+  ACTIONS,
+} from 'one_click_checkout/merchant-analytics/constant';
 
 let customer;
 
@@ -87,8 +92,16 @@ const postSubmit = (msg, data) => {
   const otpParams = routesConfig[views.OTP].otpParams;
   updateOTPStore({ loading: false });
   if (msg) {
+    merchantAnalytics({
+      event: ACTIONS.LOGIN_FAILED,
+      category: CATEGORIES.LOGIN,
+    });
     updateOTPStore({ errorMessage: msg, ...otpParams.sent });
   } else {
+    merchantAnalytics({
+      event: ACTIONS.LOGIN_SUCCESS,
+      category: CATEGORIES.LOGIN,
+    });
     if (data && data.addresses) {
       setSavedAddresses(data.addresses);
     }

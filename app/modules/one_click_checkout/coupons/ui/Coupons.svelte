@@ -8,6 +8,8 @@
 
   // store imports
   import { getCurrency, getPrefilledCouponCode } from 'razorpay';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+
   import {
     appliedCoupon,
     isCouponApplied,
@@ -61,6 +63,10 @@
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
   import { views } from 'one_click_checkout/routing/constants';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
 
   let showCta = true;
   const currency = getCurrency();
@@ -73,6 +79,15 @@
       input_source: $couponInputSource,
     });
 
+    merchantAnalytics({
+      event: `${$isCouponApplied ? 'with' : 'without'}_coupons_${
+        ACTIONS.CTA_CLICKED
+      }`,
+      category: CATEGORIES.COUPONS,
+      params: {
+        page_title: CATEGORIES.COUPONS,
+      },
+    });
     if (!$isCouponApplied) {
       removeCouponInStore();
     }
@@ -93,16 +108,17 @@
   }
 
   function onEdit() {
-    Razorpay.sendMessage({
-      event: 'event',
-      data: {
-        event: 'user_details.edit',
-      },
-    });
     showDetailsOverlay();
   }
 
   onMount(() => {
+    merchantAnalytics({
+      event: ACTIONS.PAGE_VIEW,
+      category: CATEGORIES.COUPONS,
+      params: {
+        page_title: CATEGORIES.COUPONS,
+      },
+    });
     hideAmountInTopBar();
     fetchCoupons();
     if (prefilledCoupon) {

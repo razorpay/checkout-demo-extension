@@ -10,7 +10,12 @@
   import { t } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { Events } from 'analytics';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 
   export let onClose;
   export let applyCoupon;
@@ -38,6 +43,13 @@
         {coupon}
         on:apply={() => {
           Events.Track(CouponEvents.AVAILABLE_COUPON_CLICKED);
+          merchantAnalytics({
+            event: ACTIONS.COUPON_AVAILABLE_CLICKED,
+            category: CATEGORIES.COUPONS,
+            params: {
+              coupon_code: coupon.code,
+            },
+          });
           applyCoupon(coupon.code);
         }}
         on:remove={removeCoupon}

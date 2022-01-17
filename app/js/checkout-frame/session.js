@@ -102,6 +102,8 @@ var preferences,
   dynamicFeeObject = discreet.dynamicFeeObject,
   views = discreet.views,
   CardViews = discreet.CardViews,
+  merchantAnalytics = discreet.merchantAnalytics,
+  merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
   SecurityUtils = discreet.SecurityUtils;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -4507,6 +4509,12 @@ Session.prototype = {
     var tab = this.tab;
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
+    if (selectedInstrument) {
+      merchantAnalytics({
+        event: merchantAnalyticsConstant.ACTIONS.PAY_NOW_CLICKED,
+        category: merchantAnalyticsConstant.CATEGORIES.PAYMENT_METHODS,
+      });
+    }
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.

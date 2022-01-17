@@ -18,6 +18,11 @@ import {
 import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+import {
+  CATEGORIES,
+  ACTIONS,
+} from 'one_click_checkout/merchant-analytics/constant';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -60,6 +65,14 @@ export function applyCouponCode(code) {
   if (input) {
     applyCoupon(input, source, {
       onValid: () => {
+        merchantAnalytics({
+          event: ACTIONS.COUPONS_APPLIED_SUCCESS,
+          category: CATEGORIES.COUPONS,
+          params: {
+            page_title: CATEGORIES.COUPONS,
+            coupon_code: input,
+          },
+        });
         Events.TrackBehav(CouponEvents.COUPON_APPLIED, {
           index: get(couponAppliedIndex),
           meta: {
@@ -69,6 +82,14 @@ export function applyCouponCode(code) {
         });
       },
       onInvalid: (error) => {
+        merchantAnalytics({
+          event: ACTIONS.COUPONS_APPLIED_FAILED,
+          category: CATEGORIES.COUPONS,
+          params: {
+            page_title: CATEGORIES.COUPONS,
+            coupon_code: input,
+          },
+        });
         if (error.failure_code === ERROR_USER_NOT_LOGGED_IN) {
           showDetailsOverlay(true);
           errorCode.set(error.failure_code);

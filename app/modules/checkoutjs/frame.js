@@ -3,6 +3,10 @@ import { makeUrl } from 'common/helper';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
 import Analytics, { Track } from 'analytics';
+import {
+  ACTIONS,
+  CATEGORIES,
+} from 'one_click_checkout/merchant-analytics/constant';
 
 const { screen, scrollTo } = global;
 
@@ -408,6 +412,49 @@ CheckoutFrame.prototype = {
     this.rzp.emit(data.event, data.data);
   },
 
+  onmerchantevent: function (data) {
+    const {
+      enableGoogleAnalytics,
+      enableFacebookAnalytics,
+      event,
+      category,
+      params = {},
+    } = data;
+    if (enableGoogleAnalytics) {
+      this.rzp.set('enable_ga_analytics', true);
+      if (window?.gtag && typeof window.gtag === 'function') {
+        window.gtag('event', event, {
+          event_category: category,
+          ...params,
+        });
+      } else if (window?.ga && typeof window.ga === 'function') {
+        if (event === ACTIONS.PAGE_VIEW) {
+          window.ga('send', {
+            hitType: 'pageview',
+            title: category,
+          });
+        } else {
+          window.ga('send', {
+            hitType: 'event',
+            eventCategory: category,
+            eventAction: event,
+          });
+        }
+      }
+    }
+    if (
+      enableFacebookAnalytics &&
+      window?.fbq &&
+      typeof window.fbq === 'function'
+    ) {
+      this.rzp.set('enable_fb_analytics', true);
+      window.fbq('track', event, {
+        page: category,
+        ...params,
+      });
+    }
+  },
+
   onredirect: function (data) {
     Track.flush();
 
@@ -468,6 +515,14 @@ CheckoutFrame.prototype = {
 
   // this is onsuccess method
   oncomplete: function (data) {
+    const options = this.rzp.get();
+    const { enable_ga_analytics, enable_fb_analytics } = options;
+    this.onmerchantevent({
+      event: ACTIONS.PAYMENT_SUCCESSFUL,
+      category: CATEGORIES.PAYMENT_METHODS,
+      enableGoogleAnalytics: enable_ga_analytics,
+      enableFacebookAnalytics: enable_fb_analytics,
+    });
     this.close();
     var rzp = this.rzp;
     var handler = rzp.get('handler');
@@ -485,7 +540,14 @@ CheckoutFrame.prototype = {
 
   onpaymenterror: function (data) {
     Track.flush();
-
+    const options = this.rzp.get();
+    const { enable_ga_analytics, enable_fb_analytics } = options;
+    this.onmerchantevent({
+      event: ACTIONS.PAYMENT_FAILED,
+      category: CATEGORIES.PAYMENT_METHODS,
+      enableGoogleAnalytics: enable_ga_analytics,
+      enableFacebookAnalytics: enable_fb_analytics,
+    });
     try {
       const callbackUrl = this.rzp.get('callback_url');
       const redirect = this.rzp.get('redirect') || shouldRedirect;
@@ -515,6 +577,14 @@ CheckoutFrame.prototype = {
   },
 
   onfailure: function (data) {
+    const options = this.rzp.get();
+    const { enable_ga_analytics, enable_fb_analytics } = options;
+    this.onmerchantevent({
+      event: ACTIONS.PAYMENT_FAILED,
+      category: CATEGORIES.PAYMENT_METHODS,
+      enableGoogleAnalytics: enable_ga_analytics,
+      enableFacebookAnalytics: enable_fb_analytics,
+    });
     this.ondismiss();
     global.alert('Payment Failed.\n' + data.error.description);
     this.onhidden();

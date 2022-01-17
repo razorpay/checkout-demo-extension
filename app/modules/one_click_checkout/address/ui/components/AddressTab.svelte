@@ -20,12 +20,17 @@
   // helpers imports
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
   import {
     views as addressViews,
     ADDRESS_TYPES,
   } from 'one_click_checkout/address/constants';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
 
   export let error;
   export let onSubmitCallback;
@@ -95,6 +100,10 @@
         });
         return;
       }
+      merchantAnalytics({
+        event: `addnew_address_${ACTIONS.CTA_CLICKED}`,
+        category: CATEGORIES.ADDRESS,
+      });
     } else {
       if (!$selectedAddressId) {
         alert('Please Select the address');
@@ -107,6 +116,12 @@
       is_billing_same_as_shipping: $isBillingSameAsShipping,
       opted_to_save_address: !!$shouldSaveAddress,
     });
+    if (currentView === addressViews.SAVED_ADDRESSES) {
+      merchantAnalytics({
+        event: `saved_address_${ACTIONS.CTA_CLICKED}`,
+        category: CATEGORIES.ADDRESS,
+      });
+    }
     onSubmitCallback(addressCompleted);
   }
 

@@ -18,9 +18,14 @@
   } from 'one_click_checkout/address/i18n/labels';
   // analytics import
   import { Events } from 'analytics';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   // constant imports
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
 
   export let addresses = savedAddresses;
   export let checkServiceability = true;
@@ -48,6 +53,19 @@
     const { zipcode, country } = $selectedAddress;
     const payload = [{ zipcode, country }];
     postServiceability(payload).then((res) => {
+      hydrateSamePincodeAddresses(res, zipcode);
+      isAddressServiceable = $selectedAddress.serviceability;
+      dispatchServiceability(id, index);
+      Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
+        id,
+        index,
+        serviceable: isAddressServiceable,
+      });
+      merchantAnalytics({
+        event: ACTIONS.SELECT_ADDRESS,
+        category: CATEGORIES.ADDRESS,
+        params: { zipcode },
+      });
       postAddressSelection(res, zipcode, id, index);
     });
   }
@@ -96,11 +114,29 @@
       const { zipcode, country } = $selectedAddress;
       const payload = [{ zipcode, country }];
       postServiceability(payload, true).then((res) => {
+        hydrateSamePincodeAddresses(res, zipcode);
+        isAddressServiceable = $selectedAddress.serviceability;
+        dispatchServiceability();
+        setShippingForSelectedAddress();
+        merchantAnalytics({
+          event: ACTIONS.SELECT_ADDRESS,
+          category: CATEGORIES.ADDRESS,
+          params: {
+            zipcode,
+          },
+        });
         postAddressSelection(res, zipcode, $addresses[0].id, 0);
       });
     } else {
       dispatchServiceability();
     }
+    merchantAnalytics({
+      event: ACTIONS.PAGE_VIEW,
+      category: CATEGORIES.ADDRESS,
+      params: {
+        page_title: CATEGORIES.ADDRESS,
+      },
+    });
     Events.Track(AddressEvents.SAVED_ADDRESS_SCREEN, {
       count: $addresses.length,
       type: addressType,

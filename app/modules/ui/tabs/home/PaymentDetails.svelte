@@ -51,6 +51,11 @@
   import { t } from 'svelte-i18n';
   import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
   import { CtaViews as CTA_LABELS } from 'ui/labels/cta';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
 
   const entries = _Obj.entries;
 
@@ -95,6 +100,13 @@
   }
 
   onMount(() => {
+    merchantAnalytics({
+      event: ACTIONS.PAGE_VIEW,
+      category: CATEGORIES.LOGIN,
+      params: {
+        page_title: CATEGORIES.LOGIN,
+      },
+    });
     Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
       previousScreen: screensHistory.previousRoute(),
     });

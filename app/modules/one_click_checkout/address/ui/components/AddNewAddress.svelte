@@ -32,6 +32,10 @@
     ZIPCODE_REQUIRED_LENGTH,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
   // store import
   import {
     getCityState,
@@ -44,6 +48,7 @@
   } from 'one_click_checkout/charges/store';
   // analytics imports
   import { Events } from 'analytics';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import { isIndianCustomer } from 'checkoutstore';
   import { savedAddresses } from 'one_click_checkout/address/store';
@@ -377,7 +382,10 @@
       meta: { saved_address_count: $savedAddresses?.length },
       type: addressType,
     });
-
+    merchantAnalytics({
+      event: ACTIONS.ADDRESS_ENTERED,
+      category: CATEGORIES.ADDRESS,
+    });
     pinIndex = INPUT_FORM.findIndex((field) => field.id === 'zipcode');
 
     initialiseStateIndex();

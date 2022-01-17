@@ -38,6 +38,8 @@ export const RazorpayDefaults = {
   one_click_checkout: false,
   force_cod: false,
   mandatory_login: false,
+  enable_ga_analytics: false,
+  enable_fb_analytics: false,
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

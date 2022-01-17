@@ -252,3 +252,11 @@ export const isOneClickCheckout = () =>
   getOption('one_click_checkout');
 
 export const getPrefilledCouponCode = () => getOption('prefill.coupon_code');
+
+export const isGoogleAnalyticsEnabled = () =>
+  getPreferences('features.one_cc_ga_analytics') ||
+  getOption('enable_ga_analytics');
+
+export const isFacebookAnalyticsEnabled = () =>
+  getPreferences('features.one_cc_fb_analytics') ||
+  getOption('enable_fb_analytics');

@@ -19,6 +19,11 @@
 
   import { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
+  import {
+    ACTIONS,
+    CATEGORIES,
+  } from 'one_click_checkout/merchant-analytics/constant';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 
   const { close, tick_filled_donate } = getIcons();
 
@@ -26,6 +31,13 @@
     if ($couponInputValue) {
       Events.TrackBehav(CouponEvents.INPUT, {
         couponCode: $couponInputValue,
+      });
+      merchantAnalytics({
+        event: ACTIONS.COUPONS_MANUAL_INPUT,
+        category: CATEGORIES.COUPONS,
+        params: {
+          couponCode: $couponInputValue,
+        },
       });
     }
   }
