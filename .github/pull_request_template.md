@@ -1,3 +1,9 @@
+## Details
+
+#### Description
+
+<!-- PR Description -->
+
 | Details                             | Description                               |
 | ----------------------------------- | ----------------------------------------- |
 | JIRA ticket                         | https://jira.corp.razorpay.com/browse/CE- |
@@ -10,12 +16,6 @@
 | Impacts public apis                 | No                                        |
 | Documentation update needed         | No                                        |
 | QA sign-off by                      | N/A                                       |
-
-## Details
-
-#### Description
-
-<!-- PR Description -->
 
 ## Changelog
 
@@ -35,6 +35,7 @@
 - [ ] Checked file already exist in CDN? https://cdn.razorpay.com/<filename> (if exists and intention was to replace Please create ticket to invalidate cache to devops)
 
 ### CDN (Added/modifed CDN assets path/filename)
+
 <!-- e.g. /bank/ABC.gif -->
 <!-- e.g. /walnut369.gif -->
 
@@ -46,4 +47,3 @@ List of strings that are added or modified
 
 | Before | After |
 | ------ | ----- |
-
