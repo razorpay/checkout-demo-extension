@@ -256,6 +256,7 @@
     padding: 4px 8px;
   }
   .address-container {
+    color: inherit;
     background: #fdfdfd;
     border: 1px solid #e6e7e8;
     display: block;
