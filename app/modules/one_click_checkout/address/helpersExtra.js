@@ -116,7 +116,16 @@ export const formatResults = (addresses = []) => {
   return addresses.reduce(
     (
       acc,
-      { zipcode, serviceable, cod, shipping_fee, cod_fee, city, state }
+      {
+        zipcode,
+        serviceable,
+        cod,
+        shipping_fee,
+        cod_fee,
+        city,
+        state,
+        state_code,
+      }
     ) => {
       acc[zipcode] = {
         serviceability: serviceable,
@@ -125,6 +134,7 @@ export const formatResults = (addresses = []) => {
         cod_fee,
         city,
         state,
+        state_code,
       };
       return acc;
     },

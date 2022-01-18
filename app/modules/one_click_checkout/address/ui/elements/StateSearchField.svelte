@@ -14,6 +14,8 @@
   export let onChange;
   export let stateName;
   export let label = '';
+  export let modifyIconPosition;
+  export let validationText;
 
   let open = false;
   let stateField;
@@ -64,12 +66,14 @@
   on:keydown={downArrowHandler}
   required
   icon=""
+  {modifyIconPosition}
   label={label || `${$t(STATE_LABEL)}*`}
   on:input={(e) => {
     stateName = e.target.value;
     onChange(id, e.target.value);
   }}
   on:blur
+  {validationText}
   elemClasses="address-elem"
   labelClasses="address-label"
 />

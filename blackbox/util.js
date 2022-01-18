@@ -261,7 +261,8 @@ const util = (module.exports = {
         url.startsWith(lumberjackUrl) ||
         url.startsWith(lumerjackVajraURL) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
-        url.includes('html2pdf.bundle.js');
+        url.includes('html2pdf.bundle.js') ||
+        url.includes('locations/autosuggest');
       if (ignoredUrl || (pattern && !pattern.test(url))) {
         return true;
       }

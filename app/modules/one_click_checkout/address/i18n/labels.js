@@ -30,8 +30,17 @@ export const SAVED_ADDRESS_LABEL = 'address.saved_address_label';
 export const SAME_ADDRESS_LABEL = 'address.same_address_checkbox_label';
 export const GENERIC_ERROR_LABEL = 'address.error_label';
 export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
+export const ZIPCODE_ERROR_LABEL = 'address.zipcode_error_label';
+export const GENERIC_PATTERN_ERROR_LABEL =
+  'address.generic_pattern_error_label';
 export const UNSERVICEABLE_LABEL = 'address.unserviceable_label';
 export const SERVICEABLE_LABEL = 'address.serviceable_label';
 export const ORDER_UPDATE_FAILURE = 'address.order_update_failure';
 export const STATE_SEARCH_ALL = 'address.state_search_all';
 export const STATE_SEARCH_PLACEHOLDER = 'address.state_search_placeholder';
+export const CUSTOM_TAG_CTA_LABEL = 'address.custom_tag_cta_label';
+export const CUSTOM_TAG_LABEL = 'address.custom_tag_label';
+export const REQUIRED_LABEL = 'address.required_label';
+export const INDIA_CONTACT_ERROR_LABEL = 'address.indian_contact_error_label';
+export const CONTACT_ERROR_LABEL = 'address.contact_error_label';
+export const PINCODE_ERROR_LABEL = 'address.pincode_error_message';

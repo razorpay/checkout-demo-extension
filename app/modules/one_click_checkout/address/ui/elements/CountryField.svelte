@@ -20,6 +20,8 @@
   export let extraLabelClass;
   export let showExtraLabel;
   export let formData;
+  export let validationText;
+
   let countryName;
   let id = 'country_name';
   let countryISO;
@@ -98,6 +100,8 @@
     value={countryName}
     elemClasses="address-elem"
     labelClasses="address-label"
+    {validationText}
+    modifyIconPosition={!!validationText}
   />
   {#if showExtraLabel && extraLabel}
     <div class={`${extraLabelClass} extralabel`}>

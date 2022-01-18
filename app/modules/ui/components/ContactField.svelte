@@ -33,6 +33,7 @@
   export let phone;
   export let isOptional;
   export let inAddress = false;
+  export let validationText;
 
   const dispatch = createEventDispatcher();
 
@@ -131,6 +132,7 @@
     pattern={COUNTRY_CODE_REGEX}
     readonly={isContactReadOnly()}
     icon=""
+    modifyIconPosition={!!validationText}
     formatter={{ type: 'country_code' }}
     label={$t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
@@ -158,12 +160,13 @@
     formatter={{ type: 'phone' }}
     label={$t(label)}
     icon=""
+    modifyIconPosition={!!validationText}
     on:input={(e) => (phone = e.target.value)}
     on:blur
     value={phone}
-    helpText={$t(CONTACT_HELP_TEXT)}
     elemClasses={inAddress ? 'address-elem' : ''}
     labelClasses={inAddress ? 'address-label' : ''}
+    {validationText}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

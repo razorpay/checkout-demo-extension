@@ -52,6 +52,8 @@
   export let leftImage = null;
   export let dir;
   export let disabled = false;
+  export let modifyIconPosition = false;
+
   /**
    * To show prediction as dropdown
    */
@@ -297,7 +299,7 @@
   class:with-prediction={isPredictionEnable}
 >
   {#if icon}
-    <i>
+    <i class:icon-invalid={modifyIconPosition}>
       {@html icon}
     </i>
   {/if}
@@ -423,12 +425,20 @@
   .input {
     border-bottom: 1px solid #ebedf0;
   }
+
+  .input-extralabel {
+    margin-top: 4px;
+  }
+
   .input-extralabel,
+  .input-loader {
+    font-size: 11px;
+  }
+
   .input-loader {
     position: absolute;
     right: 0;
     top: 33px;
-    font-size: 11px;
   }
   .successText {
     color: #079f0d;
@@ -500,5 +510,9 @@
     bottom: 6px;
     height: 18px;
     width: 18px;
+  }
+
+  .icon-invalid {
+    top: 12%;
   }
 </style>

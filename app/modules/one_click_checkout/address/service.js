@@ -222,6 +222,23 @@ export function updateOrder(shipping_address, billing_address) {
   });
 }
 
+export function fetchAutocompleteSuggestions(query, zipcode, country) {
+  return new Promise((resolve, reject) => {
+    fetch({
+      url: makeAuthUrl(
+        `locations/autosuggest?input=${query}&zipcode=${zipcode}&country=${country}`
+      ),
+      callback: (response) => {
+        if (response.error) {
+          reject(response.error);
+          return;
+        }
+        resolve(response);
+      },
+    });
+  });
+}
+
 export function getStatesList(country) {
   if (availableStateList[country]) {
     return Promise.resolve(availableStateList[country]);
