@@ -36,7 +36,7 @@
         event: ACTIONS.COUPONS_MANUAL_INPUT,
         category: CATEGORIES.COUPONS,
         params: {
-          couponCode: $couponInputValue,
+          coupon_code: $couponInputValue,
         },
       });
     }

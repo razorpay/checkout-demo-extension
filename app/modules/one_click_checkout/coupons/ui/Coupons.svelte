@@ -108,6 +108,12 @@
   }
 
   function onEdit() {
+    Razorpay.sendMessage({
+      event: 'event',
+      data: {
+        event: 'user_details.edit',
+      },
+    });
     showDetailsOverlay();
   }
 
