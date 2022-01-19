@@ -137,9 +137,11 @@
             document.body.appendChild(script);
         }
 
+        const decodeRequiredParams = ['config'];
         // Augment defaultParams with queryParams
         for (var i in queryParams) {
-            defaultParams[i] = queryParams[i];
+
+            defaultParams[i] = decodeRequiredParams.includes(i) ? JSON.parse(decodeURIComponent(queryParams[i])) : queryParams[i];
         }
 
         var params = defaultParams;
