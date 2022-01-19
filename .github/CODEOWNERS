@@ -1,0 +1,43 @@
+
+# This file allows Github to automatically request reviews from
+# code owners when certain files are changed.
+# Ref: https://github.com/blog/2392-introducing-de-owners
+#
+# Each line is a file pattern followed by one or more owners.
+# Order is important. The last matching pattern has the most precedence.
+
+
+#
+# Checkout Core Features : "@razorpay/Checkout-CX" team
+#
+app/modules/bridge/                                     @razorpay/Checkout-CX
+app/modules/configurability/                            @razorpay/Checkout-CX
+app/modules/trusted-badge/                              @razorpay/Checkout-CX
+app/js/checkout-frame/                                  @razorpay/Checkout-CX
+
+
+#
+# Checkout One-Click-Checkout (1cc) Features: "@razorpay/Checkout-1cc" team
+#
+app/modules/one_click_checkout/                         @razorpay/Checkout-1cc
+
+#
+# Checkout Application Build/Deploy
+#
+.github/actions/                                        @razorpay/Checkout-CX
+git-hooks/                                              @razorpay/Checkout-CX
+cdn/                                                    @razorpay/Checkout-CX           @razorpay/Checkout-1cc
+beta-cdn/qa/                                            @razorpay/QA                    @razorpay/Checkout-CX           @razorpay/Checkout-1cc 
+beta-cdn/                                               @razorpay/Checkout-CX           @razorpay/Checkout-1cc 
+dockerconf/                                             @razorpay/Checkout-CX
+Dockerfile                                              @razorpay/Checkout-CX
+Dockerfile.dev                                          @razorpay/Checkout-CX
+gulpfile.js                                             @razorpay/Checkout-CX
+jest.config.js                                          @razorpay/Checkout-CX
+jest.ut.config.js                                       @razorpay/Checkout-CX
+nodemon.json                                            @razorpay/Checkout-CX   
+rollup.config.js                                        @razorpay/Checkout-CX
+rollup.test.js                                          @razorpay/Checkout-CX
+tsconfig.json                                           @razorpay/Checkout-CX
+.babelrc                                                @razorpay/Checkout-CX
+.eslintrc.js                                            @razorpay/Checkout-CX
