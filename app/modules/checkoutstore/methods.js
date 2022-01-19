@@ -328,6 +328,10 @@ const METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER = {
   wallet() {
     return getWallets().length > 0;
   },
+
+  cod() {
+    return true;
+  },
 };
 
 function isMethodEnabledForBrowser(method) {
