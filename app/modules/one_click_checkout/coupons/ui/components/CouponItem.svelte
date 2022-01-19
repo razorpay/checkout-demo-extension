@@ -26,12 +26,16 @@
       <p>{coupon.code}</p>
     </div>
     {#if selected}
-      <button class="remove-button" on:click={() => dispatch('remove')}
-        >{$t(REMOVE_LABEL)}</button
+      <button
+        id="remove-button"
+        class="remove-button"
+        on:click={() => dispatch('remove')}>{$t(REMOVE_LABEL)}</button
       >
     {:else}
-      <button class="theme-highlight" on:click={() => dispatch('apply')}
-        >{$t(APPLY_LABEL)}</button
+      <button
+        id="coupon-item-apply"
+        class="theme-highlight"
+        on:click={() => dispatch('apply')}>{$t(APPLY_LABEL)}</button
       >
     {/if}
   </div>
@@ -50,6 +54,7 @@
   {/if}
   {#if !expanded}
     <button
+      id="show-details"
       class="theme-highlight show-details"
       on:click={() => (expanded = true)}>{$t(MORE_LABEL)}</button
     >
@@ -63,6 +68,7 @@
       </ul>
     </div>
     <button
+      id="show-details"
       class="theme-highlight show-details"
       on:click={() => (expanded = false)}>Show Less</button
     >

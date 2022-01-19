@@ -30,7 +30,9 @@
 
 <div class="available-coupons-container">
   <div class="row justify-between">
-    <p class="available-coupons-heading">{$t(AVAILABLE_COUPONS_LABEL)}</p>
+    <p id="available-coupons-heading" class="available-coupons-heading">
+      {$t(AVAILABLE_COUPONS_LABEL)}
+    </p>
     <button on:click={onClose}>
       <Icon icon={close} />
     </button>

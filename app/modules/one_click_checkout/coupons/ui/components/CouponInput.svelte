@@ -65,6 +65,7 @@
   {:else}
     <button
       disabled={!$couponInputValue}
+      id="coupon-apply-btn"
       class={`${$couponInputValue ? 'theme-highlight' : ''} coupon-apply-btn`}
       on:click|preventDefault={() => {
         Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {

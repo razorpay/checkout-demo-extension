@@ -158,7 +158,7 @@
 </script>
 
 <div>
-  <div class="address-add" on:click={onAddAddressClick}>
+  <div id="address-add" class="address-add" on:click={onAddAddressClick}>
     <div class="address-add-icon">+</div>
     <div class="add-label">
       {$t(ADD_ADDRESS_LABEL)}
@@ -168,6 +168,9 @@
   <div class="address-saved">
     {#each $addresses as s_address, index}
       <button
+        id={`address-container${
+          $selectedAddressId === s_address.id ? '-selected' : ''
+        }`}
         class="address-container"
         class:selected-container={$selectedAddressId === s_address.id}
         on:click={(e) => {

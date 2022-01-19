@@ -15,6 +15,7 @@
 
 {#if $availableCoupons.length}
   <button
+    id="coupons-available-container"
     class="coupons-available-container"
     on:click|preventDefault={() => {
       showAvailableCoupons({
