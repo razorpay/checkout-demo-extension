@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { Events, MetaProperties } from 'analytics';
+  import { Events, MetaProperties, CardEvents } from 'analytics';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -50,6 +50,7 @@
         }
       }
     });
+    Events.Track(CardEvents.AVS_FORM_SUBMIT);
   }
 
   onMount(() => {
@@ -107,6 +108,11 @@
     if (footerCta) {
       footerCta.addEventListener('click', checkFormErrors);
     }
+
+    Events.Track(CardEvents.LOAD_AVS_FORM, {
+      formData,
+    });
+
     return () => {
       if (footerCta) {
         footerCta.removeEventListener('click', checkFormErrors);
@@ -222,10 +228,16 @@
    * @param key
    */
   function handleOnBlur(key) {
+    const value = spacialCharRegex.test(formData[key])
+      ? ''
+      : formData[key].trim();
     formData = {
       ...formData,
-      [key]: spacialCharRegex.test(formData[key]) ? '' : formData[key].trim(),
+      [key]: value,
     };
+    Events.Track(CardEvents.AVS_FORM_DATA_INPUT, {
+      [key]: value,
+    });
   }
 
   $: {

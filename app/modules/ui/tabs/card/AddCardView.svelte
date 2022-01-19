@@ -150,7 +150,7 @@
       lastIin = getIin($cardNumber);
       if (lastIin) {
         getCardFeatures($cardNumber).then((data) => {
-          const { emi } = data.flows;
+          const { emi } = data.flows || {};
           if (!emi) {
             Analytics.track('card:emi:invalid', {
               type: AnalyticsTypes.BEHAV,

@@ -2,6 +2,9 @@
 const avsScreenEvents = {
   /** Show AVS Screen */
   SHOW_AVS_SCREEN: 'avs_screen:show',
+  LOAD_AVS_FORM: 'avs_screen:load_form',
+  AVS_FORM_DATA_INPUT: 'avs_screen:form_data_input',
+  AVS_FORM_SUBMIT: 'avs_screen:form_submit',
 };
 
 /** Events for Add Cards */
