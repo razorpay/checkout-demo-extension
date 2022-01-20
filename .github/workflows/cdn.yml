@@ -36,8 +36,7 @@ jobs:
           if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
               echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
               echo "pushing repo/$DIR_PATH_IN_REPO content to $PROD_CDN_BUCKET location and invalidating cache"
-              aws s3 cp $DIR_PATH_IN_REPO s3://$PROD_CDN_BUCKET/ --recursive
-              aws cloudfront create-invalidation --distribution-id ${{ secrets.PROD_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+              aws s3 cp $DIR_PATH_IN_REPO s3://$PROD_CDN_BUCKET/ --recursive  
           fi
 
       - name: Mark Deployment Success on GitHub
