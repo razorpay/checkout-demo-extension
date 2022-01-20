@@ -13,6 +13,7 @@ import {
   getMerchantOrder,
   getMerchantOrderDueAmount,
   getOption,
+  getPreferences,
   hasFeature,
   getCallbackUrl,
   getMerchantOrderAmount,
@@ -513,7 +514,7 @@ export function getCardIssuersForRecurring() {
 
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
-  collect: () => true,
+  collect: () => Boolean(getPreferences('methods.upi_type.collect', 1)),
   omnichannel: () =>
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () =>
@@ -525,6 +526,7 @@ const UPI_METHODS = {
     !isRecurring() &&
     !isPayout() &&
     getMerchantMethods().upi_intent &&
+    Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     getUPIIntentApps().all.length,
   intentUrl: () =>
     // available only on android mobile web (no-sdk, no-fb-insta)
@@ -534,6 +536,7 @@ const UPI_METHODS = {
     !AndroidWebView &&
     !isFacebookWebView() &&
     getMerchantMethods().upi_intent &&
+    Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     intentEnabledInOption() &&
     android,
 };
