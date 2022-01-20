@@ -3,7 +3,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import { replaceRetryButtonToDismissErrorMessage } from 'handlers/common';
+  import { updateActionAreaContentAndCTA } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
@@ -245,7 +245,7 @@
   function setTpvError() {
     Events.TrackMetric(OrderEvents.INVALID_TPV, tpv);
     session.showLoadError($t(TPV_METHODS_NOT_AVAILABLE), true);
-    replaceRetryButtonToDismissErrorMessage(session, 'OK');
+    updateActionAreaContentAndCTA(session, 'OK', null, true);
   }
 
   // Same functionality has to reused at pre-submit,

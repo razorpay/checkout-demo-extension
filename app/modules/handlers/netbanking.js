@@ -1,4 +1,4 @@
-import { replaceRetryButtonToDismissErrorMessage } from './common';
+import { updateActionAreaContentAndCTA } from './common';
 
 const AUTH_PENDING_MSG =
   'Payment is pending authorization. Request for authorization from approver.';
@@ -13,7 +13,7 @@ export function replaceRetryIfCorporateNetbanking(session, message) {
   if (message === AUTH_PENDING_MSG) {
     session.isCorporateBanking = true;
 
-    replaceRetryButtonToDismissErrorMessage(session, 'OK');
+    updateActionAreaContentAndCTA(session, 'OK', null, true);
   } else {
     _Doc.querySelector('#fd-hide').focus();
   }

@@ -3,6 +3,7 @@
     showBackdrop,
     hideBackdrop,
     backdropVisible,
+    backdropClick,
   } from 'checkoutstore/backdrop';
   import { isCtaShown } from 'checkoutstore/cta';
   import { showFeeLabel } from 'checkoutstore/index.js';
@@ -31,6 +32,12 @@
   export function isVisible() {
     return $backdropVisible;
   }
+  function handleOnClick(event) {
+    if (!$backdropClick) {
+      return;
+    }
+    onClick(event);
+  }
 </script>
 
 {#if $backdropVisible}
@@ -38,7 +45,7 @@
     id="frame-backdrop"
     class="backdrop"
     class:sub
-    on:click={onClick}
+    on:click={handleOnClick}
     transition:fade={{ duration: 200 }}
   />
 {/if}

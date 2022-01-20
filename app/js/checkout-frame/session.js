@@ -504,7 +504,12 @@ function errorHandler(response) {
         action: 'closeAndDismiss',
       });
     }
-    return CommonHandlers.replaceRetryButtonToDismissErrorMessage(this, 'OK');
+    return CommonHandlers.updateActionAreaContentAndCTA(
+      this,
+      'Go Back',
+      'Payment failed. Go back to initiate the payment again.',
+      true
+    );
   }
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
