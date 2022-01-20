@@ -17,6 +17,10 @@
     savedAddresses,
     isBillingSameAsShipping,
   } from 'one_click_checkout/address/store';
+  import {
+    selectedAddress,
+    selectedCountryISO as selectedShippingCountryISO,
+  } from 'one_click_checkout/address/shipping_address/store';
   // helpers imports
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
@@ -31,6 +35,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   export let error;
   export let onSubmitCallback;
@@ -110,12 +115,24 @@
         return;
       }
     }
-    Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
+    let analyticsData = {
       address_valid: true,
       is_saved_address: currentView === addressViews.SAVED_ADDRESSES,
       is_billing_same_as_shipping: $isBillingSameAsShipping,
       opted_to_save_address: !!$shouldSaveAddress,
-    });
+    };
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      const { id, country } = $selectedAddress;
+      if (id) {
+        analyticsData.address_id = id;
+      }
+      analyticsData = {
+        country_code: INDIA_COUNTRY_CODE,
+        country: country || $selectedShippingCountryISO,
+        ...analyticsData,
+      };
+    }
+    Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, analyticsData);
     if (currentView === addressViews.SAVED_ADDRESSES) {
       merchantAnalytics({
         event: `saved_address_${ACTIONS.CTA_CLICKED}`,

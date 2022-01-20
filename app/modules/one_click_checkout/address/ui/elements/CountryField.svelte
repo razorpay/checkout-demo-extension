@@ -2,6 +2,7 @@
   import { t } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { formatMessageWithLocale } from 'i18n';
+  import { Events } from 'analytics';
   import Field from 'ui/components/Field.svelte';
   import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
   import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
@@ -12,14 +13,17 @@
     country as countryCode,
     countryISOCode,
   } from 'checkoutstore/screens/home';
+  import AddressEvents from 'one_click_checkout/address/analytics';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
   import { views } from 'one_click_checkout/routing/constants';
+  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
   export let onChange;
   export let extraLabel;
   export let extraLabelClass;
   export let showExtraLabel;
   export let formData;
+  export let addressType;
   export let validationText;
 
   let countryName;
@@ -35,6 +39,12 @@
       : getCountryfromCode($countryCode, $countryISOCode);
     countryName = countryObj.name;
     countryISO = countryObj.iso;
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      Events.Track(AddressEvents.INPUT_ENTERED_country, {
+        selection: 'prefilled',
+        country: countryISO.toLocaleLowerCase(),
+      });
+    }
   });
 
   const getCountryISO = (countryName) => {

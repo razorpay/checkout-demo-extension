@@ -20,6 +20,7 @@ const address = {
   TW_END: 'checkoutThridwartchAPICallCompleted',
   INPUT_ENTERED_name: 'checkoutAddressNameEntered',
   INPUT_ENTERED_contact: 'checkoutShippingNumberEntered',
+  INPUT_ENTERED_country: 'checkoutAddressCountrySelected',
   INPUT_ENTERED_zipcode: 'checkoutAddressPincodeEntered',
   INPUT_ENTERED_line1: 'checkoutAddressLine1Entered',
   INPUT_ENTERED_line2: 'checkoutAddressLine2Entered',
@@ -28,6 +29,8 @@ const address = {
     'checkoutShippingAndBillingAddressSameOptionChecked',
   BILLING_SAME_AS_SHIPPING_UNCHECKED:
     'checkoutShippingAndBillingAddressSameOptionUnchecked',
+  PINCODE_MISSING_CITY: 'checkoutPincodeMissingCity',
+  PINCODE_MISSING_STATE: 'checkoutPincodeMissingState',
 };
 
 export default address;

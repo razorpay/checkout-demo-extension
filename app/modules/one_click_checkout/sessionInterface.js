@@ -40,6 +40,7 @@ import {
 import { views } from 'one_click_checkout/routing/constants';
 
 import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
+import { INDIA_COUNTRY_CODE } from 'common/constants';
 
 export const historyExists = () => get(history).length;
 
@@ -118,12 +119,24 @@ export function redirectToPaymentMethods(
     MetaProperties.SAVED_ADDRESS_COUNT,
     get(savedAddresses).length
   );
+  const { country, state, city, zipcode, contact, id } = address;
+  if (id) {
+    Analytics.setMeta(MetaProperties.ADDRESS_ID, id);
+  }
   Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_TYPE, addressType);
-  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_COUNTRY, address.country);
-  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_STATE, address.state);
-  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_CITY, address.city);
-  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_PINCODE, address.zipcode);
-  Analytics.setMeta(MetaProperties.SHIPPING_ADDRESS_CONTACT, address.contact);
+  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_COUNTRY, country);
+  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_STATE, state);
+  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_CITY, city);
+  Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_PINCODE, zipcode);
+  Analytics.setMeta(MetaProperties.SHIPPING_ADDRESS_CONTACT, contact);
+  Analytics.setMeta(
+    MetaProperties.COUNTRY_CODE,
+    contact?.countryCode || INDIA_COUNTRY_CODE
+  );
+  Analytics.setMeta(
+    MetaProperties.COUNTRY,
+    country || get(selectedShippingCountryISO)
+  );
 
   if (address.cod) showCodLoader.set(true);
   // If navigating from methods->details->methods we need not to update the order

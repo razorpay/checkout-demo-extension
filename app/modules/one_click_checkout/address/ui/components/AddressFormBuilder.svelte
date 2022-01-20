@@ -13,12 +13,18 @@
   import AutoCompleteInput from 'one_click_checkout/address/ui/components/AutoCompleteInput.svelte';
   import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
   import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
+  // analytics imports
+  import { Events } from 'analytics';
+  import AddressEvents from 'one_click_checkout/address/analytics';
+  // constant imports
+  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
   export let INPUT_FORM;
   export let formData;
   export let onUpdate;
   export let id;
   export let forceStopDispatch = false;
+  export let addressType;
   export let errors;
 
   let countryCode;
@@ -48,6 +54,13 @@
       countryCode = $country;
       phoneNum = $phone;
     }
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      // Field related analytics constants are suffixed with lowercase
+      Events.Track(AddressEvents.INPUT_ENTERED_contact, {
+        selection: 'prefilled',
+        country_code: countryCode,
+      });
+    }
   });
 </script>
 
@@ -74,6 +87,7 @@
               extraLabel={INPUT_FORM[2][1]?.unserviceableText}
               showExtraLabel={!formData.zipcode && !INPUT_FORM[2][1]?.required}
               {formData}
+              {addressType}
               extraLabelClass={INPUT_FORM[2][1]?.unserviceableText ===
               SERVICEABLE_LABEL
                 ? 'successText'

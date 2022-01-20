@@ -22,4 +22,7 @@ export default {
   SELECTED_ADDRESS_CITY: 'selected_address_city',
   SELECTED_ADDRESS_PINCODE: 'selected_address_pincode',
   SHIPPING_ADDRESS_CONTACT: 'shipping_address_contact',
+  COUNTRY_CODE: 'country_code',
+  ADDRESS_ID: 'address_id',
+  COUNTRY: 'country',
 };

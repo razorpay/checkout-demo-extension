@@ -30,6 +30,7 @@
     TNC_LINK,
     PRIVACY_LINK,
     ZIPCODE_REQUIRED_LENGTH,
+    ADDRESS_TYPES,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import {
@@ -46,6 +47,7 @@
     codChargeAmount,
     shippingCharge,
   } from 'one_click_checkout/charges/store';
+  import { country as countryCode } from 'checkoutstore/screens/home';
   // analytics imports
   import { Events } from 'analytics';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
@@ -85,6 +87,7 @@
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
+  const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   let INPUT_FORM = [
     {
@@ -335,6 +338,20 @@
                 UNSERVICEABLE_LABEL;
             }
             $formData.cod = res[value]?.cod;
+            if (isShippingAddress) {
+              if (!res[value].city) {
+                Events.Track(AddressEvents.PINCODE_MISSING_CITY, {
+                  country: $selectedCountryISO,
+                  zipcode: value,
+                });
+              }
+              if (!res[value].state) {
+                Events.Track(AddressEvents.PINCODE_MISSING_STATE, {
+                  country: $selectedCountryISO,
+                  zipcode: value,
+                });
+              }
+            }
           })
           .catch(() => {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
@@ -355,7 +372,24 @@
       });
     }
 
+    if (
+      key === 'contact' &&
+      value.countryCode !== $countryCode &&
+      isShippingAddress
+    ) {
+      Events.Track(AddressEvents.INPUT_ENTERED_contact, {
+        selection: 'manual',
+        country_code: value.countryCode,
+      });
+    }
+
     if (key === 'country_name' && value !== selectedCountry) {
+      if (selectedCountry && selectedCountry !== value && isShippingAddress) {
+        Events.Track(AddressEvents.INPUT_ENTERED_country, {
+          selection: 'manual',
+          country: extra,
+        });
+      }
       selectedCountry = value;
       handleCountrySelect(value, extra);
       changePincodeStateLabel();
@@ -439,7 +473,14 @@
             UNSERVICEABLE_LABEL;
         });
     }
-    Events.Track(AddressEvents[`INPUT_ENTERED_${id}`]);
+    if (id === 'zipcode' && addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`], {
+        country: $selectedCountryISO,
+        country_code: $formData?.contact?.countryCode,
+      });
+    } else {
+      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`]);
+    }
   };
 
   onMount(() => {
@@ -470,6 +511,8 @@
       {onUpdate}
       formData={$formData}
       {INPUT_FORM}
+      {pinIndex}
+      {addressType}
       on:blur={onInputFieldBlur}
     />
     {#if $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
