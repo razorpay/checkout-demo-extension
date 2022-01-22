@@ -1,4 +1,4 @@
-name: Add link to preview build
+name: Comment Test Urls & Preview Builds
 on: pull_request
 jobs:
   comment:
@@ -14,32 +14,55 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           msg: |
+            ## Builds
+
+            ### Commit-Based Builds are available at
+
+            Uses **commit-sha** in url
+            > https://betacdn.np.razorpay.in/checkout/builds/commit-builds/$GITHUB_COMMIT_SHA/v1/
+
+            ### Branch Based Builds are available at
+
             Once a build for any commit in your branch succeeds, it will be deployed at the following Links
 
-            Prod: https://betacdn.razorpay.com/_checkout/{branch_name}/v1/
-            Canary: https://betacdn.razorpay.com/_checkout/{branch_name}/canary/v1/
-            Baseline: https://betacdn.razorpay.com/_checkout/{branch_name}/baseline/v1/
+            > **Prod**.      : https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/v1/
+            > **Canary**: https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/canary/v1/
+            > **Baseline**: https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/baseline/v1/
 
-            ## Files
-            - [razorpay.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/razorpay.js)
-            - [checkout.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/checkout.js)
-            - [checkout-frame.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/checkout-frame.js)
-            - [checkout.css](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/css/checkout.css)
+            #### Files (Branch-Prod Based)
+            - [razorpay.js](https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/v1/razorpay.js)
+            - [checkout.js](https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/v1/checkout.js)
+            - [checkout-frame.js](https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/v1/checkout-frame.js)
+            - [checkout.css](https://betacdn.np.razorpay.in/checkout/builds/branch-builds/{branch_name}/v1/css/checkout.css)
 
             ## Usage
 
-            ### `layout.php` links for different API environments (opening in incognito mode is recommeded):
+            ### Standard Checkout
+            [Public Docs](https://razorpay.com/docs/payment-gateway/web-integration/standard/)
+
+            #### API-Test Layout
+            `layout.php` links for different API environments (opening in incognito mode is recommended):
 
             - Production API: https://api.razorpay.com/test/layout.php?branch={branch_name}
             - Dark API: https://api-dark.razorpay.com/test/layout.php?branch={branch_name}
             - Beta API: https://beta-api.stage.razorpay.in/test/layout.php?branch={branch_name}
             - Func API: https://api-web.func.razorpay.in/test/layout.php?branch={branch_name}
 
-            ### `checkout.html` links for different API environments:
+            #### Frame Alone ( +SDK ) 
+            `checkout.html` links for different API environments:
 
-            To use this branch on a mobile SDK, point the SDK page to one of these URLs
+            > To use this branch on a mobile SDK, point the SDK page to one of these URLs
 
             - Production API: https://api.razorpay.com/test/checkout.html?branch={branch_name}
             - Dark API: https://api-dark.razorpay.com/test/checkout.html?branch={branch_name}
             - Beta API: https://beta-api.stage.razorpay.in/test/checkout.html?branch={branch_name}
             - Func API: https://api-web.func.razorpay.in/test/checkout.html?branch={branch_name}
+
+            ### Custom Checkout
+            Note: Please add necessary checkout options **as query params** at the end of url
+            [Public Docs](https://razorpay.com/docs/payment-gateway/web-integration/custom/)
+
+            - Production API: https://betacdn.np.razorpay.in/checkout/qa/custom-checkout.html?env=prod&branch={branch_name}
+            - Automation API: https://betacdn.np.razorpay.in/checkout/qa/custom-checkout.html?env=qa&branch={branch_name}
+            - Dark API: https://betacdn.np.razorpay.in/checkout/qa/custom-checkout.html?env=dark&branch={branch_name}
+            - Func API: https://api-web.func.razorpay.in/test/checkout.html?env=func&branch={branch_name}

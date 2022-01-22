@@ -1,14 +1,23 @@
 # This is a basic workflow to help you get started with Actions
 
-name: 'Build & push to registry'
+name: 'Prod: Build & push to Harbor'
 
 # Controls when the action will run. Triggers the workflow on every push
-on: [push, deployment]
+on: [deployment, push]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-and-push-image:
     # The type of runner that the job will run on
     runs-on: [self-hosted]
+    env:
+      AWS_S3_BUCKET_FOR_BUILD: rzp-1018-nonprod-betacdn
+      AWS_REGION_FOR_BUILD: ap-south-1
+      AWS_ACCESS_KEY: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
+      AWS_ACCESS_SECRET: ${{ secrets.STAGE_AWS_SECRET_KEY }}
+      BUCKET_BASE_BATH_FOR_BRANCH: checkout/builds/branch-builds
+      BUCKET_BASE_BATH_FOR_COMMIT: checkout/builds/commit-builds
+      RUN_BUILD_NUMBER: ${{ github.run_id }}
+      GIT_COMMIT_HASH: ${{ github.sha }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -19,7 +28,6 @@ jobs:
         run: |
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-          echo "Canary Percentage ${{ github.event.deployment.payload.canary_percentage }}"
       - name: Set up Docker Buildx
         id: docker
         uses: docker/setup-buildx-action@v1
@@ -32,28 +40,25 @@ jobs:
           registry: c.rzp.io
           username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
-      - name: Build and push
+      - name: Build and push to Harbor
         id: build
+        env:
+          # build number prefix for master: null
+          CURRENT_BUILD_NUMBER: '${{ env.RUN_BUILD_NUMBER }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
+          BUILD_PATH_FOR_COMMIT: '${{ env.BUCKET_BASE_BATH_FOR_COMMIT }}/${{ env.GIT_COMMIT_HASH }}'
         uses: docker/build-push-action@v2
         with:
           file: ./Dockerfile
           build-args: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=${{ github.run_id }}"
-            "CANARY_PERCENTAGE=${{ github.event.deployment.payload.canary_percentage }}"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
-          secrets: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=${{ github.run_id }}"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
+            "AWS_S3_BUCKET_FOR_BUILD=${{ env.AWS_S3_BUCKET_FOR_BUILD }}"
+            "AWS_REGION_FOR_BUILD=${{ env.AWS_REGION_FOR_BUILD }}"
+            "AWS_ACCESS_KEY=${{ env.AWS_ACCESS_KEY }}"
+            "AWS_ACCESS_SECRET=${{ env.AWS_ACCESS_SECRET }}"
+            "BUILD_NUMBER=${{ env.CURRENT_BUILD_NUMBER }}"
+            "BUILD_PATH_FOR_BRANCH=${{ env.BUILD_PATH_FOR_BRANCH }}"
+            "BUILD_PATH_FOR_COMMIT=${{ env.BUILD_PATH_FOR_COMMIT }}"
+            "GIT_COMMIT_HASH=${{ env.GIT_COMMIT_HASH }}"
           push: true
           tags: c.rzp.io/razorpay/checkout:${{ github.sha }}
       - name: Mark workflow status as failed
@@ -68,7 +73,7 @@ jobs:
       - name: Mark workflow status as success
         if: steps.failed.conclusion == 'skipped'
         run: |
-          echo 'Status check has passed! Build number ${{ github.run_id }} , commit-id: ${{ github.sha }} with canary-percentage ${{ github.event.deployment.payload.canary_percentage }} '
+          echo 'Status check has passed! Build number ${{ github.run_id }} , commit-id: ${{ github.sha }} '
           curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${{ github.token }}" \
           -d '{ "state" : "success" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
           https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}

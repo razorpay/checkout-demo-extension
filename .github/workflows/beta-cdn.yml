@@ -36,7 +36,7 @@ jobs:
         run: |
           if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
             echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
-            echo "pushing repo/$DIR_PATH_IN_REPO content to rzp-1018-nonprod-betacdn/$PARENT_DIR_IN_CDN location"
+            echo "pushing repo/$DIR_PATH_IN_REPO content to $STAGE_CDN_BUCKET/$PARENT_DIR_IN_CDN location"
             aws s3 cp $DIR_PATH_IN_REPO s3://$STAGE_CDN_BUCKET/$PARENT_DIR_IN_CDN/ --recursive
             aws cloudfront create-invalidation --distribution-id ${{ secrets.STAGE_AWS_BETACDN_ID }} --paths "/$PARENT_DIR_IN_CDN/*"
             echo "Cache Invalidated, STAGE_CDN_BUCKET: $STAGE_CDN_BUCKET, DIR_PATH_IN_REPO: $DIR_PATH_IN_REPO, PARENT_DIR_IN_CDN: $PARENT_DIR_IN_CDN"

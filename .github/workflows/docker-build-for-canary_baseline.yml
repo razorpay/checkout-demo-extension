@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: 'Build & push to registry for Canary Baseline'
+name: 'Canary Baseline: Build & push to Harbor'
 
 # Controls when the action will run. Triggers the workflow on every push
 on: [push]
@@ -10,6 +10,14 @@ jobs:
   build-and-push-images:
     # The type of runner that the job will run on
     runs-on: [self-hosted]
+    env:
+      AWS_S3_BUCKET_FOR_BUILD: rzp-1018-nonprod-betacdn
+      AWS_REGION_FOR_BUILD: ap-south-1
+      AWS_ACCESS_KEY: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
+      AWS_ACCESS_SECRET: ${{ secrets.STAGE_AWS_SECRET_KEY }}
+      BUCKET_BASE_BATH_FOR_BRANCH: checkout/builds/branch-builds
+      RUN_BUILD_NUMBER: ${{ github.run_id }}
+      GIT_COMMIT_HASH: ${{ github.sha }}
     #if: ${{ github.event.workflow_run.conclusion == 'success' }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -20,6 +28,7 @@ jobs:
         run: |
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
       - name: Set up Docker Buildx
         id: docker
         uses: docker/setup-buildx-action@v1
@@ -34,52 +43,48 @@ jobs:
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
       - name: Build and push for canary
         id: canary_build
+        env:
+          TRAFFIC_ENV: canary
+          # build number prefix for canary: 1
+          CURRENT_BUILD_NUMBER: '1${{ env.RUN_BUILD_NUMBER }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
         uses: docker/build-push-action@v2
         with:
           file: ./Dockerfile
           build-args: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=1${{ github.run_id }}"
-            "TRAFFIC_ENV=canary"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
-          secrets: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=1${{ github.run_id }}"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
+            "AWS_S3_BUCKET_FOR_BUILD=${{ env.AWS_S3_BUCKET_FOR_BUILD }}"
+            "AWS_REGION_FOR_BUILD=${{ env.AWS_REGION_FOR_BUILD }}"
+            "AWS_ACCESS_KEY=${{ env.AWS_ACCESS_KEY }}"
+            "AWS_ACCESS_SECRET=${{ env.AWS_ACCESS_SECRET }}"
+            "BUILD_NUMBER=${{ env.CURRENT_BUILD_NUMBER }}"
+            "BUILD_PATH_FOR_BRANCH=${{ env.BUILD_PATH_FOR_BRANCH }}"
+            "GIT_COMMIT_HASH=${{ env.GIT_COMMIT_HASH }}"
+            "TRAFFIC_ENV=${{ env.TRAFFIC_ENV }}"
           push: true
-          tags: c.rzp.io/razorpay/checkout-canary:${{ github.sha }}
+          tags: c.rzp.io/razorpay/checkout-${{ env.TRAFFIC_ENV }}:${{ github.sha }}
       - name: Build and push for baseline
         id: baseline_build
+        env:
+          TRAFFIC_ENV: baseline
+          # build number prefix for baseline: 2
+          CURRENT_BUILD_NUMBER: '2${{ env.RUN_BUILD_NUMBER }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
+        # skip build if canary is failed
+        if: steps.canary_build.outcome == 'success'
         uses: docker/build-push-action@v2
         with:
           file: ./Dockerfile
           build-args: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=2${{ github.run_id }}"
-            "TRAFFIC_ENV=baseline"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
-          secrets: |
-            "AWS_CDN_BUCKET=betacdn"
-            "AWS_REGION=ap-south-1"
-            "S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}"
-            "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
-            "BRANCH=${{ steps.vars.outputs.branch }}"
-            "BUILD_NUMBER=2${{ github.run_id }}"
-            "GIT_COMMIT_HASH=${{ github.sha }}"
+            "AWS_S3_BUCKET_FOR_BUILD=${{ env.AWS_S3_BUCKET_FOR_BUILD }}"
+            "AWS_REGION_FOR_BUILD=${{ env.AWS_REGION_FOR_BUILD }}"
+            "AWS_ACCESS_KEY=${{ env.AWS_ACCESS_KEY }}"
+            "AWS_ACCESS_SECRET=${{ env.AWS_ACCESS_SECRET }}"
+            "BUILD_NUMBER=${{ env.CURRENT_BUILD_NUMBER }}"
+            "BUILD_PATH_FOR_BRANCH=${{ env.BUILD_PATH_FOR_BRANCH }}"
+            "GIT_COMMIT_HASH=${{ env.GIT_COMMIT_HASH }}"
+            "TRAFFIC_ENV=${{ env.TRAFFIC_ENV }}"
           push: true
-          tags: c.rzp.io/razorpay/checkout-baseline:${{ github.sha }}
+          tags: c.rzp.io/razorpay/checkout--${{ env.TRAFFIC_ENV }}:${{ github.sha }}
       - name: Mark workflow status as failed
         id: failed
         if: steps.vars.outcome != 'success' || steps.docker.outcome != 'success' || steps.harbor.outcome != 'success' || steps.canary_build.outcome != 'success'|| steps.baseline_build.outcome != 'success'
@@ -97,8 +102,3 @@ jobs:
           -d '{ "state" : "success" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
           https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
           exit 0
-  # ignore-builds:
-  #   runs-on: [self-hosted]
-  #   if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-  #     steps:
-  #       - run: echo "Previous workflow is failed hence ignoring this builds"

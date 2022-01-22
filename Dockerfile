@@ -5,12 +5,10 @@ COPY ./scripts /scripts
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER}
 
-ARG CANARY_PERCENTAGE
-ENV CANARY_PERCENTAGE=${CANARY_PERCENTAGE}
 
 # for testing
-ARG BRANCH
-ENV BRANCH=${BRANCH}
+ARG BUILD_PATH_FOR_BRANCH
+ENV BUILD_PATH_FOR_BRANCH=${BUILD_PATH_FOR_BRANCH}
 
 ARG TRAFFIC_ENV
 ENV TRAFFIC_ENV=${TRAFFIC_ENV}
@@ -26,7 +24,7 @@ SHELL ["/bin/bash", "-c"]
 # because of post install script 
 RUN git init 
 
-RUN if [[ -n $CANARY_PERCENTAGE ]] || [[ -n $TRAFFIC_ENV ]]; then \
+RUN if [[ -n $TRAFFIC_ENV ]]; then \
     cd /checkout_build \
     && yarn install \
     && NODE_ENV=production npm run build \
@@ -40,23 +38,23 @@ RUN if [[ -n $CANARY_PERCENTAGE ]] || [[ -n $TRAFFIC_ENV ]]; then \
 
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 
-ARG BRANCH
-ENV BRANCH=${BRANCH}
+ARG BUILD_PATH_FOR_BRANCH
+ENV BUILD_PATH_FOR_BRANCH=${BUILD_PATH_FOR_BRANCH}
 
 ARG TRAFFIC_ENV
 ENV TRAFFIC_ENV=${TRAFFIC_ENV}
 
-ARG AWS_CDN_BUCKET
-ENV AWS_CDN_BUCKET=${AWS_CDN_BUCKET}
+ARG AWS_S3_BUCKET_FOR_BUILD
+ENV AWS_S3_BUCKET_FOR_BUILD=${AWS_S3_BUCKET_FOR_BUILD}
 
-ARG AWS_REGION
-ENV AWS_DEFAULT_REGION=${AWS_REGION}
+ARG AWS_REGION_FOR_BUILD
+ENV AWS_DEFAULT_REGION=${AWS_REGION_FOR_BUILD}
 
-ARG S3_KEY_ID
-ENV AWS_ACCESS_KEY_ID=${S3_KEY_ID}
+ARG AWS_ACCESS_KEY
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 
-ARG S3_KEY_SECRET
-ENV AWS_SECRET_ACCESS_KEY=${S3_KEY_SECRET}
+ARG AWS_ACCESS_SECRET
+ENV AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_SECRET}
 
 RUN mkdir -p /app/dist/v1 \
     && mkdir -p /app/dist/v1/css
@@ -81,7 +79,7 @@ RUN mv css/checkout.css.gz css/checkout.css
 
 # shell doesn't require [[ ]], it works with []
 RUN if [ -z "$TRAFFIC_ENV" ]; then \
-    aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
+    aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_BRANCH/v1 \
     --acl public-read \
     --cache-control "max-age=2700, must-revalidate" \
     --content-encoding gzip \
@@ -89,7 +87,7 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     --include "*.js" \
     --include "*.css"; \
     else \
-    aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/$TRAFFIC_ENV/v1 \
+    aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_BRANCH/$TRAFFIC_ENV/v1 \
     --acl public-read \
     --cache-control "max-age=2700, must-revalidate" \
     --content-encoding gzip \
