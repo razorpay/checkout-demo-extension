@@ -23,13 +23,12 @@
     INTERNATIONAL_STATE_LABEL,
     INTERNATIONAL_PINCODE_LABEL,
     STATE_LABEL,
+    REQUIRED_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
   import {
-    tagLabels,
     TNC_LINK,
     PRIVACY_LINK,
-    ZIPCODE_REQUIRED_LENGTH,
     ADDRESS_TYPES,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
@@ -144,6 +143,7 @@
       pattern: '^.{1,255}$',
       autofillToken: 'address-line2',
       autocomplete: true,
+      onSelect: trackSuggestionSelection('line2'),
       suggestionsResource: (value) => {
         return fetchSuggestionsResource(
           {
@@ -167,6 +167,7 @@
       label: LANDMARK_LABEL,
       pattern: '^.{2,32}$',
       autocomplete: true,
+      onSelect: trackSuggestionSelection('landmark'),
       suggestionsResource: (value) => {
         return fetchSuggestionsResource(
           {
@@ -220,6 +221,15 @@
     }
     return true;
   };
+
+  function trackSuggestionSelection(id) {
+    return function (e) {
+      Events.Track(AddressEvents.SUGGESTION_SELECTED, {
+        index: e?.detail?.index,
+        field: id,
+      });
+    };
+  }
 
   function handleCountrySelect(name, iso) {
     // show number keypad for pincode if country is India
@@ -290,6 +300,14 @@
   };
 
   export function onUpdate(key, value, extra) {
+    // Track whenever suggestion is cleared
+    if (
+      ['landmark', 'line2'].includes(key) &&
+      value !== $formData[key] &&
+      !value
+    ) {
+      Events.Track(AddressEvents.SUGGESTION_CLEARED, { field: key });
+    }
     // If invalid field, then re-validate the input and update error messages
     if (errors[key]) {
       const field = findItem(INPUT_FORM, key);
@@ -438,6 +456,15 @@
       field,
       $selectedCountryISO
     );
+    if (errorLabel) {
+      Events.Track(AddressEvents.ADDRESS_VALIDATION_ERROR, {
+        field: id,
+        input: $formData[id] || '',
+        reason:
+          errorLabel === REQUIRED_LABEL ? 'NULL_VALUE' : 'PATTERN_MATCH_FAILED',
+      });
+    }
+
     errors[id] = errorLabel ? $t(errorLabel) : null;
     if (
       id === 'zipcode' &&
@@ -473,7 +500,14 @@
             UNSERVICEABLE_LABEL;
         });
     }
-    if (id === 'zipcode' && addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+    if (id === 'line1') {
+      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`], {
+        input_length: $formData?.name?.length,
+      });
+    } else if (
+      id === 'zipcode' &&
+      addressType === ADDRESS_TYPES.SHIPPING_ADDRESS
+    ) {
       Events.Track(AddressEvents[`INPUT_ENTERED_${id}`], {
         country: $selectedCountryISO,
         country_code: $formData?.contact?.countryCode,

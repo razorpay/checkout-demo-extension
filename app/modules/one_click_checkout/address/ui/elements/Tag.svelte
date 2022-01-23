@@ -1,12 +1,19 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+
   import TagIcon from 'one_click_checkout/address/ui/components/TagIcon.svelte';
 
+  const dispatch = createEventDispatcher();
+
   export let label;
-  export let onSelect;
   export let selected;
 </script>
 
-<div class="address-tag" class:selected-tag={selected} on:click={onSelect}>
+<div
+  class="address-tag"
+  class:selected-tag={selected}
+  on:click={() => dispatch('select', { label })}
+>
   <TagIcon {label} {selected} />
   <span class="inner-text">{label}</span>
 </div>

@@ -44,6 +44,7 @@
         textContent: line1,
       },
     });
+    dispatch('select', { index: e.detail.index });
   }
 </script>
 

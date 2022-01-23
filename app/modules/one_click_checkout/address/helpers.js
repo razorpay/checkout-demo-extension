@@ -1,9 +1,18 @@
 // all the helpers functions for 1cc
 
 import { get } from 'svelte/store';
+
+// Store imports
 import { newUserAddress } from 'one_click_checkout/address/shipping_address/store';
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 
+// Helper imports
+import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
+import { postCustomerAddress } from 'one_click_checkout/address/service';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
+// Constants imports
 import {
   LANDMARK_ERROR_LABEL,
   GENERIC_ERROR_LABEL,
@@ -14,13 +23,9 @@ import {
   CONTACT_ERROR_LABEL,
   PINCODE_ERROR_LABEL,
 } from 'one_click_checkout/address/i18n/labels';
-import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
-import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-import { postCustomerAddress } from 'one_click_checkout/address/service';
-import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
+import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
 
 /**
  * Checks for the address form if there are any errors and returns the obj

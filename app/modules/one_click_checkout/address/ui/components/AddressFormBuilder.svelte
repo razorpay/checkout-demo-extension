@@ -152,6 +152,7 @@
           validationText={errors[input.id] ? errors[input.id] : ''}
           on:blur={() => onBlur(input.id)}
           on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
+          on:select={input.onSelect}
         />
       {:else}
         <Field

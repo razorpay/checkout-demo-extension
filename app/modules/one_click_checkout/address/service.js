@@ -223,12 +223,21 @@ export function updateOrder(shipping_address, billing_address) {
 }
 
 export function fetchAutocompleteSuggestions(query, zipcode, country) {
+  Events.Track(AddressEvents.SUGGESTIONS_API_START, {
+    query,
+    country,
+    zipcode,
+  });
   return new Promise((resolve, reject) => {
     fetch({
       url: makeAuthUrl(
         `locations/autosuggest?input=${query}&zipcode=${zipcode}&country=${country}`
       ),
       callback: (response) => {
+        Events.Track(AddressEvents.SUGGESTIONS_API_END, {
+          success: !response.error,
+          result_count: response.predictions?.length || 0,
+        });
         if (response.error) {
           reject(response.error);
           return;
@@ -240,13 +249,21 @@ export function fetchAutocompleteSuggestions(query, zipcode, country) {
 }
 
 export function getStatesList(country) {
+  Events.Track(AddressEvents.STATES_API_START, { country });
   if (availableStateList[country]) {
+    Events.Track(AddressEvents.STATES_API_END, {
+      result_count: availableStateList[country]?.length || 0,
+    });
     return Promise.resolve(availableStateList[country]);
   }
   return new Promise((resolve, reject) => {
     fetch({
       url: makeAuthUrl(`locations/countries/${country}/states`),
       callback: (response) => {
+        Events.Track(AddressEvents.STATES_API_END, {
+          success: !response.error,
+          result_count: response.length || 0,
+        });
         if (response.error) {
           reject(response.error);
           return;

@@ -29,6 +29,15 @@ const address = {
     'checkoutShippingAndBillingAddressSameOptionChecked',
   BILLING_SAME_AS_SHIPPING_UNCHECKED:
     'checkoutShippingAndBillingAddressSameOptionUnchecked',
+  SUGGESTIONS_API_START: 'checkoutSuggestionsAPIInitiated',
+  SUGGESTIONS_API_END: 'checkoutSuggestionsAPICompleted',
+  OTHER_TAG_SELECTED: 'checkoutAddressTagOtherSelected',
+  CUSTOM_TAG_INPUT: 'checkoutCustomAddressTagInput',
+  ADDRESS_VALIDATION_ERROR: 'AddressValidationError',
+  SUGGESTION_SELECTED: 'checkoutSuggestionSelected',
+  SUGGESTION_CLEARED: 'checkoutSuggestionCleared',
+  STATES_API_START: 'checkoutStatesAPIInitiated',
+  STATES_API_END: 'checkoutStatesAPICompleted',
   PINCODE_MISSING_CITY: 'checkoutPincodeMissingCity',
   PINCODE_MISSING_STATE: 'checkoutPincodeMissingState',
 };

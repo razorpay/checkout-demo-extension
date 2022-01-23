@@ -37,7 +37,6 @@ export default {
   state_search_all: 'All states',
   state_search_placeholder: 'Search a state',
   custom_tag_label: 'Save As',
-  custom_tag_cta_label: 'CANCEL',
   required_label: 'Required',
   zipcode_error_label: 'Invalid zipcode entered.',
   generic_pattern_error_label: 'Inalid input entered.',

@@ -68,10 +68,11 @@
   {/if}
   {#if suggestions.length > 0}
     <div class="suggestion-dropdown">
-      {#each suggestions as suggestion}
+      {#each suggestions as suggestion, index}
         <div
           class="suggestion-item"
-          on:click={() => dispatch('suggestion-select', { ...suggestion })}
+          on:click={() =>
+            dispatch('suggestion-select', { ...suggestion, index })}
         >
           <span class="leading">{suggestion.line1} </span>
           <span class="description">{suggestion.line2} </span>

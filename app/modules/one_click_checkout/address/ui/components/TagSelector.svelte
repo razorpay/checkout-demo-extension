@@ -4,10 +4,11 @@
 
   // i18n imports
   import { t } from 'svelte-i18n';
-  import {
-    CUSTOM_TAG_CTA_LABEL,
-    CUSTOM_TAG_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
+  import { CUSTOM_TAG_LABEL } from 'one_click_checkout/address/i18n/labels';
+
+  // analytics imports
+  import { Events } from 'analytics';
+  import AddressEvents from 'one_click_checkout/address/analytics';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -30,15 +31,20 @@
     }
   }
 
-  function onCancel() {
-    selectedTag = 'Home';
+  function onTagSelection(e) {
+    const { label } = e.detail;
+    dispatch('select', { label });
+
+    if (label === 'Others') {
+      Events.Track(AddressEvents.OTHER_TAG_SELECTED);
+    }
   }
 </script>
 
 <div class="tag-selector-container">
   {#each tagLabels as label}
     <Tag
-      onSelect={() => dispatch('select', { label })}
+      on:select={onTagSelection}
       {label}
       selected={label === 'Others' && showTagInput
         ? true
@@ -55,6 +61,8 @@
     bind:this={inputRef}
     label={$t(CUSTOM_TAG_LABEL)}
     on:input={(e) => dispatch('select', { label: e.target.value })}
+    on:blur={(e) =>
+      Events.Track(AddressEvents.CUSTOM_TAG_INPUT, { tag: e.target.value })}
   />
 {/if}
 
