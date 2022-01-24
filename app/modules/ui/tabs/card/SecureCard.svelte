@@ -144,7 +144,7 @@
           {/if}
         </span>
       </div>
-      <div>
+      <div class:recurring-card-text={Boolean(isRecurring())}>
         <!-- LABEL: Keep card saved for future payments -->
         <span
           class="saved-card-text"
@@ -263,6 +263,9 @@
     cursor: pointer;
   }
 
+  .recurring-card-text {
+    line-height: 0px;
+  }
   .save_card_label_text {
     display: block;
     margin-bottom: 5px;
