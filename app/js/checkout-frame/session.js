@@ -4796,7 +4796,6 @@ Session.prototype = {
       // ==> Shake the form and show tooltip on checkbox
       if (
         RazorpayHelper.isRecurring() &&
-        RazorpayHelper.isStrictlyRecurring() &&
         discreet.storeGetter(Store.isIndianCustomer) &&
         !discreet.storeGetter(CardScreenStore.remember)
       ) {

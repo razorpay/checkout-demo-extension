@@ -46,6 +46,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { getBankText } from 'ui/tabs/home/helpers';
+  import { isRecurring } from 'razorpay';
 
   // Props
   export let card;
@@ -157,6 +158,7 @@
 <div
   class="saved-card"
   class:checked={selected}
+  class:recurring-saved-card={Boolean(isRecurring())}
   on:click={(event) => handleClick(event)}
   tabIndex="0"
   {...attributes}
@@ -316,6 +318,10 @@
   .downtime-saved-cards-icon {
     margin-right: 8px;
     margin-top: 2px;
+  }
+
+  .recurring-saved-card {
+    padding-bottom: 8px;
   }
 
   .card-non-tokenised {

@@ -133,7 +133,7 @@
         />
         <span class="checkbox">
           <!-- if add-new-card flow and recurring -->
-          {#if modalType === 'add-new-card' && isRecurring()}
+          {#if isRecurring()}
             <Tooltip
               align={['top', 'right']}
               className="subscription-flow-save-card-tooltip"
@@ -292,11 +292,13 @@
     opacity: 0.9;
     width: auto;
     white-space: nowrap;
+    line-height: 14px;
   }
 
   :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-top.tooltip-right) {
     opacity: 0.9;
     width: auto;
     white-space: nowrap;
+    line-height: 14px;
   }
 </style>
