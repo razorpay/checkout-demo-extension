@@ -4789,6 +4789,24 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
+      // If
+      // 1. Payment is Recurring and strictly recurring
+      // 2. Customer is Indian (because saved card is only visible for Indian customer)
+      // 3. If save card checkbox it not checked
+      // ==> Shake the form and show tooltip on checkbox
+      if (
+        RazorpayHelper.isRecurring() &&
+        RazorpayHelper.isStrictlyRecurring() &&
+        discreet.storeGetter(Store.isIndianCustomer) &&
+        !discreet.storeGetter(CardScreenStore.remember)
+      ) {
+        var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
+        Form.shake();
+        showSavedCardTooltip.update(function () {
+          return true;
+        });
+        return;
+      }
     } else if (selectedInstrument) {
       if (
         selectedInstrument.method === 'card' &&

@@ -47,6 +47,7 @@ function getOptions(module) {
         return;
       }
       if (warning.code === 'CIRCULAR_DEPENDENCY') {
+        console.warn(warning.message);
         throw new Error('FIX CIRCULAR_DEPENDENCY');
       }
       console.error(warning.message);
