@@ -2,11 +2,15 @@ import { setRazorpayInstance } from 'checkoutstore';
 import RazorpayStore from 'razorpay';
 import { getPreferences } from '../../../mock-api/mocks/preferences';
 
-export const setupPreferences = (type = 'loggedIn', rInstance = {}) => {
+export const setupPreferences = (
+  type = 'loggedIn',
+  rInstance = {},
+  preferencesOverride = {}
+) => {
   const rzpInstance = {
     id: 'id',
     get: jest.fn(),
-    preferences: getPreferences(type),
+    preferences: { ...getPreferences(type), ...preferencesOverride },
     ...rInstance,
   };
 

@@ -105,7 +105,7 @@
     MetaProperties,
   } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
-  import { sortBasedOnTokenization } from 'ui/tabs/card/utils';
+  import { sortBasedOnTokenization, shouldShowTnc } from 'ui/tabs/card/utils';
 
   import {
     getIin,
@@ -179,6 +179,8 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+
+  $: showTnC = shouldShowTnc($defaultDCCCurrency, $cardCountry);
 
   /**
    * tabVisible {Boolean}
@@ -1088,7 +1090,7 @@
           {/if}
         </div>
       {/if}
-      {#if isShowMORTncEnabled() && $defaultDCCCurrency === 'USD'}
+      {#if showTnC}
         <p class="pad">
           {$t(MERCHANT_OF_RECORD)}
           <a
