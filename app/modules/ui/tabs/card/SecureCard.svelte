@@ -144,7 +144,10 @@
           {/if}
         </span>
       </div>
-      <div class:recurring-card-text={Boolean(isRecurring())}>
+      <div
+        class:recurring-card-text={Boolean(isRecurring()) &&
+          modalType === 'add-new-card'}
+      >
         <!-- LABEL: Keep card saved for future payments -->
         <span
           class="saved-card-text"
