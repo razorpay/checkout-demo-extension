@@ -84,7 +84,7 @@ jobs:
             "GIT_COMMIT_HASH=${{ env.GIT_COMMIT_HASH }}"
             "TRAFFIC_ENV=${{ env.TRAFFIC_ENV }}"
           push: true
-          tags: c.rzp.io/razorpay/checkout--${{ env.TRAFFIC_ENV }}:${{ github.sha }}
+          tags: c.rzp.io/razorpay/checkout-${{ env.TRAFFIC_ENV }}:${{ github.sha }}
       - name: Mark workflow status as failed
         id: failed
         if: steps.vars.outcome != 'success' || steps.docker.outcome != 'success' || steps.harbor.outcome != 'success' || steps.canary_build.outcome != 'success'|| steps.baseline_build.outcome != 'success'
