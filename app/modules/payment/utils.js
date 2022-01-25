@@ -25,6 +25,10 @@ export function checkValidFlow(data = {}, flowName = '') {
   if (!flowName) {
     return false;
   }
+  // If we do not have a provider or wallet info: Eg, COD
+  if (!data?.provider && !data?.wallet) {
+    return Boolean(Config?.[data?.method]?.[flowName]);
+  }
   return Boolean(
     Config?.[data?.method]?.[data?.wallet || data?.provider]?.[flowName]
   );
