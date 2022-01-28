@@ -308,7 +308,8 @@ export default function Payment(data, params = {}, r) {
   }
   // in force iframe always avoid popup
   const forceIframeFlow = checkValidFlow(data, FLOWS.FORCE_IFRAME); // iframe flow only in Standard checkout
-  if (forceIframeFlow && isRazorpayFrame()) {
+  const shouldAvoidPopup = checkValidFlow(data, FLOWS.AVOID_POPUP); // checks if payment should be done without creating popup. (Eg, COD)
+  if ((forceIframeFlow && isRazorpayFrame()) || shouldAvoidPopup) {
     avoidPopup = true;
   }
   // adding a check for given flow requires popup for custom checkout (e.g twid)
