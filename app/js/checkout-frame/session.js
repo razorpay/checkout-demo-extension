@@ -4009,8 +4009,7 @@ Session.prototype = {
 
     if (this.screen === 'otp') {
       if (
-        this.ajaxErrorMetadata &&
-        CommonHandlers.shouldRetryWithPaypal(this.ajaxErrorMetadata)
+        CommonHandlers.hasPaypalOptionInErrorMetadata(this.ajaxErrorMetadata)
       ) {
         return this.commenceOTP(text, undefined, {}, 'paypal', loadingState);
       }
