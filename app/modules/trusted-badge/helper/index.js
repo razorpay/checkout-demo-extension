@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { RTB } from 'checkoutstore/rtb';
 import Analytics, { Events, MetaProperties } from 'analytics';
 import { contact } from 'checkoutstore/screens/home';
+import * as AnalyticsTypes from 'analytics-types';
 
 const TRUSTED_BADGE_EXPERIMENT_VARIANTS = ['not_applicable', 'rtb_show'];
 
@@ -23,7 +24,7 @@ function checkTrustedBadgeAvailbility(rtb) {
     rtb.experiment && TRUSTED_BADGE_EXPERIMENT_VARIANTS.includes(rtb.variant)
   );
 }
-export function setTrustedBadgeVariant(exp) {
+export function setTrustedBadgeVariant(exp, sendAnalytics = true) {
   if (!get(RTB).variant) {
     let rtb;
     if (
@@ -36,15 +37,17 @@ export function setTrustedBadgeVariant(exp) {
     } else {
       rtb = exp;
     }
-    if (rtb.variant) {
-      Analytics.track('RTB_experiment_variant', {
-        type: AnalyticsTypes.METRIC,
-        data: {
-          rtb_experiment_variant: rtb.variant,
-          contact: get(contact),
-        },
-      });
-      Events.setMeta(MetaProperties.RTB_EXPERIMENT_VARIANT, rtb.variant);
+    if (sendAnalytics) {
+      if (rtb.variant) {
+        Analytics.track('RTB_experiment_variant', {
+          type: AnalyticsTypes.METRIC,
+          data: {
+            rtb_experiment_variant: rtb.variant,
+            contact: get(contact),
+          },
+        });
+        Events.setMeta(MetaProperties.RTB_EXPERIMENT_VARIANT, rtb.variant);
+      }
     }
     RTB.update((val) => ({ ...val, ...rtb }));
   }
