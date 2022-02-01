@@ -4789,15 +4789,22 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
+
       // If
-      // 1. Payment is Recurring and strictly recurring
-      // 2. Customer is Indian (because saved card is only visible for Indian customer)
+      // 1. Payment is Recurring
+      // 2. Customer is Indian
       // 3. If save card checkbox it not checked
+      // 4. If Saved card and consent is not taken
       // ==> Shake the form and show tooltip on checkbox
+
+      var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+      var consentPendingForSelectedCardInSavedCardScreen =
+        selectedCard && !selectedCard.consent_taken;
+
       if (
         RazorpayHelper.isRecurring() &&
         discreet.storeGetter(Store.isIndianCustomer) &&
-        !discreet.storeGetter(CardScreenStore.remember)
+        consentPendingForSelectedCardInSavedCardScreen
       ) {
         var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
         Form.shake();
@@ -5117,6 +5124,7 @@ Session.prototype = {
       isSavedCardScreen && (data.method === 'card' || data['card[cvv]']);
     var addTokenizationConsentToPayload = false;
     // when card is selected from saved card screen
+    var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
     var consentPendingForSelectedCardInSavedCardScreen =
       selectedCard && !selectedCard.consent_taken;
     // when card is selected from p13n block
