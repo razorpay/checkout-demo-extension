@@ -640,6 +640,10 @@
     return getSavedCardsFromCustomer(session.getCurrentCustomer());
   }
 
+  export function isOnAddCardScreen() {
+    return currentView === Views.ADD_CARD;
+  }
+
   export function isOnSavedCardsScreen() {
     return currentView === Views.SAVED_CARDS;
   }

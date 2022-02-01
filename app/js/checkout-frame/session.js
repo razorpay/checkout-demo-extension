@@ -4796,21 +4796,28 @@ Session.prototype = {
       // 3. If save card checkbox it not checked
       // 4. If Saved card and consent is not taken
       // ==> Shake the form and show tooltip on checkbox
-
+      var isRecurring = RazorpayHelper.isRecurring();
+      var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+      var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+      var rememberCardCheck = discreet.storeGetter(CardScreenStore.remember);
       var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
       var consentPendingForSelectedCardInSavedCardScreen =
         selectedCard && !selectedCard.consent_taken;
 
-      if (
-        RazorpayHelper.isRecurring() &&
-        discreet.storeGetter(Store.isIndianCustomer) &&
-        consentPendingForSelectedCardInSavedCardScreen
-      ) {
+      if (isRecurring && isDomesticCustomer && !rememberCardCheck) {
+        // if screen in saved-cards and consent is already taken
+        if (
+          isSavedCardScreen &&
+          !consentPendingForSelectedCardInSavedCardScreen
+        ) {
+          return;
+        }
         var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
         Form.shake();
         showSavedCardTooltip.update(function () {
           return true;
         });
+
         return;
       }
     } else if (selectedInstrument) {
