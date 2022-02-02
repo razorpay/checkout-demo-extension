@@ -11,6 +11,8 @@ const {
   responseWithQRImage,
   validateQRImage,
   respondToUPIPaymentStatus,
+  shouldShowNewQRFlow,
+  respondToCreateQR,
 
   // Offers
   verifyOfferApplied,
@@ -56,6 +58,7 @@ module.exports = function (testFeatures) {
     dynamicFeeBearer,
   } = features;
   const anyFeeBearer = feeBearer || dynamicFeeBearer;
+
   describe.each(
     getTestData(title, {
       options,
@@ -91,47 +94,67 @@ module.exports = function (testFeatures) {
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }
+      if (shouldShowNewQRFlow(features, options)) {
+        if (!isHomeScreenSkipped) {
+          await proceed(context);
+        }
+        if (!missingUserDetails) {
+          await assertUserDetails(context);
+          await assertEditUserDetailsAndBack(context);
+        }
+        await assertPaymentMethods(context);
 
-      if (partialPayments) {
-        await handlePartialPayment(context, '100');
-      } else if (!isHomeScreenSkipped) {
-        await proceed(context);
-      }
-      await delay(2000);
-      if (dynamicFeeBearer) {
-        await assertDynamicFeeBearer(context, 1, true);
-      }
-      if (!missingUserDetails) {
-        await assertUserDetails(context);
-        await assertEditUserDetailsAndBack(context);
-      }
-      await assertPaymentMethods(context);
-
-      if (personalization) {
-        await verifyPersonalizationText(context, 'qr');
-        await selectPersonalizationPaymentMethod(context, '1');
-      } else {
         await selectPaymentMethod(context, 'upi');
-        await selectQRScanner(context);
-      }
+        await respondToCreateQR(context);
 
-      if (offers) {
-        await viewOffers(context);
-        await selectOffer(context, '1');
-        await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
-        await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹20');
-      }
+        await responseWithQRImage(context, true);
+        await validateQRImage(context);
+        await respondToUPIPaymentStatus(context, true);
+      } else {
+        await proceed(context);
+        if (partialPayments) {
+          await handlePartialPayment(context, '100');
+        } else if (!isHomeScreenSkipped) {
+          await proceed(context);
+        }
+        await delay(2000);
+        if (dynamicFeeBearer) {
+          await assertDynamicFeeBearer(context, 1, true);
+        }
+        await delay(500);
 
-      if (anyFeeBearer) {
-        await handleFeeBearer(context);
-      }
+        if (!missingUserDetails) {
+          await assertUserDetails(context);
+          await assertEditUserDetailsAndBack(context);
+        }
+        await assertPaymentMethods(context);
 
-      await respondToUPIAjax(context, { method: 'qr' });
-      await responseWithQRImage(context);
-      await validateQRImage(context);
-      await respondToUPIPaymentStatus(context);
+        if (personalization) {
+          await verifyPersonalizationText(context, 'qr');
+          await selectPersonalizationPaymentMethod(context, '1');
+        } else {
+          await selectPaymentMethod(context, 'upi');
+          await selectQRScanner(context);
+        }
+
+        if (offers) {
+          await viewOffers(context);
+          await selectOffer(context, '1');
+          await verifyOfferApplied(context);
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          await verifyDiscountText(context, 'You save ₹20');
+        }
+
+        if (anyFeeBearer) {
+          await handleFeeBearer(context);
+        }
+
+        await respondToUPIAjax(context, { method: 'qr' });
+        await responseWithQRImage(context);
+        await validateQRImage(context);
+        await respondToUPIPaymentStatus(context);
+      }
     });
   });
 };

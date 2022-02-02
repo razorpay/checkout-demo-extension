@@ -16,6 +16,7 @@ const {
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
+const { delay } = require('../../../../mock-api/utils');
 
 describe('UPI Intent tests', () => {
   test('perform keyless UPI Intent transaction with contact optional', async () => {
@@ -43,6 +44,7 @@ describe('UPI Intent tests', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await submit(context);
+    await delay(500);
     await respondAndVerifyIntentRequest(context);
   });
 });

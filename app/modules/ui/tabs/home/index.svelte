@@ -158,6 +158,7 @@
   import { formatTemplateWithLocale } from 'i18n';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
+  import { toggleQRTab } from 'upi/helper';
   import {
     ACTIONS,
     CATEGORIES,
@@ -1115,6 +1116,7 @@
     } else if (instrument.vendor_vpa) {
       trackUpiIntentInstrumentSelected(instrument.vendor_vpa);
       $intentVpaPrefill = instrument.vendor_vpa;
+      toggleQRTab();
       selectMethod(instrument.method, instrument.vendor_vpa);
     } else {
       // Bring instrument into view if it's not visible

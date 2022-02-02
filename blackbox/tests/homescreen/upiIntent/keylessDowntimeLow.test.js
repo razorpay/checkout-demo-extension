@@ -17,6 +17,7 @@ const {
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
+const { delay } = require('../../../util');
 
 describe('Basic upi payment', () => {
   test('Verify keyless UPI intent downtime - Low', async () => {
@@ -64,6 +65,7 @@ describe('Basic upi payment', () => {
     await selectUPIApp(context, '1', appWithDowntime);
     await verifyMethodWarned(context, 'upi', 'psp', appWithDowntime);
     await submit(context);
+    await delay(500);
     await respondAndVerifyIntentRequest(context);
   });
 });

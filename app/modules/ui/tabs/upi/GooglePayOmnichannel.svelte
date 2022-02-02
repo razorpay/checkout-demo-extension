@@ -20,6 +20,7 @@
     OMNI_GPAY_NUMBER,
     OMNI_ENTER_NUMBER,
     OMNI_ERROR,
+    OMNI_BLOCK_HEADING_QRFLOW,
   } from 'ui/labels/upi';
 
   // Props
@@ -29,7 +30,8 @@
   export let contact = '';
   export let focusOnCreate = false;
   export let value = '';
-
+  // isQRFlow flag is used to remove OR in Omichannel heading
+  export let isQRFlow = false;
   // Refs
   export let phoneField = null;
 
@@ -81,7 +83,9 @@
 </script>
 
 <!-- LABEL: Or, pay using phone number -->
-<div class="legend left">{$t(OMNI_BLOCK_HEADING)}</div>
+<div class="legend left">
+  {isQRFlow ? $t(OMNI_BLOCK_HEADING_QRFLOW) : $t(OMNI_BLOCK_HEADING)}
+</div>
 
 <SlottedRadioOption
   name="payment_type"

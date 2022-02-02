@@ -1147,6 +1147,7 @@ export default {
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',
+    omni_block_heading_qrflow: 'Pay using phone number',
     omni_enter_number: 'Enter your phone number',
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',

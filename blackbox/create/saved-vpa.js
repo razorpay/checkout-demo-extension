@@ -49,6 +49,7 @@ const {
   selectPersonalizationPaymentMethod,
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../../mock-api/utils.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -158,7 +159,7 @@ module.exports = function (testFeatures) {
       if (feeBearer || dynamicFeeBearer) {
         await handleFeeBearer(context);
       }
-
+      await delay(1000);
       if (callbackUrl) {
         await expectRedirectWithCallback(context, { method: 'upi' });
       } else {

@@ -5175,6 +5175,11 @@ Session.prototype = {
              * So, let's switch to it instead of continuing from here.
              */
             if (selectedInstrument._ungrouped[0].flow === 'qr') {
+              if (discreet.QRHelper.shouldShowNewQrFlow()) {
+                // when UPI-QR is selected from Custom block or p13n block opening UPI tab to show New QR flow
+                this.switchTab('upi');
+                return;
+              }
               this.switchTab('qr');
               return;
             }
@@ -6043,7 +6048,11 @@ Session.prototype = {
       this.prefCall.abort();
       this.prefCall = null;
     }
-
+    if (discreet.QRHelper.shouldShowNewQrFlow()) {
+      // Clearing the polling if user decides not to pay using QR and
+      //pays  with different method
+      discreet.QRHelper.stopPolling();
+    }
     if (this.isOpen) {
       Analytics.track('modal:close', {
         immediately: true,
