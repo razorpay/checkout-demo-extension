@@ -70,5 +70,4 @@ But it won'r update remember value as its already initialized and handler to pre
 
 Fix: Revert remember default value to true, and update using subscription on isIndianCustomer
  */
-
 isIndianCustomer?.subscribe(remember.set);

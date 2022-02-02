@@ -4800,12 +4800,20 @@ Session.prototype = {
       var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
       var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
       var rememberCardCheck = discreet.storeGetter(CardScreenStore.remember);
+
       var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
       var consentPendingForSelectedCardInSavedCardScreen =
         selectedCard && !selectedCard.consent_taken;
 
+      // for saved card consent is being updated in userConsentForTokenization
+      if (isSavedCardScreen) {
+        rememberCardCheck = discreet.storeGetter(
+          CardScreenStore.userConsentForTokenization
+        );
+      }
+
       if (isRecurring && isDomesticCustomer && !rememberCardCheck) {
-        // if screen in saved-cards and consent is already taken
+        // if screen is saved-cards and consent is already taken for a that card exit
         if (
           isSavedCardScreen &&
           !consentPendingForSelectedCardInSavedCardScreen
