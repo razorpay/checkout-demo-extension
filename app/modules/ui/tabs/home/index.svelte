@@ -905,7 +905,12 @@
 
   function storeContactDetails() {
     // Update save address/card checkbox
-    remember.set($isIndianCustomer);
+    // Fix: For recurring payments, need explicit consent hense ristricting
+    //      this to non recurring payments only
+
+    if (!isRecurring()) {
+      remember.set($isIndianCustomer);
+    }
 
     // Store only on mobile since Desktops can be shared b/w users
     if (isMobile()) {

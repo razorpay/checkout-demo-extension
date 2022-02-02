@@ -1,6 +1,7 @@
 import { derived, writable } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
 import { isIndianCustomer } from 'checkoutstore';
+import { isRecurring } from 'razorpay';
 
 export const cardNumber = writable('');
 export const cardCvv = writable('');
@@ -69,5 +70,13 @@ When contact is captured, it only updates the isIndianCustomer (due to derived s
 But it won'r update remember value as its already initialized and handler to present. 
 
 Fix: Revert remember default value to true, and update using subscription on isIndianCustomer
+Fix: For recurring saved cards it is creating issue for domestic user, since isIndianCustomer 
+     will be true due to which the remeber flag will also be true initially, but we need 
+     explicit consent form user in recurring, ristricting this to nonRecurring payments only
  */
-isIndianCustomer?.subscribe(remember.set);
+
+isIndianCustomer?.subscribe(() => {
+  if (!isRecurring()) {
+    return remember.set;
+  }
+});
