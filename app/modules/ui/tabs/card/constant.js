@@ -110,6 +110,7 @@ export const cardWithRecurringSupport = {
   ESFB: { credit: false, debit: true },
   HSBC: { credit: true, debit: false },
   KVBL: { credit: true, debit: true },
+  PUNB: { credit: true, debit: false },
   // OneCard exclusive banks - start
   IDFB: { credit: true, debit: false },
   SIBL: { credit: true, debit: false },
@@ -136,6 +137,10 @@ export const supportedNetworksAndProviders = {
     debit: ['VISA', 'MC'],
   },
   ONE_CARD: {
+    credit: ['VISA'],
+    debit: [],
+  },
+  PUNB: {
     credit: ['VISA'],
     debit: [],
   },
