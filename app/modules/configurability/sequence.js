@@ -71,19 +71,19 @@ export function getSequencedBlocks(params) {
        * If emi is present before cardless_emi
        * Remove old cardless_emi and put it in the place of emi
        */
-      sequence = _Arr.remove(sequence, 'cardless_emi');
+      sequence = sequence.filter((item) => item !== 'cardless_emi');
       sequence[indexOfEmi] = 'cardless_emi';
     } else {
       /**
        * cardless_emi is already before emi
        * Remove emi
        */
-      sequence = _Arr.remove(sequence, 'emi');
+      sequence = sequence.filter((item) => item !== 'emi');
     }
   }
 
   // "app" method isn't shown on Checkout yet, so remove it
-  sequence = _Arr.remove(sequence, 'app');
+  sequence = sequence.filter((item) => item !== 'app');
 
   // Get all blocks
   const allBlocks = _Arr.merge(methodBlocks, blocks);

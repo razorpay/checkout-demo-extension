@@ -184,7 +184,9 @@
   function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
     const overlay = $overlayStack.find((overlay) => overlay.id === IDs.overlay);
-    $overlayStack = _Arr.remove($overlayStack, overlay);
+    $overlayStack = $overlayStack.filter(
+      (overlayItem) => overlayItem !== overlay
+    );
   }
 
   onDestroy(() => {
