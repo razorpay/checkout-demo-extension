@@ -373,7 +373,7 @@ const getUsableApps = () => {
   let apps = [];
 
   UPI_APPS_ORDER.forEach((group) => {
-    apps = _Arr.merge(UPI_APPS[group], apps);
+    apps = apps.concat(UPI_APPS[group]);
   });
 
   return apps;
@@ -388,7 +388,7 @@ const getAllApps = () => {
   let apps = [];
 
   Object.keys(UPI_APPS).forEach((group) => {
-    apps = _Arr.merge(UPI_APPS[group], apps);
+    apps = apps.concat(UPI_APPS[group]);
   });
 
   return apps;

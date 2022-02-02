@@ -86,7 +86,7 @@ export function getSequencedBlocks(params) {
   sequence = sequence.filter((item) => item !== 'app');
 
   // Get all blocks
-  const allBlocks = _Arr.merge(methodBlocks, blocks);
+  const allBlocks = blocks.concat(methodBlocks);
 
   // Get blocks mentioned in the sequence
   const sequencedBlocks =
