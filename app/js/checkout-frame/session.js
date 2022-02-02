@@ -5131,7 +5131,6 @@ Session.prototype = {
       isSavedCardScreen && (data.method === 'card' || data['card[cvv]']);
     var addTokenizationConsentToPayload = false;
     // when card is selected from saved card screen
-    var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
     var consentPendingForSelectedCardInSavedCardScreen =
       selectedCard && !selectedCard.consent_taken;
     // when card is selected from p13n block
