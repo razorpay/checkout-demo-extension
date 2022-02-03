@@ -38,7 +38,10 @@
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isOneClickCheckout } from 'razorpay';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    merchantFBStandardAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import {
     isDCCEnabled,
     isDynamicFeeBearer,
@@ -736,6 +739,9 @@
       params: {
         page_title: CATEGORIES.PAYMENT_METHODS,
       },
+    });
+    merchantFBStandardAnalytics({
+      event: ACTIONS.ADDPAYMENTINFO,
     });
     if (isMethodEnabled('cod')) {
       Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });

@@ -2,7 +2,20 @@ import {
   isGoogleAnalyticsEnabled,
   isFacebookAnalyticsEnabled,
   isOneClickCheckout,
+  getCustomerCart,
 } from 'razorpay';
+
+function getCartInfo() {
+  const { content_type, contents, currency, value } = getCustomerCart() || {};
+  return {
+    content_ids: contents?.map((item) => item.id),
+    content_type,
+    contents,
+    currency,
+    value,
+    num_items: contents?.length,
+  };
+}
 
 export function merchantAnalytics(params) {
   if (isOneClickCheckout()) {
@@ -18,5 +31,19 @@ export function merchantAnalytics(params) {
         data: params,
       });
     }
+  }
+}
+
+export function merchantFBStandardAnalytics(data) {
+  if (
+    isOneClickCheckout() &&
+    isFacebookAnalyticsEnabled() &&
+    getCustomerCart()
+  ) {
+    data.params = getCartInfo();
+    Razorpay.sendMessage({
+      event: 'fbaevent',
+      data,
+    });
   }
 }

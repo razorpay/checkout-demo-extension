@@ -14,6 +14,8 @@ export const ACTIONS = {
   LOGIN_SUCCESS: 'login_success',
   LOGIN_FAILED: 'login_failed',
   MAGIC_CHECKOUT_REQUESTED: 'magic_checkout_requested',
+  INITIATECHECKOUT: 'InitiateCheckout',
+  ADDPAYMENTINFO: 'AddPaymentInfo',
 };
 
 export const CATEGORIES = {

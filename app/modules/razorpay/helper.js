@@ -260,3 +260,5 @@ export const isGoogleAnalyticsEnabled = () =>
 export const isFacebookAnalyticsEnabled = () =>
   getPreferences('features.one_cc_fb_analytics') ||
   getOption('enable_fb_analytics');
+
+export const getCustomerCart = () => getOption('customer_cart');
