@@ -613,8 +613,7 @@
       sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
       // Get the methods for which a preferred instrument was shown
-      const preferredMethods = _Arr.reduce(
-        setPreferredInstruments,
+      const preferredMethods = setPreferredInstruments.reduce(
         (acc, instrument) => {
           acc[`_${instrument.method}`] = true;
           return acc;

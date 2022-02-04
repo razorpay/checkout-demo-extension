@@ -1239,8 +1239,7 @@ updateCurrencyConfig(displayCurrencies);
  * which would return the current state of `currencies`.
  */
 
-export const currencies = _Arr.reduce(
-  supportedCurrencies,
+export const currencies = supportedCurrencies.reduce(
   (currenciesSoFar, currency) => {
     currenciesSoFar[currency] = displayCurrencies[currency];
 

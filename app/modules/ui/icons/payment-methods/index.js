@@ -174,11 +174,7 @@ export const getIcon = (
 };
 
 export const getIcons = (options) =>
-  _Arr.reduce(
-    availIconNames,
-    (result, method) => {
-      result[method] = getIcon(method, options);
-      return result;
-    },
-    {}
-  );
+  availIconNames.reduce((result, method) => {
+    result[method] = getIcon(method, options);
+    return result;
+  }, {});

@@ -35,14 +35,15 @@ export const setShieldParams = (params) => {
 };
 
 export const formatPayment = function (payment) {
-  let params =
-    ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
-    |> _Arr.reduce((allParams, param) => {
+  let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
+    (allParams, param) => {
       if (payment |> _Obj.hasOwnProp(param)) {
         allParams[param] = payment[param];
       }
       return allParams;
-    }, {});
+    },
+    {}
+  );
 
   payment.data = formatPayload(payment.data, payment.r, params);
   validateData(payment.data);
