@@ -17,8 +17,6 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-const { delay } = require('../../../util');
-
 describe('UPI Intent tests', () => {
   test('perform keyless UPI Intent transaction', async () => {
     const options = {
@@ -43,7 +41,6 @@ describe('UPI Intent tests', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await submit(context);
-    await delay(500);
     await respondAndVerifyIntentRequest(context);
   });
 });

@@ -132,7 +132,6 @@ import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as TrustedBadgeHelper from 'trusted-badge/helper';
-import * as QRHelper from 'upi/helper/qr';
 
 import * as SecurityUtils from 'utils/security';
 export default {
@@ -199,7 +198,6 @@ export default {
   Cta,
   dynamicFeeObject,
   TrustedBadgeHelper,
-  QRHelper,
 
   Customer,
   getCustomer,

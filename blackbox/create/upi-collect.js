@@ -52,7 +52,6 @@ const {
   selectPersonalizationPaymentMethod,
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
-const { delay } = require('../../mock-api/utils.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -156,7 +155,7 @@ module.exports = function (testFeatures) {
       if (downtimeHigh) {
         await downtimeHighAlert(context);
       }
-      await delay(500);
+
       await handleUPIAccountValidation(context, 'BHIM@upi');
       if (feeBearer) {
         await handleFeeBearer(context);

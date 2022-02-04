@@ -11,7 +11,6 @@ const {
   modifyPreferencesForDynamicFeeBearer,
   submit,
   handleValidationRequest,
-  respondToCreateQR,
 
   // UPI
   selectUPIApp,
@@ -54,7 +53,7 @@ const {
   verifyMethodWarned,
   downtimeHighAlert,
 } = require('../tests/homescreen/actions');
-const { delay } = require('../util.js');
+const { delay } = require('../../mock-api/utils.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -230,7 +229,6 @@ module.exports = function (testFeatures) {
           'offer_id=' + preferences.offers[0].id
         );
       } else {
-        await delay(500);
         await respondAndVerifyIntentRequest(context);
       }
     });

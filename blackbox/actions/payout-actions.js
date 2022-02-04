@@ -9,7 +9,7 @@ async function verifyPayoutInstruments(context) {
   );
   const vpaInstrument = Instrument[0];
   const vpaInstrumentName = await context.page.evaluate(
-    (vpaInstrument) => vpaInstrument.textContent,
+    vpaInstrument => vpaInstrument.textContent,
     vpaInstrument
   );
   expect(vpaInstrumentName).toEqual(
@@ -17,7 +17,7 @@ async function verifyPayoutInstruments(context) {
   );
   const acountInstrument = Instrument[1];
   const acountInstrumentName = await context.page.evaluate(
-    (acountInstrument) => acountInstrument.textContent,
+    acountInstrument => acountInstrument.textContent,
     acountInstrument
   );
   expect(acountInstrumentName).toEqual(

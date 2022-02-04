@@ -46,7 +46,6 @@
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
-  import UPIQR from 'upi/ui/components/qr.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
 
   import updateScore from 'analytics/checkoutScore';
@@ -71,13 +70,8 @@
   } from 'ui/labels/upi';
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
-  import {
-    oneClickUPIIntent,
-    shouldShowNewQrFlow,
-    toggleQRTab,
-  } from 'upi/helper';
+  import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
-  import { fallBack, qrExpanded } from 'upi/store/qr';
 
   // Props
   export let selectedApp = undefined;
@@ -244,15 +238,8 @@
     availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
-  $: shouldShowNewFlow = shouldShowNewQrFlow() && !$fallBack;
-
-  // Set default token value when the available flows changes
-  // set default token value when the shouldNewFlow changes
-  $: availableFlows, shouldShowNewFlow, setDefaultTokenValue();
-
-  qrExpanded.subscribe((val) => {
-    if (val) setDefaultTokenValue();
-  });
+  // Set default token value when the available flows change
+  $: availableFlows, setDefaultTokenValue();
 
   /**
    * An instrument might has only for some apps to be shown
@@ -314,8 +301,6 @@
      * But only do that if intent flow is not available.
      */
     if (hasIntentFlow) {
-      selectedToken = null;
-    } else if (shouldShowNewFlow) {
       selectedToken = null;
     } else if (availableFlows.collect) {
       if (hasTokens) {
@@ -568,9 +553,6 @@
 
   export function onUpiAppSelection(event) {
     const { severity, instrument, id } = event.detail;
-    if (id && $qrExpanded) {
-      toggleQRTab();
-    }
     if (severity) {
       downtimeSeverity = severity;
       downtimeInstrument = instrument;
@@ -791,18 +773,10 @@
             {showRecommendedUPIApp}
           />
         {/if}
-        {#if shouldShowQr && shouldShowNewFlow}
-          <UPIQR {selectedToken} />
-        {/if}
+
         {#if shouldShowCollect}
           <!-- LABEL: Pay using UPI ID -->
-          <div
-            class={`${
-              shouldShowQr && shouldShowNewFlow ? 'qr-legend' : ''
-            } legend left `}
-          >
-            {$t(UPI_COLLECT_BLOCK_HEADING)}
-          </div>
+          <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
           <div class="border-list" id="upi-collect-list">
             {#if intent}
               <ListHeader>
@@ -821,7 +795,6 @@
                 selected={selectedToken === app.id}
                 on:click={() => {
                   const { downtimeSeverity, downtimeInstrument } = app;
-                  // toggleQRTab();
                   onUpiAppSelection({
                     detail: {
                       id: app.id,
@@ -855,7 +828,6 @@
               recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
               paymentMethod={method}
               on:click={() => {
-                // toggleQRTab();
                 onUpiAppSelection({ detail: { id: 'new' } });
               }}
               customer={$customer}
@@ -880,11 +852,10 @@
               onUpiAppSelection({ detail: { id: 'gpay-omni' } });
             }}
             bind:value={omnichannelPhone}
-            isQRFlow={shouldShowQr && shouldShowNewFlow}
           />
         {/if}
 
-        {#if shouldShowQr && !shouldShowNewFlow}
+        {#if shouldShowQr}
           <!-- LABEL: Pay using QR Code -->
           <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
           <div class="options" id="showQr">
@@ -969,8 +940,5 @@
   }
   .downtime-saved-vpa {
     margin-top: 4px;
-  }
-  .qr-legend {
-    margin-top: 2px !important;
   }
 </style>

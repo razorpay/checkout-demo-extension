@@ -43,7 +43,6 @@ const {
   //DownTime
   verifyMethodWarned,
 } = require('../tests/homescreen/actions');
-const { delay } = require('../util.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -133,8 +132,6 @@ module.exports = function (testFeatures) {
       if (feeBearer) {
         await handleFeeBearer(context, page);
       }
-
-      await delay(1500);
 
       if (callbackUrl) {
         await expectRedirectWithCallback(context, { method: 'upi' });

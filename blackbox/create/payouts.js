@@ -12,10 +12,9 @@ const {
   selectInstrument,
   handleUPIAccountValidation,
   enterUPIAccount,
-  shouldShowNewQRFlow,
 } = require('../actions/common');
 
-module.exports = function (testFeatures) {
+module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'payouts',
     testFeatures
@@ -56,14 +55,6 @@ module.exports = function (testFeatures) {
       }
       if (VPAWithExistingInstrument || VPAWithoutExistingInstrument) {
         await addInstrument(context, 'VPA');
-
-        if (shouldShowNewQRFlow(features, options)) {
-          const vpaField = await context.page.waitForSelector(
-            '#new-vpa-field-upi'
-          );
-          vpaField.click();
-        }
-
         await enterUPIAccount(context, 'BHIM@upi');
       }
       await submit(context);

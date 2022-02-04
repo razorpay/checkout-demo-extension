@@ -31,7 +31,6 @@ export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';
 export const OMNI_ERROR = 'upi.omni_error';
-export const OMNI_BLOCK_HEADING_QRFLOW = 'upi.omni_block_heading_qrflow';
 
 export const CANCEL_REASON_TITLE = 'upi.cancel_reason_title';
 export const CANCEL_REASON_COLLECT_NOT_RECEIVED =

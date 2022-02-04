@@ -107,14 +107,10 @@ async function respondToUPIAjaxWithFailure(context) {
   });
 }
 
-async function respondToUPIPaymentStatus(context, newFlow) {
+async function respondToUPIPaymentStatus(context) {
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
-  if (newFlow) {
-    expect(req.url).toContain('qr_code');
-  } else {
-    expect(req.url).toContain('status?key_id');
-  }
+  expect(req.url).toContain('status?key_id');
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
@@ -124,13 +120,11 @@ async function respondToUPIPaymentStatus(context, newFlow) {
     let selector = '#covid-wrap';
     await context.page.waitForSelector(selector);
   }
-  if (!newFlow) {
-    await context.page.waitFor('#modal-inner', {
-      timeout,
-      hidden: true,
-    });
-    expect(await context.page.$('#modal-inner')).toEqual(null);
-  }
+  await context.page.waitFor('#modal-inner', {
+    timeout,
+    hidden: true,
+  });
+  expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
 async function handleUPIAccountValidation(context, vpa, accountexists = true) {
@@ -253,34 +247,6 @@ async function handleUPIOtherApps(context) {
   expect(errorDisplayedInUI).toEqual(errorText);
   expect(await context.page.$eval('#fd-hide', visible)).toEqual(true);
 }
-
-async function respondToCreateQR(context) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('qr_code');
-
-  await context.respondJSON({
-    id: 'qr_IjCMsV6qTpgStB',
-    entity: 'qr_code',
-    created_at: 1642070821,
-    name: null,
-    usage: 'single_use',
-    type: 'upi_qr',
-    image_url: null,
-    payment_amount: 100,
-    status: 'active',
-    description: null,
-    fixed_amount: true,
-    payments_amount_received: 0,
-    payments_count_received: 0,
-    notes: [],
-    customer_id: null,
-    close_by: 1642071721,
-    image_content:
-      'upi://pay?ver=01&mode=15&pa=rpy.qrrazorpay2102110597@icici&pn=Razorpay&tr=RZPIjCMsV6qTpgStBqrv2&tn=PaymenttoRazorpay&cu=INR&mc=8931&qrMedium=04&am=1',
-    tax_invoice: [],
-  });
-}
-
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
@@ -299,5 +265,4 @@ module.exports = {
   expectNoUPIApps,
   selectUPIOtherApps,
   handleUPIOtherApps,
-  respondToCreateQR,
 };

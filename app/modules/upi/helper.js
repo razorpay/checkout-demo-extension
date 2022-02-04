@@ -1,6 +1,6 @@
 import { getOffersForTab } from 'checkoutframe/offers/index';
-import { oneClickUPIIntent as oneClickUPIIntentExperiment } from 'upi/experiments';
 import { isCustomerFeeBearer } from 'razorpay';
+import { oneClickUPIIntent as oneClickUPIIntentExperiment } from 'upi/experiments';
 
 export function oneClickUPIIntent() {
   /**
