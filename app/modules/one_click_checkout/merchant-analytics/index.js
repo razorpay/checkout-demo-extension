@@ -38,7 +38,8 @@ export function merchantFBStandardAnalytics(data) {
   if (
     isOneClickCheckout() &&
     isFacebookAnalyticsEnabled() &&
-    getCustomerCart()
+    getCustomerCart() &&
+    Object.keys(getCustomerCart())?.length
   ) {
     data.params = getCartInfo();
     Razorpay.sendMessage({
