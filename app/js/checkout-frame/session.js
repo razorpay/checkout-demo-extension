@@ -2855,7 +2855,7 @@ Session.prototype = {
       if (offer && offer.issuer && offer.payment_method === 'card') {
         var cardApps = discreet.Apps.getAppsForMethod('card') || [];
         var isCardAppOffer =
-          _Arr.findIndex(cardApps, function (app) {
+          cardApps.findIndex(function (app) {
             return app === offer.issuer;
           }) !== -1;
         if (isCardAppOffer && MethodStore.isApplicationEnabled(offer.issuer)) {
