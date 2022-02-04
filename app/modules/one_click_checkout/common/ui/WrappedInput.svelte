@@ -47,6 +47,9 @@
 </script>
 
 <div class="wrapper" class:invalid={validationText}>
+  <span class="label" class:label-top={focused || !!value}>
+    {`${$t(label)}${required ? '*' : ''}`}
+  </span>
   <div
     {id}
     bind:this={inputField}
@@ -60,9 +63,6 @@
   >
     {value}
   </div>
-  <span class="label" class:label-top={focused || !!value}>
-    {`${$t(label)}${required ? '*' : ''}`}
-  </span>
   {#if validationText !== ''}
     <div class="input-validation-error">{validationText}</div>
   {/if}
@@ -84,10 +84,11 @@
 
 <style>
   .input {
-    border-bottom: 1px solid #ebedf0;
-    line-height: 15px;
-    padding: 28px 0 7px 0;
-
+    border: 1px solid #e0e0e0;
+    margin: 8px 0px;
+    padding: 16px;
+    border-radius: 4px;
+    box-sizing: border-box;
     outline-style: none;
   }
 
@@ -97,14 +98,8 @@
   }
 
   .label {
-    position: absolute;
     line-height: 19px;
     color: #757575;
-    z-index: -1;
-    top: 28px;
-    left: 0;
-
-    transition: 0.3s;
   }
 
   .label-top {

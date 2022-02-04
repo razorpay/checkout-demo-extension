@@ -771,6 +771,7 @@ export default {
     partial_payment_title: 'Select a payment type',
     pincode_help: 'Enter 6 digit pincode',
     pincode_label: 'PIN Code',
+    phone_number: 'Phone Number',
     preferred_block_title: 'Preferred Payment Methods',
     secured_by_message: 'This payment is secured by Razorpay.',
     single_block_title: 'Pay via {method}',

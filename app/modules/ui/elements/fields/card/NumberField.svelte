@@ -20,6 +20,7 @@
   // Utils
   import { getIcon } from 'icons/network';
   import { formatMessageWithLocale } from 'i18n';
+  import { isOneClickCheckout } from 'razorpay';
 
   export let value = '';
   export let type = null;
@@ -34,6 +35,8 @@
   let valid = false;
 
   const dispatch = createEventDispatcher();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Refs
   let field = null;
@@ -103,7 +106,7 @@
 
 <div class="field-container">
   {#if type}
-    <div class="icon">
+    <div class="icon" class:icon-1cc={isOneClickCheckoutEnabled}>
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
@@ -138,6 +141,14 @@
     position: absolute;
     right: 4px;
     top: 30px;
+    bottom: 0;
+    width: 24px;
+  }
+
+  .icon-1cc {
+    position: absolute;
+    right: 6%;
+    top: 48%;
     bottom: 0;
     width: 24px;
   }

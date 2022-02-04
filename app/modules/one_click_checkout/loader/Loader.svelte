@@ -3,6 +3,7 @@
   import { fly, fade } from 'svelte/transition';
   import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
+  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
 
   const theme = getTheme();
 </script>
@@ -17,7 +18,7 @@
     <div class="wrapper">
       <div class="bar" />
       <div class="content">
-        <span class="label">{$t($loaderLabel)}...</span>
+        <span class="label">{$t($loaderLabel) || $t(LOADING_LABEL)}...</span>
       </div>
     </div>
   </div>
