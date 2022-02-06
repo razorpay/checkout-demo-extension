@@ -90,7 +90,7 @@
 
   $: items, query, keys, (results = getResults(query, items));
   $: results, (focusedIndex = results.length ? 0 : null);
-  $: shownItems = _Arr.mergeWith(results, items);
+  $: shownItems = results.concat(items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
   $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
 

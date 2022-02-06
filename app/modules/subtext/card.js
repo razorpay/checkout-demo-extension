@@ -102,7 +102,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       }
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       networksString,
       typesString,
       cardsString,
@@ -134,7 +134,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       );
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,
@@ -171,7 +171,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,
@@ -200,7 +200,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,

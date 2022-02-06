@@ -303,7 +303,7 @@ export function setBlocks(
       );
     }
 
-    allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
+    allBlocks = [preferredBlock].concat(allBlocks);
   }
 
   // if walnut 369 is highlight in block

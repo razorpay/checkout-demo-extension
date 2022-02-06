@@ -38,7 +38,7 @@ export function getSequencedBlocks(params) {
 
   if (show_default_blocks) {
     // Extend the given sequence with our default sequence
-    sequence = _Arr.mergeWith(sequence, methodsToList);
+    sequence = sequence.concat(methodsToList);
   }
 
   // Filter the sequence for duplicates

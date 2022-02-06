@@ -263,7 +263,7 @@ const config = {
             return individual;
           });
 
-          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+          ungrouped = ungrouped.concat(individualInstruments);
         }
       }
 
@@ -279,7 +279,7 @@ const config = {
             )
           );
 
-          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+          ungrouped = ungrouped.concat(individualInstruments);
         }
       }
 
@@ -306,7 +306,7 @@ const config = {
             return individual;
           }) |> _Arr.filter(Boolean);
 
-        ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        ungrouped = ungrouped.concat(individualInstruments);
       }
 
       return ungrouped;
