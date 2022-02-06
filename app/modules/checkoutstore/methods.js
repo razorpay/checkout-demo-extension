@@ -73,6 +73,7 @@ import {
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { isNonNullObject } from 'utils/object';
+import { getUniqueValues } from 'utils/array';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -1126,7 +1127,7 @@ function getUsableMethods() {
   const methods = methodsFromInstruments.concat(sequenceMethods);
 
   // Remove duplicates
-  return _Arr.removeDuplicates(methods);
+  return getUniqueValues(methods);
 }
 
 /**

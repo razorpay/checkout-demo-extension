@@ -1,4 +1,5 @@
 import { createMethodBlock } from './methods';
+import { getUniqueValues } from 'utils/array';
 
 /**
  * Transforms the list of blocks into the order defined in the
@@ -42,7 +43,7 @@ export function getSequencedBlocks(params) {
   }
 
   // Filter the sequence for duplicates
-  sequence = _Arr.removeDuplicates(sequence);
+  sequence = getUniqueValues(sequence);
 
   // Copy the sequence
   const exhaustiveSequence = _Obj.clone(sequence);
