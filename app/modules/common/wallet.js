@@ -53,8 +53,8 @@ export function getSortedWallets(wallets) {
     const containsA = _Arr.contains(WALLET_SORT_ORDER, a.code);
     const containsB = _Arr.contains(WALLET_SORT_ORDER, b.code);
 
-    const indexA = _Arr.indexOf(WALLET_SORT_ORDER, a.code);
-    const indexB = _Arr.indexOf(WALLET_SORT_ORDER, b.code);
+    const indexA = WALLET_SORT_ORDER.indexOf(a.code);
+    const indexB = WALLET_SORT_ORDER.indexOf(b.code);
 
     if (containsA && containsB) {
       return indexA - indexB;

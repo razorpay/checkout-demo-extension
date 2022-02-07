@@ -427,7 +427,7 @@ export function getInstrumentMeta(instrument) {
   if (block) {
     // All indices should be one-indexed
 
-    meta.indexOfBlock = _Arr.indexOf(allBlocks, block) + 1;
+    meta.indexOfBlock = allBlocks.indexOf(block) + 1;
 
     meta.indexInBlock =
       block.instruments.findIndex(

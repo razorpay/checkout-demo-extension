@@ -64,8 +64,8 @@ export function getSequencedBlocks(params) {
     _Arr.contains(sequence, 'cardless_emi') &&
     _Arr.contains(sequence, 'emi')
   ) {
-    let indexOfEmi = _Arr.indexOf(sequence, 'emi');
-    let indexOfCardlessEmi = _Arr.indexOf(sequence, 'cardless_emi');
+    let indexOfEmi = sequence.indexOf('emi');
+    let indexOfCardlessEmi = sequence.indexOf('cardless_emi');
 
     if (indexOfEmi < indexOfCardlessEmi) {
       /**
