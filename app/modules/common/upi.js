@@ -461,8 +461,7 @@ export const getSortedApps = (allApps) => {
   });
 
   // Sort remaining apps
-  _Arr.sort(
-    allApps,
+  allApps.sort(
     (a, b) =>
       usablePackages.indexOf(a.package_name) -
       usablePackages.indexOf(b.package_name)

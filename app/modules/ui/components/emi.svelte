@@ -69,9 +69,9 @@
   }
 
   // Sort the list by bank names
-  $: banksList = _Arr.sort(_Obj.values(banks || {}), (a, b) =>
-    a.name.localeCompare(b.name)
-  );
+  $: banksList = _Obj
+    .values(banks || {})
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   $: filteredBankList = filterBanksAgainstInstrument(
     banksList,

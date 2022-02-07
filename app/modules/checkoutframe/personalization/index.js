@@ -405,7 +405,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
     }
 
     // Sort instruments by their score
-    _Arr.sort(instruments, (a, b) =>
+    instruments.sort((a, b) =>
       a.score > b.score ? -1 : ~~(a.score < b.score)
     );
 

@@ -14,7 +14,7 @@ const {
   enterUPIAccount,
 } = require('../actions/common');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'payouts',
     testFeatures
