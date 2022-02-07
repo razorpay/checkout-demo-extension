@@ -12,7 +12,7 @@
 
     **Note**: The workflow auto-invalidated the cache, upon running.
 
-1.  CDN: `cdn.yml` is the workflow used to push the content from `repo/cdn` to production cdn bucket and content will be served on the cloudfront with
+2.  CDN: `cdn.yml` is the workflow used to push the content from `repo/cdn` to production cdn bucket and content will be served on the cloudfront with
 
     > bucket-name: **checkout-live**
     >
@@ -24,7 +24,7 @@
 
     **Note**: The workflow DO NOT auto-invalidated the cache, upon running, as some files in cdn cache are not actually present in bucket are present due to the cached data. Hence refrain cache invalidation from pipeline and reach-out devops for doing such tasks.
 
-1.  Prod: Build & push to Harbor: `docker-build.yml` runs the tests, generates the files, pushes the content to stage-cdn based on the branch name and pushes the docker image to Harbor Registry ( which will be available for 90 Days )
+3.  Prod: Build & push to Harbor: `docker-build.yml` runs the tests, generates the files, pushes the content to stage-cdn based on the branch name and pushes the docker image to Harbor Registry ( which will be available for 90 Days )
 
     > docker image tag for harbor will be
 
@@ -32,7 +32,7 @@
 
     > cache control for the branch pushed content ( max-age ): 45Min
 
-1.  Canary Baseline: Build & push to Harbor: `docker-build-for-canary_baseline.yml` runs the tests, generates the files, pushes the content to stage-cdn based, to `branch-name/env-name/` on the branch name and pushes the docker image to Harbor Registry ( which will be available for 90 Days )
+4.  Canary Baseline: Build & push to Harbor: `docker-build-for-canary_baseline.yml` runs the tests, generates the files, pushes the content to stage-cdn based, to `branch-name/env-name/` on the branch name and pushes the docker image to Harbor Registry ( which will be available for 90 Days )
 
     > docker image tag for harbor will be
 
@@ -40,19 +40,32 @@
 
     > cache control for the branch pushed content ( max-age ): 45Min
 
-1.  Comment Test Urls & Preview Builds: `comment-preview-build.yml` comments all the build locations available for testing for both standard and custom checkouts with different APIs and also for SDK testing.
+5.  Comment Test Urls & Preview Builds: `comment-preview-build.yml` comments all the build locations available for testing for both standard and custom checkouts with different APIs and also for SDK testing.
+
+6.  Store Prod Builds: `store-prod-build.yml` is the workflow used to copy the commit build from `checkout/builds/commit-builds` to `checkout/builds/prod-builds`. Content will be served on the cloudfront with
+
+    > bucket-name: **rzp-1018-nonprod-betacdn**
+    >
+    > path ( in bucket ): checkout/builds/prod-builds
+    >
+    > Url : **https://betacdn.np.razorpay.in/checkout/builds/prod-builds/YYYY-MM-DD-commit-hash**
+    >
+    > Pipeline to Run: [link](https://deploy.razorpay.com/#/applications/prod-checkout/executions/configure/16d671c6-0286-4c4e-8d86-f5227ab61bd6)
 
 ### Stage Bucket Paths
 
-| Details                            | Path                                                           |
-| ---------------------------------- | -------------------------------------------------------------- |
-| Parent Dir for checkout            | `bucket-name/checkout`                                         |
-| Builds of each **commit**          | `bucket-name/checkout/builds/commit-builds/$GITHUB_COMMIT_SHA` |
-| Builds of each **branch**          | `bucket-name/checkout/builds/branch-builds/$BRANCH`            |
-| Builds of each branch- Traffic Env | `bucket-name/checkout/builds/branch-builds/$BRANCH/`           |
-| Builds of each branch-canary       | `bucket-name/checkout/builds/branch-builds/$BRANCH/canary/`    |
-| Builds of each branch-baseline     | `bucket-name/checkout/builds/branch-builds/$BRANCH/baseline/`  |
-| Content from `repo/beta-cdn/**`    | `bucket-name/checkout/**`                                      |
+| Details                            | Path                                                               |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| Parent Dir for checkout            | `bucket-name/checkout`                                             |
+| Builds of each **commit**          | `bucket-name/checkout/builds/commit-builds/$GITHUB_COMMIT_SHA`     |
+| Builds of each **branch**          | `bucket-name/checkout/builds/branch-builds/$BRANCH`                |
+| Builds of each **commit-prod**     | `bucket-name/checkout/builds/prod-builds/$DATE-$GITHUB_COMMIT_SHA` |
+| Builds of each branch- Traffic Env | `bucket-name/checkout/builds/branch-builds/$BRANCH/`               |
+| Builds of each branch-canary       | `bucket-name/checkout/builds/branch-builds/$BRANCH/canary/`        |
+| Builds of each branch-baseline     | `bucket-name/checkout/builds/branch-builds/$BRANCH/baseline/`      |
+| Content from `repo/beta-cdn/**`    | `bucket-name/checkout/**`                                          |
+
+> Note: `$DATE` is evaluated using `$(date +'%Y-%m-%d')`
 
 ### Prod Bucket Paths
 
