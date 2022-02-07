@@ -116,8 +116,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific banks to be shown?
         if (hasBanks) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.bank === preferred.banks[0]
           );
         }
@@ -130,8 +129,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific wallets to be shown?
         if (hasWallets) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.wallet === preferred.wallets[0]
           );
         }
@@ -159,8 +157,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // If there are any apps, check if the app matches
         if (preferredHasApps && instrumentHasApps) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.app === preferred.apps[0]
           );
         }
@@ -168,9 +165,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         // If there are any flows, check if the flows match and is invidiual flow
         if (instrumentHasFlows) {
           const individualFlows = ['qr'];
-
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.none(
             (ungrouped) =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
               ungrouped.flow === preferred.flows[0]
@@ -186,8 +181,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific providers to be shown?
         if (hasProviders) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.provider === preferred.providers[0]
           );
         }
