@@ -49,8 +49,7 @@ function isP13nInstrumentHiddenViaConfig(
 
   // For every individual p13n instrument, check if any hidden
   // instruments are present.
-  return !_Arr.every(
-    individualInstruments,
+  return !individualInstruments.every(
     (individualInstrument) =>
       !hiddenInstruments.some((hiddenInstrument) =>
         areInstrumentsSame(hiddenInstrument, individualInstrument)
@@ -94,7 +93,7 @@ function genericInstrumentComparator(a, b) {
  * @returns {boolean}
  */
 function shouldAllowPreferredInstrument(preferred, instruments) {
-  return _Arr.every(instruments, (instrument) => {
+  return instruments.every((instrument) => {
     if (preferred.method !== instrument.method) {
       return true;
     }

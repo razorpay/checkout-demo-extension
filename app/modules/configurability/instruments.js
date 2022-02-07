@@ -90,8 +90,8 @@ function hasOnlyAllowedKeys(instrument) {
   }
 
   // All keys must be arrays
-  const allArrays = _Arr.every(instrumentKeys, (key) =>
-    _.isArray(instrument[key])
+  const allArrays = instrumentKeys.every((key) =>
+    Array.isArray(instrument[key])
   );
 
   return allArrays;
@@ -150,8 +150,7 @@ export function isInstrumentForEntireMethod(instrument) {
   const currentInsturmentKeys = _Obj.keys(instrument);
 
   // None of the keys in the config should be present in the instrument
-  return _Arr.every(
-    config.properties,
+  return config.properties.every(
     (key) => !_Arr.contains(currentInsturmentKeys, key)
   );
 }
