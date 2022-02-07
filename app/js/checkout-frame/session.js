@@ -4793,8 +4793,8 @@ Session.prototype = {
       //
       // 1. If Payment is Recurring &&
       // 2. Customer is Indian
-      // 3. If save card checkbox it not checked in case of add card screen
-      // 4. If on saved card and consent is not already taken for saved card && checkbox is also not checked
+      // 3. If on add card screen and save card checkbox is not checked
+      // 4. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
       // ==> Shake the form and show tooltip on checkbox
       var isRecurring = RazorpayHelper.isRecurring();
       var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);

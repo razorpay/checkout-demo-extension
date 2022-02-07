@@ -1,7 +1,6 @@
 import { derived, writable } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
 import { isIndianCustomer } from 'checkoutstore';
-import { isRecurring } from 'razorpay';
 export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');
