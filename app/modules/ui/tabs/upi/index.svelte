@@ -696,18 +696,8 @@
           all: apps.all.length,
         },
         list: {
-          eligible: _Arr.join(
-            _Arr.map(apps.filtered, function (app) {
-              return app.package_name;
-            }),
-            ','
-          ),
-          all: _Arr.join(
-            _Arr.map(apps.all, function (app) {
-              return app.package_name;
-            }),
-            ','
-          ),
+          eligible: apps.filtered.map((app) => app.package_name).join(','),
+          all: apps.all.map((app) => app.package_name).join(','),
         },
       },
     });

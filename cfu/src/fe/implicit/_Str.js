@@ -75,5 +75,5 @@ export function toTitleCase(sentence) {
     return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
   });
 
-  return _Arr.join(words, ' ');
+  return words.join(' ');
 }

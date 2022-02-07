@@ -21,7 +21,7 @@ import {
  * @returns {string}
  */
 function concatTruthyString(list) {
-  return list |> _Arr.filter(Boolean) |> _Arr.join(' ');
+  return list.filter(Boolean).join(' ');
 }
 
 /**

@@ -36,7 +36,7 @@ function entityToWords(word) {
     return !sameAsLast;
   });
 
-  return _Arr.join(filtered, ' ');
+  return filtered.join(' ');
 }
 
 /**
@@ -141,7 +141,7 @@ function getEntityString(allEntities, limit = Infinity) {
     entities.push(`and ${diff} more`);
   }
 
-  return _Arr.join(entities, ', ');
+  return entities.join(', ');
 }
 
 /**
