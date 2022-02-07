@@ -129,7 +129,7 @@ export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
 export const instruments = derived(blocks, (allBlocks) => {
-  const allInstruments = _Arr.flatMap(allBlocks, (block) => block.instruments);
+  const allInstruments = allBlocks.flatMap((block) => block.instruments);
 
   return allInstruments;
 });

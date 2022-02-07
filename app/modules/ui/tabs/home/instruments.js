@@ -222,16 +222,14 @@ export function setBlocks(
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
   // Remove rzp block instruments and method instruments
-  const shownIndividualInstruments =
-    parsedConfig.display.blocks
-    |> _Arr.filter((block) => block.code !== 'rzp.cluster')
-    |> _Arr.flatMap((block) => {
-      return _Arr.filter(
-        block.instruments,
+  const shownIndividualInstruments = parsedConfig.display.blocks
+    .filter((block) => block.code !== 'rzp.cluster')
+    .flatMap((block) =>
+      block.instruments.filter(
         (instrument) => instrument._ungrouped.length === 1
-      );
-    })
-    |> _Arr.filter((instrument) => !isInstrumentForEntireMethod(instrument));
+      )
+    )
+    .filter((instrument) => !isInstrumentForEntireMethod(instrument));
 
   // show_default_blocks defaults to true
   const show_default_blocks = _Obj.getSafely(

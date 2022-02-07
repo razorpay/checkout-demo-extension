@@ -313,8 +313,7 @@ export function getBlockConfig(options, customer) {
 
   // Ungroup hidden instrument as well
   translated.display.hide.instruments =
-    translated.display.hide.instruments
-    |> _Arr.flatMap(
+    translated.display.hide.instruments.flatMap(
       (group) => getIndividualInstruments(group, customer)._ungrouped
     );
 

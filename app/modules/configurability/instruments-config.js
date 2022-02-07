@@ -73,7 +73,7 @@ function createCombinations(instrument, sequence = []) {
       }));
     } else {
       // Things have already been pushed so far, extend existing objects
-      const _soFar = _Arr.flatMap(values, (value) => {
+      const _soFar = values.flatMap((value) => {
         return _Arr.map(soFar, (s) =>
           _Obj.extend(
             {

@@ -38,7 +38,28 @@ if (!String.prototype.endsWith) {
     return this.substring(this_len - search.length, this_len) === search;
   };
 }
-// Ref: https://blog.bitsrc.io/lets-implement-our-own-array-map-sort-methods-e89c9d5e2dc8
+
+if (!Array.prototype.flatMap) {
+  Array.prototype.flatMap = function (callback, thisArg) {
+    var self = thisArg || this;
+    var list = [];
+
+    // 1. Let O be ? ToObject(this value).
+    var o = Object(self);
+
+    // 2. Let len be ? ToLength(? Get(O, "length")).
+    var len = o.length >>> 0;
+
+    for (var k = 0; k < len; ++k) {
+      if (k in o) {
+        var part_list = callback.call(self, o[k], k, o);
+        list = list.concat(part_list);
+      }
+    }
+    return list;
+  };
+}
+
 if (!Array.prototype.sort) {
   Array.prototype.sort = function (compareFn) {
     return mergeSort(this);
@@ -100,4 +121,5 @@ if (!Array.prototype.findIndex) {
     return -1;
   };
 }
+// Ref: https://blog.bitsrc.io/lets-implement-our-own-array-map-sort-methods-e89c9d5e2dc8
 /* jshint ignore:end */
