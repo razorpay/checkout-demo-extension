@@ -165,7 +165,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         // If there are any flows, check if the flows match and is invidiual flow
         if (instrumentHasFlows) {
           const individualFlows = ['qr'];
-          return !instrument._ungrouped.none(
+          return !instrument._ungrouped.some(
             (ungrouped) =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
               ungrouped.flow === preferred.flows[0]
