@@ -1,0 +1,58 @@
+name: Store Production Build
+
+on: deployment
+
+env:
+  APP_NAME: razorpay/checkout
+
+jobs:
+  store-content:
+    name: Store content based on commit SHA
+    runs-on: [self-hosted]
+    if: github.event.deployment.environment == 'prod-archive'
+    env:
+      GIT_COMMIT_HASH: ${{ github.event.deployment.ref }}
+      AWS_S3_BUCKET_FOR_BUILD: rzp-1018-nonprod-betacdn
+      BUCKET_BASE_PATH_FOR_PROD: checkout/builds/prod-builds
+      BUCKET_BASE_PATH_FOR_COMMIT: checkout/builds/commit-builds
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials For saving the artifacts to stage bucket
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.STAGE_AWS_SECRET_KEY }}
+          aws-region: ap-south-1
+      - name: Generate Vars
+        id: vars
+        run: |
+          echo ::set-output name=deployment_date::$(env TZ=Asia/Kolkata date +'%Y-%m-%d')
+
+      - name: Store content based on commit SHA
+        id: storeContent
+        run: |
+          aws s3 sync s3://$AWS_S3_BUCKET_FOR_BUILD/$BUCKET_BASE_PATH_FOR_COMMIT/$GIT_COMMIT_HASH/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUCKET_BASE_PATH_FOR_PROD/${{ steps.vars.outputs.deployment_date }}-$GIT_COMMIT_HASH/v1
+
+      - name: Pushing prod build entry to slack
+        if: steps.storeContent.conclusion == 'success'
+        env:
+          SLACK_MESSAGE: "Checkout production deployment build archived successfully. \n TRY: https://api.razorpay.com/test/layout.php?prod_build=${{ steps.vars.outputs.deployment_date }}-${{ env.GIT_COMMIT_HASH }} \n INFO: https://betacdn.np.razorpay.in/${{ env.BUCKET_BASE_PATH_FOR_PROD }}/${{ steps.vars.outputs.deployment_date }}-${{ env.GIT_COMMIT_HASH }}/v1/info.txt"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_USERNAME: Github Actions # Optional. (defaults to webhook app)
+          SLACK_CHANNEL: payments_checkout_alerts # Optional. (defaults to webhook)
+          SLACK_ICON: https://avatars2.githubusercontent.com/u/2181346?s=200&v=4 # Optional. can be (repository, sender, an URL) (defaults to webhook app avatar)
+        uses: rtCamp/action-slack-notify@v2
+
+      - name: Mark Deployment Success on GitHub
+        if: ${{ success() }}
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/razorpay/checkout/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "beta",
+            "state": "success"
+          }'

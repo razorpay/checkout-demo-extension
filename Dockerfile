@@ -10,6 +10,12 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ARG BUILD_PATH_FOR_BRANCH
 ENV BUILD_PATH_FOR_BRANCH=${BUILD_PATH_FOR_BRANCH}
 
+ARG BUILD_PATH_FOR_COMMIT
+ENV BUILD_PATH_FOR_COMMIT=${BUILD_PATH_FOR_COMMIT}
+
+ARG GIT_COMMIT_HASH
+ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
+
 ARG TRAFFIC_ENV
 ENV TRAFFIC_ENV=${TRAFFIC_ENV}
 
@@ -36,10 +42,15 @@ RUN if [[ -n $TRAFFIC_ENV ]]; then \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     fi
 
+RUN echo "Build_Creation_Date_Time: $(date +'%Y-%m-%dT%H:%M:%S') Build_Number: $BUILD_NUMBER Commit_Id: $GIT_COMMIT_HASH" > /checkout_build/app/dist/v1/info.txt
+
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 
 ARG BUILD_PATH_FOR_BRANCH
 ENV BUILD_PATH_FOR_BRANCH=${BUILD_PATH_FOR_BRANCH}
+
+ARG BUILD_PATH_FOR_COMMIT
+ENV BUILD_PATH_FOR_COMMIT=${BUILD_PATH_FOR_COMMIT}
 
 ARG TRAFFIC_ENV
 ENV TRAFFIC_ENV=${TRAFFIC_ENV}
@@ -86,6 +97,21 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     --exclude "*" \
     --include "*.js" \
     --include "*.css"; \
+    # Commit based branch storage (CSS and JS files)
+    aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_COMMIT/v1 \
+    --acl public-read \
+    --cache-control "max-age=2700, must-revalidate" \
+    --content-encoding gzip \
+    --exclude "*" \
+    --include "*.js" \
+    --include "*.css"; \
+    # Commit based branch storage (Including info.txt and commit.txt)
+    aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_COMMIT/v1 \
+    --acl public-read \
+    --cache-control "max-age=2700, must-revalidate" \
+    --content-type "text/plain; charset=utf-8" \
+    --exclude "*" \
+    --include "*.txt"; \
     else \
     aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_BRANCH/$TRAFFIC_ENV/v1 \
     --acl public-read \
