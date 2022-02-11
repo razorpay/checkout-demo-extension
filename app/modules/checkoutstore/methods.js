@@ -400,12 +400,12 @@ export function getEnabledMethods() {
   if (merchantOrder && isRecurring() && getAmount()) {
     merchantOrderMethod = merchantOrder.method || 'card';
   }
-  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+  let methodsToConsider = _Obj.keys(ALL_METHODS);
 
   if (merchantOrderMethod) {
     methodsToConsider = [merchantOrderMethod];
   }
-  return methodsToConsider |> _Arr.filter(isMethodEnabled);
+  return methodsToConsider.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {
@@ -482,7 +482,7 @@ export function getCardNetworksForRecurring(type) {
     const networks = getRecurringMethods().card[type];
     if (_.isArray(networks) && networks.length) {
       // Example: "American Express" to "amex"
-      const codes = _Arr.map(networks, findCodeByNetworkName);
+      const codes = networks.map(findCodeByNetworkName);
 
       // ["mastercard", "visa"] to { mastercard: true, visa: true }
       return codes.reduce((acc, code) => {
@@ -707,7 +707,7 @@ export function getAppsForCards() {
     return [];
   }
 
-  const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+  const apps = getAppsForMethod('card').filter(isApplicationEnabled);
 
   const disabledApps = storeGetter(HiddenInstrumentsStore)
     .filter((instrument) => instrument.method === 'app' && instrument.provider)
@@ -941,7 +941,7 @@ function transformEmiPlans(emiPlan) {
 
 export function getEligiblePlansBasedOnMinAmount(plans) {
   const amount = getAmount();
-  const eligiblePlans = _Arr.filter(plans, (plan) => plan.min_amount <= amount);
+  const eligiblePlans = plans.filter((plan) => plan.min_amount <= amount);
   return eligiblePlans;
 }
 
@@ -978,10 +978,10 @@ export function getEMIBanks() {
  */
 export function getPayLaterProviders() {
   const paylater = getMerchantMethods().paylater;
-  if (paylater |> _Obj.isEmpty) {
+  if (_Obj.isEmpty(paylater)) {
     return [];
   }
-  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(Boolean);
+  return _Obj.keys(paylater).map(getProvider).filter(Boolean);
 }
 
 /*
@@ -997,16 +997,14 @@ export function getAppProviders() {
     // explicitly setting of `google_pay`.
     apps.google_pay = true;
   }
-  if (apps |> _Obj.isEmpty) {
+  if (_Obj.isEmpty(apps)) {
     return [];
   }
-  return (
-    apps
-    |> _Obj.keys
-    |> _Arr.filter(isApplicationEnabled)
-    |> _Arr.map(getAppProvider)
-    |> _Arr.filter(Boolean)
-  );
+  return _Obj
+    .keys(apps)
+    .filter(isApplicationEnabled)
+    .map(getAppProvider)
+    .filter(Boolean);
 }
 
 export function isWalnut369Enabled() {

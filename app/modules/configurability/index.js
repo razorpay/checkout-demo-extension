@@ -45,7 +45,7 @@ function getAvailableDefaultMethods() {
     available = ['credit_card', 'debit_card'].concat(available);
   }
 
-  available = _Arr.filter(available, isMethodEnabled);
+  available = available.filter(isMethodEnabled);
 
   /**
    * We do not want to show QR in the primary list
@@ -88,7 +88,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
           }
         });
 
-        instrument.networks = _Arr.filter(instrument.networks, (network) =>
+        instrument.networks = instrument.networks.filter((network) =>
           _Arr.contains(availableNetworks, network)
         );
       }
@@ -124,8 +124,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasBanks) {
         const enabledBanks = getNetbankingBanks();
-        const shownBanks = _Arr.filter(
-          instrument.banks,
+        const shownBanks = instrument.banks.filter(
           (bank) => enabledBanks[bank]
         );
 
@@ -140,7 +139,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasWallets) {
         const enabledWallets = getWallets();
-        const shownWallets = _Arr.filter(instrument.wallets, (wallet) =>
+        const shownWallets = instrument.wallets.filter((wallet) =>
           enabledWallets.some((enabledWallet) => enabledWallet.code === wallet)
         );
 
@@ -155,8 +154,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasProviders) {
         const enabledProviders = getCardlessEMIProviders();
-        const shownProviders = _Arr.filter(
-          instrument.providers,
+        const shownProviders = instrument.providers.filter(
           (provider) => enabledProviders[provider]
         );
         instrument.providers = shownProviders;
@@ -170,7 +168,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasProviders) {
         const enabledProviders = getPayLaterProviders();
-        const shownProviders = _Arr.filter(instrument.providers, (provider) =>
+        const shownProviders = instrument.providers.filter((provider) =>
           enabledProviders.some(
             (enabledProvider) => enabledProvider.code === provider
           )
@@ -186,7 +184,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasProviders) {
         const enabledProviders = getAppProviders();
-        const shownProviders = _Arr.filter(instrument.providers, (provider) =>
+        const shownProviders = instrument.providers.filter((provider) =>
           enabledProviders.some(
             (enabledProvider) => enabledProvider.code === provider
           )
@@ -204,7 +202,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       const hasFlows = Boolean(instrument.flows);
 
       if (hasFlows) {
-        const shownFlows = _Arr.filter(instrument.flows, isUPIFlowEnabled);
+        const shownFlows = instrument.flows.filter(isUPIFlowEnabled);
         instrument.flows = shownFlows;
 
         if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
@@ -215,7 +213,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
           const allUpiAppsOnDevice = getUPIIntentApps().all;
 
           // Keep only those apps which are present on the device
-          instrument.apps = _Arr.filter(instrument.apps, (app) =>
+          instrument.apps = instrument.apps.filter((app) =>
             _Arr.find(
               allUpiAppsOnDevice,
               (deviceApp) => deviceApp.package_name === app
@@ -239,11 +237,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
  */
 function removeDisabledInstrumentsFromBlock(block) {
   block = _Obj.clone(block);
-  block.instruments =
-    block.instruments
-    |> _Arr.map(removeNonApplicableInstrumentFlows)
-    |> _Arr.filter(Boolean)
-    |> _Arr.filter(isInstrumentValid);
+  block.instruments = block.instruments
+    .map(removeNonApplicableInstrumentFlows)
+    .filter(Boolean)
+    .filter(isInstrumentValid);
 
   return block;
 }
@@ -300,14 +297,12 @@ export function getBlockConfig(options, customer) {
   }
 
   // Ungroup instruments and remove disabed instruments for each block
-  translated.display.blocks =
-    translated.display.blocks
-    |> _Arr.map(removeDisabledInstrumentsFromBlock)
-    |> _Arr.map((block) => ungroupInstruments(block, customer));
+  translated.display.blocks = translated.display.blocks
+    .map(removeDisabledInstrumentsFromBlock)
+    .map((block) => ungroupInstruments(block, customer));
 
   // Remove empty blocks
-  translated.display.blocks = _Arr.filter(
-    translated.display.blocks,
+  translated.display.blocks = translated.display.blocks.filter(
     (block) => block.instruments.length > 0
   );
 

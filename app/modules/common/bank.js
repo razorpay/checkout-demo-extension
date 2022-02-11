@@ -49,8 +49,7 @@ export function getCommonBankName(code) {
  * @return {Array<{name: string, code: string, logo: string}>}
  */
 const transformBanks = (bankObj) =>
-  _Obj.entries(bankObj)
-  |> _Arr.map((entry) => ({
+  _Obj.entries(bankObj).map((entry) => ({
     name: entry[1],
     code: entry[0],
     logo: getBankLogo(entry[0]),
@@ -151,13 +150,10 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     return;
   }
 
-  let bankList =
-    commonBanks
-    |> _Arr.filter((currBank) => {
-      return (
-        availBanks[currBank.code] && !availBanks[currBank.code.slice(0, -2)]
-      );
-    });
+  let bankList = commonBanks.filter(
+    (currBank) =>
+      availBanks[currBank.code] && !availBanks[currBank.code.slice(0, -2)]
+  );
   if (_.isArray(order)) {
     const availBanksList = transformBanks(availBanks);
 

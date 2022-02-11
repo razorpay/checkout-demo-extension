@@ -417,7 +417,7 @@ function getCountryCodeFromNumber(number) {
     codesByLength[length].push(code);
   });
 
-  codesByLength = _Arr.filter(codesByLength, Boolean).reverse();
+  codesByLength = codesByLength.filter(Boolean).reverse();
 
   for (let i = 0; i < codesByLength.length; i++) {
     const codes = codesByLength[i];

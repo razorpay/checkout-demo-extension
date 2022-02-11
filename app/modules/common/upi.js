@@ -431,7 +431,7 @@ export const getSortedApps = (allApps) => {
   // The check is only performed if verify_registration is true for the app.
   // See UPI_APPS.whitelist.
   if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
-    usableApps = _Arr.filter(usableApps, (app) => {
+    usableApps = usableApps.filter((app) => {
       // Only check for user registration if app is installed.
       if (app.verify_registration && isAppInstalled(app.package_name)) {
         return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
@@ -440,11 +440,10 @@ export const getSortedApps = (allApps) => {
     });
   }
 
-  const usablePackages = _Arr.map(usableApps, (app) => app.package_name);
+  const usablePackages = usableApps.map((app) => app.package_name);
 
   // Remove blacklisted apps
-  allApps = _Arr.filter(
-    allApps,
+  allApps = allApps.filter(
     (app) => usablePackages.indexOf(app.package_name) >= 0
   );
   allApps = allApps.map((item) => {
@@ -475,11 +474,8 @@ export const getSortedApps = (allApps) => {
  * @param {Array} allApps
  */
 export const findAndReportNewApps = (allApps) => {
-  const usablePackages = _Arr.map(getUsableApps(), (app) => app.package_name);
-  const blacklistedPackages = _Arr.map(
-    UPI_APPS.blacklist,
-    (app) => app.package_name
-  );
+  const usablePackages = getUsableApps().map((app) => app.package_name);
+  const blacklistedPackages = UPI_APPS.blacklist.map((app) => app.package_name);
 
   allApps.forEach((app) => {
     if (
@@ -504,11 +500,10 @@ export const findAndReportNewApps = (allApps) => {
  */
 export const getNumberOfAppsByCategory = (allApps) => {
   const count = {};
-  const existingPackages = _Arr.map(allApps, (app) => app.package_name);
+  const existingPackages = allApps.map((app) => app.package_name);
 
   _Obj.loop(UPI_APPS, (apps, key) => {
-    count[key] = _Arr.filter(
-      apps,
+    count[key] = apps.filter(
       (app) => existingPackages.indexOf(app.package_name) >= 0
     ).length;
   });

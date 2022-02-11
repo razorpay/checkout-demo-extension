@@ -50,10 +50,9 @@ function _createBlock(code, config = {}, validate = false) {
 
   if (instruments) {
     instruments = removeDuplicateInstruments(instruments);
-    block.instruments =
-      instruments
-      |> _Arr.map(validate ? validateKeysAndCreateInstrument : createInstrument)
-      |> _Arr.filter(Boolean);
+    block.instruments = instruments
+      .map(validate ? validateKeysAndCreateInstrument : createInstrument)
+      .filter(Boolean);
   }
 
   if (name) {

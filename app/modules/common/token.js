@@ -70,7 +70,7 @@ export const getSavedCards = (tokens) => {
   if (!tokens) {
     return [];
   }
-  return _Arr.filter(tokens, (token) => token.method === 'card');
+  return tokens.filter((token) => token.method === 'card');
 };
 
 /**
