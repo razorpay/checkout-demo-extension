@@ -411,7 +411,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
     return {
       identified,
-      instruments: _Arr.map(instruments, translateInstrumentToConfig),
+      instruments: instruments.map(translateInstrumentToConfig),
     };
   });
 };

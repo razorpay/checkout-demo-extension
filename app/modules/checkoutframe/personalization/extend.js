@@ -41,7 +41,7 @@ const EXTENDERS = {
 export function extendInstruments(params) {
   const { instruments } = params;
 
-  return _Arr.map(instruments, (instrument) => {
+  return instruments.map((instrument) => {
     const { method } = instrument;
 
     const extender = EXTENDERS[method] || EXTENDERS.default;

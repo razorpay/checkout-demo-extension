@@ -168,7 +168,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 export function getOffersForInstrument(instrument) {
   const offers = getOffersForTab(instrument.method);
 
-  return _Arr.filter(offers, (offer) =>
+  return offers.filter((offer) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
@@ -202,14 +202,14 @@ export const getAllOffers = () => {
   if (isPartialPayment()) {
     return [];
   } else {
-    return getMerchantOffers() || [] |> _Arr.filter(isOfferEligible);
+    return (getMerchantOffers() || []).filter(isOfferEligible);
   }
 };
 
 function _getAllInstrumentsForOffer(offer) {
   const allInstruments = storeGetter(instruments);
 
-  return _Arr.filter(allInstruments, (instrument) =>
+  return allInstruments.filter((instrument) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
@@ -217,8 +217,7 @@ function _getAllInstrumentsForOffer(offer) {
 const INSTRUMENT_TO_SELECT_HANDLERS = {
   default: (offer) => {
     const instruments = _getAllInstrumentsForOffer(offer);
-    const nonSavedCardInstruments = _Arr.filter(
-      instruments,
+    const nonSavedCardInstruments = instruments.filter(
       (instrument) => !isSavedCardInstrument(instrument)
     );
 

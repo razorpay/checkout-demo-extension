@@ -24,11 +24,11 @@ function hasValidExtension(filename, extensions) {
  * @returns {string} Foo Bar Baz
  */
 function entityToWords(word) {
-  const words = _Arr.map(word.split(/_|\./g), toTitleCase);
+  const words = word.split(/_|\./g).map(toTitleCase);
 
   let prev;
 
-  const filtered = _Arr.filter(words, (word) => {
+  const filtered = words.filter((word) => {
     const sameAsLast = word === prev;
 
     prev = word;
@@ -134,7 +134,7 @@ export function uploadDocument(razorpay, file) {
  * @return {string}
  */
 function getEntityString(allEntities, limit = Infinity) {
-  const entities = _Arr.map(allEntities.slice(0, limit), entityToWords);
+  const entities = allEntities.slice(0, limit).map(entityToWords);
   const diff = allEntities.length - entities.length;
 
   if (diff > 0) {

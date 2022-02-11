@@ -263,3 +263,68 @@ if (!global.alert.name) {
     configurable: true,
   });
 }
+
+/**
+ * Array.prototype.flatMap
+ */
+(function () {
+  if (!Array.prototype.flatMap) {
+    Array.prototype.flatMap = function (callback, thisArg) {
+      var self = thisArg || this;
+      var list = [];
+
+      // 1. Let O be ? ToObject(this value).
+      var o = Object(self);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      for (var k = 0; k < len; ++k) {
+        if (k in o) {
+          var part_list = callback.call(self, o[k], k, o);
+          list = list.concat(part_list);
+        }
+      }
+      return list;
+    };
+  }
+})();
+
+/**
+ * Array.prototype.findIndex
+ */
+(function () {
+  if (!Array.prototype.findIndex) {
+    Array.prototype.findIndex = function (callback) {
+      if (typeof callback !== 'function') {
+        throw new TypeError('callback must be a function');
+      }
+
+      var thisVal = arguments[1] || this;
+      for (var i = 0; i < this.length; i++) {
+        if (callback.call(thisVal, this[i], i, this)) {
+          return i;
+        }
+      }
+
+      return -1;
+    };
+  }
+})();
+
+/**
+ * Array.prototype.filter
+ */
+(function () {
+  if (!Array.prototype.filter) {
+    Array.prototype.filter = function (cb) {
+      const filtered = [],
+        size = this.length;
+
+      for (let i = 0; i < size; i++) {
+        if (cb(this[i], i, this)) filtered.push(this[i]);
+      }
+      return filtered;
+    };
+  }
+})();

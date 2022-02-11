@@ -77,4 +77,16 @@ if (!Array.prototype.findIndex) {
   };
 }
 // Ref: https://blog.bitsrc.io/lets-implement-our-own-array-map-sort-methods-e89c9d5e2dc8
+if (!Array.prototype.filter) {
+  Array.prototype.filter = function (cb) {
+    const filtered = [],
+      size = this.length;
+
+    for (let i = 0; i < size; i++) {
+      if (cb(this[i], i, this)) filtered.push(this[i]);
+    }
+    return filtered;
+  };
+}
+
 /* jshint ignore:end */

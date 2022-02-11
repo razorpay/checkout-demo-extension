@@ -69,7 +69,7 @@ export function setInstrumentsForCustomer(
   instruments,
   identified = true
 ) {
-  const transformedInstruments = _Arr.map(instruments, (instrument) =>
+  const transformedInstruments = instruments.map((instrument) =>
     transformInstrumentToStorageFormat(instrument, {
       upiApps: getUPIIntentApps().filtered,
     })
