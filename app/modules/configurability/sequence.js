@@ -90,7 +90,7 @@ export function getSequencedBlocks(params) {
 
   // Get blocks mentioned in the sequence
   const sequencedBlocks = sequence
-    .map((code) => _Arr.find(allBlocks, (block) => block.code === code))
+    .map((code) => allBlocks.find((block) => block.code === code))
     .filter(Boolean);
 
   return {

@@ -214,8 +214,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
           // Keep only those apps which are present on the device
           instrument.apps = instrument.apps.filter((app) =>
-            _Arr.find(
-              allUpiAppsOnDevice,
+            allUpiAppsOnDevice.find(
               (deviceApp) => deviceApp.package_name === app
             )
           );

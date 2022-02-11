@@ -219,7 +219,7 @@ export function isCardNetworkInPaymentOneOf(
   let network = '';
 
   if (token) {
-    const cardToken = _Arr.find(tokens, (t) => t.token === token);
+    const cardToken = tokens.find((t) => t.token === token);
 
     if (cardToken && cardToken.card && cardToken.card.network) {
       network = cardToken.card.network;
@@ -234,10 +234,7 @@ export function isCardNetworkInPaymentOneOf(
   network = network.toLowerCase();
 
   return Boolean(
-    _Arr.find(
-      listOfNetworks,
-      (listNetwork) => listNetwork.toLowerCase() === network
-    )
+    listOfNetworks.find((listNetwork) => listNetwork.toLowerCase() === network)
   );
 }
 

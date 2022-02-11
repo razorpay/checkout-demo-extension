@@ -132,7 +132,7 @@ export const getBankFromCardCache = (cardNum) => {
     issuer += '_DC';
   }
 
-  let bankObj = _Arr.find(emiBanks, (bankObj) => bankObj.code === issuer);
+  let bankObj = emiBanks.find((bankObj) => bankObj.code === issuer);
 
   if (bankObj) {
     return {

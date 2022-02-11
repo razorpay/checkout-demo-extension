@@ -26,9 +26,9 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   // Add a token
   if (instrument.token_id && customer) {
-    const token =
-      _Obj.getSafely(customer, 'tokens.items', [])
-      |> _Arr.find((token) => token.id === instrument.token_id);
+    const token = _Obj
+      .getSafely(customer, 'tokens.items', [])
+      .find((token) => token.id === instrument.token_id);
 
     if (token) {
       payment.token = token.token;
@@ -108,7 +108,7 @@ const config = {
 
       if (grouped.token_id) {
         const token_id = grouped.token_id;
-        const token = _Arr.find(tokens, (token) => token.id === token_id);
+        const token = tokens.find((token) => token.id === token_id);
 
         if (token) {
           let instrumentFromToken = [
@@ -251,7 +251,7 @@ const config = {
             if (grouped.token_id) {
               const token_id = grouped.token_id;
 
-              const token = _Arr.find(tokens, (token) => token.id === token_id);
+              const token = tokens.find((token) => token.id === token_id);
 
               if (token) {
                 individual.token_id = token_id;

@@ -24,7 +24,7 @@ export function isVpaValid(vpa) {
  * @returns {string | undefined}
  */
 export function getPackageNameFromShortcode(shortcode) {
-  const app = getAllApps() |> _Arr.find((app) => app.shortcode === shortcode);
+  const app = getAllApps().find((app) => app.shortcode === shortcode);
 
   if (app) {
     return app.package_name;
@@ -38,8 +38,7 @@ export function getPackageNameFromShortcode(shortcode) {
  * @returns {string | undefined}
  */
 export function getAppFromPackageName(packageName) {
-  const app =
-    getAllApps() |> _Arr.find((app) => app.package_name === packageName);
+  const app = getAllApps().find((app) => app.package_name === packageName);
 
   return app;
 }
@@ -413,7 +412,7 @@ export const getSortedApps = (allApps) => {
   let usableApps = getUsableApps();
 
   allApps.forEach((app, i) => {
-    const appConfig = _Arr.find(usableApps, (usableApp) => {
+    const appConfig = usableApps.find((usableApp) => {
       if (app.package_name) {
         return app.package_name === usableApp.package_name;
       } else if (app.shortcode) {
@@ -522,7 +521,7 @@ export const getUPIAppDataFromHandle = (handle) => {
   const allUsableApps = getUsableApps();
 
   return (
-    _Arr.find(allUsableApps, (app) => {
+    allUsableApps.find((app) => {
       return app.handles && _Arr.contains(app.handles, handle);
     }) || {}
   );
@@ -547,7 +546,7 @@ export const trackUPIIntentFailure = (packageName) => {
  * @param {Array} allApps
  */
 export const trackAppImpressions = (allApps) => {
-  if (_Arr.find(allApps, (app) => app.package_name === 'com.truecaller')) {
+  if (allApps.find((app) => app.package_name === 'com.truecaller')) {
     Analytics.track('upi:app:truecaller:show');
   }
 };

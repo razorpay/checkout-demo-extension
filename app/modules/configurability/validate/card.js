@@ -16,7 +16,7 @@ export function validateCardInstrument(
   let features = {};
 
   if (payment.token) {
-    let token = _Arr.find(tokens, (token) => token.token === payment.token);
+    let token = tokens.find((token) => token.token === payment.token);
 
     if (token) {
       features = token.card;

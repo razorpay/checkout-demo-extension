@@ -96,7 +96,7 @@ export function getCardApps(sdkMeta, externalSDKs, uriData) {
       if (!uriData || !uriData.length) {
         return false;
       }
-      const appData = _Arr.find(uriData, (p) => app.code === p.shortcode);
+      const appData = uriData.find((p) => app.code === p.shortcode);
       if (!appData || appData.uri !== app.uri) {
         return false;
       }

@@ -16,8 +16,7 @@ export function generateSubtextForWalletInstrument(instrument, locale) {
 
   const wallets = getWallets();
 
-  const findWallet = (code) =>
-    _Arr.find(wallets, (wallet) => wallet.code === code);
+  const findWallet = (code) => wallets.find((wallet) => wallet.code === code);
 
   const walletNames = instrument.wallets.map((wallet) =>
     getWalletName(findWallet(wallet).code, locale)
