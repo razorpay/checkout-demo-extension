@@ -79,7 +79,7 @@
     }
 
     const tokens = _Obj.getSafely($customer, 'tokens.items', []);
-    const vpaToken = _Arr.find(tokens, (item) => item.id === token);
+    const vpaToken = tokens.find((item) => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
@@ -137,8 +137,7 @@
       icon = session.themeMeta.icons['qr'];
     } else if (instrument.flow === 'intent') {
       const app =
-        _Arr.find(
-          getUPIIntentApps().all,
+        getUPIIntentApps().all.find(
           (app) => app.package_name === instrument.app
         ) || {};
 

@@ -83,8 +83,7 @@
 
   $: {
     if ($selectedBank) {
-      selectedBankName = _Arr.find(
-        banksArr,
+      selectedBankName = banksArr.find(
         (bank) => bank.code === $selectedBank
       ).name;
     } else {

@@ -137,41 +137,6 @@ export const contains = _.curry2(
 );
 
 /**
- * Returns the index of the first item in an array
- * for which iteratee evaluates to true.
- * @param {Array} arr
- * @param {function (item: *): boolean} iteratee
- *  @param {Any} item
- *  @returns {boolean}
- *
- * @returns {number}
- */
-export const findIndex = _.curry2((arr, iteratee) => {
-  let arrayLen = _.lengthOf(arr);
-  for (let i = 0; i < arrayLen; i++) {
-    if (iteratee(arr[i], i, arr)) {
-      return i;
-    }
-  }
-  return -1;
-});
-
-/**
- * Returns the first item in an array
- * for which iteratee evaluates to true.
- * @param {Array} arr
- * @param {function (item: *): boolean} iteratee
- *
- * @returns {Any}
- */
-export const find = _.curry2((arr, iteratee) => {
-  let index = findIndex(arr, iteratee);
-  if (index >= 0) {
-    return arr[index];
-  }
-});
-
-/**
  * Prepends an item to an array.
  * @param {Array} array
  * @param {Any} member

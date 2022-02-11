@@ -501,7 +501,7 @@
       return false;
     }
 
-    const block = _Arr.find($blocks, (block) =>
+    const block = $blocks.find((block) =>
       _Arr.contains(block.instruments, $methodInstrument)
     );
 

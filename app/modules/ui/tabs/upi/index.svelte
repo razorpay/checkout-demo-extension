@@ -265,7 +265,7 @@
 
     return _Arr.filter(
       _Arr.map(instrument.apps, (app) =>
-        _Arr.find(allApps, (deviceApp) => deviceApp.package_name === app)
+        allApps.find((deviceApp) => deviceApp.package_name === app)
       ),
       Boolean
     );
@@ -471,10 +471,9 @@
       default:
         // `selectedToken` can be null if nothing is to be selected by default
         if (selectedToken) {
-          _token = _Arr.find(
-            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
-            (token) => token.id === selectedToken
-          );
+          _token = _Obj
+            .getSafely(session.getCurrentCustomer(), 'tokens.items', [])
+            .find((token) => token.id === selectedToken);
 
           Analytics.track('upi:token:switch:default', {
             data: {

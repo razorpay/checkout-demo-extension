@@ -403,7 +403,7 @@ function generateInstrumentId(
  * @returns {Block|undefined}
  */
 function getInstrumentBlock(instrument, blocks) {
-  return _Arr.find(blocks, (block) => {
+  return blocks.find((block) => {
     return block.instruments.some(
       (blockInstrument) => blockInstrument.id === instrument.id
     );

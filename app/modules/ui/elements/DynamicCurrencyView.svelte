@@ -365,8 +365,7 @@
       selectedCurrency &&
       currencies[selectedCurrency].conversion_percentage) ||
     0;
-  $: selectedCurrencyInDisplay = _Arr.find(
-    displayCurrencies,
+  $: selectedCurrencyInDisplay = displayCurrencies?.find(
     ({ currency }) => currency === selectedCurrency
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
@@ -466,7 +465,7 @@
     if (!$customer.tokens.items) {
       return;
     }
-    return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
+    return $customer.tokens.items.find((token) => token.id === tokenId);
   }
 </script>
 
