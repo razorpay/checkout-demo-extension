@@ -29,13 +29,12 @@ export function getSequencedBlocks(params) {
   } = preferences;
 
   // Get the methods to list
-  const methodsToList = _Arr.filter(
-    methods,
+  const methodsToList = methods.filter(
     (method) => !_Arr.contains(hide.methods, method)
   );
 
   // Create a method block for all listed methods
-  const methodBlocks = _Arr.map(methodsToList, createMethodBlock);
+  const methodBlocks = methodsToList.map(createMethodBlock);
 
   if (show_default_blocks) {
     // Extend the given sequence with our default sequence
@@ -90,10 +89,9 @@ export function getSequencedBlocks(params) {
   const allBlocks = blocks.concat(methodBlocks);
 
   // Get blocks mentioned in the sequence
-  const sequencedBlocks =
-    sequence
-    |> _Arr.map((code) => _Arr.find(allBlocks, (block) => block.code === code))
-    |> _Arr.filter(Boolean);
+  const sequencedBlocks = sequence
+    .map((code) => _Arr.find(allBlocks, (block) => block.code === code))
+    .filter(Boolean);
 
   return {
     blocks: sequencedBlocks,

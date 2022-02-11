@@ -54,7 +54,7 @@
       return pV;
     }, []);
 
-    return _Arr.filter(banks, (bank) =>
+    return banks.filter((bank) =>
       _Arr.contains(debitEmiinclusiveIssuers, bank.code)
     );
   }

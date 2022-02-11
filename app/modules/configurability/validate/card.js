@@ -10,7 +10,7 @@ export function validateCardInstrument(
   instrument,
   { tokens = [] } = {}
 ) {
-  tokens = _Arr.filter(tokens, (token) => token.method === 'card');
+  tokens = tokens.filter((token) => token.method === 'card');
 
   const cardNumberFromPayment = payment['card[number]'];
   let features = {};

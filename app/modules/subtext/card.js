@@ -35,9 +35,9 @@ function concatTruthyString(list) {
  * @returns {string}
  */
 export function generateSubtextForCardInstrument(instrument, locale) {
-  const instrumentIssuers =
-    instrument.issuers || []
-    |> _Arr.map((bank) => getCommonBankName(bank).replace(/ Bank$/, ''));
+  const instrumentIssuers = (instrument.issuers || []).map((bank) =>
+    getCommonBankName(bank).replace(/ Bank$/, '')
+  );
   const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
   const instrumentIins = instrument.iins || [];
@@ -321,11 +321,10 @@ export function generateSubtextForRecurring({
 }
 
 function generateTextForCardNetwork({ mastercard, visa, amex }, locale) {
-  const networksList =
-    [
-      visa ? 'Visa' : '',
-      mastercard ? 'Mastercard' : '',
-      amex ? 'American Express' : '',
-    ] |> _Arr.filter(Boolean);
+  const networksList = [
+    visa ? 'Visa' : '',
+    mastercard ? 'Mastercard' : '',
+    amex ? 'American Express' : '',
+  ].filter(Boolean);
   return generateTextFromList(networksList, locale);
 }

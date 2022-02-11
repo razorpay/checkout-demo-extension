@@ -44,11 +44,9 @@ const INSTRUMENT_CREATORS = {
     }
 
     if (instrument.apps) {
-      instrument.apps =
-        instrument.apps
-        |> _Arr.map((app) => {
-          return getPackageNameFromShortcode(app) || app;
-        });
+      instrument.apps = instrument.apps.map((app) => {
+        return getPackageNameFromShortcode(app) || app;
+      });
     }
 
     return instrument;
