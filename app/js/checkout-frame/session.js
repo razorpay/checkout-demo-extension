@@ -4799,27 +4799,25 @@ Session.prototype = {
       var isRecurring = RazorpayHelper.isRecurring();
       var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
       var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
-      var rememberCardCheck = discreet.storeGetter(CardScreenStore.remember);
+
+      // For saved card screen consent is maintained elsewhere
+      var rememberCardCheck = discreet.storeGetter(
+        isSavedCardScreen
+          ? CardScreenStore.userConsentForTokenization
+          : CardScreenStore.remember
+      );
 
       var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
-      var consentPendingForSelectedCardInSavedCardScreen =
-        selectedCard && !selectedCard.consent_taken;
+      var selectedCardConsent = selectedCard && selectedCard.consent_taken;
+      var isSavedCardScreenAndConsentAlreadyTaken =
+        isSavedCardScreen && selectedCardConsent;
 
-      // for saved card consent is being updated in userConsentForTokenization
-      if (isSavedCardScreen) {
-        rememberCardCheck = discreet.storeGetter(
-          CardScreenStore.userConsentForTokenization
-        );
-      }
-
-      if (isRecurring && isDomesticCustomer && !rememberCardCheck) {
-        // if screen is saved-cards and consent is already taken for a that card exit
-        if (
-          isSavedCardScreen &&
-          !consentPendingForSelectedCardInSavedCardScreen
-        ) {
-          return;
-        }
+      if (
+        isRecurring &&
+        isDomesticCustomer &&
+        !rememberCardCheck &&
+        !isSavedCardScreenAndConsentAlreadyTaken
+      ) {
         var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
         Form.shake();
         showSavedCardTooltip.update(function () {
