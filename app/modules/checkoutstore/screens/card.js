@@ -1,7 +1,6 @@
-import { derived, writable, get } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
 import { isIndianCustomer } from 'checkoutstore';
-
 export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');
@@ -15,7 +14,7 @@ export const dccCurrency = writable('');
 export const defaultDCCCurrency = writable(''); // store default currency given by flow api
 export const currencyRequestId = writable('');
 export const cardCountry = writable(''); // If DCC is not enabled we need to check the card country, if card country is not "IN" then call flows API
-
+export const showSavedCardTooltip = writable(false); // For recurring save card is mandatory, this flag toggles help tooltip
 export const defaultUserConsentForTokenization = true; // added this as we need to override some areas
 export const userConsentForTokenization = writable(
   defaultUserConsentForTokenization
