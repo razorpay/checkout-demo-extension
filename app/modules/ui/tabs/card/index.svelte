@@ -39,6 +39,7 @@
     selectedCardFromHome,
     defaultDCCCurrency,
     cardCountry,
+    showSavedCardTooltip,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -563,6 +564,12 @@
   }
 
   export function showAddCardView() {
+    /**
+     * IMPORTANT NOTE
+     * Need to set showSavedCardTooltip to false right before showing
+     * Add card screen. Please don't change the order
+     */
+    $showSavedCardTooltip = false;
     Events.Track(CardEvents.HIDE_SAVED_CARDS);
     setView(Views.ADD_CARD);
   }

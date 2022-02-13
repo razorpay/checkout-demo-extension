@@ -133,7 +133,7 @@
         />
         <span class="checkbox">
           <!-- if add-new-card flow and recurring -->
-          {#if isRecurring()}
+          {#if $showSavedCardTooltip && isRecurring()}
             <Tooltip
               align={['top', 'right']}
               className="subscription-flow-save-card-tooltip"
