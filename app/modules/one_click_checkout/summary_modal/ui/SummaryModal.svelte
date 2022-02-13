@@ -32,6 +32,7 @@
   } from 'one_click_checkout/summary_modal/sessionInterface';
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
+  import { truncateString } from 'utils/strings';
 
   let visible = false;
   let ctaVisible = false;
@@ -101,11 +102,16 @@
           </div>
         </div>
       {/if}
-      {#if $appliedOffer}
+      {#if $appliedOffer?.amount}
         <div class="summary-row">
           <div>
             {$t(OFFER_LABEL, {
-              values: { offer_name: $appliedOffer.display_text },
+              values: {
+                offer_name: `(${truncateString(
+                  $appliedOffer.display_text,
+                  20
+                )})`,
+              },
             })}
           </div>
           <div class="text-green">

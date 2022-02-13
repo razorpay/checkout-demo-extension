@@ -66,8 +66,7 @@ export function isStrictlyRecurring() {
  */
 export const getMerchantOffers = () => {
   // Ignore all offers ( including forced offers ) in case of partial payments.
-  // Ignore offers for 1CC. Not supported in 1CC
-  if (isPartialPayment() || isOneClickCheckout()) {
+  if (isPartialPayment()) {
     return [];
   }
   // Temporary fix: If customer-feebearer do not show any offers to the user.

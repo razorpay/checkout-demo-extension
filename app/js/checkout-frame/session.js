@@ -881,7 +881,7 @@ Session.prototype = {
     Header.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function (amount, fee) {
-    if (fee) {
+    if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
@@ -2972,12 +2972,9 @@ Session.prototype = {
         : ''
     );
     if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
-      var originalAmount = storeGetter(discreet.ChargesStore.cartAmount);
-      $('#amount .original-amount').html(
-        hasDiscount
-          ? discreet.Currency.formatAmountWithSymbol(originalAmount, currency)
-          : discreet.Currency.formatAmountWithSymbol(amount, currency)
-      );
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount')[0].removeAttribute('style');
     }
     Cta.setAppropriateCtaText();
     Header.updateAmountFontSize();
@@ -3099,6 +3096,9 @@ Session.prototype = {
         this.switchTab('home-1cc');
         Cta.showCta();
         this.topBar.hide();
+        if ($('#amount .original-amount')[0]) {
+          $('#amount .original-amount')[0].removeAttribute('style');
+        }
         return;
       }
     } else {
@@ -5956,7 +5956,13 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+    var offer = this.getAppliedOffer();
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
 
+    if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
+      data.amount =
+        data.amount + storeGetter(discreet.ChargesStore.offerAmount);
+    }
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
     }
