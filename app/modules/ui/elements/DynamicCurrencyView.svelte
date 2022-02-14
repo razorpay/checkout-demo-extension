@@ -440,7 +440,7 @@
       return 0;
     });
 
-    return _Arr.map(sorted, (_currency) => {
+    return sorted.map((_currency) => {
       const currency = _currency[0];
       const rest = _currency[1];
 

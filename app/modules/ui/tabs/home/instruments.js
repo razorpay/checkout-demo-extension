@@ -256,16 +256,14 @@ export function setBlocks(
       const preferredInstruments = preferredBlock.instruments;
 
       // Filter out all preferred methods whose methods are asked to be hidden
-      let filteredPreferredInstruments = _Arr.filter(
-        preferredInstruments,
+      let filteredPreferredInstruments = preferredInstruments.filter(
         (preferredInstrument) => {
           return isMethodUsable(preferredInstrument.method);
         }
       );
 
       // Filter out all preferred instruments which are hidden using hide in config
-      filteredPreferredInstruments = _Arr.filter(
-        filteredPreferredInstruments,
+      filteredPreferredInstruments = filteredPreferredInstruments.filter(
         (instrument) =>
           !isP13nInstrumentHiddenViaConfig(
             instrument,
@@ -275,8 +273,7 @@ export function setBlocks(
       );
 
       // Filter out all preferred methods that are already being shown by the merchant
-      filteredPreferredInstruments = _Arr.filter(
-        filteredPreferredInstruments,
+      filteredPreferredInstruments = filteredPreferredInstruments.filter(
         (instrument) =>
           shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
       );
@@ -288,8 +285,7 @@ export function setBlocks(
       );
 
       // Convert preferred instruments to ungrouped format
-      preferredBlock.instruments = _Arr.map(
-        preferredBlock.instruments,
+      preferredBlock.instruments = preferredBlock.instruments.map(
         (instrument) => getIndividualInstruments(instrument, customer)
       );
     }

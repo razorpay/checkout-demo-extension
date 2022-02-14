@@ -15,7 +15,7 @@
   import { getPaylaterProviderName } from 'i18n';
   import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
 
-  const providers = _Arr.map(getPayLaterProviders(), (providerObj) =>
+  const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
   );
 
@@ -37,7 +37,7 @@
       return providers;
     }
 
-    let filteredProviders = _Arr.filter(providers, (provider) =>
+    let filteredProviders = providers.filter((provider) =>
       _Arr.contains(instrument.providers, provider.data.code)
     );
 

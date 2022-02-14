@@ -263,12 +263,11 @@
 
     const allApps = getUPIIntentApps().all;
 
-    return _Arr.filter(
-      _Arr.map(instrument.apps, (app) =>
-        allApps.find((deviceApp) => deviceApp.package_name === app)
-      ),
-      Boolean
-    );
+    return instrument.apps
+      .map((app) =>
+        _Arr.find(allApps, (deviceApp) => deviceApp.package_name === app)
+      )
+      .filter(Boolean);
   }
 
   let intentApps = getUPIIntentApps().filtered;
@@ -315,7 +314,9 @@
     // BE does not support saved vpa tokens for recurring payments
     // conditional support might be added later
     if (!isRecurring()) {
-      tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+      tokens = _Obj
+        .getSafely($customer, 'tokens.items', [])
+        .filter((token) => token.method === 'upi');
       tokens = getAllowedPSPs[method](tokens);
       addDowntime();
 

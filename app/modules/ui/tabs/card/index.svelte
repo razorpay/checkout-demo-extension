@@ -144,7 +144,7 @@
     delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
   }
 
-  const apps = _Arr.map(getAppsForCards(), (code) => getAppProvider(code));
+  const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
 
   const session = getSession();
@@ -383,7 +383,7 @@
       return tokens;
     }
 
-    const eligibleTokens = _Arr.filter(tokens, (token) => {
+    const eligibleTokens = tokens.filter((token) => {
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
 
@@ -544,11 +544,11 @@
   }
 
   function filterSavedCardsForRecurring(tokens) {
-    return _Arr.filter(tokens, (token) => token.recurring);
+    return tokens.filter((token) => token.recurring);
   }
 
   function filterSavedCardsForEmi(tokens) {
-    return _Arr.filter(tokens, (token) => token.plans);
+    return tokens.filter((token) => token.plans);
   }
 
   export function showLandingView() {

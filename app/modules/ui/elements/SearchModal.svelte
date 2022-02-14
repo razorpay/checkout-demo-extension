@@ -78,7 +78,7 @@
         threshold: -100,
       });
 
-      const finalResult = _Arr.map(results, (result) => result.ref);
+      const finalResult = results.map((result) => result.ref);
       if (typeof sortSearchResult === 'function') {
         finalResult.sort(sortSearchResult);
       }
