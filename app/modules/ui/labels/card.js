@@ -71,3 +71,8 @@ export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT2 =
   'card.save_card_know_more_add_card_modal_content2';
 export const CARD_TOKENIZATION_DEADLINE_CALLOUT =
   'card.card_tokenization_deadline_callout';
+export const SAVED_CARD_CHECKBOX_TOOLTIP = 'card.saved_card_checkbox_tooltip';
+export const SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT =
+  'card.save_card_know_more_add_card_modal_subscription_content';
+export const SAVED_CARD_KNOW_MORE_CAW_CONTENT =
+  'card.save_card_know_more_add_card_modal_recurring_content';

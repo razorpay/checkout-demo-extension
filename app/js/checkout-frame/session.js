@@ -4788,6 +4788,43 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
+
+      //
+      // 1. If Payment is Recurring &&
+      // 2. Customer is Indian
+      // 3. If on add card screen and save card checkbox is not checked
+      // 4. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
+      // ==> Shake the form and show tooltip on checkbox
+      var isRecurring = RazorpayHelper.isRecurring();
+      var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+      var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+
+      // For saved card screen consent is maintained elsewhere
+      var rememberCardCheck = discreet.storeGetter(
+        isSavedCardScreen
+          ? CardScreenStore.userConsentForTokenization
+          : CardScreenStore.remember
+      );
+
+      var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+      var selectedCardConsent = selectedCard && selectedCard.consent_taken;
+      var isSavedCardScreenAndConsentAlreadyTaken =
+        isSavedCardScreen && selectedCardConsent;
+
+      if (
+        isRecurring &&
+        isDomesticCustomer &&
+        !rememberCardCheck &&
+        !isSavedCardScreenAndConsentAlreadyTaken
+      ) {
+        var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
+        Form.shake();
+        showSavedCardTooltip.update(function () {
+          return true;
+        });
+
+        return;
+      }
     } else if (selectedInstrument) {
       if (
         selectedInstrument.method === 'card' &&
