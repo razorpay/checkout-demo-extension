@@ -1,29 +1,18 @@
 <script>
   // Declarations and Import Statements
   import SecureCardKnowMore from './SecureCardKnowMore.svelte';
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import Razorpay from 'common/Razorpay';
-  import { getSession } from 'sessionmanager';
-
   import { Events, CardEvents } from 'analytics/index';
-  import Tooltip from 'ui/elements/Tooltip.svelte';
-  import { showSavedCardTooltip } from 'checkoutstore/screens/card';
+
   let secureCardKnowMoreView;
-  import {
-    isRecurring,
-    getOption,
-    isSubscription,
-    getPreferences,
-  } from 'razorpay';
-  import { formatTemplateWithLocale } from 'i18n';
 
   //i18n
   import {
     SAVE_CARD_TEXT,
     KNOW_MORE,
     SAVE_CARD_TEXT_NEW_CARD,
-    SAVED_CARD_CHECKBOX_TOOLTIP,
   } from 'ui/labels/card';
 
   // Export statements
@@ -31,10 +20,6 @@
   export let savedcard;
   export let modalType;
   export let name = 'save';
-  export let merchantName = getOption('name');
-  export let maxAmount = getSession().formatAmountWithCurrency(
-    getPreferences('order.max_amount')
-  );
   export let cvvRef;
   export let network;
   // Function for hiding the modal
@@ -83,7 +68,6 @@
     showOverlay([secureCardDiv]);
   };
   function trackUserConsentForTokenization(event) {
-    $showSavedCardTooltip = false;
     if (modalType.includes('add')) {
       // in add-card flow we already have remember user event
       return;
@@ -99,10 +83,6 @@
     if (network) {
       checked = true;
     }
-    // In case of recurring flow, we need explicit user consent to save card, hence default will be unchecked
-    if (isRecurring()) {
-      checked = false;
-    }
   });
 </script>
 
@@ -117,84 +97,36 @@
     id="should-save-card"
     tabIndex="0"
     class:save_card_label_text={modalType === 'add-new-card'}
-    class:save-card-label-recurring={Boolean(isRecurring())}
   >
-    <div class="save-card-container">
-      <div>
-        <input
-          type="checkbox"
-          class="checkbox--square"
-          id={name}
-          on:focus
-          on:change={trackUserConsentForTokenization}
-          on:change
-          bind:checked
-          {name}
-        />
-        <span class="checkbox">
-          <!-- if add-new-card flow and recurring -->
-          {#if $showSavedCardTooltip && isRecurring()}
-            <Tooltip
-              align={['top', 'right']}
-              className="subscription-flow-save-card-tooltip"
-              shown={$showSavedCardTooltip}
-            >
-              {$t(SAVED_CARD_CHECKBOX_TOOLTIP)}
-            </Tooltip>
-          {/if}
-        </span>
-      </div>
-      <div
-        class:recurring-card-text={Boolean(isRecurring()) &&
-          modalType === 'add-new-card'}
-      >
-        <!-- LABEL: Keep card saved for future payments -->
-        <span
-          class="saved-card-text"
-          class:saved-card-text-saved-card-screen={Boolean(savedcard)}
-          class:saved-card-text-for-add-card={modalType === 'add-new-card'}
-          class:saved-card-text-for-recurring={Boolean(isRecurring())}
-        >
-          {#if modalType === 'add-new-card'}
-            {$t(SAVE_CARD_TEXT_NEW_CARD)}
-            <!-- Only for recurring payments show the subtitle/helper text -->
-            {#if isRecurring()}
-              <!-- For subscription links message is different -->
-              {#if isSubscription()}
-                <div class="save-card-subtext">
-                  {formatTemplateWithLocale(
-                    merchantName
-                      ? 'card.save_card_know_more_add_card_modal_subtitle_subscription'
-                      : 'card.save_card_know_more_add_card_modal_subtitle_subscription_without_merchant_name',
-                    { merchantName },
-                    $locale
-                  )}
-                </div>
-              {:else}
-                <!-- For caw links message is different -->
-                <div class="save-card-subtext">
-                  {formatTemplateWithLocale(
-                    !merchantName || !maxAmount
-                      ? 'card.save_card_know_more_add_card_modal_subtitle_caw_without_merchant_name'
-                      : 'card.save_card_know_more_add_card_modal_subtitle_caw',
-                    { merchantName, maxAmount },
-                    $locale
-                  )}
-                </div>
-              {/if}
-            {/if}
-          {:else}
-            {$t(SAVE_CARD_TEXT)}
-          {/if}
-        </span>
-      </div>
-    </div>
+    <input
+      type="checkbox"
+      class="checkbox--square"
+      id={name}
+      value="1"
+      on:focus
+      on:change={trackUserConsentForTokenization}
+      on:change
+      bind:checked
+      {name}
+    />
+    <span class="checkbox" />
+    <!-- LABEL: Keep card saved for future payments -->
+    <span
+      class="saved-card-text"
+      class:saved-card-text-saved-card-screen={Boolean(savedcard)}
+      class:saved-card-text-for-add-card={modalType === 'add-new-card'}
+    >
+      {#if modalType === 'add-new-card'}
+        {$t(SAVE_CARD_TEXT_NEW_CARD)}
+      {:else}
+        {$t(SAVE_CARD_TEXT)}
+      {/if}</span
+    >
   </label>
   <span
     class="know-more-text"
     class:know-more-text-saved-cards={Boolean(savedcard)}
     class:know-more-text-add-card={modalType === 'add-new-card'}
-    class:know-more-text-recurring={Boolean(isRecurring())}
   >
     <span on:click={showSecureCardKnowMoreDialog} class="cusor-pointer">
       {$t(KNOW_MORE)}
@@ -214,16 +146,11 @@
     line-height: 12px;
     color: #373737;
   }
-
   .saved-card-text-for-add-card {
     font-size: 14px;
     line-height: 14px;
+    margin-left: 5px;
   }
-
-  .saved-card-text-for-add-card.saved-card-text-for-recurring {
-    font-size: 12px;
-  }
-
   .saved-card-text-saved-card-screen {
     margin-left: 5px;
   }
@@ -237,15 +164,10 @@
     text-decoration: underline;
     cursor: pointer;
   }
-
   .know-more-text-add-card {
     font-size: 14px;
     line-height: 14px;
     margin-left: 30px;
-  }
-
-  .know-more-text-add-card.know-more-text-recurring {
-    font-size: 12px;
   }
 
   .know-more-text-saved-cards {
@@ -266,9 +188,6 @@
     cursor: pointer;
   }
 
-  .recurring-card-text {
-    line-height: 0px;
-  }
   .save_card_label_text {
     display: block;
     margin-bottom: 5px;
@@ -276,35 +195,7 @@
     margin-left: 30px;
   }
 
-  .save_card_label_text.save-card-label-recurring {
-    margin-bottom: 2px;
-  }
-
   .save_card_label_text .checkbox {
     margin-left: -30px;
-  }
-
-  .save-card-container {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .save-card-subtext {
-    font-size: 12px;
-    color: #8895a8;
-  }
-
-  :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-bottom.tooltip-right) {
-    opacity: 0.9;
-    width: auto;
-    white-space: nowrap;
-    line-height: 14px;
-  }
-
-  :global(.tooltip.subscription-flow-save-card-tooltip.tooltip-shown.tooltip-top.tooltip-right) {
-    opacity: 0.9;
-    width: auto;
-    white-space: nowrap;
-    line-height: 14px;
   }
 </style>

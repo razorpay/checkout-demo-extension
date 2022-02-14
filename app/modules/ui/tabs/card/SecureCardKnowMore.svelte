@@ -1,19 +1,15 @@
 <script>
   // Utils imports
   import Icon from 'ui/elements/Icon.svelte';
+  import padlock from 'card/icons/padlock';
   import circleTick from 'card/icons/circle-tick';
-  import shield from 'card/icons/shield';
-  import { getOption, isRecurring, isSubscription } from 'razorpay';
-  import { formatTemplateWithLocale } from 'i18n';
-
   // reusing the existing one
   import close from 'one_click_checkout/coupons/icons/close.js';
   // i18n
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   // Export Statements
   export let onClick, modalType;
-  export let merchantName = getOption('name');
 
   // i18n labels
   import {
@@ -22,9 +18,7 @@
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE,
-    SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
-    SAVED_CARD_KNOW_MORE_CAW_CONTENT,
   } from 'ui/labels/card';
 </script>
 
@@ -43,35 +37,7 @@
   </div>
   <div class="secure-card-know-more-content">
     {#if modalType === 'add-new-card'}
-      <!-- If recurring -->
-      {#if isRecurring()}
-        <div class="recurring-know-more-container">
-          <div class="recurring-shield">
-            <Icon icon={shield()} />
-          </div>
-          <div>
-            <p>
-              {formatTemplateWithLocale(
-                merchantName
-                  ? 'card.save_card_know_more_add_card_modal_content_recurring'
-                  : 'card.save_card_know_more_add_card_modal_content_recurring_without_merchant_name',
-                { merchantName },
-                $locale
-              )}
-            </p>
-
-            {#if isSubscription()}
-              <!-- If recurring and subscription -->
-              <p>{$t(SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT)}</p>
-            {:else}
-              <!-- If recurring and !subscription i.e caw-->
-              <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
-            {/if}
-          </div>
-        </div>
-      {:else}
-        <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1)}</p>
-      {/if}
+      <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1)}</p>
     {:else}
       <p>{$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT)}</p>
 
@@ -100,12 +66,7 @@
     text-align: start;
     padding: 20px;
   }
-  .recurring-know-more-container {
-    display: flex;
-  }
-  .recurring-shield {
-    margin: 14px 6px 0px 0px;
-  }
+
   .secure-card-know-more-header {
     display: flex;
     justify-content: space-between;

@@ -61,9 +61,6 @@ export function isRecurring() {
 export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
-export function isSubscription() {
-  return isRecurring() && getPreferences('subscription');
-}
 /**
  * Offers related helper function
  */

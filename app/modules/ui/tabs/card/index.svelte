@@ -39,7 +39,6 @@
     selectedCardFromHome,
     defaultDCCCurrency,
     cardCountry,
-    showSavedCardTooltip,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -566,12 +565,6 @@
   }
 
   export function showAddCardView() {
-    /**
-     * IMPORTANT NOTE
-     * Need to set showSavedCardTooltip to false right before showing
-     * Add card screen. Please don't change the order
-     */
-    $showSavedCardTooltip = false;
     Events.Track(CardEvents.HIDE_SAVED_CARDS);
     setView(Views.ADD_CARD);
   }
@@ -647,10 +640,6 @@
     }
     // TODO: Fix session.customer usage when customer is moved to store.
     return getSavedCardsFromCustomer(session.getCurrentCustomer());
-  }
-
-  export function isOnAddCardScreen() {
-    return currentView === Views.ADD_CARD;
   }
 
   export function isOnSavedCardsScreen() {
@@ -1133,7 +1122,7 @@
           isAVS={currentView === Views.AVS}
         />
       {/if}
-      {#if isRecurring() && currentView !== Views.ADD_CARD}
+      {#if isRecurring()}
         <Callout>
           {#if !session.subscription}
             <!-- LABEL: Future payments on this card will be charged automatically. -->

@@ -12,7 +12,6 @@
     selectedCard,
     currentAuthType,
     currentCvv,
-    showSavedCardTooltip,
   } from 'checkoutstore/screens/card';
 
   // Utils
@@ -46,12 +45,6 @@
       return;
     }
 
-    /**
-     * IMPORTANT NOTE
-     * Please don't the showSavedCardTooltip = false statement after dispatch
-     * It creates wierd bug in saved card flow, in which multiple cards remain selected
-     */
-    $showSavedCardTooltip = false;
     Analytics.track('saved_card:select', {
       type: AnalyticsTypes.BEHAV,
       data: {

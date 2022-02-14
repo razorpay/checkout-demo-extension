@@ -31,7 +31,7 @@ describe('RecurringCardsCallout.svelte', () => {
     it('Limited cards support', () => {
       const { getByText } = render(RecurringCardsCallout);
       const label =
-        "Only limited cards support recurring payments as per RBI's new regulations.";
+        'Only limited cards support recurring payments due to new payment regulations by RBI.';
       expect(getByText(label)).toBeInTheDocument();
     });
 
