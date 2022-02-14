@@ -20,7 +20,6 @@
   // Utils
   import { getIcon } from 'icons/network';
   import { formatMessageWithLocale } from 'i18n';
-  import { isIndianCustomer } from 'checkoutstore';
 
   export let value = '';
   export let type = null;
@@ -48,12 +47,7 @@
     (value && helpText) || (!valid ? getHelpText($locale) : undefined);
 
   function getHelpText(locale) {
-    if (
-      $isIndianCustomer && // Card ristricutions are for domestic users only
-      recurring &&
-      value &&
-      !isCardSupportedForRecurring
-    ) {
+    if (recurring && value && !isCardSupportedForRecurring) {
       // LABEL: Card does not support recurring payments.
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
     }
