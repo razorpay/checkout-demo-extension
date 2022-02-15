@@ -11,7 +11,7 @@ const EXTENDERS = {
     }
 
     // Find a token with the same VPA as the handle
-    const tokenWithSameVpa = _Arr.find(tokens, (token) => {
+    const tokenWithSameVpa = tokens.find((token) => {
       if (token.method !== 'upi') {
         return false;
       }

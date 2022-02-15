@@ -22,5 +22,5 @@ export const getCardByTokenId = (tokens, tokenId) => {
   if (!tokens.items) {
     return null;
   }
-  return _Arr.find(tokens.items, (token) => token.id === tokenId);
+  return tokens.items.find((token) => token.id === tokenId);
 };

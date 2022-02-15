@@ -34,8 +34,7 @@ export function setUpiApps(apps) {
   }, []);
   const unusedApps = apps.filter(
     (app) =>
-      !_Arr.find(
-        filteredUniqueApps,
+      !filteredUniqueApps.find(
         (filteredApp) => filteredApp.package_name === app.package_name
       )
   );

@@ -458,11 +458,9 @@ function getRewardsParams(razorpayInstance) {
 
 function updateOptions(preferences) {
   // Get amount
-  const orderKey =
-    ['order', 'invoice', 'subscription']
-    |> _Arr.find(
-      (key) => preferences[key] && _.isNumber(preferences[key].amount)
-    );
+  const orderKey = ['order', 'invoice', 'subscription'].find(
+    (key) => preferences[key] && _.isNumber(preferences[key].amount)
+  );
 
   if (orderKey) {
     const order = preferences[orderKey];

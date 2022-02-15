@@ -209,6 +209,33 @@
 })();
 
 /**
+ * Polyfill for Array.prototype.find
+ */
+
+(function () {
+  if (!Array.prototype.flatMap) {
+    Array.prototype.flatMap = function (callback, thisArg) {
+      var self = thisArg || this;
+      var list = [];
+
+      // 1. Let O be ? ToObject(this value).
+      var o = Object(self);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      for (var k = 0; k < len; ++k) {
+        if (k in o) {
+          var part_list = callback.call(self, o[k], k, o);
+          list = list.concat(part_list);
+        }
+      }
+      return list;
+    };
+  }
+})();
+
+/**
  * Polyfill for Object.assign
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
  */

@@ -2804,12 +2804,13 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(
-          MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOffer),
-          function (p) {
-            return p.duration === emiDuration;
-          }
-        );
+        var plan = MethodStore.getEMIBankPlans(
+          bank,
+          'credit',
+          !isEmiOffer
+        ).find(function (p) {
+          return p.duration === emiDuration;
+        });
         if (
           plan &&
           offer.id &&
@@ -3553,7 +3554,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3673,7 +3674,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3757,7 +3758,7 @@ Session.prototype = {
         },
 
         select: function (value) {
-          var plan = _Arr.find(plans, function (plan) {
+          var plan = plans.find(function (plan) {
             return plan.duration === value;
           });
 

@@ -232,10 +232,7 @@ const INSTRUMENT_TO_SELECT_HANDLERS = {
     const instruments = _getAllInstrumentsForOffer(offer);
 
     // Try choosing instrument for entire method
-    const methodInstrument = _Arr.find(
-      instruments,
-      isInstrumentForEntireMethod
-    );
+    const methodInstrument = instruments.find(isInstrumentForEntireMethod);
 
     if (methodInstrument) {
       return methodInstrument;

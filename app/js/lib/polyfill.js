@@ -76,6 +76,26 @@ if (!Array.prototype.findIndex) {
     return -1;
   };
 }
+
+/**
+ * ref: https://github.com/jsPolyfill/Array.prototype.find/blob/master/find.js
+ */
+
+if (!Array.prototype.find) {
+  Array.prototype.find = function (callback) {
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function');
+    }
+
+    var thisVal = arguments[1] || this;
+    for (var i = 0; i < this.length; i++) {
+      if (callback.call(thisVal, this[i], i, this)) {
+        return this[i];
+      }
+    }
+  };
+}
+
 // Ref: https://blog.bitsrc.io/lets-implement-our-own-array-map-sort-methods-e89c9d5e2dc8
 if (!Array.prototype.filter) {
   Array.prototype.filter = function (cb) {

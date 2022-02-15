@@ -142,10 +142,7 @@ export const selectedInstrumentId = writable(null);
 export const selectedInstrument = derived(
   [instruments, selectedInstrumentId],
   ([$instruments = [], $selectedInstrumentId = null]) =>
-    _Arr.find(
-      $instruments,
-      (instrument) => instrument.id === $selectedInstrumentId
-    )
+    $instruments.find((instrument) => instrument.id === $selectedInstrumentId)
 );
 
 /**
