@@ -232,8 +232,6 @@ export default {
     save_card_text: 'Keep card saved for future payments',
     save_card_text_new_card: 'Save card securely for future payments',
     know_more: 'Know More',
-    card_tokenization_deadline_callout:
-      'Card will not be saved on Razorpay after Dec 31, 2021.',
     saved_card_label: 'Card ending with <b>{last4}<b>',
     saved_card_checkbox_tooltip: 'Required for recurring payments',
     subscription_callout:

@@ -27,7 +27,6 @@
     NOCVV_LABEL,
     AUTH_TYPE_PIN,
     AUTH_TYPE_OTP,
-    CARD_TOKENIZATION_DEADLINE_CALLOUT,
   } from 'ui/labels/card';
 
   import {
@@ -198,9 +197,7 @@
       {/if}
     </div>
   </div>
-  {#if !isTokenised && !selected}<div class="saved-middle">
-      {$t(CARD_TOKENIZATION_DEADLINE_CALLOUT)}
-    </div>{/if}
+
   {#if collectCardTokenisationConsent}
     <div class="saved-cards-tokenisation-consent">
       <SecureCard
@@ -329,13 +326,5 @@
     font-size: 16px;
     font-weight: 500;
     margin-left: 2px;
-  }
-  .saved-middle {
-    line-height: 10px;
-    font-size: 10px;
-    opacity: 0.5;
-    padding-left: 48px;
-    margin-top: -10px;
-    margin-bottom: 5px;
   }
 </style>
