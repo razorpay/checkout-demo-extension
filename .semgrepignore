@@ -8,3 +8,5 @@
 /app/modules/handlers/common.js
 /mock-api/
 /cfu/
+/app/modules/checkoutframe/search.js
+/app/modules/checkoutjs/frame.js
