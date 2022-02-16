@@ -1,4 +1,5 @@
-/blackbox
+/blackbox/
+/scripts/
 /app/js/checkout-frame/session.js
 /app/js/lib
 /app/modules/analytics/base-analytics.js
