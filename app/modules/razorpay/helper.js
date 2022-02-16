@@ -61,13 +61,15 @@ export function isRecurring() {
 export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
+export function isSubscription() {
+  return isRecurring() && getPreferences('subscription');
+}
 /**
  * Offers related helper function
  */
 export const getMerchantOffers = () => {
   // Ignore all offers ( including forced offers ) in case of partial payments.
-  // Ignore offers for 1CC. Not supported in 1CC
-  if (isPartialPayment() || isOneClickCheckout()) {
+  if (isPartialPayment()) {
     return [];
   }
   // Temporary fix: If customer-feebearer do not show any offers to the user.
@@ -260,3 +262,5 @@ export const isGoogleAnalyticsEnabled = () =>
 export const isFacebookAnalyticsEnabled = () =>
   getPreferences('features.one_cc_fb_analytics') ||
   getOption('enable_fb_analytics');
+
+export const getCustomerCart = () => getOption('customer_cart');

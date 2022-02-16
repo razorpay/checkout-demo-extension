@@ -76,7 +76,9 @@ function hasOnlyAllowedKeys(instrument) {
   }
 
   // Removing 'method' because it is a common key
-  const instrumentKeys = instrument |> _Obj.keys |> _Arr.remove('method');
+  const instrumentKeys = Object.keys(instrument).filter(
+    (key) => key !== 'method'
+  );
 
   // None of the instrumentKeys should be absent from allowedKeys
   const anyAbsent = instrumentKeys.some(

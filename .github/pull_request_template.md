@@ -6,7 +6,7 @@
 
 | Details                             | Description                               |
 | ----------------------------------- | ----------------------------------------- |
-| JIRA ticket                         | https://jira.corp.razorpay.com/browse/CE- |
+| JIRA ticket                         | https://razorpay.atlassian.net/browse/CE- |
 | Slack thread                        | N/A                                       |
 | Design source                       | N/A                                       |
 | Tech Specs                          | N/A                                       |

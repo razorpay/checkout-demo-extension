@@ -15,7 +15,7 @@ jobs:
       AWS_REGION_FOR_BUILD: ap-south-1
       AWS_ACCESS_KEY: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
       AWS_ACCESS_SECRET: ${{ secrets.STAGE_AWS_SECRET_KEY }}
-      BUCKET_BASE_BATH_FOR_BRANCH: checkout/builds/branch-builds
+      BUCKET_BASE_PATH_FOR_BRANCH: checkout/builds/branch-builds
       RUN_BUILD_NUMBER: ${{ github.run_id }}
       GIT_COMMIT_HASH: ${{ github.sha }}
     #if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -47,7 +47,7 @@ jobs:
           TRAFFIC_ENV: canary
           # build number prefix for canary: 1
           CURRENT_BUILD_NUMBER: '1${{ env.RUN_BUILD_NUMBER }}'
-          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_PATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
         uses: docker/build-push-action@v2
         with:
           file: ./Dockerfile
@@ -68,7 +68,7 @@ jobs:
           TRAFFIC_ENV: baseline
           # build number prefix for baseline: 2
           CURRENT_BUILD_NUMBER: '2${{ env.RUN_BUILD_NUMBER }}'
-          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_PATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
         # skip build if canary is failed
         if: steps.canary_build.outcome == 'success'
         uses: docker/build-push-action@v2

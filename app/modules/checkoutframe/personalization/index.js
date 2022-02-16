@@ -310,7 +310,7 @@ function updateInstrumentForCustomer(instrument, customer) {
 
   // Replace existing instrument with new one
   if (existing) {
-    instruments = _Arr.remove(instruments, existing);
+    instruments = instruments.filter((item) => item !== existing);
   }
   instruments.push(instrument);
 

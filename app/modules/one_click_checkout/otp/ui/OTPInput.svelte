@@ -73,13 +73,44 @@
       $digits[index - 1] = '';
     }
   }
+
+  // Method to handle paste functionality in OTP
+  function otpPaste(e) {
+    e.preventDefault();
+    const otpLength = $digits.length;
+    /* Currently we are getting position of OTP Input as otp|[position]
+    in id. Added a split function to identify the actual position */
+    const currentInput = Number(e?.target?.id?.split('|')[1]);
+    // In case we are not getting current
+    if (isNaN(currentInput)) {
+      return;
+    }
+
+    const pastedData = e.clipboardData
+      .getData('text/plain')
+      .replace(/[^\d]/g, '')
+      .slice(0, otpLength - currentInput)
+      .split('');
+
+    const nextActiveInput = currentInput + pastedData.length - 1;
+
+    for (let pos = 0; pos < otpLength; ++pos) {
+      if (pos >= currentInput && pastedData.length > 0) {
+        $digits[pos] = pastedData.shift();
+      }
+    }
+
+    onOtpDigitInput(e, nextActiveInput);
+    otpContainer.children[nextActiveInput].focus();
+  }
 </script>
 
 <!-- TODO: Figure out autofill. -->
 <div class="otp-container" bind:this={otpContainer} class:hidden id="otp-input">
   {#each $digits as _, i}
     <input
-      id={`otp[${i}]`}
+      data-testid={`otp[${i}]`}
+      id={`otp|${i}`}
       name="otp"
       type="tel"
       pattern="[0-9]"
@@ -91,6 +122,7 @@
       on:input={(e) => onOtpDigitInput(e, i)}
       on:keydown={(e) => onOtpDigitKeyDown(e, i)}
       autocomplete={i === 0 && autoCompleteMethod}
+      on:paste={otpPaste}
     />
   {/each}
 </div>

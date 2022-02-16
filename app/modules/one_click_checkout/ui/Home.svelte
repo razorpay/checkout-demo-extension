@@ -22,7 +22,10 @@
   import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    merchantFBStandardAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
     ACTIONS,
@@ -50,6 +53,9 @@
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,
+    });
+    merchantFBStandardAnalytics({
+      event: ACTIONS.INITIATECHECKOUT,
     });
     new Loader({
       target: discreet._Doc.querySelector('#one-cc-loader'),

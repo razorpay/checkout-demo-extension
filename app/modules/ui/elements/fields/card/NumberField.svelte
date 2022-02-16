@@ -21,6 +21,7 @@
   import { getIcon } from 'icons/network';
   import { formatMessageWithLocale } from 'i18n';
   import { isOneClickCheckout } from 'razorpay';
+  import { isIndianCustomer } from 'checkoutstore';
 
   export let value = '';
   export let type = null;
@@ -50,7 +51,12 @@
     (value && helpText) || (!valid ? getHelpText($locale) : undefined);
 
   function getHelpText(locale) {
-    if (recurring && value && !isCardSupportedForRecurring) {
+    if (
+      $isIndianCustomer && // Card ristricutions are for domestic users only
+      recurring &&
+      value &&
+      !isCardSupportedForRecurring
+    ) {
       // LABEL: Card does not support recurring payments.
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
     }

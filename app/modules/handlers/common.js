@@ -1,7 +1,7 @@
-import * as MethodStore from 'checkoutstore/methods';
+import { getMerchantMethods } from 'razorpay';
 import { setBackdropClick } from 'checkoutstore/backdrop';
 import { wallets } from 'common/wallet';
-import Analytics from 'analytics';
+import Analytics, { Events } from 'analytics';
 import CardEvents from 'analytics/card';
 
 /**
@@ -100,12 +100,20 @@ export function updateActionAreaContentAndCTA(
   updateButton(errorMessageContainer, buttonLabel, onButtonClick);
 }
 
+/**
+ * Check if ajax error response contains any retry method
+ *
+ * @param {object} errorMetadata
+ * @returns boolean
+ */
 export function hasPaypalOptionInErrorMetadata(errorMetadata) {
   if (!errorMetadata || typeof errorMetadata !== 'object') {
     return false;
   }
 
   let hasPaypal = false;
+
+  const isPaypalWalletEnabled = getMerchantMethods()?.wallet?.paypal;
 
   if (Array.isArray(errorMetadata.next)) {
     errorMetadata.next.forEach((retryMethod) => {
@@ -121,32 +129,13 @@ export function hasPaypalOptionInErrorMetadata(errorMetadata) {
       }
     });
   }
-  return hasPaypal;
-}
 
-/**
- * Check if ajax error response contains any retry method
- *
- * @param {object} errorMetadata
- * @returns boolean
- */
-export function shouldRetryWithPaypal(errorMetadata) {
-  if (!errorMetadata || typeof errorMetadata !== 'object') {
-    return false;
-  }
-
-  const isPaypalEnabled =
-    MethodStore.getWallets().filter(function (wallet) {
-      return wallet.code === wallets.paypal.code;
-    }).length > 0;
-
-  Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_ENABLED, {
-    data: {
-      paypalEnable: isPaypalEnabled,
-    },
+  Events.Track(CardEvents.PAYPAL_RETRY_PAYPAL_ENABLED, {
+    paypalInErrorCode: hasPaypal,
+    isPaypalWalletEnabled,
   });
 
-  return isPaypalEnabled && hasPaypalOptionInErrorMetadata(errorMetadata);
+  return isPaypalWalletEnabled && hasPaypal;
 }
 
 /**
@@ -160,7 +149,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
 
   var existingPaypalContainer = document.querySelector('#fd-paypal-container');
 
-  if (!shouldRetryWithPaypal(errorMetadata)) {
+  if (!hasPaypalOptionInErrorMetadata(errorMetadata)) {
     // Remove Paypal container and show retry button
     if (existingPaypalContainer) {
       existingPaypalContainer.parentNode.removeChild(existingPaypalContainer);
@@ -226,7 +215,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     errorMessageContainer.appendChild(paypalContainer);
 
     cancelBtn.addEventListener('click', function () {
-      Analytics.track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK, {
+      Events.Track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK, {
         currentScreen: that.screen,
       });
       that.hideErrorMessage.call(that);

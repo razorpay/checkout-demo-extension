@@ -28,12 +28,10 @@ export function getEligibleBanksBasedOnMinAmount(amount, banks) {
       );
 
       if (eligiblePlans.length) {
-        eligible[bank] =
-          eligiblePlans
-          |> _Arr.reduce((o, plan) => {
-            o[plan.duration] = plan;
-            return o;
-          }, {});
+        eligible[bank] = eligiblePlans.reduce((o, plan) => {
+          o[plan.duration] = plan;
+          return o;
+        }, {});
       }
     }
   });

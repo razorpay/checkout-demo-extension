@@ -1,6 +1,12 @@
 function makeOptions(features, options) {
-  const { showCoupons, showAddress, mandatoryLogin, forceCOD, orderId } =
-    features;
+  const {
+    showCoupons,
+    showAddress,
+    mandatoryLogin,
+    forceCOD,
+    orderId,
+    callbackUrl,
+  } = features;
 
   options = {
     one_click_checkout: true,
@@ -10,6 +16,12 @@ function makeOptions(features, options) {
     force_cod: forceCOD,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
+
+  if (callbackUrl) {
+    options.callback_url =
+      'http://www.merchanturl.com/callback?test1=abc&test2=xyz';
+    options.redirect = true;
+  }
 
   return options;
 }

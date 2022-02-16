@@ -3,7 +3,7 @@
 name: 'Prod: Build & push to Harbor'
 
 # Controls when the action will run. Triggers the workflow on every push
-on: [deployment, push]
+on: [push]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-and-push-image:
@@ -14,8 +14,8 @@ jobs:
       AWS_REGION_FOR_BUILD: ap-south-1
       AWS_ACCESS_KEY: ${{ secrets.STAGE_AWS_ACCESS_KEY }}
       AWS_ACCESS_SECRET: ${{ secrets.STAGE_AWS_SECRET_KEY }}
-      BUCKET_BASE_BATH_FOR_BRANCH: checkout/builds/branch-builds
-      BUCKET_BASE_BATH_FOR_COMMIT: checkout/builds/commit-builds
+      BUCKET_BASE_PATH_FOR_BRANCH: checkout/builds/branch-builds
+      BUCKET_BASE_PATH_FOR_COMMIT: checkout/builds/commit-builds
       RUN_BUILD_NUMBER: ${{ github.run_id }}
       GIT_COMMIT_HASH: ${{ github.sha }}
 
@@ -45,8 +45,8 @@ jobs:
         env:
           # build number prefix for master: null
           CURRENT_BUILD_NUMBER: '${{ env.RUN_BUILD_NUMBER }}'
-          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_BATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
-          BUILD_PATH_FOR_COMMIT: '${{ env.BUCKET_BASE_BATH_FOR_COMMIT }}/${{ env.GIT_COMMIT_HASH }}'
+          BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_PATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
+          BUILD_PATH_FOR_COMMIT: '${{ env.BUCKET_BASE_PATH_FOR_COMMIT }}/${{ env.GIT_COMMIT_HASH }}'
         uses: docker/build-push-action@v2
         with:
           file: ./Dockerfile

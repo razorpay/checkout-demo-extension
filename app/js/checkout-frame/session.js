@@ -881,7 +881,7 @@ Session.prototype = {
     Header.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function (amount, fee) {
-    if (fee) {
+    if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
@@ -2855,7 +2855,7 @@ Session.prototype = {
       if (offer && offer.issuer && offer.payment_method === 'card') {
         var cardApps = discreet.Apps.getAppsForMethod('card') || [];
         var isCardAppOffer =
-          _Arr.findIndex(cardApps, function (app) {
+          cardApps.findIndex(function (app) {
             return app === offer.issuer;
           }) !== -1;
         if (isCardAppOffer && MethodStore.isApplicationEnabled(offer.issuer)) {
@@ -2972,12 +2972,9 @@ Session.prototype = {
         : ''
     );
     if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
-      var originalAmount = storeGetter(discreet.ChargesStore.cartAmount);
-      $('#amount .original-amount').html(
-        hasDiscount
-          ? discreet.Currency.formatAmountWithSymbol(originalAmount, currency)
-          : discreet.Currency.formatAmountWithSymbol(amount, currency)
-      );
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount')[0].removeAttribute('style');
     }
     Cta.setAppropriateCtaText();
     Header.updateAmountFontSize();
@@ -3099,6 +3096,9 @@ Session.prototype = {
         this.switchTab('home-1cc');
         Cta.showCta();
         this.topBar.hide();
+        if ($('#amount .original-amount')[0]) {
+          $('#amount .original-amount')[0].removeAttribute('style');
+        }
         return;
       }
     } else {
@@ -4009,8 +4009,7 @@ Session.prototype = {
 
     if (this.screen === 'otp') {
       if (
-        this.ajaxErrorMetadata &&
-        CommonHandlers.shouldRetryWithPaypal(this.ajaxErrorMetadata)
+        CommonHandlers.hasPaypalOptionInErrorMetadata(this.ajaxErrorMetadata)
       ) {
         return this.commenceOTP(text, undefined, {}, 'paypal', loadingState);
       }
@@ -4787,6 +4786,43 @@ Session.prototype = {
           return;
         }
       } else if (this.checkInvalid()) {
+        return;
+      }
+
+      //
+      // 1. If Payment is Recurring &&
+      // 2. Customer is Indian
+      // 3. If on add card screen and save card checkbox is not checked
+      // 4. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
+      // ==> Shake the form and show tooltip on checkbox
+      var isRecurring = RazorpayHelper.isRecurring();
+      var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+      var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+
+      // For saved card screen consent is maintained elsewhere
+      var rememberCardCheck = discreet.storeGetter(
+        isSavedCardScreen
+          ? CardScreenStore.userConsentForTokenization
+          : CardScreenStore.remember
+      );
+
+      var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+      var selectedCardConsent = selectedCard && selectedCard.consent_taken;
+      var isSavedCardScreenAndConsentAlreadyTaken =
+        isSavedCardScreen && selectedCardConsent;
+
+      if (
+        isRecurring &&
+        isDomesticCustomer &&
+        !rememberCardCheck &&
+        !isSavedCardScreenAndConsentAlreadyTaken
+      ) {
+        var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
+        Form.shake();
+        showSavedCardTooltip.update(function () {
+          return true;
+        });
+
         return;
       }
     } else if (selectedInstrument) {
@@ -5957,7 +5993,13 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+    var offer = this.getAppliedOffer();
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
 
+    if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
+      data.amount =
+        data.amount + storeGetter(discreet.ChargesStore.offerAmount);
+    }
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
     }

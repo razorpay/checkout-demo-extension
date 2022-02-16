@@ -437,14 +437,12 @@ export function getInstrumentMeta(instrument) {
     meta.indexOfBlock = _Arr.indexOf(allBlocks, block) + 1;
 
     meta.indexInBlock =
-      _Arr.findIndex(
-        block.instruments,
+      block.instruments.findIndex(
         (blockInstrument) => blockInstrument.id === instrument.id
       ) + 1;
 
     meta.indexInInstruments =
-      _Arr.findIndex(
-        storeGetter(instruments),
+      storeGetter(instruments).findIndex(
         (storeInstrument) => storeInstrument.id === instrument.id
       ) + 1;
 

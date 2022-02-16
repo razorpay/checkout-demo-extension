@@ -25,10 +25,12 @@
 
   $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
   onMount(() => {
-    Analytics.track('RTB:show', {
-      type: AnalyticsTypes.RENDER,
-      data: getTrustedBadgeAnaltyicsPayload(),
-    });
+    if (sendAnalytics) {
+      Analytics.track('RTB:show', {
+        type: AnalyticsTypes.RENDER,
+        data: getTrustedBadgeAnaltyicsPayload(),
+      });
+    }
   });
 
   let list;
@@ -43,15 +45,18 @@
 
   export let isInfoVisible = false;
 
+  export let sendAnalytics = true;
   function handleInfoClicked() {
     isInfoVisible = !isInfoVisible;
-    Analytics.track('RTB:click', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        highlightsVisible: isInfoVisible,
-        ...getTrustedBadgeAnaltyicsPayload(),
-      },
-    });
+    if (sendAnalytics) {
+      Analytics.track('RTB:click', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          highlightsVisible: isInfoVisible,
+          ...getTrustedBadgeAnaltyicsPayload(),
+        },
+      });
+    }
   }
 </script>
 
@@ -63,6 +68,7 @@
           class="trusted-badge-header-section"
           class:active={isInfoVisible}
           on:click={handleInfoClicked}
+          data-testid="trusted-badge"
         >
           <i slot="icon">
             <TrustedBadgeIcon />
@@ -81,7 +87,12 @@
           </div>
         </div>
         {#if isInfoVisible}
-          <div class="trusted-badge-info-section" in:fade out:fade>
+          <div
+            data-testid="trusted-badge-info"
+            class="trusted-badge-info-section"
+            in:fade
+            out:fade
+          >
             {#each list as point, i}
               <div class="trusted-badge-list-item">
                 <div

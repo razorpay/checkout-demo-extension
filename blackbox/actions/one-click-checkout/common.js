@@ -176,7 +176,7 @@ async function handleFeeSummary(context, features) {
 async function handleTypeOTP(context, otpValue = '000008') {
   await context.page.waitForSelector('#otp-input');
   for (const [index, value] of otpValue.split('').entries()) {
-    await context.page.type(`input[id="otp[${index}]"]`, value);
+    await context.page.type(`input[data-testid="otp[${index}]"]`, value);
   }
 }
 

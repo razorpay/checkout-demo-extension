@@ -3,8 +3,9 @@ import { trackAvailabilty } from './availability';
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-const map62 =
-  base62Chars |> _Arr.reduce((map, chr, i) => _Obj.setProp(map, chr, i), {});
+const map62 = base62Chars
+  .split('')
+  .reduce((map, chr, i) => _Obj.setProp(map, chr, i), {});
 
 function toBase62(number) {
   var rixit;
@@ -233,9 +234,10 @@ export default function Track(r, event, data, immediately) {
      * to object
      */
 
-    options.external_wallets =
-      externalWallets
-      |> _Arr.reduce((acc, wallet) => acc |> _Obj.setProp(wallet, true), {});
+    options.external_wallets = externalWallets.reduce(
+      (acc, wallet) => acc |> _Obj.setProp(wallet, true),
+      {}
+    );
 
     if (_uid) {
       properties.local_order_id = _uid;

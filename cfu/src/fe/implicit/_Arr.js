@@ -201,19 +201,6 @@ export const append = _.curry2((array, member) => {
 });
 
 /**
- * Returns an array with the member
- * removed from the original array.
- * Does not modify the original array.
- * @param {Array} array
- * @param {Any} member
- *
- * @returns {Array}
- */
-export const remove = _.curry2((array, member) =>
-  filter(array, (item) => item !== member)
-);
-
-/**
  * Returns the first item of the array.
  * @param {Array} array
  *

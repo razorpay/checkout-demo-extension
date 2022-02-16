@@ -439,10 +439,10 @@ CheckoutFrame.prototype = {
     const { event, category, params = {} } = data;
     if (window?.fbq && typeof window.fbq === 'function') {
       this.rzp.set('enable_fb_analytics', true);
-      window.fbq('track', event, {
-        page: category,
-        ...params,
-      });
+      if (category) {
+        params.page = category;
+      }
+      window.fbq('track', event, params);
     }
   },
 

@@ -484,14 +484,10 @@ export function getCardNetworksForRecurring(type) {
       const codes = _Arr.map(networks, findCodeByNetworkName);
 
       // ["mastercard", "visa"] to { mastercard: true, visa: true }
-      return _Arr.reduce(
-        codes,
-        (acc, code) => {
-          acc[code] = true;
-          return acc;
-        },
-        {}
-      );
+      return codes.reduce((acc, code) => {
+        acc[code] = true;
+        return acc;
+      }, {});
     }
   }
 }

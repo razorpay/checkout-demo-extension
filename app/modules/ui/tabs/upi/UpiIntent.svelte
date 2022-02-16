@@ -53,7 +53,7 @@
     if (apps.length <= 5 || showAll) {
       showableApps = apps;
     } else {
-      showableApps = _Arr.slice(apps, 0, 4);
+      showableApps = apps.slice(0, 4);
     }
   }
 

@@ -38,7 +38,10 @@
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isOneClickCheckout } from 'razorpay';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    merchantFBStandardAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import {
     isDCCEnabled,
     isDynamicFeeBearer,
@@ -53,6 +56,7 @@
 
   import { getUPIIntentApps } from 'checkoutstore/native';
   import { blocks } from 'checkoutstore/screens/home';
+  import { showOffers as showMethodOffers } from 'checkoutstore/offers';
 
   // i18n
   import {
@@ -82,6 +86,7 @@
     getPrefilledEmail,
     isEmailOptional,
     isContactEmailOptional,
+    getMerchantOffers,
   } from 'razorpay';
 
   import {
@@ -609,8 +614,7 @@
       sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
       // Get the methods for which a preferred instrument was shown
-      const preferredMethods = _Arr.reduce(
-        setPreferredInstruments,
+      const preferredMethods = setPreferredInstruments.reduce(
         (acc, instrument) => {
           acc[`_${instrument.method}`] = true;
           return acc;
@@ -724,6 +728,9 @@
   }
 
   export function codActions() {
+    if (isOneClickCheckout() && getMerchantOffers()?.length) {
+      showMethodOffers.set(true);
+    }
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,
@@ -735,6 +742,9 @@
       params: {
         page_title: CATEGORIES.PAYMENT_METHODS,
       },
+    });
+    merchantFBStandardAnalytics({
+      event: ACTIONS.ADDPAYMENTINFO,
     });
     if (isMethodEnabled('cod')) {
       Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });

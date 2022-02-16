@@ -41,7 +41,7 @@ function getAvailableDefaultMethods() {
 
   // Separate out debit and credit cards
   if (shouldSeparateDebitCard()) {
-    available = _Arr.remove(available, 'card');
+    available = available.filter((method) => method !== 'card');
     available = ['credit_card', 'debit_card'].concat(available);
   }
 
@@ -51,7 +51,7 @@ function getAvailableDefaultMethods() {
    * We do not want to show QR in the primary list
    * of payment options anymore
    */
-  available = _Arr.remove(available, 'qr');
+  available = available.filter((method) => method !== 'qr');
 
   // TODO: Filter based on amount
 
@@ -100,7 +100,9 @@ function removeNonApplicableInstrumentFlows(instrument) {
           _Arr.contains(instrument.types, 'credit') &&
           !getMerchantMethods().credit_card
         ) {
-          instrument.types = _Arr.remove(instrument.types, 'credit');
+          instrument.types = instrument.types.filter(
+            (type) => type !== 'credit'
+          );
         }
 
         // Check for debit cards
@@ -108,7 +110,9 @@ function removeNonApplicableInstrumentFlows(instrument) {
           _Arr.contains(instrument.types, 'debit') &&
           !getMerchantMethods().debit_card
         ) {
-          instrument.types = _Arr.remove(instrument.types, 'debit');
+          instrument.types = instrument.types.filter(
+            (type) => type !== 'debit'
+          );
         }
       }
 
