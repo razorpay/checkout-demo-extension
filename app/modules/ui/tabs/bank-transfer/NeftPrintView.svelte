@@ -16,6 +16,11 @@
     csdKey,
     csdDisclaimer,
   } from './challanConstants';
+  import {
+    isCustomChallan,
+    getCustomFields,
+    getCustomDisclaimers,
+  } from './helper';
 
   const {
     HEADER,
@@ -54,9 +59,12 @@
   const name = getOption('prefill.name');
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
+
+  const hasCustomDisclaimers = isCustomChallan('challan.disclaimers');
+  const hasCustomFields = isCustomChallan('challan.fields');
+
   let org_logo = rzpLogo;
   let tableDetails = {};
-
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
@@ -66,6 +74,9 @@
     }
     if (key === csdKey) {
       disclaimers.push({ text: csdDisclaimer, padding: 9 });
+    }
+    if (hasCustomDisclaimers) {
+      disclaimers = [...disclaimers, ...getCustomDisclaimers()];
     }
     if (!isHDFC) {
       labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
@@ -234,19 +245,29 @@
           );
         }
       }
-
+      if (hasCustomFields) {
+        let fields = getCustomFields();
+        for (let field of fields) {
+          addRow(
+            { text: field.title, bold: true, x: 15 },
+            { text: field.value, bold: false, x: 80 },
+            true
+          );
+        }
+      }
       addRow({ text: `${DISCLAIMER_LABEL}:`, bold: true, x: 15 });
-
-      addRow(null, null);
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null);
+      }
 
       for (let i = 0; i < disclaimers.length; i++) {
         const dis = disclaimers[i];
         const text = doc.splitTextToSize(`${i + 1}.) ${dis.text}`, 180);
         addRow({ text, bold: false, x: 15 }, null, false, 16, 0, dis.padding);
       }
-
-      addRow(null, null, true);
-
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null, true);
+      }
       addRow(
         { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 154 },
         null,
@@ -254,10 +275,10 @@
         12,
         12
       );
-
-      addRow(null, null, true);
-
-      addRow({ text: OFFICE_USE.header, bold: false, x: 15 });
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null, true);
+      }
+      addRow({ text: OFFICE_USE.header, bold: false, x: 80 });
 
       for (let i = 0; i < OFFICE_USE.list.length; i++) {
         addRow({ text: OFFICE_USE.list[i], bold: true, x: 15 });
