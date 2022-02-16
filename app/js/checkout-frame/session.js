@@ -2315,7 +2315,11 @@ Session.prototype = {
     var offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
     if (offer && offer.amount) {
-      this.updateAmountInHeaderForOffer(offer.amount);
+      if (RazorpayHelper.isOneClickCheckout()) {
+        this.updateAmountInHeaderForOffer(amount);
+      } else {
+        this.updateAmountInHeaderForOffer(offer.amount);
+      }
     }
   },
 
@@ -3928,6 +3932,11 @@ Session.prototype = {
         each(upiData, function (key, value) {
           data[key] = value;
         });
+      }
+
+      // For a QR Payment in 1CC Flow, set the amount.
+      if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
+        data.amount = this.payload.amount;
       }
 
       if (this.screen === 'wallet') {
