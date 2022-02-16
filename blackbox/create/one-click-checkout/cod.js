@@ -19,7 +19,7 @@ const {
 } = require('../../tests/homescreen/userDetailsActions');
 const { proceed } = require('../../tests/homescreen/sharedActions');
 const { delay } = require('../../util');
-const { submit } = require('../../actions/common');
+const { submit, expectRedirectWithCallback } = require('../../actions/common');
 const {
   handleCODPayment,
   checkDisabledCOD,
@@ -37,7 +37,9 @@ module.exports = function (testFeatures) {
     serviceable,
     codFee,
     isThirdWatchEligible,
+    callbackUrl,
   } = features;
+
   describe.each(
     getTestData(title, {
       options,
@@ -46,6 +48,7 @@ module.exports = function (testFeatures) {
   )('One Click Checkout COD test', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.cod = true;
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
