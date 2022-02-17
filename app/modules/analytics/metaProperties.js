@@ -34,5 +34,4 @@ export default {
   /** NVS FORM DATA */
   NVS_FORM_DATA: 'nvsFormData',
   RTB_EXPERIMENT_VARIANT: 'rtb_experiment_variant',
-  CUSTOM_CHALLAN: 'custom_challan',
 };

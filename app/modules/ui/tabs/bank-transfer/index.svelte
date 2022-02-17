@@ -14,7 +14,7 @@
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
   import { getSession } from 'sessionmanager';
-  import Analytics, { Events, MetaProperties } from 'analytics';
+  import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
   // UI imports
@@ -49,15 +49,6 @@
   import { t, locale } from 'svelte-i18n';
 
   import { formatTemplateWithLocale } from 'i18n';
-  import { getBankTransferUrl, setCustomChallanMetaProp } from './helper';
-  import {
-    BANK_TRANSFER_CHALLAN_PRINT,
-    BANK_TRANSFER_COPY_DETAILS,
-    BANK_TRANSFER_SUBMIT,
-    VIRTUAL_ACCOUNT_FAILURE,
-    VIRTUAL_ACCOUNT_SUCCESS,
-    BANK_TRANSFER_PDF_INIT_FAILURE,
-  } from './events';
 
   // adding 3rd party script for printing, adding here to not increase unnecessary bundle size
   function addScript(url, content) {
@@ -104,19 +95,19 @@
     const submitData = session.getPayload();
     const data = getPayloadForVirtualAccounts();
 
-    Analytics.track(BANK_TRANSFER_SUBMIT, {
+    Analytics.track('submit', {
       data: submitData,
     });
-    if (setCustomChallanMetaProp()) {
-      Events.setMeta(MetaProperties.CUSTOM_CHALLAN, true);
-    }
+
     Razorpay.sendMessage({
       event: 'submit',
       data: submitData,
     });
 
+    let url = makeAuthUrl(session.r, `orders/${order_id}/virtual_accounts`);
+
     fetch.post({
-      url: getBankTransferUrl(session.r, order_id),
+      url,
       data,
       callback: getNEFTDetails,
     });
@@ -124,17 +115,10 @@
 
   function getNEFTDetails(response) {
     if (response.error) {
-      Analytics.track(VIRTUAL_ACCOUNT_FAILURE, {
-        data: {
-          error: response.error.description,
-        },
-      });
       loading = false;
       error = response.error.description;
       return;
     }
-
-    Analytics.track(VIRTUAL_ACCOUNT_SUCCESS);
 
     let receivers = response.receivers;
 
@@ -167,7 +151,7 @@
 
   export function copyDetails() {
     copyToClipboard('.neft-details', neftDetails.innerText);
-    Analytics.track(BANK_TRANSFER_COPY_DETAILS, {
+    Analytics.track('bank_transfer:copy:click', {
       type: AnalyticsTypes.BEHAV,
     });
     copied = true;
@@ -193,18 +177,8 @@
           },
           target: document.getElementById('challan-wrapper'),
         });
-        Analytics.track(BANK_TRANSFER_CHALLAN_PRINT, {
-          type: AnalyticsTypes.BEHAV,
-        });
       })
-      .catch((err) => {
-        console.log(err);
-        Analytics.track(BANK_TRANSFER_PDF_INIT_FAILURE, {
-          data: {
-            error: err,
-          },
-        });
-      });
+      .catch((err) => console.log(err));
   }
 
   init();
