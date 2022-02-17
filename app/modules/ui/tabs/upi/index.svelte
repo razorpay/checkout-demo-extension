@@ -264,9 +264,7 @@
     const allApps = getUPIIntentApps().all;
 
     return instrument.apps
-      .map((app) =>
-        _Arr.find(allApps, (deviceApp) => deviceApp.package_name === app)
-      )
+      .map((app) => allApps.find((deviceApp) => deviceApp.package_name === app))
       .filter(Boolean);
   }
 
