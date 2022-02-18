@@ -35,6 +35,8 @@ import {
   checkWebPaymentsForApp,
 } from 'common/webPaymentsApi';
 
+import { isStandardCheckout } from 'common/helper';
+
 let CheckoutBridge = window.CheckoutBridge;
 
 const showModal = (session) => {
@@ -230,7 +232,8 @@ export const handleMessage = function (message) {
       Track(session.r, MiscEvents.OPEN);
     }
 
-    fetch.setKeylessHeader(session.r.get('keyless_header'));
+    // NOTE: call this before making any XHR or jsonp call
+    setParamsForDdosProtection(session);
 
     fetchPrefs(session);
   }
@@ -242,6 +245,26 @@ export const handleMessage = function (message) {
     }
   } catch (e) {}
 };
+
+/**
+ * Set all the necessary values to fetch, so that these values get
+ * appended on every XHR or jsonp request as query param
+ * @param {Object} session
+ */
+function setParamsForDdosProtection(session) {
+  fetch.setKeylessHeader(session.r.get('keyless_header'));
+
+  const qpmap = _.getQueryParams() |> _Obj.unflatten;
+
+  if (isStandardCheckout() && qpmap?.captcha_id) {
+    Analytics.setMeta('captcha_id', qpmap.captcha_id);
+  }
+
+  if (isStandardCheckout() && qpmap?.session_token) {
+    global.session_token = qpmap.session_token;
+    Analytics.setMeta('session_token_available', true);
+  }
+}
 
 function fetchPrefs(session) {
   if (session.isOpen) {
