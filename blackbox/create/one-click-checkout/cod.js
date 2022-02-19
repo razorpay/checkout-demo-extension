@@ -68,8 +68,8 @@ module.exports = function (testFeatures) {
         codFee,
       });
       await proceed(context);
-      await handleThirdWatchReq(context, isThirdWatchEligible);
       await handleUpdateOrderReq(context, options.order_id);
+      await handleThirdWatchReq(context, isThirdWatchEligible);
       await delay(200);
       if (isCODEligible) {
         features.isSelectCOD = true;

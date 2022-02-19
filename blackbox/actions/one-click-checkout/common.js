@@ -75,10 +75,10 @@ async function handleVerifyOTPReq(context, inValidOTP = false) {
 }
 
 async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
-  await context.getRequest(`/v1/tw/address/check_cod_eligibility`);
+  await context.getRequest(`/v1/1cc/check_cod_eligibility`);
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
-  expect(req.url).toContain('address/check_cod_eligibility');
+  expect(req.url).toContain('1cc/check_cod_eligibility');
   await context.respondJSON({ cod: isThirdWatchEligible });
   await delay(200);
 }

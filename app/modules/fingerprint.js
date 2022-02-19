@@ -126,9 +126,9 @@ try {
 } catch (e) {}
 
 export function getFingerprint() {
-  return fingerPrint;
+  return fingerPrint ?? null;
 }
 
 export function getDeviceId() {
-  return deviceId;
+  return deviceId ?? null;
 }

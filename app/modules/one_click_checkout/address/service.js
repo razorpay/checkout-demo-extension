@@ -7,6 +7,7 @@ import {
   getServiceabilityPayload,
   formatAddress,
   formatResults,
+  getDevicePayload,
 } from 'one_click_checkout/address/helpersExtra';
 // analytics import
 import { Events } from 'analytics';
@@ -178,16 +179,21 @@ export function thirdWatchCodServiceability(address) {
   const payload = {
     address: { ...formattedPayload, id: address.id ?? null },
     order_id: orderId,
+    device: getDevicePayload(),
   };
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     fetch.post({
-      url: makeUrl('tw/address/check_cod_eligibility'),
+      url: makeUrl('1cc/check_cod_eligibility'),
       data: payload,
       callback: (response) => {
         Events.TrackMetric(AddressEvents.TW_END, {
           time: serviceabilityApiTimer(),
           response,
         });
+        if (response.error) {
+          reject(response.error);
+          return;
+        }
         resolve(response);
       },
     });
@@ -207,6 +213,7 @@ export function updateOrder(shipping_address, billing_address) {
           ...getContactPayload(),
           shipping_address: formatAddress(shipping_address),
           billing_address: formatAddress(billing_address, 'billing_address'),
+          device: getDevicePayload(),
         },
       },
       callback: (response) => {

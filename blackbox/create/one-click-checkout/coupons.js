@@ -108,8 +108,8 @@ module.exports = function (testFeatures) {
         await fillUserAddress(context, { isSaveAddress, serviceable });
       }
       await proceed(context);
-      await handleThirdWatchReq(context);
       await handleUpdateOrderReq(context, options.order_id);
+      await handleThirdWatchReq(context);
       await delay(200);
       await handleFeeSummary(context, features);
       await selectPaymentMethod(context, 'netbanking');
