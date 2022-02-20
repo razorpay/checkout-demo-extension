@@ -2,6 +2,7 @@ import { contact, email } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
 import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
+import { getDeviceId } from 'fingerprint';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -140,4 +141,13 @@ export const formatResults = (addresses = []) => {
     },
     {}
   );
+};
+
+/**
+ *
+ * @returns payload object containing the device ID in the desired format
+ */
+export const getDevicePayload = () => {
+  const deviceId = getDeviceId();
+  return deviceId ? { id: deviceId } : null;
 };

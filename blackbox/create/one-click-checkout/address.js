@@ -149,8 +149,8 @@ module.exports = function (testFeatures) {
       if (addAddress) {
         await handleCustomerAddressReq(context);
       }
-      await handleThirdWatchReq(context);
       await handleUpdateOrderReq(context, options.order_id);
+      await handleThirdWatchReq(context);
       await selectPaymentMethod(context, 'netbanking');
       await delay(400);
       await selectBank(context, 'SBIN');

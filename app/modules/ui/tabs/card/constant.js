@@ -118,7 +118,7 @@ export const cardWithRecurringSupport = {
   FDRL: { credit: true, debit: false },
   // OneCard exclusive banks - end
 };
-export const cobrandingPartners = ['ONE_CARD', 'SLICE'];
+export const cobrandingPartners = ['ONE_CARD', 'SLICE', 'RAZORPAYX'];
 export const supportedNetworksAndProviders = {
   CIUB: {
     credit: [],
@@ -141,6 +141,10 @@ export const supportedNetworksAndProviders = {
     debit: [],
   },
   PUNB: {
+    credit: ['VISA'],
+    debit: [],
+  },
+  RAZORPAYX: {
     credit: ['VISA'],
     debit: [],
   },

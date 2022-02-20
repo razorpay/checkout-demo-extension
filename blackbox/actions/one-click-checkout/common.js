@@ -75,10 +75,10 @@ async function handleVerifyOTPReq(context, inValidOTP = false) {
 }
 
 async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
-  await context.getRequest(`/v1/tw/address/check_cod_eligibility`);
+  await context.getRequest(`/v1/1cc/check_cod_eligibility`);
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
-  expect(req.url).toContain('address/check_cod_eligibility');
+  expect(req.url).toContain('1cc/check_cod_eligibility');
   await context.respondJSON({ cod: isThirdWatchEligible });
   await delay(200);
 }
@@ -89,24 +89,30 @@ async function getSummaryInfo(context, isValidCoupon, codFee) {
     (element, isValidCoupon, codFee) => {
       const priceEle = element.getElementsByClassName('summary-row')[0];
       const price = priceEle.getElementsByTagName('div')[1].innerText;
-      const shippingEle = element.getElementsByClassName('summary-row')[1];
-      const shippingAmount =
-        shippingEle.getElementsByTagName('div')[1].innerText;
       if (isValidCoupon) {
-        const couponEle = element.getElementsByClassName('summary-row')[2];
+        const couponEle = element.getElementsByClassName('summary-row')[1];
         const couponText = couponEle.getElementsByTagName('div')[0].innerText;
         const discountPrice =
           couponEle.getElementsByTagName('div')[1].innerText;
+        const shippingEle = element.getElementsByClassName('summary-row')[2];
+        const shippingAmount =
+          shippingEle.getElementsByTagName('div')[1].innerText;
         const totalEle = element.getElementsByClassName('summary-row')[3];
         const total = totalEle.getElementsByTagName('div')[1].innerText;
         return { price, discountPrice, total, couponText, shippingAmount };
       } else if (codFee) {
+        const shippingEle = element.getElementsByClassName('summary-row')[1];
+        const shippingAmount =
+          shippingEle.getElementsByTagName('div')[1].innerText;
         const codEle = element.getElementsByClassName('summary-row')[2];
         const codAmount = codEle.getElementsByTagName('div')[1].innerText;
         const totalEle = element.getElementsByClassName('summary-row')[3];
         const total = totalEle.getElementsByTagName('div')[1].innerText;
         return { price, codAmount, total, shippingAmount };
       } else {
+        const shippingEle = element.getElementsByClassName('summary-row')[1];
+        const shippingAmount =
+          shippingEle.getElementsByTagName('div')[1].innerText;
         const totalEle = element.getElementsByClassName('summary-row')[2];
         const total = totalEle.getElementsByTagName('div')[1].innerText;
         return { price, total, shippingAmount };
