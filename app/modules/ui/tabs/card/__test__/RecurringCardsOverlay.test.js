@@ -25,6 +25,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'Karur Vysya'}     | ${true}  | ${true}  | ${false}
       ${'OneCard'}         | ${true}  | ${false} | ${false}
       ${'Punjab National'} | ${true}  | ${false} | ${false}
+      ${'RazorpayX'}       | ${true}  | ${false} | ${false}
       ${'Slice'}           | ${false} | ${false} | ${true}
     `(
       '$bankName, supports credit card - $isCredit, debit card - $isDebit, super cards - $isSuperCard',
@@ -58,6 +59,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'Karur Vysya'}     | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
       ${'OneCard'}         | ${['Visa']}               | ${[]}                     | ${[]}
       ${'Punjab National'} | ${['Visa']}               | ${[]}                     | ${[]}
+      ${'RazorpayX'}       | ${['Visa']}               | ${[]}                     | ${[]}
       ${'Slice'}           | ${[]}                     | ${[]}                     | ${['Visa']}
     `(
       '$bankName, supports this networks - In debit - $debitCards, In Credit - ${creditCards}, and in Super Cards - ${superCards}',
