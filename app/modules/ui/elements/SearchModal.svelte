@@ -272,7 +272,7 @@
 
     const key = _.getKeyFromEvent(event);
 
-    if (!_Arr.contains(handleKeys, key)) {
+    if (!handleKeys.includes(key)) {
       return;
     }
 

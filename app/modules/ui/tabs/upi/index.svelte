@@ -256,7 +256,7 @@
     if (
       !instrument.flows ||
       !instrument.apps ||
-      !_Arr.contains(instrument.flows, 'intent')
+      !instrument.flows.includes('intent')
     ) {
       return getUPIIntentApps().filtered;
     }
@@ -287,7 +287,7 @@
   // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
   $: selectedToken,
     selectedBankForRecurring,
-    _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
+    ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;

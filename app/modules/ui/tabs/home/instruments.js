@@ -167,7 +167,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
           const individualFlows = ['qr'];
           return !instrument._ungrouped.some(
             (ungrouped) =>
-              _Arr.contains(individualFlows, ungrouped.flow) &&
+              individualFlows.includes(ungrouped.flow) &&
               ungrouped.flow === preferred.flows[0]
           );
         }

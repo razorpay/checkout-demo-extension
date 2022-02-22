@@ -407,16 +407,14 @@
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
-        ? _Arr.contains(issuers, token.card.issuer)
+        ? issuers.includes(token.card.issuer)
         : true;
 
       const networkMatches = hasNetworks
-        ? _Arr.contains(networks, token.card.network)
+        ? networks.includes(token.card.network)
         : true;
 
-      const typeMatches = hasTypes
-        ? _Arr.contains(types, token.card.type)
-        : true;
+      const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
       return issuerMatches && networkMatches && typeMatches;
     });
@@ -502,7 +500,7 @@
     }
 
     const block = $blocks.find((block) =>
-      _Arr.contains(block.instruments, $methodInstrument)
+      block.instruments.includes($methodInstrument)
     );
 
     return block && block.code !== 'rzp.cluster';

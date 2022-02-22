@@ -120,7 +120,7 @@
       invalidateOffer = true;
     }
     otherOffers = getOtherOffers(applicableOffers);
-    if ($appliedOffer && !_Arr.contains(applicableOffers, $appliedOffer)) {
+    if ($appliedOffer && !applicableOffers.includes($appliedOffer)) {
       selected = $appliedOffer = null;
       invalidateOffer = true;
     }

@@ -131,7 +131,7 @@
 
   $: isCardEmi = !provider;
   $: showInterest =
-    !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider);
+    !isCardEmi || !['zestmoney', 'earlysalary'].includes(provider);
   $: formattedAmount = session.formatAmountWithCurrency(amountAfterDiscount);
   $: formattedAmountPerMonth = session.formatAmountWithCurrency(amountPerMonth);
   $: formattedFinalAmount = session.formatAmountWithCurrency(

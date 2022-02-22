@@ -81,7 +81,7 @@
     }
 
     let filtered = wallets.filter((wallet) =>
-      _Arr.contains(instrument.wallets, wallet.code)
+      instrument.wallets.includes(wallet.code)
     );
 
     return filtered;

@@ -38,7 +38,7 @@
     }
 
     let filteredProviders = providers.filter((provider) =>
-      _Arr.contains(instrument.providers, provider.data.code)
+      instrument.providers.includes(provider.data.code)
     );
 
     return filteredProviders;

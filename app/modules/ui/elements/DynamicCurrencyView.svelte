@@ -428,8 +428,8 @@
       if (b === cardCurrency) {
         return 1;
       }
-      if (_Arr.contains(topCurrencies, a)) {
-        if (_Arr.contains(topCurrencies, b)) {
+      if (topCurrencies.includes(a)) {
+        if (topCurrencies.includes(b)) {
           const indexOfA = topCurrencies.indexOf(a);
           const indexOfB = topCurrencies.indexOf(b);
           return indexOfA > indexOfB ? 1 : -1;
