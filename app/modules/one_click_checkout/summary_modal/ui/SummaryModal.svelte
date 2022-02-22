@@ -32,6 +32,7 @@
   } from 'one_click_checkout/summary_modal/sessionInterface';
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
+  import { truncateString } from 'utils/strings';
 
   let visible = false;
   let ctaVisible = false;
@@ -75,6 +76,16 @@
         <div>{$t(AMOUNT_LABEL)}</div>
         <div>{formatAmountWithCurrency($cartAmount)}</div>
       </div>
+      {#if $isCouponApplied}
+        <div class="summary-row">
+          <div>
+            {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
+          </div>
+          <div class="text-green">
+            -{formatAmountWithCurrency($cartDiscount)}
+          </div>
+        </div>
+      {/if}
       {#if $isShippingAddedToAmount}
         <div class="summary-row" class:text-green={!$shippingCharge}>
           <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
@@ -91,21 +102,16 @@
           <div>{formatAmountWithCurrency($codChargeAmount)}</div>
         </div>
       {/if}
-      {#if $isCouponApplied}
-        <div class="summary-row">
-          <div>
-            {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
-          </div>
-          <div class="text-green">
-            -{formatAmountWithCurrency($cartDiscount)}
-          </div>
-        </div>
-      {/if}
-      {#if $appliedOffer}
+      {#if $appliedOffer?.amount}
         <div class="summary-row">
           <div>
             {$t(OFFER_LABEL, {
-              values: { offer_name: $appliedOffer.display_text },
+              values: {
+                offer_name: `(${truncateString(
+                  $appliedOffer.display_text,
+                  20
+                )})`,
+              },
             })}
           </div>
           <div class="text-green">

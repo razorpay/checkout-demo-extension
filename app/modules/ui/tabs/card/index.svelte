@@ -39,6 +39,7 @@
     selectedCardFromHome,
     defaultDCCCurrency,
     cardCountry,
+    showSavedCardTooltip,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -563,6 +564,12 @@
   }
 
   export function showAddCardView() {
+    /**
+     * IMPORTANT NOTE
+     * Need to set showSavedCardTooltip to false right before showing
+     * Add card screen. Please don't change the order
+     */
+    $showSavedCardTooltip = false;
     Events.Track(CardEvents.HIDE_SAVED_CARDS);
     setView(Views.ADD_CARD);
   }
@@ -640,6 +647,10 @@
     return getSavedCardsFromCustomer(session.getCurrentCustomer());
   }
 
+  export function isOnAddCardScreen() {
+    return currentView === Views.ADD_CARD;
+  }
+
   export function isOnSavedCardsScreen() {
     return currentView === Views.SAVED_CARDS;
   }
@@ -711,9 +722,10 @@
   $: {
     /**
      * recurring callout needs to be displayed when 3 conditions are met
-     * a -> must be a recurring/subscription payment
-     * b -> user focused in card input.
-     * c -> card bin number is NOT supported for recurring payments (card's constants)
+     * a -> user must be domestic user
+     * b -> must be a recurring/subscription payment
+     * c -> user focused in card input.
+     * d -> card bin number is NOT supported for recurring payments (card's constants)
      *
      * note: b -> toggles on when user clicks on card input field, for subsequent interactions it remains toggled on.
      * note: c -> as user enters the card number, we switch it to false (#onCardInput),
@@ -721,10 +733,15 @@
      *            the issuer and type is compared with supported recurring BINS. (#checkCardSupportForRecurring)
      */
     showRecurringCallout =
-      isRecurring() && $newCardInputFocused && !isCardSupportedForRecurring;
+      $isIndianCustomer &&
+      isRecurring() &&
+      $newCardInputFocused &&
+      !isCardSupportedForRecurring;
   }
 
   function checkCardSupportForRecurring(features) {
+    // For non domestic users don't need to check support
+    if (!$isIndianCustomer) return true;
     const { issuer, type } = features;
     const issuerDetail = cardWithRecurringSupport[issuer];
     return Boolean(issuerDetail?.[type]);
@@ -1114,7 +1131,7 @@
           isAVS={currentView === Views.AVS}
         />
       {/if}
-      {#if isRecurring()}
+      {#if isRecurring() && currentView !== Views.ADD_CARD}
         <Callout>
           {#if !session.subscription}
             <!-- LABEL: Future payments on this card will be charged automatically. -->

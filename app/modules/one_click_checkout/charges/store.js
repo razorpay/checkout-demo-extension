@@ -8,6 +8,7 @@ import { showAmountInCta } from 'checkoutstore/cta';
 export const shippingCharge = writable(null);
 
 export const amount = writable(0);
+export const offerAmount = writable(0);
 amount.subscribe((amount) => {
   if (amount) {
     const session = getSession();
@@ -17,14 +18,17 @@ amount.subscribe((amount) => {
 });
 appliedOffer.subscribe((offer) => {
   if (!isOneClickCheckout()) return;
-  let currentAmount = get(cartAmount);
-  const shippingCharges = get(shippingCharge) || 0;
-  const couponDis = get(cartDiscount) || 0;
-  let offerDiscount = 0;
+  let currentAmount = offer ? get(cartAmount) : get(amount);
   if (offer) {
-    offerDiscount = offer.original_amount - offer.amount;
+    const shippingCharges = get(shippingCharge) || 0;
+    const couponDis = get(cartDiscount) || 0;
+    const offerDiscount = offer.original_amount - offer.amount || 0;
+    currentAmount = currentAmount + shippingCharges - offerDiscount - couponDis;
+    offerAmount.set(offerDiscount);
+  } else {
+    currentAmount = currentAmount + get(offerAmount);
+    offerAmount.set(0);
   }
-  currentAmount = currentAmount + shippingCharges - offerDiscount - couponDis;
   amount.set(currentAmount);
 });
 

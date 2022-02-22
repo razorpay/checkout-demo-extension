@@ -56,6 +56,7 @@
 
   import { getUPIIntentApps } from 'checkoutstore/native';
   import { blocks } from 'checkoutstore/screens/home';
+  import { showOffers as showMethodOffers } from 'checkoutstore/offers';
 
   // i18n
   import {
@@ -85,6 +86,7 @@
     getPrefilledEmail,
     isEmailOptional,
     isContactEmailOptional,
+    getMerchantOffers,
   } from 'razorpay';
 
   import {
@@ -726,6 +728,9 @@
   }
 
   export function codActions() {
+    if (isOneClickCheckout() && getMerchantOffers()?.length) {
+      showMethodOffers.set(true);
+    }
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,

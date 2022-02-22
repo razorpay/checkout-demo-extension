@@ -881,7 +881,7 @@ Session.prototype = {
     Header.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function (amount, fee) {
-    if (fee) {
+    if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
@@ -2312,7 +2312,11 @@ Session.prototype = {
     var offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
     if (offer && offer.amount) {
-      this.updateAmountInHeaderForOffer(offer.amount);
+      if (RazorpayHelper.isOneClickCheckout()) {
+        this.updateAmountInHeaderForOffer(amount);
+      } else {
+        this.updateAmountInHeaderForOffer(offer.amount);
+      }
     }
   },
 
@@ -2970,12 +2974,9 @@ Session.prototype = {
         : ''
     );
     if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
-      var originalAmount = storeGetter(discreet.ChargesStore.cartAmount);
-      $('#amount .original-amount').html(
-        hasDiscount
-          ? discreet.Currency.formatAmountWithSymbol(originalAmount, currency)
-          : discreet.Currency.formatAmountWithSymbol(amount, currency)
-      );
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount')[0].removeAttribute('style');
     }
     Cta.setAppropriateCtaText();
     Header.updateAmountFontSize();
@@ -3097,6 +3098,9 @@ Session.prototype = {
         this.switchTab('home-1cc');
         Cta.showCta();
         this.topBar.hide();
+        if ($('#amount .original-amount')[0]) {
+          $('#amount .original-amount')[0].removeAttribute('style');
+        }
         return;
       }
     } else {
@@ -3923,6 +3927,11 @@ Session.prototype = {
         each(upiData, function (key, value) {
           data[key] = value;
         });
+      }
+
+      // For a QR Payment in 1CC Flow, set the amount.
+      if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
+        data.amount = this.payload.amount;
       }
 
       if (this.screen === 'wallet') {
@@ -4781,6 +4790,43 @@ Session.prototype = {
           return;
         }
       } else if (this.checkInvalid()) {
+        return;
+      }
+
+      //
+      // 1. If Payment is Recurring &&
+      // 2. Customer is Indian
+      // 3. If on add card screen and save card checkbox is not checked
+      // 4. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
+      // ==> Shake the form and show tooltip on checkbox
+      var isRecurring = RazorpayHelper.isRecurring();
+      var isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+      var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+
+      // For saved card screen consent is maintained elsewhere
+      var rememberCardCheck = discreet.storeGetter(
+        isSavedCardScreen
+          ? CardScreenStore.userConsentForTokenization
+          : CardScreenStore.remember
+      );
+
+      var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+      var selectedCardConsent = selectedCard && selectedCard.consent_taken;
+      var isSavedCardScreenAndConsentAlreadyTaken =
+        isSavedCardScreen && selectedCardConsent;
+
+      if (
+        isRecurring &&
+        isDomesticCustomer &&
+        !rememberCardCheck &&
+        !isSavedCardScreenAndConsentAlreadyTaken
+      ) {
+        var showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
+        Form.shake();
+        showSavedCardTooltip.update(function () {
+          return true;
+        });
+
         return;
       }
     } else if (selectedInstrument) {
@@ -5951,7 +5997,13 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+    var offer = this.getAppliedOffer();
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
 
+    if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
+      data.amount =
+        data.amount + storeGetter(discreet.ChargesStore.offerAmount);
+    }
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
     }

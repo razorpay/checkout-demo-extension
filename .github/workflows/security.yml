@@ -9,7 +9,7 @@ jobs:
   security-sast:
     uses: razorpay/security-action/.github/workflows/semgrep.yml@master
     with:
-      SEMGREP_MANDATORY: false
+      SEMGREP_MANDATORY: true
     secrets:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 

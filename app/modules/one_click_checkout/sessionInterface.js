@@ -138,38 +138,44 @@ export function redirectToPaymentMethods(
     country || get(selectedShippingCountryISO)
   );
 
-  if (address.cod) showCodLoader.set(true);
   // If navigating from methods->details->methods we need not to update the order
   if (shouldUpdateOrder) {
-    thirdWatchCodServiceability(address).then((res) => {
-      session.homeTab.codActions();
-      if (isCodForced()) {
-        showCodLoader.set(false);
-        return;
-      }
-
-      if (addressType === 'saved') {
-        const newAddresses = get(savedAddresses).map((item) => {
-          if (item.id === address.id && item.cod) {
-            item.cod = res?.cod;
-          }
-          return item;
-        });
-        savedAddresses.set(newAddresses);
-      } else {
-        const newAddressServiceability = get(newUserAddress).cod && res?.cod;
-        newUserAddress.set({
-          ...get(newUserAddress),
-          cod: newAddressServiceability,
-        });
-      }
-      showCodLoader.set(false);
-    });
-
     updateOrder(address, billing_address)
       .then(() => {
+        if (address.cod) showCodLoader.set(true);
         session.oneClickCheckoutRedirection(showSnackbar);
         navigator.navigateTo({ path: views.METHODS });
+
+        if (isCodForced()) {
+          showCodLoader.set(false);
+        }
+
+        thirdWatchCodServiceability(address)
+          .then((res) => {
+            session.homeTab.codActions();
+            if (isCodForced()) return;
+
+            if (addressType === 'saved') {
+              const newAddresses = get(savedAddresses).map((item) => {
+                if (item.id === address.id && item.cod) {
+                  item.cod = res?.cod;
+                }
+                return item;
+              });
+              savedAddresses.set(newAddresses);
+            } else {
+              const newAddressServiceability =
+                get(newUserAddress).cod && res?.cod;
+              newUserAddress.set({
+                ...get(newUserAddress),
+                cod: newAddressServiceability,
+              });
+            }
+            showCodLoader.set(false);
+          })
+          .catch(() => {
+            showCodLoader.set(false);
+          });
       })
       .catch((e) => {
         session.updateOrderFailure();

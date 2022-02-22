@@ -27,7 +27,6 @@
     NOCVV_LABEL,
     AUTH_TYPE_PIN,
     AUTH_TYPE_OTP,
-    CARD_TOKENIZATION_DEADLINE_CALLOUT,
   } from 'ui/labels/card';
 
   import {
@@ -46,6 +45,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { getBankText } from 'ui/tabs/home/helpers';
+  import { isRecurring } from 'razorpay';
 
   // Props
   export let card;
@@ -157,6 +157,7 @@
 <div
   class="saved-card"
   class:checked={selected}
+  class:recurring-saved-card={Boolean(isRecurring())}
   on:click={(event) => handleClick(event)}
   tabIndex="0"
   {...attributes}
@@ -196,9 +197,7 @@
       {/if}
     </div>
   </div>
-  {#if !isTokenised && !selected}<div class="saved-middle">
-      {$t(CARD_TOKENIZATION_DEADLINE_CALLOUT)}
-    </div>{/if}
+
   {#if collectCardTokenisationConsent}
     <div class="saved-cards-tokenisation-consent">
       <SecureCard
@@ -318,18 +317,14 @@
     margin-top: 2px;
   }
 
+  .recurring-saved-card {
+    padding-bottom: 8px;
+  }
+
   .card-non-tokenised {
     color: red;
     font-size: 16px;
     font-weight: 500;
     margin-left: 2px;
-  }
-  .saved-middle {
-    line-height: 10px;
-    font-size: 10px;
-    opacity: 0.5;
-    padding-left: 48px;
-    margin-top: -10px;
-    margin-bottom: 5px;
   }
 </style>
