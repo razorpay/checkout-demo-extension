@@ -1010,10 +1010,7 @@ Session.prototype = {
       // We're currently bypassing prefill check for emandate and nach.
       // TODO: We'll need to fix this
       var methodsToBypassCheckFor = ['emandate', 'nach'];
-      var bypassMethodCheck = _Arr.contains(
-        methodsToBypassCheckFor,
-        usableMethod
-      );
+      var bypassMethodCheck = methodsToBypassCheckFor.includes(usableMethod);
 
       // Go to homescreen if prefilled method is unusable
       if (!bypassMethodCheck && !MethodStore.isMethodUsable(usableMethod)) {
@@ -3879,17 +3876,14 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(
-          [
-            '#form-upi',
-            '#form-card',
-            '#form-wallet',
-            '#form-emandate',
-            '#form-upi_otm',
-            '#form-international',
-          ],
-          activeForm
-        )
+        ![
+          '#form-upi',
+          '#form-card',
+          '#form-wallet',
+          '#form-emandate',
+          '#form-upi_otm',
+          '#form-international',
+        ].includes(activeForm)
       ) {
         fillData(activeForm, data);
       }

@@ -135,7 +135,7 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set SDK details.
    */
-  if (qpmap.platform && _Arr.contains(['android', 'ios'], qpmap.platform)) {
+  if (qpmap.platform && ['android', 'ios'].includes(qpmap.platform)) {
     Events.setMeta(MetaProperties.SDK_PLATFORM, qpmap.platform);
 
     if (qpmap.version) {
@@ -512,14 +512,14 @@ function updateAnalytics(preferences) {
   }
   // Set optional fields in meta
   const optionalFields = preferences.optional;
-  if (optionalFields |> _.isArray) {
+  if (Array.isArray(optionalFields)) {
     Events.setMeta(
       MetaProperties.OPTIONAL_CONTACT,
-      optionalFields |> _Arr.contains('contact')
+      optionalFields.includes('contact')
     );
     Events.setMeta(
       MetaProperties.OPTIONAL_EMAIL,
-      optionalFields |> _Arr.contains('email')
+      optionalFields.includes('email')
     );
   }
 }

@@ -64,7 +64,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
    *
    * Unset card object if payment not made via saved card
    */
-  if (_Arr.contains(['card', 'emi'], payment.method)) {
+  if (['card', 'emi'].includes(payment.method)) {
     if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
@@ -447,7 +447,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
   });
 
   // Add token to saved card and saved vpa instrument
-  if (_Arr.contains(['card', 'upi'], payment.method)) {
+  if (['card', 'upi'].includes(payment.method)) {
     const tokens = customer && _Obj.getSafely(customer, 'tokens.items', []);
 
     const token = tokens.find((token) => token.id === instrument.token_id);

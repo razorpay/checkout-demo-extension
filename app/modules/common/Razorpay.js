@@ -444,7 +444,7 @@ export const optionValidations = {
   },
 
   currency: function (currency) {
-    if (!_Arr.contains(supportedCurrencies, currency)) {
+    if (!supportedCurrencies.includes(currency)) {
       return 'The provided currency is not currently supported';
     }
   },
@@ -485,7 +485,7 @@ export function validateOverrides(options, skip = []) {
   options = options.get();
 
   _Obj.loop(optionValidations, function (validation, key) {
-    if (_Arr.contains(skip, key)) {
+    if (skip.includes(key)) {
       return;
     }
 

@@ -647,9 +647,7 @@ export function isGpayMergedFlowEnabled() {
 
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
-  return (
-    _Arr.contains(cardApps.all, 'cred') || isWebPaymentsApiAvailable('cred')
-  );
+  return cardApps.all.includes('cred') || isWebPaymentsApiAvailable('cred');
 }
 
 export function getAgentPayload(option) {
@@ -878,7 +876,7 @@ export function isEMandateBankEnabled(bank) {
  * @returns {boolean}
  */
 export function isEMandateAuthTypeEnabled(bank, authType) {
-  return getEMandateAuthTypes(bank) |> _Arr.contains(authType);
+  return getEMandateAuthTypes(bank).includes(authType);
 }
 
 /**
@@ -904,7 +902,7 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
     // Then use "HDFC_DC" plans and not "HDFC" plans.
     // If code is "HDFC_DC" then don't append "_DC" at the end.
     const debitCode = code + '_DC';
-    if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+    if (DEBIT_EMI_BANKS.includes(debitCode)) {
       code = debitCode;
     } else {
       return;
@@ -1101,7 +1099,7 @@ function addExternalWallets(enabledWallets) {
     |> _Obj.loop((externalWallet) => {
       if (wallets[externalWallet]) {
         wallets[externalWallet].custom = true;
-        if (!(enabledWallets |> _Arr.contains(externalWallet))) {
+        if (!enabledWallets.includes(externalWallet)) {
           enabledWallets.unshift(externalWallet);
         }
       }
@@ -1137,7 +1135,7 @@ function getUsableMethods() {
  * @returns {boolean}
  */
 export function isMethodUsable(method) {
-  return _Arr.contains(getUsableMethods(), method);
+  return getUsableMethods().includes(method);
 }
 
 /**

@@ -77,7 +77,7 @@ export function getOffersForTab(method) {
 
   if (method) {
     const sequence = storeGetter(sequenceStore);
-    const sessionHasEmi = _Arr.contains(sequence, 'emi');
+    const sessionHasEmi = sequence.includes('emi');
 
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
@@ -92,9 +92,7 @@ export function getOffersForTab(method) {
       methods.push('emi');
     }
 
-    return allOffers.filter((offer) =>
-      _Arr.contains(methods, offer.payment_method)
-    );
+    return allOffers.filter((offer) => methods.includes(offer.payment_method));
   }
 
   return allOffers;
@@ -127,7 +125,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 
   const sequence = storeGetter(sequenceStore);
 
-  const sessionHasEmi = _Arr.contains(sequence, 'emi');
+  const sessionHasEmi = sequence.includes('emi');
   const isOfferForEmi = offer.payment_method === 'emi';
   const isInstrumentForCardlessEmi = instrument.method === 'cardless_emi';
 
@@ -153,7 +151,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
       return true;
     }
 
-    return _Arr.contains(instrumentValues, offerIssuer);
+    return instrumentValues.includes(offerIssuer);
   } else {
     return true;
   }

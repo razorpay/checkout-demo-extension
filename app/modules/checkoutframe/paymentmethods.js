@@ -63,9 +63,9 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
     // Keep in order that we want to display
     const APPS_ORDER = ['cred', 'google_pay'];
     // Get the app names to show
-    const apps = APPS_ORDER.filter((app) =>
-      _Arr.contains(availableApps, app)
-    ).map((app) => getRawMethodTitle(app, locale));
+    const apps = APPS_ORDER.filter((app) => availableApps.includes(app)).map(
+      (app) => getRawMethodTitle(app, locale)
+    );
 
     const credit = isCreditCardEnabled();
     const debit = isDebitCardEnabled();
@@ -302,7 +302,7 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
       hasQr = qrEnabled;
 
       if (qrEnabled && hasInstrument) {
-        hasQr = _Arr.contains(extra.instrument.flows || [], 'qr');
+        hasQr = (extra.instrument.flows || []).includes('qr');
       }
 
       if (hasQr) {
@@ -354,7 +354,7 @@ export function getMethodDowntimeDescription(
 
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = availableMethods.some(
-    (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
+    (enabledMethod) => !downMethods.includes(enabledMethod)
   );
 
   // If there's another method available, ask user to select it.

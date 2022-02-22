@@ -522,7 +522,7 @@ export const getUPIAppDataFromHandle = (handle) => {
 
   return (
     allUsableApps.find((app) => {
-      return app.handles && _Arr.contains(app.handles, handle);
+      return app.handles && app.handles.includes(handle);
     }) || {}
   );
 };
