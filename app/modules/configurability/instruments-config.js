@@ -237,7 +237,7 @@ const config = {
         apps = grouped.apps;
       }
 
-      if (_Arr.contains(flows, 'collect')) {
+      if (flows.includes('collect')) {
         if (vpas.length) {
           let individualInstruments = vpas.map((vpa) => {
             let individual = _Obj.extend(
@@ -265,7 +265,7 @@ const config = {
         }
       }
 
-      if (_Arr.contains(flows, 'intent')) {
+      if (flows.includes('intent')) {
         if (apps.length) {
           let individualInstruments = apps.map((app) =>
             _Obj.extend(
@@ -360,7 +360,7 @@ const config = {
           return false;
         }
 
-        if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
+        if (!hasFlows || !instrument.flows.includes('intent')) {
           return false;
         }
       }

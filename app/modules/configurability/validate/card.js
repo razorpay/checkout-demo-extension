@@ -58,19 +58,19 @@ export function validateCardInstrument(
     let isIinValid = true;
 
     if (iin && iins) {
-      isIinValid = _Arr.contains(iins, iin);
+      isIinValid = iins.includes(iin);
     }
 
     if (type && types) {
-      isTypeValid = _Arr.contains(types, type);
+      isTypeValid = types.includes(type);
     }
 
     if (issuer && issuers) {
-      isIssuerValid = _Arr.contains(issuers, issuer);
+      isIssuerValid = issuers.includes(issuer);
     }
 
     if (network && networks) {
-      isNetworkValid = _Arr.contains(networks, network);
+      isNetworkValid = networks.includes(network);
     }
 
     return isTypeValid && isNetworkValid && isIssuerValid && isIinValid;

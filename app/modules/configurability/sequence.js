@@ -30,7 +30,7 @@ export function getSequencedBlocks(params) {
 
   // Get the methods to list
   const methodsToList = methods.filter(
-    (method) => !_Arr.contains(hide.methods, method)
+    (method) => !hide.methods.includes(method)
   );
 
   // Create a method block for all listed methods
@@ -59,10 +59,7 @@ export function getSequencedBlocks(params) {
    * Whichever of "emi" or "cardless_emi" is present first in the sequence,
    * lets put "cardless_emi" at that place. And remove "emi" altogether.
    */
-  if (
-    _Arr.contains(sequence, 'cardless_emi') &&
-    _Arr.contains(sequence, 'emi')
-  ) {
+  if (sequence.includes('cardless_emi') && sequence.includes('emi')) {
     let indexOfEmi = sequence.indexOf('emi');
     let indexOfCardlessEmi = sequence.indexOf('cardless_emi');
 

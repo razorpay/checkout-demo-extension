@@ -89,7 +89,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
         });
 
         instrument.networks = instrument.networks.filter((network) =>
-          _Arr.contains(availableNetworks, network)
+          availableNetworks.includes(network)
         );
       }
 
@@ -97,7 +97,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasTypes) {
         // Check for credit cards
         if (
-          _Arr.contains(instrument.types, 'credit') &&
+          instrument.types.includes('credit') &&
           !getMerchantMethods().credit_card
         ) {
           instrument.types = instrument.types.filter(
@@ -107,7 +107,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
         // Check for debit cards
         if (
-          _Arr.contains(instrument.types, 'debit') &&
+          instrument.types.includes('debit') &&
           !getMerchantMethods().debit_card
         ) {
           instrument.types = instrument.types.filter(
@@ -205,7 +205,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
         const shownFlows = instrument.flows.filter(isUPIFlowEnabled);
         instrument.flows = shownFlows;
 
-        if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
+        if (instrument.apps && !instrument.flows.includes('intent')) {
           delete instrument.apps;
         }
 
@@ -281,7 +281,7 @@ export function getBlockConfig(options, customer) {
   const hasConfiguredBlocks =
     hasTranslatedBlocks &&
     translated.display.blocks.some((block) =>
-      _Arr.contains(translated.display.sequence, block.code)
+      translated.display.sequence.includes(block.code)
     );
 
   /**

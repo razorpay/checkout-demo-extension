@@ -35,7 +35,6 @@
   export let isBankTransferView;
 
   const entries = _Obj.entries;
-  const contains = _Arr.contains;
   const dispatch = createEventDispatcher();
   const session = getSession();
   const fee_label = session.get('fee_label');
@@ -109,7 +108,7 @@
     <br />
     <div class="fees-container">
       {#each entries(feeBreakup) as [type, amount] (type)}
-        {#if contains(allowedKeys, type)}
+        {#if allowedKeys.includes(type)}
           <div class="fee">
             <div class="fee-title">
               {#if type === 'razorpay_fee'}
