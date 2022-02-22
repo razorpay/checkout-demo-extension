@@ -878,7 +878,7 @@ export default {
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
-      international: 'International Payments',
+      international: 'Instant Bank Transfer',
     },
   },
   misc: {
@@ -1130,7 +1130,7 @@ export default {
     coupons: 'Back',
     details: 'Back',
     billingAddress: 'Address',
-    international: 'International Payments',
+    international: 'Instant Bank Transfer',
   },
   upi: {
     cancel_reason_back_action: 'Back',
