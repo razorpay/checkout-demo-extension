@@ -22,6 +22,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'City Union'}      | ${false} | ${true}  | ${false}
       ${'Equitas'}         | ${false} | ${true}  | ${false}
       ${'HSBC'}            | ${true}  | ${false} | ${false}
+      ${'Jupiter'}         | ${false} | ${true}  | ${false}
       ${'Karur Vysya'}     | ${true}  | ${true}  | ${false}
       ${'OneCard'}         | ${true}  | ${false} | ${false}
       ${'Punjab National'} | ${true}  | ${false} | ${false}
@@ -56,6 +57,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'City Union'}      | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'Equitas'}         | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'HSBC'}            | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
+      ${'Jupiter'}         | ${[]}                     | ${['Visa']}               | ${[]}
       ${'Karur Vysya'}     | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
       ${'OneCard'}         | ${['Visa']}               | ${[]}                     | ${[]}
       ${'Punjab National'} | ${['Visa']}               | ${[]}                     | ${[]}

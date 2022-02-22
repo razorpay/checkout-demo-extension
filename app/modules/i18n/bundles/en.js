@@ -920,6 +920,7 @@ export default {
     one_card: 'OneCard',
     razorpayx: 'RazorpayX',
     slice: 'Slice',
+    jupiter: 'Jupiter',
   },
   nach: {
     allowed_formats_info:

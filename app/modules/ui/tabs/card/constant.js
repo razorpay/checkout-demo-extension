@@ -118,7 +118,7 @@ export const cardWithRecurringSupport = {
   FDRL: { credit: true, debit: false },
   // OneCard exclusive banks - end
 };
-export const cobrandingPartners = ['ONE_CARD', 'SLICE', 'RAZORPAYX'];
+export const cobrandingPartners = ['ONE_CARD', 'SLICE', 'RAZORPAYX', 'JUPITER'];
 export const supportedNetworksAndProviders = {
   CIUB: {
     credit: [],
@@ -131,6 +131,9 @@ export const supportedNetworksAndProviders = {
   HSBC: {
     credit: ['VISA', 'MC'],
     debit: [],
+  },
+  JUPITER: {
+    debit: ['VISA'],
   },
   KVBL: {
     credit: ['VISA'],
