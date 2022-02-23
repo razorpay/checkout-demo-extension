@@ -43,3 +43,4 @@ export const REQUIRED_LABEL = 'address.required_label';
 export const INDIA_CONTACT_ERROR_LABEL = 'address.indian_contact_error_label';
 export const CONTACT_ERROR_LABEL = 'address.contact_error_label';
 export const PINCODE_ERROR_LABEL = 'address.pincode_error_message';
+export const EDIT_ADDRESS_LABEL = 'address.edit_address_label';

@@ -5,6 +5,7 @@
   import CTA from 'ui/elements/CTA.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
   // i18n imports
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
@@ -36,6 +37,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
 
   export let error;
   export let onSubmitCallback;
@@ -56,6 +58,8 @@
   } = Resource[addressType];
 
   let isFormComplete = false;
+
+  const { location } = getIcons();
 
   export function handleAddAddressClick() {
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
@@ -187,8 +191,9 @@
     ]}
   >
     <slot name="inner-header" />
-    <div class="address-shipping-label">
-      {$t(title)}
+    <div class="label-container">
+      <Icon icon={location} />
+      <p class="label-text">{$t(title)}</p>
     </div>
     {#if currentView === addressViews.SAVED_ADDRESSES}
       <SavedAddresses
@@ -220,8 +225,13 @@
 </div>
 
 <style>
+  * {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+  }
   .address-wrapper {
-    padding: 18px 24px 0;
+    padding: 26px 18px 0px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
     height: calc(100% - 47px - 55px);
@@ -231,13 +241,18 @@
     height: inherit;
   }
 
-  .address-shipping-label {
-    font-weight: normal;
-    color: rgba(51, 51, 51, 0.6);
-    font-size: 13px;
-    padding-bottom: 6px;
-    text-transform: uppercase;
+  .label-container {
+    display: flex;
+    align-items: center;
   }
+
+  .label-text {
+    color: #263a4a;
+    font-size: 14px;
+    text-transform: capitalize;
+    margin-left: 8px;
+  }
+
   .billing-address-wrapper {
     padding: 8px 24px 12px;
     /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */

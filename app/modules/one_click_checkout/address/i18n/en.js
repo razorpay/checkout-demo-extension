@@ -12,7 +12,7 @@ export default {
   house_label: 'House Number/House Name/Apartment/Floor',
   area_label: 'Area/Colony/Street/Sector',
   landmark_label: 'Landmark',
-  shipping_address_label: 'Shipping Address',
+  shipping_address_label: 'Delivery Address',
   save_label: 'Save As',
   cta_label: 'Continue',
   save_consent_label:
@@ -43,5 +43,6 @@ export default {
   indian_contact_error_label: 'Enter a 10-digit number only.',
   contact_error_label: 'Enter a valid mobile number.',
   pincode_error_message: 'Enter a 6-digit pincode only.',
+  edit_address_label: 'Edit',
   ...billingAddressLabels,
 };
