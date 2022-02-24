@@ -52,7 +52,10 @@
         <div class="address-tag">{address['tag']}</div>
       {/if}
     </div>
-    <DropdownMenu triggerElement={dropdownTrigger}>
+    <DropdownMenu
+      triggerElement={dropdownTrigger}
+      on:click={() => dispatch('selectAddress')}
+    >
       <button bind:this={dropdownTrigger}>
         <Icon icon={kebab_menu} />
       </button>
@@ -166,6 +169,7 @@
 
   .dropdown-item {
     font-weight: 500;
+    padding: 10px 20px;
   }
 
   .selected-container {

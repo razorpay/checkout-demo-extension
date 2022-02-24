@@ -6,7 +6,7 @@
 </script>
 
 <script>
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
   export let open = false;
@@ -15,6 +15,8 @@
   export let classes = '';
   export let menuClasses = '';
   export let triggerElement;
+
+  const dispatch = createEventDispatcher();
 
   let menuItem;
   let outsideClickEvent;
@@ -57,6 +59,7 @@
       triggerEvent = attachEvent(triggerElement, 'click', (event) => {
         event.stopPropagation();
         event.preventDefault();
+        dispatch('click');
         open = !open;
       });
     });
@@ -75,7 +78,7 @@
     <div
       class="dropdown-menu-{placement}  dropdown-menu {menuClasses}"
       bind:this={menuItem}
-      transition:slide={{ duration: 100 }}
+      transition:slide|local={{ duration: 100 }}
     >
       <slot name="DropdownMenu" />
     </div>
@@ -93,7 +96,6 @@
     box-shadow: 0px 4px 5px 0px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     z-index: 1;
-    padding: 10px 20px;
     border-radius: 4px;
   }
 
