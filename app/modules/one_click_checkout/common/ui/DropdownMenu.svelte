@@ -7,6 +7,7 @@
 
 <script>
   import { onMount, onDestroy, tick } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   export let open = false;
   export let placement = MENU_PLACEMENT.right;
@@ -74,6 +75,7 @@
     <div
       class="dropdown-menu-{placement}  dropdown-menu {menuClasses}"
       bind:this={menuItem}
+      transition:slide={{ duration: 100 }}
     >
       <slot name="DropdownMenu" />
     </div>

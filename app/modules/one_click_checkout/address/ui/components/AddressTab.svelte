@@ -26,6 +26,7 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
   import {
@@ -61,13 +62,28 @@
 
   const { location } = getIcons();
 
-  export function handleAddAddressClick() {
-    Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
-    selectedAddressId.set('');
+  export function navigateToAddAddress() {
     currentView = addressViews.ADD_ADDRESS;
     navigator.navigateTo({
       path: Resource[addressType].routes[addressViews.ADD_ADDRESS],
     });
+  }
+
+  export function handleAddAddressClick() {
+    Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
+    selectedAddressId.set('');
+    navigateToAddAddress();
+  }
+
+  function handleEditAddressClick({ detail: _address }) {
+    selectedAddressId.set(_address.id);
+    if (_address.country) selectedShippingCountryISO.set(_address.country);
+
+    newUserAddress.update((addr) => ({
+      ...addr,
+      ...formatAddressToFormData(_address),
+    }));
+    navigateToAddAddress();
   }
 
   export function setCurrentView(view) {
@@ -200,6 +216,7 @@
         {selectedAddressId}
         addresses={savedAddresses}
         on:selectedAddressUpdate={handleAddressSelection}
+        on:editAddressClick={handleEditAddressClick}
         onAddAddressClick={handleAddAddressClick}
         checkServiceability={Resource[addressType].checkServiceability}
         {addressType}

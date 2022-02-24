@@ -1,4 +1,6 @@
 <script>
+  // svelte imports
+  import { createEventDispatcher } from 'svelte';
   // ui imports
   import DropdownMenu from 'one_click_checkout/common/ui/DropdownMenu.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -18,8 +20,9 @@
   export let checkServiceability = true;
 
   const { kebab_menu } = getIcons();
-
+  const dispatch = createEventDispatcher();
   let dropdownTrigger;
+
   $: isServiceable = !(
     address['serviceability'] === false && checkServiceability
   );
@@ -38,7 +41,7 @@
   id={`address-container${isSelected ? '-selected' : ''}`}
   class="address-container"
   class:selected-container={isSelected}
-  on:click|preventDefault={onClick}
+  on:click|preventDefault={() => dispatch('selectAddress')}
 >
   <div class:disabled={!isServiceable} class="box-header">
     <div class="box-title">
@@ -54,7 +57,10 @@
         <Icon icon={kebab_menu} />
       </button>
       <div slot="DropdownMenu">
-        <button class="dropdown-item" type="button"
+        <button
+          class="dropdown-item"
+          type="button"
+          on:click={() => dispatch('editAddressClick', address)}
           >{$t(EDIT_ADDRESS_LABEL)}</button
         >
       </div>

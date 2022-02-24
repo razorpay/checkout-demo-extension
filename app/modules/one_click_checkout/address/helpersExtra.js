@@ -3,6 +3,7 @@ import { get as storeGetter } from 'svelte/store';
 import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
 import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
 import { getDeviceId } from 'fingerprint';
+import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -51,6 +52,30 @@ export const formatAddress = (
     landmark,
     country: countryName,
     contact: contactNumber,
+  };
+};
+
+export const formatAddressToFormData = ({
+  country: countryPostalCode,
+  contact,
+  ...address
+}) => {
+  let countryName = '';
+  let countryCode = '';
+  if (countryPostalCode) {
+    countryName = COUNTRY_POSTALS_MAP[countryPostalCode.toUpperCase()].name;
+    countryCode = `+${COUNTRY_TO_CODE_MAP[countryPostalCode.toUpperCase()]}`;
+  }
+
+  let phoneNum = contact ? contact.substring(countryCode.length) : '';
+
+  return {
+    ...address,
+    contact: {
+      countryCode,
+      phoneNum,
+    },
+    country_name: countryName,
   };
 };
 

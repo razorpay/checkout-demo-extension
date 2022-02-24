@@ -166,7 +166,8 @@
     {#each $addresses as s_address, index}
       <AddressBox
         address={s_address}
-        onClick={() => handleRadioClick(s_address.id, index)}
+        on:selectAddress={() => handleRadioClick(s_address.id, index)}
+        on:editAddressClick
         isSelected={$selectedAddressId === s_address.id}
         {checkServiceability}
       />
