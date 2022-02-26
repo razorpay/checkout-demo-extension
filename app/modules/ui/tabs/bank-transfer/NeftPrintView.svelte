@@ -21,6 +21,8 @@
     getCustomFields,
     getCustomDisclaimers,
   } from './helper';
+  import { getCheckoutBridge, getNewIosBridge } from 'bridge';
+  import { getSDKMeta } from 'checkoutstore/native';
 
   const {
     HEADER,
@@ -288,7 +290,38 @@
 
       addRow({ text: BRANCH_LABEL, bold: true, x: 167 });
 
-      doc.save('challan.pdf');
+      const CheckoutBridge = getCheckoutBridge();
+      const iosBridge = getNewIosBridge();
+      const urlString = doc.output('dataurlstring');
+      const { platform } = getSDKMeta();
+
+      /**
+       * Incase of Android & IOS SDK's we are passing the filename
+       * only along with base64 string to the native methods
+       * But in case of web we call doc.save with filename & extension
+       */
+      if (
+        CheckoutBridge &&
+        platform === 'android' &&
+        session.pdf_download_supported
+      ) {
+        CheckoutBridge.getPdfString('challan', urlString);
+      } else if (
+        iosBridge &&
+        platform === 'ios' &&
+        session.pdf_download_supported
+      ) {
+        iosBridge.postMessage({
+          action: 'getPdfString',
+          body: {
+            title: 'challan',
+            pdfUrl: urlString,
+          },
+        });
+      } else {
+        doc.save('challan.pdf');
+      }
+
       session.hideErrorMessage();
       neftView.ownerDocument.defaultView.close();
     }
