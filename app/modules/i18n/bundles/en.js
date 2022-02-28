@@ -921,6 +921,7 @@ export default {
     razorpayx: 'RazorpayX',
     slice: 'Slice',
     jupiter: 'Jupiter',
+    niyo: 'Niyo Global Cards',
   },
   nach: {
     allowed_formats_info:
