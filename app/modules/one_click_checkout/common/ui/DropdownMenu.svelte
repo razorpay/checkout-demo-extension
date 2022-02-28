@@ -6,11 +6,15 @@
 </script>
 
 <script>
+  // svelte imports
   import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
+  // utils imports
+  import { attachEvent } from '../utils';
+
   export let open = false;
-  export let placement = MENU_PLACEMENT.right;
+  export let placement = MENU_PLACEMENT.RIGHT;
   export let closeOnOutsideClick = true;
   export let classes = '';
   export let menuClasses = '';
@@ -28,13 +32,6 @@
     } else {
       onDropdownClosed();
     }
-  }
-
-  function attachEvent(target, ...args) {
-    target.addEventListener(...args);
-    return {
-      remove: () => target.removeEventListener(...args),
-    };
   }
 
   function onDropdownOpened() {

@@ -16,6 +16,9 @@
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import { getIcons } from 'one_click_checkout/sessionInterface';
 
+  // utils imports
+  import { removeTrailingCommas } from 'one_click_checkout/common/utils';
+
   export let address;
   export let isSelected = false;
   export let onClick;
@@ -74,10 +77,9 @@
   <div class="address-text">
     <div class:disabled={!isServiceable}>
       <div>
-        <!-- the regex deletes any leading or trailing commas -->
-        {`${address['line1'] ?? ''}, ${address['line2'] ?? ''}`
-          .trim()
-          .replace(/(^,)|(,$)/g, '')}
+        {removeTrailingCommas(
+          `${address['line1'] ?? ''}, ${address['line2'] ?? ''}`
+        )}
       </div>
       <div>
         {`${address['city']}, ${address['state']}, ${getCountryName(
