@@ -9,6 +9,8 @@
   import {
     EDIT_ADDRESS_LABEL,
     NON_SERVICEABLE_LABEL,
+    SAVED_ADDRESS_LANDMARK_LABEL,
+    SAVED_ADDRESS_PHONE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // constant imports
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
@@ -84,12 +86,14 @@
       </div>
       {#if address['landmark']}
         <div class="address-landmark">
-          {`Landmark: ${address['landmark']}`}
+          {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
+          {address['landmark']}
         </div>
       {/if}
       {#if address['contact']}
         <div>
-          {`Phone no: ${address['contact']}`}
+          {$t(SAVED_ADDRESS_PHONE_LABEL)}:
+          {address['contact']}
         </div>
       {/if}
     </div>
@@ -118,7 +122,7 @@
     font-size: 12px;
   }
   .address-serviceability-error {
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 12px;
     color: #eb001b;
     background: #fff1f1;

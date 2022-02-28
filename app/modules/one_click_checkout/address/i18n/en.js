@@ -25,6 +25,8 @@ export default {
   area_error_label: 'Enter a minimum of 5 characters',
   add_address_label: 'Add New Address',
   non_serviceable_label: 'This order cannot be delivered to this location.',
+  saved_address_phone_label: 'Phone no',
+  saved_address_landmark_label: 'Landmark',
   saved_address_cta_label: 'Use saved addresses',
   shipping_charges_label: '{charge} shipping charge added',
   same_address_checkbox_label: 'Billing address same as shipping address',

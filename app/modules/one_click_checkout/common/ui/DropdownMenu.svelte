@@ -1,7 +1,7 @@
 <script context="module">
   export const MENU_PLACEMENT = {
-    right: 'right',
-    left: 'left',
+    RIGHT: 'right',
+    LEFT: 'left',
   };
 </script>
 

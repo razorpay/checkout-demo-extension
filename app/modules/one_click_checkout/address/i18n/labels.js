@@ -21,6 +21,9 @@ export const INPUT_ERROR_LABEL = 'address.input_error_label';
 export const HOUSE_ERROR_LABEL = 'address.house_error_label';
 export const AREA_ERROR_LABEL = 'address.area_error_label';
 export const ADD_ADDRESS_LABEL = 'address.add_address_label';
+export const SAVED_ADDRESS_PHONE_LABEL = 'address.saved_address_phone_label';
+export const SAVED_ADDRESS_LANDMARK_LABEL =
+  'address.saved_address_landmark_label';
 export const NON_SERVICEABLE_LABEL = 'address.non_serviceable_label';
 export const COD_DISABLED_LABEL = 'cod.disabled_label';
 export const COD_CHARGES_DESCRIPTION = 'methods.descriptions.cod_charge';
