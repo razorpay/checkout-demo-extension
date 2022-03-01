@@ -13,11 +13,7 @@
     SAVED_ADDRESS_PHONE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // constant imports
-  import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-
-  // utils imports
-  import { removeTrailingCommas } from 'one_click_checkout/common/utils';
 
   export let address;
   export let isSelected = false;
@@ -31,15 +27,6 @@
   $: isServiceable = !(
     address['serviceability'] === false && checkServiceability
   );
-
-  const getCountryName = (countryISO) => {
-    const rows = Object.entries(COUNTRY_POSTALS_MAP);
-    for (const [iso, countryInfo] of rows) {
-      if (countryISO && countryISO.toUpperCase() === iso) {
-        return countryInfo.name;
-      }
-    }
-  };
 </script>
 
 <button
@@ -76,16 +63,8 @@
   </div>
   <div class="address-text">
     <div class:disabled={!isServiceable}>
-      <div>
-        {removeTrailingCommas(
-          `${address['line1'] ?? ''}, ${address['line2'] ?? ''}`
-        )}
-      </div>
-      <div>
-        {`${address['city']}, ${address['state']}, ${getCountryName(
-          address['country']
-        )}, ${address['zipcode']}`}
-      </div>
+      <p>{address.formattedLine1}</p>
+      <p>{address.formattedLine2}</p>
       {#if address['landmark']}
         <div class="address-landmark">
           {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:

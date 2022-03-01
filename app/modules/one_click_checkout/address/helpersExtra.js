@@ -4,6 +4,7 @@ import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_chec
 import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
 import { getDeviceId } from 'fingerprint';
 import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
+import { removeTrailingCommas } from 'one_click_checkout/common/utils';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -26,7 +27,7 @@ export const formatAddress = (
   },
   type = 'shipping_address'
 ) => {
-  const countryName =
+  const countryISO =
     country ||
     (type === 'shipping_address'
       ? storeGetter(selectedShippingCountryISO)
@@ -45,16 +46,41 @@ export const formatAddress = (
     type,
     line1,
     line2,
-    zipcode: zipcode || countryName,
+    zipcode: zipcode || countryISO,
     city,
     state,
     tag,
     landmark,
-    country: countryName,
+    country: countryISO,
     contact: contactNumber,
+    formattedLine1: removeTrailingCommas(`${line1 ?? ''}, ${line2 ?? ''}`),
+    formattedLine2: `${city}, ${state}, ${getCountryName(
+      countryISO
+    )}, ${zipcode}`,
   };
 };
 
+/**
+ *
+ * @param {String} countryISO country ISO code
+ * @returns String
+ * returns the country name from COUNTRY POSTAL CODE LIST
+ */
+const getCountryName = (countryISO) => {
+  const rows = Object.entries(COUNTRY_POSTALS_MAP);
+  for (const [iso, countryInfo] of rows) {
+    if (countryISO && countryISO.toUpperCase() === iso) {
+      return countryInfo.name;
+    }
+  }
+};
+
+/**
+ *
+ * @param {Object} address Address object which is to be formatted
+ * @returns Object
+ * format the savedAddress to send it to the edit Address form
+ */
 export const formatAddressToFormData = ({
   country: countryPostalCode,
   contact,
