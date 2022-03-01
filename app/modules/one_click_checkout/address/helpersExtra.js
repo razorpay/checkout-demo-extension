@@ -53,6 +53,26 @@ export const formatAddress = (
     landmark,
     country: countryISO,
     contact: contactNumber,
+  };
+};
+
+/**
+ *
+ * @param {Object} address Address object which is to be formatted
+ * @param {string} type Address type (shipping_address/billing_address)
+ * @returns Object
+ * format the address received from api
+ */
+export const formatApiAddress = (payload, type = 'shipping_address') => {
+  const { country, line1, line2, city, state, zipcode } = payload;
+  const countryISO =
+    country ||
+    (type === 'shipping_address'
+      ? storeGetter(selectedShippingCountryISO)
+      : storeGetter(selectedBillingCountryISO));
+
+  return {
+    ...formatAddress(payload),
     formattedLine1: removeTrailingCommas(`${line1 ?? ''}, ${line2 ?? ''}`),
     formattedLine2: `${city}, ${state}, ${getCountryName(
       countryISO
