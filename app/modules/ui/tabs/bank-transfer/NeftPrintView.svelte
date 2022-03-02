@@ -150,9 +150,16 @@
 
   const session = getSession();
 
+  function stripOffNonUTF8Chars(text) {
+    if (typeof text !== 'string') return text;
+    return text.replace(/[^ -~]/g, '');
+  }
+
   // TODO: move it to utils or use any currently existing methods for formatting
   function formatDate(d) {
-    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+    return stripOffNonUTF8Chars(
+      `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`
+    );
   }
 
   function addHorizintalLine() {

@@ -56,7 +56,7 @@ export const labels = {
   BRANCH_LABEL: 'Branch Stamp',
 };
 export const rzpLogo =
-  'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg';
+  'https://cdn.razorpay.com/static/assets/secured_by_razorpay.png';
 export const hdfcLogo = 'https://cdn.razorpay.com/bank/HDFC.gif';
 export const jsPdfUrl =
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.0/jspdf.min.js';
