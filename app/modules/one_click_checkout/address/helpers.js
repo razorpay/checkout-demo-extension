@@ -67,10 +67,12 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
   if (['landmark', 'zipcode', 'contact'].includes(formInput.id)) {
     let pattern = formInput.pattern;
     if (formInput.id === 'contact') {
-      pattern =
-        input?.countryCode === INDIA_COUNTRY_CODE
-          ? INDIAN_CONTACT_PATTERN
-          : PHONE_PATTERN;
+      if (input?.countryCode === INDIA_COUNTRY_CODE) {
+        pattern = INDIAN_CONTACT_PATTERN;
+        value = value?.replace(/^0+/, '');
+      } else {
+        pattern = PHONE_PATTERN;
+      }
     }
     const exp = new RegExp(pattern);
     const valid = exp.test(value);
