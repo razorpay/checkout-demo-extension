@@ -10,7 +10,7 @@
   // store imports
   import { resendTimeout } from 'checkoutstore/screens/otp';
 
-  // constant imports
+  // ui imports
   import CountdownTimer from 'ui/components/CountdownTimer.svelte';
 
   // utils imports
@@ -67,7 +67,7 @@
   </div>
 {:else}
   <LinkButton {id} on:click={(event) => invokeResend(event, 'resend')}>
-    {$t(RESEND_LABEL)}
+    {$t(RESEND_BTN)}
     {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
   </LinkButton>
 {/if}
