@@ -19,7 +19,7 @@
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { isOneClickCheckout, showFeeLabel } from 'checkoutstore/index.js';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -266,38 +266,43 @@
       </div>
 
       <div id="otp-sec-outer" class:compact>
-        {#if showInput}
-          {#if $allowResend}
-            <!-- LABEL: Resend OTP -->
-            <ResendButton
-              id="otp-resend"
-              resendTimeout={$resendTimeout}
-              on:resend={(event) => {
-                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
-                invoke('resend', event);
-              }}
-            />
+        <div
+          class="otp-action-container"
+          class:action-container-center={isOneClickCheckout()}
+        >
+          {#if showInput}
+            {#if $allowResend}
+              <!-- LABEL: Resend OTP -->
+              <ResendButton
+                id="otp-resend"
+                resendTimeout={$resendTimeout}
+                on:resend={(event) => {
+                  Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
+                  invoke('resend', event);
+                }}
+              />
+            {/if}
+            {#if $allowSkip}
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => invoke('secondary', event)}
+              >
+                {$t(`otp.skip_text.${$skipTextLabel}`)}
+              </LinkButton>
+            {:else if $allowBack}
+              <!-- LABEL: Go Back -->
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => {
+                  Events.TrackBehav(otpEvents.OTP_SKIP_CLICK);
+                  invoke('secondary', event);
+                }}
+              >
+                {$t(BACK_LABEL)}
+              </LinkButton>
+            {/if}
           {/if}
-          {#if $allowSkip}
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => invoke('secondary', event)}
-            >
-              {$t(`otp.skip_text.${$skipTextLabel}`)}
-            </LinkButton>
-          {:else if $allowBack}
-            <!-- LABEL: Go Back -->
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => {
-                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK);
-                invoke('secondary', event);
-              }}
-            >
-              {$t(BACK_LABEL)}
-            </LinkButton>
-          {/if}
-        {/if}
+        </div>
       </div>
     </div>
     {#if otpPromptVisible && $mode}
@@ -374,5 +379,16 @@
 
   .text-initial {
     text-transform: initial;
+  }
+  .otp-action-container {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+  }
+
+  .action-container-center {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
 </style>

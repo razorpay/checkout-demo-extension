@@ -985,7 +985,8 @@ export default {
     add_funds_label: 'Add Funds',
     back_label: 'Go Back',
     otp_field_help: 'Please enter the OTP',
-    resend_label: 'Resend OTP',
+    resend_label: 'Didn’t get the code?',
+    resend_btn: 'Resend OTP',
     retry_label: 'Retry',
     cancel_label: 'Cancel',
     pay_with_paypal: 'Pay With PayPal',
@@ -1013,7 +1014,7 @@ export default {
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
       loading: 'Loading...',
       mandate_login:
-        'A text message with an OTP has been sent to <strong>{phone}</strong>',
+        'A text message with an OTP has been sent to <strong class="theme">{phone}</strong>',
       otp_proceed_with_upi_subscription:
         'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',

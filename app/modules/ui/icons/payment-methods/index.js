@@ -31,6 +31,7 @@ import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
 import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
+import editPaper from './edit_paper';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -57,6 +58,7 @@ const availIconNames = getAllMethods().concat([
   'saved_card',
   'rzp_logo',
   'edit_phone',
+  'edit_paper',
 ]);
 
 function getIconFn(iconName) {
@@ -162,6 +164,9 @@ function getIconFn(iconName) {
 
     case 'international':
       return internationalIcon;
+
+    case 'edit_paper':
+      return editPaper;
   }
 }
 
