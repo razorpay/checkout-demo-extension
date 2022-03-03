@@ -1,4 +1,4 @@
-import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+import { getCustomerDetails } from 'common/helpers/customer';
 import { views } from 'one_click_checkout/routing/constants';
 
 const isAuthenticated = () => {

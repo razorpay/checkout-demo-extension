@@ -1,186 +1,188 @@
 <!DOCTYPE html>
 <!-- Lives at https://betacdn.razorpay.com/qa/index.html -->
 <html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+  </head>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-</head>
-
-<body>
+  <body>
     <script>
-        var defaultParams = {
-            env: 'prod',
-            key: 'rzp_test_1DP5mmOlF5G5ag',
-            amount: 105,
-        };
+      var defaultParams = {
+        env: 'prod',
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: 105,
+      };
 
-        // Keys from config that do not need to be passed to Checkout
-        var deleteFromConfig = ['env', 'api', 'frame'];
+      // Keys from config that do not need to be passed to Checkout
+      var deleteFromConfig = ['env', 'api', 'frame'];
 
-        var queryParams = location.search
-            .slice(1)
-            .split(/=|&/)
-            .reduce(function (map, param, index, array) {
-                if (index % 2) {
-                    map[array[index - 1]] = param;
-                }
-                return map;
-            }, {});
+      var queryParams = location.search
+        .slice(1)
+        .split(/=|&/)
+        .reduce(function (map, param, index, array) {
+          if (index % 2) {
+            map[array[index - 1]] = param;
+          }
+          return map;
+        }, {});
 
-        // Env <-> Config map
-        var configMap = {
-            dark: {
-                domain: 'checkout-dark.razorpay.com',
-                Razorpay: {
-                    config: {
-                        frame: 'https://api-dark.razorpay.com/v1/checkout/public',
-                        api: "https://api-dark.razorpay.com/"
-                    },
-                },
+      // Env <-> Config map
+      var configMap = {
+        dark: {
+          domain: 'checkout-dark.razorpay.com',
+          Razorpay: {
+            config: {
+              frame: 'https://api-dark.razorpay.com/v1/checkout/public',
+              api: 'https://api-dark.razorpay.com/',
             },
+          },
+        },
 
-            prod: {
-                domain: 'checkout.razorpay.com',
-            },
+        prod: {
+          domain: 'checkout.razorpay.com',
+        },
 
-            canary: {
-                domain: 'prod-checkout-canary.razorpay.com',
-                Razorpay: {
-                    config: {
-                        frame:
-                            'https://api.razorpay.com/v1/checkout/public/canary?canary=1',
-                        api: "https://api.razorpay.com/"
-                    },
-                },
+        canary: {
+          domain: 'prod-checkout-canary.razorpay.com',
+          Razorpay: {
+            config: {
+              frame:
+                'https://api.razorpay.com/v1/checkout/public/canary?canary=1',
+              api: 'https://api.razorpay.com/',
             },
+          },
+        },
 
-            func: {
-                domain: 'checkout.func.razorpay.in',
-                Razorpay: {
-                    config: {
-                        frame: 'https://api-web.func.razorpay.in/v1/checkout/public',
-                    },
-                },
+        func: {
+          domain: 'checkout.func.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-web.func.razorpay.in/v1/checkout/public',
             },
+          },
+        },
 
-            qa: {
-                domain: 'checkout.qa.razorpay.in',
-                Razorpay: {
-                    config: {
-                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
-                        api: "https://api-3.qa.razorpay.in/"
-                    },
-                },
+        qa: {
+          domain: 'checkout.qa.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+              api: 'https://api-3.qa.razorpay.in/',
             },
-            qa2: {
-                domain: 'checkout-2.qa.razorpay.in',
-                Razorpay: {
-                    config: {
-                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
-                        api: "https://api-3.qa.razorpay.in/"
-                    },
-                },
+          },
+        },
+        qa2: {
+          domain: 'checkout-2.qa.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+              api: 'https://api-3.qa.razorpay.in/',
             },
-            qa3: {
-                domain: 'checkout-3.qa.razorpay.in',
-                Razorpay: {
-                    config: {
-                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
-                        api: "https://api-3.qa.razorpay.in/"
-                    },
-                },
+          },
+        },
+        qa3: {
+          domain: 'checkout-3.qa.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+              api: 'https://api-3.qa.razorpay.in/',
             },
-            stage: {
-                domain: 'checkout.stage.razorpay.in',
-                Razorpay: {
-                    config: {
-                        frame: 'https://beta-api.stage.razorpay.in/v1/checkout/public',
-                    },
-                },
+          },
+        },
+        stage: {
+          domain: 'checkout.stage.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://beta-api.stage.razorpay.in/v1/checkout/public',
             },
-        };
+          },
+        },
+      };
 
-        [1, 2, 3, 4, 5, 6].forEach(function (i) {
-            i += 1;
-            configMap['func' + i] = JSON.parse(JSON.stringify(configMap.func));
-            configMap['func' + i].Razorpay.config.frame =
-                'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
-        });
+      [1, 2, 3, 4, 5, 6].forEach(function (i) {
+        i += 1;
+        configMap['func' + i] = JSON.parse(JSON.stringify(configMap.func));
+        configMap['func' + i].Razorpay.config.frame =
+          'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
+      });
 
-        if (queryParams.frame) {
-            for (var environment in configMap) {
-                try {
-                    configMap[environment].Razorpay.config.frame = queryParams.frame;
-                } catch (err) {
-                    console.log(err);
-                }
-            }
+      if (queryParams.frame) {
+        for (var environment in configMap) {
+          try {
+            configMap[environment].Razorpay.config.frame = queryParams.frame;
+          } catch (err) {
+            console.log(err);
+          }
         }
+      }
 
-        if (queryParams.api) {
-            var Razorpay = {
-                config: {
-                    api: queryParams.api,
-                },
-            };
-        }
+      if (queryParams.api) {
+        var Razorpay = {
+          config: {
+            api: queryParams.api,
+          },
+        };
+      }
     </script>
 
     <div></div>
 
     <script>
-        // Load Checkout from the given domain
-        function loadCheckout(domain, callback) {
-            var script = document.createElement('script');
-            script.onload = callback;
-            script.src = 'https://' + domain + '/v1/checkout.js';
-            document.body.appendChild(script);
+      // Load Checkout from the given domain
+      function loadCheckout(domain, callback) {
+        var script = document.createElement('script');
+        script.onload = callback;
+        script.src = 'https://' + domain + '/v1/checkout.js';
+        document.body.appendChild(script);
+      }
+
+      const decodeRequiredParams = ['config'];
+      // Augment defaultParams with queryParams
+      for (var i in queryParams) {
+        defaultParams[i] = decodeRequiredParams.includes(i)
+          ? JSON.parse(decodeURIComponent(queryParams[i]))
+          : queryParams[i];
+      }
+
+      var params = defaultParams;
+
+      if (params.subscription_id || params.order_id || params.invoice_id) {
+        delete params.key;
+      }
+
+      // If env does not have a config, default to prod
+      if (!configMap[params.env]) {
+        params.env = 'prod';
+      }
+
+      // Get the config for this env
+      var config = configMap[params.env];
+
+      // Get the Checkout domain
+      var domain = config.domain;
+
+      // Get the Razorpay config
+      if (config.Razorpay) {
+        window.Razorpay = config.Razorpay;
+      }
+
+      var div = document.querySelector('div');
+
+      params.handler = function (resp) {
+        document.querySelector('div').innerHTML = resp.razorpay_payment_id;
+      };
+
+      loadCheckout(domain, function () {
+        // Delete extra keys that do not need to be passed to Checkout
+        for (var i = 0; i < deleteFromConfig.length; i++) {
+          delete params[deleteFromConfig[i]];
         }
 
-        const decodeRequiredParams = ['config'];
-        // Augment defaultParams with queryParams
-        for (var i in queryParams) {
-
-            defaultParams[i] = decodeRequiredParams.includes(i) ? JSON.parse(decodeURIComponent(queryParams[i])) : queryParams[i];
-        }
-
-        var params = defaultParams;
-
-        if (params.subscription_id || params.order_id || params.invoice_id) {
-            delete params.key;
-        }
-
-        // If env does not have a config, default to prod
-        if (!configMap[params.env]) {
-            params.env = 'prod';
-        }
-
-        // Get the config for this env
-        var config = configMap[params.env];
-
-        // Get the Checkout domain
-        var domain = config.domain;
-
-        // Get the Razorpay config
-        if (config.Razorpay) {
-            window.Razorpay = config.Razorpay;
-        }
-
-        var div = document.querySelector('div');
-
-        params.handler = function (resp) {
-            document.querySelector('div').innerHTML = resp.razorpay_payment_id;
-        };
-
-        loadCheckout(domain, function () {
-            // Delete extra keys that do not need to be passed to Checkout
-            for (var i = 0; i < deleteFromConfig.length; i++) {
-                delete params[deleteFromConfig[i]];
-            }
-
-            Razorpay(params).open();
-        });
+        Razorpay(params).open();
+      });
     </script>
-</body>
-
+  </body>
 </html>

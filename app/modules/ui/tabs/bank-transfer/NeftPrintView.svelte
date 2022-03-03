@@ -16,6 +16,13 @@
     csdKey,
     csdDisclaimer,
   } from './challanConstants';
+  import {
+    isCustomChallan,
+    getCustomFields,
+    getCustomDisclaimers,
+  } from './helper';
+  import { getCheckoutBridge, getNewIosBridge } from 'bridge';
+  import { getSDKMeta } from 'checkoutstore/native';
 
   const {
     HEADER,
@@ -54,9 +61,12 @@
   const name = getOption('prefill.name');
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
+
+  const hasCustomDisclaimers = isCustomChallan('challan.disclaimers');
+  const hasCustomFields = isCustomChallan('challan.fields');
+
   let org_logo = rzpLogo;
   let tableDetails = {};
-
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
@@ -66,6 +76,9 @@
     }
     if (key === csdKey) {
       disclaimers.push({ text: csdDisclaimer, padding: 9 });
+    }
+    if (hasCustomDisclaimers) {
+      disclaimers = [...disclaimers, ...getCustomDisclaimers()];
     }
     if (!isHDFC) {
       labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
@@ -137,9 +150,16 @@
 
   const session = getSession();
 
+  function stripOffNonUTF8Chars(text) {
+    if (typeof text !== 'string') return text;
+    return text.replace(/[^ -~]/g, '');
+  }
+
   // TODO: move it to utils or use any currently existing methods for formatting
   function formatDate(d) {
-    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+    return stripOffNonUTF8Chars(
+      `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`
+    );
   }
 
   function addHorizintalLine() {
@@ -234,19 +254,29 @@
           );
         }
       }
-
+      if (hasCustomFields) {
+        let fields = getCustomFields();
+        for (let field of fields) {
+          addRow(
+            { text: field.title, bold: true, x: 15 },
+            { text: field.value, bold: false, x: 80 },
+            true
+          );
+        }
+      }
       addRow({ text: `${DISCLAIMER_LABEL}:`, bold: true, x: 15 });
-
-      addRow(null, null);
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null);
+      }
 
       for (let i = 0; i < disclaimers.length; i++) {
         const dis = disclaimers[i];
         const text = doc.splitTextToSize(`${i + 1}.) ${dis.text}`, 180);
         addRow({ text, bold: false, x: 15 }, null, false, 16, 0, dis.padding);
       }
-
-      addRow(null, null, true);
-
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null, true);
+      }
       addRow(
         { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 154 },
         null,
@@ -254,10 +284,10 @@
         12,
         12
       );
-
-      addRow(null, null, true);
-
-      addRow({ text: OFFICE_USE.header, bold: false, x: 15 });
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow(null, null, true);
+      }
+      addRow({ text: OFFICE_USE.header, bold: false, x: 80 });
 
       for (let i = 0; i < OFFICE_USE.list.length; i++) {
         addRow({ text: OFFICE_USE.list[i], bold: true, x: 15 });
@@ -267,7 +297,38 @@
 
       addRow({ text: BRANCH_LABEL, bold: true, x: 167 });
 
-      doc.save('challan.pdf');
+      const CheckoutBridge = getCheckoutBridge();
+      const iosBridge = getNewIosBridge();
+      const urlString = doc.output('dataurlstring');
+      const { platform } = getSDKMeta();
+
+      /**
+       * Incase of Android & IOS SDK's we are passing the filename
+       * only along with base64 string to the native methods
+       * But in case of web we call doc.save with filename & extension
+       */
+      if (
+        CheckoutBridge &&
+        platform === 'android' &&
+        session.pdf_download_supported
+      ) {
+        CheckoutBridge.getPdfString('challan', urlString);
+      } else if (
+        iosBridge &&
+        platform === 'ios' &&
+        session.pdf_download_supported
+      ) {
+        iosBridge.postMessage({
+          action: 'getPdfString',
+          body: {
+            title: 'challan',
+            pdfUrl: urlString,
+          },
+        });
+      } else {
+        doc.save('challan.pdf');
+      }
+
       session.hideErrorMessage();
       neftView.ownerDocument.defaultView.close();
     }
