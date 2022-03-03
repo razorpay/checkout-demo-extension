@@ -11,7 +11,7 @@
   on:click
   class="hc_border"
   class:theme={isOneClickCheckout()}
-  class:colored-btn={isOneClickCheckout()}
+  class:one-cc-btn={isOneClickCheckout()}
   {disabled}
 >
   <slot />
@@ -24,7 +24,7 @@
     border-bottom: 1px solid;
   }
 
-  .colored-btn {
+  .one-cc-btn {
     padding: 2px 1px;
     font-size: 16px;
     font-weight: 500;
