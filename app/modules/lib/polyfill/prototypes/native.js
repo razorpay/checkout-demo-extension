@@ -263,3 +263,26 @@ if (!global.alert.name) {
     configurable: true,
   });
 }
+
+/**
+ * Polyfill for Array.prototype.findIndex
+ * Source: https://github.com/jsPolyfill/Array.prototype.findIndex/blob/master/findIndex.js
+ */
+(function () {
+  if (!Array.prototype.findIndex) {
+    Array.prototype.findIndex = function (callback) {
+      if (typeof callback !== 'function') {
+        throw new TypeError('callback must be a function');
+      }
+
+      var thisVal = arguments[1] || this;
+      for (var i = 0; i < this.length; i++) {
+        if (callback.call(thisVal, this[i], i, this)) {
+          return i;
+        }
+      }
+
+      return -1;
+    };
+  }
+})();

@@ -879,7 +879,7 @@ export default {
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
-      international: 'International Payments',
+      international: 'Instant Bank Transfer',
     },
   },
   misc: {
@@ -921,6 +921,8 @@ export default {
     one_card: 'OneCard',
     razorpayx: 'RazorpayX',
     slice: 'Slice',
+    jupiter: 'Jupiter',
+    niyo: 'Niyo Global Cards',
   },
   nach: {
     allowed_formats_info:
@@ -1131,7 +1133,7 @@ export default {
     coupons: 'Back',
     details: 'Back',
     billingAddress: 'Address',
-    international: 'International Payments',
+    international: 'Instant Bank Transfer',
   },
   upi: {
     cancel_reason_back_action: 'Back',

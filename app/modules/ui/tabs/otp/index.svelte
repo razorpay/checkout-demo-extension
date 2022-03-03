@@ -20,6 +20,7 @@
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { showFeeLabel } from 'checkoutstore/index.js';
+  import { isRecurring } from 'razorpay';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -72,7 +73,7 @@
 
   let otpPromptVisible;
   let compact;
-
+  let allowSkipButton = $allowSkip;
   const session = getSession();
   // As of Jan 2021, Safari is the only browser that supports one-time-code
   let autoCompleteMethod = 'off';
@@ -102,6 +103,11 @@
      */
 
     inputWidth = `${19 + ($maxlength - 1) * 10 + $maxlength * 14}px`;
+    // For recurring payments Skip Saving card is not an option
+    // Since we already took mandatory consent on privios screen(Save Checkbox)
+    // we are not allowing Skip saving option on OTP Screen
+    const isSaveYourCardOTPScreen = $skipTextLabel === 'skip_saving_card';
+    allowSkipButton = isRecurring() ? !isSaveYourCardOTPScreen : $allowSkip;
   }
 
   $: {
@@ -165,7 +171,11 @@
           $cardNumber}
       />
     {/if}
-    <div class="otp-controls">
+
+    <div
+      class="otp-controls"
+      class:recurring-alignment={isRecurring() ? !allowSkipButton : false}
+    >
       <div id="otp-prompt">
         {#if $loading}
           <AsyncLoading>
@@ -278,7 +288,7 @@
               }}
             />
           {/if}
-          {#if $allowSkip}
+          {#if allowSkipButton}
             <LinkButton
               id="otp-sec"
               on:click={(event) => invoke('secondary', event)}
@@ -332,6 +342,12 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+  /* For recurring we are not showing Skip saving card button as
+     saving card is mandatory for recurring payments.
+  */
+  .otp-screen-contents .recurring-alignment #otp-sec-outer {
+    justify-content: center;
   }
 
   .otp-controls {

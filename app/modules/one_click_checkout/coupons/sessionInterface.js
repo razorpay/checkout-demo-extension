@@ -19,7 +19,7 @@ import {
   removeCoupon,
   validateCoupon,
 } from 'one_click_checkout/coupons/service';
-import { timer } from 'utils/timer';
+import { setOption, getPrefilledCouponCode } from 'razorpay';
 
 /**
  * Method which shows an overlay with available methods.
@@ -114,6 +114,9 @@ export function removeCouponCode(callback) {
   couponRemovedIndex.set(index);
   couponState.set('loading');
   const code = get(appliedCoupon);
+  if (getPrefilledCouponCode()) {
+    setOption('prefill.coupon_code', '');
+  }
 
   Events.TrackBehav(CouponEvents.COUPON_REMOVE_CLICKED, {
     index: get(couponRemovedIndex),

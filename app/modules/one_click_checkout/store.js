@@ -1,7 +1,7 @@
 // Svelte store for address
 import { writable, get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
-import { getOption, isOneClickCheckout } from 'razorpay';
+import { getOption, isOneClickCheckout, getPreferences } from 'razorpay';
 
 export const isEditContactFlow = writable(false);
 
@@ -45,3 +45,6 @@ export function getContactPayload() {
 
   return payload;
 }
+
+export const isAutopopulateDisabled = () =>
+  getPreferences('1cc_city_autopopulate_disable');
