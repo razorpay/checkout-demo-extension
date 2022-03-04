@@ -33,7 +33,7 @@
   id={`address-container${isSelected ? '-selected' : ''}`}
   class="address-container"
   class:selected-container={isSelected}
-  on:click|preventDefault={() => dispatch('selectAddress')}
+  on:click|preventDefault={() => dispatch('select')}
 >
   <div class:disabled={!isServiceable} class="box-header">
     <div class="box-title">
@@ -46,7 +46,7 @@
     </div>
     <DropdownMenu
       triggerElement={dropdownTrigger}
-      on:click={() => dispatch('selectAddress')}
+      on:click={() => dispatch('select')}
     >
       <button bind:this={dropdownTrigger}>
         <Icon icon={kebab_menu} />
@@ -55,7 +55,7 @@
         <button
           class="dropdown-item"
           type="button"
-          on:click={() => dispatch('editAddressClick', address)}
+          on:click={() => dispatch('editClick', address)}
           >{$t(EDIT_ADDRESS_LABEL)}</button
         >
       </div>

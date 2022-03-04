@@ -3,7 +3,7 @@
   import { onMount, createEventDispatcher } from 'svelte';
   // ui imports
   import Icon from 'ui/elements/Icon.svelte';
-  import AddressBox from './AddressBox.svelte';
+  import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
   // store imports
   import { savedAddresses } from 'one_click_checkout/address/store';
   import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
@@ -40,7 +40,7 @@
   const { add_square } = getIcons();
 
   function dispatchServiceability(id, index) {
-    dispatch('selectedAddressUpdate', {
+    dispatch('select', {
       isAddressServiceable,
       addressId: id,
       addressIndex: index,
@@ -144,8 +144,8 @@
     {#each $addresses as s_address, index}
       <AddressBox
         address={s_address}
-        on:selectAddress={() => handleRadioClick(s_address.id, index)}
-        on:editAddressClick
+        on:select={() => handleRadioClick(s_address.id, index)}
+        on:editClick
         isSelected={$selectedAddressId === s_address.id}
         {checkServiceability}
       />
