@@ -3936,7 +3936,17 @@ Session.prototype = {
 
       // For a QR Payment in 1CC Flow, set the amount.
       if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
-        data.amount = this.payload.amount;
+        var offer = this.getAppliedOffer();
+        var hasDiscount = offer && offer.amount !== offer.original_amount;
+
+        if (this.payload && this.payload.amount) {
+          data.amount = this.payload.amount;
+        } else if (hasDiscount) {
+          data.amount =
+            this.get('amount') + storeGetter(discreet.ChargesStore.offerAmount);
+        } else {
+          data.amount = this.get('amount');
+        }
       }
 
       if (this.screen === 'wallet') {
