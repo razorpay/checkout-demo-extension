@@ -77,7 +77,7 @@
       bind:this={menuItem}
       transition:slide|local={{ duration: 100 }}
     >
-      <slot name="DropdownMenu" />
+      <slot name="dropdown_menu" />
     </div>
   {/if}
 </div>

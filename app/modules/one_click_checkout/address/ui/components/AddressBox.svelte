@@ -17,7 +17,6 @@
 
   export let address;
   export let isSelected = false;
-  export let onClick;
   export let checkServiceability = true;
 
   const { kebab_menu } = getIcons();
@@ -51,7 +50,7 @@
       <button bind:this={dropdownTrigger}>
         <Icon icon={kebab_menu} />
       </button>
-      <div slot="DropdownMenu">
+      <div slot="dropdown_menu">
         <button
           class="dropdown-item"
           type="button"
