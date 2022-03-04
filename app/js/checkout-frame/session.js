@@ -5030,9 +5030,7 @@ Session.prototype = {
     // [ANALYTICS]
     if (data && data.method === 'upi') {
       trackUpiIntentInstrumentPaymentAttempted(
-        discreet.storeGetter(
-          UpiScreenStore.intentVpaPrefilledFromPersonalisation
-        )
+        discreet.storeGetter(UpiScreenStore.intentVpaPrefilledFromPreferences)
       );
     }
 

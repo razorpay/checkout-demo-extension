@@ -189,12 +189,6 @@ module.exports = {
     emulate,
     withSiftJS,
   }) {
-    // Set experiment for all the tests
-    const experimentOverrides = {
-      upi_and_card_only_preferred_methods: 0,
-    };
-    experiments = { ...experiments, ...experimentOverrides };
-
     // Disable animations for testing
     options = {
       ...options,

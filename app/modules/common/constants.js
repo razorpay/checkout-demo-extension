@@ -66,7 +66,6 @@ export const PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
 export const MINUTES_TO_WAIT_FOR_PENDING_PAYMENT = 10;
 
 export const cookieDisabled = !navigator.cookieEnabled;
-
 export const isIframe = global !== global.parent;
 export const ownerWindow = isIframe ? global.parent : global.opener;
 
@@ -107,7 +106,6 @@ export const CHECK_ERROR = {
 export const INDIA_COUNTRY_CODE = '+91';
 
 export const MAX_PREFERRED_INSTRUMENTS = 3;
-export const MAX_PREFERRED_INSTRUMENTS_FOR_UPI_AND_CARD = 2;
 
 export const COLORS = {
   RAZORPAY_COLOR: '#528FF0',

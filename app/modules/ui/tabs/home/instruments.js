@@ -6,15 +6,9 @@ import {
   hiddenMethods,
   hiddenInstruments,
 } from 'checkoutstore/screens/home';
-import {
-  updateBlocksForExperiments,
-  filterAndSlotUpiAndSavedCardInstruments,
-} from './helpers';
+import { updateBlocksForExperiments } from './helpers';
 import { get as storeGetter } from 'svelte/store';
-import {
-  MAX_PREFERRED_INSTRUMENTS,
-  MAX_PREFERRED_INSTRUMENTS_FOR_UPI_AND_CARD,
-} from 'common/constants';
+import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
@@ -24,7 +18,6 @@ import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { getAppFromPackageName } from 'common/upi';
-import { upiAndCardOnlyPreferredMethods } from 'checkoutframe/personalization/experiments';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -235,11 +228,6 @@ export function setBlocks(
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  const FINAL_PREFERRED_INSTRUMENTS_COUNT =
-    upiAndCardOnlyPreferredMethods.enabled()
-      ? MAX_PREFERRED_INSTRUMENTS_FOR_UPI_AND_CARD
-      : MAX_PREFERRED_INSTRUMENTS;
-
   // Remove rzp block instruments and method instruments
   const shownIndividualInstruments =
     parsedConfig.display.blocks
@@ -271,7 +259,7 @@ export function setBlocks(
   if (addPreferredInstrumentsBlock) {
     if (showPreferredLoader) {
       preferredBlock.instruments = makeLoaderInstruments(
-        FINAL_PREFERRED_INSTRUMENTS_COUNT
+        MAX_PREFERRED_INSTRUMENTS
       );
     } else {
       const preferredInstruments = preferredBlock.instruments;
@@ -302,16 +290,10 @@ export function setBlocks(
           shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
       );
 
-      if (upiAndCardOnlyPreferredMethods.enabled()) {
-        filteredPreferredInstruments = filterAndSlotUpiAndSavedCardInstruments(
-          filteredPreferredInstruments
-        );
-      }
-
       // Take top 3 preferred
       preferredBlock.instruments = filteredPreferredInstruments.slice(
         0,
-        FINAL_PREFERRED_INSTRUMENTS_COUNT
+        MAX_PREFERRED_INSTRUMENTS
       );
 
       // Convert preferred instruments to ungrouped format

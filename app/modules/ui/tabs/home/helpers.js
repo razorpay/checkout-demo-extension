@@ -136,29 +136,3 @@ export function getBankText(card, loggedIn, isEmiInstrument, locale) {
 export const addConsentDetailsToInstrument = (instrument, card) => {
   instrument.consent_taken = card.consent_taken;
 };
-
-/**
- * Should return max 2 instruments of type upi or card or both
- * @param {Array} filteredPreferredInstruments
- * @returns filtered preferred instruments of method upi or card only
- */
-export const filterAndSlotUpiAndSavedCardInstruments = (
-  filteredPreferredInstruments
-) => {
-  const methodBuckets = filteredPreferredInstruments.reduce(
-    (acc, instrument) => {
-      if (['upi', 'card'].includes(instrument?.method)) {
-        acc[instrument.method].push(instrument);
-      }
-
-      return acc;
-    },
-    { upi: [], card: [] }
-  );
-
-  if (methodBuckets.upi.length === 0 || methodBuckets.card.length === 0) {
-    return [...methodBuckets.upi, ...methodBuckets.card];
-  } else {
-    return [methodBuckets.upi[0], methodBuckets.card[0]];
-  }
-};

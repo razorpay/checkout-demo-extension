@@ -12,6 +12,8 @@ import {
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
+import { highlightUPIIntentOnDesktop } from 'upi/experiments';
+
 /**
  * Map of filter fn for each method
  * that says whether or not a given instrument
@@ -226,7 +228,7 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
       return true;
     }
 
-    if (instrument?.vendor_vpa) {
+    if (instrument?.vendor_vpa && highlightUPIIntentOnDesktop.enabled()) {
       return true;
     }
 
@@ -260,69 +262,3 @@ export function filterInstruments({ instruments, upiApps = [], customer }) {
     |> filterInstrumentsForSanity
   );
 }
-
-//#region UPI NR Improvements
-
-/**
- * We only want to show UPI instruments (except QR) and saved card instruments
- */
-const METHOD_FILTERS_FOR_UPI_AND_SAVED_CARDS = {
-  upi: (instrument, { customer }) => {
-    if (instrument['_[upiqr]']) {
-      return false;
-    }
-
-    return METHOD_FILTERS['upi'](instrument, { customer });
-  },
-  card: METHOD_FILTERS['card'],
-};
-
-/**
- * Only show saved VPA and saved cards instruments
- * @param {Array} instruments List of intruments to be filtered
- *
- * @returns {Array} filtered instruments
- */
-
-export const filterInstrumentsForUPIAndSavedCardMethods = _.curry2(
-  (instruments, { customer }) => {
-    return instruments.filter((instrument) => {
-      const { method } = instrument;
-      if (
-        METHOD_FILTERS_FOR_UPI_AND_SAVED_CARDS[method] &&
-        isMethodEnabled(method)
-      ) {
-        return METHOD_FILTERS_FOR_UPI_AND_SAVED_CARDS[method](instrument, {
-          customer,
-        });
-      }
-
-      return false;
-    });
-  }
-);
-
-/**
- * Filters instruments for UPI and saved cards only
- *
- *  @prop {Array} instruments
- *  @prop {Array} upiApps List of UPI apps on the device
- *  @prop {Customer} customer
- *
- * @returns {Array} filtered instruments
- */
-export function filterInstrumentsForUPIAndSavedCards({
-  instruments,
-  upiApps = [],
-  customer,
-}) {
-  return (
-    instruments
-    |> filterFalsyInstruments
-    |> filterInstrumentsForUPIAndSavedCardMethods({ customer })
-    |> filterInstrumentsByAvailableUpiApps(upiApps)
-    |> filterInstrumentsForSanity
-  );
-}
-
-//#endregion

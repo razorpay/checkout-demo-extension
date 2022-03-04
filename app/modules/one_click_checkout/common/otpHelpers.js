@@ -1,4 +1,4 @@
-import { getCustomerDetails } from 'common/helpers/customer';
+import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 import { RESEND_OTP_INTERVAL } from 'one_click_checkout/otp/constants';
 
