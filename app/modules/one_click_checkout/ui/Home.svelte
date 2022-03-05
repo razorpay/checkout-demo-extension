@@ -1,4 +1,7 @@
 <script>
+  // svelte imports
+  import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
+
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import TopBar from 'ui/components/Topbar.svelte';
@@ -6,22 +9,32 @@
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Router from 'one_click_checkout/routing/component/Router.svelte';
+
   // Store imports
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
+  import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
+
   // Constants import
   import routes from 'one_click_checkout/routing/routes';
   import { views } from 'one_click_checkout/routing/constants';
+
   // Helpers import
   import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'common/helpers/customer';
   import { destroySummaryModal } from 'one_click_checkout/summary_modal';
-  // svelte imports
-  import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
-  import { getTheme } from 'one_click_checkout/address/sessionInterface';
+
+  // session imports
+  import {
+    getTheme,
+    loadAddressesWithServiceability,
+  } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
+
+  // analytics imports
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -30,6 +43,9 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+
+  // service imports
+  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
 
   let topbar;
   let isBackEnabled;
@@ -50,6 +66,12 @@
     .join(';');
 
   onMount(() => {
+    if (
+      $savedAddresses.length &&
+      $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+    ) {
+      loadAddressesWithServiceability();
+    }
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,

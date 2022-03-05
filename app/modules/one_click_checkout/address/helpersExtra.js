@@ -222,3 +222,39 @@ export const getDevicePayload = () => {
   const deviceId = getDeviceId();
   return deviceId ? { id: deviceId } : null;
 };
+
+/**
+ *
+ * @param {Array<Addresses>} addresses
+ * @param {Object} zipecodeHash
+ * @returns Array of addresses with zipcode data
+ * This method adds serviceability data to all the addresses from zipcodeHash
+ *
+ */
+export function hydrateSamePincodeAddresses(addresses, zipcodeHash) {
+  return addresses.map((item) => {
+    if (
+      item.zipcode === item.country &&
+      zipcodeHash[item.zipcode]?.hasOwnProperty('city') &&
+      zipcodeHash[item.zipcode]?.hasOwnProperty('state')
+    ) {
+      delete zipcodeHash[item.zipcode].city;
+      delete zipcodeHash[item.zipcode].state;
+    }
+
+    return {
+      ...item,
+      ...zipcodeHash[item.zipcode],
+    };
+  });
+}
+
+/**
+ *
+ * @param {Array<Addresses>} addresses
+ * @returns Returns the last updated serviceable address
+ *
+ */
+export function getLatestServiceableAddress(addresses) {
+  return addresses.find((addr) => addr.serviceability);
+}

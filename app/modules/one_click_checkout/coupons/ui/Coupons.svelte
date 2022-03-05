@@ -9,7 +9,7 @@
   // store imports
   import { getCurrency, getPrefilledCouponCode } from 'razorpay';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-
+  import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
     isCouponApplied,
@@ -17,6 +17,7 @@
     error,
     couponInputSource,
   } from 'one_click_checkout/coupons/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // svelte imports
   import { onMount } from 'svelte';
@@ -71,6 +72,9 @@
   let showCta = true;
   const currency = getCurrency();
   const prefilledCoupon = getPrefilledCouponCode();
+
+  let ctaDisabled = false;
+  $: ctaDisabled = $savedAddresses.length && !$selectedAddress.serviceability;
 
   function onSubmit() {
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
@@ -175,7 +179,7 @@
       </div>
     </div>
     {#if showCta}
-      <CTA on:click={onSubmit}>{$t(CONTINUE_LABEL)}</CTA>
+      <CTA disabled={ctaDisabled} on:click={onSubmit}>{$t(CONTINUE_LABEL)}</CTA>
     {/if}
   </div>
 </Screen>

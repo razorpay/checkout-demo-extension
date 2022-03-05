@@ -91,17 +91,18 @@
   }
 
   export function handleAddressSelection({
-    detail: { isAddressServiceable, addressId, addressIndex, is_cod_available },
+    detail: { addressId, addressIndex },
   }) {
+    const { serviceability, cod } = $selectedAddress;
     Events.Track(AddressEvents.SAVED_ADDRESS_SELECTED, {
-      serviceable: isAddressServiceable,
+      serviceable: serviceability,
       address_id: addressId,
       address_index: addressIndex,
-      is_cod_available,
+      is_cod_available: cod,
     });
     showCta = true;
     if (Resource[addressType].checkServiceability) {
-      showCta = isAddressServiceable;
+      showCta = serviceability;
     }
   }
 
