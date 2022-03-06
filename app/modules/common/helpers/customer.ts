@@ -11,6 +11,6 @@ export function getCustomerDetails() {
   return getCustomer(get(contact), null, true);
 }
 
-export function getCustomerByContact(phone) {
+export function getCustomerByContact(phone: string) {
   return getCustomer(phone, null, true);
 }

@@ -12,8 +12,6 @@ import {
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
-import { highlightUPIIntentOnDesktop } from 'upi/experiments';
-
 /**
  * Map of filter fn for each method
  * that says whether or not a given instrument
@@ -228,7 +226,7 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
       return true;
     }
 
-    if (instrument?.vendor_vpa && highlightUPIIntentOnDesktop.enabled()) {
+    if (instrument?.vendor_vpa) {
       return true;
     }
 
