@@ -47,7 +47,12 @@
 </script>
 
 <div class="wrapper" class:invalid={validationText}>
-  <span class="label" class:label-top={focused || !!value}>
+  <span
+    class="label"
+    class:label-top={focused || !!value}
+    class:label-top-focused={focused}
+    class:label-error={validationText !== ''}
+  >
     {`${$t(label)}${required ? '*' : ''}`}
   </span>
   <div
@@ -57,6 +62,8 @@
     contenteditable
     class="input"
     class:focused
+    class:input-focused={focused}
+    class:input-error={validationText !== ''}
     on:input
     on:focus={onFocus}
     on:blur={onBlur}
@@ -90,6 +97,15 @@
     border-radius: 4px;
     box-sizing: border-box;
     outline-style: none;
+    position: relative;
+  }
+
+  .input-focused {
+    border-color: #5186f3;
+  }
+
+  .input-error {
+    border-color: var(--error-validation-color);
   }
 
   .wrapper {
@@ -100,13 +116,28 @@
   .label {
     line-height: 19px;
     color: #757575;
+    position: absolute;
+    top: 24px;
+    padding: 0px 12px;
   }
 
   .label-top {
-    top: 40px;
-    font-size: 12px;
-    line-height: 13px;
+    position: absolute;
+    top: 28px;
+    left: 8px;
+    bottom: auto;
     transform: translateY(-30px);
+    padding: 0px 4px;
+    background-color: #fff;
+    z-index: 1;
+  }
+
+  .label-top-focused {
+    color: #5186f3;
+  }
+
+  .label-error {
+    color: var(--error-validation-color);
   }
 
   .suggestion-dropdown {
@@ -150,12 +181,12 @@
   }
 
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
 
   .invalid:not(.focused) {
-    color: #f46060;
+    color: var(--error-validation-color);
   }
 </style>

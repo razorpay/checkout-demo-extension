@@ -441,7 +441,7 @@
     border-bottom: 0px;
   }
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
@@ -467,7 +467,7 @@
     color: #079f0d;
   }
   .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .with-prediction {
     .prediction-input {
