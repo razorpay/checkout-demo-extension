@@ -61,7 +61,7 @@
   import { Events } from 'analytics';
   import { screensHistory } from 'one_click_checkout/routing/History';
 
-  const { edit_paper } = getTheme().icons;
+  const { edit_phone } = getTheme().icons;
 
   const { otpReason } = screensHistory.config[views.OTP].props;
 
@@ -96,24 +96,6 @@
     $ipAddress = '';
     $accessTime = '';
     errorMessage.set('');
-  }
-
-  function onSkip(event) {
-    Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
-    if (skipOTPHandle) {
-      skipOTPHandle();
-    } else {
-      invoke('secondary', event);
-    }
-  }
-
-  function onResend(event) {
-    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
-    if (resendOTPHandle) {
-      resendOTPHandle();
-    } else {
-      invoke('resend', event);
-    }
   }
 </script>
 
@@ -165,7 +147,7 @@
                 class="edit-contact-btn"
                 on:click={() => handleEditContact()}
               >
-                <Icon icon={edit_paper} />
+                <Icon icon={edit_phone} />
               </span>
             {/if}
           </div>
@@ -234,27 +216,45 @@
       </div>
 
       <div id="otp-sec-outer" class:compact>
-        <div class="otp-action-container">
-          {#if showInput}
-            {#if $allowResend}
-              <!-- LABEL: Resend OTP -->
-              <ResendButton id="otp-resend" on:resend={onResend} />
-            {/if}
-            {#if $allowSkip}
-              <LinkButton id="otp-sec" on:click={onSkip}>
-                {$t(`otp.skip_text.${$skipTextLabel}`)}
-              </LinkButton>
-            {:else if $allowBack}
-              <!-- LABEL: Go Back -->
-              <LinkButton
-                id="otp-sec"
-                on:click={(event) => invoke('secondary', event)}
-              >
-                {$t(BACK_LABEL)}
-              </LinkButton>
-            {/if}
+        {#if showInput}
+          {#if $allowResend}
+            <!-- LABEL: Resend OTP -->
+            <ResendButton
+              id="otp-resend"
+              on:resend={(event) => {
+                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
+                if (resendOTPHandle) {
+                  resendOTPHandle();
+                } else {
+                  invoke('resend', event);
+                }
+              }}
+            />
           {/if}
-        </div>
+          {#if $allowSkip}
+            <LinkButton
+              id="otp-sec"
+              on:click={(event) => {
+                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
+                if (skipOTPHandle) {
+                  skipOTPHandle();
+                } else {
+                  invoke('secondary', event);
+                }
+              }}
+            >
+              {$t(`otp.skip_text.${$skipTextLabel}`)}
+            </LinkButton>
+          {:else if $allowBack}
+            <!-- LABEL: Go Back -->
+            <LinkButton
+              id="otp-sec"
+              on:click={(event) => invoke('secondary', event)}
+            >
+              {$t(BACK_LABEL)}
+            </LinkButton>
+          {/if}
+        {/if}
       </div>
     </div>
     {#if otpPromptVisible && $mode}
@@ -283,9 +283,10 @@
     margin: 10px 0;
   }
   .otp-title {
-    color: #263a4a;
-    text-align: center;
-    padding: 0px 20px;
+    /* margin: 0 40px; */
+    line-height: 164%;
+    color: rgba(0, 0, 0, 0.74);
+    font-weight: normal;
   }
   .otp-screen-contents {
     display: flex;
@@ -334,11 +335,12 @@
     margin-top: 0px !important;
   }
   .otp-heading {
-    margin: 34px 0 24px;
-    text-align: center;
-    color: #263a4a;
-    text-transform: capitalize;
-    font-weight: bold;
+    margin: 24px 0 15px;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 16px;
+    color: #33333399;
+    text-transform: uppercase;
   }
 
   .heading-1cc {
@@ -364,13 +366,5 @@
   .edit-contact-btn {
     margin-left: 4px;
     cursor: pointer;
-  }
-
-  .otp-action-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    flex: 1;
   }
 </style>
