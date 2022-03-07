@@ -46,9 +46,7 @@
   }
 
   function onDropdownClosed() {
-    if (outsideClickEvent) {
-      outsideClickEvent.remove();
-    }
+    outsideClickEvent?.remove();
   }
 
   onMount(() => {

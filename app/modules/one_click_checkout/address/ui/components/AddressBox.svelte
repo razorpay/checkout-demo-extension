@@ -23,9 +23,7 @@
   const dispatch = createEventDispatcher();
   let dropdownTrigger;
 
-  $: isServiceable = !(
-    address['serviceability'] === false && checkServiceability
-  );
+  $: isServiceable = !(address.serviceability === false && checkServiceability);
 </script>
 
 <button
@@ -37,10 +35,10 @@
   <div class:disabled={!isServiceable} class="box-header">
     <div class="box-title">
       <span class="address-name">
-        {address['name']}
+        {address.name}
       </span>
-      {#if address['tag']}
-        <div class="address-tag">{address['tag']}</div>
+      {#if address.tag}
+        <div class="address-tag">{address.tag}</div>
       {/if}
     </div>
     <DropdownMenu
@@ -64,20 +62,20 @@
     <div class:disabled={!isServiceable}>
       <p>{address.formattedLine1}</p>
       <p>{address.formattedLine2}</p>
-      {#if address['landmark']}
+      {#if address.landmark}
         <div class="address-landmark">
           {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
-          {address['landmark']}
+          {address.landmark}
         </div>
       {/if}
-      {#if address['contact']}
+      {#if address.contact}
         <div>
           {$t(SAVED_ADDRESS_PHONE_LABEL)}:
-          {address['contact']}
+          {address.contact}
         </div>
       {/if}
     </div>
-    <!-- address['serviceability'] will be null for unknown serviceability -->
+    <!-- address.serviceability will be null for unknown serviceability -->
     {#if !isServiceable}
       <div class="address-serviceability-error">
         {$t(NON_SERVICEABLE_LABEL)}

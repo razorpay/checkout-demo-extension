@@ -113,7 +113,7 @@ export const formatAddressToFormData = ({
     countryCode = `+${COUNTRY_TO_CODE_MAP[countryPostalCode.toUpperCase()]}`;
   }
 
-  let phoneNum = contact ? contact.substring(countryCode.length) : '';
+  let phoneNum = contact?.substring(countryCode.length) || '';
 
   return {
     ...address,
