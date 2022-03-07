@@ -145,6 +145,11 @@
     $ipAddress = '';
     $accessTime = '';
   }
+
+  function onResend(event) {
+    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
+    invoke('resend', event);
+  }
 </script>
 
 <div
@@ -276,10 +281,7 @@
               <ResendButton
                 id="otp-resend"
                 resendTimeout={$resendTimeout}
-                on:resend={(event) => {
-                  Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
-                  invoke('resend', event);
-                }}
+                on:resend={onResend}
               />
             {/if}
             {#if $allowSkip}

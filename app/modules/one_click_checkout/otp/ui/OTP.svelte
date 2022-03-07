@@ -97,6 +97,24 @@
     $accessTime = '';
     errorMessage.set('');
   }
+
+  function onSkip(event) {
+    Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
+    if (skipOTPHandle) {
+      skipOTPHandle();
+    } else {
+      invoke('secondary', event);
+    }
+  }
+
+  function onResend(event) {
+    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
+    if (resendOTPHandle) {
+      resendOTPHandle();
+    } else {
+      invoke('resend', event);
+    }
+  }
 </script>
 
 <!-- // TODO: showable logic -->
@@ -220,30 +238,10 @@
           {#if showInput}
             {#if $allowResend}
               <!-- LABEL: Resend OTP -->
-              <ResendButton
-                id="otp-resend"
-                on:resend={(event) => {
-                  Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
-                  if (resendOTPHandle) {
-                    resendOTPHandle();
-                  } else {
-                    invoke('resend', event);
-                  }
-                }}
-              />
+              <ResendButton id="otp-resend" on:resend={onResend} />
             {/if}
             {#if $allowSkip}
-              <LinkButton
-                id="otp-sec"
-                on:click={(event) => {
-                  Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
-                  if (skipOTPHandle) {
-                    skipOTPHandle();
-                  } else {
-                    invoke('secondary', event);
-                  }
-                }}
-              >
+              <LinkButton id="otp-sec" on:click={onSkip}>
                 {$t(`otp.skip_text.${$skipTextLabel}`)}
               </LinkButton>
             {:else if $allowBack}
