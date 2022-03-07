@@ -15,9 +15,10 @@ export default function ({ topbar }) {
   const session = getSession();
   const contact = getPayoutContact();
   const accounts = (contact && contact.fund_accounts) || [];
-  const upiAccounts = accounts |> _Arr.filter((a) => a.account_type === 'vpa');
-  const bankAccounts =
-    accounts |> _Arr.filter((a) => a.account_type === 'bank_account');
+  const upiAccounts = accounts.filter((a) => a.account_type === 'vpa');
+  const bankAccounts = accounts.filter(
+    (a) => a.account_type === 'bank_account'
+  );
 
   const payoutsView = new PayoutInstruments({
     target: _Doc.querySelector('#form-fields'),

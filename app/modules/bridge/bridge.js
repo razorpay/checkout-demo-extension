@@ -69,11 +69,9 @@ Bridge.prototype = {
    *                                Nothing is returned in default cases.
    **/
   callAndroid: function (methodName, ...params) {
-    params =
-      params
-      |> _Arr.map((arg) =>
-        typeof arg === 'object' ? _Obj.stringify(arg) : arg
-      );
+    params = params.map((arg) =>
+      typeof arg === 'object' ? _Obj.stringify(arg) : arg
+    );
 
     const method = this.get(methodName);
 

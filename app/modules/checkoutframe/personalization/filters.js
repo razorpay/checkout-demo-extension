@@ -140,7 +140,7 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
   (instruments, { customer }) => {
     // TODO: Move Downtime logic to this function
 
-    const allowed = _Arr.filter(instruments, (instrument) => {
+    const allowed = instruments.filter((instrument) => {
       let { method } = instrument;
 
       if (instrument['_[upiqr]']) {
@@ -190,7 +190,7 @@ const SANITY_FILTERS = {
  * @returns {Array} filtered instruments
  */
 export function filterInstrumentsForSanity(instruments) {
-  return _Arr.filter(instruments, (instrument) => {
+  return instruments.filter((instrument) => {
     if (SANITY_FILTERS[instrument.method]) {
       return SANITY_FILTERS[instrument.method](instrument);
     }
@@ -206,7 +206,7 @@ export function filterInstrumentsForSanity(instruments) {
  * @returns {Array} filtered instruments
  */
 export function filterFalsyInstruments(instruments) {
-  return _Arr.filter(instruments, Boolean);
+  return instruments.filter(Boolean);
 }
 
 /**
@@ -217,7 +217,7 @@ export function filterFalsyInstruments(instruments) {
  * @returns {Array}
  */
 const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
-  return _Arr.filter(instruments, (instrument) => {
+  return instruments.filter((instrument) => {
     if (instrument.method !== 'upi') {
       return true;
     }

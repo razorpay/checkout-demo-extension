@@ -73,6 +73,7 @@ import {
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { isNonNullObject } from 'utils/object';
+import { getUniqueValues } from 'utils/array';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -399,12 +400,12 @@ export function getEnabledMethods() {
   if (merchantOrder && isRecurring() && getAmount()) {
     merchantOrderMethod = merchantOrder.method || 'card';
   }
-  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+  let methodsToConsider = _Obj.keys(ALL_METHODS);
 
   if (merchantOrderMethod) {
     methodsToConsider = [merchantOrderMethod];
   }
-  return methodsToConsider |> _Arr.filter(isMethodEnabled);
+  return methodsToConsider.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {
@@ -481,7 +482,7 @@ export function getCardNetworksForRecurring(type) {
     const networks = getRecurringMethods().card[type];
     if (_.isArray(networks) && networks.length) {
       // Example: "American Express" to "amex"
-      const codes = _Arr.map(networks, findCodeByNetworkName);
+      const codes = networks.map(findCodeByNetworkName);
 
       // ["mastercard", "visa"] to { mastercard: true, visa: true }
       return codes.reduce((acc, code) => {
@@ -646,9 +647,7 @@ export function isGpayMergedFlowEnabled() {
 
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
-  return (
-    _Arr.contains(cardApps.all, 'cred') || isWebPaymentsApiAvailable('cred')
-  );
+  return cardApps.all.includes('cred') || isWebPaymentsApiAvailable('cred');
 }
 
 export function getAgentPayload(option) {
@@ -706,7 +705,7 @@ export function getAppsForCards() {
     return [];
   }
 
-  const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+  const apps = getAppsForMethod('card').filter(isApplicationEnabled);
 
   const disabledApps = storeGetter(HiddenInstrumentsStore)
     .filter((instrument) => instrument.method === 'app' && instrument.provider)
@@ -877,7 +876,7 @@ export function isEMandateBankEnabled(bank) {
  * @returns {boolean}
  */
 export function isEMandateAuthTypeEnabled(bank, authType) {
-  return getEMandateAuthTypes(bank) |> _Arr.contains(authType);
+  return getEMandateAuthTypes(bank).includes(authType);
 }
 
 /**
@@ -903,7 +902,7 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
     // Then use "HDFC_DC" plans and not "HDFC" plans.
     // If code is "HDFC_DC" then don't append "_DC" at the end.
     const debitCode = code + '_DC';
-    if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+    if (DEBIT_EMI_BANKS.includes(debitCode)) {
       code = debitCode;
     } else {
       return;
@@ -940,7 +939,7 @@ function transformEmiPlans(emiPlan) {
 
 export function getEligiblePlansBasedOnMinAmount(plans) {
   const amount = getAmount();
-  const eligiblePlans = _Arr.filter(plans, (plan) => plan.min_amount <= amount);
+  const eligiblePlans = plans.filter((plan) => plan.min_amount <= amount);
   return eligiblePlans;
 }
 
@@ -977,10 +976,10 @@ export function getEMIBanks() {
  */
 export function getPayLaterProviders() {
   const paylater = getMerchantMethods().paylater;
-  if (paylater |> _Obj.isEmpty) {
+  if (_Obj.isEmpty(paylater)) {
     return [];
   }
-  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(Boolean);
+  return _Obj.keys(paylater).map(getProvider).filter(Boolean);
 }
 
 /*
@@ -996,16 +995,14 @@ export function getAppProviders() {
     // explicitly setting of `google_pay`.
     apps.google_pay = true;
   }
-  if (apps |> _Obj.isEmpty) {
+  if (_Obj.isEmpty(apps)) {
     return [];
   }
-  return (
-    apps
-    |> _Obj.keys
-    |> _Arr.filter(isApplicationEnabled)
-    |> _Arr.map(getAppProvider)
-    |> _Arr.filter(Boolean)
-  );
+  return _Obj
+    .keys(apps)
+    .filter(isApplicationEnabled)
+    .map(getAppProvider)
+    .filter(Boolean);
 }
 
 export function isWalnut369Enabled() {
@@ -1102,7 +1099,7 @@ function addExternalWallets(enabledWallets) {
     |> _Obj.loop((externalWallet) => {
       if (wallets[externalWallet]) {
         wallets[externalWallet].custom = true;
-        if (!(enabledWallets |> _Arr.contains(externalWallet))) {
+        if (!enabledWallets.includes(externalWallet)) {
           enabledWallets.unshift(externalWallet);
         }
       }
@@ -1126,7 +1123,7 @@ function getUsableMethods() {
   const methods = methodsFromInstruments.concat(sequenceMethods);
 
   // Remove duplicates
-  return _Arr.removeDuplicates(methods);
+  return getUniqueValues(methods);
 }
 
 /**
@@ -1138,7 +1135,7 @@ function getUsableMethods() {
  * @returns {boolean}
  */
 export function isMethodUsable(method) {
-  return _Arr.contains(getUsableMethods(), method);
+  return getUsableMethods().includes(method);
 }
 
 /**

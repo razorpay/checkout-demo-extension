@@ -256,19 +256,16 @@
     if (
       !instrument.flows ||
       !instrument.apps ||
-      !_Arr.contains(instrument.flows, 'intent')
+      !instrument.flows.includes('intent')
     ) {
       return getUPIIntentApps().filtered;
     }
 
     const allApps = getUPIIntentApps().all;
 
-    return _Arr.filter(
-      _Arr.map(instrument.apps, (app) =>
-        _Arr.find(allApps, (deviceApp) => deviceApp.package_name === app)
-      ),
-      Boolean
-    );
+    return instrument.apps
+      .map((app) => allApps.find((deviceApp) => deviceApp.package_name === app))
+      .filter(Boolean);
   }
 
   let intentApps = getUPIIntentApps().filtered;
@@ -290,7 +287,7 @@
   // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
   $: selectedToken,
     selectedBankForRecurring,
-    _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
+    ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
@@ -315,7 +312,9 @@
     // BE does not support saved vpa tokens for recurring payments
     // conditional support might be added later
     if (!isRecurring()) {
-      tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+      tokens = _Obj
+        .getSafely($customer, 'tokens.items', [])
+        .filter((token) => token.method === 'upi');
       tokens = getAllowedPSPs[method](tokens);
       addDowntime();
 
@@ -471,10 +470,9 @@
       default:
         // `selectedToken` can be null if nothing is to be selected by default
         if (selectedToken) {
-          _token = _Arr.find(
-            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
-            (token) => token.id === selectedToken
-          );
+          _token = _Obj
+            .getSafely(session.getCurrentCustomer(), 'tokens.items', [])
+            .find((token) => token.id === selectedToken);
 
           Analytics.track('upi:token:switch:default', {
             data: {
@@ -696,18 +694,8 @@
           all: apps.all.length,
         },
         list: {
-          eligible: _Arr.join(
-            _Arr.map(apps.filtered, function (app) {
-              return app.package_name;
-            }),
-            ','
-          ),
-          all: _Arr.join(
-            _Arr.map(apps.all, function (app) {
-              return app.package_name;
-            }),
-            ','
-          ),
+          eligible: apps.filtered.map((app) => app.package_name).join(','),
+          all: apps.all.map((app) => app.package_name).join(','),
         },
       },
     });

@@ -145,7 +145,7 @@
     delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
   }
 
-  const apps = _Arr.map(getAppsForCards(), (code) => getAppProvider(code));
+  const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
 
   const session = getSession();
@@ -384,7 +384,7 @@
       return tokens;
     }
 
-    const eligibleTokens = _Arr.filter(tokens, (token) => {
+    const eligibleTokens = tokens.filter((token) => {
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
 
@@ -408,16 +408,14 @@
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
-        ? _Arr.contains(issuers, token.card.issuer)
+        ? issuers.includes(token.card.issuer)
         : true;
 
       const networkMatches = hasNetworks
-        ? _Arr.contains(networks, token.card.network)
+        ? networks.includes(token.card.network)
         : true;
 
-      const typeMatches = hasTypes
-        ? _Arr.contains(types, token.card.type)
-        : true;
+      const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
       return issuerMatches && networkMatches && typeMatches;
     });
@@ -502,8 +500,8 @@
       return false;
     }
 
-    const block = _Arr.find($blocks, (block) =>
-      _Arr.contains(block.instruments, $methodInstrument)
+    const block = $blocks.find((block) =>
+      block.instruments.includes($methodInstrument)
     );
 
     return block && block.code !== 'rzp.cluster';
@@ -545,11 +543,11 @@
   }
 
   function filterSavedCardsForRecurring(tokens) {
-    return _Arr.filter(tokens, (token) => token.recurring);
+    return tokens.filter((token) => token.recurring);
   }
 
   function filterSavedCardsForEmi(tokens) {
-    return _Arr.filter(tokens, (token) => token.plans);
+    return tokens.filter((token) => token.plans);
   }
 
   export function showLandingView() {

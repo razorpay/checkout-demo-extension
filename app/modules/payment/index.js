@@ -613,7 +613,7 @@ Payment.prototype = {
       isPowerWallet(data.wallet);
     if (
       !isRazorpayFrame() && // razorpay.js
-      (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)
+      (popupForMethods.includes(data.method) || paymentThroughPowerWallet)
     ) {
       return;
     }

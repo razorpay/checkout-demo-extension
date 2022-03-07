@@ -77,7 +77,7 @@ export function getOffersForTab(method) {
 
   if (method) {
     const sequence = storeGetter(sequenceStore);
-    const sessionHasEmi = _Arr.contains(sequence, 'emi');
+    const sessionHasEmi = sequence.includes('emi');
 
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
@@ -92,9 +92,7 @@ export function getOffersForTab(method) {
       methods.push('emi');
     }
 
-    return allOffers.filter((offer) =>
-      _Arr.contains(methods, offer.payment_method)
-    );
+    return allOffers.filter((offer) => methods.includes(offer.payment_method));
   }
 
   return allOffers;
@@ -127,7 +125,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 
   const sequence = storeGetter(sequenceStore);
 
-  const sessionHasEmi = _Arr.contains(sequence, 'emi');
+  const sessionHasEmi = sequence.includes('emi');
   const isOfferForEmi = offer.payment_method === 'emi';
   const isInstrumentForCardlessEmi = instrument.method === 'cardless_emi';
 
@@ -153,7 +151,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
       return true;
     }
 
-    return _Arr.contains(instrumentValues, offerIssuer);
+    return instrumentValues.includes(offerIssuer);
   } else {
     return true;
   }
@@ -168,7 +166,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 export function getOffersForInstrument(instrument) {
   const offers = getOffersForTab(instrument.method);
 
-  return _Arr.filter(offers, (offer) =>
+  return offers.filter((offer) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
@@ -202,14 +200,14 @@ export const getAllOffers = () => {
   if (isPartialPayment()) {
     return [];
   } else {
-    return getMerchantOffers() || [] |> _Arr.filter(isOfferEligible);
+    return (getMerchantOffers() || []).filter(isOfferEligible);
   }
 };
 
 function _getAllInstrumentsForOffer(offer) {
   const allInstruments = storeGetter(instruments);
 
-  return _Arr.filter(allInstruments, (instrument) =>
+  return allInstruments.filter((instrument) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
@@ -217,8 +215,7 @@ function _getAllInstrumentsForOffer(offer) {
 const INSTRUMENT_TO_SELECT_HANDLERS = {
   default: (offer) => {
     const instruments = _getAllInstrumentsForOffer(offer);
-    const nonSavedCardInstruments = _Arr.filter(
-      instruments,
+    const nonSavedCardInstruments = instruments.filter(
       (instrument) => !isSavedCardInstrument(instrument)
     );
 
@@ -233,10 +230,7 @@ const INSTRUMENT_TO_SELECT_HANDLERS = {
     const instruments = _getAllInstrumentsForOffer(offer);
 
     // Try choosing instrument for entire method
-    const methodInstrument = _Arr.find(
-      instruments,
-      isInstrumentForEntireMethod
-    );
+    const methodInstrument = instruments.find(isInstrumentForEntireMethod);
 
     if (methodInstrument) {
       return methodInstrument;

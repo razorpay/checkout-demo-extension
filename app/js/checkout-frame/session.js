@@ -1010,10 +1010,7 @@ Session.prototype = {
       // We're currently bypassing prefill check for emandate and nach.
       // TODO: We'll need to fix this
       var methodsToBypassCheckFor = ['emandate', 'nach'];
-      var bypassMethodCheck = _Arr.contains(
-        methodsToBypassCheckFor,
-        usableMethod
-      );
+      var bypassMethodCheck = methodsToBypassCheckFor.includes(usableMethod);
 
       // Go to homescreen if prefilled method is unusable
       if (!bypassMethodCheck && !MethodStore.isMethodUsable(usableMethod)) {
@@ -2808,12 +2805,13 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(
-          MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOffer),
-          function (p) {
-            return p.duration === emiDuration;
-          }
-        );
+        var plan = MethodStore.getEMIBankPlans(
+          bank,
+          'credit',
+          !isEmiOffer
+        ).find(function (p) {
+          return p.duration === emiDuration;
+        });
         if (
           plan &&
           offer.id &&
@@ -3557,7 +3555,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3677,7 +3675,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3761,7 +3759,7 @@ Session.prototype = {
         },
 
         select: function (value) {
-          var plan = _Arr.find(plans, function (plan) {
+          var plan = plans.find(function (plan) {
             return plan.duration === value;
           });
 
@@ -3882,17 +3880,14 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(
-          [
-            '#form-upi',
-            '#form-card',
-            '#form-wallet',
-            '#form-emandate',
-            '#form-upi_otm',
-            '#form-international',
-          ],
-          activeForm
-        )
+        ![
+          '#form-upi',
+          '#form-card',
+          '#form-wallet',
+          '#form-emandate',
+          '#form-upi_otm',
+          '#form-international',
+        ].includes(activeForm)
       ) {
         fillData(activeForm, data);
       }

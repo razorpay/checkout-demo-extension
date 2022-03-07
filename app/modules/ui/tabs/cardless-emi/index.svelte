@@ -94,8 +94,8 @@
     if (!instrument.providers) {
       return providers;
     }
-    const filteredProviders = _Arr.filter(providers, (provider) =>
-      _Arr.contains(instrument.providers, provider.data.code)
+    const filteredProviders = providers.filter((provider) =>
+      instrument.providers.includes(provider.data.code)
     );
 
     return filteredProviders;

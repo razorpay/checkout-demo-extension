@@ -46,21 +46,18 @@ function _translate(options = {}, external) {
   /**
    * Create hidden instruments
    */
-  const allHiddenInstruments =
-    hide |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
+  const allHiddenInstruments = hide.map(createInstrument).filter(Boolean);
 
-  const hiddenInstruments = _Arr.filter(
-    allHiddenInstruments,
+  const hiddenInstruments = allHiddenInstruments.filter(
     (instrument) => !isInstrumentForEntireMethod(instrument)
   );
 
   /**
    * Create disabled methods
    */
-  const hiddenMethods =
-    allHiddenInstruments
-    |> _Arr.filter(isInstrumentForEntireMethod)
-    |> _Arr.map((instrument) => instrument.method);
+  const hiddenMethods = allHiddenInstruments
+    .filter(isInstrumentForEntireMethod)
+    .map((instrument) => instrument.method);
 
   /**
    * RESTRICTIONS

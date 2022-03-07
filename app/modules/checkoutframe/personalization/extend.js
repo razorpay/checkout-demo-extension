@@ -11,7 +11,7 @@ const EXTENDERS = {
     }
 
     // Find a token with the same VPA as the handle
-    const tokenWithSameVpa = _Arr.find(tokens, (token) => {
+    const tokenWithSameVpa = tokens.find((token) => {
       if (token.method !== 'upi') {
         return false;
       }
@@ -41,7 +41,7 @@ const EXTENDERS = {
 export function extendInstruments(params) {
   const { instruments } = params;
 
-  return _Arr.map(instruments, (instrument) => {
+  return instruments.map((instrument) => {
     const { method } = instrument;
 
     const extender = EXTENDERS[method] || EXTENDERS.default;

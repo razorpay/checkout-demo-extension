@@ -365,8 +365,7 @@
       selectedCurrency &&
       currencies[selectedCurrency].conversion_percentage) ||
     0;
-  $: selectedCurrencyInDisplay = _Arr.find(
-    displayCurrencies,
+  $: selectedCurrencyInDisplay = displayCurrencies?.find(
     ({ currency }) => currency === selectedCurrency
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
@@ -429,8 +428,8 @@
       if (b === cardCurrency) {
         return 1;
       }
-      if (_Arr.contains(topCurrencies, a)) {
-        if (_Arr.contains(topCurrencies, b)) {
+      if (topCurrencies.includes(a)) {
+        if (topCurrencies.includes(b)) {
           const indexOfA = topCurrencies.indexOf(a);
           const indexOfB = topCurrencies.indexOf(b);
           return indexOfA > indexOfB ? 1 : -1;
@@ -441,7 +440,7 @@
       return 0;
     });
 
-    return _Arr.map(sorted, (_currency) => {
+    return sorted.map((_currency) => {
       const currency = _currency[0];
       const rest = _currency[1];
 
@@ -466,7 +465,7 @@
     if (!$customer.tokens.items) {
       return;
     }
-    return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
+    return $customer.tokens.items.find((token) => token.id === tokenId);
   }
 </script>
 

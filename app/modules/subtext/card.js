@@ -21,7 +21,7 @@ import {
  * @returns {string}
  */
 function concatTruthyString(list) {
-  return list |> _Arr.filter(Boolean) |> _Arr.join(' ');
+  return list.filter(Boolean).join(' ');
 }
 
 /**
@@ -35,9 +35,9 @@ function concatTruthyString(list) {
  * @returns {string}
  */
 export function generateSubtextForCardInstrument(instrument, locale) {
-  const instrumentIssuers =
-    instrument.issuers || []
-    |> _Arr.map((bank) => getCommonBankName(bank).replace(/ Bank$/, ''));
+  const instrumentIssuers = (instrument.issuers || []).map((bank) =>
+    getCommonBankName(bank).replace(/ Bank$/, '')
+  );
   const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
   const instrumentIins = instrument.iins || [];
@@ -102,7 +102,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       }
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       networksString,
       typesString,
       cardsString,
@@ -134,7 +134,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       );
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,
@@ -171,7 +171,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,
@@ -200,7 +200,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
-    stringList = _Arr.mergeWith(stringList, [
+    stringList = stringList.concat([
       issuersString,
       networksString,
       typesString,
@@ -321,11 +321,10 @@ export function generateSubtextForRecurring({
 }
 
 function generateTextForCardNetwork({ mastercard, visa, amex }, locale) {
-  const networksList =
-    [
-      visa ? 'Visa' : '',
-      mastercard ? 'Mastercard' : '',
-      amex ? 'American Express' : '',
-    ] |> _Arr.filter(Boolean);
+  const networksList = [
+    visa ? 'Visa' : '',
+    mastercard ? 'Mastercard' : '',
+    amex ? 'American Express' : '',
+  ].filter(Boolean);
   return generateTextFromList(networksList, locale);
 }

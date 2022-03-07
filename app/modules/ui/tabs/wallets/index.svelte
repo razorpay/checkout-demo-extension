@@ -80,8 +80,8 @@
       return wallets;
     }
 
-    let filtered = _Arr.filter(wallets, (wallet) =>
-      _Arr.contains(instrument.wallets, wallet.code)
+    let filtered = wallets.filter((wallet) =>
+      instrument.wallets.includes(wallet.code)
     );
 
     return filtered;

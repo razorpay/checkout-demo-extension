@@ -59,8 +59,8 @@ export const getAppsForMethod = (method) => {
 };
 
 export function getCardApps(sdkMeta, externalSDKs, uriData) {
-  const apps = getAppsForMethod('card') |> _Arr.map(getProvider);
-  const filteredApps = _Arr.filter(apps, (app) => {
+  const apps = getAppsForMethod('card').map(getProvider);
+  const filteredApps = apps.filter((app) => {
     if (app.externalSDK) {
       if (!_.isNonNullObject(externalSDKs)) {
         return false;
@@ -96,7 +96,7 @@ export function getCardApps(sdkMeta, externalSDKs, uriData) {
       if (!uriData || !uriData.length) {
         return false;
       }
-      const appData = _Arr.find(uriData, (p) => app.code === p.shortcode);
+      const appData = uriData.find((p) => app.code === p.shortcode);
       if (!appData || appData.uri !== app.uri) {
         return false;
       }
@@ -106,5 +106,5 @@ export function getCardApps(sdkMeta, externalSDKs, uriData) {
     return true;
   });
 
-  return filteredApps |> _Arr.map((app) => app.code);
+  return filteredApps.map((app) => app.code);
 }

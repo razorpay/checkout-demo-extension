@@ -158,7 +158,7 @@
       // Flip just the overflowing direction
       directionsList.push(
         [flipped].concat(
-          _Arr.filter(directions, (direction) => direction !== overflowIn[0])
+          directions.filter((direction) => direction !== overflowIn[0])
         )
       );
 

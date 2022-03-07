@@ -64,11 +64,11 @@ function getExtractedDetails(payment, customer, extra = {}) {
    *
    * Unset card object if payment not made via saved card
    */
-  if (_Arr.contains(['card', 'emi'], payment.method)) {
+  if (['card', 'emi'].includes(payment.method)) {
     if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
-        let token = _Arr.find(cards, (card) => card.token === details.token);
+        let token = cards.find((card) => card.token === details.token);
 
         if (!token) {
           return;
@@ -98,7 +98,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
   if (payment.method === 'upi') {
     if (payment.token && customer) {
       let tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      let token = _Arr.find(tokens, (token) => token.token === details.token);
+      let token = tokens.find((token) => token.token === details.token);
 
       if (!token) {
         return;
@@ -117,8 +117,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
   }
 
   if (payment.upi_app) {
-    let app = _Arr.find(
-      getUPIIntentApps().all,
+    let app = getUPIIntentApps().all.find(
       (app) => app.package_name === payment.upi_app
     );
     details.app_name = app.app_name;
@@ -178,8 +177,7 @@ const MAPPERS = {
     }
 
     // Find an instrument with the same VPA
-    const existingInstrumentWithVpa = _Arr.find(
-      instruments,
+    const existingInstrumentWithVpa = instruments.find(
       (instrument) => instrument.vpa === vpa
     );
 
@@ -197,7 +195,7 @@ const MAPPERS = {
 
   // Works to extract instruments based on a unique key
   default: (extracted, instruments) => {
-    return _Arr.find(instruments, (instrument) => {
+    return instruments.find((instrument) => {
       let same = true;
 
       _Obj.loop(extracted, (val, key) => {
@@ -303,8 +301,7 @@ function updateInstrumentForCustomer(instrument, customer) {
   const instrumentsList = getAllInstruments();
   let instruments = getAllInstrumentsForCustomer(customer);
 
-  const existing = _Arr.find(
-    instruments,
+  const existing = instruments.find(
     (_instrument) => _instrument.id === instrument.id
   );
 
@@ -405,13 +402,13 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
     }
 
     // Sort instruments by their score
-    _Arr.sort(instruments, (a, b) =>
+    instruments.sort((a, b) =>
       a.score > b.score ? -1 : ~~(a.score < b.score)
     );
 
     return {
       identified,
-      instruments: _Arr.map(instruments, translateInstrumentToConfig),
+      instruments: instruments.map(translateInstrumentToConfig),
     };
   });
 };
@@ -450,13 +447,10 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
   });
 
   // Add token to saved card and saved vpa instrument
-  if (_Arr.contains(['card', 'upi'], payment.method)) {
+  if (['card', 'upi'].includes(payment.method)) {
     const tokens = customer && _Obj.getSafely(customer, 'tokens.items', []);
 
-    const token = _Arr.find(
-      tokens,
-      (token) => token.id === instrument.token_id
-    );
+    const token = tokens.find((token) => token.id === instrument.token_id);
 
     if (token) {
       payment.token = token.token;

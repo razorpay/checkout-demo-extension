@@ -44,11 +44,9 @@ const INSTRUMENT_CREATORS = {
     }
 
     if (instrument.apps) {
-      instrument.apps =
-        instrument.apps
-        |> _Arr.map((app) => {
-          return getPackageNameFromShortcode(app) || app;
-        });
+      instrument.apps = instrument.apps.map((app) => {
+        return getPackageNameFromShortcode(app) || app;
+      });
     }
 
     return instrument;
@@ -81,17 +79,15 @@ function hasOnlyAllowedKeys(instrument) {
   );
 
   // None of the instrumentKeys should be absent from allowedKeys
-  const anyAbsent = instrumentKeys.some(
-    (key) => !_Arr.contains(allowedKeys, key)
-  );
+  const anyAbsent = instrumentKeys.some((key) => !allowedKeys.includes(key));
 
   if (anyAbsent) {
     return false;
   }
 
   // All keys must be arrays
-  const allArrays = _Arr.every(instrumentKeys, (key) =>
-    _.isArray(instrument[key])
+  const allArrays = instrumentKeys.every((key) =>
+    Array.isArray(instrument[key])
   );
 
   return allArrays;
@@ -150,10 +146,7 @@ export function isInstrumentForEntireMethod(instrument) {
   const currentInsturmentKeys = _Obj.keys(instrument);
 
   // None of the keys in the config should be present in the instrument
-  return _Arr.every(
-    config.properties,
-    (key) => !_Arr.contains(currentInsturmentKeys, key)
-  );
+  return config.properties.every((key) => !currentInsturmentKeys.includes(key));
 }
 
 /**
@@ -196,9 +189,7 @@ export function getExtendedSingleInstrument(instrument) {
  * @returns {boolean}
  */
 export function isSavedCardInstrument(instrument) {
-  return (
-    _Arr.contains(['card', 'emi'], instrument.method) && instrument.token_id
-  );
+  return ['card', 'emi'].includes(instrument.method) && instrument.token_id;
 }
 
 /**
@@ -218,7 +209,7 @@ export function isInstrumentGrouped(instrument) {
    *
    * TODO: Check for UPI in isMethodWithToken
    */
-  const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
+  const isMethodWithToken = ['card', 'emi'].includes(instrument.method);
 
   if (isMethodInstrument) {
     return true;
@@ -237,7 +228,7 @@ export function isInstrumentGrouped(instrument) {
     }
 
     // UPI omnichannel always needs to go deeper
-    if (_Arr.contains(instrument.flows, 'omnichannel')) {
+    if (instrument.flows.includes('omnichannel')) {
       return true;
     }
 
@@ -245,7 +236,7 @@ export function isInstrumentGrouped(instrument) {
      * Collect needs to go deeper if this is not an individual
      * instrument with a VPA
      */
-    if (_Arr.contains(instrument.flows, 'collect')) {
+    if (instrument.flows.includes('collect')) {
       let ungrouped = instrument._ungrouped;
 
       // If individual, check for VPA
@@ -261,7 +252,7 @@ export function isInstrumentGrouped(instrument) {
     }
 
     // If flow is intent and no apps are specified, go deeper
-    if (_Arr.contains(instrument.flows, 'intent') && !instrument.apps) {
+    if (instrument.flows.includes('intent') && !instrument.apps) {
       return true;
     }
   }
