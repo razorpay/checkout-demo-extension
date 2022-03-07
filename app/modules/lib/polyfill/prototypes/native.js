@@ -319,6 +319,8 @@ if (!global.alert.name) {
 
 /**
  * Array.prototype.findIndex
+ * Polyfill for Array.prototype.findIndex
+ * Source: https://github.com/jsPolyfill/Array.prototype.findIndex/blob/master/findIndex.js
  */
 (function () {
   if (!Array.prototype.findIndex) {

@@ -87,7 +87,12 @@ const messageTransformers = {
   },
 
   addFeatures: (transfomed, message) => {
-    const features = ['activity_recreated', 'embedded', 'params'];
+    const features = [
+      'activity_recreated',
+      'embedded',
+      'params',
+      'pdf_download_supported',
+    ];
     const options = message.options;
 
     _Obj.loop(features, (feature) => {

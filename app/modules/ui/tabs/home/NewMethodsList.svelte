@@ -1,21 +1,23 @@
 <script>
   // Svelte imports
   import { onDestroy } from 'svelte';
-  import { slide } from 'svelte/transition';
   import { linear } from 'svelte/easing';
+  import { slide } from 'svelte/transition';
 
   // UI imports
-  import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
   import RazorpayCluster from 'ui/tabs/home/RazorpayCluster.svelte';
+  import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
 
-  // Utils imports
-  import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
+  // Utils & helpers imports
   import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
-  import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+  import * as AnalyticsTypes from 'analytics-types';
   import { getAnimationOptions } from 'svelte-utils';
+  import { isUserLoggedIn } from 'common/helpers/customer';
+  import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+  import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
   import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+
   // Store
   import {
     selectedInstrument,
@@ -30,14 +32,15 @@
     CONFIG_BLOCK_DEFAULT_TITLE,
     FREQUENTLY_USED_CONFIG_TITLE,
   } from 'ui/labels/methods';
+
   // helpers
   import { setDynamicFees } from './helpers';
+
+  const session = getSession();
 
   onDestroy(() => {
     deselectInstrument();
   });
-
-  const session = getSession();
 
   $: {
     if (session.screen === '') {

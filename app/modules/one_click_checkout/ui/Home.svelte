@@ -16,7 +16,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   // Helpers import
   import { determineLandingView } from 'one_click_checkout/helper';
-  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+  import { getCustomerDetails } from 'common/helpers/customer';
   import { destroySummaryModal } from 'one_click_checkout/summary_modal';
   // svelte imports
   import { onMount, tick, afterUpdate, onDestroy } from 'svelte';

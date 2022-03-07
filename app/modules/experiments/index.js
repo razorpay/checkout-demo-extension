@@ -154,7 +154,7 @@ class Experiment {
   /**
    *
    * @param {String} name
-   * @param {Function} evaluator returns 0 or 1
+   * @param {Function | Number} evaluator returns 0 or 1
    * @param {CreateExperimentOptions} options
    * @returns {SingleExperiment}
    */
