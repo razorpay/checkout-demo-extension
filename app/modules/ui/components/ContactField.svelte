@@ -7,6 +7,8 @@
   import Field from 'ui/components/Field.svelte';
   import CountrySearchModal from 'ui/components/CountrySearchModal.svelte';
 
+  import { shouldShowNewDesign } from 'one_click_checkout/store';
+
   import {
     COUNTRY_CODE_PATTERN,
     PHONE_PATTERN,
@@ -37,7 +39,7 @@
   export let inAddress = false;
   export let validationText;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const shouldShowNewDesigns = shouldShowNewDesign();
 
   const dispatch = createEventDispatcher();
 
@@ -138,13 +140,18 @@
     icon=""
     modifyIconPosition={!!validationText}
     formatter={{ type: 'country_code' }}
-    label={isOneClickCheckoutEnabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
+    label={shouldShowNewDesigns ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
     on:blur
     value={country}
     helpText={$t(COUNTRY_HELP_TEXT)}
     elemClasses={inAddress ? 'address-elem' : ''}
-    labelClasses={inAddress ? 'address-label' : ''}
+    labelClasses={`${inAddress && 'address-label'} ${
+      shouldShowNewDesign && 'hidden'
+    }`}
+    inputFieldClasses={shouldShowNewDesigns
+      ? 'country-code-one-click-checkout'
+      : ''}
   />
   <!-- LABEL: Please enter a valid country code -->
 
@@ -169,7 +176,15 @@
     on:blur
     value={phone}
     elemClasses={inAddress ? 'address-elem' : ''}
-    labelClasses={inAddress ? 'address-label' : ''}
+    labelClasses={`${inAddress && 'address-label'} ${
+      shouldShowNewDesign && 'contact-label'
+    }`}
+    inputFieldClasses={shouldShowNewDesigns
+      ? 'phone-field-one-click-checkout'
+      : ''}
+    errorValidationClasses={shouldShowNewDesigns
+      ? 'contact-validation-error'
+      : ''}
     {validationText}
   />
   <!-- LABEL: Please enter a valid contact number -->
