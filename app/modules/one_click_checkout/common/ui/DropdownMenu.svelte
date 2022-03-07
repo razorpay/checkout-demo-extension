@@ -11,7 +11,7 @@
   import { slide } from 'svelte/transition';
 
   // utils imports
-  import { attachEvent } from '../utils';
+  import { attachEvent } from 'one_click_checkout/common/utils';
 
   export let open = false;
   export let placement = MENU_PLACEMENT.RIGHT;
