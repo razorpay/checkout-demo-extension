@@ -55,10 +55,12 @@
   setEmail(getPrefilledEmail());
 
   let theme = getTheme();
+
   let styles = {
     'highlight-color': theme.highlightColor,
     'sec-highlight-color': theme.secondaryHighlightColor,
     'background-color': theme.backgroundColor,
+    'error-validation-color': '#B21528',
   };
 
   $: cssVarStyles = Object.entries(styles)

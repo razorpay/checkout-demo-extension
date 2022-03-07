@@ -29,9 +29,12 @@
     }
   }
 
-  function onFocus() {
+  function onFocus(event) {
     focused = true;
-
+    const { parentNode } = event.target || {};
+    if (parentNode?.classList?.contains('focused')) {
+      parentNode.classList.remove('focused');
+    }
     if (value) {
       selectFullText();
     }
@@ -44,12 +47,13 @@
     }, 200);
     dispatch('blur', e);
   }
+
+  function handleClickLabel() {
+    inputField.focus();
+  }
 </script>
 
-<div class="wrapper" class:invalid={validationText}>
-  <span class="label" class:label-top={focused || !!value}>
-    {`${$t(label)}${required ? '*' : ''}`}
-  </span>
+<div class="wrapper input-group" class:invalid={validationText}>
   <div
     {id}
     bind:this={inputField}
@@ -57,12 +61,22 @@
     contenteditable
     class="input"
     class:focused
+    class:input-focused={focused}
+    class:input-error={validationText !== ''}
     on:input
     on:focus={onFocus}
     on:blur={onBlur}
   >
     {value}
   </div>
+  <label
+    for="inputField"
+    class="label"
+    class:label-upper={value}
+    on:click={handleClickLabel}
+  >
+    {$t(label)}
+  </label>
   {#if validationText !== ''}
     <div class="input-validation-error">{validationText}</div>
   {/if}
@@ -90,6 +104,15 @@
     border-radius: 4px;
     box-sizing: border-box;
     outline-style: none;
+    position: relative;
+  }
+
+  .input-focused {
+    border-color: #5186f3;
+  }
+
+  .input-error {
+    border-color: var(--error-validation-color);
   }
 
   .wrapper {
@@ -97,16 +120,23 @@
     margin-bottom: 12px;
   }
 
-  .label {
-    line-height: 19px;
-    color: #757575;
+  .label-top {
+    position: absolute;
+    top: 28px;
+    left: 8px;
+    bottom: auto;
+    transform: translateY(-30px);
+    padding: 0px 4px;
+    background-color: #fff;
+    z-index: 1;
   }
 
-  .label-top {
-    top: 40px;
-    font-size: 12px;
-    line-height: 13px;
-    transform: translateY(-30px);
+  .label-top-focused {
+    color: #5186f3;
+  }
+
+  .label-error {
+    color: var(--error-validation-color);
   }
 
   .suggestion-dropdown {
@@ -150,12 +180,64 @@
   }
 
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
 
   .invalid:not(.focused) {
-    color: #f46060;
+    color: var(--error-validation-color);
+  }
+
+  .input {
+    outline: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #424242;
+    margin-bottom: 0px;
+  }
+  .label {
+    color: #8d8d8d;
+    position: absolute;
+    top: 22px;
+    left: 16px;
+    background: #fff;
+    cursor: inherit;
+    transition: all ease-in 0.2s;
+  }
+  .input:focus {
+    border: 1px solid royalblue;
+  }
+  .input-group.invalid .input:focus {
+    border: 1px solid var(--error-validation-color);
+    color: var(--error-validation-color);
+  }
+
+  .input-group .input:focus + .label {
+    top: 0px;
+    padding: 0 4px;
+    font-size: 12px;
+    left: 8px;
+    color: royalblue;
+    transition: all ease-out 0.2s;
+  }
+  .input-group .input:valid + .label {
+    top: -8px;
+    padding: 0 4px;
+    font-size: 12px;
+    left: 8px;
+  }
+
+  .label-upper {
+    top: 0px;
+    padding: 0 4px;
+    font-size: 12px;
+    left: 8px;
+    transition: all ease-out 0.2s;
+  }
+
+  .input-group.invalid .input:focus + .label {
+    color: var(--error-validation-color);
   }
 </style>

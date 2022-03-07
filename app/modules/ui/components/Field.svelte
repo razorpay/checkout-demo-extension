@@ -5,6 +5,7 @@
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { isOneClickCheckout } from 'razorpay';
+  import { shouldShowNewDesign } from 'one_click_checkout/store';
 
   // Actions
   import {
@@ -54,6 +55,8 @@
   export let dir;
   export let disabled = false;
   export let modifyIconPosition = false;
+  export let inputFieldClasses = '';
+  export let errorValidationClasses = '';
 
   /**
    * To show prediction as dropdown
@@ -108,6 +111,8 @@
   let formatterObj = null;
 
   const session = getSession();
+
+  const shouldShowNewDesigns = shouldShowNewDesign();
 
   export function getCaretPosition() {
     return formatterObj.caretPosition;
@@ -191,6 +196,12 @@
     readonlyValue = e.target.value;
     value = readonlyValue;
     getPrediction();
+    if (shouldShowNewDesigns) {
+      const { parentNode } = e.target || {};
+      if (parentNode?.classList?.contains('filled')) {
+        parentNode.classList.remove('filled');
+      }
+    }
   }
 
   function handleInputFocus(event) {
@@ -298,35 +309,30 @@
 <div
   bind:this={wrap}
   class={`elem ${elemClasses}`}
-  class:elem-1cc={isOneClickCheckoutEnabled}
+  class:elem-one-click-checkout={shouldShowNewDesigns}
   class:readonly
   class:with-prediction={isPredictionEnable}
 >
   {#if icon}
     <i
       class:icon-invalid={modifyIconPosition}
-      class:hidding-elements-1cc={isOneClickCheckoutEnabled}
+      class:hidden={shouldShowNewDesigns}
     >
       {@html icon}
     </i>
   {/if}
   {#if leftImage}
-    <img
-      class="left-img"
-      src={leftImage}
-      class:hidding-elements-1cc={isOneClickCheckoutEnabled}
-    />
+    <img class="left-img" src={leftImage} class:hidden={shouldShowNewDesigns} />
   {/if}
-  {#if label && isOneClickCheckoutEnabled}<label
-      class={`label-1cc ${labelClasses} ${
-        id === 'contact' && 'hidding-visiblity-1cc'
-      }`}>{label}</label
-    >{/if}
   <input
-    class={`${isOneClickCheckoutEnabled ? 'input-1cc' : 'input'} main`}
+    class={`${
+      shouldShowNewDesigns
+        ? `input-one-click-checkout ${inputFieldClasses}`
+        : 'input'
+    } main`}
     class:with-left-img={leftImage}
-    class:country-code-1cc={isOneClickCheckoutEnabled && id === 'country-code'}
-    class:phone-field-1cc={isOneClickCheckoutEnabled && id === 'contact'}
+    class:error-field-one-click-checkout={shouldShowNewDesigns &&
+      validationText}
     bind:this={input}
     id={identifier}
     type={inputType}
@@ -378,10 +384,15 @@
       class="input prediction-input"
     />
   {/if}
-  {#if label}<label
+  {#if label}
+    <label
       class={labelClasses}
-      class:hidding-elements-1cc={isOneClickCheckoutEnabled}>{label}</label
-    >{/if}
+      class:label-one-click-checkout={shouldShowNewDesigns}
+      class:label-upper={shouldShowNewDesigns && !focused && value}
+      class:error-label-one-click-checkout={shouldShowNewDesigns &&
+        validationText}>{label}</label
+    >
+  {/if}
   {#if extraLabel}
     <div class={`${extraLabelClass} input-extralabel`}>
       {$t(extraLabel)}
@@ -424,7 +435,13 @@
     </ul>
   {/if}
   {#if validationText !== ''}
-    <div class="input-validation-error">{validationText}</div>
+    <div
+      class={`input-validation-error ${errorValidationClasses}`}
+      class:validation-error-one-click-checkout={shouldShowNewDesigns}
+      class:contact-validation-error={shouldShowNewDesigns && id === 'contact'}
+    >
+      {validationText}
+    </div>
   {/if}
 </div>
 
@@ -441,7 +458,7 @@
     border-bottom: 0px;
   }
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
@@ -467,7 +484,7 @@
     color: #079f0d;
   }
   .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .with-prediction {
     .prediction-input {
@@ -539,40 +556,102 @@
     top: 12%;
   }
 
-  .hidding-elements-1cc {
+  .hidden {
     display: none;
   }
 
-  .hidding-visiblity-1cc {
+  .hidden {
     visibility: hidden;
   }
 
-  .input-1cc {
+  .input-one-click-checkout {
     border: 1px solid #e0e0e0;
-    margin: 8px 0px;
-    padding: 16px;
+    margin-top: 8px;
+    padding: 15px 16px;
     border-radius: 4px;
     box-sizing: border-box;
   }
 
-  .label-1cc {
-    display: contents;
-  }
-
-  .elem-1cc::after {
+  .elem-one-click-checkout::after {
     border-bottom: none !important;
   }
-  .country-code-1cc {
+  .country-code-one-click-checkout {
     border-right: none;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
   }
 
-  .phone-field-1cc {
+  .phone-field-one-click-checkout {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
-    margin-left: -22%;
+    margin-left: -15%;
     padding-right: 15%;
     width: -webkit-fill-available !important;
+  }
+
+  .label-one-click-checkout {
+    color: #8d8d8d;
+    position: absolute;
+    top: 24px;
+    left: 15px;
+    cursor: inherit;
+    transition: all ease-in 0.2s;
+  }
+
+  .input-one-click-checkout:focus + .label-one-click-checkout,
+  .label-upper {
+    top: 0px;
+    background-color: transparent;
+    font-size: 12px;
+    padding: 0px 4px;
+    left: 9px;
+    color: var(--background-color);
+    transition: all ease-out 0.2s;
+    background-color: #fff;
+  }
+
+  .input-one-click-checkout:focus
+    + .label-one-click-checkout.error-label-one-click-checkout,
+  .label-one-click-checkout.error-label-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .label-upper {
+    color: #8d8d8d;
+  }
+  .label-one-click-checkout.label-upper.contact-label {
+    left: -40%;
+  }
+
+  .label-one-click-checkout.contact-label {
+    left: -8%;
+  }
+  .input-one-click-checkout:focus + .label-one-click-checkout.contact-label {
+    left: -40%;
+  }
+
+  .input-one-click-checkout:focus {
+    border-color: var(--background-color);
+  }
+
+  .error-field-one-click-checkout {
+    border-color: var(--error-validation-color);
+  }
+
+  .error-field-one-click-checkout .label-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .error-field-one-click-checkout:focus {
+    border-color: var(--error-validation-color);
+  }
+
+  .validation-error-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .contact-validation-error {
+    position: relative;
+    left: -8%;
   }
 </style>

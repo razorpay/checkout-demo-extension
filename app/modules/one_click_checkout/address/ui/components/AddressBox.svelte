@@ -17,45 +17,42 @@
 
   export let address;
   export let isSelected = false;
-  export let onClick;
   export let checkServiceability = true;
 
   const { kebab_menu } = getIcons();
   const dispatch = createEventDispatcher();
   let dropdownTrigger;
 
-  $: isServiceable = !(
-    address['serviceability'] === false && checkServiceability
-  );
+  $: isServiceable = !(address.serviceability === false && checkServiceability);
 </script>
 
 <button
   id={`address-container${isSelected ? '-selected' : ''}`}
   class="address-container"
   class:selected-container={isSelected}
-  on:click|preventDefault={() => dispatch('selectAddress')}
+  on:click|preventDefault={() => dispatch('select')}
 >
   <div class:disabled={!isServiceable} class="box-header">
     <div class="box-title">
       <span class="address-name">
-        {address['name']}
+        {address.name}
       </span>
-      {#if address['tag']}
-        <div class="address-tag">{address['tag']}</div>
+      {#if address.tag}
+        <div class="address-tag">{address.tag}</div>
       {/if}
     </div>
     <DropdownMenu
       triggerElement={dropdownTrigger}
-      on:click={() => dispatch('selectAddress')}
+      on:click={() => dispatch('select')}
     >
       <button bind:this={dropdownTrigger}>
         <Icon icon={kebab_menu} />
       </button>
-      <div slot="DropdownMenu">
+      <div slot="dropdown_menu">
         <button
           class="dropdown-item"
           type="button"
-          on:click={() => dispatch('editAddressClick', address)}
+          on:click={() => dispatch('editClick', address)}
           >{$t(EDIT_ADDRESS_LABEL)}</button
         >
       </div>
@@ -65,20 +62,20 @@
     <div class:disabled={!isServiceable}>
       <p>{address.formattedLine1}</p>
       <p>{address.formattedLine2}</p>
-      {#if address['landmark']}
+      {#if address.landmark}
         <div class="address-landmark">
           {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
-          {address['landmark']}
+          {address.landmark}
         </div>
       {/if}
-      {#if address['contact']}
+      {#if address.contact}
         <div>
           {$t(SAVED_ADDRESS_PHONE_LABEL)}:
-          {address['contact']}
+          {address.contact}
         </div>
       {/if}
     </div>
-    <!-- address['serviceability'] will be null for unknown serviceability -->
+    <!-- address.serviceability will be null for unknown serviceability -->
     {#if !isServiceable}
       <div class="address-serviceability-error">
         {$t(NON_SERVICEABLE_LABEL)}

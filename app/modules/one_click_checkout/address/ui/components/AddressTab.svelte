@@ -216,8 +216,8 @@
       <SavedAddresses
         {selectedAddressId}
         addresses={savedAddresses}
-        on:selectedAddressUpdate={handleAddressSelection}
-        on:editAddressClick={handleEditAddressClick}
+        on:select={handleAddressSelection}
+        on:editClick={handleEditAddressClick}
         onAddAddressClick={handleAddAddressClick}
         checkServiceability={Resource[addressType].checkServiceability}
         {addressType}

@@ -11,7 +11,7 @@
   import { slide } from 'svelte/transition';
 
   // utils imports
-  import { attachEvent } from '../utils';
+  import { attachEvent } from 'one_click_checkout/common/utils';
 
   export let open = false;
   export let placement = MENU_PLACEMENT.RIGHT;
@@ -46,9 +46,7 @@
   }
 
   function onDropdownClosed() {
-    if (outsideClickEvent) {
-      outsideClickEvent.remove();
-    }
+    outsideClickEvent?.remove();
   }
 
   onMount(() => {
@@ -77,7 +75,7 @@
       bind:this={menuItem}
       transition:slide|local={{ duration: 100 }}
     >
-      <slot name="DropdownMenu" />
+      <slot name="dropdown_menu" />
     </div>
   {/if}
 </div>
