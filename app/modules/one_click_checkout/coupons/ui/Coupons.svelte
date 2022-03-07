@@ -1,4 +1,7 @@
 <script>
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI Imports
   import CTA from 'ui/elements/CTA.svelte';
   import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
@@ -9,7 +12,10 @@
   // store imports
   import { getCurrency, getPrefilledCouponCode } from 'razorpay';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-  import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    checkServiceabilityStatus,
+    selectedAddress,
+  } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
     isCouponApplied,
@@ -18,9 +24,12 @@
     couponInputSource,
   } from 'one_click_checkout/coupons/store';
   import { savedAddresses } from 'one_click_checkout/address/store';
-
-  // svelte imports
-  import { onMount } from 'svelte';
+  import {
+    cartAmount,
+    cartDiscount,
+    amount,
+  } from 'one_click_checkout/charges/store';
+  import { removeCouponInStore } from 'one_click_checkout/coupons/store';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -35,39 +44,36 @@
     AMOUNT_LABEL,
   } from 'one_click_checkout/summary_modal/i18n/labels';
 
-  import { formatAmountWithSymbol } from 'common/currency';
-
-  // Coupons imports
+  // session imports
   import {
     showDetailsOverlay,
     removeCouponCode,
     showAmountInTopBar,
     hideAmountInTopBar,
   } from 'one_click_checkout/coupons/sessionInterface';
+  import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
+
+  // analytics imports
   import Razorpay from 'common/Razorpay';
   import Analytics, { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
-
-  import {
-    cartAmount,
-    cartDiscount,
-    amount,
-  } from 'one_click_checkout/charges/store';
-
-  import {
-    fetchCoupons,
-    applyCouponCode,
-  } from 'one_click_checkout/coupons/helpers';
-
-  import { removeCouponInStore } from 'one_click_checkout/coupons/store';
-
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
-  import { views } from 'one_click_checkout/routing/constants';
-  import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+
+  // utils imports
+  import {
+    fetchCoupons,
+    applyCouponCode,
+  } from 'one_click_checkout/coupons/helpers';
+  import { formatAmountWithSymbol } from 'common/currency';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
+  // constant imports
+  import { views } from 'one_click_checkout/routing/constants';
+  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
 
   let showCta = true;
   const currency = getCurrency();
@@ -122,6 +128,12 @@
   }
 
   onMount(() => {
+    if (
+      $savedAddresses.length &&
+      $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+    ) {
+      loadAddressesWithServiceability();
+    }
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,

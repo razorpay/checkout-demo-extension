@@ -15,8 +15,6 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
-  import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
-  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constants import
   import routes from 'one_click_checkout/routing/routes';
@@ -28,10 +26,7 @@
   import { destroySummaryModal } from 'one_click_checkout/summary_modal';
 
   // session imports
-  import {
-    getTheme,
-    loadAddressesWithServiceability,
-  } from 'one_click_checkout/address/sessionInterface';
+  import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
@@ -43,9 +38,6 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
-
-  // service imports
-  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
 
   let topbar;
   let isBackEnabled;
@@ -68,12 +60,6 @@
     .join(';');
 
   onMount(() => {
-    if (
-      $savedAddresses.length &&
-      $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
-    ) {
-      loadAddressesWithServiceability();
-    }
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,
