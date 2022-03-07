@@ -30,7 +30,7 @@
     checked={$isBillingSameAsShipping}
     id="same-address-checkbox"
   />
-  <span>{$t(SAME_ADDRESS_LABEL)}</span>
+  <span class="checkbox-text">{$t(SAME_ADDRESS_LABEL)}</span>
 </div>
 
 <style>
@@ -42,6 +42,9 @@
     padding-bottom: 8px;
   }
 
+  .checkbox-text {
+    color: #263a4a;
+  }
   .checkbox-sticky {
     position: absolute;
     bottom: 0;
