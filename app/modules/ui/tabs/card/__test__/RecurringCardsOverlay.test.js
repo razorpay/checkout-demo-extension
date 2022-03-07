@@ -18,14 +18,16 @@ describe('RecurringCardsOverlay.svelte', () => {
 
   describe('Banks support', () => {
     it.each`
-      bankName             | isCredit | isDebit  | isSuperCard
-      ${'City Union'}      | ${false} | ${true}  | ${false}
-      ${'Equitas'}         | ${false} | ${true}  | ${false}
-      ${'HSBC'}            | ${true}  | ${false} | ${false}
-      ${'Karur Vysya'}     | ${true}  | ${true}  | ${false}
-      ${'OneCard'}         | ${true}  | ${false} | ${false}
-      ${'Punjab National'} | ${true}  | ${false} | ${false}
-      ${'Slice'}           | ${false} | ${false} | ${true}
+      bankName               | isCredit | isDebit  | isSuperCard
+      ${'City Union'}        | ${false} | ${true}  | ${false}
+      ${'Equitas'}           | ${false} | ${true}  | ${false}
+      ${'HSBC'}              | ${true}  | ${false} | ${false}
+      ${'Niyo Global Cards'} | ${true}  | ${false} | ${false}
+      ${'Karur Vysya'}       | ${true}  | ${true}  | ${false}
+      ${'OneCard'}           | ${true}  | ${false} | ${false}
+      ${'Punjab National'}   | ${true}  | ${false} | ${false}
+      ${'RazorpayX'}         | ${true}  | ${false} | ${false}
+      ${'Slice'}             | ${false} | ${false} | ${true}
     `(
       '$bankName, supports credit card - $isCredit, debit card - $isDebit, super cards - $isSuperCard',
       ({ bankName, isCredit, isDebit, isSuperCard }) => {
@@ -51,14 +53,16 @@ describe('RecurringCardsOverlay.svelte', () => {
   // Check if networks are shown as configured below
   describe('Network support', () => {
     it.each`
-      bankName             | creditCards               | debitCards                | superCards
-      ${'City Union'}      | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
-      ${'Equitas'}         | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
-      ${'HSBC'}            | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
-      ${'Karur Vysya'}     | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
-      ${'OneCard'}         | ${['Visa']}               | ${[]}                     | ${[]}
-      ${'Punjab National'} | ${['Visa']}               | ${[]}                     | ${[]}
-      ${'Slice'}           | ${[]}                     | ${[]}                     | ${['Visa']}
+      bankName               | creditCards               | debitCards                | superCards
+      ${'City Union'}        | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
+      ${'Equitas'}           | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
+      ${'HSBC'}              | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
+      ${'Niyo Global Cards'} | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
+      ${'Karur Vysya'}       | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
+      ${'OneCard'}           | ${['Visa']}               | ${[]}                     | ${[]}
+      ${'Punjab National'}   | ${['Visa']}               | ${[]}                     | ${[]}
+      ${'RazorpayX'}         | ${['Visa']}               | ${[]}                     | ${[]}
+      ${'Slice'}             | ${[]}                     | ${[]}                     | ${['Visa']}
     `(
       '$bankName, supports this networks - In debit - $debitCards, In Credit - ${creditCards}, and in Super Cards - ${superCards}',
       ({ bankName, creditCards, debitCards, superCards }) => {

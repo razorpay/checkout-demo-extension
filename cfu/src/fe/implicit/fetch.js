@@ -40,6 +40,25 @@ function setKeylessHeader(id) {
 }
 
 /**
+ * Appends the query parameter to url when passed
+ * @param {string} url
+ * @param {string} paramName
+ * * @param {string} paramValue
+ *
+ * @returns {string}
+ */
+function appendQueryParamToUrl(url, paramName, paramValue) {
+  if (!paramName || !paramValue) return url;
+
+  return _.appendParamsToUrl(
+    url,
+    _.obj2query({
+      [paramName]: paramValue,
+    })
+  );
+}
+
+/**
  * Appends the keyless header query parameter to url when present
  * @param {string} url
  * @param {string} keylessHeader
@@ -47,14 +66,7 @@ function setKeylessHeader(id) {
  * @returns {string}
  */
 function appendKeylessHeaderParamToUrl(url, keylessHeader) {
-  if (!keylessHeader) return url;
-
-  return _.appendParamsToUrl(
-    url,
-    _.obj2query({
-      keyless_header: keylessHeader,
-    })
-  );
+  return appendQueryParamToUrl(url, 'keyless_header', keylessHeader);
 }
 
 /**
@@ -125,7 +137,22 @@ const fetchPrototype = {
   call: function (callback = this.options.callback) {
     var { url, method, data, headers } = this.options;
 
+    //#region DDoS Protection
+    /**
+     * These values are added in the query parameter to protect against DDoS. Edge gives
+     * some token to checkout after validating a user. Checkout then sends back these
+     * values attached with every network request because Edge will only let the
+     * network request pass through which has valid token and reject others
+     * with status code 401.
+     *
+     * keyless_header : an encrypted value is added to the serverside rendered pages like
+     *                  payment links, payment pages etc. This value is then passed to
+     *                  checkout via checkout options. This is then passed here.
+     *
+     * Same is repeated below for jsonp reqquests.
+     */
     url = appendKeylessHeaderParamToUrl(url, keylessHeader);
+    //#endregion
 
     var xhr = new Xhr();
     this.setReq('ajax', xhr);
@@ -310,7 +337,9 @@ function jsonp(options) {
     // Make the source URL
     let src = _.appendParamsToUrl(options.url, options.data);
 
+    //#region DDoS Protection
     src = appendKeylessHeaderParamToUrl(src, keylessHeader);
+    //#endregion
 
     // Add callback name to the source URL
     src = _.appendParamsToUrl(

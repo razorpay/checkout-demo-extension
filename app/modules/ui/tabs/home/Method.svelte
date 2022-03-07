@@ -34,9 +34,6 @@
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
 
-  import { onMount } from 'svelte';
-  import { RTB } from 'checkoutstore/rtb';
-
   // Props
   export let method = null; // Name of the method
   export let icon = null; // Override: icon. Picked from method if not overridden.
@@ -99,15 +96,11 @@
     }
   }
 
-  onMount(() => {
-    if (method === 'cod') {
-      isCodAvailable.subscribe((available) => {
-        disabled = !available;
-        errorLabel = COD_DISABLED_LABEL;
-        error = $codReason;
-      });
-    }
-  });
+  $: if (method === 'cod') {
+    disabled = !$isCodAvailable || $showCodLoader;
+    errorLabel = COD_DISABLED_LABEL;
+    error = $codReason;
+  }
 
   function select() {
     Analytics.track('payment_method:select', {

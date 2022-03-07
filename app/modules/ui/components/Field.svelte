@@ -4,6 +4,7 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Actions
   import {
@@ -98,6 +99,8 @@
 
   let focused = false;
   let placeholderToShow = placeholder;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Refs
   export let wrap = null;
@@ -295,20 +298,35 @@
 <div
   bind:this={wrap}
   class={`elem ${elemClasses}`}
+  class:elem-1cc={isOneClickCheckoutEnabled}
   class:readonly
   class:with-prediction={isPredictionEnable}
 >
   {#if icon}
-    <i class:icon-invalid={modifyIconPosition}>
+    <i
+      class:icon-invalid={modifyIconPosition}
+      class:hidding-elements-1cc={isOneClickCheckoutEnabled}
+    >
       {@html icon}
     </i>
   {/if}
   {#if leftImage}
-    <img class="left-img" src={leftImage} />
+    <img
+      class="left-img"
+      src={leftImage}
+      class:hidding-elements-1cc={isOneClickCheckoutEnabled}
+    />
   {/if}
+  {#if label && isOneClickCheckoutEnabled}<label
+      class={`label-1cc ${labelClasses} ${
+        id === 'contact' && 'hidding-visiblity-1cc'
+      }`}>{label}</label
+    >{/if}
   <input
-    class="input main"
+    class={`${isOneClickCheckoutEnabled ? 'input-1cc' : 'input'} main`}
     class:with-left-img={leftImage}
+    class:country-code-1cc={isOneClickCheckoutEnabled && id === 'country-code'}
+    class:phone-field-1cc={isOneClickCheckoutEnabled && id === 'contact'}
     bind:this={input}
     id={identifier}
     type={inputType}
@@ -360,7 +378,10 @@
       class="input prediction-input"
     />
   {/if}
-  {#if label}<label class={labelClasses}>{label}</label>{/if}
+  {#if label}<label
+      class={labelClasses}
+      class:hidding-elements-1cc={isOneClickCheckoutEnabled}>{label}</label
+    >{/if}
   {#if extraLabel}
     <div class={`${extraLabelClass} input-extralabel`}>
       {$t(extraLabel)}
@@ -373,7 +394,9 @@
     <div class="help">{helpText}</div>
   {/if}
   {#if downtimeSeverity}
-    <div class="downtime-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
+    <div class="downtime-icon">
+      <DowntimeIcon severe={downtimeSeverity} />
+    </div>
   {/if}
   {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
     <ul
@@ -418,7 +441,7 @@
     border-bottom: 0px;
   }
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
@@ -444,7 +467,7 @@
     color: #079f0d;
   }
   .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .with-prediction {
     .prediction-input {
@@ -514,5 +537,42 @@
 
   .icon-invalid {
     top: 12%;
+  }
+
+  .hidding-elements-1cc {
+    display: none;
+  }
+
+  .hidding-visiblity-1cc {
+    visibility: hidden;
+  }
+
+  .input-1cc {
+    border: 1px solid #e0e0e0;
+    margin: 8px 0px;
+    padding: 16px;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .label-1cc {
+    display: contents;
+  }
+
+  .elem-1cc::after {
+    border-bottom: none !important;
+  }
+  .country-code-1cc {
+    border-right: none;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .phone-field-1cc {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-left: -22%;
+    padding-right: 15%;
+    width: -webkit-fill-available !important;
   }
 </style>

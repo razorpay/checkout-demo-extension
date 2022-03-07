@@ -117,8 +117,18 @@ export const cardWithRecurringSupport = {
   STCB: { credit: true, debit: false, prepaid: true },
   FDRL: { credit: true, debit: false },
   // OneCard exclusive banks - end
+  // NIYO PAY Global Cards - start
+  DCBL: { credit: true, debit: false },
+  YESB: { credit: true, debit: false },
+  // NIYO PAY Global Cards - end
 };
-export const cobrandingPartners = ['ONE_CARD', 'SLICE'];
+export const cobrandingPartners = [
+  'ONE_CARD',
+  'SLICE',
+  'RAZORPAYX',
+  'JUPITER',
+  'NIYO',
+];
 export const supportedNetworksAndProviders = {
   CIUB: {
     credit: [],
@@ -132,15 +142,23 @@ export const supportedNetworksAndProviders = {
     credit: ['VISA', 'MC'],
     debit: [],
   },
+
   KVBL: {
     credit: ['VISA'],
     debit: ['VISA', 'MC'],
+  },
+  NIYO: {
+    credit: ['VISA', 'MC'],
   },
   ONE_CARD: {
     credit: ['VISA'],
     debit: [],
   },
   PUNB: {
+    credit: ['VISA'],
+    debit: [],
+  },
+  RAZORPAYX: {
     credit: ['VISA'],
     debit: [],
   },

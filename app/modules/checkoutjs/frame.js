@@ -108,7 +108,7 @@ function makeCheckoutUrl(rzp) {
   // const useCanary = _.random() < CANARY_PERCENTAGE;
 
   if (!url) {
-    url = makeUrl('checkout');
+    url = makeUrl('checkout', false);
 
     var urlParams = makePrefParams(rzp);
     if (!urlParams) {

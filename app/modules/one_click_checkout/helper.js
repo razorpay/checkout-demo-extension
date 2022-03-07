@@ -5,7 +5,7 @@ import {
 } from 'one_click_checkout/store';
 import { otpReasons } from 'one_click_checkout/otp/constants';
 import { views } from 'one_click_checkout/routing/constants';
-import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+import { isUserLoggedIn } from 'common/helpers/customer';
 import { askForOTP } from 'one_click_checkout/common/otp';
 import { tick } from 'svelte';
 import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';

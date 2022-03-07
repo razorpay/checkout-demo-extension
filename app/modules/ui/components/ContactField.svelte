@@ -17,12 +17,14 @@
   import {
     CONTACT_LABEL_REQUIRED,
     CONTACT_LABEL_OPTIONAL,
-    CONTACT_HELP_TEXT,
     COUNTRY_LABEL,
     COUNTRY_HELP_TEXT,
+    PHONE_NUMBER,
   } from 'ui/labels/home';
 
   import { t } from 'svelte-i18n';
+
+  import { isOneClickCheckout } from 'razorpay';
 
   // Refs
   let countryField;
@@ -34,6 +36,8 @@
   export let isOptional;
   export let inAddress = false;
   export let validationText;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   const dispatch = createEventDispatcher();
 
@@ -134,7 +138,7 @@
     icon=""
     modifyIconPosition={!!validationText}
     formatter={{ type: 'country_code' }}
-    label={$t(COUNTRY_LABEL)}
+    label={isOneClickCheckoutEnabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
     on:blur
     value={country}

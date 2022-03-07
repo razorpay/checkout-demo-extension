@@ -102,6 +102,12 @@ RazorpayDefaults.external = {
   handler: returnAsIs,
 };
 
+RazorpayDefaults.challan = {
+  fields: [],
+  disclaimers: [],
+  expiry: {},
+};
+
 RazorpayDefaults.theme = {
   upi_only: false,
   color: '',

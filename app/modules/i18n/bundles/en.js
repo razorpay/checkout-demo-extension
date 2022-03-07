@@ -787,6 +787,7 @@ export default {
     partial_payment_title: 'Select a payment type',
     pincode_help: 'Enter 6 digit pincode',
     pincode_label: 'PIN Code',
+    phone_number: 'Phone Number',
     preferred_block_title: 'Preferred Payment Methods',
     secured_by_message: 'This payment is secured by Razorpay.',
     single_block_title: 'Pay via {method}',
@@ -878,7 +879,7 @@ export default {
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
-      international: 'International Payments',
+      international: 'Instant Bank Transfer',
     },
   },
   misc: {
@@ -918,7 +919,10 @@ export default {
     search_results_label: 'Results',
     select_another_method: 'Please select another method.',
     one_card: 'OneCard',
+    razorpayx: 'RazorpayX',
     slice: 'Slice',
+    jupiter: 'Jupiter',
+    niyo: 'Niyo Global Cards',
   },
   nach: {
     allowed_formats_info:
@@ -1130,7 +1134,7 @@ export default {
     coupons: 'Back',
     details: 'Back',
     billingAddress: 'Address',
-    international: 'International Payments',
+    international: 'Instant Bank Transfer',
   },
   upi: {
     cancel_reason_back_action: 'Back',

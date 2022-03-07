@@ -38,21 +38,4 @@ if (!String.prototype.endsWith) {
     return this.substring(this_len - search.length, this_len) === search;
   };
 }
-
-if (!Array.prototype.findIndex) {
-  Array.prototype.findIndex = function (callback) {
-    if (typeof callback !== 'function') {
-      throw new TypeError('callback must be a function');
-    }
-
-    var thisVal = arguments[1] || this;
-    for (var i = 0; i < this.length; i++) {
-      if (callback.call(thisVal, this[i], i, this)) {
-        return i;
-      }
-    }
-
-    return -1;
-  };
-}
 /* jshint ignore:end */

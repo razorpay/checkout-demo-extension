@@ -47,6 +47,14 @@
 </script>
 
 <div class="wrapper" class:invalid={validationText}>
+  <span
+    class="label"
+    class:label-top={focused || !!value}
+    class:label-top-focused={focused}
+    class:label-error={validationText !== ''}
+  >
+    {`${$t(label)}${required ? '*' : ''}`}
+  </span>
   <div
     {id}
     bind:this={inputField}
@@ -54,15 +62,14 @@
     contenteditable
     class="input"
     class:focused
+    class:input-focused={focused}
+    class:input-error={validationText !== ''}
     on:input
     on:focus={onFocus}
     on:blur={onBlur}
   >
     {value}
   </div>
-  <span class="label" class:label-top={focused || !!value}>
-    {`${$t(label)}${required ? '*' : ''}`}
-  </span>
   {#if validationText !== ''}
     <div class="input-validation-error">{validationText}</div>
   {/if}
@@ -84,11 +91,21 @@
 
 <style>
   .input {
-    border-bottom: 1px solid #ebedf0;
-    line-height: 15px;
-    padding: 28px 0 7px 0;
-
+    border: 1px solid #e0e0e0;
+    margin: 8px 0px;
+    padding: 16px;
+    border-radius: 4px;
+    box-sizing: border-box;
     outline-style: none;
+    position: relative;
+  }
+
+  .input-focused {
+    border-color: #5186f3;
+  }
+
+  .input-error {
+    border-color: var(--error-validation-color);
   }
 
   .wrapper {
@@ -97,21 +114,30 @@
   }
 
   .label {
-    position: absolute;
     line-height: 19px;
     color: #757575;
-    z-index: -1;
-    top: 28px;
-    left: 0;
-
-    transition: 0.3s;
+    position: absolute;
+    top: 24px;
+    padding: 0px 12px;
   }
 
   .label-top {
-    top: 40px;
-    font-size: 12px;
-    line-height: 13px;
+    position: absolute;
+    top: 28px;
+    left: 8px;
+    bottom: auto;
     transform: translateY(-30px);
+    padding: 0px 4px;
+    background-color: #fff;
+    z-index: 1;
+  }
+
+  .label-top-focused {
+    color: #5186f3;
+  }
+
+  .label-error {
+    color: var(--error-validation-color);
   }
 
   .suggestion-dropdown {
@@ -155,12 +181,12 @@
   }
 
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
 
   .invalid:not(.focused) {
-    color: #f46060;
+    color: var(--error-validation-color);
   }
 </style>
