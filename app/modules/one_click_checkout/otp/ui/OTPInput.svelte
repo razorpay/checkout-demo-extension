@@ -147,7 +147,7 @@
 
   .otp-input-small {
     width: 18px;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 21px;
     padding: 8px 4px;
   }

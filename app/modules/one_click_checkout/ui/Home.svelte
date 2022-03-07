@@ -39,6 +39,7 @@
   setEmail(getPrefilledEmail());
 
   let theme = getTheme();
+
   let styles = {
     'highlight-color': theme.highlightColor,
     'sec-highlight-color': theme.secondaryHighlightColor,

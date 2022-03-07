@@ -1,7 +1,7 @@
 // interactions with session
 import { savedAddresses } from 'one_click_checkout/address/store';
 import { showSavedAddressCta } from 'one_click_checkout/address/shipping_address/store';
-import { formatAddress } from 'one_click_checkout/address/helpersExtra';
+import { formatApiAddress } from 'one_click_checkout/address/helpersExtra';
 import { getSession } from 'sessionmanager';
 
 /**
@@ -18,7 +18,7 @@ function formatAddresses(addresses, type) {
   if (!addresses) return [];
   return (addresses = addresses
     .map((item) => {
-      return { ...formatAddress(item, type), id: item.id };
+      return { ...formatApiAddress(item, type), id: item.id };
     })
     .reverse());
 }
