@@ -5586,7 +5586,14 @@ Session.prototype = {
           AVSData.country = AVSData._country;
           delete AVSData._country;
         }
-        data.billing_address = AVSData;
+        data.billing_address = {
+          city: AVSData.city,
+          country: AVSData.country,
+          line1: AVSData.line1,
+          line2: AVSData.line2,
+          postal_code: AVSData.postal_code,
+          state: AVSData.state,
+        };
         Analytics.track('card:avsdata', {
           data: AVSData,
         });
