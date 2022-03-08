@@ -5,6 +5,8 @@ import {
   addAddress,
   savedBillingAddress,
   addBillingAddress,
+  editAddress,
+  editBillingAddress,
 } from 'one_click_checkout/address/config';
 import otp from 'one_click_checkout/common/otpConfig';
 import { screensHistory } from 'one_click_checkout/routing/History';
@@ -13,10 +15,12 @@ const routes = [
   { ...coupons },
   { ...savedAddress },
   { ...addAddress },
+  { ...editAddress },
   { ...otp },
   { ...details },
   { ...savedBillingAddress },
   { ...addBillingAddress },
+  { ...editBillingAddress },
 ];
 
 screensHistory.setConfig({ otp });

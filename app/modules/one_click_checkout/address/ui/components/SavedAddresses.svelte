@@ -6,7 +6,10 @@
   import AddressBox from './AddressBox.svelte';
   // store imports
   import { savedAddresses } from 'one_click_checkout/address/store';
-  import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    selectedAddress,
+    selectedAddressId as selectedShippingAddressId,
+  } from 'one_click_checkout/address/shipping_address/store';
   import {
     shippingCharge,
     codChargeAmount,
@@ -26,6 +29,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { getIcons } from 'one_click_checkout/sessionInterface';
+  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
   export let addresses = savedAddresses;
   export let checkServiceability = true;
@@ -99,9 +103,22 @@
     });
   }
 
+  function getSavedAddresses() {
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) return $addresses;
+    return $addresses.filter(
+      (_addr) => _addr.id !== $selectedShippingAddressId
+    );
+  }
+
   onMount(() => {
     if ($addresses.length > 0) {
-      selectedAddressId.set($addresses[0].id);
+      // select the 2nd billing address if 1st address is selected for shipping
+      if (
+        addressType === ADDRESS_TYPES.BILLING_ADDRESS &&
+        $selectedShippingAddressId === $addresses[0].id
+      )
+        selectedAddressId.set($addresses[1].id);
+      else selectedAddressId.set($addresses[0].id);
       dispatchServiceability();
     }
     if (checkServiceability) {
@@ -141,7 +158,7 @@
   </div>
 
   <div>
-    {#each $addresses as s_address, index}
+    {#each getSavedAddresses() as s_address, index}
       <AddressBox
         address={s_address}
         on:selectAddress={() => handleRadioClick(s_address.id, index)}

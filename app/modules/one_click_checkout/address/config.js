@@ -64,3 +64,21 @@ export const addBillingAddress = {
     skipOTPHandle: addressSaveOTPSkipHandler,
   },
 };
+
+export const editAddress = {
+  name: views.EDIT_ADDRESS,
+  parent: views.ADDRESS,
+  component: Address,
+  tabTitle: views.ADDRESS,
+  props: { currentView: views.EDIT_ADDRESS },
+  isBackEnabled: true,
+};
+
+export const editBillingAddress = {
+  name: views.EDIT_BILLING_ADDRESS,
+  parent: views.BILLING_ADDRESS,
+  component: BillingAddress,
+  tabTitle: views.BILLING_ADDRESS,
+  props: { currentView: views.EDIT_BILLING_ADDRESS },
+  isBackEnabled: true,
+};

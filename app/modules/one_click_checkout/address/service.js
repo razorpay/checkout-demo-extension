@@ -67,6 +67,51 @@ export function getCityState(pincode, country) {
     }
   });
 }
+
+/**
+ *
+ * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
+ * @returns Promise {
+ *    address_id
+ * }
+ * Api call for updating address
+ */
+export function putCustomerAddress({ shipping_address, billing_address }) {
+  loaderLabel.set(UPDATE_ADDRESS_LABEL);
+  showLoader.set(true);
+  const addressApiTimer = timer();
+  Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
+  const payload = getCustomerAddressApiPayload(
+    {
+      shipping_address,
+      billing_address,
+    },
+    true
+  );
+  return new Promise((resolve, reject) => {
+    fetch.put({
+      url: makeAuthUrl(`customers/addresses`),
+      data: payload,
+      callback: (response) => {
+        Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END, {
+          time: addressApiTimer(),
+          addressSaved: response.status_code === 200,
+          failure_reason: response?.error?.description,
+          address_id: response?.shipping_address?.id,
+        });
+        if (response.error) {
+          reject(response.error);
+          showLoader.set(false);
+          return;
+        }
+        didSaveAddress.set(true);
+        showLoader.set(false);
+        resolve(response);
+      },
+    });
+  });
+}
+
 /**
  *
  * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
@@ -84,6 +129,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
     shipping_address,
     billing_address,
   });
+
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl(`customers/addresses`),

@@ -12,6 +12,7 @@ import {
   addressCompleted as shippingAddressCompleted,
   shouldSaveAddress as shouldSaveShippingAddress,
   selectedCountryISO as selectedShippingCountryISO,
+  resetAddress as resetShippingAddress,
 } from 'one_click_checkout/address/shipping_address/store';
 import {
   newUserAddress as newBillingAddress,
@@ -19,6 +20,7 @@ import {
   addressCompleted as billingAddressCompleted,
   shouldSaveAddress as shouldSaveBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
+  resetAddress as resetBillingAddress,
 } from 'one_click_checkout/address/billing_address/store';
 
 /**
@@ -40,6 +42,7 @@ export default {
       addressCompleted: shippingAddressCompleted,
       shouldSaveAddress: shouldSaveShippingAddress,
       selectedCountryISO: selectedShippingCountryISO,
+      resetAddress: resetShippingAddress,
     },
     type: ADDRESS_TYPES.SHIPPING_ADDRESS,
     formId: 'addressForm',
@@ -47,6 +50,7 @@ export default {
     routes: {
       [addressViews.ADD_ADDRESS]: views.ADD_ADDRESS,
       [addressViews.SAVED_ADDRESSES]: views.SAVED_ADDRESSES,
+      [addressViews.EDIT_ADDRESS]: views.EDIT_ADDRESS,
     },
     classes: {
       'billing-address-wrapper': false,
@@ -60,6 +64,7 @@ export default {
       addressCompleted: billingAddressCompleted,
       shouldSaveAddress: shouldSaveBillingAddress,
       selectedCountryISO: selectedBillingCountryISO,
+      resetAddress: resetBillingAddress,
     },
     type: ADDRESS_TYPES.BILLING_ADDRESS,
     formId: 'addressForm',
@@ -67,6 +72,7 @@ export default {
     routes: {
       [addressViews.ADD_ADDRESS]: views.ADD_BILLING_ADDRESS,
       [addressViews.SAVED_ADDRESSES]: views.SAVED_BILLING_ADDRESS,
+      [addressViews.EDIT_ADDRESS]: views.EDIT_BILLING_ADDRESS,
     },
     classes: {
       'billing-address-wrapper': true,

@@ -14,13 +14,11 @@ export const setSavedAddresses = (addresses) => {
   savedAddresses.set(formatAddresses(addresses));
 };
 
-function formatAddresses(addresses, type) {
+function formatAddresses(addresses) {
   if (!addresses) return [];
-  return (addresses = addresses
-    .map((item) => {
-      return { ...formatApiAddress(item, type), id: item.id };
-    })
-    .reverse());
+  return (addresses = addresses.map((item) => {
+    return { ...formatApiAddress(item, item.type), id: item.id };
+  }));
 }
 
 /**
