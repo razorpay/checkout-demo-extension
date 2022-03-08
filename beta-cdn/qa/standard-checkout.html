@@ -128,7 +128,8 @@
       }
     </script>
 
-    <div></div>
+    <div id="1"></div>
+    <div id="2"></div>
 
     <script>
       // Load Checkout from the given domain
@@ -172,7 +173,8 @@
       var div = document.querySelector('div');
 
       params.handler = function (resp) {
-        document.querySelector('div').innerHTML = resp.razorpay_payment_id;
+        document.querySelector('div#1').innerHTML = resp.razorpay_payment_id;
+        document.querySelector('div#2').innerHTML =  resp.razorpay_signature;
       };
 
       loadCheckout(domain, function () {
