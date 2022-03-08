@@ -19,11 +19,7 @@
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import {
-    isOneClickCheckout,
-    showFeeLabel,
-    showFeeLabel,
-  } from 'checkoutstore/index.js';
+  import { isOneClickCheckout, showFeeLabel } from 'checkoutstore/index.js';
   import { isRecurring } from 'razorpay';
 
   // Utils
