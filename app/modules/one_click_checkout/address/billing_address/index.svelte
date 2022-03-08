@@ -12,6 +12,7 @@
   import {
     newUserAddress as newShippingAddress,
     shouldSaveAddress as shouldSaveShippingAddress,
+    addressCompleted as shippingAddressComplete,
   } from 'one_click_checkout/address/shipping_address/store';
   import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
 
@@ -52,8 +53,9 @@
     const shouldSaveAddress =
       $shouldSaveShippingAddress || $shouldSaveBillingAddress;
     if (
-      routeMap[currentView] === addressViews.SAVED_ADDRESSES ||
-      !shouldSaveAddress
+      !shippingAddressComplete &&
+      (routeMap[currentView] === addressViews.SAVED_ADDRESSES ||
+        !shouldSaveAddress)
     ) {
       redirectToPaymentMethods();
       return;
