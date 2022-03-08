@@ -26,7 +26,7 @@
   import { getUPIIntentApps } from 'checkoutstore/native';
   import {
     intentVpaPrefill,
-    intentVpaPrefilledFromPersonalisation,
+    intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
@@ -342,7 +342,7 @@
           onUpiAppSelection({ detail: { id: 'new' } });
           vpaEntered = $intentVpaPrefill;
           $intentVpaPrefill = '';
-          $intentVpaPrefilledFromPersonalisation = true;
+          $intentVpaPrefilledFromPreferences = true;
         })
         .then(() => {
           if (vpaField) {
@@ -351,7 +351,7 @@
           }
         });
     } else {
-      $intentVpaPrefilledFromPersonalisation = false;
+      $intentVpaPrefilledFromPreferences = false;
     }
   }
 

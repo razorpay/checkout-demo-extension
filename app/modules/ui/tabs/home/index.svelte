@@ -134,7 +134,7 @@
   import {
     trackUpiIntentInstrumentSelected,
     trackUpiIntentInstrumentAvailable,
-  } from 'upi/helper/highlight-upi-intent';
+  } from 'analytics/highlightUpiIntentAnalytics';
 
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';

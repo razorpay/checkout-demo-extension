@@ -2,7 +2,7 @@
 import { getSession } from 'sessionmanager';
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
-import { getCustomerDetails } from 'common/helpers/customer';
+import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 // store imports
 import { get } from 'svelte/store';
