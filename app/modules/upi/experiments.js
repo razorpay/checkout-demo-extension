@@ -13,7 +13,7 @@ const oneClickUPIIntent = createExperiment('one_click_upi_intent', 1, {
  * Temporary full rollout
  */
 const highlightUPIIntentOnDesktop = createExperiment(
-  'highlight_upi_intent_instruments_on_desktop',
+  'highlight_upi_intent_instruments_on_desktop_v2',
   0
 );
 
