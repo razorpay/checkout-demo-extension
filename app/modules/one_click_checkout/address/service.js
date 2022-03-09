@@ -289,7 +289,7 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
   });
 
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
-    is_saved_address: false,
+    is_saved_address: onSavedAddress,
   });
 
   const order_id = getOrderId();

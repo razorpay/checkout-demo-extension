@@ -64,7 +64,7 @@
         $savedAddresses.length &&
         $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
       ) {
-        loadAddressesWithServiceability($savedAddresses);
+        loadAddressesWithServiceability(true);
       }
     } else {
       // billing address
