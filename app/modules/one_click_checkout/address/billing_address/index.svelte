@@ -12,8 +12,12 @@
   import {
     newUserAddress as newShippingAddress,
     shouldSaveAddress as shouldSaveShippingAddress,
+    addressCompleted as shippingAddressCompleted,
   } from 'one_click_checkout/address/shipping_address/store';
-  import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
+  import {
+    shouldSaveAddress as shouldSaveBillingAddress,
+    addressCompleted as billingAddressCompleted,
+  } from 'one_click_checkout/address/billing_address/store';
 
   // Constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -50,11 +54,9 @@
       addressCompleted.set(true);
     }
     const shouldSaveAddress =
-      $shouldSaveShippingAddress || $shouldSaveBillingAddress;
-    if (
-      routeMap[currentView] === addressViews.SAVED_ADDRESSES ||
-      !shouldSaveAddress
-    ) {
+      ($shouldSaveShippingAddress && $shippingAddressCompleted) ||
+      ($shouldSaveBillingAddress && $billingAddressCompleted);
+    if (!shouldSaveAddress) {
       redirectToPaymentMethods();
       return;
     }
