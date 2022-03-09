@@ -24,7 +24,7 @@
 
   const dispatch = createEventDispatcher();
 
-  $: showTagInput = !['Home', 'Office'].includes(selectedTag);
+  $: showTagInput = selectedTag && !['Home', 'Office'].includes(selectedTag);
   $: {
     if (showTagInput) {
       inputRef?.focus();
@@ -60,7 +60,9 @@
     elemClasses="address-elem"
     bind:this={inputRef}
     label={$t(CUSTOM_TAG_LABEL)}
-    on:input={(e) => dispatch('select', { label: e.target.value })}
+    on:input={(e) => {
+      if (e.target.value) dispatch('select', { label: e.target.value });
+    }}
     on:blur={(e) =>
       Events.Track(AddressEvents.CUSTOM_TAG_INPUT, { tag: e.target.value })}
   />

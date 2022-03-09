@@ -75,7 +75,7 @@ export const INITIAL_ADDRESS = {
   line1: '',
   line2: '',
   landmark: '',
-  tag: '',
+  tag: 'Home',
   country_name: '',
 };
 
