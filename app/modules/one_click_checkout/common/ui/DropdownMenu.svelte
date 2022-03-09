@@ -37,11 +37,19 @@
   function onDropdownOpened() {
     // outside Event listener
     if (closeOnOutsideClick) {
-      outsideClickEvent = attachEvent(document, 'click', (event) => {
-        if (event.target !== menuItem && !menuItem.contains(event.target)) {
-          open = false;
-        }
-      });
+      outsideClickEvent = attachEvent(
+        document,
+        'click',
+        (event) => {
+          if (
+            !triggerElement.contains(event.target) &&
+            !menuItem.contains(event.target)
+          ) {
+            open = false;
+          }
+        },
+        true
+      );
     }
   }
 
@@ -54,7 +62,6 @@
   onMount(() => {
     tick().then(() => {
       triggerEvent = attachEvent(triggerElement, 'click', (event) => {
-        event.stopPropagation();
         event.preventDefault();
         dispatch('click');
         open = !open;
