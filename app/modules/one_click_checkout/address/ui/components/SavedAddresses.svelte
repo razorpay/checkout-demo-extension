@@ -165,7 +165,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin: 16px 0 24px;
+    margin: 28px 0px;
     padding: 12px 16px;
     border: 1px dashed #8d97a1;
     border-radius: 4px;

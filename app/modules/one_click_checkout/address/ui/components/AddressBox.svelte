@@ -10,7 +10,6 @@
     EDIT_ADDRESS_LABEL,
     NON_SERVICEABLE_LABEL,
     SAVED_ADDRESS_LANDMARK_LABEL,
-    SAVED_ADDRESS_PHONE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // constant imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -60,18 +59,15 @@
   </div>
   <div class="address-text">
     <div class:disabled={!isServiceable}>
+      {#if address.contact}
+        <p>{address.contact}</p>
+      {/if}
       <p>{address.formattedLine1}</p>
       <p>{address.formattedLine2}</p>
       {#if address.landmark}
         <div class="address-landmark">
           {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
           {address.landmark}
-        </div>
-      {/if}
-      {#if address.contact}
-        <div>
-          {$t(SAVED_ADDRESS_PHONE_LABEL)}:
-          {address.contact}
         </div>
       {/if}
     </div>
@@ -135,6 +131,7 @@
   .address-name {
     margin-right: 4px;
     font-size: 14px;
+    text-transform: capitalize;
   }
   .address-tag {
     font-size: 10px;
