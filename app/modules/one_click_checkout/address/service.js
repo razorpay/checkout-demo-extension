@@ -155,7 +155,13 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(addresses, onSavedAddress, order_id) {
+export function postServiceability(addresses, onSavedAddress) {
+  Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
+    is_saved_address: onSavedAddress,
+  });
+
+  const order_id = getOrderId();
+
   const serviceabilityApiTimer = timer();
   const formattedPayload = getServiceabilityPayload(
     addresses,
@@ -334,15 +340,11 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
     }
   });
 
-  Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
-    is_saved_address: onSavedAddress,
-  });
-
   const order_id = getOrderId();
 
   return Promise.all(
     Object.values(zipecodeHash).map((address) =>
-      postServiceability([address], onSavedAddress, order_id)
+      postServiceability([address], onSavedAddress)
     )
   ).then(() =>
     hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])
