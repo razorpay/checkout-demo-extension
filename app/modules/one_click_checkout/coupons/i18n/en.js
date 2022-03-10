@@ -11,4 +11,7 @@ export default {
   available_coupons_label: 'Available Coupons',
   remove_label: 'REMOVE',
   more_label: 'Show More',
+  address_label: 'Delivery Address',
+  address_cta_label: 'Add / Change',
+  total_addresses_label: '{count} saved',
 };

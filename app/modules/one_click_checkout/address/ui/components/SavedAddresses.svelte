@@ -111,13 +111,15 @@
 
   <div>
     {#each getSavedAddresses() as s_address, index}
-      <AddressBox
-        address={s_address}
-        on:select={() => handleRadioClick(s_address.id, index)}
-        on:editClick
-        isSelected={$selectedAddressId === s_address.id}
-        {checkServiceability}
-      />
+      <div class="address-box">
+        <AddressBox
+          address={s_address}
+          on:select={() => handleRadioClick(s_address.id, index)}
+          on:editClick
+          isSelected={$selectedAddressId === s_address.id}
+          {checkServiceability}
+        />
+      </div>
     {/each}
   </div>
 </div>
@@ -143,5 +145,9 @@
   .add-label {
     color: #263a4a;
     margin-left: 6px;
+  }
+
+  .address-box {
+    margin-bottom: 24px;
   }
 </style>

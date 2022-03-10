@@ -8,6 +8,7 @@
   import CouponInput from './components/CouponInput.svelte';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
 
   // store imports
   import { getCurrency, getPrefilledCouponCode } from 'razorpay';
@@ -23,7 +24,10 @@
     error,
     couponInputSource,
   } from 'one_click_checkout/coupons/store';
-  import { savedAddresses } from 'one_click_checkout/address/store';
+  import {
+    isBillingSameAsShipping,
+    savedAddresses,
+  } from 'one_click_checkout/address/store';
   import {
     cartAmount,
     cartDiscount,
@@ -52,6 +56,7 @@
     hideAmountInTopBar,
   } from 'one_click_checkout/coupons/sessionInterface';
   import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
+  import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
   import Razorpay from 'common/Razorpay';
@@ -101,7 +106,14 @@
     if (!$isCouponApplied) {
       removeCouponInStore();
     }
-    navigator.navigateTo({ path: views.SAVED_ADDRESSES });
+
+    if (!$savedAddresses.length) {
+      navigator.navigateTo({ path: views.ADD_ADDRESS });
+    } else {
+      if (!$isBillingSameAsShipping) {
+        navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
+      } else redirectToPaymentMethods();
+    }
     showAmountInTopBar();
   }
 
@@ -164,6 +176,15 @@
       applyCoupon={(code) => applyCouponCode(code)}
       removeCoupon={removeCouponCode}
     />
+
+    {#if $selectedAddress}
+      <AddressWidget
+        loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+        address={$selectedAddress}
+        on:headerCtaClick={() =>
+          navigator.navigateTo({ path: views.SAVED_ADDRESSES })}
+      />
+    {/if}
 
     <p class="coupon-order-summary-label">{$t(SUMMARY_LABEL)}</p>
 
