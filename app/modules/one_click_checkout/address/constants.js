@@ -84,3 +84,9 @@ export const ZIPCODE_REQUIRED_LENGTH = 6;
 export const TNC_LINK = 'https://razorpay.com/terms/';
 
 export const PRIVACY_LINK = 'https://razorpay.com/privacy/';
+
+export const SERVICEABILITY_STATUS = {
+  UNCHECKED: 'unchecked',
+  CHECKED: 'checked',
+  LOADING: 'loading',
+};
