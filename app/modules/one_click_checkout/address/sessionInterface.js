@@ -74,19 +74,20 @@ export { showSavedAddressCta };
  *
  */
 export function postAddressSelection(id, index) {
+  const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
   const selectedAddress = get(selectedShippingAddress);
-  shippingCharge.set(selectedAddress.shipping_fee);
-  codChargeAmount.set(selectedAddress.cod_fee);
+  shippingCharge.set(shipping_fee);
+  codChargeAmount.set(cod_fee);
 
   Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
     id,
     index,
-    serviceable: selectedAddress.serviceability,
+    serviceable: serviceability,
   });
   merchantAnalytics({
     event: ACTIONS.SELECT_ADDRESS,
     category: CATEGORIES.ADDRESS,
-    params: { zipcode: selectedAddress.zipcode },
+    params: { zipcode },
   });
 }
 
