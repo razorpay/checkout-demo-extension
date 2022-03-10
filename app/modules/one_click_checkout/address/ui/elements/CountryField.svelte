@@ -136,7 +136,7 @@
     color: #079f0d;
   }
   .field-wrapper .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .field-wrapper .extralabel {
     position: absolute;

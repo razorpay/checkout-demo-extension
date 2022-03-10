@@ -45,7 +45,6 @@ describe.each(
       page,
       options,
       preferences,
-      experiments: { highlight_upi_intent_instruments_on_desktop: 1 },
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context, '8888888881');

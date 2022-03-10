@@ -6,7 +6,7 @@ import { setSavedAddresses } from 'one_click_checkout/address/sessionInterface';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
-import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+import { getCustomerDetails } from 'common/helpers/customer';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import otpEvents from 'ui/tabs/otp/analytics';
 import { Events } from 'analytics';

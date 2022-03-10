@@ -67,6 +67,8 @@
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
 
+  import { isAutopopulateDisabled } from 'one_click_checkout/store';
+
   // props
   export let formData;
   export let checkServiceability = true;
@@ -87,6 +89,8 @@
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
+
+  const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
 
   let INPUT_FORM = [
     {
@@ -349,8 +353,10 @@
               stateCode = res[value].state_code;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
-              onUpdate('city', toTitleCase(res[value].city) || '');
-              onUpdate('state', toTitleCase(res[value].state) || '');
+              if (!isCityStateAutopopulateDisabled) {
+                onUpdate('city', toTitleCase(res[value].city) || '');
+                onUpdate('state', toTitleCase(res[value].state) || '');
+              }
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
@@ -382,7 +388,8 @@
     } else if (
       !checkServiceability &&
       key === 'zipcode' &&
-      pinPattern.test(value)
+      pinPattern.test(value) &&
+      !isCityStateAutopopulateDisabled
     ) {
       getCityState(value, $selectedCountryISO).then((response) => {
         onUpdate('city', toTitleCase(response.city) || '');
@@ -488,8 +495,10 @@
             stateCode = res[zipcode].state_code;
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               SERVICEABLE_LABEL;
-            onUpdate('city', toTitleCase(res[zipcode].city) || '');
-            onUpdate('state', toTitleCase(res[zipcode].state) || '');
+            if (!isCityStateAutopopulateDisabled) {
+              onUpdate('city', toTitleCase(res[zipcode].city) || '');
+              onUpdate('state', toTitleCase(res[zipcode].state) || '');
+            }
           } else {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;

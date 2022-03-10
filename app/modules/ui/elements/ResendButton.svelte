@@ -5,12 +5,15 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { RESEND_LABEL } from 'ui/labels/otp';
+  import { RESEND_BTN, RESEND_LABEL } from 'ui/labels/otp';
 
-  // Utils imports
-  import { formatToMMSS } from 'utils/date';
-
+  // store imports
   import { resendTimeout } from 'checkoutstore/screens/otp';
+
+  // ui imports
+  import CountdownTimer from 'ui/components/CountdownTimer.svelte';
+
+  // utils imports
   import { isOneClickCheckout } from 'razorpay';
 
   const dispatch = createEventDispatcher();
@@ -20,40 +23,26 @@
   // Local
   let interval;
 
-  let secondsLeft;
-  $: secondsLeft = Math.floor(($resendTimeout - Date.now()) / 1000);
+  let initialSeconds;
+  $: initialSeconds = Math.floor(($resendTimeout - Date.now()) / 1000);
 
   let secondsLeftText;
-  $: secondsLeftText = secondsLeft > 0 ? `(${secondsLeft})` : '';
+  $: secondsLeftText = initialSeconds > 0 ? `(${initialSeconds})` : '';
 
-  let disabled = false;
-  secondsLeft > 0;
-
-  $: disabled = secondsLeft > 0 && isOneClickCheckout();
+  let countdownEnabled = false;
+  $: countdownEnabled = initialSeconds > 0 && isOneClickCheckout();
 
   function invokeResend(event) {
-    if (!disabled) {
-      dispatch('resend', event);
-    }
+    dispatch('resend', event);
   }
 
-  function startTimer() {
-    interval = setInterval(function () {
-      secondsLeft--;
-      if (secondsLeft > 0 && resendTimeout) {
-        secondsLeftText = ` (${secondsLeft})`;
-      } else {
-        disabled = false;
-        secondsLeftText = '';
-        clearInterval(interval);
-      }
-    }, 1000);
-  }
-
-  // No need to call startTimer if the button is not disabled
-  $: {
-    if (disabled) {
-      startTimer();
+  function handleTimerUpdate(ev) {
+    let secondsLeft = ev.detail;
+    if (secondsLeft > 0 && resendTimeout) {
+      secondsLeftText = ` (${secondsLeft})`;
+    } else {
+      countdownEnabled = false;
+      secondsLeftText = '';
     }
   }
 
@@ -62,25 +51,32 @@
   });
 </script>
 
-{#if disabled}
-  <div class="timer-container">
-    <div class="spinner" />
-    <span>{formatToMMSS(secondsLeft)}</span>
+{#if countdownEnabled}
+  <CountdownTimer
+    countdown={initialSeconds}
+    on:timerUpdate={handleTimerUpdate}
+    width={50}
+    height={50}
+  />
+{:else if isOneClickCheckout()}
+  <div class="resend-container">
+    <span class="resend-label">{$t(RESEND_LABEL)}</span>
+    <LinkButton {id} on:click={(event) => invokeResend(event, 'resend')}>
+      {$t(RESEND_BTN)}
+    </LinkButton>
   </div>
 {:else}
-  <LinkButton
-    {id}
-    {disabled}
-    on:click={(event) => invokeResend(event, 'resend')}
-  >
-    {$t(RESEND_LABEL)}
+  <LinkButton {id} on:click={(event) => invokeResend(event, 'resend')}>
+    {$t(RESEND_BTN)}
     {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
   </LinkButton>
 {/if}
 
 <style>
-  .timer-container {
-    display: flex;
-    align-items: center;
+  .resend-container {
+    padding: 40px 0px 32px;
+  }
+  .resend-label {
+    font-size: 16px;
   }
 </style>

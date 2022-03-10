@@ -2,13 +2,17 @@
 
 import { getCustomer } from 'checkoutframe/customer';
 import Analytics, { Track } from 'analytics';
-import { filterInstruments } from './filters';
+import {
+  filterInstruments,
+  filterInstrumentsForUPIAndSavedCards,
+} from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
+import { upiAndCardOnlyPreferredMethods } from 'checkoutframe/personalization/experiments';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -366,11 +370,20 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
   return getInstruments.then(({ identified, instruments }) => {
     // Filter out the list
-    instruments = filterInstruments({
-      instruments,
-      upiApps,
-      customer,
-    });
+
+    if (upiAndCardOnlyPreferredMethods.enabled()) {
+      instruments = filterInstrumentsForUPIAndSavedCards({
+        instruments,
+        upiApps,
+        customer,
+      });
+    } else {
+      instruments = filterInstruments({
+        instruments,
+        upiApps,
+        customer,
+      });
+    }
 
     instruments = optimizeInstruments({
       instruments,

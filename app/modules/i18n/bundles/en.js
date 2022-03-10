@@ -756,8 +756,8 @@ export default {
     bank_details_heading: 'Bank Details',
     config_block_default_title: 'Available Payment Methods',
     contact_help_text: 'Please enter a valid contact number',
-    contact_label_optional: 'Phone (Optional)',
-    contact_label_required: 'Phone',
+    contact_label_optional: 'Phone Number (Optional)',
+    contact_label_required: 'Phone Number',
     country_help_text: 'Please enter a valid country code',
     country_label: 'Country',
     country_search_all: 'All countries',
@@ -879,7 +879,7 @@ export default {
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
-      international: 'International Payments',
+      international: 'Instant Bank Transfer',
     },
   },
   misc: {
@@ -921,6 +921,8 @@ export default {
     one_card: 'OneCard',
     razorpayx: 'RazorpayX',
     slice: 'Slice',
+    jupiter: 'Jupiter',
+    niyo: 'Niyo Global Cards',
   },
   nach: {
     allowed_formats_info:
@@ -987,7 +989,8 @@ export default {
     add_funds_label: 'Add Funds',
     back_label: 'Go Back',
     otp_field_help: 'Please enter the OTP',
-    resend_label: 'Resend OTP',
+    resend_label: 'Didn’t get the code?',
+    resend_btn: 'Resend OTP',
     retry_label: 'Retry',
     cancel_label: 'Cancel',
     pay_with_paypal: 'Pay With PayPal',
@@ -1015,7 +1018,7 @@ export default {
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
       loading: 'Loading...',
       mandate_login:
-        'A text message with an OTP has been sent to <strong>{phone}</strong>',
+        'A text message with an OTP has been sent to <strong class="theme">{phone}</strong>',
       otp_proceed_with_upi_subscription:
         'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',
@@ -1131,7 +1134,7 @@ export default {
     coupons: 'Back',
     details: 'Back',
     billingAddress: 'Address',
-    international: 'International Payments',
+    international: 'Instant Bank Transfer',
   },
   upi: {
     cancel_reason_back_action: 'Back',
