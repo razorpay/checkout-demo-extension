@@ -5,8 +5,12 @@
   // ui imports
   import Icon from 'ui/elements/Icon.svelte';
   import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
+
   // store imports
   import { savedAddresses } from 'one_click_checkout/address/store';
+  import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
+
+  // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
 
   // i18n imports
@@ -24,6 +28,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
   // session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -57,19 +62,30 @@
     dispatchServiceability(id, index);
   }
 
+  function getSavedAddresses() {
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) return $addresses;
+    return $addresses.filter(
+      (_addr) => _addr.id !== $selectedShippingAddressId
+    );
+  }
+
   onMount(() => {
-    if (checkServiceability) {
-      // shipping address
-      if (
-        $savedAddresses.length &&
-        $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
-      ) {
-        loadAddressesWithServiceability(true);
+    if ($addresses.length) {
+      if (checkServiceability) {
+        // shipping address
+
+        if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
+          loadAddressesWithServiceability(true);
+        }
+      } else {
+        // billing address
+
+        // select the 2nd billing address if 1st address is selected for shipping
+        if ($selectedShippingAddressId === $addresses[0].id)
+          selectedAddressId.set($addresses[1].id);
+        else selectedAddressId.set($addresses[0].id);
+        dispatchServiceability();
       }
-    } else {
-      // billing address
-      selectedAddressId.set($addresses[0].id);
-      dispatchServiceability();
     }
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
@@ -94,7 +110,7 @@
   </div>
 
   <div>
-    {#each $addresses as s_address, index}
+    {#each getSavedAddresses() as s_address, index}
       <AddressBox
         address={s_address}
         on:select={() => handleRadioClick(s_address.id, index)}

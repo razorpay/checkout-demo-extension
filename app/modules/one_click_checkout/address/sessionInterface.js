@@ -43,16 +43,15 @@ import { getServiceabilityOfAddresses } from 'one_click_checkout/address/service
  * Taking addresses array received from api and saving it in store
  */
 export const setSavedAddresses = (addresses) => {
+  checkServiceabilityStatus.set(SERVICEABILITY_STATUS.UNCHECKED);
   savedAddresses.set(formatAddresses(addresses));
 };
 
-function formatAddresses(addresses, type) {
+function formatAddresses(addresses) {
   if (!addresses) return [];
-  return (addresses = addresses
-    .map((item) => {
-      return { ...formatApiAddress(item, type), id: item.id };
-    })
-    .reverse());
+  return (addresses = addresses.map((item) => {
+    return { ...formatApiAddress(item, item.type), id: item.id };
+  }));
 }
 
 /**
@@ -74,8 +73,8 @@ export { showSavedAddressCta };
  *
  */
 export function postAddressSelection(id, index) {
-  const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
   const selectedAddress = get(selectedShippingAddress);
+  const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
   shippingCharge.set(shipping_fee);
   codChargeAmount.set(cod_fee);
 
@@ -107,7 +106,7 @@ export function loadAddressesWithServiceability(onSavedAddress) {
       let latestAddress;
       if (onSavedAddress) {
         // to set first address as selected even if unserviceable
-        latestAddress = _addresses[0].id;
+        latestAddress = _addresses[0];
       } else {
         // to set last updated serviceable address as selected
         latestAddress =

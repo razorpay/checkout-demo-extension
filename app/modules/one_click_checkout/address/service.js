@@ -64,6 +64,51 @@ export function getCityState(pincode, country) {
     }
   });
 }
+
+/**
+ *
+ * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
+ * @returns Promise {
+ *    address_id
+ * }
+ * Api call for updating address
+ */
+export function putCustomerAddress({ shipping_address, billing_address }) {
+  loaderLabel.set(UPDATE_ADDRESS_LABEL);
+  showLoader.set(true);
+  const addressApiTimer = timer();
+  Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
+  const payload = getCustomerAddressApiPayload(
+    {
+      shipping_address,
+      billing_address,
+    },
+    true
+  );
+  return new Promise((resolve, reject) => {
+    fetch.put({
+      url: makeAuthUrl(`customers/addresses`),
+      data: payload,
+      callback: (response) => {
+        Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END, {
+          time: addressApiTimer(),
+          addressSaved: response.status_code === 200,
+          failure_reason: response?.error?.description,
+          address_id: response?.shipping_address?.id,
+        });
+        if (response.error) {
+          reject(response.error);
+          showLoader.set(false);
+          return;
+        }
+        didSaveAddress.set(true);
+        showLoader.set(false);
+        resolve(response);
+      },
+    });
+  });
+}
+
 /**
  *
  * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
@@ -81,6 +126,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
     shipping_address,
     billing_address,
   });
+
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl(`customers/addresses`),
@@ -109,7 +155,13 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(addresses, onSavedAddress, order_id) {
+export function postServiceability(addresses, onSavedAddress) {
+  Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
+    is_saved_address: onSavedAddress,
+  });
+
+  const order_id = getOrderId();
+
   const serviceabilityApiTimer = timer();
   const formattedPayload = getServiceabilityPayload(
     addresses,
@@ -288,15 +340,11 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
     }
   });
 
-  Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
-    is_saved_address: onSavedAddress,
-  });
-
   const order_id = getOrderId();
 
   return Promise.all(
     Object.values(zipecodeHash).map((address) =>
-      postServiceability([address], onSavedAddress, order_id)
+      postServiceability([address], onSavedAddress)
     )
   ).then(() =>
     hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])
