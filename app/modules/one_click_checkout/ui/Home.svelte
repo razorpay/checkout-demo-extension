@@ -23,7 +23,6 @@
   // Helpers import
   import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'common/helpers/customer';
-  import { destroySummaryModal } from 'one_click_checkout/summary_modal';
 
   // session imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
@@ -124,7 +123,6 @@
 
   onDestroy(() => {
     resetRouting();
-    destroySummaryModal();
   });
 </script>
 

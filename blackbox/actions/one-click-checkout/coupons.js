@@ -30,16 +30,19 @@ function getCouponResponse(isValidCoupon, discountAmount, personalised) {
 }
 
 async function applyCoupon(context, code = 'WELCOME10') {
-  await context.page.waitForSelector('#coupon-input');
+  await context.page.waitForSelector('.coupon-input-container');
   await context.page.type('#coupon-input', code);
   await context.page.click('.coupon-apply-btn');
 }
 
 async function applyAvailableCoupon(context) {
-  await context.page.waitForSelector('.coupons-available-container');
-  await context.page.click('.coupons-available-container');
   await context.page.waitForSelector('.available-coupons-container');
-  await context.page.click('button.theme-highlight');
+  await context.page.click('#coupon-item-apply');
+}
+
+async function handleCouponView(context) {
+  await context.page.waitForSelector('.coupon-arrow-next');
+  await context.page.click('.coupon-arrow-next');
 }
 
 async function handleApplyCouponReq(
@@ -59,6 +62,7 @@ async function handleApplyCouponReq(
 }
 
 async function getOrderSummary(context, isValidCoupon) {
+  await context.page.waitForSelector('.coupon-order-summary');
   const orderInfo = await context.page.$eval(
     '.coupon-order-summary',
     (element, isValidCoupon) => {
@@ -91,13 +95,9 @@ async function verifyValidCoupon(context, features) {
   }
   await delay(200);
   handleApplyCouponReq(context, true, discountAmount);
-  await context.page.waitForSelector('#success-message');
-  expect(
-    await context.page.$eval('#success-message', (el) => el.innerText)
-  ).toEqual('Coupon applied');
   const { price, discountPrice, total } = await getOrderSummary(context, true);
   expect(price).toEqual(`₹ ${amount / 100}`);
-  expect(discountPrice).toEqual(`₹ ${discountAmount / 100}`);
+  expect(discountPrice).toEqual(`- ₹ ${discountAmount / 100}`);
   const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
   expect(total).toEqual(`₹ ${calcTotalAmount}`);
 }
@@ -110,6 +110,10 @@ async function verifyInValidCoupon(context, amount) {
   expect(
     await context.page.$eval('#error-feedback', (el) => el.innerText)
   ).toEqual('Coupon code is not valid');
+  await delay(400);
+  await context.page.waitForSelector('.back');
+  await context.page.click('.back');
+  await delay(200);
   const { price, total } = await getOrderSummary(context);
   expect(price).toEqual(`₹ ${amount / 100}`);
   expect(total).toEqual(`₹ ${amount / 100}`);
@@ -123,6 +127,7 @@ async function handleAvailableCouponReq(context, availableCoupons = []) {
 }
 
 async function handleRemoveCouponReq(context) {
+  await context.getRequest('coupon/remove');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('coupon/remove');
@@ -130,14 +135,15 @@ async function handleRemoveCouponReq(context) {
 }
 
 async function removeCoupon(context) {
-  await context.page.waitForSelector('.coupon-input-group');
-  await context.page.click('.close-button');
+  await context.page.waitForSelector('.coupon-remove-text');
+  await context.page.click('.coupon-remove-text');
 }
 
 async function handleRemoveCoupon(context, amount) {
+  await delay(600);
   removeCoupon(context);
-  await delay(200);
   handleRemoveCouponReq(context);
+  await delay(200);
   const { price, total } = await getOrderSummary(context);
   expect(price).toEqual(`₹ ${amount / 100}`);
   expect(total).toEqual(`₹ ${amount / 100}`);
@@ -158,4 +164,5 @@ module.exports = {
   applyCoupon,
   handleApplyCouponReq,
   handleFillUserDetails,
+  handleCouponView,
 };

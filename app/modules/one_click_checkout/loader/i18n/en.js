@@ -3,4 +3,5 @@ export default {
   address: 'Updating your address',
   loading: 'Loading',
   fetching: 'Fetching addresses',
+  coupon: 'Applying Coupon',
 };

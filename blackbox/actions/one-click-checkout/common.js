@@ -43,6 +43,7 @@ function getVerifyOTPResponse(inValidOTP) {
 }
 
 async function handleCustomerStatusReq(context, saved_address = false) {
+  await context.getRequest('customers/status');
   const req = await context.expectRequest();
   expect(req.method).toBe('GET');
   expect(req.url).toContain('customers/status');
@@ -68,6 +69,7 @@ async function handleCreateOTPReq(context) {
 }
 
 async function handleVerifyOTPReq(context, inValidOTP = false) {
+  await context.getRequest('otp/verify');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/verify');

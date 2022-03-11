@@ -1,4 +1,7 @@
 <script>
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI Imports
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -8,21 +11,31 @@
 
   // i18n imports
   import {
+    COUPON_DETAIL_LABEL,
+    COUPON_OTP_LABEL,
+  } from 'one_click_checkout/coupons/i18n/labels';
+  import { t } from 'svelte-i18n';
+  import {
     DETAILS_TITLE_LABEL,
-    DETAILS_DESCRIPTION_LABEL,
     DETAILS_CTA_LABEL,
   } from 'ui/labels/details-modal';
-  import { t } from 'svelte-i18n';
-  import { onMount } from 'svelte';
-  import { errorCode } from 'one_click_checkout/coupons/store';
+
+  // store imports
+  import {
+    errorCode,
+    couponInputValue,
+  } from 'one_click_checkout/coupons/store';
+
+  // utils imports
   import { isIndianCustomer } from 'checkoutstore';
   import { askForOTP } from 'one_click_checkout/common/otp';
   import { isUserLoggedIn } from 'common/helpers/customer';
+
+  // constant imports
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
 
   export let onClose;
-  // export let couponsCta;
   const { close } = getIcons();
 
   onMount(() => {
@@ -52,9 +65,12 @@
       <Icon icon={close} />
     </button>
   </div>
+  <hr />
   {#if $errorCode === ERROR_USER_NOT_LOGGED_IN}
     <div class="details-description">
-      {$t(DETAILS_DESCRIPTION_LABEL)}
+      {$t(COUPON_DETAIL_LABEL)}
+      “<span class="coupon-text">{$couponInputValue}</span>”
+      {$t(COUPON_OTP_LABEL)}
     </div>
   {/if}
   <div class="details-fields-wrapper">
@@ -79,23 +95,21 @@
     justify-content: space-between;
     align-items: center;
 
-    margin-bottom: 18px;
+    margin-bottom: 13px;
   }
 
   .details-fields-wrapper {
     margin-left: -20px;
     margin-right: -20px;
 
-    margin-bottom: 30px;
+    margin-bottom: 18px;
   }
 
   .details-signup-label {
     font-style: normal;
-    font-weight: normal;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 16px;
-
-    color: rgba(51, 51, 51, 0.6);
+    font-weight: 600;
   }
 
   .details-verify-button {
@@ -109,9 +123,19 @@
   }
 
   .details-description {
-    color: #043015;
     font-weight: normal;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 20px;
+    color: #757575;
+  }
+
+  hr {
+    margin-bottom: 13px;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+  }
+
+  .coupon-text {
+    font-weight: bold;
   }
 </style>

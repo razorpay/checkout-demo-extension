@@ -11,6 +11,7 @@ const {
   applyCoupon,
   handleApplyCouponReq,
   handleFillUserDetails,
+  handleCouponView,
 } = require('../../actions/one-click-checkout/coupons');
 const {
   handleCustomerStatusReq,
@@ -69,11 +70,10 @@ module.exports = function (testFeatures) {
         preferences,
       });
 
+      await handleCouponView(context);
       await handleAvailableCouponReq(context, availableCoupons);
-
       if (personalised) {
         await applyCoupon(context, couponCode);
-        await delay(200);
         await handleApplyCouponReq(
           context,
           false,

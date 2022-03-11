@@ -210,6 +210,6 @@
   }
 
   .pd-1cc {
-    padding-top: 8px;
+    padding: 8px 0px;
   }
 </style>

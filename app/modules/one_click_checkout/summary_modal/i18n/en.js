@@ -3,7 +3,7 @@ export default {
   modal_title: 'PAYMENT SUMMARY',
   cta_label: 'CONFIRM ORDER',
   total_charges_label: 'Total Amount',
-  shipping_charges_label: 'Shipping Charge',
+  shipping_charges_label: 'Delivery Charges',
   cod_charges_label: 'COD Charges',
   coupon_discount_label: 'Coupon ({code})',
   free_label: 'FREE',

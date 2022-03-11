@@ -1,9 +1,14 @@
 import { getSession } from 'sessionmanager';
 import AvailableCoupons from 'one_click_checkout/coupons/ui/AvailableCoupons.svelte';
 import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+import { hideToast } from 'one_click_checkout/Toast';
 import { showBackdrop } from 'checkoutstore/backdrop';
 import { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
+import { hideCta } from 'checkoutstore/cta';
+import { activeRoute } from 'one_click_checkout/routing/store';
+import { showLoaderView } from 'one_click_checkout/loader/helper.js';
+import { showLoader } from 'one_click_checkout/loader/store';
 import { get } from 'svelte/store';
 import {
   couponInputValue,
@@ -19,6 +24,8 @@ import {
   removeCoupon,
   validateCoupon,
 } from 'one_click_checkout/coupons/service';
+import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
+import { views } from 'one_click_checkout/routing/constants';
 import { setOption, getPrefilledCouponCode } from 'razorpay';
 
 /**
@@ -66,6 +73,9 @@ export function showDetailsOverlay() {
     props: {
       onClose: function () {
         session.hideErrorMessage();
+        if (get(activeRoute)?.name === views.COUPONS_LIST) {
+          hideCta();
+        }
       },
     },
   });
@@ -89,6 +99,7 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
     input_source: source,
   });
   couponState.set('loading');
+  showLoaderView(APPLY_COUPON);
   validateCoupon(code, source)
     .then((response) => {
       applyCouponInStore(code, response);
@@ -102,6 +113,9 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
       }
       // TODO: Check for failure_code and trigger login if required\
       updateFailureReasonInStore(error);
+    })
+    .finally(() => {
+      showLoader.set(false);
     });
 }
 
@@ -110,6 +124,7 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
  * @param {function} callback
  */
 export function removeCouponCode(callback) {
+  hideToast();
   const index = get(couponRemovedIndex) + 1;
   couponRemovedIndex.set(index);
   couponState.set('loading');

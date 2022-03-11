@@ -1,5 +1,6 @@
 import address from 'one_click_checkout/address/i18n/en';
 import coupons from 'one_click_checkout/coupons/i18n/en';
+import contact from 'one_click_checkout/contact_widget/i18n/en';
 import loader from 'one_click_checkout/loader/i18n/en';
 import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
@@ -1308,6 +1309,7 @@ export default {
   },
   address,
   coupons,
+  contact,
   loader,
   details_modal,
   summary_modal,
