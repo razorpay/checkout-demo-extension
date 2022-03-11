@@ -32,6 +32,7 @@
   import {
     views as addressViews,
     ADDRESS_TYPES,
+    ADDRESS_FORM_VIEWS,
   } from 'one_click_checkout/address/constants';
   import {
     CATEGORIES,
@@ -62,17 +63,13 @@
 
   const { location } = getIcons();
 
-  export function navigateToAddAddress() {
+  export function handleAddAddressClick() {
+    Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
+    Resource[addressType].store.resetAddress();
     currentView = addressViews.ADD_ADDRESS;
     navigator.navigateTo({
       path: Resource[addressType].routes[addressViews.ADD_ADDRESS],
     });
-  }
-
-  export function handleAddAddressClick() {
-    Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
-    selectedAddressId.set('');
-    navigateToAddAddress();
   }
 
   function handleEditAddressClick({ detail: _address }) {
@@ -83,7 +80,10 @@
       ...addr,
       ...formatAddressToFormData(_address),
     }));
-    navigateToAddAddress();
+    currentView = addressViews.EDIT_ADDRESS;
+    navigator.navigateTo({
+      path: Resource[addressType].routes[addressViews.EDIT_ADDRESS],
+    });
   }
 
   export function setCurrentView(view) {
@@ -91,22 +91,23 @@
   }
 
   export function handleAddressSelection({
-    detail: { isAddressServiceable, addressId, addressIndex, is_cod_available },
+    detail: { addressId, addressIndex },
   }) {
+    const { serviceability, cod } = $selectedAddress;
     Events.Track(AddressEvents.SAVED_ADDRESS_SELECTED, {
-      serviceable: isAddressServiceable,
+      serviceable: serviceability,
       address_id: addressId,
       address_index: addressIndex,
-      is_cod_available,
+      is_cod_available: cod,
     });
     showCta = true;
     if (Resource[addressType].checkServiceability) {
-      showCta = isAddressServiceable;
+      showCta = serviceability;
     }
   }
 
   export function onSubmit() {
-    if (currentView === addressViews.ADD_ADDRESS) {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       const elementId = Resource[addressType].formId;
 
       const inpError = validateInput(elementId);
@@ -191,8 +192,9 @@
     }
   }
 
-  $: disabled =
-    currentView === addressViews.ADD_ADDRESS ? !isFormComplete : !showCta;
+  $: disabled = ADDRESS_FORM_VIEWS.includes(currentView)
+    ? !isFormComplete
+    : !showCta;
 </script>
 
 <div class="address-tab">
@@ -201,7 +203,7 @@
     class="address-wrapper"
     class:shipping-address-wrapper={addressType ===
       ADDRESS_TYPES.SHIPPING_ADDRESS &&
-      currentView === addressViews.ADD_ADDRESS}
+      ADDRESS_FORM_VIEWS.includes(currentView)}
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
@@ -221,7 +223,7 @@
         checkServiceability={Resource[addressType].checkServiceability}
         {addressType}
       />
-    {:else if currentView === addressViews.ADD_ADDRESS}
+    {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
       <AddNewAddress
         on:formCompletion={onFormCompletion}
         id={Resource[addressType].formId}

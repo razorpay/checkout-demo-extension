@@ -5,8 +5,11 @@ export const tagLabels = ['Home', 'Office', 'Others'];
 export const views = {
   ADD_ADDRESS: 'addAddress',
   SAVED_ADDRESSES: 'savedAddress',
+  EDIT_ADDRESS: 'editAddress',
   OTP: 'otp',
 };
+
+export const ADDRESS_FORM_VIEWS = [views.ADD_ADDRESS, views.EDIT_ADDRESS];
 
 export const errorLabels = {
   name: 'name',
@@ -63,7 +66,7 @@ export const ADDRESS_TYPES = {
   BILLING_ADDRESS: 'billing',
 };
 
-export const INITIAL_ADDRESS = {
+const INITIAL_ADDRESS = {
   name: '',
   contact: {
     countryCode: '',
@@ -79,8 +82,24 @@ export const INITIAL_ADDRESS = {
   country_name: '',
 };
 
+export const INITIAL_SHIPPING_ADDRESS = {
+  ...INITIAL_ADDRESS,
+  type: 'shipping_address',
+};
+
+export const INITIAL_BILLING_ADDRESS = {
+  ...INITIAL_ADDRESS,
+  type: 'billing_address',
+};
+
 export const ZIPCODE_REQUIRED_LENGTH = 6;
 
 export const TNC_LINK = 'https://razorpay.com/terms/';
 
 export const PRIVACY_LINK = 'https://razorpay.com/privacy/';
+
+export const SERVICEABILITY_STATUS = {
+  UNCHECKED: 'unchecked',
+  CHECKED: 'checked',
+  LOADING: 'loading',
+};

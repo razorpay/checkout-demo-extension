@@ -1,6 +1,6 @@
 <script>
   // svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -25,11 +25,6 @@
   const dispatch = createEventDispatcher();
 
   $: showTagInput = selectedTag && !['Home', 'Office'].includes(selectedTag);
-  $: {
-    if (showTagInput) {
-      inputRef?.focus();
-    }
-  }
 
   function onTagSelection(e) {
     const { label } = e.detail;
@@ -37,6 +32,9 @@
 
     if (label === 'Others') {
       Events.Track(AddressEvents.OTHER_TAG_SELECTED);
+      tick().then(() => {
+        inputRef?.focus();
+      });
     }
   }
 </script>

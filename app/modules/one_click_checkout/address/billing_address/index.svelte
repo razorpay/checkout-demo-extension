@@ -12,13 +12,18 @@
   import {
     newUserAddress as newShippingAddress,
     shouldSaveAddress as shouldSaveShippingAddress,
+    addressCompleted as shippingAddressCompleted,
   } from 'one_click_checkout/address/shipping_address/store';
-  import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
+  import {
+    shouldSaveAddress as shouldSaveBillingAddress,
+    addressCompleted as billingAddressCompleted,
+  } from 'one_click_checkout/address/billing_address/store';
 
   // Constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
   import {
+    ADDRESS_FORM_VIEWS,
     ADDRESS_TYPES,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
@@ -29,7 +34,7 @@
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 
   // Utility/Service imports
-  import { saveNewAddress } from 'one_click_checkout/address/helpers';
+  import { saveAddress } from 'one_click_checkout/address/helpers';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
   import { askForOTP } from 'one_click_checkout/common/otp';
   import Resource from 'one_click_checkout/address/resource';
@@ -43,23 +48,22 @@
   const routeMap = {
     [views.ADD_BILLING_ADDRESS]: addressViews.ADD_ADDRESS,
     [views.SAVED_BILLING_ADDRESS]: addressViews.SAVED_ADDRESSES,
+    [views.EDIT_BILLING_ADDRESS]: addressViews.EDIT_ADDRESS,
   };
 
   function onSubmit(addressCompleted) {
-    if (routeMap[currentView] === addressViews.ADD_ADDRESS) {
+    if (ADDRESS_FORM_VIEWS.includes(routeMap[currentView])) {
       addressCompleted.set(true);
     }
     const shouldSaveAddress =
-      $shouldSaveShippingAddress || $shouldSaveBillingAddress;
-    if (
-      routeMap[currentView] === addressViews.SAVED_ADDRESSES ||
-      !shouldSaveAddress
-    ) {
+      ($shouldSaveShippingAddress && $shippingAddressCompleted) ||
+      ($shouldSaveBillingAddress && $billingAddressCompleted);
+    if (!shouldSaveAddress) {
       redirectToPaymentMethods();
       return;
     }
     if (customer.logged) {
-      saveNewAddress().then((res) => {
+      saveAddress().then((res) => {
         $newShippingAddress.id = res.shipping_address?.id;
         redirectToPaymentMethods();
       });

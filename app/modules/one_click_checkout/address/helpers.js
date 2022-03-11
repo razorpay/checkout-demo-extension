@@ -9,7 +9,10 @@ import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 // Helper imports
 import { isUserLoggedIn } from 'common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-import { postCustomerAddress } from 'one_click_checkout/address/service';
+import {
+  postCustomerAddress,
+  putCustomerAddress,
+} from 'one_click_checkout/address/service';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 // Constants imports
@@ -111,7 +114,7 @@ export function successHandler(data) {
  */
 export function addressSaveOTPSuccessHandler(service) {
   // Save address
-  saveNewAddress(service).then((res) => {
+  saveAddress(service).then((res) => {
     get(newUserAddress).id = res.shipping_address?.id;
     redirectToPaymentMethods();
   });
@@ -135,15 +138,39 @@ export const skipOTPHandle = () => {
  * Method called when an address has to be saved.
  * @returns {Promise} promise which is completed when address save is successful
  */
-export const saveNewAddress = () => {
+export const saveAddress = () => {
   let payload = getSaveAddressPayload();
   const loggedIn = isUserLoggedIn();
   if (loggedIn && Object.keys(payload).length > 0) {
-    return new Promise((resolve) => {
-      postCustomerAddress(payload).then((res) => {
-        resolve(res);
-      });
-    });
+    const { shipping_address, billing_address } = payload;
+
+    /**
+     * send a single request if both forms share common type (add/edit)
+     * or if only one billing/shipping address needs to be created/updated
+     */
+    if (
+      shipping_address?.formView === billing_address?.formView ||
+      !shipping_address ||
+      !billing_address
+    ) {
+      if (
+        shipping_address?.formView === views.EDIT_ADDRESS ||
+        billing_address?.formView === views.EDIT_ADDRESS
+      )
+        return putCustomerAddress(payload);
+      return postCustomerAddress(payload);
+    } else {
+      let postPayload = { shipping_address };
+      let putPayload = { billing_address };
+      if (payload.shipping_address?.formView === views.EDIT_ADDRESS) {
+        postPayload = { billing_address };
+        putPayload = { shipping_address };
+      }
+      return Promise.all([
+        postCustomerAddress(postPayload),
+        putCustomerAddress(putPayload),
+      ]);
+    }
   }
   return Promise.resolve(false);
 };

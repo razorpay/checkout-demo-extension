@@ -20,7 +20,7 @@
   import { getTheme } from 'one_click_checkout/sessionInterface';
 
   // helpers imports
-  import { saveNewAddress } from 'one_click_checkout/address/helpers';
+  import { saveAddress } from 'one_click_checkout/address/helpers';
   import { getCustomer } from 'checkoutframe/customer';
   import { askForOTP } from 'one_click_checkout/common/otp';
 
@@ -32,6 +32,7 @@
   import Analytics, { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import {
+    ADDRESS_FORM_VIEWS,
     ADDRESS_TYPES,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
@@ -51,10 +52,8 @@
 
   let customer = getCustomer($contact, null, true);
 
-  $: isViewAddAddress = routeMap[currentView] === addressViews.ADD_ADDRESS;
-
   function onSubmit(addressCompleted) {
-    if (currentView === views.ADD_ADDRESS) {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       addressCompleted.set(true);
     }
 
@@ -76,7 +75,7 @@
       return;
     }
     if (customer.logged) {
-      saveNewAddress().then((res) => {
+      saveAddress().then((res) => {
         $newUserAddress.id = res.shipping_address?.id;
         redirectToPaymentMethods();
       });
@@ -88,6 +87,7 @@
   const routeMap = {
     [views.ADD_ADDRESS]: addressViews.ADD_ADDRESS,
     [views.SAVED_ADDRESSES]: addressViews.SAVED_ADDRESSES,
+    [views.EDIT_ADDRESS]: addressViews.EDIT_ADDRESS,
   };
 
   function onSavedAddressClick() {
@@ -133,7 +133,7 @@
   currentView={routeMap[currentView]}
 >
   <div slot="header">
-    {#if $showSavedAddressCta && isViewAddAddress}
+    {#if $showSavedAddressCta && routeMap[currentView] === addressViews.ADD_ADDRESS}
       <button
         class="saved-addresses-cta"
         on:click|preventDefault={onSavedAddressClick}
@@ -144,7 +144,7 @@
     {/if}
   </div>
   <div slot="inner-footer">
-    {#if isViewAddAddress}
+    {#if ADDRESS_FORM_VIEWS.includes(currentView)}
       <SameBillingAndShipping
         shouldSaveAddress={true}
         on:toggle={trackSameBillingAndShippingCheckbox}

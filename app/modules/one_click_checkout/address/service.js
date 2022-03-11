@@ -8,6 +8,7 @@ import {
   formatAddress,
   formatResults,
   getDevicePayload,
+  hydrateSamePincodeAddresses,
 } from 'one_click_checkout/address/helpersExtra';
 // analytics import
 import { Events } from 'analytics';
@@ -16,11 +17,7 @@ import AddressEvents from 'one_click_checkout/address/analytics';
 import { timer } from 'utils/timer';
 import { getContactPayload } from 'one_click_checkout/store';
 import { showLoader, loaderLabel } from 'one_click_checkout/loader/store';
-import {
-  UPDATE_ADDRESS_LABEL,
-  CHECK_PIN_LABEL,
-  FETCHING_ADDRESS_LABEL,
-} from 'one_click_checkout/loader/i18n/labels';
+import { UPDATE_ADDRESS_LABEL } from 'one_click_checkout/loader/i18n/labels';
 import { didSaveAddress } from 'one_click_checkout/address/store';
 
 const addressCache = {};
@@ -67,6 +64,51 @@ export function getCityState(pincode, country) {
     }
   });
 }
+
+/**
+ *
+ * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
+ * @returns Promise {
+ *    address_id
+ * }
+ * Api call for updating address
+ */
+export function putCustomerAddress({ shipping_address, billing_address }) {
+  loaderLabel.set(UPDATE_ADDRESS_LABEL);
+  showLoader.set(true);
+  const addressApiTimer = timer();
+  Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
+  const payload = getCustomerAddressApiPayload(
+    {
+      shipping_address,
+      billing_address,
+    },
+    true
+  );
+  return new Promise((resolve, reject) => {
+    fetch.put({
+      url: makeAuthUrl(`customers/addresses`),
+      data: payload,
+      callback: (response) => {
+        Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END, {
+          time: addressApiTimer(),
+          addressSaved: response.status_code === 200,
+          failure_reason: response?.error?.description,
+          address_id: response?.shipping_address?.id,
+        });
+        if (response.error) {
+          reject(response.error);
+          showLoader.set(false);
+          return;
+        }
+        didSaveAddress.set(true);
+        showLoader.set(false);
+        resolve(response);
+      },
+    });
+  });
+}
+
 /**
  *
  * @param {Object} combined_address_obj an object containing shipping and billing addresses under separate keys
@@ -84,6 +126,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
     shipping_address,
     billing_address,
   });
+
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl(`customers/addresses`),
@@ -112,24 +155,19 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(addresses, onSavedAddress = false) {
-  if (onSavedAddress) {
-    loaderLabel.set(FETCHING_ADDRESS_LABEL);
-  } else {
-    loaderLabel.set(CHECK_PIN_LABEL);
-  }
-  const order_id = getOrderId();
-  showLoader.set(true);
-  const serviceabilityApiTimer = timer();
+export function postServiceability(addresses, onSavedAddress) {
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
     is_saved_address: onSavedAddress,
   });
+
+  const order_id = getOrderId();
+
+  const serviceabilityApiTimer = timer();
   const formattedPayload = getServiceabilityPayload(
     addresses,
     serviceabilityCache[order_id]
   );
   if (!formattedPayload) {
-    showLoader.set(false);
     return Promise.resolve(serviceabilityCache[order_id]);
   }
   const payload = { addresses: formattedPayload, order_id };
@@ -145,7 +183,6 @@ export function postServiceability(addresses, onSavedAddress = false) {
         });
         if (response.error) {
           reject(response.error);
-          showLoader.set(false);
           return;
         }
         if (
@@ -160,7 +197,7 @@ export function postServiceability(addresses, onSavedAddress = false) {
         } else {
           serviceabilityCache[order_id] = formatResults(response.addresses);
         }
-        showLoader.set(false);
+
         resolve(serviceabilityCache[order_id]);
       },
     });
@@ -282,4 +319,34 @@ export function getStatesList(country) {
       },
     });
   });
+}
+
+/**
+ *
+ * @param {Array<Addresses>} addresses
+ * @param {boolean} onSavedAddress
+ * @returns Promise which returns array of addresses with serviceability data
+ *
+ **/
+export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
+  // unique pincode hash
+  const zipecodeHash = {};
+  addresses.forEach(({ zipcode, country }) => {
+    if (!zipecodeHash[zipcode]) {
+      zipecodeHash[zipcode] = {
+        zipcode,
+        country,
+      };
+    }
+  });
+
+  const order_id = getOrderId();
+
+  return Promise.all(
+    Object.values(zipecodeHash).map((address) =>
+      postServiceability([address], onSavedAddress)
+    )
+  ).then(() =>
+    hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])
+  );
 }
