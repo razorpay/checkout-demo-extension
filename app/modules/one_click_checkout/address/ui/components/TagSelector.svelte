@@ -15,7 +15,7 @@
   import Tag from 'one_click_checkout/address/ui/elements/Tag.svelte';
 
   // Constant imports
-  import { tagLabels } from 'one_click_checkout/address/constants';
+  import { TAG_LABELS } from 'one_click_checkout/address/constants';
 
   export let selectedTag;
 
@@ -24,27 +24,33 @@
 
   const dispatch = createEventDispatcher();
 
-  $: showTagInput = selectedTag && !['Home', 'Office'].includes(selectedTag);
+  $: showTagInput =
+    selectedTag && ![TAG_LABELS.HOME, TAG_LABELS.OFFICE].includes(selectedTag);
 
   function onTagSelection(e) {
     const { label } = e.detail;
     dispatch('select', { label });
 
-    if (label === 'Others') {
+    if (label === TAG_LABELS.OTHERS) {
       Events.Track(AddressEvents.OTHER_TAG_SELECTED);
       tick().then(() => {
         inputRef?.focus();
       });
     }
   }
+
+  function handleInput(e) {
+    if (e.target.value) dispatch('select', { label: e.target.value });
+    else dispatch('select', { label: TAG_LABELS.OTHERS });
+  }
 </script>
 
 <div class="tag-selector-container">
-  {#each tagLabels as label}
+  {#each Object.entries(TAG_LABELS) as [, label]}
     <Tag
       on:select={onTagSelection}
       {label}
-      selected={label === 'Others' && showTagInput
+      selected={label === TAG_LABELS.OTHERS && showTagInput
         ? true
         : selectedTag === label}
     />
@@ -58,9 +64,7 @@
     elemClasses="address-elem"
     bind:this={inputRef}
     label={$t(CUSTOM_TAG_LABEL)}
-    on:input={(e) => {
-      if (e.target.value) dispatch('select', { label: e.target.value });
-    }}
+    on:input={handleInput}
     on:blur={(e) =>
       Events.Track(AddressEvents.CUSTOM_TAG_INPUT, { tag: e.target.value })}
   />

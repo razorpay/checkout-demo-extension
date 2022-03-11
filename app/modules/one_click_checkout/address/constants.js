@@ -1,6 +1,10 @@
 import { PROCEED_PAYMENT } from 'ui/labels/cta';
 
-export const tagLabels = ['Home', 'Office', 'Others'];
+export const TAG_LABELS = {
+  HOME: 'Home',
+  OFFICE: 'Office',
+  OTHERS: 'Others',
+};
 
 export const views = {
   ADD_ADDRESS: 'addAddress',
