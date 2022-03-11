@@ -37,6 +37,8 @@ import addSquare from 'one_click_checkout/address/icons/add_square';
 import kebabMenu from 'one_click_checkout/address/icons/kebab_menu';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
+import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
+import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 import editPaper from './edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 
@@ -65,6 +67,8 @@ const availIconNames = getAllMethods().concat([
   'saved_card',
   'rzp_logo',
   'edit_phone',
+  'circle_check',
+  'rtb_close',
   'circle_arrow_next',
   'arrow_down',
   'order',
@@ -188,6 +192,11 @@ function getIconFn(iconName) {
     case 'international':
       return internationalIcon;
 
+    case 'circle_check':
+      return circle_check;
+
+    case 'rtb_close':
+      return rtb_close;
     case 'edit_paper':
       return editPaper;
     case 'location':

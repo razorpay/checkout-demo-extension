@@ -264,3 +264,5 @@ export const isFacebookAnalyticsEnabled = () =>
   getOption('enable_fb_analytics');
 
 export const getCustomerCart = () => getOption('customer_cart');
+
+export const getMerchantName = () => getOption('name');
