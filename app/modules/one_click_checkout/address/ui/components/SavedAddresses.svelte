@@ -118,6 +118,7 @@
           on:editClick
           isSelected={$selectedAddressId === s_address.id}
           {checkServiceability}
+          loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         />
       </div>
     {/each}
