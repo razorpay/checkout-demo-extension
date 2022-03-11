@@ -7,15 +7,19 @@
   let shimmerStyle;
 
   $: shimmerStyle = style || '';
-  $: if (width)
+  $: if (width) {
     shimmerStyle += `;width: ${
       typeof width === 'number' ? `${width}px` : width
     }`;
-  $: if (height)
+  }
+  $: if (height) {
     shimmerStyle += `;height: ${
       typeof height === 'number' ? `${height}px` : height
     }`;
-  $: if (borderRadius) shimmerStyle += `;border-radius: ${borderRadius}`;
+  }
+  $: if (borderRadius) {
+    shimmerStyle += `;border-radius: ${borderRadius}`;
+  }
 </script>
 
 <div class="shimmer-bg shimmer-line" style={shimmerStyle} />
