@@ -1,11 +1,13 @@
 <script>
-  import { t } from 'svelte-i18n';
+  // svelte imports
   import { fly, fade } from 'svelte/transition';
-  import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
-  import { getTheme } from 'one_click_checkout/address/sessionInterface';
-  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
 
-  const theme = getTheme();
+  // store imports
+  import { showLoader } from 'one_click_checkout/account_modal/store';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
 </script>
 
 {#if $showLoader}
@@ -18,7 +20,7 @@
     <div class="wrapper">
       <div class="bar" />
       <div class="content">
-        <span class="label">{$t($loaderLabel) || $t(LOADING_LABEL)}...</span>
+        <span class="label">{$t(LOADING_LABEL)}...</span>
       </div>
     </div>
   </div>
@@ -30,7 +32,6 @@
     height: 100%;
     opacity: 0.2;
     position: absolute;
-    background-color: black;
     top: 0;
     right: 0;
     z-index: 10000;
@@ -62,6 +63,7 @@
 
   .label {
     cursor: default;
+    text-transform: capitalize;
   }
 
   .wrapper {
@@ -73,7 +75,7 @@
   }
   .bar {
     width: 20%;
-    height: 5px;
+    min-height: 5px;
     top: 0px;
     position: relative;
     animation-name: loader;
@@ -82,14 +84,5 @@
     animation-iteration-count: infinite;
     animation-direction: normal;
     background-color: #b88c45;
-  }
-
-  @keyframes loader {
-    0% {
-      left: 0px;
-    }
-    100% {
-      left: 100%;
-    }
   }
 </style>

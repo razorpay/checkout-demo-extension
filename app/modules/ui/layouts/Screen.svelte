@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount } from 'svelte';
 
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   // Props
   export let pad = true;
   export let threshold = 16;
@@ -64,6 +65,7 @@
   on:scroll={onScroll}
 >
   <slot />
+  <AccountTab />
 </div>
 <div class="shadow shadow-top" />
 <div class="shadow shadow-bottom" />

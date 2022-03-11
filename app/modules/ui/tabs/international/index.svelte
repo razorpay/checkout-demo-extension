@@ -32,6 +32,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import NVSForm from 'ui/tabs/international/NVSForm.svelte';
   import Info from 'ui/elements/Info.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // Constants
   import { VIEWS_MAP } from 'ui/tabs/international/constants';
@@ -216,56 +217,63 @@
 </script>
 
 <Tab method="international" pad={false} overrideMethodCheck>
-  {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
-    <div class="border-list collapsable">
-      {#each filteredProviders as provider, i (provider.code)}
-        <SlottedRadioOption
-          name={provider.code}
-          selected={$selectedInternationalProvider === provider.code}
-          align="top"
-          on:click={() => handleProviderSelect(provider)}
-        >
-          <div
-            class="title-container"
-            slot="title"
-            bind:this={providerRefs[provider.code]}
-            id={`international-radio-${provider.code}`}
+  <div class="international-wrapper">
+    {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
+      <div class="border-list collapsable">
+        {#each filteredProviders as provider, i (provider.code)}
+          <SlottedRadioOption
+            name={provider.code}
+            selected={$selectedInternationalProvider === provider.code}
+            align="top"
+            on:click={() => handleProviderSelect(provider)}
           >
-            <span class="title"
-              >{getAppProviderName(provider.code, $locale)}</span
+            <div
+              class="title-container"
+              slot="title"
+              bind:this={providerRefs[provider.code]}
+              id={`international-radio-${provider.code}`}
             >
-            <span class="subtitle"
-              >{getAppProviderSubtext(provider.code, $locale)}</span
-            >
-          </div>
-          <i slot="icon" class="top">
-            <Icon icon={provider.logo} />
-          </i>
-        </SlottedRadioOption>
-      {/each}
-    </div>
-  {:else if currentView === VIEWS_MAP.NVS_FORM}
-    <div id="nvsContainer">
-      {#if selectedProvider}
-        <div class="nvs-provider-info">
-          <Icon icon={selectedProvider.logo} />
-          <span class="provider-name">
-            {getAppProviderName(selectedProvider.code, $locale)}
-          </span>
-        </div>
-      {/if}
-      <div class="nvs-title">
-        {$t(AVS_HEADING)}
-        <span
-          on:click={() => {
-            showNVSInfo = true;
-          }}><Icon icon={icons.question} /></span
-        >
+              <span class="title"
+                >{getAppProviderName(provider.code, $locale)}</span
+              >
+              <span class="subtitle"
+                >{getAppProviderSubtext(provider.code, $locale)}</span
+              >
+            </div>
+            <i slot="icon" class="top">
+              <Icon icon={provider.logo} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
       </div>
-      <NVSForm />
-      <Info bind:show={showNVSInfo} title={$t(AVS_INFO_TITLE)} data={NVSInfo} />
-    </div>
-  {/if}
+    {:else if currentView === VIEWS_MAP.NVS_FORM}
+      <div id="nvsContainer">
+        {#if selectedProvider}
+          <div class="nvs-provider-info">
+            <Icon icon={selectedProvider.logo} />
+            <span class="provider-name">
+              {getAppProviderName(selectedProvider.code, $locale)}
+            </span>
+          </div>
+        {/if}
+        <div class="nvs-title">
+          {$t(AVS_HEADING)}
+          <span
+            on:click={() => {
+              showNVSInfo = true;
+            }}><Icon icon={icons.question} /></span
+          >
+        </div>
+        <NVSForm />
+        <Info
+          bind:show={showNVSInfo}
+          title={$t(AVS_INFO_TITLE)}
+          data={NVSInfo}
+        />
+      </div>
+    {/if}
+    <AccountTab />
+  </div>
   <Bottom tab="international">
     {#if $selectedInternationalProvider}
       <DynamicCurrencyView
@@ -325,5 +333,11 @@
     margin-left: 12px;
     font-size: 13px;
     color: #707070;
+  }
+
+  .international-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 </style>

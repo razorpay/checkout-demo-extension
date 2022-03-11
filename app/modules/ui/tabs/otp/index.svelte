@@ -54,6 +54,7 @@
   import ResendButton from 'ui/elements/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
@@ -333,6 +334,7 @@
       </span>
     {/if}
   </div>
+  <AccountTab />
 </div>
 
 <style>

@@ -5,6 +5,8 @@
   import CTA from 'ui/elements/CTA.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+
   import Icon from 'ui/elements/Icon.svelte';
   // i18n imports
   import { t, locale } from 'svelte-i18n';
@@ -208,34 +210,37 @@
       'billing-address-wrapper'
     ]}
   >
-    <slot name="inner-header" />
-    <div class="label-container">
-      <Icon icon={location} />
-      <p class="label-text">{$t(title)}</p>
+    <div class="address-section">
+      <slot name="inner-header" />
+      <div class="label-container">
+        <Icon icon={location} />
+        <p class="label-text">{$t(title)}</p>
+      </div>
+      {#if currentView === addressViews.SAVED_ADDRESSES}
+        <SavedAddresses
+          {selectedAddressId}
+          addresses={savedAddresses}
+          on:select={handleAddressSelection}
+          on:editClick={handleEditAddressClick}
+          onAddAddressClick={handleAddAddressClick}
+          checkServiceability={Resource[addressType].checkServiceability}
+          {addressType}
+        />
+      {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
+        <AddNewAddress
+          on:formCompletion={onFormCompletion}
+          id={Resource[addressType].formId}
+          checkServiceability={Resource[addressType].checkServiceability}
+          formData={newUserAddress}
+          {error}
+          {shouldSaveAddress}
+          {addressType}
+          {selectedCountryISO}
+        />
+      {/if}
+      <slot name="inner-footer" />
     </div>
-    {#if currentView === addressViews.SAVED_ADDRESSES}
-      <SavedAddresses
-        {selectedAddressId}
-        addresses={savedAddresses}
-        on:select={handleAddressSelection}
-        on:editClick={handleEditAddressClick}
-        onAddAddressClick={handleAddAddressClick}
-        checkServiceability={Resource[addressType].checkServiceability}
-        {addressType}
-      />
-    {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
-      <AddNewAddress
-        on:formCompletion={onFormCompletion}
-        id={Resource[addressType].formId}
-        checkServiceability={Resource[addressType].checkServiceability}
-        formData={newUserAddress}
-        {error}
-        {shouldSaveAddress}
-        {addressType}
-        {selectedCountryISO}
-      />
-    {/if}
-    <slot name="inner-footer" />
+    <AccountTab />
   </div>
   <slot name="footer" />
   <CTA on:click={onSubmit} {disabled}>
@@ -250,7 +255,9 @@
     border: 0px;
   }
   .address-wrapper {
-    padding: 26px 18px 0px;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 0px 0px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
     height: calc(100% - 47px - 55px);
@@ -287,5 +294,9 @@
   }
   :global(.address-label) {
     font-size: 14px;
+  }
+
+  .address-section {
+    padding: 0px 24px;
   }
 </style>

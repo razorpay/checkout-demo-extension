@@ -19,6 +19,8 @@ import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { ignoreFirstCall } from 'svelte-utils';
 import BrowserStorage from 'browserstorage';
+import { showLoader } from 'one_click_checkout/account_modal/store';
+import { isOneClickCheckout } from 'razorpay';
 
 const LOCALES = {
   en: 'English',
@@ -156,7 +158,11 @@ export function bindI18nEvents(retryErrorHandler = false, queryParams = {}) {
   // Show loader whenever language bundle is loading
   isLoading.subscribe((value) => {
     if (value) {
-      session.showLoadError('Loading', false, true);
+      if (isOneClickCheckout()) {
+        showLoader.set(true);
+      } else {
+        session.showLoadError('Loading', false, true);
+      }
     } else {
       // TODO: fix this and remove try/catch
       try {
@@ -168,7 +174,11 @@ export function bindI18nEvents(retryErrorHandler = false, queryParams = {}) {
           session.errorHandler(queryParams);
           retryErrorHandler = false;
         } else {
-          session.hideOverlayMessage();
+          if (isOneClickCheckout()) {
+            showLoader.set(false);
+          } else {
+            session.hideOverlayMessage();
+          }
         }
       } catch (e) {}
     }

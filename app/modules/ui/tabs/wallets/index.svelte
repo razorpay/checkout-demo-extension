@@ -26,6 +26,7 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { scrollIntoView } from 'lib/utils';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // Transitions
   import { slide } from 'svelte/transition';
@@ -157,44 +158,48 @@
   });
 </script>
 
-<Tab method="wallet">
-  <div class="border-list collapsable">
-    {#each filteredWallets as wallet, i (wallet.code)}
-      <SlottedRadioOption
-        name={wallet.code}
-        selected={$selectedWallet === wallet.code}
-        align="top"
-        on:click={() => onWalletSelection(wallet.code)}
-      >
-        <div
-          class="title-container"
-          slot="title"
-          bind:this={walletReferences[wallet.code]}
-          id={`wallet-radio-${wallet.code}`}
+<Tab method="wallet" pad={false}>
+  <div class="wallet-wrapper">
+    <div class="border-list collapsable">
+      {#each filteredWallets as wallet, i (wallet.code)}
+        <SlottedRadioOption
+          name={wallet.code}
+          selected={$selectedWallet === wallet.code}
+          align="top"
+          on:click={() => onWalletSelection(wallet.code)}
         >
-          <span class="title">{getWalletName(wallet.code, $locale)}</span>
-          <span class="subtitle">{getWalletSubtitle(wallet.code, $locale)}</span
+          <div
+            class="title-container"
+            slot="title"
+            bind:this={walletReferences[wallet.code]}
+            id={`wallet-radio-${wallet.code}`}
           >
-        </div>
-        <div slot="body">
-          {#if $selectedWallet === wallet.code}
-            <div transition:slide={getAnimationOptions({ duration: 200 })}>
-              {#if getApplicableOffer(wallet.code)}
-                <span class="offer">
-                  {getApplicableOffer(wallet.code).name}
-                </span>
-                <div class="offer-info">
-                  {getApplicableOffer(wallet.code).display_text}
-                </div>
-              {/if}
-            </div>
-          {/if}
-        </div>
-        <i slot="icon" class="top">
-          <Icon icon={wallet.sqLogo} />
-        </i>
-      </SlottedRadioOption>
-    {/each}
+            <span class="title">{getWalletName(wallet.code, $locale)}</span>
+            <span class="subtitle"
+              >{getWalletSubtitle(wallet.code, $locale)}</span
+            >
+          </div>
+          <div slot="body">
+            {#if $selectedWallet === wallet.code}
+              <div transition:slide={getAnimationOptions({ duration: 200 })}>
+                {#if getApplicableOffer(wallet.code)}
+                  <span class="offer">
+                    {getApplicableOffer(wallet.code).name}
+                  </span>
+                  <div class="offer-info">
+                    {getApplicableOffer(wallet.code).display_text}
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+          <i slot="icon" class="top">
+            <Icon icon={wallet.sqLogo} />
+          </i>
+        </SlottedRadioOption>
+      {/each}
+    </div>
+    <AccountTab />
   </div>
   <Bottom tab="wallet">
     <!-- skip dcc check as paypal cc doesn't depend upon dcc -->
@@ -206,9 +211,7 @@
 
 <style>
   .border-list {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    margin: 0 -12px;
+    margin: 12px;
   }
 
   [slot='icon'].top {
@@ -222,5 +225,11 @@
 
   .subtitle {
     font-size: 10px;
+  }
+
+  .wallet-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 </style>
