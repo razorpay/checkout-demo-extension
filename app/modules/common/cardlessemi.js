@@ -30,7 +30,7 @@ const config = {
   },
   zestmoney: {
     name: 'ZestMoney',
-    min_amount: 90000,
+    min_amount: 9900,
     fee_bearer_customer: false,
   },
   flexmoney: {
