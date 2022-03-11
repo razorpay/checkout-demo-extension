@@ -157,8 +157,8 @@ async function fillUserAddress(
 }
 
 async function handleAddAddress(context) {
-  await context.page.waitForSelector('.address-add-icon');
-  await context.page.click('.address-add-icon');
+  await context.page.waitForSelector('#address-add');
+  await context.page.click('#address-add');
 }
 
 async function handleCustomerAddressReq(context) {

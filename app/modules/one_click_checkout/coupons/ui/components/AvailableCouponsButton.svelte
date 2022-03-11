@@ -1,38 +1,65 @@
 <script>
-  import { availableCoupons } from 'one_click_checkout/coupons/store';
-
-  import { AVAILABLE_COUPONS_LABEL } from 'one_click_checkout/coupons/i18n/labels';
-  import { t } from 'svelte-i18n';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
-  import { showAvailableCoupons } from 'one_click_checkout/coupons/sessionInterface';
+  // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
+
+  // store imports
+  import {
+    appliedCoupon,
+    availableCoupons,
+  } from 'one_click_checkout/coupons/store';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import {
+    HAVE_COUPON_LABEL,
+    REMOVE_LABEL,
+    AVAILABLE_LABEL,
+  } from 'one_click_checkout/coupons/i18n/labels';
+
+  // constant imports
+  import { views } from 'one_click_checkout/routing/constants';
+
+  // utils imports
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
   export let applyCoupon;
   export let removeCoupon;
 
-  const { offers, arrow_next } = getIcons();
+  const { offers, circle_arrow_next } = getIcons();
+  const showAvailableCoupons = () => {
+    navigator.navigateTo({ path: views.COUPONS_LIST });
+  };
 </script>
 
-{#if $availableCoupons.length}
-  <button
-    id="coupons-available-container"
-    class="coupons-available-container"
-    on:click|preventDefault={() => {
-      showAvailableCoupons({
-        onApply: applyCoupon,
-        onRemove: removeCoupon,
-      });
-    }}
-  >
-    <Icon icon={offers} />
+<div id="coupons-available-container">
+  <Icon icon={offers} />
+  {#if $appliedCoupon}
     <div class="coupons-available-text">
-      {`${$availableCoupons.length} ${$t(AVAILABLE_COUPONS_LABEL)}`}
+      ‘{$appliedCoupon}’ {$t(AVAILABLE_LABEL)}
     </div>
-    <span class="coupon-arrow-next">
-      <Icon icon={arrow_next} />
+    <span class="coupon-remove-text" on:click|preventDefault={removeCoupon}>
+      {$t(REMOVE_LABEL)}
     </span>
-  </button>
-{/if}
+  {:else}
+    <div class="coupons-available-text">
+      {$t(HAVE_COUPON_LABEL)}
+      {#if $availableCoupons.length}
+        <span class="coupons-available-count">
+          ({$availableCoupons.length}
+          {$t(AVAILABLE_LABEL)})
+        </span>
+      {/if}
+    </div>
+    <span
+      class="coupon-arrow-next"
+      on:click|preventDefault={showAvailableCoupons}
+    >
+      <Icon icon={circle_arrow_next} />
+    </span>
+  {/if}
+</div>
+<div class="separator" />
 
 <style>
   .coupons-available-text {
@@ -40,7 +67,18 @@
     font-weight: 600;
   }
 
+  .coupons-available-count {
+    font-weight: 300;
+    color: rgba(51, 51, 51, 0.6);
+  }
   .coupon-arrow-next {
     margin-left: auto;
+    cursor: pointer;
+    padding-top: 2px;
+  }
+
+  .separator {
+    height: 10px;
+    background-color: #f8fafd;
   }
 </style>

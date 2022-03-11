@@ -1,5 +1,5 @@
 export default {
-  title: 'VERIFY MOBILE NUMBER',
+  title: 'Enter Contact Details',
   description: 'We require this to check if the coupon is applicable',
-  cta: 'VERIFY',
+  cta: 'Continue',
 };

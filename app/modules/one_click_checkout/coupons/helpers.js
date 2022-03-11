@@ -23,6 +23,13 @@ import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
+import { showToast, TOAST_THEME } from 'one_click_checkout/Toast';
+import { COUPON_TOAST_MESSAGE } from 'one_click_checkout/coupons/i18n/labels';
+import { getCurrency } from 'razorpay';
+import { formatAmountWithSymbol } from 'common/currency';
+import { formatTemplateWithLocale } from 'i18n';
+import { locale } from 'svelte-i18n';
+import { cartDiscount } from 'one_click_checkout/charges/store';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -80,6 +87,18 @@ export function applyCouponCode(code) {
             coupon_code: input,
           },
         });
+        navigator.navigateTo({ path: views.COUPONS });
+        showToast({
+          delay: 5000,
+          message: formatTemplateWithLocale(
+            COUPON_TOAST_MESSAGE,
+            {
+              amount: formatAmountWithSymbol(get(cartDiscount), getCurrency()),
+            },
+            get(locale)
+          ),
+          theme: TOAST_THEME.SUCCESS,
+        });
       },
       onInvalid: (error) => {
         merchantAnalytics({
@@ -107,4 +126,8 @@ export function successHandler() {
 
 export function skipCouponOTP() {
   navigator.replace(views.COUPONS);
+}
+
+export function skipCouponListOTP() {
+  navigator.replace(views.COUPONS_LIST);
 }

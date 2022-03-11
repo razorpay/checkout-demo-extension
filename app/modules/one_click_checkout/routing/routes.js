@@ -1,4 +1,4 @@
-import coupons from 'one_click_checkout/coupons/config';
+import { coupons, couponsList } from 'one_click_checkout/coupons/config';
 import details from 'one_click_checkout/common/details/config';
 import {
   savedAddress,
@@ -13,6 +13,7 @@ import { screensHistory } from 'one_click_checkout/routing/History';
 
 const routes = [
   { ...coupons },
+  { ...couponsList },
   { ...savedAddress },
   { ...addAddress },
   { ...editAddress },

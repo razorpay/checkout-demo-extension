@@ -1,17 +1,16 @@
 <script>
   // svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
 
   // UI Imports
   import CTA from 'ui/elements/CTA.svelte';
   import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
-  import CouponInput from './components/CouponInput.svelte';
   import ContactWidget from 'one_click_checkout/contact_widget/ContactWidget.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // store imports
   import { getCurrency, getPrefilledCouponCode } from 'razorpay';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import {
     checkServiceabilityStatus,
     selectedAddress,
@@ -28,6 +27,8 @@
     cartAmount,
     cartDiscount,
     amount,
+    isShippingAddedToAmount,
+    shippingCharge,
   } from 'one_click_checkout/charges/store';
   import { removeCouponInStore } from 'one_click_checkout/coupons/store';
 
@@ -36,12 +37,13 @@
   import {
     SUMMARY_LABEL,
     TOTAL_LABEL,
-    HAVE_COUPON_LABEL,
     CONTINUE_LABEL,
   } from 'one_click_checkout/coupons/i18n/labels';
   import {
     COUPON_DISCOUNT_LABEL,
     AMOUNT_LABEL,
+    SHIPPING_CHARGES_LABEL,
+    FREE_LABEL,
   } from 'one_click_checkout/summary_modal/i18n/labels';
 
   // session imports
@@ -50,25 +52,28 @@
     showAmountInTopBar,
     hideAmountInTopBar,
   } from 'one_click_checkout/coupons/sessionInterface';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
 
   // analytics imports
-  import Razorpay from 'common/Razorpay';
   import Analytics, { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
 
   // utils imports
+  import Razorpay from 'common/Razorpay';
   import {
     fetchCoupons,
     applyCouponCode,
   } from 'one_click_checkout/coupons/helpers';
   import { formatAmountWithSymbol } from 'common/currency';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { hideToast } from 'one_click_checkout/Toast';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -77,6 +82,7 @@
   let showCta = true;
   const currency = getCurrency();
   const prefilledCoupon = getPrefilledCouponCode();
+  const { order } = getIcons();
 
   let ctaDisabled = false;
   $: ctaDisabled = $savedAddresses.length && !$selectedAddress.serviceability;
@@ -136,44 +142,55 @@
       applyCouponCode(prefilledCoupon);
     }
   });
+
+  onDestroy(() => {
+    hideToast();
+  });
 </script>
 
 <Screen pad={false}>
   <div class="coupon-container">
     <ContactWidget />
-    <p class="have-coupon-label">{$t(HAVE_COUPON_LABEL)}</p>
 
-    <CouponInput
-      {onCouponInput}
-      applyCoupon={() => applyCouponCode()}
-      removeCoupon={removeCouponCode}
-    />
-
+    <div class="separator" />
     <AvailableCouponsButton
       applyCoupon={(code) => applyCouponCode(code)}
       removeCoupon={removeCouponCode}
     />
 
-    <p class="coupon-order-summary-label">{$t(SUMMARY_LABEL)}</p>
+    <div class="coupon-order-summary-label">
+      <span class="order-icon"><Icon icon={order} /></span>
+      {$t(SUMMARY_LABEL)}
+    </div>
 
     <div class="coupon-order-summary">
-      <div class="row justify-between">
+      <div class="row justify-between color-gray">
         <p>{$t(AMOUNT_LABEL)}</p>
         <p>
           {formatAmountWithSymbol($cartAmount, currency)}
         </p>
       </div>
       {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
-        <div class="row justify-between">
+        <div class="row justify-between color-gray">
           <p>
             {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
           </p>
           <p class="color-green">
-            {formatAmountWithSymbol($cartDiscount, currency)}
+            - {formatAmountWithSymbol($cartDiscount, currency)}
           </p>
         </div>
       {/if}
-      <hr />
+      {#if $isShippingAddedToAmount}
+        <div class="row justify-between color-gray">
+          <p>{$t(SHIPPING_CHARGES_LABEL)}</p>
+          <p>
+            {$shippingCharge
+              ? formatAmountWithSymbol($shippingCharge, currency)
+              : $t(FREE_LABEL)}
+          </p>
+        </div>
+      {/if}
+      <hr class="order-split" />
       <div class="row justify-between">
         <p><b>{$t(TOTAL_LABEL)}</b></p>
         <p><b>{formatAmountWithSymbol($amount, currency)}</b></p>
@@ -188,24 +205,26 @@
 <style>
   .coupon-order-summary-label {
     font-style: normal;
-    font-weight: normal;
+    font-weight: 600;
     font-size: 13px;
     line-height: 16px;
     margin-top: 20px;
-    text-transform: uppercase;
-    color: rgba(51, 51, 51, 0.6);
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    padding: 0px 18px;
+  }
+  .order-icon {
+    margin-right: 8px;
+    padding-top: 3px;
   }
   .coupon-container {
-    padding-left: 24px;
-    padding-right: 24px;
     padding-top: 20px;
   }
 
   .coupon-order-summary {
-    margin-top: 14px;
     margin-bottom: 14px;
-    padding: 12px 14px;
-    background: #f7f7f7;
+    padding: 12px 18px;
     font-size: 14px;
   }
   .row {
@@ -225,9 +244,8 @@
     color: #079f0d;
   }
 
-  hr {
-    opacity: 0.1;
-    border: 1px solid #000000;
+  .color-gray {
+    color: #8d97a1;
   }
 
   .have-coupon-label {
@@ -243,5 +261,15 @@
   b {
     color: #000000;
     line-height: 17px;
+  }
+
+  .order-split {
+    border: 1px dashed #8d97a1;
+    border-bottom: none;
+  }
+
+  .separator {
+    height: 10px;
+    background-color: #f8fafd;
   }
 </style>

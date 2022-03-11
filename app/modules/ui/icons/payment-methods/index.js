@@ -28,6 +28,9 @@ import internationalIcon from './international';
 import close from 'one_click_checkout/coupons/icons/close';
 import offers from 'one_click_checkout/coupons/icons/offers';
 import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
+import circle_arrow_next from 'one_click_checkout/coupons/icons/circle_arrow_next';
+import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
+import order from 'one_click_checkout/coupons/icons/order';
 import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
 import location from 'one_click_checkout/address/icons/location';
 import addSquare from 'one_click_checkout/address/icons/add_square';
@@ -62,6 +65,9 @@ const availIconNames = getAllMethods().concat([
   'saved_card',
   'rzp_logo',
   'edit_phone',
+  'circle_arrow_next',
+  'arrow_down',
+  'order',
   'edit_paper',
   'location',
   'add_square',
@@ -162,6 +168,15 @@ function getIconFn(iconName) {
 
     case 'arrow_next':
       return arrow_next;
+
+    case 'circle_arrow_next':
+      return circle_arrow_next;
+
+    case 'order':
+      return order;
+
+    case 'arrow_down':
+      return arrow_down;
 
     case 'saved_card':
       return savedCard;

@@ -142,7 +142,6 @@ module.exports = function (testFeatures) {
         await proceed(context);
       }
       if (isSaveAddress && skipOTP) {
-        await delay(200);
         await handleVerifyOTPReq(context);
         await handleCustomerAddressReq(context);
       }
