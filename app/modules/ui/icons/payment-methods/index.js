@@ -35,6 +35,7 @@ import kebabMenu from 'one_click_checkout/address/icons/kebab_menu';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
 import editPaper from './edit_paper';
+import user from 'one_click_checkout/contact_widget/icons/user';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -65,6 +66,7 @@ const availIconNames = getAllMethods().concat([
   'location',
   'add_square',
   'kebab_menu',
+  'user',
 ]);
 
 function getIconFn(iconName) {
@@ -181,6 +183,9 @@ function getIconFn(iconName) {
 
     case 'kebab_menu':
       return kebabMenu;
+
+    case 'user':
+      return user;
   }
 }
 

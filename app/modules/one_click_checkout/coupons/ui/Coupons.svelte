@@ -6,7 +6,7 @@
   import CTA from 'ui/elements/CTA.svelte';
   import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
   import CouponInput from './components/CouponInput.svelte';
-  import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
+  import ContactWidget from 'one_click_checkout/contact_widget/ContactWidget.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
 
   // store imports
@@ -46,7 +46,6 @@
 
   // session imports
   import {
-    showDetailsOverlay,
     removeCouponCode,
     showAmountInTopBar,
     hideAmountInTopBar,
@@ -117,16 +116,6 @@
     }
   }
 
-  function onEdit() {
-    Razorpay.sendMessage({
-      event: 'event',
-      data: {
-        event: 'user_details.edit',
-      },
-    });
-    showDetailsOverlay();
-  }
-
   onMount(() => {
     if (
       $savedAddresses.length &&
@@ -151,7 +140,7 @@
 
 <Screen pad={false}>
   <div class="coupon-container">
-    <UserDetailsStrip {onEdit} />
+    <ContactWidget />
     <p class="have-coupon-label">{$t(HAVE_COUPON_LABEL)}</p>
 
     <CouponInput
