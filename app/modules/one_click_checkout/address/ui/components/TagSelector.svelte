@@ -40,8 +40,11 @@
   }
 
   function handleInput(e) {
-    if (e.target.value) dispatch('select', { label: e.target.value });
-    else dispatch('select', { label: TAG_LABELS.OTHERS });
+    if (e.target.value) {
+      dispatch('select', { label: e.target.value });
+    } else {
+      dispatch('select', { label: TAG_LABELS.OTHERS });
+    }
   }
 </script>
 

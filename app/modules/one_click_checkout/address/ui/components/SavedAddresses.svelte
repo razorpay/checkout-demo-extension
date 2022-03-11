@@ -84,9 +84,11 @@
 
         // select the 2nd billing address if 1st address is selected for shipping
         if (!$selectedAddressId) {
-          if ($selectedShippingAddressId === $addresses[0].id)
+          if ($selectedShippingAddressId === $addresses[0].id) {
             selectedAddressId.set($addresses[1].id);
-          else selectedAddressId.set($addresses[0].id);
+          } else {
+            selectedAddressId.set($addresses[0].id);
+          }
         }
         dispatchServiceability();
       }
