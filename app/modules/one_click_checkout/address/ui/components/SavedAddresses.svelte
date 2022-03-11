@@ -76,14 +76,18 @@
 
         if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
           loadAddressesWithServiceability(true);
+        } else if (!$selectedAddressId) {
+          selectedAddressId.set($addresses[0].id);
         }
       } else {
         // billing address
 
         // select the 2nd billing address if 1st address is selected for shipping
-        if ($selectedShippingAddressId === $addresses[0].id)
-          selectedAddressId.set($addresses[1].id);
-        else selectedAddressId.set($addresses[0].id);
+        if (!$selectedAddressId) {
+          if ($selectedShippingAddressId === $addresses[0].id)
+            selectedAddressId.set($addresses[1].id);
+          else selectedAddressId.set($addresses[0].id);
+        }
         dispatchServiceability();
       }
     }
@@ -137,7 +141,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin: 16px 0 24px;
+    margin: 28px 0px;
     padding: 12px 16px;
     border: 1px dashed #8d97a1;
     border-radius: 4px;

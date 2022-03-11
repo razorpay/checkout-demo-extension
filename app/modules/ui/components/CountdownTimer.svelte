@@ -66,7 +66,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .countdown-text {
@@ -74,5 +74,6 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 12px;
+    color: rgba(38, 58, 74, 0.5);
   }
 </style>

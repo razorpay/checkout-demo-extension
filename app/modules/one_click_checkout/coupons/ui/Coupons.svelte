@@ -177,7 +177,7 @@
       removeCoupon={removeCouponCode}
     />
 
-    {#if $selectedAddress}
+    {#if $savedAddresses.length}
       <AddressWidget
         loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         address={$selectedAddress}

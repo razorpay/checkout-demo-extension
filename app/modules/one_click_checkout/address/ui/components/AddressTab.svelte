@@ -270,6 +270,7 @@
     font-size: 14px;
     text-transform: capitalize;
     margin-left: 8px;
+    font-weight: bold;
   }
 
   .billing-address-wrapper {

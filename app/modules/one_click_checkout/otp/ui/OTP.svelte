@@ -143,7 +143,11 @@
       class="otp-controls"
       class:margin-none={otpClasses.includes($textView)}
     >
-      <div id="otp-prompt" class:text-start={otpClasses.includes($textView)}>
+      <div
+        id="otp-prompt"
+        class="otp-header"
+        class:text-start={otpClasses.includes($textView)}
+      >
         {#if $headingText}
           <div class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
             {getOtpScreenHeading($headingText, $templateData, $locale)}
@@ -334,7 +338,7 @@
     margin-top: 0px !important;
   }
   .otp-heading {
-    margin: 34px 0 24px;
+    margin: 34px 0 26px;
     text-align: center;
     color: #263a4a;
     text-transform: capitalize;
@@ -372,5 +376,9 @@
     align-items: center;
     flex-direction: column;
     flex: 1;
+  }
+
+  .otp-header {
+    margin-bottom: 24px;
   }
 </style>
