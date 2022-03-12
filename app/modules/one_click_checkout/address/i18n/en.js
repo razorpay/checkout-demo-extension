@@ -15,8 +15,7 @@ export default {
   shipping_address_label: 'Delivery Address',
   save_label: 'Save As',
   cta_label: 'Continue',
-  save_consent_label:
-    "I agree to save my address for future use according to Razorpay's",
+  save_consent_label: 'Save address',
   save_consent_label_tnc: 'T&C',
   save_consent_label_privacy: 'Privacy Policy',
   save_consent_label_and: 'and',
@@ -29,7 +28,7 @@ export default {
   saved_address_landmark_label: 'Landmark',
   saved_address_cta_label: 'Use saved addresses',
   shipping_charges_label: '{charge} shipping charge added',
-  same_address_checkbox_label: 'Billing address same as shipping address',
+  same_address_checkbox_label: '"Billing address same as delivery address"',
   saved_address_label: 'Your address has been saved',
   error_label: 'Address should be less than 255 characters',
   landmark_error_label: 'Enter characters between 2 to 32 only.',
@@ -46,5 +45,7 @@ export default {
   contact_error_label: 'Enter a valid mobile number.',
   pincode_error_message: 'Enter a 6-digit pincode only.',
   edit_address_label: 'Edit',
+  pincode_non_serviceable_label:
+    'This pincode is not serviceable. Try again with another address',
   ...billingAddressLabels,
 };

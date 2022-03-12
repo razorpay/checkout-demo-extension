@@ -37,12 +37,13 @@ import addSquare from 'one_click_checkout/address/icons/add_square';
 import kebabMenu from 'one_click_checkout/address/icons/kebab_menu';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
+import info from 'ui/icons/payment-methods/info';
 import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
 import double_arrow from 'one_click_checkout/topbar/icons/double_arrow';
 import rzp_brand_logo from 'one_click_checkout/account_modal/icons/rzp_brand_logo';
 import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
-import editPaper from './edit_paper';
+import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
@@ -70,6 +71,7 @@ const availIconNames = getAllMethods().concat([
   'saved_card',
   'rzp_logo',
   'edit_phone',
+  'info',
   'back_arrow',
   'double_arrow',
   'rzp_brand_logo',
@@ -194,6 +196,8 @@ function getIconFn(iconName) {
       return rzpLogo;
     case 'edit_phone':
       return edit_phone;
+    case 'info':
+      return info;
 
     case 'international':
       return internationalIcon;
@@ -211,7 +215,7 @@ function getIconFn(iconName) {
     case 'rtb_close':
       return rtb_close;
     case 'edit_paper':
-      return editPaper;
+      return edit_paper;
     case 'location':
       return location;
 

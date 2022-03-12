@@ -41,4 +41,9 @@
     background-color: #e5f6ea;
     border-top: 2px solid #b9dfc2;
   }
+
+  .error {
+    background-color: #fae8e3;
+    border-top: 2px solid #e7bbb4;
+  }
 </style>

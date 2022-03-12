@@ -41,8 +41,12 @@
     value.extra ? onUpdate(id, value.val, value.extra) : onUpdate(id, value);
   };
 
-  const onBlur = (id) => {
+  const onBlur = (id, e) => {
     dispatch('blur', { id });
+
+    if (id === 'landmark' && !formData[id]) {
+      showLandmark = false;
+    }
   };
 
   onMount(() => {
@@ -62,6 +66,12 @@
       });
     }
   });
+
+  let showLandmark = false;
+
+  const handleLandmarkToggle = () => {
+    showLandmark = true;
+  };
 </script>
 
 <form {id}>
@@ -143,17 +153,42 @@
           on:input={(e) => handleInput(input.id, e.target.textContent)}
         />
       {:else if input.autocomplete}
-        <AutoCompleteInput
-          id={input.id}
-          label={input.label}
-          required={input.required}
-          value={formData[input.id]}
-          suggestionsResource={input.suggestionsResource}
-          validationText={errors[input.id] ? errors[input.id] : ''}
-          on:blur={() => onBlur(input.id)}
-          on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
-          on:select={input.onSelect}
-        />
+        {#if input.id === 'landmark'}
+          {#if showLandmark}
+            <AutoCompleteInput
+              id={input.id}
+              label={input.label}
+              required={input.required}
+              value={formData[input.id]}
+              suggestionsResource={input.suggestionsResource}
+              validationText={errors[input.id] ? errors[input.id] : ''}
+              on:blur={() => onBlur(input.id)}
+              on:input={(e) =>
+                handleInput(input.id, e.detail.target.textContent)}
+              on:select={input.onSelect}
+              autofocus={true}
+            />
+          {:else}
+            <span
+              on:click={() => handleLandmarkToggle()}
+              class="show-landmark-label"
+            >
+              + Add Landmark <span class="optional"> (Optional) </span>
+            </span>
+          {/if}
+        {:else}
+          <AutoCompleteInput
+            id={input.id}
+            label={input.label}
+            required={input.required}
+            value={formData[input.id]}
+            suggestionsResource={input.suggestionsResource}
+            validationText={errors[input.id] ? errors[input.id] : ''}
+            on:blur={() => onBlur(input.id)}
+            on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
+            on:select={input.onSelect}
+          />
+        {/if}
       {:else}
         <Field
           id={input.id}
@@ -192,11 +227,11 @@
   }
 
   .form-input > :global(div:nth-child(odd)) {
-    margin-right: 18px;
+    margin-right: 12px;
   }
 
   .form-input > :global(div:nth-child(even)) {
-    margin-left: 18px;
+    margin-left: 12px;
   }
 
   .form-input > :global(div:last-child) {
@@ -214,5 +249,14 @@
   form :global(.elem > i) {
     transform: rotate(-90deg) scale(0.5);
     top: 50%;
+  }
+
+  .show-landmark-label {
+    margin-bottom: 12px;
+    color: #3395ff;
+    cursor: pointer;
+  }
+  .show-landmark-label .optional {
+    color: #79747e;
   }
 </style>

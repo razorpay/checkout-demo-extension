@@ -4,7 +4,6 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { isOneClickCheckout } from 'razorpay';
   import { shouldShowNewDesign } from 'one_click_checkout/store';
 
   // Actions
@@ -102,8 +101,6 @@
 
   let focused = false;
   let placeholderToShow = placeholder;
-
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Refs
   export let wrap = null;
@@ -611,8 +608,7 @@
   }
 
   .input-one-click-checkout:focus
-    + .label-one-click-checkout.error-label-one-click-checkout,
-  .label-one-click-checkout.error-label-one-click-checkout {
+    + .label-one-click-checkout.error-label-one-click-checkout {
     color: var(--error-validation-color);
   }
 

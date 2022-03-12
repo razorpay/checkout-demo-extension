@@ -1,6 +1,6 @@
 <script>
   import { t } from 'svelte-i18n';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let id;
   export let label = '';
@@ -8,6 +8,7 @@
   export let required = false;
   export let suggestions = [];
   export let validationText = '';
+  export let autofocus;
 
   let focused = false;
   let inputField;
@@ -51,6 +52,12 @@
   function handleClickLabel() {
     inputField.focus();
   }
+
+  onMount(() => {
+    if (autofocus) {
+      inputField.focus();
+    }
+  });
 </script>
 
 <div class="wrapper input-group" class:invalid={validationText}>
@@ -237,7 +244,8 @@
     transition: all ease-out 0.2s;
   }
 
-  .input-group.invalid .input:focus + .label {
+  .input-group.invalid .input:focus + .label,
+  .input-group.invalid .input + .label {
     color: var(--error-validation-color);
   }
 </style>

@@ -14,6 +14,7 @@
   export let required;
   export let validationText;
   export let suggestionsResource;
+  export let autofocus;
 
   let suggestions = [];
   const dispatch = createEventDispatcher();
@@ -58,4 +59,5 @@
   on:blur
   {suggestions}
   on:suggestion-select={onSuggestionSelect}
+  {autofocus}
 />

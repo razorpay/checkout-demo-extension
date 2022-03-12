@@ -25,18 +25,21 @@
     flex-direction: row;
     width: 85px;
     margin-right: 8px;
-    background: #f4f5f6;
     box-sizing: border-box;
     border-radius: 19px;
     cursor: pointer;
     font-size: 12px;
     justify-content: center;
     align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #ffffff;
   }
 
   .selected-tag {
     color: var(--highlight-color);
     border: 1px solid var(--highlight-color);
+    background: #f1f8ff;
   }
 
   .inner-text {

@@ -6,6 +6,8 @@
   import AddressFormBuilder from 'one_click_checkout/address/ui/components/AddressFormBuilder.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import TagSelector from 'one_click_checkout/address/ui/components/TagSelector.svelte';
+  import { showToast, hideToast, TOAST_THEME } from 'one_click_checkout/Toast';
+  import { onDestroy } from 'svelte';
   // labels import
   import {
     NAME_LABEL,
@@ -17,20 +19,14 @@
     SAVE_ADDRESS_CONSENT,
     UNSERVICEABLE_LABEL,
     SERVICEABLE_LABEL,
-    SAVE_ADDRESS_CONSENT_TNC,
-    SAVE_ADDRESS_CONSENT_PRIVACY,
-    SAVE_ADDRESS_CONSENT_AND,
+    PINCODE_NON_SERVICEABLE_LABEL,
     INTERNATIONAL_STATE_LABEL,
     INTERNATIONAL_PINCODE_LABEL,
     STATE_LABEL,
     REQUIRED_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
-  import {
-    TNC_LINK,
-    PRIVACY_LINK,
-    ADDRESS_TYPES,
-  } from 'one_click_checkout/address/constants';
+  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import {
     CATEGORIES,
@@ -66,6 +62,10 @@
   } from 'common/constants';
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getTheme } from 'one_click_checkout/sessionInterface';
+
+  const { info } = getTheme().icons;
 
   import { isAutopopulateDisabled } from 'one_click_checkout/store';
 
@@ -91,6 +91,11 @@
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
+
+  const pincode_error_toast = {
+    message: $t(PINCODE_NON_SERVICEABLE_LABEL),
+    theme: TOAST_THEME.ERROR,
+  };
 
   let INPUT_FORM = [
     {
@@ -269,12 +274,14 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+              showToast(pincode_error_toast);
             }
             $formData.cod = res[$selectedCountryISO]?.cod;
           })
           .catch(() => {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
+            showToast(pincode_error_toast);
           });
       }
     } else {
@@ -324,6 +331,7 @@
     }
     // checks if pincode has been filled and autofills city, state for the same
     if (key === 'zipcode' && checkServiceability) {
+      hideToast();
       if (
         INPUT_FORM[pinIndex][pinSubIndex]?.unserviceableText &&
         !$formData.city
@@ -360,6 +368,7 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+              showToast(pincode_error_toast);
             }
             $formData.cod = res[value]?.cod;
             if (isShippingAddress) {
@@ -381,6 +390,7 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
+            showToast(pincode_error_toast);
           });
       } else if (INPUT_FORM[pinIndex][pinSubIndex]?.required) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
@@ -502,11 +512,13 @@
           } else {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
+            showToast(pincode_error_toast);
           }
         })
         .catch(() => {
           INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
             UNSERVICEABLE_LABEL;
+          showToast(pincode_error_toast);
         });
     }
     if (id === 'line1') {
@@ -544,6 +556,10 @@
     );
     el.focus();
   });
+
+  onDestroy(() => {
+    hideToast();
+  });
 </script>
 
 <div>
@@ -565,15 +581,9 @@
           checked={$shouldSaveAddress}
           id="address-consent-checkbox"
         />
-        <span>
-          {$t(SAVE_ADDRESS_CONSENT)}
-          <a href={TNC_LINK} class="address-consent-links" target="_blank">
-            {$t(SAVE_ADDRESS_CONSENT_TNC)}
-          </a>
-          {$t(SAVE_ADDRESS_CONSENT_AND)}
-          <a href={PRIVACY_LINK} class="address-consent-links" target="_blank">
-            {$t(SAVE_ADDRESS_CONSENT_PRIVACY)}
-          </a>
+
+        <span class="save-address-wrapper">
+          {$t(SAVE_ADDRESS_CONSENT)} &nbsp; <Icon icon={info} />
         </span>
       </div>
     {/if}
@@ -594,5 +604,11 @@
   }
   .address-consent-links {
     color: #551a8b;
+  }
+
+  .save-address-wrapper {
+    height: fit-content;
+    display: flex;
+    align-items: center;
   }
 </style>

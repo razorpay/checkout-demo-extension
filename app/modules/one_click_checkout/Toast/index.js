@@ -34,4 +34,5 @@ export function hideToast() {
 
 export const TOAST_THEME = {
   SUCCESS: 'success',
+  ERROR: 'error',
 };
