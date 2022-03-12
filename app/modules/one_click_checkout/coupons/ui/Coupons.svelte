@@ -7,6 +7,7 @@
   import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
   import ContactWidget from 'one_click_checkout/contact_widget/ContactWidget.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // store imports
@@ -22,7 +23,10 @@
     error,
     couponInputSource,
   } from 'one_click_checkout/coupons/store';
-  import { savedAddresses } from 'one_click_checkout/address/store';
+  import {
+    isBillingSameAsShipping,
+    savedAddresses,
+  } from 'one_click_checkout/address/store';
   import {
     cartAmount,
     cartDiscount,
@@ -54,6 +58,7 @@
   } from 'one_click_checkout/coupons/sessionInterface';
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
+  import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
   import Analytics, { Events } from 'analytics';
@@ -106,7 +111,14 @@
     if (!$isCouponApplied) {
       removeCouponInStore();
     }
-    navigator.navigateTo({ path: views.SAVED_ADDRESSES });
+
+    if (!$savedAddresses.length) {
+      navigator.navigateTo({ path: views.ADD_ADDRESS });
+    } else {
+      if (!$isBillingSameAsShipping) {
+        navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
+      } else redirectToPaymentMethods();
+    }
     showAmountInTopBar();
   }
 
@@ -157,6 +169,15 @@
       applyCoupon={(code) => applyCouponCode(code)}
       removeCoupon={removeCouponCode}
     />
+
+    {#if $savedAddresses.length}
+      <AddressWidget
+        loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+        address={$selectedAddress}
+        on:headerCtaClick={() =>
+          navigator.navigateTo({ path: views.SAVED_ADDRESSES })}
+      />
+    {/if}
 
     <div class="coupon-order-summary-label">
       <span class="order-icon"><Icon icon={order} /></span>

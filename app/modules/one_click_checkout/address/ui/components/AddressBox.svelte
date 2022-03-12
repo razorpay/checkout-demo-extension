@@ -10,14 +10,17 @@
     EDIT_ADDRESS_LABEL,
     NON_SERVICEABLE_LABEL,
     SAVED_ADDRESS_LANDMARK_LABEL,
-    SAVED_ADDRESS_PHONE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // constant imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
+  import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
 
   export let address;
   export let isSelected = false;
   export let checkServiceability = true;
+  export let loading = false;
+  export let withBorder = true;
+  export let isEditable = true;
 
   const { kebab_menu } = getIcons();
   const dispatch = createEventDispatcher();
@@ -26,63 +29,79 @@
   $: isServiceable = !(address.serviceability === false && checkServiceability);
 </script>
 
-<button
-  id={`address-container${isSelected ? '-selected' : ''}`}
-  class="address-container"
-  class:selected-container={isSelected}
-  on:click|preventDefault={() => dispatch('select')}
->
-  <div class:disabled={!isServiceable} class="box-header">
-    <div class="box-title">
-      <span class="address-name">
-        {address.name}
-      </span>
-      {#if address.tag}
-        <div class="address-tag">{address.tag}</div>
-      {/if}
-    </div>
-    <DropdownMenu
-      triggerElement={dropdownTrigger}
-      on:click={() => dispatch('select')}
-    >
-      <button bind:this={dropdownTrigger}>
-        <Icon icon={kebab_menu} />
-      </button>
-      <div slot="dropdown_menu">
-        <button
-          class="dropdown-item"
-          type="button"
-          on:click={() => dispatch('editClick', address)}
-          >{$t(EDIT_ADDRESS_LABEL)}</button
+{#if loading}
+  <div class="card shimmer-card" class:card-border={withBorder}>
+    <Shimmer height={20} width="40%" />
+    <div class="spacing-14" />
+    <Shimmer width="35%" />
+    <div class="spacing-14" />
+    <Shimmer />
+    <div class="spacing-6" />
+    <Shimmer />
+    <div class="spacing-6" />
+    <Shimmer />
+    <div class="spacing-6" />
+    <Shimmer />
+  </div>
+{:else}
+  <button
+    id={`address-container${isSelected ? '-selected' : ''}`}
+    class="card address-container"
+    class:card-border={withBorder}
+    class:selected-container={isSelected}
+    on:click|preventDefault={() => dispatch('select')}
+  >
+    <div class:disabled={!isServiceable} class="box-header">
+      <div class="box-title">
+        <span class="address-name">
+          {address.name}
+        </span>
+        {#if address.tag}
+          <div class="address-tag">{address.tag}</div>
+        {/if}
+      </div>
+      {#if isEditable}
+        <DropdownMenu
+          triggerElement={dropdownTrigger}
+          on:click={() => dispatch('select')}
         >
-      </div>
-    </DropdownMenu>
-  </div>
-  <div class="address-text">
-    <div class:disabled={!isServiceable}>
-      <p>{address.formattedLine1}</p>
-      <p>{address.formattedLine2}</p>
-      {#if address.landmark}
-        <div class="address-landmark">
-          {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
-          {address.landmark}
-        </div>
+          <button bind:this={dropdownTrigger}>
+            <Icon icon={kebab_menu} />
+          </button>
+          <div slot="dropdown_menu">
+            <button
+              class="dropdown-item"
+              type="button"
+              on:click={() => dispatch('editClick', address)}
+              >{$t(EDIT_ADDRESS_LABEL)}</button
+            >
+          </div>
+        </DropdownMenu>
       {/if}
-      {#if address.contact}
-        <div>
-          {$t(SAVED_ADDRESS_PHONE_LABEL)}:
-          {address.contact}
+    </div>
+    <div class="address-text">
+      <div class:disabled={!isServiceable}>
+        {#if address.contact}
+          <p>{address.contact}</p>
+        {/if}
+        <p>{address.formattedLine1}</p>
+        <p>{address.formattedLine2}</p>
+        {#if address.landmark}
+          <div class="address-landmark">
+            {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
+            {address.landmark}
+          </div>
+        {/if}
+      </div>
+      <!-- address.serviceability will be null for unknown serviceability -->
+      {#if !isServiceable}
+        <div class="address-serviceability-error">
+          {$t(NON_SERVICEABLE_LABEL)}
         </div>
       {/if}
     </div>
-    <!-- address.serviceability will be null for unknown serviceability -->
-    {#if !isServiceable}
-      <div class="address-serviceability-error">
-        {$t(NON_SERVICEABLE_LABEL)}
-      </div>
-    {/if}
-  </div>
-</button>
+  </button>
+{/if}
 
 <style>
   * {
@@ -109,18 +128,22 @@
     opacity: 1;
   }
   .address-container {
-    color: inherit;
     background: #fdfdfd;
-    border: 1px solid #e0e0e0;
-    width: 100%;
-    margin-bottom: 24px;
-    padding: 26px 16px 20px;
-    border-radius: 2px;
     text-align: left;
-
     transition-duration: 0.15s;
     transition-property: border;
     transition-timing-function: linear;
+  }
+
+  .card {
+    width: 100%;
+    color: inherit;
+  }
+
+  .card-border {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    padding: 26px 16px 20px;
   }
 
   .box-header {
@@ -135,6 +158,7 @@
   .address-name {
     margin-right: 4px;
     font-size: 14px;
+    text-transform: capitalize;
   }
   .address-tag {
     font-size: 10px;
@@ -156,5 +180,17 @@
 
   .selected-container {
     border: 1px solid var(--background-color);
+  }
+  .shimmer-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .spacing-14 {
+    height: 14px;
+  }
+
+  .spacing-6 {
+    height: 6px;
   }
 </style>

@@ -43,7 +43,7 @@
   }
 
   .checkbox-text {
-    color: #263a4a;
+    color: var(--text-color, #263a4a);
   }
   .checkbox-sticky {
     position: absolute;

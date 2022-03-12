@@ -78,7 +78,7 @@
   export let selectedCountryISO;
 
   let errors = {};
-  let selectedTag = $formData.tag || 'Home';
+  let selectedTag = $formData.tag;
   let called = false;
   let pinIndex = 2;
   let pinSubIndex = 1;

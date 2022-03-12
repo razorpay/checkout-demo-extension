@@ -69,7 +69,7 @@
 
   onDestroy(() => {
     onDropdownClosed();
-    triggerEvent.remove();
+    triggerEvent?.remove();
   });
 </script>
 
