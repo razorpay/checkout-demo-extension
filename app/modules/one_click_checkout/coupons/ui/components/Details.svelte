@@ -34,10 +34,6 @@
   // constant imports
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
-  import {
-    COUPON_DETAIL_LABEL,
-    COUPON_OTP_LABEL,
-  } from 'one_click_checkout/coupons/i18n/labels';
 
   export let onClose;
   const { close } = getIcons();
