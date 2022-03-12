@@ -59,6 +59,10 @@
   import { scrollIntoView } from 'lib/utils';
   import { getSession } from 'sessionmanager';
   import { getAnimationOptions } from 'svelte-utils';
+  import { setTabTitle } from 'one_click_checkout/topbar/helper';
+
+  // Constant imports
+  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   // Analytics imports
   import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
@@ -290,6 +294,7 @@
   }
 
   onMount(() => {
+    setTabTitle(TAB_TITLE.NETBANKING);
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
   });
 </script>

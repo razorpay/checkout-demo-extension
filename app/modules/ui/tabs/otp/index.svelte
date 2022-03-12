@@ -16,6 +16,7 @@
     resendTimeout,
     ipAddress,
     accessTime,
+    tabLogo,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
@@ -24,6 +25,7 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+  import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -119,6 +121,10 @@
     if (showInput && !prevShowInput) {
       input && input.focus();
     }
+  }
+
+  export function onShown() {
+    setTabTitleLogo($tabLogo);
   }
 
   export function invoke(type, event) {

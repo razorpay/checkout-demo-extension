@@ -7,6 +7,8 @@ import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import trustedBadgeLang from 'trusted-badge/i18n/en';
+import topbar from 'one_click_checkout/topbar/i18n/en';
+
 export default {
   app: {
     providers: {
@@ -1315,6 +1317,7 @@ export default {
   account,
   details_modal,
   summary_modal,
+  topbar,
   cod: {
     disabled_label: 'Not available',
   },

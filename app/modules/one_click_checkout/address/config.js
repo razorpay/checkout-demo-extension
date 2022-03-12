@@ -6,6 +6,7 @@ import {
   OTP_LABELS as ADDRESS_OTP_LABELS,
   ADD_ADDRESS_OTP_LABELS,
 } from 'one_click_checkout/address/constants';
+import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
 import {
   successHandler as addressOTPSuccessHandler,
@@ -26,6 +27,7 @@ export const savedAddress = {
     successHandler: addressOTPSuccessHandler,
     skipOTPHandle: addressOTPSkipHandler,
   },
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 
 export const savedBillingAddress = {
@@ -35,6 +37,7 @@ export const savedBillingAddress = {
   tabTitle: views.BILLING_ADDRESS,
   props: { currentView: views.SAVED_BILLING_ADDRESS },
   isBackEnabled: true,
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 
 export const addAddress = {
@@ -49,6 +52,7 @@ export const addAddress = {
     successHandler: addressSaveOTPSuccessHandler,
     skipOTPHandle: addressSaveOTPSkipHandler,
   },
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 
 export const addBillingAddress = {
@@ -63,6 +67,7 @@ export const addBillingAddress = {
     successHandler: addressSaveOTPSuccessHandler,
     skipOTPHandle: addressSaveOTPSkipHandler,
   },
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 
 export const editAddress = {

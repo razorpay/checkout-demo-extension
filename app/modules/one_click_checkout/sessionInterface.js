@@ -7,7 +7,7 @@ import { navigator } from 'one_click_checkout/routing/helpers/routing';
 // store imports
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'razorpay';
-import { history } from 'one_click_checkout/routing/store';
+import { history, activeRoute } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,
   isBillingSameAsShipping,
@@ -28,6 +28,7 @@ import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
+import { tabTitle, tabTitleLogo } from 'one_click_checkout/topbar/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
@@ -49,8 +50,15 @@ export const historyExists = () => get(history).length;
  */
 export const handleBack = () => {
   const session = getSession();
+  let handleBack = get(activeRoute)?.props?.handleBack;
+
+  if (handleBack) {
+    handleBack();
+  }
+  tabTitle.set('');
+  tabTitleLogo.set('');
   const currHistory = get(history);
-  if (currHistory.length === 1) {
+  if (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) {
     session.closeModal();
     return;
   }

@@ -7,6 +7,7 @@
   // Utils imports
   import { getPayLaterProviders } from 'checkoutstore/methods';
   import { createProvider } from 'common/paylater';
+  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -16,9 +17,16 @@
   import { getPaylaterProviderName } from 'i18n';
   import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
 
+  // Constant imports
+  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
+
   const providers = _Arr.map(getPayLaterProviders(), (providerObj) =>
     createProvider(providerObj.code, providerObj.name)
   );
+
+  export function onShown() {
+    setTabTitle(TAB_TITLE.PAYLATER);
+  }
 
   /**
    * Filters providers against the given instrument.

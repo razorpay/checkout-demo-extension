@@ -4,7 +4,6 @@
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
-  import TopBar from 'ui/components/Topbar.svelte';
   import Loader from 'one_click_checkout/loader/Loader.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -67,8 +66,12 @@
       event: ACTIONS.INITIATECHECKOUT,
     });
     new Loader({
-      target: discreet._Doc.querySelector('#one-cc-loader'),
+      target: document.querySelector('#one-cc-loader'),
     });
+    const checkoutTopbar = document.querySelector('#topbar-wrap');
+    if (checkoutTopbar) {
+      checkoutTopbar.classList.add('hide-topbar');
+    }
     const view = determineLandingView();
     navigator.navigateTo({ path: view });
     contact.subscribe(updateTopBar);
@@ -133,7 +136,6 @@
   pad={false}
   resetMargin="true"
 >
-  <TopBar bind:this={topbar} on:back={onBack} isFixed={true} />
   <div style={cssVarStyles} class="container">
     <Router {routes} />
   </div>

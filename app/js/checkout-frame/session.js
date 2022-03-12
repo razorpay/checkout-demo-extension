@@ -104,6 +104,7 @@ var preferences,
   CardViews = discreet.CardViews,
   merchantAnalytics = discreet.merchantAnalytics,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
+  TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
   SecurityUtils = discreet.SecurityUtils;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -1521,6 +1522,14 @@ Session.prototype = {
     });
   },
 
+  setOneCCTabLogo: function (logo) {
+    if (RazorpayHelper.isOneClickCheckout()) {
+      this.otpView.updateScreen({
+        tabLogo: logo,
+      });
+    }
+  },
+
   setEmiScreen: function () {
     var session = this;
     if (!MethodStore.getEMIBanks().BAJAJ) {
@@ -1551,7 +1560,6 @@ Session.prototype = {
       'image',
       CardlessEmi.getImageUrl(providerCode)
     );
-
     if (!plans) {
       this.fetchCardlessEmiPlans();
       return;
@@ -1638,6 +1646,7 @@ Session.prototype = {
 
     var topbarImages = CardlessEmi.getImageUrl(providerCode);
     this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.setOneCCTabLogo(topbarImages);
 
     var locale = I18n.getCurrentLocale();
     this.commenceOTP('cardlessemi_sending', 'cardless_emi_enter', {
@@ -1736,6 +1745,7 @@ Session.prototype = {
 
     var topbarImages = PayLater.getImageUrl(providerCode);
     this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.setOneCCTabLogo(topbarImages);
 
     var params = {
       provider: payLaterProviderObj.name,
@@ -2784,6 +2794,10 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
+    } else if (screen === 'paylater' && this.payLaterView) {
+      this.payLaterView.onShown();
+    } else if (screen === 'cardless_emi' && this.cardlessEmiView) {
+      this.cardlessEmiView.onShown();
     } else if (screen === 'wallet' && this.walletTab) {
       this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
@@ -3003,6 +3017,10 @@ Session.prototype = {
     var thisTab = this.tab;
     var self = this;
 
+    if (RazorpayHelper.isOneClickCheckout()) {
+      TopbarMagicCheckoutStore.tabTitle.set('');
+      TopbarMagicCheckoutStore.tabTitleLogo.set('');
+    }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
     });
@@ -3010,7 +3028,10 @@ Session.prototype = {
     var isNVSFormHomeScreenView = discreet.storeGetter(
       discreet.InternationalStores.isNVSFormHomeScreenView
     );
-
+    if (thisTab === 'home-1cc' || this.screen === 'home-1cc') {
+      discreet.OneClickCheckoutInterface.handleBack();
+      return;
+    }
     if (
       this.screen === 'otp' &&
       thisTab !== 'card' &&
@@ -4074,6 +4095,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       this.otpView.setTextView(textView, templateData);
+      if (RazorpayHelper.isOneClickCheckout()) {
+        this.otpView.view.onShown();
+      }
       this.otpView.updateScreen({
         headingText: headingText,
       });
@@ -5753,6 +5777,7 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
+      this.setOneCCTabLogo(walletObj.logo);
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
@@ -5808,6 +5833,7 @@ Session.prototype = {
             allowSkip: false,
           });
           that.topBar.setTitleOverride('otp', 'image', walletObj.logo);
+          this.setOneCCTabLogo(walletObj.logo);
           if (wallet === 'freecharge') {
             that.otpView.updateScreen({
               maxlength: 4,

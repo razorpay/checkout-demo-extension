@@ -76,6 +76,7 @@ import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
 import { reward as rewardsStore } from 'checkoutstore/rewards';
 import * as address from 'one_click_checkout/address/sessionInterface';
+import * as TopbarMagicCheckoutStore from 'one_click_checkout/topbar/store';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -287,6 +288,7 @@ export default {
   isInternationalInPreferredInstrument,
   merchantAnalytics,
   merchantAnalyticsConstant,
+  TopbarMagicCheckoutStore,
 
   SecurityUtils,
 };

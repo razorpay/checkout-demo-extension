@@ -20,6 +20,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
   import { getAnimationOptions } from 'svelte-utils';
+  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -31,6 +32,9 @@
   // Transitions
   import { slide } from 'svelte/transition';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
+
+  // Constant imports
+  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   const session = getSession();
   const wallets = getWallets();
@@ -122,6 +126,7 @@
   }
 
   export function onShown() {
+    setTabTitle(TAB_TITLE.WALLET);
     if ($selectedWallet) {
       showCta();
       setTimeout(() => {

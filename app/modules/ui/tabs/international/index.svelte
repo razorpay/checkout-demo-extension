@@ -23,6 +23,7 @@
   import { Events } from 'analytics';
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
+  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   //UI Imports
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -43,6 +44,7 @@
     AVS_INFO_MESSAGE_2,
     AVS_INFO_MESSAGE_3,
   } from 'ui/labels/card';
+  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -155,6 +157,7 @@
   }
 
   export function onShown() {
+    setTabTitle(TAB_TITLE.INTERNATIONAL);
     if ($selectedInternationalProvider) {
       tabVisible = true;
       showCta();

@@ -57,6 +57,10 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
   import { getAnimationOptions } from 'svelte-utils';
+  import { setTabTitle } from 'one_click_checkout/topbar/helper';
+
+  // Constant imports
+  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   const session = getSession();
 
@@ -142,6 +146,7 @@
   }
 
   export function onShown() {
+    setTabTitle(TAB_TITLE.EMANDATE);
     active = true;
     setInitialState();
     showLandingView();
