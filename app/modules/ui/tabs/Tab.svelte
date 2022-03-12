@@ -1,6 +1,7 @@
 <script>
   // Utils imports
   import { isMethodEnabled } from 'checkoutstore/methods';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Props
   export let method;
@@ -24,6 +25,7 @@
     class:pad
     class:hasMessage
     class:resetMargin
+    class:tab-content-one-cc={isOneClickCheckout()}
   >
     <slot />
   </div>
@@ -32,5 +34,9 @@
 <style>
   .resetMargin {
     margin-top: 0;
+  }
+
+  .tab-content-one-cc {
+    margin-top: 0px;
   }
 </style>

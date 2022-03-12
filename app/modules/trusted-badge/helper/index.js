@@ -17,7 +17,7 @@ export function getTrustedBadgeHighlights(data) {
     }
   }
 
-  return false;
+  return true;
 }
 function checkTrustedBadgeAvailbility(rtb) {
   return (

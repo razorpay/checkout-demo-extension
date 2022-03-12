@@ -84,6 +84,7 @@ const availIconNames = getAllMethods().concat([
   'location',
   'add_square',
   'kebab_menu',
+  'info',
   'user',
 ]);
 
@@ -192,8 +193,10 @@ function getIconFn(iconName) {
 
     case 'saved_card':
       return savedCard;
+
     case 'rzp_logo':
       return rzpLogo;
+
     case 'edit_phone':
       return edit_phone;
     case 'info':
@@ -207,15 +210,19 @@ function getIconFn(iconName) {
 
     case 'double_arrow':
       return double_arrow;
+
     case 'rzp_brand_logo':
       return rzp_brand_logo;
+
     case 'circle_check':
       return circle_check;
 
     case 'rtb_close':
       return rtb_close;
+
     case 'edit_paper':
       return edit_paper;
+
     case 'location':
       return location;
 
@@ -224,6 +231,9 @@ function getIconFn(iconName) {
 
     case 'kebab_menu':
       return kebabMenu;
+
+    case 'info':
+      return info;
 
     case 'user':
       return user;

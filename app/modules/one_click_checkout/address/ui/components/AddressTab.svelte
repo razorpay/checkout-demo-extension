@@ -1,20 +1,23 @@
 <script>
   // svelte imports
   import { get } from 'svelte/store';
+
   // UI imports
   import CTA from 'ui/elements/CTA.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-
   import Icon from 'ui/elements/Icon.svelte';
+
   // i18n imports
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
+
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+
   // store imports
   import {
     savedAddresses,
@@ -24,11 +27,13 @@
     selectedAddress,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
+
   // helpers imports
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
+
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
   import {
@@ -42,7 +47,6 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-
   export let error;
   export let onSubmitCallback;
   export let currentView;
@@ -60,9 +64,7 @@
       selectedCountryISO,
     },
   } = Resource[addressType];
-
   let isFormComplete = false;
-
   const { location } = getIcons();
 
   export function handleAddAddressClick() {
@@ -77,7 +79,6 @@
   function handleEditAddressClick({ detail: _address }) {
     selectedAddressId.set(_address.id);
     if (_address.country) selectedShippingCountryISO.set(_address.country);
-
     newUserAddress.update((addr) => ({
       ...addr,
       ...formatAddressToFormData(_address),
@@ -111,7 +112,6 @@
   export function onSubmit() {
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       const elementId = Resource[addressType].formId;
-
       const inpError = validateInput(elementId);
       if (inpError) {
         error = inpError;
@@ -254,13 +254,14 @@
     padding: 0px;
     border: 0px;
   }
+
   .address-wrapper {
     display: flex;
     flex-direction: column;
     padding: 18px 0px 0px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
-    height: calc(100% - 47px - 55px);
+    height: calc(100% - 55px);
   }
 
   .address-tab {
@@ -284,15 +285,17 @@
     padding: 8px 24px 12px;
     /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
     height: calc(
-      100% - 47px - 55px + 20px + 16px
+      100% - 55px + 20px + 16px
     ); /* 16 is because of the reduced vertical padding */
   }
+
   .shipping-address-wrapper {
     height: calc(
-      100% - 47px - 55px + 20px + 10px
+      100% - 55px + 20px + 10px
     ); /* add 10 for the reduced padding-bottom */
     padding-bottom: 8px;
   }
+
   :global(.address-label) {
     font-size: 14px;
   }

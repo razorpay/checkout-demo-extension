@@ -3,8 +3,8 @@ import PoweredBy from 'ui/components/PoweredBy.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
 import { showTopbar } from 'one_click_checkout/topbar';
+import { showHeader } from 'one_click_checkout/header';
 import { isPayout } from 'checkoutstore';
-import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 import { isOneClickCheckout } from 'razorpay';
@@ -24,6 +24,7 @@ export function render() {
   session.topBar = topbar;
 
   if (isOneClickCheckout()) {
+    showHeader();
     showTopbar();
   }
 

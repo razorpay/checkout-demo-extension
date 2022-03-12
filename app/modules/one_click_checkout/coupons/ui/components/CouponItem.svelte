@@ -12,13 +12,11 @@
     TERMS_CONDITION_LABEL,
   } from 'one_click_checkout/coupons/i18n/labels';
 
-  // utils imports
-  import { getIcons } from 'one_click_checkout/sessionInterface';
+  // icon imports
+  import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
 
   export let coupon;
   export let selected;
-
-  const { arrow_down } = getIcons();
 
   const dispatch = createEventDispatcher();
 
@@ -53,7 +51,7 @@
       class:up-arrow={expanded}
       on:click={() => (expanded = !expanded)}
     >
-      <Icon icon={arrow_down} />
+      <Icon icon={arrow_down()} />
     </span>
   </div>
   {#if expanded}

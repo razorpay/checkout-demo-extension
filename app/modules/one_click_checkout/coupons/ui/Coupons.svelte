@@ -78,6 +78,7 @@
   } from 'one_click_checkout/coupons/helpers';
   import { formatAmountWithSymbol } from 'common/currency';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { showHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
 
   // constant imports
@@ -135,6 +136,7 @@
   }
 
   onMount(() => {
+    showHeader();
     if (
       $savedAddresses.length &&
       $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED

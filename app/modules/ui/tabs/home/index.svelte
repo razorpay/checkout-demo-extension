@@ -1158,11 +1158,13 @@
       {#if view === HOME_VIEWS.METHODS}
         <div
           class="solidbg"
-          class:topbar-mg={isOneClickCheckout()}
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
-          <TrustedBadge />
+          <!-- We dont want it to show in 1cc flow-->
+          {#if !isOneClickCheckout()}
+            <TrustedBadge />
+          {/if}
 
           {#if showUserDetailsStrip || isPartialPayment}
             <div
@@ -1319,8 +1321,5 @@
   .solidbg {
     background: white;
     order: -1;
-  }
-  .topbar-mg {
-    margin-top: 47px;
   }
 </style>

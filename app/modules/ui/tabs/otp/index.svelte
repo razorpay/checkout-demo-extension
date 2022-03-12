@@ -170,6 +170,7 @@
   class="tab-content screen"
   class:loading={$loading}
   class:showable={addShowableClass}
+  class:tab-content-one-cc={isOneClickCheckout()}
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
@@ -344,6 +345,9 @@
 </div>
 
 <style>
+  .tab-content {
+    margin-top: 0px;
+  }
   h3 {
     margin: 10px 0;
   }
@@ -416,5 +420,9 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+  }
+
+  .tab-content-one-cc {
+    margin-top: 0px;
   }
 </style>

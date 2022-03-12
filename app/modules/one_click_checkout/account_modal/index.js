@@ -1,5 +1,4 @@
 import AccountModal from 'one_click_checkout/account_modal/ui/AccountModal.svelte';
-
 let modal;
 
 /**
@@ -11,9 +10,9 @@ function create() {
   });
 }
 
-export function showAccountModal() {
+export function showAccountModal(options) {
   if (!modal) {
     create();
   }
-  modal.show();
+  modal.show(options);
 }

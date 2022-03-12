@@ -21,6 +21,7 @@
   import { shouldUseVernacular } from 'checkoutstore/methods';
 
   // i18n imports
+  import { getBundle } from 'i18n';
   import { t, locale, locales } from 'svelte-i18n';
   import { getLocaleName } from 'i18n/init';
   import {
@@ -39,9 +40,12 @@
 
   // analytics imports
   import { Events, MiscEvents } from 'analytics';
+  import { ACCOUNT_VARIANT } from 'one_click_checkout/account_modal/constants';
 
   let isLoggedIn;
   let showLanguageList;
+
+  let variant = ACCOUNT_VARIANT.DEFAULT;
 
   const showChangeLanguage = shouldUseVernacular();
   let visible = false;
@@ -55,7 +59,9 @@
     });
   }
 
-  export function show() {
+  export function show(options) {
+    const { variant: variantType } = options || {};
+    variant = variantType;
     isLoggedIn = isUserLoggedIn();
     showLanguageList = false;
     visible = true;
@@ -95,6 +101,10 @@
 
   function selectLanguage(code) {
     $locale = code;
+    // In order to insure the bottom sheet get closes...when different language is chosen
+    if (Object.keys(getBundle(code))?.length) {
+      hide();
+    }
     showLanguageList = false;
   }
 
@@ -110,54 +120,76 @@
 
 <Backdrop {visible} on:click={handleBackdropClick}>
   <div class="account-container">
-    <div class="account-heading-container">
-      <div id="account-heading" class="account-heading">
-        {$t(ACCOUNT)}
-        {#if showLanguageList}
-          <span class="language-selection">{$t(CHANGE_LANGUAGE)}</span>
-        {/if}
+    {#if variant === ACCOUNT_VARIANT.LANGUAGE_ONLY}
+      <div class="account-heading-container">
+        <p class="account-heading">
+          {$t(CHANGE_LANGUAGE)}
+        </p>
+        <button class="account-toggle-icon" on:click={hide}>
+          <Icon icon={arrow_left(13, 13, '#212121')} />
+        </button>
       </div>
-      <div class="account-toggle-icon" on:click={hide}>
-        <Icon icon={arrow_left(13, 13, '#212121')} />
-      </div>
-    </div>
-    <hr />
-    {#if showLanguageList}
-      <div class="back-btn-container" on:click={handleBack}>
-        <span class="back-btn-icon">
-          <Icon icon={arrow_left(11, 11, '#616161')} />
-        </span>
-        <span class="back-btn-text">{$t(BACK)}</span>
-      </div>
+      <hr />
       <div class="language-container">
         {#each $locales as locale}
-          <div class="account-menu" on:click={() => selectLanguage(locale)}>
+          <button class="account-menu" on:click={() => selectLanguage(locale)}>
             {getLocaleName(locale)}
-          </div>
+          </button>
         {/each}
       </div>
     {:else}
-      {#if isLoggedIn}
-        <div class="account-menu" on:click={handleEdit}>
-          {$t(EDIT_CONTACT_ACTION)}
-        </div>
-      {/if}
-      {#if showChangeLanguage}
-        <div class="account-menu" on:click={handleChangeLanguage}>
-          {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
-          <span class="language-btn">
+      <div class="account-heading-container">
+        <p class="account-heading">
+          {$t(ACCOUNT)}
+          {#if showLanguageList}
+            <span class="language-selection">{$t(CHANGE_LANGUAGE)}</span>
+          {/if}
+        </p>
+        <button class="account-toggle-icon" on:click={hide}>
+          <Icon icon={arrow_left(13, 13, '#212121')} />
+        </button>
+      </div>
+      <hr />
+      {#if showLanguageList}
+        <button class="back-btn-container" on:click={handleBack}>
+          <span class="back-btn-icon">
             <Icon icon={arrow_left(11, 11, '#616161')} />
           </span>
+          <span class="back-btn-text">{$t(BACK)}</span>
+        </button>
+        <div class="language-container">
+          {#each $locales as locale}
+            <button
+              class="account-menu"
+              on:click={() => selectLanguage(locale)}
+            >
+              {getLocaleName(locale)}
+            </button>
+          {/each}
         </div>
-      {/if}
-      {#if isLoggedIn}
-        <hr class="account-separator" />
-        <div class="account-menu" on:click={handleLogoutClick}>
-          {$t(LOGOUT_ACTION)}
-        </div>
-        <div class="account-menu" on:click={handleLogoutAllDevicesClick}>
-          {$t(LOGOUT_ALL_DEVICES_ACTION)}
-        </div>
+      {:else}
+        {#if isLoggedIn}
+          <p class="account-menu" on:click={handleEdit}>
+            {$t(EDIT_CONTACT_ACTION)}
+          </p>
+        {/if}
+        {#if showChangeLanguage}
+          <p class="account-menu" on:click={handleChangeLanguage}>
+            {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
+            <span class="language-btn">
+              <Icon icon={arrow_left(11, 11, '#616161')} />
+            </span>
+          </p>
+        {/if}
+        {#if isLoggedIn}
+          <hr class="account-separator" />
+          <p class="account-menu" on:click={handleLogoutClick}>
+            {$t(LOGOUT_ACTION)}
+          </p>
+          <p class="account-menu" on:click={handleLogoutAllDevicesClick}>
+            {$t(LOGOUT_ALL_DEVICES_ACTION)}
+          </p>
+        {/if}
       {/if}
     {/if}
   </div>
@@ -171,6 +203,7 @@
     text-align: start;
     width: 100%;
     padding: 24px;
+    bottom: -55px;
   }
   .account-menu {
     cursor: pointer;

@@ -24,6 +24,7 @@
   import { selectedInstrument } from 'checkoutstore/screens/home';
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+
   // i18n
   import { t, locale } from 'svelte-i18n';
   import {
@@ -125,6 +126,7 @@
   class:showable={addShowableClass}
   class:tab-mg-1cc={isOneClickCheckout()}
   class:resetMargin={!addShowableClass}
+  class:tab-content-one-cc={isOneClickCheckout()}
 >
   <!-- <div id="form-otp" class="tab-content screen" class:loading={$loading}> -->
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
@@ -378,6 +380,9 @@
     flex: 1;
   }
 
+  .tab-content-one-cc {
+    margin-top: 0px;
+  }
   .otp-header {
     margin-bottom: 24px;
   }
