@@ -61,22 +61,24 @@
         {/if}
       </div>
       {#if isEditable}
-        <DropdownMenu
-          triggerElement={dropdownTrigger}
-          on:click={() => dispatch('select')}
-        >
-          <button bind:this={dropdownTrigger}>
-            <Icon icon={kebab_menu} />
-          </button>
-          <div slot="dropdown_menu">
-            <button
-              class="dropdown-item"
-              type="button"
-              on:click={() => dispatch('editClick', address)}
-              >{$t(EDIT_ADDRESS_LABEL)}</button
-            >
-          </div>
-        </DropdownMenu>
+        <div class="edit-cta">
+          <DropdownMenu
+            triggerElement={dropdownTrigger}
+            on:click={() => dispatch('select')}
+          >
+            <button bind:this={dropdownTrigger}>
+              <Icon icon={kebab_menu} />
+            </button>
+            <div slot="dropdown_menu">
+              <button
+                class="dropdown-item"
+                type="button"
+                on:click={() => dispatch('editClick', address)}
+                >{$t(EDIT_ADDRESS_LABEL)}</button
+              >
+            </div>
+          </DropdownMenu>
+        </div>
       {/if}
     </div>
     <div class="address-text">
@@ -133,6 +135,7 @@
     transition-duration: 0.15s;
     transition-property: border;
     transition-timing-function: linear;
+    position: relative;
   }
 
   .card {
@@ -148,8 +151,13 @@
 
   .box-header {
     display: flex;
-    justify-content: space-between;
     margin-bottom: 10px;
+  }
+
+  .edit-cta {
+    position: absolute;
+    top: 26px;
+    right: 20px;
   }
 
   .box-title {

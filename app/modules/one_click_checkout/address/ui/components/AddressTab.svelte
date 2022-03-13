@@ -200,7 +200,6 @@
 </script>
 
 <div class="address-tab">
-  <slot name="header" />
   <div
     class="address-wrapper"
     class:shipping-address-wrapper={addressType ===
@@ -211,6 +210,7 @@
     ]}
   >
     <div class="address-section">
+      <slot name="header" />
       <slot name="inner-header" />
       <div class="label-container">
         <Icon icon={location} />
@@ -236,6 +236,7 @@
           {shouldSaveAddress}
           {addressType}
           {selectedCountryISO}
+          {currentView}
         />
       {/if}
       <slot name="inner-footer" />
@@ -258,7 +259,7 @@
   .address-wrapper {
     display: flex;
     flex-direction: column;
-    padding: 18px 0px 0px;
+    padding-top: 26px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
     height: calc(100% - 55px);
@@ -282,7 +283,7 @@
   }
 
   .billing-address-wrapper {
-    padding: 8px 24px 12px;
+    padding: 8px 0px 12px;
     /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
     height: calc(
       100% - 55px + 20px + 16px
@@ -301,6 +302,7 @@
   }
 
   .address-section {
-    padding: 0px 24px;
+    /* TODO: to replace left/right padding with variable */
+    padding: 0px 16px 16px;
   }
 </style>

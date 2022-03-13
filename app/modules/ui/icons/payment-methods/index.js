@@ -45,6 +45,7 @@ import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
+import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -86,6 +87,7 @@ const availIconNames = getAllMethods().concat([
   'kebab_menu',
   'info',
   'user',
+  'caret_circle_right',
 ]);
 
 function getIconFn(iconName) {
@@ -237,6 +239,9 @@ function getIconFn(iconName) {
 
     case 'user':
       return user;
+
+    case 'caret_circle_right':
+      return caret_circle_right;
   }
 }
 
