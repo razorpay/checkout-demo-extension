@@ -47,7 +47,7 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
-  import ResendButton from 'ui/elements/ResendButton.svelte';
+  import ResendButton from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OTPInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
   import CTA from 'ui/elements/CTA.svelte';

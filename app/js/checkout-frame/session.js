@@ -749,7 +749,7 @@ function askOTP(
         }
       }
     } else {
-      textView = isOneClickCheckout()
+      textView = RazorpayHelper.isOneClickCheckout()
         ? 'otp_sent_generic_one_cc'
         : 'otp_sent_generic';
     }
