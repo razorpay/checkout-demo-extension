@@ -22,8 +22,9 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'City Union'}        | ${false} | ${true}  | ${false}
       ${'Equitas'}           | ${false} | ${true}  | ${false}
       ${'HSBC'}              | ${true}  | ${false} | ${false}
-      ${'Niyo Global Cards'} | ${true}  | ${false} | ${false}
+      ${'IOB'}               | ${false} | ${true}  | ${false}
       ${'Karur Vysya'}       | ${true}  | ${true}  | ${false}
+      ${'Niyo Global Cards'} | ${true}  | ${false} | ${false}
       ${'OneCard'}           | ${true}  | ${false} | ${false}
       ${'Punjab National'}   | ${true}  | ${false} | ${false}
       ${'RazorpayX'}         | ${true}  | ${false} | ${false}
@@ -57,8 +58,9 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'City Union'}        | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'Equitas'}           | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'HSBC'}              | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
-      ${'Niyo Global Cards'} | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
+      ${'IOB'}               | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'Karur Vysya'}       | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
+      ${'Niyo Global Cards'} | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
       ${'OneCard'}           | ${['Visa']}               | ${[]}                     | ${[]}
       ${'Punjab National'}   | ${['Visa']}               | ${[]}                     | ${[]}
       ${'RazorpayX'}         | ${['Visa']}               | ${[]}                     | ${[]}
