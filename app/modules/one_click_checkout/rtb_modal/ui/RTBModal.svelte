@@ -2,7 +2,7 @@
   // UI Imports
   import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import TrustedBadgeIcon from 'trusted-badge/ui/component/TrustedBadgeIcon.svelte';
+  import badge from 'one_click_checkout/rtb_modal/icons/badge';
 
   //i18n Imports
   import {
@@ -47,7 +47,10 @@
   <div class="rtb-container">
     <div class="rtb-header">
       <div class="rtb-icon">
-        <TrustedBadgeIcon height="60" width="60" />
+        <!-- It is done intentionally. Both RTB Badges styles were getting else wise over lapped-->
+        {#if visible}
+          <Icon icon={badge(60, 60)} />
+        {/if}
       </div>
       <div class="rtb-header-section">
         <div class="rtb-header-text">{merchantName}</div>
@@ -89,7 +92,7 @@
   .rtb-content {
     background: #e7f7f1;
     color: #616161;
-    padding: 16px 16px 0px;
+    padding: 16px 16px 2px;
     border-radius: 4px;
   }
   .rtb-list {
@@ -137,6 +140,9 @@
     border: 2px solid #59d686;
     width: 34%;
     border-radius: 4px;
+  }
+  .rtb-icon {
+    padding-right: 4px;
   }
   :global(.mobile) .rtb-container {
     bottom: 0;

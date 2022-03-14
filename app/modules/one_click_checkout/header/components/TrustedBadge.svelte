@@ -4,6 +4,7 @@
 
   // Imports Related to RTB
   import { RTB } from 'checkoutstore/rtb';
+  import badge from 'one_click_checkout/rtb_modal/icons/badge';
   import { showRTBModal } from 'one_click_checkout/rtb_modal';
   import {
     getTrustedBadgeHighlights,
@@ -42,7 +43,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadgeIcon height="24" width="24" />
+        <Icon icon={badge(24, 24)} />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
@@ -50,7 +51,7 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadgeIcon height="24" width="24" />
+        <Icon icon={badge(24, 24)} />
       </div>
       <div class="rtb-down-arrow-wrapper">
         <Icon icon={arrow_down(10, 8)} />
@@ -68,7 +69,7 @@
   .rtb-expanded-wrapper {
     background: #e7f7f1;
     border-radius: 4px;
-    padding: 4px 6px;
+    padding: 6px 10px;
     cursor: pointer;
     display: flex;
     align-items: center;

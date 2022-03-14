@@ -22,7 +22,7 @@
 
 {#if $headerVisible}
   <div id="header-1cc">
-    {#if routeName === views.COUPONS_LIST}
+    {#if routeName === views.COUPONS}
       <div
         class="header-title-wrapper"
         class:header-title-wrapper-with-extra-padding={!isRTBEnabled}
@@ -77,6 +77,6 @@
   .header-body-wrapper {
     display: flex;
     justify-content: space-between;
-    padding: 8px 16px;
+    padding: 8px 16px 16px;
   }
 </style>

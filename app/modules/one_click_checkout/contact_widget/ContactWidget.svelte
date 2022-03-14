@@ -35,7 +35,7 @@
   }
 </script>
 
-{#if showUserDetailsStrip}
+{#if showUserDetailsStrip || showEditUserDetails}
   <div class="contact-container">
     <div class="contact-header">
       <div class="contact-title">

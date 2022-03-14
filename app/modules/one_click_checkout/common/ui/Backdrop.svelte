@@ -1,4 +1,5 @@
 <script>
+  import { isOneClickCheckout } from 'razorpay';
   import { fade } from 'svelte/transition';
 
   export let visible;
@@ -6,6 +7,7 @@
 
 <div
   class="backdrop"
+  class:backdrop-one-cc={isOneClickCheckout()}
   class:visible
   on:click
   transition:fade={{ duration: 200 }}
@@ -27,6 +29,9 @@
     background: rgba(0, 0, 0, 0.3);
   }
 
+  .backdrop-one-cc {
+    background: rgba(7, 38, 84, 0.4);
+  }
   .visible {
     display: block;
   }

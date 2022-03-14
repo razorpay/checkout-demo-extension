@@ -20,28 +20,33 @@
 
 {#if isOneClickCheckout()}
   <div class="account-tab-container">
-    <div class="account-section" on:click={showAccountModal}>
-      {$t(ACCOUNT)}
-      <span class="account-toggle-icon">
-        <Icon icon={arrow_left(13, 13, '#212121')} />
-      </span>
-    </div>
-    <div class="rzp-icon-section">
-      <span class="brand-text">{$t(SECURED_BY)}</span>
-      <Icon icon={rzp_brand_logo} />
+    <div class="account-wrapper">
+      <div class="account-section" on:click={showAccountModal}>
+        {$t(ACCOUNT)}
+        <span class="account-toggle-icon">
+          <Icon icon={arrow_left(13, 13, '#212121')} />
+        </span>
+      </div>
+      <div class="rzp-icon-section">
+        <span class="brand-text">{$t(SECURED_BY)}</span>
+        <Icon icon={rzp_brand_logo} />
+      </div>
     </div>
   </div>
 {/if}
 
 <style>
   .account-tab-container {
+    margin-top: auto;
+  }
+  .account-wrapper {
     background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 24px;
     border-top: 1px solid #c4c4c4;
-    margin-top: auto;
+    margin-top: 50px;
   }
   .brand-text {
     font-size: 12px;
