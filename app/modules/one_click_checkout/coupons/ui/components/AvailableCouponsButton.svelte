@@ -14,6 +14,7 @@
     HAVE_COUPON_LABEL,
     REMOVE_LABEL,
     AVAILABLE_LABEL,
+    APPLIED_LABEL,
   } from 'one_click_checkout/coupons/i18n/labels';
 
   // constant imports
@@ -36,7 +37,7 @@
   <Icon icon={offers} />
   {#if $appliedCoupon}
     <div class="coupons-available-text">
-      ‘{$appliedCoupon}’ {$t(AVAILABLE_LABEL)}
+      ‘{$appliedCoupon}’ {$t(APPLIED_LABEL)}
     </div>
     <span class="coupon-remove-text" on:click|preventDefault={removeCoupon}>
       {$t(REMOVE_LABEL)}
@@ -59,7 +60,6 @@
     </span>
   {/if}
 </div>
-<div class="separator" />
 
 <style>
   .coupons-available-text {
@@ -68,6 +68,7 @@
   }
 
   .coupons-available-count {
+    padding-left: 2px;
     font-weight: 300;
     color: rgba(51, 51, 51, 0.6);
   }
@@ -75,10 +76,5 @@
     margin-left: auto;
     cursor: pointer;
     padding-top: 2px;
-  }
-
-  .separator {
-    height: 10px;
-    background-color: #f8fafd;
   }
 </style>

@@ -28,7 +28,7 @@ export default {
   saved_address_landmark_label: 'Landmark',
   saved_address_cta_label: 'Use your Saved Address',
   shipping_charges_label: '{charge} shipping charge added',
-  same_address_checkbox_label: '"Billing address same as delivery address"',
+  same_address_checkbox_label: 'Billing address same as delivery address',
   saved_address_label: 'Your address has been saved',
   error_label: 'Address should be less than 255 characters',
   landmark_error_label: 'Enter characters between 2 to 32 only.',

@@ -156,6 +156,7 @@
   .coupon-apply-btn {
     font-size: 14px;
     font-weight: 600;
+    padding-right: 22px;
   }
 
   .invalid {
@@ -171,8 +172,8 @@
   .coupon-spinner {
     display: inline-block;
     position: relative;
-    top: 2px;
-    left: 20px;
+    top: 12px;
+    right: 24px;
   }
 
   .color-green {
@@ -243,6 +244,8 @@
   }
 
   .input-group {
+    display: flex;
+    justify-content: space-between;
     position: relative;
     border: 1px solid #dadce0;
     border-radius: 4px;

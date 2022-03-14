@@ -59,10 +59,6 @@
 </Screen>
 
 <style>
-  .coupon-container {
-    padding-top: 20px;
-  }
-
   .row {
     margin-bottom: 10px;
     display: flex;
@@ -93,6 +89,6 @@
     background-color: #f8fafd;
   }
   .coupon-input-container {
-    padding: 0px 18px 20px;
+    padding: 24px 16px 22px;
   }
 </style>

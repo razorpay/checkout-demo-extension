@@ -8,6 +8,7 @@ import {
 } from 'one_click_checkout/coupons/helpers';
 import { OTP_LABELS } from 'one_click_checkout/coupons/constants';
 import { SUMMARY_LABEL } from 'one_click_checkout/topbar/i18n/label';
+import { COUPON_LABEL } from 'one_click_checkout/coupons/i18n/labels';
 
 export const coupons = {
   name: views.COUPONS,
@@ -33,4 +34,5 @@ export const couponsList = {
     skipOTPHandle: skipCouponListOTP,
   },
   otpLabels: OTP_LABELS,
+  topbarTitle: COUPON_LABEL,
 };

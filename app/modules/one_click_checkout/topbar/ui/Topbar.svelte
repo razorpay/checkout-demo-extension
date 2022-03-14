@@ -41,6 +41,8 @@
       if (typeof isBackEnabled === 'function') {
         isBackEnabled = isBackEnabled();
       }
+    } else {
+      isBackEnabled = true;
     }
   }
   export function show() {
@@ -77,10 +79,10 @@
       {#if $tabTitleLogo}
         <img class="title-logo" alt="Logo" src={$tabTitleLogo} />
       {:else if $activeRoute?.topbarTitle || !blackListedTabTitle?.includes($tabTitle)}
-        {$activeRoute.topbarTitle || $tabTitle}
+        {$activeRoute.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
       {/if}
     </div>
-    {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$tabTitleLogo}
+    {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$tabTitleLogo && !$activeRoute?.topbarTitle}
       <div class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
           <span
@@ -91,7 +93,9 @@
             {$t(breadcrumbItem)}
           </span>
           {#if i + 1 < $breadcrumbItems.length}
-            <Icon icon={double_arrow} />
+            <span class="breadcrumb-icon">
+              <Icon icon={double_arrow} />
+            </span>
           {/if}
         {/each}
       </div>
@@ -109,6 +113,10 @@
     border-bottom: 1px solid #e1e5ea;
     padding: 10px 16px;
     align-items: center;
+    box-sizing: border-box;
+    height: 44px;
+    z-index: 2;
+    box-shadow: 10px 10px 30px rgba(107, 108, 109, 0.1);
   }
   .back {
     cursor: pointer;
@@ -133,5 +141,9 @@
   }
   .title-logo {
     height: 16px;
+  }
+
+  .breadcrumb-icon {
+    padding: 2px 8px 0px;
   }
 </style>

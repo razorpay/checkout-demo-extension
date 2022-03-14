@@ -49,7 +49,9 @@
       {/if}
     </div>
     {#if showEditUserDetails}
-      <PaymentDetails />
+      <div class="contact-wrapper">
+        <PaymentDetails />
+      </div>
     {:else}
       <div class="contact-info">
         {#if $isContactPresent && !isContactHidden()}
@@ -84,7 +86,7 @@
     align-items: center;
   }
   .contact-info {
-    padding: 14px 0px;
+    padding: 14px 0px 0px;
   }
   .phone-text {
     line-height: 20px;
@@ -93,5 +95,9 @@
     color: #8d97a1;
     padding-top: 6px;
     line-height: 20px;
+  }
+
+  .contact-wrapper {
+    padding-top: 14px;
   }
 </style>

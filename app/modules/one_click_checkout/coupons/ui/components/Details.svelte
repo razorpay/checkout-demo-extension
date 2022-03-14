@@ -95,13 +95,13 @@
     justify-content: space-between;
     align-items: center;
 
-    margin-bottom: 13px;
+    margin-bottom: 16px;
   }
 
   .details-fields-wrapper {
     margin-left: -20px;
     margin-right: -20px;
-
+    padding: 0px 20px;
     margin-bottom: 18px;
   }
 
@@ -125,12 +125,13 @@
   .details-description {
     font-weight: normal;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 22px;
     color: #757575;
+    padding-bottom: 20px;
   }
 
   hr {
-    margin-bottom: 13px;
+    margin-bottom: 16px;
     border: 1px solid #e0e0e0;
     border-bottom: none;
   }

@@ -85,8 +85,7 @@
   .coupons-list {
     margin-left: -20px;
     margin-right: -20px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 4px 16px 24px;
   }
 
   .available-coupons-container {

@@ -17,5 +17,7 @@ export const TOTAL_ADDRESSES_LABEL = 'coupons.total_addresses_label';
 export const COUPON_TOAST_MESSAGE = 'coupons.toast_message';
 export const TERMS_CONDITION_LABEL = 'coupons.terms_condition_label';
 export const AVAILABLE_LABEL = 'coupons.available_label';
+export const APPLIED_LABEL = 'coupons.applied_label';
 export const COUPON_DETAIL_LABEL = 'coupons.coupon_detail_label';
 export const COUPON_OTP_LABEL = 'coupons.coupon_otp_label';
+export const COUPON_LABEL = 'coupons.coupon_label';

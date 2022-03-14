@@ -39,7 +39,10 @@
         <Icon icon={location} />
         <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
       </div>
-      <button on:click={() => dispatch('headerCtaClick')} class="label-cta">
+      <button
+        on:click={() => dispatch('headerCtaClick')}
+        class="label-cta theme"
+      >
         {$t(ADDRESS_CTA_LABEL)}
       </button>
     </div>
@@ -74,7 +77,8 @@
 
   .label-container {
     justify-content: space-between;
-    margin-bottom: 8px;
+    align-items: flex-start;
+    margin-bottom: 14px;
   }
 
   .label-text {
@@ -86,15 +90,16 @@
   }
 
   .label-cta {
-    color: var(--background-color);
     font-size: 12px;
     text-align: right;
+    font-weight: 600;
   }
   .total-addresses {
     position: relative;
     top: -6px;
     margin-bottom: 2px;
     color: #8d97a1;
+    font-weight: 300;
   }
 
   .mb-14 {

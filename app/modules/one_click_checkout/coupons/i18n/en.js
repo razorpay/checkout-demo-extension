@@ -17,7 +17,8 @@ export default {
   toast_message: 'Coupon applied! You save {amount}',
   terms_condition_label: 'Terms and Conditions',
   available_label: 'Available',
+  applied_label: 'Applied',
   coupon_detail_label: 'To use the coupon',
-  coupon_otp_label:
-    'enter your contact details. OTP will be sent on your phone number.',
+  coupon_otp_label: 'verify your contact details with an OTP.',
+  coupon_label: 'Coupons',
 };
