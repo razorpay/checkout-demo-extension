@@ -141,19 +141,16 @@
           $cardNumber}
       />
     {/if}
-    <div
-      class="otp-controls"
-      class:margin-none={otpClasses.includes($textView)}
-    >
+    <div class="otp-controls">
       <div
         id="otp-prompt"
         class="otp-header"
         class:text-start={otpClasses.includes($textView)}
       >
         {#if $headingText}
-          <div class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+          <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
             {getOtpScreenHeading($headingText, $templateData, $locale)}
-          </div>
+          </p>
         {/if}
         <!-- Align text to start only if in address context -->
         {#if $loading}
@@ -232,7 +229,11 @@
           {/if}
         {/if}
 
-        <OTPInput hidden={!showInput} />
+        <OTPInput
+          --color={getTheme().backgroundColor}
+          hidden={!showInput}
+          isError={$errorMessage}
+        />
       </div>
 
       <div class="error-message" class:hidden={!showInput}>
@@ -300,12 +301,11 @@
   }
   .otp-controls {
     flex-grow: 1;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0px 16px 0px;
   }
   /* If otp controls is the first thing in the screen, then push it down by 40px */
   .otp-screen-contents .otp-controls:first-child {
-    margin-top: 40px;
+    margin-top: 34px;
   }
   :global(.otp-screen-contents .card-box:first-child) {
     margin-bottom: 12px;
@@ -328,16 +328,13 @@
     padding-bottom: 24px;
   }
   .error-message {
-    color: #eb001b;
+    color: #d64052;
     text-align: start !important;
     margin: 12px 0px;
     font-size: 12px;
   }
   .text-start {
     text-align: start !important;
-  }
-  .margin-none {
-    margin-top: 0px !important;
   }
   .otp-heading {
     margin: 34px 0 26px;
@@ -384,6 +381,6 @@
     margin-top: 0px;
   }
   .otp-header {
-    margin-bottom: 24px;
+    margin-bottom: 24px !important;
   }
 </style>

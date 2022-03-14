@@ -10,7 +10,11 @@ import Analytics, {
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
-import RazorpayStore, { getRecurringMethods, isRecurring } from 'razorpay';
+import RazorpayStore, {
+  getRecurringMethods,
+  isOneClickCheckout,
+  isRecurring,
+} from 'razorpay';
 
 import { format } from 'i18n';
 
@@ -246,7 +250,11 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            callback(format('otp.title.incorrect_otp_retry'));
+            callback(
+              isOneClickCheckout()
+                ? format('otp.title.incorrect_otp_retry_one_cc')
+                : format('otp.title.incorrect_otp_retry')
+            );
           }
         } else {
           callback(undefined, data);

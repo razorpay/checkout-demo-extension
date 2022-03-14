@@ -17,11 +17,15 @@
     ipAddress,
     accessTime,
     tabLogo,
+    headingText,
+    errorMessage,
+    isRazorpayOTP,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { isOneClickCheckout, showFeeLabel } from 'checkoutstore/index.js';
   import { isRecurring } from 'razorpay';
+  import { getThemeColor } from 'checkoutstore/theme';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -29,7 +33,11 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { getOtpScreenTitle, getOtpScreenMiscText } from 'i18n';
+  import {
+    getOtpScreenTitle,
+    getOtpScreenMiscText,
+    getOtpScreenHeading,
+  } from 'i18n';
 
   import {
     ADD_FUNDS_LABEL,
@@ -47,6 +55,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
+  import { handleEditContact as handleOneCCEditContact } from 'one_click_checkout/sessionInterface';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
@@ -57,6 +66,8 @@
   import CardBox from 'ui/elements/CardBox.svelte';
   import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
@@ -84,6 +95,8 @@
     autoCompleteMethod = 'one-time-code';
   }
 
+  const { edit_paper } = session.themeMeta.icons;
+
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.
   $: otpPromptVisible = !$action && !$loading;
@@ -109,7 +122,9 @@
     // For recurring payments Skip Saving card is not an option
     // Since we already took mandatory consent on privios screen(Save Checkbox)
     // we are not allowing Skip saving option on OTP Screen
-    const isSaveYourCardOTPScreen = $skipTextLabel === 'skip_saving_card';
+    const isSaveYourCardOTPScreen =
+      $skipTextLabel === 'skip_saving_card' ||
+      $skipTextLabel === 'skip_saving_card_one_cc';
     allowSkipButton = isRecurring() ? !isSaveYourCardOTPScreen : $allowSkip;
   }
 
@@ -174,7 +189,7 @@
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
-  <div class="otp-screen-contents">
+  <div class="otp-screen-contents" class:heading-1cc={isOneClickCheckout()}>
     {#if otpPromptVisible && $mode === 'HDFC_DC'}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
@@ -187,16 +202,34 @@
 
     <div
       class="otp-controls"
+      class:otp-controls-one-cc={isOneClickCheckout()}
       class:recurring-alignment={isRecurring() ? !allowSkipButton : false}
     >
-      <div id="otp-prompt">
+      <div id="otp-prompt" class:otp-header={isOneClickCheckout()}>
         {#if $loading}
           <AsyncLoading>
             {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
         {:else}
+          {#if isOneClickCheckout() && $headingText}
+            <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+              {getOtpScreenHeading('default_login', $templateData, $locale)}
+            </p>
+          {/if}
           <div class="otp-title">
-            {getOtpScreenTitle($textView, $templateData, $locale)}
+            {#if $isRazorpayOTP && isOneClickCheckout()}
+              {@html getOtpScreenTitle($textView, $templateData, $locale)}
+              {#if $textView}
+                <span
+                  class="edit-contact-btn"
+                  on:click={() => handleOneCCEditContact()}
+                >
+                  <Icon icon={edit_paper} />
+                </span>
+              {/if}
+            {:else}
+              {getOtpScreenTitle($textView, $templateData, $locale)}
+            {/if}
           </div>
         {/if}
       </div>
@@ -264,34 +297,49 @@
           {/if}
         {/if}
 
-        <div
-          id="otp-elem"
-          style="width: {inputWidth};"
-          class:compact
-          class:hidden={!showInput}
-        >
-          <!-- LABEL: Please enter the OTP -->
-          <div class="help">{$t(OTP_FIELD_HELP)}</div>
-          <input
-            bind:this={input}
-            on:blur={trackInput}
-            type="tel"
-            class="input"
-            name="otp"
-            id="otp"
-            bind:value={$otp}
-            pattern="[0-9]"
-            maxlength={$maxlength || 6}
-            autocomplete={autoCompleteMethod}
-            required
+        <!-- LABEL: Please enter the OTP -->
+
+        {#if $isRazorpayOTP && isOneClickCheckout()}
+          <OtpInput
+            hidden={!showInput}
+            --color={getThemeColor()}
+            isError={$errorMessage}
           />
-        </div>
+        {:else}
+          <div
+            id="otp-elem"
+            style="width: {inputWidth};"
+            class:compact
+            class:hidden={!showInput}
+          >
+            <div class="help">{$t(OTP_FIELD_HELP)}</div>
+            <input
+              bind:this={input}
+              on:blur={trackInput}
+              type="tel"
+              class="input"
+              name="otp"
+              id="otp"
+              bind:value={$otp}
+              pattern="[0-9]"
+              maxlength={$maxlength || 6}
+              autocomplete={autoCompleteMethod}
+              required
+            />
+          </div>
+        {/if}
       </div>
+
+      {#if isOneClickCheckout() && $errorMessage}
+        <div class="error-message" class:hidden={!showInput}>
+          {$t($errorMessage)}
+        </div>
+      {/if}
 
       <div id="otp-sec-outer" class:compact>
         <div
           class="otp-action-container"
-          class:action-container-center={isOneClickCheckout()}
+          class:action-container-center={$isRazorpayOTP && isOneClickCheckout()}
         >
           {#if showInput}
             {#if $allowResend}
@@ -374,9 +422,18 @@
     padding-left: 24px;
     padding-right: 24px;
   }
+
+  .otp-controls-one-cc {
+    padding: 0px 16px;
+  }
+
   /* If otp controls is the first thing in the screen, then push it down by 40px */
   .otp-screen-contents .otp-controls:first-child {
     margin-top: 40px;
+  }
+
+  .otp-screen-contents .otp-controls-one-cc:first-child {
+    margin-top: 34px;
   }
 
   :global(.otp-screen-contents .card-box:first-child) {
@@ -424,5 +481,28 @@
 
   .tab-content-one-cc {
     margin-top: 0px;
+  }
+
+  .otp-heading {
+    margin-bottom: 26px;
+    text-align: center;
+    color: #263a4a;
+    text-transform: capitalize;
+    font-weight: bold;
+  }
+
+  .heading-1cc {
+    margin-top: 0 !important;
+  }
+
+  .error-message {
+    color: #d64052;
+    text-align: start !important;
+    margin: 12px 0px;
+    font-size: 12px;
+  }
+
+  .otp-header {
+    margin-bottom: 24px !important;
   }
 </style>

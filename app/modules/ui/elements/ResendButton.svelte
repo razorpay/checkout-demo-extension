@@ -8,7 +8,7 @@
   import { RESEND_BTN, RESEND_LABEL } from 'ui/labels/otp';
 
   // store imports
-  import { resendTimeout } from 'checkoutstore/screens/otp';
+  import { isRazorpayOTP, resendTimeout } from 'checkoutstore/screens/otp';
 
   // ui imports
   import CountdownTimer from 'ui/components/CountdownTimer.svelte';
@@ -58,7 +58,7 @@
     width={50}
     height={50}
   />
-{:else if isOneClickCheckout()}
+{:else if $isRazorpayOTP && isOneClickCheckout()}
   <div class="resend-container">
     <span class="resend-label">{$t(RESEND_LABEL)}</span>
     <LinkButton {id} on:click={(event) => invokeResend(event, 'resend')}>
