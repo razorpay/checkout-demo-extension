@@ -31,26 +31,27 @@
 
 <div>
   {#if !loading}
-    <div class="flex-row label-container">
+    <div
+      class:mb-14={$savedAddresses.length <= 1}
+      class="flex-row col-center label-container"
+    >
       <div class="flex-row col-center">
         <Icon icon={location} />
         <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
       </div>
-      <div>
-        <button on:click={() => dispatch('headerCtaClick')} class="label-cta"
-          >{$t(ADDRESS_CTA_LABEL)}</button
-        >
-        {#if $savedAddresses.length > 1}
-          <p class="label-cta total-addresses">
-            ({formatTemplateWithLocale(
-              TOTAL_ADDRESSES_LABEL,
-              { count: $savedAddresses.length },
-              $locale
-            )})
-          </p>
-        {/if}
-      </div>
+      <button on:click={() => dispatch('headerCtaClick')} class="label-cta">
+        {$t(ADDRESS_CTA_LABEL)}
+      </button>
     </div>
+    {#if $savedAddresses.length > 1}
+      <p class="label-cta total-addresses">
+        ({formatTemplateWithLocale(
+          TOTAL_ADDRESSES_LABEL,
+          { count: $savedAddresses.length },
+          $locale
+        )})
+      </p>
+    {/if}
   {/if}
   <AddressBox {address} {loading} withBorder={false} isEditable={false} />
   {#if !loading} <SameBillingAndShipping --text-color="#8d97a1" />{/if}
@@ -89,8 +90,14 @@
     font-size: 12px;
     text-align: right;
   }
-
   .total-addresses {
+    position: relative;
+    top: -6px;
+    margin-bottom: 2px;
     color: #8d97a1;
+  }
+
+  .mb-14 {
+    margin-bottom: 14px;
   }
 </style>

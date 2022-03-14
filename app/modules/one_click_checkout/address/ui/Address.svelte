@@ -16,8 +16,10 @@
   import { isIndianCustomer } from 'checkoutstore';
   import { contact } from 'checkoutstore/screens/home';
   // interface imports
-  import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
+  import {
+    getIcons,
+    redirectToPaymentMethods,
+  } from 'one_click_checkout/sessionInterface';
 
   // helpers imports
   import { saveAddress } from 'one_click_checkout/address/helpers';
@@ -48,7 +50,7 @@
 
   let address;
 
-  const { arrow_next } = getTheme().icons;
+  const { caret_circle_right } = getIcons();
 
   let customer = getCustomer($contact, null, true);
 
@@ -93,7 +95,7 @@
   function onSavedAddressClick() {
     Events.Track(AddressEvents.ACCESS_SAVED_ADDRESS);
 
-    address.currentView.setCurrentView(addressViews.SAVED_ADDRESSES);
+    address.setCurrentView(addressViews.SAVED_ADDRESSES);
     navigator.navigateTo({
       path: Resource[ADDRESS_TYPES.SHIPPING_ADDRESS].routes[
         addressViews.SAVED_ADDRESSES
@@ -138,8 +140,10 @@
         class="saved-addresses-cta"
         on:click|preventDefault={onSavedAddressClick}
       >
-        {$t(SAVED_ADDRESS_CTA_LABEL)}
-        <Icon icon={arrow_next} />
+        <span class="saved-addresses-cta__text">
+          {$t(SAVED_ADDRESS_CTA_LABEL)}
+        </span>
+        <Icon icon={caret_circle_right} />
       </button>
     {/if}
   </div>
@@ -163,7 +167,30 @@
 </AddressTab>
 
 <style>
+  * {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+  }
+
   div[slot='inner-footer'] {
     margin-top: 16px;
+  }
+
+  .saved-addresses-cta {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 12px 16px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .saved-addresses-cta__text {
+    color: var(--background-color);
+    font-weight: bold;
+    font-size: 14px;
   }
 </style>

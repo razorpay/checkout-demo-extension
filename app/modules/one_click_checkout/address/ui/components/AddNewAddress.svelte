@@ -26,7 +26,10 @@
     REQUIRED_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
-  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
+  import {
+    ADDRESS_TYPES,
+    views as addressViews,
+  } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import {
     CATEGORIES,
@@ -76,6 +79,7 @@
   export let shouldSaveAddress;
   export let addressType;
   export let selectedCountryISO;
+  export let currentView;
 
   let errors = {};
   let selectedTag = $formData.tag;
@@ -574,7 +578,7 @@
       {addressType}
       on:blur={onInputFieldBlur}
     />
-    {#if $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
+    {#if currentView === addressViews.ADD_ADDRESS && $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
       <div class="address-save-consent">
         <Checkbox
           on:change={handleSaveConsentChange}
@@ -595,6 +599,7 @@
 
 <style>
   .address-new {
+    margin-top: 16px;
     margin-bottom: -14px;
   }
   .address-save-consent {
