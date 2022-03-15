@@ -45,7 +45,9 @@ async function selectEMIPlanWithoutOffer(context, offerNumber) {
 }
 
 async function selectCardlessEMIOption(context, optionName) {
-  await page.$eval(`img[src$="${optionName}.svg"]`, el => el.click());
+  await context.page.evaluate((optionName) => {
+    document.querySelector(`img[src$="${optionName}.svg"]`).click();
+  }, optionName);
 }
 
 async function handleCardlessEMIValidation(context) {
@@ -55,8 +57,7 @@ async function handleCardlessEMIValidation(context) {
     type: 'respawn',
     method: 'cardless_emi',
     request: {
-      url:
-        'https://api.razorpay.com/v1/otp/verify?method=cardless_emi&provider=zestmoney&payment_id=pay_DnKu1wENm6Bqij&key_id=rzp_test_ILgsfZCZoFIKMb',
+      url: 'https://api.razorpay.com/v1/otp/verify?method=cardless_emi&provider=zestmoney&payment_id=pay_DnKu1wENm6Bqij&key_id=rzp_test_ILgsfZCZoFIKMb',
       method: 'POST',
       content: {
         contact: '+919620875358',

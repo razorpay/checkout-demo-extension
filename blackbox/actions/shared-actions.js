@@ -167,6 +167,12 @@ async function expectRedirectWithCallback(context, fields) {
       } else {
         apiSuffix = 'checkout';
       }
+    } else if (
+      fields.method === 'cardless_emi' &&
+      fields.provider === 'zestmoney' &&
+      context.preferences.features.redirect_to_zestmoney
+    ) {
+      apiSuffix = 'checkout';
     } else {
       apiSuffix = 'ajax';
     }
