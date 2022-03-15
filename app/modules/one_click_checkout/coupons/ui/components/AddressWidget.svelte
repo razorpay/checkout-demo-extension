@@ -77,8 +77,7 @@
 
   .label-container {
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 14px;
+    align-items: center;
   }
 
   .label-text {
