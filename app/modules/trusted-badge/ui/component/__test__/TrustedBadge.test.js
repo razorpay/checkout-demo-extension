@@ -7,7 +7,15 @@ import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
 jest.mock('razorpay', () => ({
   getPreferences: jest.fn(),
 }));
-describe('Trusted Badge', () => {
+
+// Disabling exp for test cases temporarily till we completely move to the new feature in the next few days - CE-5342
+jest.mock('trusted-badge/experiments', () => ({
+  hideRTBHighlightsExperiment: {
+    enabled: jest.fn(() => false),
+  },
+}));
+
+fdescribe('Trusted Badge', () => {
   test('RTB should be shown for RTB enabled', async () => {
     getPreferences.mockReturnValue(true);
     const { component, container, getByTestId, queryByTestId } = render(

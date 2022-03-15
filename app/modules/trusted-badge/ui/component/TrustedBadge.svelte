@@ -22,8 +22,11 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { RTB } from 'checkoutstore/rtb';
+  import { hideRTBHighlightsExperiment } from 'trusted-badge/experiments';
 
   $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
+  const shouldHideHighlights = hideRTBHighlightsExperiment.enabled();
+
   onMount(() => {
     if (sendAnalytics) {
       Analytics.track('RTB:show', {
@@ -47,7 +50,7 @@
 
   export let sendAnalytics = true;
   function handleInfoClicked() {
-    isInfoVisible = !isInfoVisible;
+    isInfoVisible = shouldHideHighlights ? false : !isInfoVisible;
     if (sendAnalytics) {
       Analytics.track('RTB:click', {
         type: AnalyticsTypes.BEHAV,
@@ -63,10 +66,11 @@
 <div>
   {#if trustedBadgeHighlights}
     <trusted-badge>
-      <div class="trusted-badge-wrapper">
+      <div class="trusted-badge-wrapper" class:center={shouldHideHighlights}>
         <div
           class="trusted-badge-header-section"
           class:active={isInfoVisible}
+          class:cursor-pointer={!shouldHideHighlights}
           on:click={handleInfoClicked}
           data-testid="trusted-badge"
         >
@@ -77,13 +81,15 @@
             <div class="trusted-badge-header-labels">
               <div><b>{$t(TRUSTED_BADGE_HEADER)}</b></div>
             </div>
-            <div class="trusted-badge-arrow">
-              <i
-                class="arrow"
-                class:arrow-down={!isInfoVisible}
-                class:arrow-up={isInfoVisible}
-              />
-            </div>
+            {#if !shouldHideHighlights}
+              <div class="trusted-badge-arrow">
+                <i
+                  class="arrow"
+                  class:arrow-down={!isInfoVisible}
+                  class:arrow-up={isInfoVisible}
+                />
+              </div>
+            {/if}
           </div>
         </div>
         {#if isInfoVisible}
@@ -118,8 +124,14 @@
   .trusted-badge-wrapper {
     padding: 5.5px 20px;
   }
+  .trusted-badge-wrapper.center {
+    display: flex;
+    justify-content: center;
+  }
   .trusted-badge-header-section {
     display: flex;
+  }
+  .trusted-badge-header-section.cursor-pointer {
     cursor: pointer;
   }
   .trusted-badge-header-labels {
