@@ -36,7 +36,7 @@
   } from 'one_click_checkout/account_modal/i18n/labels';
 
   // helper imports
-  import { isUserLoggedIn } from 'common/helpers/customer';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
   // analytics imports
   import { Events, MiscEvents } from 'analytics';
