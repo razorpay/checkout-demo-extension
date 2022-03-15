@@ -51,7 +51,7 @@ Eventer.prototype = {
     if (argLen === 2) {
       var listeners = events[event];
       if (_.isFunction(callback) && _.isArray(listeners)) {
-        listeners.splice(_Arr.indexOf(listeners, callback), 1);
+        listeners.splice(listeners.indexOf(callback), 1);
         if (listeners.length) {
           return;
         }

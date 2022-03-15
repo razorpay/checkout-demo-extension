@@ -20,7 +20,7 @@
   // Constant imports
   import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
-  const providers = _Arr.map(getPayLaterProviders(), (providerObj) =>
+  const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
   );
 
@@ -46,8 +46,8 @@
       return providers;
     }
 
-    let filteredProviders = _Arr.filter(providers, (provider) =>
-      _Arr.contains(instrument.providers, provider.data.code)
+    let filteredProviders = providers.filter((provider) =>
+      instrument.providers.includes(provider.data.code)
     );
 
     return filteredProviders;

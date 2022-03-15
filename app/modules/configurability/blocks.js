@@ -2,28 +2,7 @@ import {
   validateKeysAndCreateInstrument,
   createInstrument,
 } from './instruments';
-
-/**
- * This is equivalent [...new Set(array)]
- * Supported in legacy browsers & IE
- * @param {Array<any>} array
- * @param {Function} [func]
- * @returns Returns the array with unique elements.
- */
-function getUniqueValues(array, func) {
-  if (!Array.isArray(array)) {
-    return array;
-  }
-  return array
-    .reduce((result, data) => {
-      const _stringifiedData = JSON.stringify(func ? func(data) : data);
-      if (!result.includes(_stringifiedData)) {
-        result.push(_stringifiedData);
-      }
-      return result;
-    }, [])
-    .map(JSON.parse);
-}
+import { getUniqueValues } from 'utils/array';
 
 /**
  *
@@ -71,10 +50,9 @@ function _createBlock(code, config = {}, validate = false) {
 
   if (instruments) {
     instruments = removeDuplicateInstruments(instruments);
-    block.instruments =
-      instruments
-      |> _Arr.map(validate ? validateKeysAndCreateInstrument : createInstrument)
-      |> _Arr.filter(Boolean);
+    block.instruments = instruments
+      .map(validate ? validateKeysAndCreateInstrument : createInstrument)
+      .filter(Boolean);
   }
 
   if (name) {

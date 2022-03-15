@@ -28,7 +28,7 @@
   // Utils
   import { getSession } from 'sessionmanager';
   import { getAnimationOptions } from 'svelte-utils';
-  import { getCustomerDetails } from 'common/helpers/customer';
+  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 
   import { Events, MiscEvents } from 'analytics';
   import { activeRoute } from 'one_click_checkout/routing/store';

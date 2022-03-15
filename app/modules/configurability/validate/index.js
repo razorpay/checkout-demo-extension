@@ -6,7 +6,7 @@ const PAYMENT_VALIDATORS = {
       return true;
     }
 
-    return _Arr.contains(instrument.banks, payment.bank);
+    return instrument.banks.includes(payment.bank);
   },
 
   wallet: (payment, instrument) => {
@@ -14,7 +14,7 @@ const PAYMENT_VALIDATORS = {
       return true;
     }
 
-    return _Arr.contains(instrument.wallets, payment.wallet);
+    return instrument.wallets.includes(payment.wallet);
   },
 
   // Also used for paylater
@@ -23,7 +23,7 @@ const PAYMENT_VALIDATORS = {
       return true;
     }
 
-    return _Arr.contains(instrument.providers, payment.provider);
+    return instrument.providers.includes(payment.provider);
   },
 
   upi: (payment, instrument) => {
@@ -38,19 +38,19 @@ const PAYMENT_VALIDATORS = {
     const isIntentPayment = !isQrPayment && payment['_[flow]'] === 'intent';
 
     if (isVpaPayment) {
-      return _Arr.contains(flows, 'collect');
+      return flows.includes('collect');
     }
 
     if (isQrPayment) {
-      return _Arr.contains(flows, 'qr');
+      return flows.includes('qr');
     }
 
-    if (isIntentPayment && _Arr.contains(flows, 'intent')) {
+    if (isIntentPayment && flows.includes('intent')) {
       if (!apps) {
         return true;
       }
 
-      return _Arr.contains(apps, payment['_[app]']);
+      return apps.includes(payment['_[app]']);
     }
 
     return false;

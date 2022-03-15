@@ -38,8 +38,8 @@
       const countryA = a.country;
       const countryB = b.country;
 
-      const hasA = _Arr.contains(orderOfCountries, countryA);
-      const hasB = _Arr.contains(orderOfCountries, countryB);
+      const hasA = orderOfCountries.includes(countryA);
+      const hasB = orderOfCountries.includes(countryB);
 
       if (hasA && hasB) {
         const indexA = orderOfCountries.indexOf(countryA);

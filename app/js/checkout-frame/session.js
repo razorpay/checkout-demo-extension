@@ -1011,10 +1011,7 @@ Session.prototype = {
       // We're currently bypassing prefill check for emandate and nach.
       // TODO: We'll need to fix this
       var methodsToBypassCheckFor = ['emandate', 'nach'];
-      var bypassMethodCheck = _Arr.contains(
-        methodsToBypassCheckFor,
-        usableMethod
-      );
+      var bypassMethodCheck = methodsToBypassCheckFor.includes(usableMethod);
 
       // Go to homescreen if prefilled method is unusable
       if (!bypassMethodCheck && !MethodStore.isMethodUsable(usableMethod)) {
@@ -2822,12 +2819,13 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(
-          MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOffer),
-          function (p) {
-            return p.duration === emiDuration;
-          }
-        );
+        var plan = MethodStore.getEMIBankPlans(
+          bank,
+          'credit',
+          !isEmiOffer
+        ).find(function (p) {
+          return p.duration === emiDuration;
+        });
         if (
           plan &&
           offer.id &&
@@ -3578,7 +3576,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3698,7 +3696,7 @@ Session.prototype = {
         },
 
         select: function (value, contact) {
-          var plan = _Arr.find(plans, function (p) {
+          var plan = plans.find(function (p) {
             return p.duration === value;
           });
           EmiStore.selectedPlan.set(plan);
@@ -3782,7 +3780,7 @@ Session.prototype = {
         },
 
         select: function (value) {
-          var plan = _Arr.find(plans, function (plan) {
+          var plan = plans.find(function (plan) {
             return plan.duration === value;
           });
 
@@ -3903,17 +3901,14 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(
-          [
-            '#form-upi',
-            '#form-card',
-            '#form-wallet',
-            '#form-emandate',
-            '#form-upi_otm',
-            '#form-international',
-          ],
-          activeForm
-        )
+        ![
+          '#form-upi',
+          '#form-card',
+          '#form-wallet',
+          '#form-emandate',
+          '#form-upi_otm',
+          '#form-international',
+        ].includes(activeForm)
       ) {
         fillData(activeForm, data);
       }
@@ -3957,7 +3952,17 @@ Session.prototype = {
 
       // For a QR Payment in 1CC Flow, set the amount.
       if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
-        data.amount = this.payload.amount;
+        var offer = this.getAppliedOffer();
+        var hasDiscount = offer && offer.amount !== offer.original_amount;
+
+        if (this.payload && this.payload.amount) {
+          data.amount = this.payload.amount;
+        } else if (hasDiscount) {
+          data.amount =
+            this.get('amount') + storeGetter(discreet.ChargesStore.offerAmount);
+        } else {
+          data.amount = this.get('amount');
+        }
       }
 
       if (this.screen === 'wallet') {
@@ -5054,9 +5059,7 @@ Session.prototype = {
     // [ANALYTICS]
     if (data && data.method === 'upi') {
       trackUpiIntentInstrumentPaymentAttempted(
-        discreet.storeGetter(
-          UpiScreenStore.intentVpaPrefilledFromPersonalisation
-        )
+        discreet.storeGetter(UpiScreenStore.intentVpaPrefilledFromPreferences)
       );
     }
 
@@ -5600,7 +5603,14 @@ Session.prototype = {
           AVSData.country = AVSData._country;
           delete AVSData._country;
         }
-        data.billing_address = AVSData;
+        data.billing_address = {
+          city: AVSData.city,
+          country: AVSData.country,
+          line1: AVSData.line1,
+          line2: AVSData.line2,
+          postal_code: AVSData.postal_code,
+          state: AVSData.state,
+        };
         Analytics.track('card:avsdata', {
           data: AVSData,
         });

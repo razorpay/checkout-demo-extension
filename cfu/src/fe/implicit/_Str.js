@@ -71,9 +71,9 @@ export const endsWith = _.curry2(
  * @returns {string}
  */
 export function toTitleCase(sentence) {
-  const words = _Arr.map(sentence.split(' '), (word) => {
+  const words = sentence.split(' ').map((word) => {
     return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
   });
 
-  return _Arr.join(words, ' ');
+  return words.join(' ');
 }

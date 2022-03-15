@@ -6,15 +6,9 @@ import {
   hiddenMethods,
   hiddenInstruments,
 } from 'checkoutstore/screens/home';
-import {
-  updateBlocksForExperiments,
-  filterAndSlotUpiAndSavedCardInstruments,
-} from './helpers';
+import { updateBlocksForExperiments } from './helpers';
 import { get as storeGetter } from 'svelte/store';
-import {
-  MAX_PREFERRED_INSTRUMENTS,
-  MAX_PREFERRED_INSTRUMENTS_FOR_UPI_AND_CARD,
-} from 'common/constants';
+import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
@@ -24,7 +18,6 @@ import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { getAppFromPackageName } from 'common/upi';
-import { upiAndCardOnlyPreferredMethods } from 'checkoutframe/personalization/experiments';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -56,8 +49,7 @@ function isP13nInstrumentHiddenViaConfig(
 
   // For every individual p13n instrument, check if any hidden
   // instruments are present.
-  return !_Arr.every(
-    individualInstruments,
+  return !individualInstruments.every(
     (individualInstrument) =>
       !hiddenInstruments.some((hiddenInstrument) =>
         areInstrumentsSame(hiddenInstrument, individualInstrument)
@@ -101,7 +93,7 @@ function genericInstrumentComparator(a, b) {
  * @returns {boolean}
  */
 function shouldAllowPreferredInstrument(preferred, instruments) {
-  return _Arr.every(instruments, (instrument) => {
+  return instruments.every((instrument) => {
     if (preferred.method !== instrument.method) {
       return true;
     }
@@ -124,8 +116,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific banks to be shown?
         if (hasBanks) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.bank === preferred.banks[0]
           );
         }
@@ -138,8 +129,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific wallets to be shown?
         if (hasWallets) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.wallet === preferred.wallets[0]
           );
         }
@@ -167,8 +157,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // If there are any apps, check if the app matches
         if (preferredHasApps && instrumentHasApps) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.app === preferred.apps[0]
           );
         }
@@ -176,11 +165,9 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         // If there are any flows, check if the flows match and is invidiual flow
         if (instrumentHasFlows) {
           const individualFlows = ['qr'];
-
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) =>
-              _Arr.contains(individualFlows, ungrouped.flow) &&
+              individualFlows.includes(ungrouped.flow) &&
               ungrouped.flow === preferred.flows[0]
           );
         }
@@ -194,8 +181,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific providers to be shown?
         if (hasProviders) {
-          return _Arr.none(
-            instrument._ungrouped,
+          return !instrument._ungrouped.some(
             (ungrouped) => ungrouped.provider === preferred.providers[0]
           );
         }
@@ -235,22 +221,15 @@ export function setBlocks(
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  const FINAL_PREFERRED_INSTRUMENTS_COUNT =
-    upiAndCardOnlyPreferredMethods.enabled()
-      ? MAX_PREFERRED_INSTRUMENTS_FOR_UPI_AND_CARD
-      : MAX_PREFERRED_INSTRUMENTS;
-
   // Remove rzp block instruments and method instruments
-  const shownIndividualInstruments =
-    parsedConfig.display.blocks
-    |> _Arr.filter((block) => block.code !== 'rzp.cluster')
-    |> _Arr.flatMap((block) => {
-      return _Arr.filter(
-        block.instruments,
+  const shownIndividualInstruments = parsedConfig.display.blocks
+    .filter((block) => block.code !== 'rzp.cluster')
+    .flatMap((block) =>
+      block.instruments.filter(
         (instrument) => instrument._ungrouped.length === 1
-      );
-    })
-    |> _Arr.filter((instrument) => !isInstrumentForEntireMethod(instrument));
+      )
+    )
+    .filter((instrument) => !isInstrumentForEntireMethod(instrument));
 
   // show_default_blocks defaults to true
   const show_default_blocks = _Obj.getSafely(
@@ -271,22 +250,20 @@ export function setBlocks(
   if (addPreferredInstrumentsBlock) {
     if (showPreferredLoader) {
       preferredBlock.instruments = makeLoaderInstruments(
-        FINAL_PREFERRED_INSTRUMENTS_COUNT
+        MAX_PREFERRED_INSTRUMENTS
       );
     } else {
       const preferredInstruments = preferredBlock.instruments;
 
       // Filter out all preferred methods whose methods are asked to be hidden
-      let filteredPreferredInstruments = _Arr.filter(
-        preferredInstruments,
+      let filteredPreferredInstruments = preferredInstruments.filter(
         (preferredInstrument) => {
           return isMethodUsable(preferredInstrument.method);
         }
       );
 
       // Filter out all preferred instruments which are hidden using hide in config
-      filteredPreferredInstruments = _Arr.filter(
-        filteredPreferredInstruments,
+      filteredPreferredInstruments = filteredPreferredInstruments.filter(
         (instrument) =>
           !isP13nInstrumentHiddenViaConfig(
             instrument,
@@ -296,32 +273,24 @@ export function setBlocks(
       );
 
       // Filter out all preferred methods that are already being shown by the merchant
-      filteredPreferredInstruments = _Arr.filter(
-        filteredPreferredInstruments,
+      filteredPreferredInstruments = filteredPreferredInstruments.filter(
         (instrument) =>
           shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
       );
 
-      if (upiAndCardOnlyPreferredMethods.enabled()) {
-        filteredPreferredInstruments = filterAndSlotUpiAndSavedCardInstruments(
-          filteredPreferredInstruments
-        );
-      }
-
       // Take top 3 preferred
       preferredBlock.instruments = filteredPreferredInstruments.slice(
         0,
-        FINAL_PREFERRED_INSTRUMENTS_COUNT
+        MAX_PREFERRED_INSTRUMENTS
       );
 
       // Convert preferred instruments to ungrouped format
-      preferredBlock.instruments = _Arr.map(
-        preferredBlock.instruments,
+      preferredBlock.instruments = preferredBlock.instruments.map(
         (instrument) => getIndividualInstruments(instrument, customer)
       );
     }
 
-    allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
+    allBlocks = [preferredBlock].concat(allBlocks);
   }
 
   // if walnut 369 is highlight in block
@@ -430,7 +399,7 @@ function generateInstrumentId(
  * @returns {Block|undefined}
  */
 function getInstrumentBlock(instrument, blocks) {
-  return _Arr.find(blocks, (block) => {
+  return blocks.find((block) => {
     return block.instruments.some(
       (blockInstrument) => blockInstrument.id === instrument.id
     );
@@ -452,7 +421,7 @@ export function getInstrumentMeta(instrument) {
   if (block) {
     // All indices should be one-indexed
 
-    meta.indexOfBlock = _Arr.indexOf(allBlocks, block) + 1;
+    meta.indexOfBlock = allBlocks.indexOf(block) + 1;
 
     meta.indexInBlock =
       block.instruments.findIndex(

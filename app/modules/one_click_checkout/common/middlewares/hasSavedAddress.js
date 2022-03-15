@@ -1,4 +1,7 @@
-import { getCustomerDetails, isUserLoggedIn } from 'common/helpers/customer';
+import {
+  getCustomerDetails,
+  isUserLoggedIn,
+} from 'one_click_checkout/common/helpers/customer';
 import otpEvents from 'ui/tabs/otp/analytics';
 import { Events } from 'analytics';
 import { get } from 'svelte/store';

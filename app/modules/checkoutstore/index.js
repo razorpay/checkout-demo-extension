@@ -68,11 +68,11 @@ export function isSiftJSEnabled() {
 }
 
 export function isContactOptional() {
-  return preferences.optional || [] |> _Arr.contains('contact');
+  return (preferences.optional || []).includes('contact');
 }
 
 export function isEmailOptional() {
-  return preferences.optional || [] |> _Arr.contains('email');
+  return (preferences.optional || []).includes('email');
 }
 
 export function getOptionalObject() {

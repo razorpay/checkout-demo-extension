@@ -22,10 +22,7 @@ export function getEligibleBanksBasedOnMinAmount(amount, banks) {
 
   _Obj.loop(banks, (plans, bank) => {
     if (getEMIBank(bank)) {
-      const eligiblePlans = _Arr.filter(
-        plans,
-        (plan) => plan.min_amount <= amount
-      );
+      const eligiblePlans = plans.filter((plan) => plan.min_amount <= amount);
 
       if (eligiblePlans.length) {
         eligible[bank] = eligiblePlans.reduce((o, plan) => {

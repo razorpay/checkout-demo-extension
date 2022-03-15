@@ -63,10 +63,9 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
     // Keep in order that we want to display
     const APPS_ORDER = ['cred', 'google_pay'];
     // Get the app names to show
-    const apps =
-      APPS_ORDER
-      |> _Arr.filter((app) => _Arr.contains(availableApps, app))
-      |> _Arr.map((app) => getRawMethodTitle(app, locale));
+    const apps = APPS_ORDER.filter((app) => availableApps.includes(app)).map(
+      (app) => getRawMethodTitle(app, locale)
+    );
 
     const credit = isCreditCardEnabled();
     const debit = isDebitCardEnabled();
@@ -100,10 +99,9 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
     const networksFromPrefs = getCardNetworks();
 
     // Get the network names to show
-    const networks =
-      NW_ORDER
-      |> _Arr.filter((network) => Boolean(networksFromPrefs[network]))
-      |> _Arr.map((network) => getNetworkName(network, locale));
+    const networks = NW_ORDER.filter((network) =>
+      Boolean(networksFromPrefs[network])
+    ).map((network) => getNetworkName(network, locale));
 
     return generateTextFromList(networks, locale, 4);
   }
@@ -221,8 +219,7 @@ export function getMethodDescription(method, locale) {
 
 export function getEMIBanksText(locale) {
   const emiBanks = getEMIBanks();
-  const bankNames =
-    emiBanks |> _Obj.keys |> _Arr.map((bank) => emiBanks[bank].name);
+  const bankNames = _Obj.keys(emiBanks).map((bank) => emiBanks[bank].name);
   // Here 15 is the number of banks in the store in banks.js
   // To Do: Do we really need to show list of 15 banks
   return generateTextFromList(bankNames, locale, 15);
@@ -305,7 +302,7 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
       hasQr = qrEnabled;
 
       if (qrEnabled && hasInstrument) {
-        hasQr = _Arr.contains(extra.instrument.flows || [], 'qr');
+        hasQr = (extra.instrument.flows || []).includes('qr');
       }
 
       if (hasQr) {
@@ -357,7 +354,7 @@ export function getMethodDowntimeDescription(
 
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = availableMethods.some(
-    (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
+    (enabledMethod) => !downMethods.includes(enabledMethod)
   );
 
   // If there's another method available, ask user to select it.

@@ -1,4 +1,5 @@
 import { createMethodBlock } from './methods';
+import { getUniqueValues } from 'utils/array';
 
 /**
  * Transforms the list of blocks into the order defined in the
@@ -28,21 +29,20 @@ export function getSequencedBlocks(params) {
   } = preferences;
 
   // Get the methods to list
-  const methodsToList = _Arr.filter(
-    methods,
-    (method) => !_Arr.contains(hide.methods, method)
+  const methodsToList = methods.filter(
+    (method) => !hide.methods.includes(method)
   );
 
   // Create a method block for all listed methods
-  const methodBlocks = _Arr.map(methodsToList, createMethodBlock);
+  const methodBlocks = methodsToList.map(createMethodBlock);
 
   if (show_default_blocks) {
     // Extend the given sequence with our default sequence
-    sequence = _Arr.mergeWith(sequence, methodsToList);
+    sequence = sequence.concat(methodsToList);
   }
 
   // Filter the sequence for duplicates
-  sequence = _Arr.removeDuplicates(sequence);
+  sequence = getUniqueValues(sequence);
 
   // Copy the sequence
   const exhaustiveSequence = _Obj.clone(sequence);
@@ -59,12 +59,9 @@ export function getSequencedBlocks(params) {
    * Whichever of "emi" or "cardless_emi" is present first in the sequence,
    * lets put "cardless_emi" at that place. And remove "emi" altogether.
    */
-  if (
-    _Arr.contains(sequence, 'cardless_emi') &&
-    _Arr.contains(sequence, 'emi')
-  ) {
-    let indexOfEmi = _Arr.indexOf(sequence, 'emi');
-    let indexOfCardlessEmi = _Arr.indexOf(sequence, 'cardless_emi');
+  if (sequence.includes('cardless_emi') && sequence.includes('emi')) {
+    let indexOfEmi = sequence.indexOf('emi');
+    let indexOfCardlessEmi = sequence.indexOf('cardless_emi');
 
     if (indexOfEmi < indexOfCardlessEmi) {
       /**
@@ -89,10 +86,9 @@ export function getSequencedBlocks(params) {
   const allBlocks = blocks.concat(methodBlocks);
 
   // Get blocks mentioned in the sequence
-  const sequencedBlocks =
-    sequence
-    |> _Arr.map((code) => _Arr.find(allBlocks, (block) => block.code === code))
-    |> _Arr.filter(Boolean);
+  const sequencedBlocks = sequence
+    .map((code) => allBlocks.find((block) => block.code === code))
+    .filter(Boolean);
 
   return {
     blocks: sequencedBlocks,

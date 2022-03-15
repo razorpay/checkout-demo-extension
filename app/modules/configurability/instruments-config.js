@@ -26,9 +26,9 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   // Add a token
   if (instrument.token_id && customer) {
-    const token =
-      _Obj.getSafely(customer, 'tokens.items', [])
-      |> _Arr.find((token) => token.id === instrument.token_id);
+    const token = _Obj
+      .getSafely(customer, 'tokens.items', [])
+      .find((token) => token.id === instrument.token_id);
 
     if (token) {
       payment.token = token.token;
@@ -68,13 +68,13 @@ function createCombinations(instrument, sequence = []) {
 
     // If nothing has been pushed so far, this is the first key to be pushed
     if (soFar.length === 0) {
-      soFar = _Arr.map(values, (value) => ({
+      soFar = values.map((value) => ({
         [singularKey]: value,
       }));
     } else {
       // Things have already been pushed so far, extend existing objects
-      const _soFar = _Arr.flatMap(values, (value) => {
-        return _Arr.map(soFar, (s) =>
+      const _soFar = values.flatMap((value) => {
+        return soFar.map((s) =>
           _Obj.extend(
             {
               [singularKey]: value,
@@ -108,7 +108,7 @@ const config = {
 
       if (grouped.token_id) {
         const token_id = grouped.token_id;
-        const token = _Arr.find(tokens, (token) => token.id === token_id);
+        const token = tokens.find((token) => token.id === token_id);
 
         if (token) {
           let instrumentFromToken = [
@@ -134,9 +134,7 @@ const config = {
         'iins',
       ]);
 
-      return _Arr.map(combinations, (combination) =>
-        _Obj.extend(combination, base)
-      );
+      return combinations.map((combination) => _Obj.extend(combination, base));
     },
     isValid: (instrument) => {
       if (instrument.token_id) {
@@ -169,7 +167,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.banks;
 
-      return _Arr.map(grouped.banks || [], (bank) => {
+      return (grouped.banks || []).map((bank) => {
         return _Obj.extend(
           {
             bank,
@@ -189,7 +187,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.wallets;
 
-      return _Arr.map(grouped.wallets || [], (wallet) => {
+      return (grouped.wallets || []).map((wallet) => {
         return _Obj.extend(
           {
             wallet,
@@ -239,9 +237,9 @@ const config = {
         apps = grouped.apps;
       }
 
-      if (_Arr.contains(flows, 'collect')) {
+      if (flows.includes('collect')) {
         if (vpas.length) {
-          let individualInstruments = _Arr.map(vpas, (vpa) => {
+          let individualInstruments = vpas.map((vpa) => {
             let individual = _Obj.extend(
               {
                 vpa,
@@ -253,7 +251,7 @@ const config = {
             if (grouped.token_id) {
               const token_id = grouped.token_id;
 
-              const token = _Arr.find(tokens, (token) => token.id === token_id);
+              const token = tokens.find((token) => token.id === token_id);
 
               if (token) {
                 individual.token_id = token_id;
@@ -263,13 +261,13 @@ const config = {
             return individual;
           });
 
-          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+          ungrouped = ungrouped.concat(individualInstruments);
         }
       }
 
-      if (_Arr.contains(flows, 'intent')) {
+      if (flows.includes('intent')) {
         if (apps.length) {
-          let individualInstruments = _Arr.map(apps, (app) =>
+          let individualInstruments = apps.map((app) =>
             _Obj.extend(
               {
                 app,
@@ -279,13 +277,13 @@ const config = {
             )
           );
 
-          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+          ungrouped = ungrouped.concat(individualInstruments);
         }
       }
 
       if (flows.length > 0) {
-        let individualInstruments =
-          _Arr.map(flows, (flow) => {
+        let individualInstruments = flows
+          .map((flow) => {
             let individual = _Obj.extend(
               {
                 flow,
@@ -304,9 +302,10 @@ const config = {
             }
 
             return individual;
-          }) |> _Arr.filter(Boolean);
+          })
+          .filter(Boolean);
 
-        ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        ungrouped = ungrouped.concat(individualInstruments);
       }
 
       return ungrouped;
@@ -361,7 +360,7 @@ const config = {
           return false;
         }
 
-        if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
+        if (!hasFlows || !instrument.flows.includes('intent')) {
           return false;
         }
       }
@@ -377,7 +376,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], (provider) => {
+      return (grouped.providers || []).map((provider) => {
         return _Obj.extend(
           {
             provider,
@@ -397,7 +396,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], (provider) => {
+      return (grouped.providers || []).map((provider) => {
         return _Obj.extend(
           {
             provider,
@@ -417,7 +416,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], (provider) => {
+      return (grouped.providers || []).map((provider) => {
         return _Obj.extend(
           {
             provider,
@@ -436,7 +435,7 @@ const config = {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], (provider) => {
+      return (grouped.providers || []).map((provider) => {
         return _Obj.extend(
           {
             provider,

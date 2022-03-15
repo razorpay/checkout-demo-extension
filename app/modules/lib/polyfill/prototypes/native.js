@@ -13,17 +13,6 @@
 })();
 
 /**
- * Polyfill for Array.prototype.includes
- */
-(function () {
-  if (!Array.prototype.includes) {
-    Array.prototype.includes = function () {
-      return Array.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-  }
-})();
-
-/**
  * Polyfill for String.prototype.startsWith
  */
 (function () {
@@ -265,24 +254,18 @@ if (!global.alert.name) {
 }
 
 /**
- * Polyfill for Array.prototype.findIndex
- * Source: https://github.com/jsPolyfill/Array.prototype.findIndex/blob/master/findIndex.js
+ * Array.prototype.filter
  */
 (function () {
-  if (!Array.prototype.findIndex) {
-    Array.prototype.findIndex = function (callback) {
-      if (typeof callback !== 'function') {
-        throw new TypeError('callback must be a function');
-      }
+  if (!Array.prototype.filter) {
+    Array.prototype.filter = function (cb) {
+      const filtered = [],
+        size = this.length;
 
-      var thisVal = arguments[1] || this;
-      for (var i = 0; i < this.length; i++) {
-        if (callback.call(thisVal, this[i], i, this)) {
-          return i;
-        }
+      for (let i = 0; i < size; i++) {
+        if (cb(this[i], i, this)) filtered.push(this[i]);
       }
-
-      return -1;
+      return filtered;
     };
   }
 })();

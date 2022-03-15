@@ -7,7 +7,7 @@ import { newUserAddress } from 'one_click_checkout/address/shipping_address/stor
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 
 // Helper imports
-import { isUserLoggedIn } from 'common/helpers/customer';
+import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import {
   postCustomerAddress,

@@ -81,7 +81,7 @@
         threshold: -100,
       });
 
-      const finalResult = _Arr.map(results, (result) => result.ref);
+      const finalResult = results.map((result) => result.ref);
       if (typeof sortSearchResult === 'function') {
         finalResult.sort(sortSearchResult);
       }
@@ -93,7 +93,7 @@
 
   $: items, query, keys, (results = getResults(query, items));
   $: results, (focusedIndex = results.length ? 0 : null);
-  $: shownItems = _Arr.mergeWith(results, items);
+  $: shownItems = results.concat(items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
   $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
 
@@ -275,7 +275,7 @@
 
     const key = _.getKeyFromEvent(event);
 
-    if (!_Arr.contains(handleKeys, key)) {
+    if (!handleKeys.includes(key)) {
       return;
     }
 

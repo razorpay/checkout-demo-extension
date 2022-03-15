@@ -29,9 +29,9 @@
   $: title = getTitleFromInstruments(block.instruments, $locale);
 
   function getTitleFromInstruments(instruments, locale) {
-    const methods = _Arr.map(instruments, (instrument) => instrument.method);
+    const methods = instruments.map((instrument) => instrument.method);
 
-    const blockNames = _Arr.map(methods, (method) =>
+    const blockNames = methods.map((method) =>
       getTranslatedMethodPrefix(method, locale)
     );
 

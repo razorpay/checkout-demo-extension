@@ -185,6 +185,7 @@
             id={`nvs-${subInput.id}`}
             name={`nvs-${subInput.id}`}
             type="text"
+            autocomplete="donot-autocomplete"
             leftImage={subInput.id === 'country' && formData._country
               ? `https://cdn.razorpay.com/country-flags/${formData._country}.svg`
               : ''}
@@ -212,6 +213,7 @@
           id={`nvs-${input.id}`}
           name={`nvs-${input.id}`}
           type="text"
+          autocomplete="donot-autocomplete"
           required={input.required}
           on:click={input.type === 'search'
             ? openSearchModal.bind(null, input.id)
@@ -243,7 +245,7 @@
     title={searchModalState.title || ''}
     placeholder={searchModalState.placeholder || ''}
     all={searchModalState.all}
-    autocomplete="country"
+    autocomplete="donot-autocomplete"
     items={searchModalState.data || []}
     keys={searchModalState.keys || ['label']}
     component={CountrySearchItem}

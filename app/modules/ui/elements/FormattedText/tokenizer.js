@@ -41,7 +41,7 @@ export const tokenizeTextForFormatters = (text) => {
   formatters.forEach((formatter) => {
     _tokenized = _tokenized.reduce((pV, cV) => {
       if (cV.type === 'plain') {
-        return _Arr.mergeWith(pV, tokenizeTextForFormatter(cV.text, formatter));
+        return pV.concat(tokenizeTextForFormatter(cV.text, formatter));
       }
       pV.push(cV);
       return pV;

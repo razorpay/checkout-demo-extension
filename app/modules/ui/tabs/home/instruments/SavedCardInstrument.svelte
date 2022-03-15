@@ -63,8 +63,7 @@
   let cardKnown = false;
 
   const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
-  const savedCard = _Arr.find(
-    savedCards,
+  const savedCard = savedCards.find(
     (card) => card.id === individualInstrument.token_id
   );
 

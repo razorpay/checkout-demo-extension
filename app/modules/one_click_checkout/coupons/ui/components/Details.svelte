@@ -29,9 +29,7 @@
   // utils imports
   import { isIndianCustomer } from 'checkoutstore';
   import { askForOTP } from 'one_click_checkout/common/otp';
-  import { isUserLoggedIn } from 'common/helpers/customer';
-
-  // constant imports
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
 

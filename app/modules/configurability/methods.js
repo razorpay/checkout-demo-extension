@@ -59,5 +59,5 @@ export function clusterRazorpayBlocks(blocks) {
   // Push any pending clusters
   checkAndPushCluster();
 
-  return _Arr.map(clustered, ungroupInstruments);
+  return clustered.map(ungroupInstruments);
 }

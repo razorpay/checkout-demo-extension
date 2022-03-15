@@ -47,7 +47,7 @@ import * as Token from 'common/token';
 import * as Apps from 'common/apps';
 import * as SessionManager from 'sessionmanager';
 import updateScore from 'analytics/checkoutScore';
-import { trackUpiIntentInstrumentPaymentAttempted } from 'upi/helper/highlight-upi-intent';
+import { trackUpiIntentInstrumentPaymentAttempted } from 'analytics/highlightUpiIntentAnalytics';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';

@@ -21,9 +21,9 @@
 
   // Helpers import
   import { determineLandingView } from 'one_click_checkout/helper';
-  import { getCustomerDetails } from 'common/helpers/customer';
+  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 
-  // session imports
+  // svelte imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 

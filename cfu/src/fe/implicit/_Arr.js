@@ -77,17 +77,6 @@ export const none = _.curry2((arr, evalutor) => !any(arr, evalutor));
 export const map = arrayCall('map');
 
 /**
- * Maps each element using a mapping function and flattens the
- * result into a new array.
- * @param {Array} arr
- * @param {function (item: *): Array} mapper
- * @returns {Array}
- */
-export const flatMap = _.curry2((arr, mapper) => {
-  return arr |> map(mapper) |> reduce(mergeWith, []);
-});
-
-/**
  * Returns a new array consisting of elements
  * from the orignal array that pass
  * the filter.
@@ -137,41 +126,6 @@ export const contains = _.curry2(
 );
 
 /**
- * Returns the index of the first item in an array
- * for which iteratee evaluates to true.
- * @param {Array} arr
- * @param {function (item: *): boolean} iteratee
- *  @param {Any} item
- *  @returns {boolean}
- *
- * @returns {number}
- */
-export const findIndex = _.curry2((arr, iteratee) => {
-  let arrayLen = _.lengthOf(arr);
-  for (let i = 0; i < arrayLen; i++) {
-    if (iteratee(arr[i], i, arr)) {
-      return i;
-    }
-  }
-  return -1;
-});
-
-/**
- * Returns the first item in an array
- * for which iteratee evaluates to true.
- * @param {Array} arr
- * @param {function (item: *): boolean} iteratee
- *
- * @returns {Any}
- */
-export const find = _.curry2((arr, iteratee) => {
-  let index = findIndex(arr, iteratee);
-  if (index >= 0) {
-    return arr[index];
-  }
-});
-
-/**
  * Prepends an item to an array.
  * @param {Array} array
  * @param {Any} member
@@ -217,31 +171,6 @@ export const first = (array) => array[0];
 export const last = (array) => array[_.lengthOf(array) - 1];
 
 /**
- * Returns a subarray from the array.
- * @param {Array} array
- * @param {number} from Initial index, included in the result
- * @param {number} to Last index, not included in the result
- *
- * @returns {Array}
- */
-export const slice = _.curry3((array, from, to) =>
-  protoSlice.call(array, from, to)
-);
-
-/**
- * Returns a subarray from the array
- * starting from the provided index,
- * till the end of the array
- * @param {Array} array
- * @param {number} from Initial index, included in the result
- *
- * @returns {Array}
- */
-export const sliceFrom = _.curry2((array, from) =>
-  protoSlice.call(array, from)
-);
-
-/**
  * Array.prototype.reduce
  * @param {Array} array
  * @param {function (accumulator: *, currentValue: *): *} reducer
@@ -252,75 +181,3 @@ export const sliceFrom = _.curry2((array, from) =>
 export const reduce = _.curry3((array, reducer, initialValue) =>
   proto.reduce.call(array, reducer, initialValue)
 );
-
-/**
- * Merges array1 into array2.
- * Result: [...array2, ...array2]
- * @param {Array} arr1
- * @param {Array} arr2
- *
- * @returns {Array}
- */
-export const merge = _.curry2((arr1, arr2) => {
-  const arr2Len = _.lengthOf(arr2);
-  var combinedArray = Array(arr2Len + _.lengthOf(arr1));
-  loop(arr2, (member, index) => (combinedArray[index] = member));
-  loop(arr1, (member, index) => (combinedArray[index + arr2Len] = member));
-  return combinedArray;
-});
-
-/**
- * Merges array1 with array2.
- * Result: [...array1, ...array2]
- * @param {Array} arr1
- * @param {Array} arr2
- *
- * @returns {Array}
- */
-export const mergeWith = _.curry2((arr1, arr2) => {
-  return merge(arr2, arr1);
-});
-
-/**
- * Inserts (pushes) an element in the array
- * at the given index.
- * @param {Array} array
- * @param {*} item
- * @param {number} index
- *
- * @returns {Array}
- */
-export const insertAt = _.curry3((array, item, index) => {
-  if (index > array.length - 1) {
-    const inserted = sliceFrom(array, 0);
-    inserted[index] = item;
-
-    return inserted;
-  } else {
-    const first = slice(array, 0, index);
-    const middle = [item];
-    const end = sliceFrom(array, index);
-
-    return first |> mergeWith(middle) |> mergeWith(end);
-  }
-});
-
-/**
- * Returns a new array with duplicates removed. Uses equality comparison to
- * check for duplicates.
- *
- * @param {Array} array
- *
- * @returns {Array}
- */
-export const removeDuplicates = (array) =>
-  reduce(
-    array,
-    (result, item) => {
-      if (!contains(result, item)) {
-        result.push(item);
-      }
-      return result;
-    },
-    []
-  );

@@ -93,7 +93,7 @@
   };
   const accountTypes = _Obj.keys(accountTextLabels);
 
-  if (!_Arr.contains(accountTypes, prefilledAccountType)) {
+  if (!accountTypes.includes(prefilledAccountType)) {
     prefilledAccountType = '';
   }
 
