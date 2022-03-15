@@ -54,7 +54,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
-  import { handleEditContact as handleOneCCEditContact } from 'one_click_checkout/sessionInterface';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
@@ -66,7 +65,6 @@
   import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
@@ -93,8 +91,6 @@
   if (Safari) {
     autoCompleteMethod = 'one-time-code';
   }
-
-  const { edit_paper } = session.themeMeta.icons;
 
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.
@@ -218,14 +214,6 @@
           <div class="otp-title">
             {#if $isRazorpayOTP && isOneClickCheckout()}
               {@html getOtpScreenTitle($textView, $templateData, $locale)}
-              {#if $textView}
-                <span
-                  class="edit-contact-btn"
-                  on:click={() => handleOneCCEditContact()}
-                >
-                  <Icon icon={edit_paper} />
-                </span>
-              {/if}
             {:else}
               {getOtpScreenTitle($textView, $templateData, $locale)}
             {/if}

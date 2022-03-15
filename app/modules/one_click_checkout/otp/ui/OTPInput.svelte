@@ -147,7 +147,7 @@
     text-align: center;
   }
 
-  .otp-error {
+  #otp-input .otp-error {
     border-color: #b21528;
   }
 
