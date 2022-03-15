@@ -228,12 +228,7 @@
             </div>
           {/if}
         {/if}
-
-        <OTPInput
-          --color={getTheme().backgroundColor}
-          hidden={!showInput}
-          isError={$errorMessage}
-        />
+        <OTPInput hidden={!showInput} isError={$errorMessage} />
       </div>
 
       <div class="error-message" class:hidden={!showInput}>

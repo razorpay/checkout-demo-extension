@@ -25,7 +25,6 @@
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { isOneClickCheckout, showFeeLabel } from 'checkoutstore/index.js';
   import { isRecurring } from 'razorpay';
-  import { getThemeColor } from 'checkoutstore/theme';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -300,11 +299,7 @@
         <!-- LABEL: Please enter the OTP -->
 
         {#if $isRazorpayOTP && isOneClickCheckout()}
-          <OtpInput
-            hidden={!showInput}
-            --color={getThemeColor()}
-            isError={$errorMessage}
-          />
+          <OtpInput hidden={!showInput} isError={$errorMessage} />
         {:else}
           <div
             id="otp-elem"
