@@ -250,11 +250,13 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            callback(
-              isOneClickCheckout()
-                ? format('otp.title.incorrect_otp_retry_one_cc')
-                : format('otp.title.incorrect_otp_retry')
-            );
+            var errorMsg = '';
+            if (isOneClickCheckout()) {
+              errorMsg = 'otp.title.incorrect_otp_retry_one_cc';
+            } else {
+              errorMsg = 'otp.title.incorrect_otp_retry';
+            }
+            callback(errorMsg);
           }
         } else {
           callback(undefined, data);

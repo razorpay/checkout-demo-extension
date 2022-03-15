@@ -627,7 +627,7 @@ function askOTP(
     digits: new Array(storeGetter(discreet.OTPScreenStore.maxlength)),
     otp: '',
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-    errorMessage,
+    errorMessage: errorMessage,
     isRazorpayOTP: !!isRazorpayOTP,
   };
   if (Store.isASubscription()) {
@@ -651,10 +651,9 @@ function askOTP(
 
   $('#body').addClass('sub');
 
-  const isOneCCOtpScreen =
-    RazorpayHelper.isOneClickCheckout() &&
-    isRazorpayOTP &&
-    thisSession.tab === 'card';
+  var isOneCC = RazorpayHelper.isOneClickCheckout();
+
+  var isOneCCOtpScreen = isOneCC && isRazorpayOTP && thisSession.tab === 'card';
 
   if (!textView) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
@@ -739,19 +738,17 @@ function askOTP(
         }
       } else {
         if (thisSession.payload) {
-          textView = RazorpayHelper.isOneClickCheckout()
+          textView = isOneCC
             ? 'otp_sent_save_card_one_cc'
             : 'otp_sent_save_card';
         } else {
-          textView = RazorpayHelper.isOneClickCheckout()
+          textView = isOneCC
             ? 'otp_sent_access_card_one_cc'
             : 'otp_sent_access_card';
         }
       }
     } else {
-      textView = RazorpayHelper.isOneClickCheckout()
-        ? 'otp_sent_generic_one_cc'
-        : 'otp_sent_generic';
+      textView = isOneCC ? 'otp_sent_generic_one_cc' : 'otp_sent_generic';
     }
   } else if (isOneCCOtpScreen) {
     if (thisSession.payload) {

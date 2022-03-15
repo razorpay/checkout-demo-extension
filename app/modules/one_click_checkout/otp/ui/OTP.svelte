@@ -142,11 +142,7 @@
       />
     {/if}
     <div class="otp-controls">
-      <div
-        id="otp-prompt"
-        class="otp-header"
-        class:text-start={otpClasses.includes($textView)}
-      >
+      <div id="otp-prompt">
         {#if $headingText}
           <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
             {getOtpScreenHeading($headingText, $templateData, $locale)}
@@ -324,12 +320,8 @@
   }
   .error-message {
     color: #d64052;
-    text-align: start !important;
     margin: 12px 0px;
     font-size: 12px;
-  }
-  .text-start {
-    text-align: start !important;
   }
   .otp-heading {
     margin: 34px 0 26px;
@@ -339,9 +331,10 @@
     font-weight: bold;
   }
 
-  .heading-1cc {
-    margin-top: 0 !important;
+  #form-otp .heading-1cc {
+    margin-top: 0px;
   }
+
   .tab-mg-1cc {
     margin-top: 20px;
   }
@@ -375,7 +368,7 @@
   .tab-content-one-cc {
     margin-top: 0px;
   }
-  .otp-header {
-    margin-bottom: 24px !important;
+  #otp-prompt {
+    margin-bottom: 24px;
   }
 </style>

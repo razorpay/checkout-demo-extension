@@ -474,18 +474,17 @@
     font-weight: bold;
   }
 
-  .heading-1cc {
-    margin-top: 0 !important;
+  #form-otp .heading-1cc {
+    margin-top: 0px;
   }
 
   .error-message {
     color: #d64052;
-    text-align: start !important;
     margin: 12px 0px;
     font-size: 12px;
   }
 
-  .otp-header {
-    margin-bottom: 24px !important;
+  #otp-prompt.otp-header {
+    margin-bottom: 24px;
   }
 </style>
