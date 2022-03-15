@@ -37,6 +37,7 @@ RazorpayDefaults.method = {
   upi_intent: true,
   qr: true,
   bank_transfer: true,
+  offline_challan: true,
   upi_otm: true,
   cod: true,
 };

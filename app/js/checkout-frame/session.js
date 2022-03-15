@@ -3090,6 +3090,8 @@ Session.prototype = {
         discreet.internationalTab.destroy();
         this.internationalTab = null;
       }
+    } else if (this.tab === 'offline_challan') {
+      discreet.offlineChallanTab.destroy();
     } else if (!this.tab) {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
         discreet.ChargesHelper.removeShippingCharges();
@@ -3382,6 +3384,10 @@ Session.prototype = {
 
     if (tab === 'bank_transfer') {
       es6components.bankTransferTab.render();
+    }
+
+    if (tab === 'offline_challan') {
+      discreet.offlineChallanTab.render();
     }
   },
 

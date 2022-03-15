@@ -134,6 +134,9 @@ import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as TrustedBadgeHelper from 'trusted-badge/helper';
 
 import * as SecurityUtils from 'utils/security';
+
+import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
+
 export default {
   RazorpayConfig,
   updateScore,
@@ -289,4 +292,7 @@ export default {
   merchantAnalyticsConstant,
 
   SecurityUtils,
+
+  // Offline Challan
+  offlineChallanTab,
 };

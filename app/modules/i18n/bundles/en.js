@@ -48,6 +48,12 @@ export default {
     fee_breakup: 'See Fee Breakup',
     wait_text: 'Please wait while we download the pdf',
   },
+  offline_challan: {
+    header:
+      'To complete the transaction via cash/cheque or DD, visit the bank branch along with the challan copy',
+    download_challan: 'Download Challan',
+    challan_number: 'Challan Number',
+  },
   banks: {
     long: {
       ABHY: 'Abhyudaya Co-operative Bank',
@@ -833,9 +839,11 @@ export default {
       cod_charge_applied: '{charge} cash on delivery charge added',
       cod_charge_removed: '{charge} cash on delivery charge removed',
       international: 'Trustly & POLI',
+      offline_challan: 'Cash/Cheque/DD deposit via Bank branch',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
+      offline_challan: 'Challan',
       card: 'Cards',
       credit_cards: 'Credit cards',
       credit_debit: 'Credit/Debit',
@@ -856,6 +864,7 @@ export default {
     },
     titles: {
       bank_transfer: 'Bank Transfer',
+      offline_challan: 'Challan',
       card: 'Card',
       cardless_emi: 'Cardless EMI',
       cred: 'CRED',
@@ -1105,6 +1114,7 @@ export default {
   },
   tab_titles: {
     bank_transfer: 'Bank Transfer',
+    offline_challan: 'Challan',
     card: 'Card',
     cardless_emi: 'EMI',
     credit_card: 'Credit Card',

@@ -8,6 +8,7 @@ import qr from './qr';
 import paylater from './paylater';
 import paypal from './paypal';
 import bank_transfer from './bank_transfer';
+import offlineChallan from './offlineChallan';
 import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
@@ -162,6 +163,9 @@ function getIconFn(iconName) {
 
     case 'international':
       return internationalIcon;
+
+    case 'offline_challan':
+      return offlineChallan;
   }
 }
 
