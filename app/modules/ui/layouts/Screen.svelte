@@ -3,6 +3,8 @@
   import { onMount } from 'svelte';
 
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import { isOneClickCheckout } from 'razorpay';
+  import { shouldShowNewDesign } from 'one_click_checkout/store';
   // Props
   export let pad = true;
   export let threshold = 16;
@@ -29,7 +31,7 @@
 
     const isContentOverflowing = scrollHeight > offsetHeight;
 
-    if (isContentOverflowing) {
+    if (isContentOverflowing && !shouldShowNewDesign()) {
       if (scrollHeight - offsetHeight - scrollTop >= threshold) {
         // Content hidden on the bottom
         bottomShadow = true;

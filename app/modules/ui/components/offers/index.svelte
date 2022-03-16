@@ -38,6 +38,7 @@
     APPLY_OFFER_CTA,
   } from 'ui/labels/offers';
 
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
   import {
@@ -53,6 +54,7 @@
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
   export let onShown;
+  export let onHide;
 
   let listActive;
   let otherActive;
@@ -63,6 +65,7 @@
   let discount;
   let previousApplied = {};
   let currentTab;
+  let renderCtaOneCC = false;
 
   $: {
     _El.keepClass(_Doc.querySelector('#header'), 'offer-fade', listActive);
@@ -173,6 +176,8 @@
       selected = $appliedOffer;
     }
 
+    renderCtaOneCC = true;
+
     if (isOneClickCheckout()) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.add('offers-fade');
@@ -181,8 +186,11 @@
   }
 
   function hideList() {
+    renderCtaOneCC = false;
     listActive = false;
     selected = null;
+
+    onHide();
     if (isOneClickCheckout()) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.remove('offers-fade');
@@ -283,7 +291,7 @@
       </span>
     </header>
     {#if error}
-      <div class="error-container">
+      <div class="error-container" class:one-cc={isOneClickCheckout()}>
         <div class="error-desc">
           <!-- LABEL: The offer is not applicable on {error}. -->
           <b>
@@ -309,7 +317,7 @@
       <main
         class="list"
         class:main-one-cc={isOneClickCheckout()}
-        transition:fly={getAnimationOptions({ y: 40, duration: 200 })}
+        transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
         <header class="close-offerlist" on:click={hideList}>
           <!-- LABEL: Select an offer -->
@@ -377,7 +385,15 @@
       </main>
     {/if}
   </div>
-  {#if error}
+  {#if renderCtaOneCC}
+    <CTAOneCC
+      disabled={error || !selected}
+      on:click={onSubmit}
+      showAmount={false}
+    >
+      {$t(APPLY_OFFER_CTA)}
+    </CTAOneCC>
+  {:else if error}
     <CTA show={false} />
   {:else if listActive}
     <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA
@@ -489,6 +505,10 @@
     bottom: 0;
     right: 0;
     left: 0;
+  }
+
+  .one-cc.error-container {
+    bottom: 96px;
   }
   .error-desc {
     padding: 16px 24px;

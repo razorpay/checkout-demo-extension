@@ -6,7 +6,7 @@
   import TpvBank from 'ui/elements/TpvBank.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   // Store
   import {
@@ -58,7 +58,6 @@
 
   import { t } from 'svelte-i18n';
   import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
-  import { CtaViews as CTA_LABELS } from 'ui/labels/cta';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
@@ -204,9 +203,7 @@
     {/if}
   {/if}
   {#if newCta}
-    <CTA on:click={onSubmitClick} {disabled}
-      >{$t(`cta.${CTA_LABELS.PROCEED}`)}</CTA
-    >
+    <CTAOneCC on:click={onSubmitClick} {disabled} showAmount={false} />
   {/if}
 </div>
 

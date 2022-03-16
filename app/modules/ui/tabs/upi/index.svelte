@@ -47,6 +47,7 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   import updateScore from 'analytics/checkoutScore';
 
@@ -72,6 +73,9 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
+
+  // Constant imports
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let selectedApp = undefined;
@@ -104,6 +108,7 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
   let upiIntent;
+  let renderCtaOneCC = false;
 
   const merchantName = getName();
 
@@ -408,12 +413,17 @@
   }
 
   export function onShown() {
+    renderCtaOneCC = true;
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
     if (requiresBankSelection) {
       upiFlowStep = steps.preUpiPspBankSelection;
     }
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
   }
 
   export function updateStep() {
@@ -882,6 +892,11 @@
         {recurringFrequency}
       />
     </div>
+    {#if renderCtaOneCC}
+      <CTAOneCC on:click={() => session.preSubmit()}>
+        {$t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 

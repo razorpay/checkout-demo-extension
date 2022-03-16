@@ -8,6 +8,7 @@ import { selectedBank } from 'checkoutstore/screens/netbanking';
 import { getSession } from 'sessionmanager';
 import { setView, destroyView } from './';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import { METHODS } from 'checkoutframe/constants';
 
 const NETBANKING_KEY = 'netbankingTab';
 
@@ -60,6 +61,11 @@ function render() {
     });
 
     setView(NETBANKING_KEY, netbankingTab);
+
+    session.tabs = {
+      ...session.tabs,
+      [METHODS.NETBANKING]: netbankingTab,
+    };
   }
 }
 

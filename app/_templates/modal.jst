@@ -20,9 +20,8 @@ else
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
   <div id="tnc-wrap"></div>
-  <div id="modal" class="mchild `?RazorpayHelper.isOneClickCheckout()`modal-one-cc`?`">
-    <div id="modal-inner" class="`?RazorpayHelper.isOneClickCheckout()`modal-inner-one-cc`?`">
-      <div id="one-cc-loader"></div>
+  <div id="modal" class="mchild">
+    <div id="modal-inner" class="`?RazorpayHelper.isOneClickCheckout()`one-cc`?`">
       <div id="overlay" class="showable"></div>
       <div id="nocost-overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
@@ -101,9 +100,11 @@ else
               `?`
             </div>
             <div id="bottom"></div>
-            <div id="footer" role="button" class="button">
+            <div id="footer" role="button" class="button `?RazorpayHelper.isOneClickCheckout()`hidden`?`">
               <span id="footer-cta">`=cta`</span>
             </div>
+            <div id="one-cc-loader"></div>
+            <div id="one-cc-footer"></div>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">
             `?`

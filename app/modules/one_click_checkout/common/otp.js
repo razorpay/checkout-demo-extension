@@ -105,6 +105,7 @@ const postSubmit = (msg, data) => {
     if (data && data.addresses) {
       setSavedAddresses(data.addresses);
     }
+    updateOTPStore({ renderCtaOneCC: false });
     screensHistory.config.otp.props.successHandler(data);
   }
 };

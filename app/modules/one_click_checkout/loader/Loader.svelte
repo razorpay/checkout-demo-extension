@@ -6,11 +6,19 @@
   import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
 
   const theme = getTheme();
+  let resizeBackdrop = false;
+
+  $: {
+    if ($showLoader) {
+      resizeBackdrop = !!document.getElementById('one-cc-cta');
+    }
+  }
 </script>
 
 {#if $showLoader}
   <div
     class="loader-backdrop"
+    class:resize-backdrop={resizeBackdrop}
     in:fade={{ duration: 250 }}
     out:fade={{ duration: 250 }}
   />
@@ -25,11 +33,15 @@
 {/if}
 
 <style>
+  .loader-backdrop.resize-backdrop {
+    height: calc(100% - 96px);
+  }
+
   .loader-backdrop {
     width: 100%;
     height: 100%;
-    opacity: 0.2;
     position: absolute;
+    opacity: 0.2;
     background-color: black;
     top: 0;
     right: 0;
@@ -46,9 +58,8 @@
     font-weight: 500;
     box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.08);
     background-color: #fef5e5;
-    position: absolute;
-    bottom: 0;
   }
+
   .content {
     display: flex;
     flex-direction: column;

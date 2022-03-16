@@ -17,6 +17,7 @@
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   // Store
   import {
@@ -140,6 +141,7 @@
     fetchAVSFlagForCard,
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   let delayOTPExperiment;
 
@@ -182,6 +184,7 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+  let renderCtaOneCC = false;
 
   $: showTnC = shouldShowTnc($defaultDCCCurrency, $cardCountry);
 
@@ -899,12 +902,19 @@
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
+    setTabTitle(TAB_TITLE.CARD);
+    renderCtaOneCC = true;
     $selectedCard = null;
     showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
     //#endregion
     tab = session.tab;
     onCardInput();
   }
+
+  export function onHide() {
+    renderCtaOneCC = false;
+  }
+
   function isDowntime(instrument, value) {
     const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
     if (currentDowntime) {
@@ -1150,6 +1160,11 @@
         </Callout>
       {/if}
     </Bottom>
+    {#if renderCtaOneCC}
+      <CTAOneCC on:click={() => session.preSubmit()}>
+        {$t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 
