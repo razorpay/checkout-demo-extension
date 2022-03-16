@@ -35,6 +35,7 @@ import { translatePaymentPopup as t } from 'i18n/popup';
 import updateScore from 'analytics/checkoutScore';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
+import { shouldRedirectZestMoney } from 'common/emi';
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -276,6 +277,8 @@ export default function Payment(data, params = {}, r) {
         if (data.provider === 'sezzle') {
           avoidPopup = false;
         } else if (!data.contact) {
+          avoidPopup = false;
+        } else if (shouldRedirectZestMoney()) {
           avoidPopup = false;
         } else {
           if (data.emi_duration) {

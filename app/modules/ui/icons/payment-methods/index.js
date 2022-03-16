@@ -8,6 +8,7 @@ import qr from './qr';
 import paylater from './paylater';
 import paypal from './paypal';
 import bank_transfer from './bank_transfer';
+import offlineChallan from './offlineChallan';
 import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
@@ -148,6 +149,7 @@ function getIconFn(iconName) {
 
     case 'tick_filled_donate':
       return tickFilledDonate;
+
     case 'warning':
       return warning;
 
@@ -201,6 +203,7 @@ function getIconFn(iconName) {
 
     case 'edit_phone':
       return edit_phone;
+
     case 'info':
       return info;
 
@@ -242,6 +245,9 @@ function getIconFn(iconName) {
 
     case 'caret_circle_right':
       return caret_circle_right;
+
+    case 'offline_challan':
+      return offlineChallan;
   }
 }
 

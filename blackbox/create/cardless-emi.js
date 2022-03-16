@@ -53,6 +53,7 @@ module.exports = function (testFeatures) {
     optionalContact,
     optionalEmail,
     provider = 'zestmoney',
+    popupZestMoney,
   } = features;
 
   if (provider === 'bajaj') {
@@ -76,6 +77,9 @@ module.exports = function (testFeatures) {
         bajaj: true,
         walnut369: true,
       };
+      if (popupZestMoney) {
+        preferences.features['redirect_to_zestmoney'] = true;
+      }
       // Why do the following and not include Bajaj in emi_options.json file?
       // When EMI on Cards is available,
       // we show "EMI" on homescreen, clicking on which takes us to Cards screen
@@ -157,7 +161,10 @@ module.exports = function (testFeatures) {
         await handleFeeBearer(context);
       }
       if (provider === 'zestmoney') {
-        if (!context.state.contact) {
+        if (
+          !context.state.contact ||
+          preferences.features.redirect_to_zestmoney
+        ) {
           // await context.popup();
           return;
         }
@@ -226,7 +233,10 @@ module.exports = function (testFeatures) {
 
       if (provider !== 'bajaj') {
         if (callbackUrl) {
-          await expectRedirectWithCallback(context, { method: 'cardless_emi' });
+          await expectRedirectWithCallback(context, {
+            method: 'cardless_emi',
+            provider,
+          });
         } else {
           await handleCardlessEMIPaymentCreation(context);
         }

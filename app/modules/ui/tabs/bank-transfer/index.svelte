@@ -162,7 +162,9 @@
   const amount = getAmount();
 
   onDestroy(() => {
-    data.amount = session.setAmount(amount);
+    if (data) {
+      data.amount = session.setAmount(amount);
+    }
   });
 
   export function copyDetails() {

@@ -274,6 +274,17 @@ const ALL_METHODS = {
     );
   },
 
+  offline_challan() {
+    return (
+      !isRecurring() &&
+      !isInternational() &&
+      getAmount() &&
+      getMerchantMethods().offline &&
+      getOption('method.offline_challan') &&
+      getOption('order_id')
+    );
+  },
+
   paypal() {
     return (
       !isRecurring() && isInternational() && getMerchantMethods().wallet?.paypal
@@ -421,6 +432,7 @@ export function getSingleMethod() {
     'wallet',
     'paypal',
     'bank_transfer',
+    'offline_challan',
     'international',
   ];
 

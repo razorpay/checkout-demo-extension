@@ -710,7 +710,6 @@ var responseTypes = {
     if (this.data && this.data.method === 'cardless_emi' && this.data.contact) {
       return responseTypes.cardless_emi.call(this, request, fullResponse);
     }
-
     // By default, use first coproto.
     return responseTypes.first.call(this, request, fullResponse);
   },

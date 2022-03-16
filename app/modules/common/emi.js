@@ -1,3 +1,4 @@
+import { hasFeature } from 'checkoutstore';
 import { emiBanks } from 'common/bank';
 
 // convert emiBanks array to map keyed by bank-code
@@ -52,4 +53,8 @@ export function getMinimumAmountFromPlans(plans = {}) {
   });
 
   return minimum;
+}
+
+export function shouldRedirectZestMoney() {
+  return hasFeature('redirect_to_zestmoney', false);
 }

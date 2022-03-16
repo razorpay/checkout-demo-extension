@@ -87,6 +87,7 @@ export const AVAILABLE_METHODS = [
   'paylater',
   'paypal',
   'bank_transfer',
+  'offline_challan',
   'nach',
   'app',
   'emandate',
