@@ -17,7 +17,10 @@ import AddressEvents from 'one_click_checkout/address/analytics';
 import { timer } from 'utils/timer';
 import { getContactPayload } from 'one_click_checkout/store';
 import { showLoader, loaderLabel } from 'one_click_checkout/loader/store';
-import { UPDATE_ADDRESS_LABEL } from 'one_click_checkout/loader/i18n/labels';
+import {
+  CHECK_PIN_LABEL,
+  UPDATE_ADDRESS_LABEL,
+} from 'one_click_checkout/loader/i18n/labels';
 import { didSaveAddress } from 'one_click_checkout/address/store';
 
 const addressCache = {};
@@ -155,7 +158,15 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(addresses, onSavedAddress) {
+export function postServiceability(
+  addresses,
+  onSavedAddress,
+  withLoader = true
+) {
+  if (withLoader) {
+    loaderLabel.set(CHECK_PIN_LABEL);
+    showLoader.set(true);
+  }
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
     is_saved_address: onSavedAddress,
   });
@@ -168,6 +179,7 @@ export function postServiceability(addresses, onSavedAddress) {
     serviceabilityCache[order_id]
   );
   if (!formattedPayload) {
+    showLoader.set(false);
     return Promise.resolve(serviceabilityCache[order_id]);
   }
   const payload = { addresses: formattedPayload, order_id };
@@ -183,6 +195,7 @@ export function postServiceability(addresses, onSavedAddress) {
         });
         if (response.error) {
           reject(response.error);
+          showLoader.set(false);
           return;
         }
         if (
@@ -197,7 +210,7 @@ export function postServiceability(addresses, onSavedAddress) {
         } else {
           serviceabilityCache[order_id] = formatResults(response.addresses);
         }
-
+        showLoader.set(false);
         resolve(serviceabilityCache[order_id]);
       },
     });
@@ -344,7 +357,7 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
 
   return Promise.all(
     Object.values(zipecodeHash).map((address) =>
-      postServiceability([address], onSavedAddress)
+      postServiceability([address], onSavedAddress, false)
     )
   ).then(() =>
     hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])

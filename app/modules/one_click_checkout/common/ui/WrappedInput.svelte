@@ -1,6 +1,12 @@
 <script>
-  import { t } from 'svelte-i18n';
+  // svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+
+  // helper imports
+  import { isOneClickCheckout } from 'razorpay';
 
   export let id;
   export let label = '';
@@ -88,15 +94,21 @@
     <div class="input-validation-error">{validationText}</div>
   {/if}
   {#if suggestions.length > 0}
-    <div class="suggestion-dropdown">
+    <div
+      class="suggestion-dropdown"
+      class:dropdown-one-cc={isOneClickCheckout()}
+    >
       {#each suggestions as suggestion, index}
         <div
           class="suggestion-item"
           on:click={() =>
             dispatch('suggestion-select', { ...suggestion, index })}
         >
-          <span class="leading">{suggestion.line1} </span>
-          <span class="description">{suggestion.line2} </span>
+          <span class="leading">{suggestion.line1}</span>
+          <span class="description">{suggestion.line2}</span>
+          {#if isOneClickCheckout()}
+            <div class="separator" />
+          {/if}
         </div>
       {/each}
     </div>
@@ -242,5 +254,37 @@
     font-size: 12px;
     left: 8px;
     transition: all ease-out 0.2s;
+  }
+
+  .dropdown-one-cc {
+    margin-top: 0px;
+    max-height: 280px;
+  }
+
+  .dropdown-one-cc .suggestion-item {
+    padding: 20px 16px 0px;
+    border-bottom: none;
+  }
+
+  .dropdown-one-cc .leading {
+    font-family: 'Inter';
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    color: #424242;
+  }
+
+  .dropdown-one-cc .description {
+    margin-top: 4px;
+    font-family: 'Inter';
+    font-size: 12px;
+    font-weight: 200;
+    color: #757575;
+  }
+
+  .separator {
+    margin-top: 20px;
+    height: 1px;
+    background-color: #e0e0e0;
   }
 </style>

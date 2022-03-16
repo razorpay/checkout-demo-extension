@@ -85,7 +85,7 @@
     font-size: 14px;
     text-transform: capitalize;
     margin-left: 8px;
-    font-weight: bold;
+    font-weight: 600;
   }
 
   .label-cta {

@@ -388,9 +388,6 @@
 </div>
 
 <style>
-  .tab-content {
-    margin-top: 0px;
-  }
   h3 {
     margin: 10px 0;
   }
@@ -483,7 +480,7 @@
     text-align: center;
     color: #263a4a;
     text-transform: capitalize;
-    font-weight: bold;
+    font-weight: 600;
   }
 
   #form-otp .heading-1cc {
