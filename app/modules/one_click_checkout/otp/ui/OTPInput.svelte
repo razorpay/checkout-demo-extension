@@ -11,6 +11,7 @@
   import { Safari } from 'common/useragent';
 
   export let hidden;
+  export let isError;
 
   let otpContainer;
   let autoCompleteMethod = 'off';
@@ -114,7 +115,7 @@
       name="otp"
       type="tel"
       pattern="[0-9]"
-      class="otp-input"
+      class="otp-input theme-border"
       class:otp-input-small={$digits.length > 6}
       maxlength="1"
       bind:value={$digits[i]}
@@ -123,6 +124,7 @@
       on:keydown={(e) => onOtpDigitKeyDown(e, i)}
       autocomplete={i === 0 && autoCompleteMethod}
       on:paste={otpPaste}
+      class:otp-error={isError}
     />
   {/each}
 </div>
@@ -138,11 +140,15 @@
     font-size: 16px;
     padding: 14px 4px;
     margin: 0px 5px;
-    border: 1px solid #3395ff;
+    border: 1px solid;
     box-shadow: 0px 4px 4px rgba(166, 158, 158, 0.08);
     border-radius: 5px;
     box-sizing: border-box;
     text-align: center;
+  }
+
+  #otp-input .otp-error {
+    border-color: #b21528;
   }
 
   .otp-input-small {

@@ -47,7 +47,7 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
-  import ResendButton from 'ui/elements/ResendButton.svelte';
+  import ResendButton from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OTPInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
   import CTA from 'ui/elements/CTA.svelte';
@@ -141,19 +141,12 @@
           $cardNumber}
       />
     {/if}
-    <div
-      class="otp-controls"
-      class:margin-none={otpClasses.includes($textView)}
-    >
-      <div
-        id="otp-prompt"
-        class="otp-header"
-        class:text-start={otpClasses.includes($textView)}
-      >
+    <div class="otp-controls">
+      <div id="otp-prompt">
         {#if $headingText}
-          <div class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+          <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
             {getOtpScreenHeading($headingText, $templateData, $locale)}
-          </div>
+          </p>
         {/if}
         <!-- Align text to start only if in address context -->
         {#if $loading}
@@ -231,8 +224,7 @@
             </div>
           {/if}
         {/if}
-
-        <OTPInput hidden={!showInput} />
+        <OTPInput hidden={!showInput} isError={$errorMessage} />
       </div>
 
       <div class="error-message" class:hidden={!showInput}>
@@ -300,12 +292,11 @@
   }
   .otp-controls {
     flex-grow: 1;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0px 16px 0px;
   }
   /* If otp controls is the first thing in the screen, then push it down by 40px */
   .otp-screen-contents .otp-controls:first-child {
-    margin-top: 40px;
+    margin-top: 34px;
   }
   :global(.otp-screen-contents .card-box:first-child) {
     margin-bottom: 12px;
@@ -328,16 +319,9 @@
     padding-bottom: 24px;
   }
   .error-message {
-    color: #eb001b;
-    text-align: start !important;
+    color: #d64052;
     margin: 12px 0px;
     font-size: 12px;
-  }
-  .text-start {
-    text-align: start !important;
-  }
-  .margin-none {
-    margin-top: 0px !important;
   }
   .otp-heading {
     margin: 34px 0 26px;
@@ -347,9 +331,10 @@
     font-weight: bold;
   }
 
-  .heading-1cc {
-    margin-top: 0 !important;
+  #form-otp .heading-1cc {
+    margin-top: 0px;
   }
+
   .tab-mg-1cc {
     margin-top: 20px;
   }
@@ -383,7 +368,7 @@
   .tab-content-one-cc {
     margin-top: 0px;
   }
-  .otp-header {
+  #otp-prompt {
     margin-bottom: 24px;
   }
 </style>

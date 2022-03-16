@@ -565,7 +565,15 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
+function askOTP(
+  view,
+  textView,
+  shouldLimitResend,
+  templateData,
+  headingText,
+  errorMessage,
+  isRazorpayOTP
+) {
   var origText = textView; // ಠ_ಠ
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -619,8 +627,9 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
     digits: new Array(storeGetter(discreet.OTPScreenStore.maxlength)),
     otp: '',
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
+    errorMessage: errorMessage,
+    isRazorpayOTP: !!isRazorpayOTP,
   };
-
   if (Store.isASubscription()) {
     _Obj.extend(otpProperties, {
       allowSkip: session.get('subscription_card_change') ? false : true,
@@ -641,6 +650,10 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
   }
 
   $('#body').addClass('sub');
+
+  var isOneCC = RazorpayHelper.isOneClickCheckout();
+
+  var isOneCCOtpScreen = isOneCC && isRazorpayOTP && thisSession.tab === 'card';
 
   if (!textView) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
@@ -725,18 +738,28 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
         }
       } else {
         if (thisSession.payload) {
-          textView = 'otp_sent_save_card';
+          textView = isOneCC
+            ? 'otp_sent_save_card_one_cc'
+            : 'otp_sent_save_card';
         } else {
-          textView = 'otp_sent_access_card';
+          textView = isOneCC
+            ? 'otp_sent_access_card_one_cc'
+            : 'otp_sent_access_card';
         }
       }
     } else {
-      textView = 'otp_sent_generic';
+      textView = isOneCC ? 'otp_sent_generic_one_cc' : 'otp_sent_generic';
+    }
+  } else if (isOneCCOtpScreen) {
+    if (thisSession.payload) {
+      textView = 'otp_sent_save_card_one_cc';
+    } else {
+      textView = 'otp_sent_access_card_one_cc';
     }
   }
 
   view.updateScreen({
-    headingText: headingText,
+    headingText: headingText || isOneCCOtpScreen ? 'default_login' : '',
   });
   view.setTextView(textView, templateData);
 }
@@ -2254,7 +2277,15 @@ Session.prototype = {
       this.getCurrentCustomer().createOTP(
         function (message) {
           // TODO: check how message is being consumed. Possible bug.
-          askOTP(self.otpView, message, true, { phone: getPhone() });
+          askOTP(
+            self.otpView,
+            message,
+            true,
+            { phone: getPhone() },
+            undefined,
+            undefined,
+            true
+          );
           self.updateCustomerInStore();
         },
         null,
@@ -3438,7 +3469,9 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: 'skip_saved_cards',
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+        ? 'skip_saved_cards_one_cc'
+        : 'skip_saved_cards',
     });
 
     /**
@@ -3465,7 +3498,9 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: 'skip_saved_cards',
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+        ? 'skip_saved_cards_one_cc'
+        : 'skip_saved_cards',
     });
 
     self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
@@ -3487,7 +3522,15 @@ Session.prototype = {
        * 2. If customer doesn't have saved cards, show cards screen.
        */
       if (customer.saved && !customer.logged) {
-        askOTP(self.otpView, undefined, true, { phone: getPhone() });
+        askOTP(
+          self.otpView,
+          undefined,
+          true,
+          { phone: getPhone() },
+          undefined,
+          undefined,
+          true
+        );
       } else {
         self.setScreen('card');
       }
@@ -4272,7 +4315,12 @@ Session.prototype = {
       storeGetter(discreet.OTPScreenStore.otp) ||
       storeGetter(discreet.OTPScreenStore.digits).join('');
 
-    if (otp.length > 0) {
+    if (
+      otp.length > 0 &&
+      (!RazorpayHelper.isOneClickCheckout() ||
+        !storeGetter(discreet.OTPScreenStore.isRazorpayOTP) ||
+        otp.length === storeGetter(discreet.OTPScreenStore.digits).length)
+    ) {
       this.commenceOTP('verifying_otp');
 
       if (isWallet || this.headless) {
@@ -4309,7 +4357,16 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-              askOTP(this.otpView, msg, true);
+
+              askOTP(
+                this.otpView,
+                msg,
+                true,
+                { phone: getPhone() },
+                undefined,
+                msg,
+                true
+              );
               this.updateCustomerInStore();
             }
           };
@@ -4341,7 +4398,15 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-              askOTP(this.otpView, msg, true);
+              askOTP(
+                this.otpView,
+                msg,
+                true,
+                { phone: getPhone() },
+                undefined,
+                msg,
+                true
+              );
               self.updateCustomerInStore();
             }
           };
@@ -5522,13 +5587,23 @@ Session.prototype = {
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         this.otpView.updateScreen({
-          skipTextLabel: 'skip_saving_card',
+          skipTextLabel: RazorpayHelper.isOneClickCheckout()
+            ? 'skip_saving_card_one_cc'
+            : 'skip_saving_card',
         });
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
           phone: getPhone(),
         });
-        askOTP(this.otpView, undefined, true, { phone: getPhone() });
+        askOTP(
+          this.otpView,
+          undefined,
+          true,
+          { phone: getPhone() },
+          undefined,
+          undefined,
+          true
+        );
         var otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
         this.getCurrentCustomer().createOTP(
           function () {

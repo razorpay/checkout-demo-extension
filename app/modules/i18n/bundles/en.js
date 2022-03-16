@@ -1013,22 +1013,26 @@ export default {
       resend_otp: 'Resend OTP',
       skip_saved_cards: 'Skip Saved Cards',
       skip_saving_card: 'Skip saving card',
+      skip_saved_cards_one_cc: 'Skip OTP',
+      skip_saving_card_one_cc: 'Skip OTP',
       skip_saved_address: 'Skip',
     },
     heading: {
       mandate_login: 'Verify Mobile Number',
-      access_saved_addresses: 'Save Address',
+      access_saved_addresses: 'Verify Mobile Number',
+      default_login: 'Verify Mobile Number',
     },
     title: {
       access_saved_addresses:
-        'To use your saved addresses, enter the OTP sent to <strong>{phone}</strong>',
+        'To use your saved addresses, enter the OTP sent to <strong class="theme">{phone}</strong>',
       address:
-        'To use this address for future orders, enter the OTP sent to <strong>{phone}</strong>',
+        'To use this address for future orders, enter the OTP sent to <strong class="theme">{phone}</strong>',
       cardlessemi_plans:
         'Enter the OTP sent on {phone} to get EMI plans for {provider}',
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
+      incorrect_otp_retry_one_cc: 'Incorrect OTP. Try Again',
       loading: 'Loading...',
       mandate_login:
         'A text message with an OTP has been sent to <strong class="theme">{phone}</strong>',
@@ -1038,10 +1042,15 @@ export default {
       otp_resent_successful: 'OTP has been resent successfully.',
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
+      otp_sent_access_card_one_cc:
+        'To use your saved card, enter the OTP sent to <strong class="theme">{phone}</strong>',
       otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_generic_one_cc: 'Enter OTP to complete payment',
       otp_sent_phone: 'Enter OTP sent on {phone} to complete the payment',
       otp_sent_no_phone: 'Enter OTP to complete payment',
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
+      otp_sent_save_card_one_cc:
+        'To save your card, enter the OTP sent to <strong class="theme">{phone}</strong>',
       otp_sent_save_card_recurring:
         'Enter OTP sent to {phone} to save your card for future payments',
       paylater_continue:
