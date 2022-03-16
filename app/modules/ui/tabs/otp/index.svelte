@@ -61,6 +61,7 @@
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
   import ResendButton from 'ui/elements/ResendButton.svelte';
+  import ResendButtonOneCC from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
@@ -132,6 +133,9 @@
       input && input.focus();
     }
   }
+
+  let isRazorpayOTPAndOneCC;
+  $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isOneClickCheckout();
 
   export function onShown() {
     setTabTitleLogo($tabLogo);
@@ -212,7 +216,7 @@
             </p>
           {/if}
           <div class="otp-title">
-            {#if $isRazorpayOTP && isOneClickCheckout()}
+            {#if isRazorpayOTPAndOneCC}
               {@html getOtpScreenTitle($textView, $templateData, $locale)}
             {:else}
               {getOtpScreenTitle($textView, $templateData, $locale)}
@@ -286,7 +290,7 @@
 
         <!-- LABEL: Please enter the OTP -->
 
-        {#if $isRazorpayOTP && isOneClickCheckout()}
+        {#if isRazorpayOTPAndOneCC}
           <OtpInput hidden={!showInput} isError={$errorMessage} />
         {:else}
           <div
@@ -322,16 +326,24 @@
       <div id="otp-sec-outer" class:compact>
         <div
           class="otp-action-container"
-          class:action-container-center={$isRazorpayOTP && isOneClickCheckout()}
+          class:action-container-center={isRazorpayOTPAndOneCC}
         >
           {#if showInput}
             {#if $allowResend}
               <!-- LABEL: Resend OTP -->
-              <ResendButton
-                id="otp-resend"
-                resendTimeout={$resendTimeout}
-                on:resend={onResend}
-              />
+              {#if isRazorpayOTPAndOneCC}
+                <ResendButtonOneCC
+                  id="otp-resend"
+                  resendTimeout={$resendTimeout}
+                  on:resend={onResend}
+                />
+              {:else}
+                <ResendButton
+                  id="otp-resend"
+                  resendTimeout={$resendTimeout}
+                  on:resend={onResend}
+                />
+              {/if}
             {/if}
             {#if allowSkipButton}
               <LinkButton

@@ -1,6 +1,5 @@
 <script>
   // Svelte imports
-  import LinkButton from 'components/LinkButton.svelte';
   import { createEventDispatcher, onDestroy } from 'svelte';
 
   // i18n
@@ -11,7 +10,8 @@
   import { resendTimeout } from 'checkoutstore/screens/otp';
 
   // ui imports
-  import CountdownTimer from 'ui/components/CountdownTimer.svelte';
+  import LinkButton from 'components/LinkButton.svelte';
+  import CountdownTimer from 'one_click_checkout/otp/ui/components/CountdownTimer.svelte';
 
   const dispatch = createEventDispatcher();
 
