@@ -30,11 +30,11 @@
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getImageUrl } from 'common/cardlessemi';
   import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
 
   // Utils imports
   import { isMethodUsable } from 'checkoutstore/methods';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
 
   // Props
   export let actions;
@@ -131,9 +131,8 @@
   }
 
   export function onShown() {
-    if (provider && getImageUrl(provider)) {
-      setTabTitleLogo(getImageUrl(provider));
-    }
+    toggleHeader(true);
+    setTabTitleLogo('');
     showPlansView();
   }
 

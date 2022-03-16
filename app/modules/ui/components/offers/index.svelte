@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, isOneClickCheckout } from 'razorpay';
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
@@ -173,12 +173,20 @@
       selected = $appliedOffer;
     }
 
+    if (isOneClickCheckout()) {
+      const headerMagicCheckout = document.querySelector('#header-1cc');
+      headerMagicCheckout.classList.add('offers-fade');
+    }
     onShown();
   }
 
   function hideList() {
     listActive = false;
     selected = null;
+    if (isOneClickCheckout()) {
+      const headerMagicCheckout = document.querySelector('#header-1cc');
+      headerMagicCheckout.classList.remove('offers-fade');
+    }
   }
 
   export function isListShown() {
@@ -300,6 +308,7 @@
     {#if listActive}
       <main
         class="list"
+        class:main-one-cc={isOneClickCheckout()}
         transition:fly={getAnimationOptions({ y: 40, duration: 200 })}
       >
         <header class="close-offerlist" on:click={hideList}>
@@ -308,10 +317,15 @@
           <!-- LABEL: Hide -->
           <span>{$t(HIDE_ACTION)}</span>
         </header>
-        <div class="offerlist-container">
+        <div
+          class="offerlist-container"
+          class:offerlist-one-cc={isOneClickCheckout()}
+        >
           {#if applicableOffers.length}
             <!-- LABEL: Available Offers -->
-            <legend>{$t(AVAILABLE_OFFERS_HEADER)}</legend>
+            <legend class:one-cc-label={isOneClickCheckout()}
+              >{$t(AVAILABLE_OFFERS_HEADER)}</legend
+            >
             <OfferItemList
               {selected}
               offers={applicableOffers}
@@ -329,7 +343,9 @@
             {#if otherActive || !applicableOffers.length}
               {#if otherActive}
                 <!-- LABEL: Other Offers -->
-                <legend>{$t(OTHER_OFFERS_HEADER)}</legend>
+                <legend class:one-cc-label={isOneClickCheckout()}
+                  >{$t(OTHER_OFFERS_HEADER)}</legend
+                >
               {/if}
               <OfferItemList
                 {selected}
@@ -429,10 +445,22 @@
     display: flex;
     flex-direction: column;
   }
+  main.main-one-cc {
+    height: calc(100% - 104px);
+    top: inherit;
+  }
   .offerlist-container {
     overflow: auto;
     flex: 1;
     padding-bottom: 14px;
+  }
+  .offerlist-one-cc {
+    background-color: #fff;
+  }
+  .one-cc-label {
+    padding: 24px 14px;
+    text-transform: capitalize;
+    font-size: 14px;
   }
   .close-offerlist {
     line-height: 44px;

@@ -684,6 +684,20 @@ i {
   font-family: $font;
 }
 
+.offers-fade {
+  pointer-events: none;
+  &::after {
+    content: '';
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    position: absolute;
+    background: rgba(7, 38, 84, 0.4);
+    z-index: 2;
+    height: 104px;
+  }
+}
 #content {
   text-align: left;
   white-space: normal;
@@ -716,7 +730,7 @@ i {
 
 @media (min-width: 769px) {
   #content.one-cc {
-    min-height: 541px;
+    height: 600px;
   }
 }
 
@@ -939,6 +953,10 @@ i {
     box-sizing: border-box;
   }
 
+}
+
+#powered-by.powered-one-cc {
+  bottom: 34px;
 }
 
 #body {

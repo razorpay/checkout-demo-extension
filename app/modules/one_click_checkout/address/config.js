@@ -77,6 +77,7 @@ export const editAddress = {
   tabTitle: views.ADDRESS,
   props: { currentView: views.EDIT_ADDRESS },
   isBackEnabled: true,
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 
 export const editBillingAddress = {
@@ -86,4 +87,5 @@ export const editBillingAddress = {
   tabTitle: views.BILLING_ADDRESS,
   props: { currentView: views.EDIT_BILLING_ADDRESS },
   isBackEnabled: true,
+  breadcrumHighlight: ADDRESS_LABEL,
 };

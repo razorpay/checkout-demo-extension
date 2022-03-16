@@ -47,4 +47,5 @@ export function setThemeColor(color) {
   theme.highlightColor = Color.getHighlightColor(color, RAZORPAY_COLOR);
   theme.secondaryHighlightColor = theme.hoverStateColor;
   theme.icons = _PaymentMethodIcons.getIcons(colorVariations);
+  theme.highlightBorderColor = Color.transparentify(theme.highlightColor, 40);
 }

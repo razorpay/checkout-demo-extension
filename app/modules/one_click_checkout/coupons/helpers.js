@@ -93,7 +93,11 @@ export function applyCouponCode(code) {
           message: formatTemplateWithLocale(
             COUPON_TOAST_MESSAGE,
             {
-              amount: formatAmountWithSymbol(get(cartDiscount), getCurrency()),
+              amount: formatAmountWithSymbol(
+                get(cartDiscount),
+                getCurrency(),
+                false
+              ),
             },
             get(locale)
           ),

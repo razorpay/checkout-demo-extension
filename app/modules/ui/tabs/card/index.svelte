@@ -115,7 +115,6 @@
     addDowntimesToSavedCards,
     injectSiftScript,
   } from 'common/card';
-  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
@@ -130,7 +129,6 @@
 
   // Constant imports
   import { Views, cardWithRecurringSupport } from './constant';
-  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   let showAVSInfo = false;
 
@@ -901,7 +899,6 @@
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
-    setTabTitle(TAB_TITLE.CARD);
     $selectedCard = null;
     showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
     //#endregion

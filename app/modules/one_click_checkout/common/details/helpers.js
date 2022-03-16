@@ -8,11 +8,15 @@ import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { askForOTP } from 'one_click_checkout/common/otp';
 import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 import { isEditContactFlow, isLogoutFlow } from 'one_click_checkout/store';
-import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
+import {
+  getCustomerByContact,
+  getCustomerDetails,
+} from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { determineLandingView } from 'one_click_checkout/helper';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { otpReasons } from 'one_click_checkout/otp/constants';
+import { toggleHeader } from 'one_click_checkout/header/helper';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -66,7 +70,22 @@ export const handleDetailsNext = (prevContact) => {
         view = views.COUPONS;
       }
     } else if (get(isEditContactFlow) && shouldShowCoupons()) {
-      view = views.COUPONS;
+      const customer = getCustomerDetails();
+      const params = { skip_otp: true };
+      customer.checkStatus(
+        function () {
+          if (customer.saved_address && !customer.logged) {
+            toggleHeader(true);
+            askForOTP(otpReasons.coupons_edit_contact);
+          } else {
+            isEditContactFlow.set(false);
+            navigator.navigateTo({ path: views.COUPONS });
+          }
+        },
+        params,
+        customer.contact
+      );
+      return;
     }
 
     isEditContactFlow.set(false);

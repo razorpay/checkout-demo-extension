@@ -667,7 +667,7 @@
 
   .servicibility-icon-wrapper {
     position: absolute;
-    right: 10%;
-    top: 44%;
+    right: 14px;
+    top: 24px;
   }
 </style>

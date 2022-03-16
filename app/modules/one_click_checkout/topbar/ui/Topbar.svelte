@@ -13,6 +13,7 @@
     tabTitle,
     tabTitleLogo,
   } from 'one_click_checkout/topbar/store';
+  import { headerVisible } from 'one_click_checkout/header/store';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -39,7 +40,7 @@
     if ($activeRoute?.hasOwnProperty('isBackEnabled')) {
       isBackEnabled = $activeRoute?.isBackEnabled;
       if (typeof isBackEnabled === 'function') {
-        isBackEnabled = isBackEnabled();
+        isBackEnabled();
       }
     } else {
       isBackEnabled = true;
@@ -69,7 +70,7 @@
 </script>
 
 {#if shown}
-  <div id="topbar-new">
+  <div id="topbar-new" class:topbar-header={!$headerVisible}>
     <div class="title-section">
       {#if isBackEnabled}
         <span class="back" on:click={handleBackClick}>
@@ -117,6 +118,9 @@
     height: 44px;
     z-index: 2;
     box-shadow: 10px 10px 30px rgba(107, 108, 109, 0.1);
+  }
+  #topbar-new.topbar-header {
+    height: 55px;
   }
   .back {
     cursor: pointer;

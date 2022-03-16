@@ -20,12 +20,12 @@
 
   // utils imports
   import { applyCouponCode } from 'one_click_checkout/coupons/helpers';
-  import { hideHeader } from 'one_click_checkout/header/helper';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideCta } from 'checkoutstore/cta';
 
   onMount(() => {
     hideCta();
-    hideHeader();
+    toggleHeader(false);
   });
 
   function onCouponInput() {

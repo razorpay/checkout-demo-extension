@@ -29,6 +29,7 @@
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
   import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -139,6 +140,7 @@
 
   export function onShown() {
     setTabTitleLogo($tabLogo);
+    toggleHeader(false);
   }
 
   export function invoke(type, event) {

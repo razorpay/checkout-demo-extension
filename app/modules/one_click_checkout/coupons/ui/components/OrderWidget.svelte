@@ -44,6 +44,7 @@
 
   const currency = getCurrency();
   const { order } = getIcons();
+  const spaceAmoutWithSymbol = false;
 
   $: {
     if ($savedAddresses?.length && $shippingCharge) {
@@ -61,7 +62,7 @@
   <div class="row justify-between color-gray">
     <p>{$t(AMOUNT_LABEL)}</p>
     <p>
-      {formatAmountWithSymbol($cartAmount, currency)}
+      {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
     </p>
   </div>
   {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
@@ -70,7 +71,11 @@
         {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
       </p>
       <p class="color-green">
-        - {formatAmountWithSymbol($cartDiscount, currency)}
+        - {formatAmountWithSymbol(
+          $cartDiscount,
+          currency,
+          spaceAmoutWithSymbol
+        )}
       </p>
     </div>
   {/if}
@@ -83,20 +88,24 @@
         <p>{$t(SHIPPING_CHARGES_LABEL)}</p>
         <p>
           {$shippingCharge
-            ? formatAmountWithSymbol($shippingCharge, currency)
+            ? formatAmountWithSymbol(
+                $shippingCharge,
+                currency,
+                spaceAmoutWithSymbol
+              )
             : $t(FREE_LABEL)}
         </p>
       {/if}
     </div>
   {/if}
   <hr class="split" />
-  <div class="row justify-between">
+  <div class="row justify-between total-label">
     {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
       <Shimmer width="40%" />
       <Shimmer width="20%" />
     {:else}
-      <p><b>{$t(TOTAL_LABEL)}</b></p>
-      <p><b>{formatAmountWithSymbol($amount, currency)}</b></p>
+      <p>{$t(TOTAL_LABEL)}</p>
+      <p>{formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}</p>
     {/if}
   </div>
 </div>
@@ -152,5 +161,9 @@
   .split {
     border: 1px dashed #8d97a1;
     border-bottom: none;
+    margin: 16px 0px;
+  }
+  .total-label {
+    font-weight: 600;
   }
 </style>

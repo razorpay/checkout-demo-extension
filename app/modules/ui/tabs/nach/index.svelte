@@ -12,7 +12,6 @@
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
-  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   import {
     showUploadNachForm,
@@ -42,9 +41,6 @@
   } from 'ui/labels/nach';
 
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
-
-  // Constant imports
-  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   let abortUploadRequest = () => {};
   let uploaded = false;
@@ -84,7 +80,6 @@
    * Session calls this method when it switches to "nach" tab
    */
   export function onShown() {
-    setTabTitle(TAB_TITLE.NACH);
     showUploadNachForm();
   }
 

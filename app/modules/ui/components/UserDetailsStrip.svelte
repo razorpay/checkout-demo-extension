@@ -56,7 +56,6 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     margin-bottom: 20px;
-    padding: 0px 18px;
   }
 
   .details-strip-container :global(.stack > div:nth-of-type(1)) {

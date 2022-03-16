@@ -125,8 +125,8 @@
               elemClasses={'address-elem'}
               handleInput
               autocomplete={subInput.autofillToken ?? 'off'}
-              showServicableIcon={subInput.unserviceableText ===
-                SERVICEABLE_LABEL}
+              showServicableIcon={!subInput?.hideStatusText &&
+                subInput.unserviceableText === SERVICEABLE_LABEL}
               disabled={subInput.disabled}
             />
           {/if}

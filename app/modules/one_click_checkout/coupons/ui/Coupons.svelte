@@ -27,6 +27,7 @@
   } from 'one_click_checkout/address/store';
   import { isShippingAddedToAmount } from 'one_click_checkout/charges/store';
   import { removeCouponInStore } from 'one_click_checkout/coupons/store';
+  import { isIndianCustomer } from 'checkoutstore';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -58,9 +59,10 @@
     applyCouponCode,
   } from 'one_click_checkout/coupons/helpers';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
-  import { showHeader } from 'one_click_checkout/header/helper';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -92,7 +94,9 @@
       removeCouponInStore();
     }
 
-    if (!$savedAddresses.length) {
+    if (!isUserLoggedIn() && $isIndianCustomer) {
+      navigator.navigateTo({ path: views.SAVED_ADDRESSES });
+    } else if (!$savedAddresses.length) {
       navigator.navigateTo({ path: views.ADD_ADDRESS });
     } else {
       if (!$isBillingSameAsShipping) {
@@ -103,7 +107,7 @@
   }
 
   onMount(() => {
-    showHeader();
+    toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
       if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {

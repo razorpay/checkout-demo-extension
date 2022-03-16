@@ -56,7 +56,7 @@
   </div>
   {#if expanded}
     <div>
-      <ul>
+      <ul class="terms-section">
         {#each coupon.tnc as term, _}
           <li>{term}</li>
         {/each}
@@ -100,7 +100,6 @@
 
   .coupon-item-description {
     font-style: normal;
-    font-weight: 500;
     font-size: 12px;
     line-height: 16px;
     color: #263a4a;
@@ -112,7 +111,7 @@
     font-weight: bold;
     font-size: 12px;
     line-height: 16px;
-    color: #333333;
+    color: #263a4a;
     margin-bottom: 6px;
     text-transform: capitalize;
   }
@@ -174,5 +173,8 @@
   .show-details {
     padding-left: 0;
     font-weight: 500;
+  }
+  .terms-section {
+    font-style: normal;
   }
 </style>

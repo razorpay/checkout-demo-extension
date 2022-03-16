@@ -17,9 +17,14 @@
     isEmailHidden,
     isContactEmailHidden,
   } from 'checkoutstore';
+  import { isEditContactFlow } from 'one_click_checkout/store';
 
   // Utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
+  // Constant Imports
+  import { views } from 'one_click_checkout/routing/constants';
 
   let showUserDetailsStrip;
   let showEditUserDetails = !$isContactPresent && !$email;
@@ -31,7 +36,8 @@
   const { user } = getIcons();
 
   function editContact() {
-    showEditUserDetails = true;
+    isEditContactFlow.set(true);
+    navigator.navigateTo({ path: views.DETAILS });
   }
 </script>
 

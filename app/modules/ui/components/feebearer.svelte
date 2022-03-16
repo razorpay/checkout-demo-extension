@@ -12,6 +12,7 @@
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
+  import { isOneClickCheckout } from 'razorpay';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -34,6 +35,8 @@
   export let paymentData;
   export let isBankTransferView;
 
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
   const entries = _Obj.entries;
   const dispatch = createEventDispatcher();
   const session = getSession();
@@ -127,7 +130,11 @@
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
-              {formatAmountWithSymbol(amount * 100, 'INR')}
+              {formatAmountWithSymbol(
+                amount * 100,
+                'INR',
+                spaceAmoutWithSymbol
+              )}
             </div>
           </div>
         {/if}
