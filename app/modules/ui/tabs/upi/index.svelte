@@ -18,7 +18,6 @@
     getUPIAppDataFromHandle,
     isOtherIntentApp,
   } from 'common/upi';
-  import { setTabTitle } from 'one_click_checkout/topbar/helper';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
@@ -73,9 +72,6 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
-
-  // Constant imports
-  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   // Props
   export let selectedApp = undefined;
@@ -412,7 +408,6 @@
   }
 
   export function onShown() {
-    setTabTitle(TAB_TITLE.UPI);
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();

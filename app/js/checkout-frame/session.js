@@ -2822,10 +2822,6 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
-    } else if (screen === 'paylater' && this.payLaterView) {
-      this.payLaterView.onShown();
-    } else if (screen === 'cardless_emi' && this.cardlessEmiView) {
-      this.cardlessEmiView.onShown();
     } else if (screen === 'wallet' && this.walletTab) {
       this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {

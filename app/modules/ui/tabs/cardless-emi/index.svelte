@@ -13,7 +13,6 @@
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
   import { getSession } from 'sessionmanager';
-  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -26,9 +25,6 @@
     SELECT_RECOMMENDED_TITLE,
     OTHER_OPTIONS,
   } from 'ui/labels/cardlessemi';
-
-  // Constant imports
-  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
 
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -56,10 +52,6 @@
         : OTHER_OPTIONS,
     recommended: SELECT_RECOMMENDED_TITLE,
   };
-
-  export function onShown() {
-    setTabTitle(TAB_TITLE.CARDLESS_EMI);
-  }
 
   /**
    * Returns _all_ Cardless EMI providers

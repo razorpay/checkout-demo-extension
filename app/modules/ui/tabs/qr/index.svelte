@@ -15,7 +15,6 @@
     isCustomerFeeBearer,
     getOptionalObject,
   } from 'razorpay';
-  import { setTabTitle } from 'one_click_checkout/topbar/helper';
 
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -33,9 +32,6 @@
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
-  // Constant imports
-  import { TAB_TITLE } from 'one_click_checkout/topbar/constants';
-
   // Props
   export let view = 'qr';
   export let paymentData;
@@ -49,7 +45,6 @@
   const session = getSession();
 
   onMount(() => {
-    setTabTitle(TAB_TITLE.QR);
     init();
   });
 

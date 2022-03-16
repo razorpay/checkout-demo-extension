@@ -58,7 +58,7 @@
     applyCouponCode,
   } from 'one_click_checkout/coupons/helpers';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
-  import { showHeader } from 'one_click_checkout/header/helper';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
 
@@ -103,7 +103,7 @@
   }
 
   onMount(() => {
-    showHeader();
+    toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
       if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
