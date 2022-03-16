@@ -4,7 +4,12 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { shouldShowNewDesign } from 'one_click_checkout/store';
+  import { isOneClickCheckout } from 'razorpay';
+
+  // Icon Imports
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  const { circle_check } = getIcons();
 
   // Actions
   import {
@@ -56,6 +61,7 @@
   export let modifyIconPosition = false;
   export let inputFieldClasses = '';
   export let errorValidationClasses = '';
+  export let showServicableIcon = false;
 
   /**
    * To show prediction as dropdown
@@ -109,7 +115,7 @@
 
   const session = getSession();
 
-  const shouldShowNewDesigns = shouldShowNewDesign();
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   export function getCaretPosition() {
     return formatterObj.caretPosition;
@@ -193,7 +199,7 @@
     readonlyValue = e.target.value;
     value = readonlyValue;
     getPrediction();
-    if (shouldShowNewDesigns) {
+    if (isOneClickCheckoutEnabled) {
       const { parentNode } = e.target || {};
       if (parentNode?.classList?.contains('filled')) {
         parentNode.classList.remove('filled');
@@ -306,29 +312,36 @@
 <div
   bind:this={wrap}
   class={`elem ${elemClasses}`}
-  class:elem-one-click-checkout={shouldShowNewDesigns}
+  class:elem-one-click-checkout={isOneClickCheckoutEnabled}
   class:readonly
   class:with-prediction={isPredictionEnable}
 >
   {#if icon}
     <i
       class:icon-invalid={modifyIconPosition}
-      class:hidden={shouldShowNewDesigns}
+      class:hidden={isOneClickCheckoutEnabled}
     >
       {@html icon}
     </i>
   {/if}
+  {#if showServicableIcon}
+    <span class="servicibility-icon-wrapper"><Icon icon={circle_check} /></span>
+  {/if}
   {#if leftImage}
-    <img class="left-img" src={leftImage} class:hidden={shouldShowNewDesigns} />
+    <img
+      class="left-img"
+      src={leftImage}
+      class:hidden={isOneClickCheckoutEnabled}
+    />
   {/if}
   <input
     class={`${
-      shouldShowNewDesigns
+      isOneClickCheckoutEnabled
         ? `input-one-click-checkout ${inputFieldClasses}`
         : 'input'
     } main`}
     class:with-left-img={leftImage}
-    class:error-field-one-click-checkout={shouldShowNewDesigns &&
+    class:error-field-one-click-checkout={isOneClickCheckoutEnabled &&
       validationText}
     bind:this={input}
     id={identifier}
@@ -384,9 +397,9 @@
   {#if label}
     <label
       class={labelClasses}
-      class:label-one-click-checkout={shouldShowNewDesigns}
-      class:label-upper={shouldShowNewDesigns && !focused && value}
-      class:error-label-one-click-checkout={shouldShowNewDesigns &&
+      class:label-one-click-checkout={isOneClickCheckoutEnabled}
+      class:label-upper={isOneClickCheckoutEnabled && !focused && value}
+      class:error-label-one-click-checkout={isOneClickCheckoutEnabled &&
         validationText}>{label}</label
     >
   {/if}
@@ -434,8 +447,9 @@
   {#if validationText !== ''}
     <div
       class={`input-validation-error ${errorValidationClasses}`}
-      class:validation-error-one-click-checkout={shouldShowNewDesigns}
-      class:contact-validation-error={shouldShowNewDesigns && id === 'contact'}
+      class:validation-error-one-click-checkout={isOneClickCheckoutEnabled}
+      class:contact-validation-error={isOneClickCheckoutEnabled &&
+        id === 'contact'}
     >
       {validationText}
     </div>
@@ -557,8 +571,8 @@
     display: none;
   }
 
-  .hidden {
-    visibility: hidden;
+  .visible {
+    display: block;
   }
 
   .input-one-click-checkout {
@@ -602,7 +616,7 @@
     font-size: 12px;
     padding: 0px 4px;
     left: 9px;
-    color: var(--background-color);
+    color: var(--highlight-color);
     transition: all ease-out 0.2s;
     background-color: #fff;
   }
@@ -627,7 +641,7 @@
   }
 
   .input-one-click-checkout:focus {
-    border-color: var(--background-color);
+    border-color: var(--highlight-color);
   }
 
   .error-field-one-click-checkout {
@@ -649,5 +663,11 @@
   .contact-validation-error {
     position: relative;
     left: -8%;
+  }
+
+  .servicibility-icon-wrapper {
+    position: absolute;
+    right: 10%;
+    top: 44%;
   }
 </style>

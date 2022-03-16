@@ -187,7 +187,7 @@
   }
 
   .selected-container {
-    border: 1px solid var(--background-color);
+    border: 1px solid var(--highlight-color);
   }
   .shimmer-card {
     position: relative;

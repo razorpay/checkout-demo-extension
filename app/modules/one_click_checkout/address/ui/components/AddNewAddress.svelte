@@ -1,13 +1,17 @@
 <script>
   // svelte imports
   import { t } from 'svelte-i18n';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+
   // UI imports
   import AddressFormBuilder from 'one_click_checkout/address/ui/components/AddressFormBuilder.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import TagSelector from 'one_click_checkout/address/ui/components/TagSelector.svelte';
   import { showToast, hideToast, TOAST_THEME } from 'one_click_checkout/Toast';
-  import { onDestroy } from 'svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import info from 'ui/icons/payment-methods/info';
+  import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+
   // labels import
   import {
     NAME_LABEL,
@@ -25,6 +29,7 @@
     STATE_LABEL,
     REQUIRED_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
+
   // const import
   import {
     ADDRESS_TYPES,
@@ -35,6 +40,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+
   // store import
   import {
     getCityState,
@@ -46,10 +52,15 @@
     shippingCharge,
   } from 'one_click_checkout/charges/store';
   import { country as countryCode } from 'checkoutstore/screens/home';
+  import { isAutopopulateDisabled } from 'one_click_checkout/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
+
   // analytics imports
   import { Events } from 'analytics';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+
+  // other imports
   import { isIndianCustomer } from 'checkoutstore';
   import { savedAddresses } from 'one_click_checkout/address/store';
   import {
@@ -63,14 +74,9 @@
     PHONE_REGEX_INDIA,
     INDIA_COUNTRY_ISO_CODE,
   } from 'common/constants';
+  import { views } from 'one_click_checkout/routing/constants';
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
-  import Icon from 'ui/elements/Icon.svelte';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
-
-  const { info } = getTheme().icons;
-
-  import { isAutopopulateDisabled } from 'one_click_checkout/store';
 
   // props
   export let formData;
@@ -542,6 +548,26 @@
     }
   };
 
+  function trackSameBillingAndShippingCheckbox({ detail }) {
+    if (detail.checked) {
+      Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_CHECKED, {
+        address_screen: ADDRESS_TYPES.SHIPPING_ADDRESS,
+      });
+    } else {
+      Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_UNCHECKED, {
+        address_screen: ADDRESS_TYPES.SHIPPING_ADDRESS,
+      });
+    }
+  }
+
+  let showTooltipVar = false;
+  function showTooltip() {
+    showTooltipVar = true;
+    setInterval(function () {
+      showTooltipVar = false;
+    }, 5000);
+  }
+
   onMount(() => {
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
@@ -578,6 +604,14 @@
       {addressType}
       on:blur={onInputFieldBlur}
     />
+
+    {#if $activeRoute?.name !== views.ADD_BILLING_ADDRESS}
+      <SameBillingAndShipping
+        shouldSaveAddress={true}
+        on:toggle={trackSameBillingAndShippingCheckbox}
+      />
+    {/if}
+
     {#if currentView === addressViews.ADD_ADDRESS && $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
       <div class="address-save-consent">
         <Checkbox
@@ -585,10 +619,22 @@
           checked={$shouldSaveAddress}
           id="address-consent-checkbox"
         />
-
-        <span class="save-address-wrapper">
-          {$t(SAVE_ADDRESS_CONSENT)} &nbsp; <Icon icon={info} />
-        </span>
+        <div class="save-address-wrapper">
+          {$t(SAVE_ADDRESS_CONSENT)} &nbsp;
+          <div class="icon-wrapper" on:click={showTooltip}>
+            <Icon icon={info('#263A4A')} />
+          </div>
+        </div>
+      </div>
+      <div class="elem-wrap-save-address-tc">
+        {#if showTooltipVar}
+          <div class="save-address-tooltip">
+            I agree to save my details as per Razorpay’s <span class="tc-text">
+              Terms and Conditions
+            </span>
+            and <span class="tc-text"> Privacy Policy </span>
+          </div>
+        {/if}
       </div>
     {/if}
     {#if $isIndianCustomer && $shouldSaveAddress}
@@ -615,5 +661,48 @@
     height: fit-content;
     display: flex;
     align-items: center;
+  }
+
+  .icon-wrapper {
+    cursor: pointer;
+  }
+
+  .elem-wrap-save-address-tc {
+    margin-top: 5px;
+    position: relative;
+  }
+
+  .save-address-tooltip {
+    transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+    transform: translateY(-10px);
+    color: #fff;
+    position: absolute;
+    line-height: 16px;
+    padding: 12px;
+    font-size: 12px;
+    background: #2d313a;
+    box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
+    z-index: 3;
+    border-radius: 2px;
+    bottom: -56px;
+    pointer-events: none;
+    margin: 0px 16px;
+  }
+  .save-address-tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent #2d313a;
+    bottom: 100%;
+    left: 50%;
+    margin: 0 0 -1px -10px;
+  }
+
+  .tc-text {
+    cursor: pointer;
+    color: #3684d6;
   }
 </style>

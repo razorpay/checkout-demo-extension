@@ -115,7 +115,7 @@
   }
 
   .input-focused {
-    border-color: #5186f3;
+    border-color: var(--highlight-color);
   }
 
   .input-error {
@@ -139,7 +139,7 @@
   }
 
   .label-top-focused {
-    color: #5186f3;
+    color: var(--highlight-color);
   }
 
   .label-error {
@@ -214,7 +214,7 @@
     transition: all ease-in 0.2s;
   }
   .input:focus {
-    border: 1px solid royalblue;
+    border: 1px solid var(--highlight-color);
   }
   .input-group.invalid .input:focus {
     border: 1px solid var(--error-validation-color);
@@ -226,7 +226,7 @@
     padding: 0 4px;
     font-size: 12px;
     left: 8px;
-    color: royalblue;
+    color: var(--highlight-color);
     transition: all ease-out 0.2s;
   }
   .input-group .input:valid + .label {
@@ -242,10 +242,5 @@
     font-size: 12px;
     left: 8px;
     transition: all ease-out 0.2s;
-  }
-
-  .input-group.invalid .input:focus + .label,
-  .input-group.invalid .input + .label {
-    color: var(--error-validation-color);
   }
 </style>

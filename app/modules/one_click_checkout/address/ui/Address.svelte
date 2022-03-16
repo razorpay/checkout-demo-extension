@@ -13,7 +13,6 @@
     showSavedAddressCta,
   } from 'one_click_checkout/address/shipping_address/store';
   import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
-  import { isIndianCustomer } from 'checkoutstore';
   import { contact } from 'checkoutstore/screens/home';
 
   // interface imports
@@ -149,14 +148,6 @@
         </span>
         <Icon icon={caret_circle_right} />
       </button>
-    {/if}
-  </div>
-  <div slot="inner-footer">
-    {#if ADDRESS_FORM_VIEWS.includes(currentView)}
-      <SameBillingAndShipping
-        shouldSaveAddress={true}
-        on:toggle={trackSameBillingAndShippingCheckbox}
-      />
     {/if}
   </div>
   <div slot="footer">

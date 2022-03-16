@@ -125,10 +125,8 @@
               elemClasses={'address-elem'}
               handleInput
               autocomplete={subInput.autofillToken ?? 'off'}
-              extraLabel={subInput.unserviceableText}
-              extraLabelClass={subInput.unserviceableText === SERVICEABLE_LABEL
-                ? 'successText'
-                : 'failureText'}
+              showServicableIcon={subInput.unserviceableText ===
+                SERVICEABLE_LABEL}
               disabled={subInput.disabled}
             />
           {/if}
@@ -252,8 +250,8 @@
   }
 
   .show-landmark-label {
-    margin-bottom: 12px;
-    color: #3395ff;
+    margin: 8px 0px;
+    color: var(--highlight-color);
     cursor: pointer;
   }
   .show-landmark-label .optional {

@@ -39,7 +39,7 @@
   .selected-tag {
     color: var(--highlight-color);
     border: 1px solid var(--highlight-color);
-    background: #f1f8ff;
+    background: var(--sec-highlight-color);
   }
 
   .inner-text {
