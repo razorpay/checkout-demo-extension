@@ -47,7 +47,7 @@
   import { getAmount } from 'checkoutstore';
   import { getCurrencies } from 'card/helper/dcc';
 
-  import { getCurrency, isPartialPayment } from 'razorpay';
+  import { getCurrency, isPartialPayment, isOneClickCheckout } from 'razorpay';
 
   import { getIin } from 'common/card';
 
@@ -75,6 +75,8 @@
     POLI_PROVIDER: 'poli',
     AVS: 'avs-card',
   };
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
 
   let prop = null;
   let entity = null;
@@ -258,8 +260,16 @@
           }
         }
         updateAmountInHeaderAndCTA(
-          formatAmountWithSymbol(amount, selectedCurrency),
-          formatAmountWithSymbol(dccAmount, selectedCurrency)
+          formatAmountWithSymbol(
+            amount,
+            selectedCurrency,
+            spaceAmoutWithSymbol
+          ),
+          formatAmountWithSymbol(
+            dccAmount,
+            selectedCurrency,
+            spaceAmoutWithSymbol
+          )
         );
       } else if (!offer) {
         updateAmountInHeaderAndCTA();
@@ -498,7 +508,11 @@
             {$t(PAY_IN)}
             {selectedCurrency}
             {explicitUI
-              ? `(${formatAmountWithSymbol(dccAmount, selectedCurrency)})`
+              ? `(${formatAmountWithSymbol(
+                  dccAmount,
+                  selectedCurrency,
+                  spaceAmoutWithSymbol
+                )})`
               : ''}
           </div>
         {/if}
@@ -535,13 +549,18 @@
             {/if}
           {:else}
             <b dir="ltr"
-              >{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b
+              >{formatAmountWithSymbol(
+                dccAmount,
+                selectedCurrency,
+                spaceAmoutWithSymbol
+              )}</b
             >
             {#if selectedCurrency !== originalCurrency && currencies[originalCurrency]}
               <span class="small-text">
                 ({formatAmountWithSymbol(
                   currencies[originalCurrency].amount,
-                  originalCurrency
+                  originalCurrency,
+                  spaceAmoutWithSymbol
                 )})
               </span>
             {/if}

@@ -33,7 +33,11 @@
   };
 </script>
 
-<div id="coupons-available-container">
+<div
+  id="coupons-available-container"
+  class:apply={!$appliedCoupon}
+  on:click|preventDefault={!$appliedCoupon && showAvailableCoupons}
+>
   <Icon icon={offers} />
   {#if $appliedCoupon}
     <div class="coupons-available-text">
@@ -52,10 +56,7 @@
         </span>
       {/if}
     </div>
-    <span
-      class="coupon-arrow-next"
-      on:click|preventDefault={showAvailableCoupons}
-    >
+    <span class="coupon-arrow-next">
       <Icon icon={circle_arrow_next} />
     </span>
   {/if}
@@ -76,5 +77,8 @@
     margin-left: auto;
     cursor: pointer;
     padding-top: 2px;
+  }
+  .apply {
+    cursor: pointer;
   }
 </style>

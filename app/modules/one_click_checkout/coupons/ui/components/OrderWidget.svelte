@@ -44,6 +44,7 @@
 
   const currency = getCurrency();
   const { order } = getIcons();
+  const spaceAmoutWithSymbol = false;
 
   $: {
     if ($savedAddresses?.length && $shippingCharge) {
@@ -61,7 +62,7 @@
   <div class="row justify-between color-gray">
     <p>{$t(AMOUNT_LABEL)}</p>
     <p>
-      {formatAmountWithSymbol($cartAmount, currency)}
+      {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
     </p>
   </div>
   {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
@@ -70,7 +71,11 @@
         {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
       </p>
       <p class="color-green">
-        - {formatAmountWithSymbol($cartDiscount, currency)}
+        - {formatAmountWithSymbol(
+          $cartDiscount,
+          currency,
+          spaceAmoutWithSymbol
+        )}
       </p>
     </div>
   {/if}
@@ -83,7 +88,11 @@
         <p>{$t(SHIPPING_CHARGES_LABEL)}</p>
         <p>
           {$shippingCharge
-            ? formatAmountWithSymbol($shippingCharge, currency)
+            ? formatAmountWithSymbol(
+                $shippingCharge,
+                currency,
+                spaceAmoutWithSymbol
+              )
             : $t(FREE_LABEL)}
         </p>
       {/if}
@@ -96,7 +105,7 @@
       <Shimmer width="20%" />
     {:else}
       <p>{$t(TOTAL_LABEL)}</p>
-      <p>{formatAmountWithSymbol($amount, currency)}</p>
+      <p>{formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}</p>
     {/if}
   </div>
 </div>

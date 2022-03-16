@@ -1,4 +1,6 @@
 <script>
+  import { fly } from 'svelte/transition';
+
   export let shown;
   let msg;
   let theme;
@@ -25,7 +27,10 @@
 </script>
 
 {#if shown}
-  <div class={`toast-wrapper ${theme || ''}`}>
+  <div
+    class={`toast-wrapper ${theme || ''}`}
+    transition:fly|local={{ y: 30, duration: 800 }}
+  >
     {msg}
   </div>
 {/if}

@@ -132,6 +132,7 @@
         unserviceableText: '',
         autofillToken: 'postal-code',
         disabled: false,
+        hideStatusText: false,
       },
     ],
     [
@@ -258,6 +259,12 @@
       INPUT_FORM[pinIndex][pinSubIndex].type = 'text';
     }
     $selectedCountryISO = iso.toLowerCase();
+    if (!COUNTRY_POSTALS_MAP[iso]?.pattern) {
+      INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = true;
+    } else {
+      INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = false;
+      INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+    }
     pinPattern = new RegExp(COUNTRY_POSTALS_MAP[iso].pattern);
     INPUT_FORM[pinIndex][pinSubIndex].pattern =
       COUNTRY_POSTALS_MAP[iso].pattern;

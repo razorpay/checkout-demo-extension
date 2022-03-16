@@ -17,8 +17,11 @@
 
   // Util imports
   import { getAmount } from 'checkoutstore';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, isOneClickCheckout } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
+
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
 
   let plan;
   let duration;
@@ -34,7 +37,8 @@
       installment = Razorpay.emi.calculator(getAmount(), duration, interest);
       formattedInstallmentAmount = formatAmountWithSymbol(
         installment,
-        getCurrency()
+        getCurrency(),
+        spaceAmoutWithSymbol
       );
     }
   }

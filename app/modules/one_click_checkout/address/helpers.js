@@ -29,6 +29,7 @@ import {
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
+import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
 
 /**
  * Checks for the address form if there are any errors and returns the obj
@@ -87,6 +88,9 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
       } else if (formInput.id === 'landmark') {
         return LANDMARK_ERROR_LABEL;
       } else if (formInput.id === 'zipcode') {
+        if (!COUNTRY_POSTALS_MAP[selectedCountryIso]?.pattern) {
+          return;
+        }
         return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE
           ? PINCODE_ERROR_LABEL
           : ZIPCODE_ERROR_LABEL;

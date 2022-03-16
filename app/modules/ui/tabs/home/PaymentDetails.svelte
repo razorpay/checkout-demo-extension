@@ -20,6 +20,7 @@
     multiTpvOption,
     countryISOCode,
   } from 'checkoutstore/screens/home';
+  import { activeRoute } from 'one_click_checkout/routing/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -36,6 +37,7 @@
     isContactOptional,
     isOneClickCheckout,
   } from 'razorpay';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
 
   import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
@@ -44,7 +46,13 @@
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { ContactDetailsEvents } from 'analytics/home/events';
-  import { CONTACT_REGEX, EMAIL_REGEX, STATES } from 'common/constants';
+  import {
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    STATES,
+    INDIA_COUNTRY_CODE,
+    PHONE_REGEX_INDIA,
+  } from 'common/constants';
   import { onMount } from 'svelte';
   import { screensHistory } from 'one_click_checkout/routing/History';
 
@@ -56,6 +64,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import { views } from 'one_click_checkout/routing/constants';
 
   const entries = _Obj.entries;
 
@@ -97,6 +106,10 @@
 
   $: {
     disabled = !(CONTACT_REGEX.test($contact) && EMAIL_REGEX.test($email));
+
+    if ($country === INDIA_COUNTRY_CODE) {
+      disabled = !PHONE_REGEX_INDIA.test($phone);
+    }
   }
 
   onMount(() => {
@@ -110,6 +123,9 @@
     Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
       previousScreen: screensHistory.previousRoute(),
     });
+    if (isOneClickCheckout() && $activeRoute?.name === views.DETAILS) {
+      toggleHeader(false);
+    }
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();
@@ -128,7 +144,11 @@
   }
 </script>
 
-<div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
+<div
+  class:details-wrapper={isOneClickCheckout() &&
+    $activeRoute?.name === views.DETAILS}
+  in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
+>
   {#if isLoginMandatory()}
     <div class="details-callout">{$t(MANDATORY_LOGIN_CALLOUT)}</div>
   {/if}
@@ -191,6 +211,9 @@
 </div>
 
 <style>
+  .details-wrapper {
+    padding: 28px 16px;
+  }
   .details-block {
     padding: 0 24px;
   }
