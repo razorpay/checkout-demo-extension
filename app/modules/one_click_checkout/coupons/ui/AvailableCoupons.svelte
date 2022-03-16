@@ -83,14 +83,12 @@
 
 <style>
   .coupons-list {
-    margin-left: -20px;
-    margin-right: -20px;
-    padding: 4px 16px 24px;
+    padding: 4px 0px 24px;
   }
 
   .available-coupons-container {
     margin-bottom: 80px;
-    padding: 20px 18px 0px;
+    padding: 20px 16px 0px;
   }
   .available-coupons-heading {
     display: flex;

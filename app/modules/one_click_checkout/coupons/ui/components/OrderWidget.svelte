@@ -90,13 +90,13 @@
     </div>
   {/if}
   <hr class="split" />
-  <div class="row justify-between">
+  <div class="row justify-between total-label">
     {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
       <Shimmer width="40%" />
       <Shimmer width="20%" />
     {:else}
-      <p><b>{$t(TOTAL_LABEL)}</b></p>
-      <p><b>{formatAmountWithSymbol($amount, currency)}</b></p>
+      <p>{$t(TOTAL_LABEL)}</p>
+      <p>{formatAmountWithSymbol($amount, currency)}</p>
     {/if}
   </div>
 </div>
@@ -152,5 +152,9 @@
   .split {
     border: 1px dashed #8d97a1;
     border-bottom: none;
+    margin: 16px 0px;
+  }
+  .total-label {
+    font-weight: 600;
   }
 </style>
