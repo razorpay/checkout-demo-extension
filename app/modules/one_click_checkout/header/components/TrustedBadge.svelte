@@ -78,7 +78,7 @@
   .rtb-text {
     font-size: 12px;
     line-height: 150%;
-    font-weight: 900;
+    font-weight: 600;
     margin: 0px 6px 0px 2px;
   }
 

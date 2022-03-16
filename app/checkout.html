@@ -9,6 +9,9 @@
       name="viewport"
       content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1"
     />
+
+    <!-- In checkout we are consuming 2 fonts. If a user rendered checkout using normal flow
+      lato will get rendered and if users render checkout using 1cc flow Inter gets rendered. -->
     <style>
       @font-face {
         font-family: 'lato';
@@ -16,6 +19,38 @@
           url('fonts/lato.woff') format('woff');
         font-weight: normal;
         font-style: normal;
+      }
+
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url('fonts/Inter-Light.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: normal;
+        font-display: swap;
+        src: url('fonts/Inter.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url('fonts/Inter-SemiBold.ttf') format('truetype');
+      }
+
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: bold;
+        font-display: swap;
+        src: url('fonts/Inter-Bold.ttf') format('truetype');
       }
     </style>
     <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet" />
