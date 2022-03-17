@@ -49,10 +49,7 @@
 <div id="downtime-wrap" class:container-one-cc={isOneClickCheckout()}>
   <div class="container">
     <ul class="list">
-      <li
-        class={isOneClickCheckout() ? 'line1-one-cc' : 'line1'}
-        class:theme={isOneClickCheckout()}
-      >
+      <li class={isOneClickCheckout() ? 'theme line1-one-cc' : 'line1'}>
         <div class="icon-wrapper">
           {#if !isOneClickCheckout()}
             <DowntimeIcon severe="high" />
