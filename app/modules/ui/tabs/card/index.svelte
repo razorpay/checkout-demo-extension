@@ -902,7 +902,6 @@
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
-    setTabTitle(TAB_TITLE.CARD);
     renderCtaOneCC = true;
     $selectedCard = null;
     showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
