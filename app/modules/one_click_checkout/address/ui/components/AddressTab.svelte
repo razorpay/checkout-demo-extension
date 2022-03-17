@@ -23,6 +23,7 @@
   } from 'one_click_checkout/address/store';
   import {
     selectedAddress,
+    selectedAddressId as selectedShippingAddressId,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
 
@@ -52,6 +53,21 @@
   export let addressType;
 
   let showCta = true;
+  $: showCta = Resource[addressType].checkServiceability
+    ? $selectedAddress.serviceability
+    : true;
+
+  let addresses;
+  $: {
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      addresses = $savedAddresses;
+    } else {
+      addresses = $savedAddresses.filter(
+        (_addr) => _addr.id !== $selectedShippingAddressId
+      );
+    }
+  }
+
   let disabled;
   let {
     title,
@@ -102,10 +118,6 @@
       address_index: addressIndex,
       is_cod_available: cod,
     });
-    showCta = true;
-    if (Resource[addressType].checkServiceability) {
-      showCta = serviceability;
-    }
   }
 
   export function onSubmit() {
@@ -218,7 +230,7 @@
       {#if currentView === addressViews.SAVED_ADDRESSES}
         <SavedAddresses
           {selectedAddressId}
-          addresses={savedAddresses}
+          {addresses}
           on:select={handleAddressSelection}
           on:editClick={handleEditAddressClick}
           onAddAddressClick={handleAddAddressClick}
