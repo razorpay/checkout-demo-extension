@@ -3362,7 +3362,7 @@ Session.prototype = {
         offer &&
         discreet.Offers.getOfferMethodForTab(tab) !== offer.payment_method
       ) {
-        this.offers.clearOffer();
+        this.offers.clearOffer(false);
       }
     } else {
       this.payload = null;
