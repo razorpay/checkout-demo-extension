@@ -320,7 +320,11 @@
             class:search-field-1cc={isOneClickCheckoutEnabled}
           >
             <div class="icon">
-              <Icon icon={getMiscIcon('search')} />
+              <Icon
+                icon={isOneClickCheckoutEnabled
+                  ? getMiscIcon('search_one_cc')
+                  : getMiscIcon('search')}
+              />
             </div>
             <input
               class="no-escape"
@@ -347,6 +351,7 @@
             aria-label={$t('misc.search_results_label')}
             role="listbox"
             bind:this={resultsContainerRef}
+            class:search-dropdown-1cc={isOneClickCheckoutEnabled}
           >
             {#if query}
               {#if results.length}
@@ -589,5 +594,14 @@
     border-radius: 4px;
     align-self: stretch;
     margin: 20px 16px;
+  }
+
+  .search-field-1cc .icon :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .search-field-1cc .icon {
+    margin-right: -6px;
   }
 </style>
