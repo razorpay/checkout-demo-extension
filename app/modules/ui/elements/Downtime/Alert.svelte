@@ -100,7 +100,6 @@
         class="continue-button {isOneClickCheckout()
           ? 'theme-bg-color'
           : 'blue-continue-btn'}"
-        class:theme-bg-color={isOneClickCheckout()}
         on:click={handleContinue}>Continue</button
       >
     </div>
