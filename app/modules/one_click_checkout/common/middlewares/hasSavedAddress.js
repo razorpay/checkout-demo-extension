@@ -11,6 +11,7 @@ import {
   updateOTPStore,
 } from 'one_click_checkout/common/otpHelpers';
 import { savedAddresses } from 'one_click_checkout/address/store';
+import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { views } from 'one_click_checkout/routing/constants';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
@@ -33,9 +34,17 @@ const hasSavedAddresses =
     }
 
     if (loggedIn) {
-      if (get(savedAddresses).length) {
+      let addresses = get(savedAddresses);
+      if (route.name === views.SAVED_BILLING_ADDRESS) {
+        addresses = addresses.filter(
+          (addr) => addr.id !== get(selectedShippingAddressId)
+        );
+      }
+
+      if (addresses.length) {
         return;
       }
+
       return redirect;
     }
 
