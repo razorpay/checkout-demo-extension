@@ -185,12 +185,15 @@
     onShown();
   }
 
-  function hideList() {
+  function hideList(shouldMountCta) {
     renderCtaOneCC = false;
     listActive = false;
     selected = null;
 
-    onHide();
+    // onHide basically mounts the active screen's cta..don't do it in edge cases. (When going back from home screen)
+    if (shouldMountCta) {
+      onHide();
+    }
     if (isOneClickCheckout()) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.remove('offers-fade');
@@ -202,10 +205,10 @@
   }
 
   export function onSubmit() {
-    applyOffer(selected);
+    applyOffer(selected, true);
   }
 
-  function applyOffer(offer) {
+  function applyOffer(offer, shouldMountCta) {
     Events.TrackBehav(OfferEvents.APPLY, { offer });
     if (offer && offer.id === CRED_EXPERIMENTAL_OFFER_ID) {
       Events.TrackBehav(CredEvents.EXPERIMENT_OFFER_SELECTED);
@@ -215,14 +218,14 @@
       previousApplied[offer.payment_method] = offer;
     }
     // you hide offers view first, to initiate CTA unmount lifecycle
-    hideList();
+    hideList(shouldMountCta);
     // let other view updation take place after offers hide
     // to maintain CTA lifo stack
     tick().then(() => setAppliedOffer(offer, true));
   }
 
-  export function clearOffer() {
-    applyOffer(null);
+  export function clearOffer(shouldMountCta = true) {
+    applyOffer(null, shouldMountCta);
     selected = null;
   }
 
