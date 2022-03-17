@@ -49,3 +49,5 @@ export const PINCODE_ERROR_LABEL = 'address.pincode_error_message';
 export const EDIT_ADDRESS_LABEL = 'address.edit_address_label';
 export const PINCODE_NON_SERVICEABLE_LABEL =
   'address.pincode_non_serviceable_label';
+export const ADD_LANDMARK = 'address.add_landmark';
+export const OPTIONAL = 'address.optional';

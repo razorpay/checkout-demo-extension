@@ -9,7 +9,7 @@
   // Icon Imports
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  const { circle_check } = getIcons();
+  const { circle_check, solid_down_arrow } = getIcons();
 
   // Actions
   import {
@@ -62,6 +62,7 @@
   export let inputFieldClasses = '';
   export let errorValidationClasses = '';
   export let showServicableIcon = false;
+  export let showDropDownIcon = false;
 
   /**
    * To show prediction as dropdown
@@ -326,6 +327,9 @@
   {/if}
   {#if showServicableIcon}
     <span class="servicibility-icon-wrapper"><Icon icon={circle_check} /></span>
+  {/if}
+  {#if showDropDownIcon}
+    <span class="drop-down-icon-wrapper"><Icon icon={solid_down_arrow} /></span>
   {/if}
   {#if leftImage}
     <img
@@ -669,5 +673,11 @@
     position: absolute;
     right: 14px;
     top: 24px;
+  }
+
+  .drop-down-icon-wrapper {
+    position: absolute;
+    right: 14px;
+    top: 22px;
   }
 </style>
