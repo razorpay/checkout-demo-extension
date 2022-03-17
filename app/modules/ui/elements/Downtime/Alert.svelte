@@ -19,6 +19,9 @@
 
   import { Events, DowntimeEvents, MetaProperties } from 'analytics';
 
+  // helper imports
+  import { isOneClickCheckout } from 'razorpay';
+
   let instrument;
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -43,11 +46,18 @@
   };
 </script>
 
-<div id="downtime-wrap">
+<div id="downtime-wrap" class:container-one-cc={isOneClickCheckout()}>
   <div class="container">
     <ul class="list">
-      <li class="line1">
-        <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
+      <li
+        class={isOneClickCheckout() ? 'line1-one-cc' : 'line1'}
+        class:theme={isOneClickCheckout()}
+      >
+        <div class="icon-wrapper">
+          {#if !isOneClickCheckout()}
+            <DowntimeIcon severe="high" />
+          {/if}
+        </div>
         <div>{$t(DOWNTIME_HIGHLIGHT1)}</div>
       </li>
       <li class="line2">
@@ -80,8 +90,18 @@
       </li>
     </ul>
     <div class="buttons">
-      <button class="back-button" on:click={handleBack}>Back</button>
-      <button class="continue-button" on:click={handleContinue}>Continue</button
+      <button
+        class="back-button {isOneClickCheckout()
+          ? 'theme theme-border'
+          : 'blue-back-btn'}"
+        on:click={handleBack}>Back</button
+      >
+      <button
+        class="continue-button {isOneClickCheckout()
+          ? 'theme-bg-color'
+          : 'blue-continue-btn'}"
+        class:theme-bg-color={isOneClickCheckout()}
+        on:click={handleContinue}>Continue</button
       >
     </div>
   </div>
@@ -121,19 +141,26 @@
   }
   .back-button {
     padding: 12px 32px;
-    border: 1px solid #5aa4f5;
+    border: 1px solid;
+  }
+
+  .blue-back-btn {
+    border-color: #5aa4f5;
     color: #5aa4f5;
   }
   .continue-button {
     padding: 12px 60px;
+    color: #ffffff;
+  }
+  .blue-continue-btn {
     background: linear-gradient(
         97.84deg,
         rgba(255, 255, 255, 0.2) 0%,
         rgba(0, 0, 0, 0.2) 100%
       ),
       #3a97fc;
-    color: #ffffff;
   }
+
   .icon-wrapper {
     min-width: 25px;
     text-align: right;
@@ -154,5 +181,33 @@
     transition: 0.2s;
     padding-top: 20px;
     z-index: 100;
+  }
+  #downtime-wrap.container-one-cc {
+    height: 224px;
+  }
+  .container-one-cc .list {
+    margin: 6px 0px 26px;
+  }
+  .container-one-cc .list li div {
+    font-size: 12px;
+  }
+
+  .line1-one-cc {
+    font-weight: 600;
+  }
+
+  .container-one-cc .line2,
+  .container-one-cc .line3 {
+    color: #8d97a1;
+    font-weight: 400;
+  }
+
+  .container-one-cc .buttons button {
+    border-radius: 6px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
   }
 </style>
