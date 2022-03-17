@@ -6,10 +6,6 @@
   import Icon from 'ui/elements/Icon.svelte';
   import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
 
-  // store imports
-  import { savedAddresses } from 'one_click_checkout/address/store';
-  import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
-
   // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
 
@@ -28,7 +24,6 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
-  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
   // session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -37,7 +32,7 @@
     postAddressSelection,
   } from 'one_click_checkout/address/sessionInterface';
 
-  export let addresses = savedAddresses;
+  export let addresses;
   export let checkServiceability = true;
   export let selectedAddressId;
   export let onAddAddressClick;
@@ -62,37 +57,17 @@
     dispatchServiceability(id, index);
   }
 
-  function getSavedAddresses() {
-    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) return $addresses;
-    return $addresses.filter(
-      (_addr) => _addr.id !== $selectedShippingAddressId
-    );
-  }
-
   onMount(() => {
-    if ($addresses.length) {
-      if (checkServiceability) {
-        // shipping address
-
-        if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
-          loadAddressesWithServiceability(true);
-        } else if (!$selectedAddressId) {
-          selectedAddressId.set($addresses[0].id);
-        }
-      } else {
-        // billing address
-
-        // select the 2nd billing address if 1st address is selected for shipping
-        if (!$selectedAddressId) {
-          if ($selectedShippingAddressId === $addresses[0].id) {
-            selectedAddressId.set($addresses[1].id);
-          } else {
-            selectedAddressId.set($addresses[0].id);
-          }
-        }
-        dispatchServiceability();
-      }
+    if (
+      checkServiceability &&
+      $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+    ) {
+      loadAddressesWithServiceability(true);
+    } else if (!$selectedAddressId) {
+      selectedAddressId.set(addresses[0].id);
     }
+    dispatchServiceability();
+
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.ADDRESS,
@@ -101,7 +76,7 @@
       },
     });
     Events.Track(AddressEvents.SAVED_ADDRESS_SCREEN, {
-      count: $addresses.length,
+      count: addresses.length,
       type: addressType,
     });
   });
@@ -116,13 +91,13 @@
   </div>
 
   <div>
-    {#each getSavedAddresses() as s_address, index}
+    {#each addresses as addr, index}
       <div class="address-box">
         <AddressBox
-          address={s_address}
-          on:select={() => handleRadioClick(s_address.id, index)}
+          address={addr}
+          on:select={() => handleRadioClick(addr.id, index)}
           on:editClick
-          isSelected={$selectedAddressId === s_address.id}
+          isSelected={$selectedAddressId === addr.id}
           {checkServiceability}
           loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         />

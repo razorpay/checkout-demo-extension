@@ -2,6 +2,7 @@
   // UI imports
   import Callout from 'ui/elements/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import EmiPlanCards from 'ui/tabs/emi/emiplancards.svelte';
   import EmiContact from 'ui/tabs/emi/emicontact.svelte';
 
@@ -25,6 +26,7 @@
     PLAN_LIST_CALLOUT_AGREEMENT,
     PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT,
   } from 'ui/labels/emi';
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Util imports
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
@@ -34,6 +36,7 @@
 
   // Utils imports
   import { isMethodUsable } from 'checkoutstore/methods';
+  import { isOneClickCheckout } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
 
   // Props
@@ -49,6 +52,9 @@
 
   // Computed
   export let showActions;
+
+  let ctaOneCCDisabled = true;
+  let renderCtaOneCC = false;
 
   // Constants
   const Views = {
@@ -112,8 +118,10 @@
     const validContact = INDIAN_CONTACT_REGEX.test(contact);
     // Don't let the user continue if the contact is invalid.
     if (validContact) {
+      ctaOneCCDisabled = false;
       showCta();
     } else {
+      ctaOneCCDisabled = true;
       hideCta();
     }
     // However, invoke setContact everytime the value changes.
@@ -131,9 +139,14 @@
   }
 
   export function onShown() {
+    renderCtaOneCC = true;
     toggleHeader(true);
     setTabTitleLogo('');
     showPlansView();
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
   }
 
   export function showPlansView() {
@@ -162,6 +175,8 @@
       on[type](event);
     }
   }
+
+  $: ctaOneCCDisabled = expanded === -1;
 </script>
 
 <div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
@@ -241,6 +256,11 @@
       on:blur={(e) => onContactFilled(e.target.value)}
       isSavedCard={type === 'saved'}
     />
+  {/if}
+  {#if renderCtaOneCC}
+    <CTAOneCC disabled={ctaOneCCDisabled}>
+      {$t(PAY_NOW_CTA_LABEL)}
+    </CTAOneCC>
   {/if}
 </div>
 

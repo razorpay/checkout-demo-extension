@@ -3,7 +3,7 @@
   import { get } from 'svelte/store';
 
   // UI imports
-  import CTA from 'ui/elements/CTA.svelte';
+  import CTA from 'one_click_checkout/cta/index.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
@@ -12,8 +12,6 @@
   // i18n imports
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-  import { CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
-
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
@@ -25,10 +23,12 @@
   } from 'one_click_checkout/address/store';
   import {
     selectedAddress,
+    selectedAddressId as selectedShippingAddressId,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
 
   // helpers imports
+  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
@@ -46,13 +46,28 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
+
   export let error;
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
 
   let showCta = true;
+  $: showCta = Resource[addressType].checkServiceability
+    ? $selectedAddress.serviceability
+    : true;
+
+  let addresses;
+  $: {
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      addresses = $savedAddresses;
+    } else {
+      addresses = $savedAddresses.filter(
+        (_addr) => _addr.id !== $selectedShippingAddressId
+      );
+    }
+  }
+
   let disabled;
   let {
     title,
@@ -103,10 +118,6 @@
       address_index: addressIndex,
       is_cod_available: cod,
     });
-    showCta = true;
-    if (Resource[addressType].checkServiceability) {
-      showCta = serviceability;
-    }
   }
 
   export function onSubmit() {
@@ -219,7 +230,7 @@
       {#if currentView === addressViews.SAVED_ADDRESSES}
         <SavedAddresses
           {selectedAddressId}
-          addresses={savedAddresses}
+          {addresses}
           on:select={handleAddressSelection}
           on:editClick={handleEditAddressClick}
           onAddAddressClick={handleAddAddressClick}
@@ -244,9 +255,7 @@
     <AccountTab />
   </div>
   <slot name="footer" />
-  <CTA on:click={onSubmit} {disabled}>
-    {$t(CTA_LABEL)}
-  </CTA>
+  <CTA on:click={onSubmit} {disabled} hidden={!showCta} />
 </div>
 
 <style>

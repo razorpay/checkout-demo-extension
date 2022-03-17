@@ -3,15 +3,20 @@
   import { onMount, onDestroy } from 'svelte';
 
   // UI Imports
-  import CTA from 'ui/elements/CTA.svelte';
-  import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
+  import AvailableCouponsButton from 'one_click_checkout/coupons/ui/components/AvailableCouponsButton.svelte';
   import ContactWidget from 'one_click_checkout/contact_widget/ContactWidget.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
+  import CTA from 'one_click_checkout/cta/index.svelte';
 
   // store imports
-  import { getPrefilledCouponCode } from 'razorpay';
+  import { contact, email } from 'checkoutstore/screens/home';
+  import {
+    getPrefilledCouponCode,
+    isContactHidden,
+    isEmailHidden,
+  } from 'razorpay';
   import {
     checkServiceabilityStatus,
     selectedAddress,
@@ -30,8 +35,6 @@
   import { isIndianCustomer } from 'checkoutstore';
 
   // i18n imports
-  import { t } from 'svelte-i18n';
-  import { CONTINUE_LABEL } from 'one_click_checkout/coupons/i18n/labels';
   import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
   // session imports
@@ -68,11 +71,14 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
 
-  let showCta = true;
   const prefilledCoupon = getPrefilledCouponCode();
 
   let ctaDisabled = false;
-  $: ctaDisabled = $savedAddresses.length && !$selectedAddress.serviceability;
+
+  $: ctaDisabled =
+    (!$contact && !isContactHidden()) ||
+    (!$email && !isEmailHidden()) ||
+    ($savedAddresses.length && !$selectedAddress.serviceability);
 
   function onSubmit() {
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
@@ -132,6 +138,10 @@
   onDestroy(() => {
     hideToast();
   });
+
+  function onViewDetailsClick() {
+    document.getElementById('order-widget').scrollIntoView();
+  }
 </script>
 
 <Screen pad={false}>
@@ -161,13 +171,10 @@
     </div>
     <div class="separator" />
 
-    <div class="widget-wrapper">
+    <div class="widget-wrapper" id="order-widget">
       <OrderWidget />
     </div>
-
-    {#if showCta}
-      <CTA disabled={ctaDisabled} on:click={onSubmit}>{$t(CONTINUE_LABEL)}</CTA>
-    {/if}
+    <CTA on:click={onSubmit} {onViewDetailsClick} disabled={ctaDisabled} />
   </div>
 </Screen>
 

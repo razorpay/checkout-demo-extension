@@ -43,6 +43,7 @@
   }
 
   .inner-text {
-    margin-left: 6px;
+    margin-left: 4px;
+    margin-top: 2px;
   }
 </style>

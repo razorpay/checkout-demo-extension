@@ -3,6 +3,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import { updateActionAreaContentAndCTA } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
@@ -168,12 +169,19 @@
     CATEGORIES,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
+  import {
+    PAY_NOW_CTA_LABEL,
+    PLACE_ORDER_CTA_LABEL,
+  } from 'one_click_checkout/cta/i18n';
 
   const cardOffer = getCardOffer();
   const session = getSession();
   const singleMethod = getSingleMethod();
 
+  let selectedMethod = '';
   let showHome = false;
+  let renderCtaOneCC = false;
+  let ctaOneCCDisabled = true;
 
   // TPV
   const tpv = getTPV();
@@ -788,6 +796,7 @@
   }
 
   export function onShown() {
+    renderCtaOneCC = true;
     if (!isOneClickCheckout()) {
       showHome = true;
     }
@@ -996,6 +1005,7 @@
   function deselectInstrument() {
     $selectedInstrumentId = null;
     dccView = 'home-screen';
+    ctaOneCCDisabled = true;
   }
 
   function showSnackbar(isCodApplied) {
@@ -1017,6 +1027,7 @@
   }
 
   export function selectMethod(method) {
+    selectedMethod = method;
     Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
       method,
     });
@@ -1049,6 +1060,10 @@
       // other code to run and perform validations.
       session.switchTab(method);
     });
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
   }
 
   function showCODCharges(method) {
@@ -1105,6 +1120,7 @@
   }
 
   export function onSelectInstrument(event) {
+    ctaOneCCDisabled = false;
     const instrument = event.detail;
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
       instrument,
@@ -1245,6 +1261,13 @@
         <SecuredMessage />
       {/if}
     </Bottom>
+    {#if renderCtaOneCC}
+      <CTAOneCC disabled={ctaOneCCDisabled}>
+        {selectedMethod === 'cod'
+          ? $t(PLACE_ORDER_CTA_LABEL)
+          : $t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 

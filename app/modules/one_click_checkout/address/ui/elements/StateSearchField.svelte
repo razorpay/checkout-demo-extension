@@ -9,6 +9,7 @@
     STATE_SEARCH_ALL,
     STATE_SEARCH_PLACEHOLDER,
   } from 'one_click_checkout/address/i18n/labels';
+  import { truncateString } from 'utils/strings';
 
   export let items = [];
   export let onChange;
@@ -61,7 +62,7 @@
   {id}
   name="state"
   autocomplete="off"
-  value={stateName}
+  value={truncateString(stateName, 12)}
   on:click={openStateModal}
   on:keydown={downArrowHandler}
   required
@@ -76,6 +77,7 @@
   {validationText}
   elemClasses="address-elem"
   labelClasses="address-label"
+  showDropDownIcon={true}
 />
 <SearchModal
   bind:open

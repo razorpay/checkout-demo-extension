@@ -47,5 +47,7 @@ export default {
   edit_address_label: 'Edit',
   pincode_non_serviceable_label:
     'This pincode is not serviceable. Try again with another address',
+  add_landmark: 'Add Landmark',
+  optional: '(Optional)',
   ...billingAddressLabels,
 };

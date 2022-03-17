@@ -47,6 +47,7 @@ import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
+import solid_down_arrow from 'one_click_checkout/address/icons/solid_down_arrow';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -89,6 +90,7 @@ const availIconNames = getAllMethods().concat([
   'info',
   'user',
   'caret_circle_right',
+  'solid_down_arrow',
 ]);
 
 function getIconFn(iconName) {
@@ -144,6 +146,7 @@ function getIconFn(iconName) {
 
     case 'present':
       return present;
+
     case 'trusted_badge':
       return trustedBadge;
 
@@ -248,6 +251,9 @@ function getIconFn(iconName) {
 
     case 'offline_challan':
       return offlineChallan;
+
+    case 'solid_down_arrow':
+      return solid_down_arrow;
   }
 }
 

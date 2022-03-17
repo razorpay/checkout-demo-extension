@@ -139,7 +139,7 @@
     position: absolute;
     background: white;
     text-align: start;
-    bottom: -55px;
+    bottom: 0;
     width: 100%;
     padding: 24px;
   }

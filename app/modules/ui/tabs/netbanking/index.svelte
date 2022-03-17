@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
@@ -23,6 +23,7 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   // i18n
   import {
@@ -62,6 +63,7 @@
 
   // Analytics imports
   import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let banks;
@@ -80,6 +82,8 @@
   let downtimeSeverity = false;
   let selectedBankName;
   let translatedBanksArr;
+
+  let renderCtaOneCC = false;
 
   $: {
     if ($selectedBank) {
@@ -290,7 +294,20 @@
 
   onMount(() => {
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+    renderCtaOneCC = true;
   });
+
+  onDestroy(() => {
+    renderCtaOneCC = false;
+  });
+
+  export function onShown() {
+    renderCtaOneCC = true;
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
+  }
 </script>
 
 <!-- TODO: remove override after fixing method check -->
@@ -423,6 +440,14 @@
     </Bottom>
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />
+    {/if}
+    {#if renderCtaOneCC}
+      <CTAOneCC
+        disabled={!$selectedBank}
+        on:click={() => getSession().preSubmit()}
+      >
+        {$t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
     {/if}
   </Screen>
 </Tab>

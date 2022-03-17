@@ -23,15 +23,23 @@ import {
   isAVSEnabledForEntity,
 } from 'checkoutstore/screens/card';
 import CardTab from 'ui/tabs/card/index.svelte';
+import { getSession } from 'sessionmanager';
+import { METHODS } from 'checkoutframe/constants';
 
 const CARD_KEY = 'svelteCardTab';
 
 export function render() {
+  const session = getSession();
   if (isCardOrEMIEnabled) {
     const cardTab = new CardTab({
       target: _Doc.querySelector('#form-fields'),
     });
     setView(CARD_KEY, cardTab);
+    session.tabs = {
+      ...session.tabs,
+      [METHODS.EMI]: cardTab,
+      [METHODS.CARD]: cardTab,
+    };
     return cardTab;
   }
 }

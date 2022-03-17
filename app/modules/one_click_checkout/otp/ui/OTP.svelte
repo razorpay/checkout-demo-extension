@@ -17,7 +17,7 @@
     accessTime,
     errorMessage,
     disableCTA,
-    ctaLabel,
+    renderCtaOneCC,
   } from 'checkoutstore/screens/otp';
   import { isOneClickCheckout } from 'razorpay';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
@@ -50,7 +50,7 @@
   import ResendButton from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OTPInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
+  import CTA from 'one_click_checkout/cta/index.svelte';
   import {
     stopResendCountdown,
     getTheme,
@@ -82,6 +82,8 @@
   $: otpPromptVisible = !$action && !$loading;
   $: compact = $mode === 'HDFC_DC' || ($ipAddress && $accessTime);
   $: showInput = !($action || $loading);
+  $: newCta = $renderCtaOneCC && newCta;
+
   export function invoke(type, event) {
     const method = on[type];
     if (type === 'secondary') {
@@ -271,8 +273,8 @@
       </span>
     {/if}
   </div>
-  {#if newCta}
-    <CTA disabled={$disableCTA} on:click={onSubmit}>{$t($ctaLabel)}</CTA>
+  {#if newCta && !$loading}
+    <CTA disabled={$disableCTA} on:click={onSubmit} showAmount={false} />
   {/if}
 </div>
 

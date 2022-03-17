@@ -759,8 +759,23 @@ i {
   }
 
   #body {
-    height: 403px;
-    flex-basis: 403px;
+    min-height: 440px;
+    height: 440px;
+    flex-basis: 440px;
+  }
+
+  #body.sub {
+    margin-bottom: 0;
+  }
+
+  #form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #form-fields {
+    z-index: inherit;
+    position: inherit;
   }
 
   #modal, #timeout, button, input, textarea, select {
@@ -1582,4 +1597,19 @@ div.callout span{
 
 .hide-topbar {
   display: none;
+}
+
+#footer.hidden {
+  display: none;
+}
+
+#one-cc-footer {
+  background: white;
+  z-index: 3;
+  color: black;
+  width: 100%;
+}
+
+#one-cc-footer:hover {
+  cursor: pointer;
 }

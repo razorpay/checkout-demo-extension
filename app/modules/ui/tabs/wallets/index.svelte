@@ -1,6 +1,6 @@
 <script>
   // Svelte Imports
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
@@ -8,10 +8,10 @@
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
   import { isDynamicWalletFlow } from 'checkoutstore';
-  import Bottom from 'ui/layouts/Bottom.svelte';
+
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
-  import { locale } from 'svelte-i18n';
+  import { locale, t } from 'svelte-i18n';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -23,6 +23,8 @@
 
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { scrollIntoView } from 'lib/utils';
@@ -32,6 +34,9 @@
   import { slide } from 'svelte/transition';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
+  // Constant imports
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+
   const session = getSession();
   const wallets = getWallets();
 
@@ -39,6 +44,7 @@
   const ua_iPhone = /iPhone/.test(ua);
 
   let filteredWallets = wallets;
+  let renderCtaOneCC = false;
   $: {
     filteredWallets = filterWalletsAgainstInstrument(
       wallets,
@@ -123,14 +129,22 @@
 
   export function onShown() {
     if ($selectedWallet) {
+      renderCtaOneCC = true;
       showCta();
       setTimeout(() => {
         scrollIntoView(walletReferences[$selectedWallet]);
       }, 200);
     } else {
+      renderCtaOneCC = false;
       hideCta();
     }
   }
+
+  export function onHide() {
+    renderCtaOneCC = false;
+  }
+
+  $: renderCtaOneCC = !!$selectedWallet;
 
   // Called when the user presses the pay button
   export function getPayload() {
@@ -155,6 +169,10 @@
 
   onMount(() => {
     Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
+  });
+
+  onDestroy(() => {
+    renderCtaOneCC = false;
   });
 </script>
 
@@ -207,6 +225,11 @@
       <DynamicCurrencyView tabVisible view={$selectedWallet} />
     {/if}
   </Bottom>
+  {#if renderCtaOneCC}
+    <CTAOneCC on:click={() => session.preSubmit()}>
+      {$t(PAY_NOW_CTA_LABEL)}
+    </CTAOneCC>
+  {/if}
 </Tab>
 
 <style>

@@ -4,6 +4,7 @@ import account from 'one_click_checkout/account_modal/i18n/en';
 import contact from 'one_click_checkout/contact_widget/i18n/en';
 import loader from 'one_click_checkout/loader/i18n/en';
 import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
+import ctaOneCC from 'one_click_checkout/cta/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import trustedBadgeLang from 'trusted-badge/i18n/en';
@@ -1344,4 +1345,5 @@ export default {
     nvs_first_name: 'First Name*',
     nvs_last_name: 'Last Name*',
   },
+  cta_one_cc: ctaOneCC,
 };

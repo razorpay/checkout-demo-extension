@@ -691,7 +691,7 @@
     box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
     z-index: 3;
     border-radius: 2px;
-    bottom: -56px;
+    bottom: -60px;
     pointer-events: none;
     margin: 0px 16px;
   }
@@ -704,7 +704,7 @@
     border-style: solid;
     border-color: transparent transparent #2d313a;
     bottom: 100%;
-    left: 50%;
+    left: 33%;
     margin: 0 0 -1px -10px;
   }
 

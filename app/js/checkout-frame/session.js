@@ -137,6 +137,8 @@ var PayLaterStore = {
   lenderBranding: {},
 };
 
+var METHODS = discreet.CommonConstants.METHODS;
+
 /**
  * Store for what tab and screen
  * should be shown when back is pressed.
@@ -1540,6 +1542,8 @@ Session.prototype = {
       var providerCode = event.detail.code;
       self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
+
+    this.tabs[METHODS.PAYLATER] = this.payLaterView;
   },
 
   setOneCCTabLogo: function (logo) {
@@ -2826,6 +2830,11 @@ Session.prototype = {
       this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
+    } else {
+      var instance = this.getCurrentTabInstance(screen);
+      if (instance && instance.onShown) {
+        instance.onShown();
+      }
     }
 
     return;
@@ -3301,6 +3310,14 @@ Session.prototype = {
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
+    // Executes actions to be done when moving away from a screen
+    if (this.tab !== tab) {
+      var instance = this.getCurrentTabInstance();
+      if (instance && instance.onHide) {
+        instance.onHide();
+      }
+    }
+
     if (tab === '') {
       this.homeTab.onShown();
     }
@@ -3345,7 +3362,7 @@ Session.prototype = {
         offer &&
         discreet.Offers.getOfferMethodForTab(tab) !== offer.payment_method
       ) {
-        this.offers.clearOffer();
+        this.offers.clearOffer(false);
       }
     } else {
       this.payload = null;
@@ -4607,6 +4624,9 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function (e, payload) {
+    if (this.tab === 'home-1cc') {
+      return;
+    }
     preventDefault(e);
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
@@ -6331,12 +6351,22 @@ Session.prototype = {
             session.handleDiscount();
           },
           onShown: function () {
+            var instance = session.getCurrentTabInstance();
+            if (instance && instance.onHide) {
+              instance.onHide();
+            }
             Analytics.track(
               'offers:list_view:screen:' + (session.screen || 'home'),
               {
                 data: session.getAppliedOffer(),
               }
             );
+          },
+          onHide: function () {
+            var instance = session.getCurrentTabInstance();
+            if (instance && instance.onShown) {
+              instance.onShown();
+            }
           },
         },
       });
@@ -6537,6 +6567,16 @@ Session.prototype = {
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },
+
+  getCurrentTabInstance: function (override_tab) {
+    var tab = override_tab || this.tab;
+    if (tab === '') {
+      return this.homeTab;
+    }
+    return this.tabs[tab];
+  },
+
+  tabs: {},
 
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,

@@ -3,7 +3,11 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { SERVICEABLE_LABEL } from 'one_click_checkout/address/i18n/labels';
+  import {
+    SERVICEABLE_LABEL,
+    ADD_LANDMARK,
+    OPTIONAL,
+  } from 'one_click_checkout/address/i18n/labels';
 
   import { country, phone } from 'checkoutstore/screens/home';
 
@@ -13,6 +17,7 @@
   import AutoCompleteInput from 'one_click_checkout/address/ui/components/AutoCompleteInput.svelte';
   import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
   import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
+
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
@@ -171,7 +176,8 @@
               on:click={() => handleLandmarkToggle()}
               class="show-landmark-label"
             >
-              + Add Landmark <span class="optional"> (Optional) </span>
+              + {$t(ADD_LANDMARK)}
+              <span class="optional"> {$t(OPTIONAL)} </span>
             </span>
           {/if}
         {:else}
@@ -253,6 +259,8 @@
     margin: 8px 0px;
     color: var(--highlight-color);
     cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
   }
   .show-landmark-label .optional {
     color: #79747e;

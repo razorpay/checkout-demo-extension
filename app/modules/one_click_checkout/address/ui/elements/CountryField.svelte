@@ -18,6 +18,8 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
+  import { truncateString } from 'utils/strings';
+
   export let onChange;
   export let extraLabel;
   export let extraLabelClass;
@@ -107,11 +109,12 @@
       onChange(id, { val: countryName, extra: countryISO });
     }}
     on:blur
-    value={countryName}
+    value={truncateString(countryName, 12)}
     elemClasses="address-elem"
     labelClasses="address-label"
     {validationText}
     modifyIconPosition={!!validationText}
+    showDropDownIcon={true}
   />
   {#if showExtraLabel && extraLabel}
     <div class={`${extraLabelClass} extralabel`}>
