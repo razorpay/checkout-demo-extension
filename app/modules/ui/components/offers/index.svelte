@@ -205,7 +205,7 @@
   }
 
   export function onSubmit() {
-    applyOffer(selected);
+    applyOffer(selected, true);
   }
 
   function applyOffer(offer, shouldMountCta) {

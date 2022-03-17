@@ -43,7 +43,9 @@
     {#if showAmount}
       <div class="flex-column">
         <span class="price-label">{formatAmountWithCurrency($amount)}</span>
-        <button id="cta-view-details" on:click={onViewDetailsClick}
+        <button
+          id="cta-view-details"
+          on:click|preventDefault={onViewDetailsClick}
           >{$t(VIEW_DETAILS_LABEL)}</button
         >
       </div>
