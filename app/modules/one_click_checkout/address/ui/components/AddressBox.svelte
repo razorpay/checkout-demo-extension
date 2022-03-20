@@ -130,7 +130,6 @@
     opacity: 1;
   }
   .address-container {
-    background: #fdfdfd;
     text-align: left;
     transition-duration: 0.15s;
     transition-property: border;
@@ -173,8 +172,10 @@
     color: #263a4a;
     background: #f2f6fb;
     border-radius: 2px;
-    padding: 2px 4px;
+    padding: 2px 4px 3px;
     align-self: baseline;
+    font-weight: 500;
+    line-height: 14px;
   }
   .address-text {
     line-height: 22px;

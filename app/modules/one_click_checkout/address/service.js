@@ -16,9 +16,15 @@ import AddressEvents from 'one_click_checkout/address/analytics';
 // utils import
 import { timer } from 'utils/timer';
 import { getContactPayload } from 'one_click_checkout/store';
-import { showLoader, loaderLabel } from 'one_click_checkout/loader/store';
-import { UPDATE_ADDRESS_LABEL } from 'one_click_checkout/loader/i18n/labels';
+import {
+  UPDATE_ADDRESS_LABEL,
+  CHECK_PIN_LABEL,
+} from 'one_click_checkout/loader/i18n/labels';
 import { didSaveAddress } from 'one_click_checkout/address/store';
+import {
+  showLoaderView,
+  hideLoaderView,
+} from 'one_click_checkout/loader/helper';
 
 const addressCache = {};
 let serviceabilityCache = {};
@@ -36,8 +42,7 @@ let availableStateList = {};
 export function getCityState(pincode, country) {
   const cityStateApiTimer = timer();
   const cachedAddress = addressCache[pincode];
-  loaderLabel.set('');
-  showLoader.set(true);
+  showLoaderView();
   Events.TrackMetric(AddressEvents.CITY_STATE_START);
 
   return new Promise((resolve, reject) => {
@@ -49,7 +54,7 @@ export function getCityState(pincode, country) {
             time: cityStateApiTimer(),
           });
           // If request was successful, save response in cache
-          showLoader.set(false);
+          hideLoaderView();
           if (response.error) {
             reject(response.error);
             return;
@@ -59,7 +64,7 @@ export function getCityState(pincode, country) {
         },
       });
     } else {
-      showLoader.set(false);
+      hideLoaderView();
       resolve(cachedAddress);
     }
   });
@@ -74,8 +79,7 @@ export function getCityState(pincode, country) {
  * Api call for updating address
  */
 export function putCustomerAddress({ shipping_address, billing_address }) {
-  loaderLabel.set(UPDATE_ADDRESS_LABEL);
-  showLoader.set(true);
+  showLoaderView(UPDATE_ADDRESS_LABEL);
   const addressApiTimer = timer();
   Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
   const payload = getCustomerAddressApiPayload(
@@ -98,11 +102,11 @@ export function putCustomerAddress({ shipping_address, billing_address }) {
         });
         if (response.error) {
           reject(response.error);
-          showLoader.set(false);
+          hideLoaderView();
           return;
         }
         didSaveAddress.set(true);
-        showLoader.set(false);
+        hideLoaderView();
         resolve(response);
       },
     });
@@ -118,8 +122,7 @@ export function putCustomerAddress({ shipping_address, billing_address }) {
  * Api call for saving address if user is logged in
  */
 export function postCustomerAddress({ shipping_address, billing_address }) {
-  loaderLabel.set(UPDATE_ADDRESS_LABEL);
-  showLoader.set(true);
+  showLoaderView(UPDATE_ADDRESS_LABEL);
   const addressApiTimer = timer();
   Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
   const payload = getCustomerAddressApiPayload({
@@ -140,11 +143,11 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
         });
         if (response.error) {
           reject(response.error);
-          showLoader.set(false);
+          hideLoaderView();
           return;
         }
         didSaveAddress.set(true);
-        showLoader.set(false);
+        hideLoaderView();
         resolve(response);
       },
     });
@@ -155,7 +158,14 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(addresses, onSavedAddress) {
+export function postServiceability(
+  addresses,
+  onSavedAddress,
+  withLoader = true
+) {
+  if (withLoader) {
+    showLoaderView(CHECK_PIN_LABEL);
+  }
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
     is_saved_address: onSavedAddress,
   });
@@ -168,6 +178,7 @@ export function postServiceability(addresses, onSavedAddress) {
     serviceabilityCache[order_id]
   );
   if (!formattedPayload) {
+    hideLoaderView();
     return Promise.resolve(serviceabilityCache[order_id]);
   }
   const payload = { addresses: formattedPayload, order_id };
@@ -183,6 +194,7 @@ export function postServiceability(addresses, onSavedAddress) {
         });
         if (response.error) {
           reject(response.error);
+          hideLoaderView();
           return;
         }
         if (
@@ -197,7 +209,7 @@ export function postServiceability(addresses, onSavedAddress) {
         } else {
           serviceabilityCache[order_id] = formatResults(response.addresses);
         }
-
+        hideLoaderView();
         resolve(serviceabilityCache[order_id]);
       },
     });
@@ -238,8 +250,7 @@ export function thirdWatchCodServiceability(address) {
 }
 
 export function updateOrder(shipping_address, billing_address) {
-  loaderLabel.set('');
-  showLoader.set(true);
+  showLoaderView();
   const orderId = getOrderId();
   // TODO: Add analytics
   return new Promise((resolve, reject) => {
@@ -256,10 +267,10 @@ export function updateOrder(shipping_address, billing_address) {
       callback: (response) => {
         if (response.error) {
           reject(response.error);
-          showLoader.set(false);
+          hideLoaderView();
           return;
         }
-        showLoader.set(false);
+        hideLoaderView();
         resolve(response);
       },
     });
@@ -344,7 +355,7 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
 
   return Promise.all(
     Object.values(zipecodeHash).map((address) =>
-      postServiceability([address], onSavedAddress)
+      postServiceability([address], onSavedAddress, false)
     )
   ).then(() =>
     hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])
