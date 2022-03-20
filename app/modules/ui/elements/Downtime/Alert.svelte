@@ -25,6 +25,7 @@
   let instrument;
   const session = getSession();
   const icons = session.themeMeta.icons;
+  const isOneCCEnabled = isOneClickCheckout();
 
   const handleContinue = () => {
     session.hideOverlayMessage();
@@ -46,12 +47,12 @@
   };
 </script>
 
-<div id="downtime-wrap" class:container-one-cc={isOneClickCheckout()}>
+<div id="downtime-wrap" class:container-one-cc={isOneCCEnabled}>
   <div class="container">
     <ul class="list">
-      <li class={isOneClickCheckout() ? 'theme line1-one-cc' : 'line1'}>
+      <li class={isOneCCEnabled ? 'theme line1-one-cc' : 'line1'}>
         <div class="icon-wrapper">
-          {#if !isOneClickCheckout()}
+          {#if !isOneCCEnabled}
             <DowntimeIcon severe="high" />
           {/if}
         </div>
@@ -88,13 +89,13 @@
     </ul>
     <div class="buttons">
       <button
-        class="back-button {isOneClickCheckout()
+        class="back-button {isOneCCEnabled
           ? 'theme theme-border'
           : 'blue-back-btn'}"
         on:click={handleBack}>Back</button
       >
       <button
-        class="continue-button {isOneClickCheckout()
+        class="continue-button {isOneCCEnabled
           ? 'theme-bg-color'
           : 'blue-continue-btn'}"
         on:click={handleContinue}>Continue</button
