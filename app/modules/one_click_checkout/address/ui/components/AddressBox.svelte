@@ -51,6 +51,27 @@
     class:selected-container={isSelected}
     on:click|preventDefault={() => dispatch('select')}
   >
+    {#if isEditable}
+      <div class="edit-cta">
+        <DropdownMenu
+          triggerElement={dropdownTrigger}
+          on:click={() => dispatch('select')}
+        >
+          <button bind:this={dropdownTrigger}>
+            <Icon icon={kebab_menu} />
+          </button>
+          <div slot="dropdown_menu">
+            <button
+              class="dropdown-item"
+              type="button"
+              on:click={() => dispatch('editClick', address)}
+            >
+              {$t(EDIT_ADDRESS_LABEL)}
+            </button>
+          </div>
+        </DropdownMenu>
+      </div>
+    {/if}
     <div class:disabled={!isServiceable} class="box-header">
       <div class="box-title">
         <span class="address-name">
@@ -60,26 +81,6 @@
           <div class="address-tag">{address.tag}</div>
         {/if}
       </div>
-      {#if isEditable}
-        <div class="edit-cta">
-          <DropdownMenu
-            triggerElement={dropdownTrigger}
-            on:click={() => dispatch('select')}
-          >
-            <button bind:this={dropdownTrigger}>
-              <Icon icon={kebab_menu} />
-            </button>
-            <div slot="dropdown_menu">
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={() => dispatch('editClick', address)}
-                >{$t(EDIT_ADDRESS_LABEL)}</button
-              >
-            </div>
-          </DropdownMenu>
-        </div>
-      {/if}
     </div>
     <div class="address-text">
       <div class:disabled={!isServiceable}>
@@ -157,6 +158,7 @@
     position: absolute;
     top: 26px;
     right: 20px;
+    z-index: 1;
   }
 
   .box-title {

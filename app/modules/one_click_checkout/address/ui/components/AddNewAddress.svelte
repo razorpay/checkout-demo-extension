@@ -98,6 +98,7 @@
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
+  let lastUpdateState = '';
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
@@ -328,6 +329,14 @@
   };
 
   export function onUpdate(key, value, extra) {
+    /**
+     * onUpdate gets fired twice for every input change.
+     * therefore, returning if last state was same.
+     */
+    if (lastUpdateState === JSON.stringify({ key, value, extra })) {
+      return;
+    }
+    lastUpdateState = JSON.stringify({ key, value, extra });
     // Track whenever suggestion is cleared
     if (
       ['landmark', 'line2'].includes(key) &&
@@ -354,11 +363,6 @@
         !$formData.city
       ) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
-      }
-      // Hack to prevent api being called twice, will remove and look for a better solution
-      called = !called;
-      if (!called) {
-        return;
       }
       if (pinPattern.test(value)) {
         const payload = [
