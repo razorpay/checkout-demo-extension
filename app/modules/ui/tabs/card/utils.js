@@ -1,8 +1,9 @@
-import { getCustomSubtextForMethod } from 'razorpay';
+import { getCustomSubtextForMethod, getMerchantKey } from 'razorpay';
 
 import { isShowMORTncEnabled } from 'checkoutstore';
 
 import { getAppProviderSubtext } from 'i18n';
+import { merchantsEnabledOnSIHub } from './constant';
 
 export function getAppInstrumentSubtext(provider, locale) {
   return (
@@ -18,6 +19,14 @@ export const sortBasedOnTokenization = (cards) =>
   );
 
 export const isCardTokenized = (card) => Boolean(card.consent_taken);
+
+/**
+ * Check if Merchant has allow_billdesk_sihub is enabled or not
+ * @returns boolean
+ */
+export const isSIHubEnabledMerchant = () => {
+  return merchantsEnabledOnSIHub.includes(getMerchantKey());
+};
 
 /**
  * Show TnC based on these conditions if flag is enabled:

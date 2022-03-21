@@ -106,7 +106,11 @@
     MetaProperties,
   } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
-  import { sortBasedOnTokenization, shouldShowTnc } from 'ui/tabs/card/utils';
+  import {
+    sortBasedOnTokenization,
+    shouldShowTnc,
+    isSIHubEnabledMerchant,
+  } from 'ui/tabs/card/utils';
 
   import {
     getIin,
@@ -735,6 +739,7 @@
     showRecurringCallout =
       $isIndianCustomer &&
       isRecurring() &&
+      !isSIHubEnabledMerchant() &&
       $newCardInputFocused &&
       !isCardSupportedForRecurring;
   }
