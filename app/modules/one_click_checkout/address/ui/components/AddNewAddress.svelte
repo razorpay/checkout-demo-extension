@@ -28,6 +28,10 @@
     INTERNATIONAL_PINCODE_LABEL,
     STATE_LABEL,
     REQUIRED_LABEL,
+    SAVE_ADDRESS_CONSENT_TNC,
+    SAVE_ADDRESS_CONSENT_PRIVACY,
+    SAVE_ADDRESS_CONSENT_AND,
+    SAVE_ADDRESS_CONSENT_TOOLTIP,
   } from 'one_click_checkout/address/i18n/labels';
 
   // const import
@@ -77,6 +81,8 @@
   import { views } from 'one_click_checkout/routing/constants';
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
+
+  import { clickOutside } from 'one_click_checkout/helper';
 
   // props
   export let formData;
@@ -567,12 +573,18 @@
     }
   }
 
-  let showTooltipVar = false;
-  function showTooltip() {
-    showTooltipVar = true;
-    setInterval(function () {
-      showTooltipVar = false;
-    }, 5000);
+  /* Helpers for - tooltip.
+  Not created a dedicated component for it - because its just used at one place and
+  its abstraction is a little tricky! With interest of time - I am adding it just here
+  if needed in future - we will abstract it. */
+  $: showTooltip = false;
+
+  function handleShowTooltip() {
+    showTooltip = true;
+  }
+
+  function handleHideTooltip() {
+    showTooltip = false;
   }
 
   onMount(() => {
@@ -628,18 +640,34 @@
         />
         <div class="save-address-wrapper">
           {$t(SAVE_ADDRESS_CONSENT)} &nbsp;
-          <div class="icon-wrapper" on:click={showTooltip}>
+          <div class="icon-wrapper" on:click={handleShowTooltip}>
             <Icon icon={info('#263A4A')} />
           </div>
         </div>
       </div>
-      <div class="elem-wrap-save-address-tc">
-        {#if showTooltipVar}
+      <div
+        class="elem-wrap-save-address-tc"
+        use:clickOutside
+        on:click_outside={handleHideTooltip}
+      >
+        {#if showTooltip}
           <div class="save-address-tooltip">
-            I agree to save my details as per Razorpay’s <span class="tc-text">
-              Terms and Conditions
-            </span>
-            and <span class="tc-text"> Privacy Policy </span>
+            {$t(SAVE_ADDRESS_CONSENT_TOOLTIP)}
+            <a
+              class="tc-text"
+              href="https://razorpay.com/terms/"
+              target="_blank"
+            >
+              {$t(SAVE_ADDRESS_CONSENT_TNC)}
+            </a>
+            {$t(SAVE_ADDRESS_CONSENT_AND)}
+            <a
+              class="tc-text"
+              href="https://razorpay.com/privacy/"
+              target="_blank"
+            >
+              {$t(SAVE_ADDRESS_CONSENT_PRIVACY)}
+            </a>
           </div>
         {/if}
       </div>
@@ -672,6 +700,7 @@
 
   .icon-wrapper {
     cursor: pointer;
+    margin-top: 2px;
   }
 
   .elem-wrap-save-address-tc {
@@ -704,7 +733,7 @@
     border-style: solid;
     border-color: transparent transparent #2d313a;
     bottom: 100%;
-    left: 33%;
+    left: 37%;
     margin: 0 0 -1px -10px;
   }
 
