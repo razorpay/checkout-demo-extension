@@ -106,7 +106,11 @@
     MetaProperties,
   } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
-  import { sortBasedOnTokenization, shouldShowTnc } from 'ui/tabs/card/utils';
+  import {
+    sortBasedOnTokenization,
+    shouldShowTnc,
+    isSIHubEnabledMerchant,
+  } from 'ui/tabs/card/utils';
 
   import {
     getIin,
@@ -724,8 +728,9 @@
      * recurring callout needs to be displayed when 3 conditions are met
      * a -> user must be domestic user
      * b -> must be a recurring/subscription payment
-     * c -> user focused in card input.
-     * d -> card bin number is NOT supported for recurring payments (card's constants)
+     * c -> SI-HUB should not be enabled
+     * d -> user focused in card input.
+     * e -> card bin number is NOT supported for recurring payments (card's constants)
      *
      * note: b -> toggles on when user clicks on card input field, for subsequent interactions it remains toggled on.
      * note: c -> as user enters the card number, we switch it to false (#onCardInput),
@@ -735,6 +740,7 @@
     showRecurringCallout =
       $isIndianCustomer &&
       isRecurring() &&
+      !isSIHubEnabledMerchant() &&
       $newCardInputFocused &&
       !isCardSupportedForRecurring;
   }
