@@ -180,7 +180,9 @@
     z-index: 100;
   }
   #downtime-wrap.container-one-cc {
-    height: 224px;
+    height: auto;
+    bottom: 0px;
+    padding: 20px 0px;
   }
   .container-one-cc .list {
     margin: 6px 0px 26px;
