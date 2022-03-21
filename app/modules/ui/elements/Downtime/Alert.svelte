@@ -52,9 +52,7 @@
     <ul class="list">
       <li class={isOneCCEnabled ? 'theme line1-one-cc' : 'line1'}>
         <div class="icon-wrapper">
-          {#if !isOneCCEnabled}
-            <DowntimeIcon severe="high" />
-          {/if}
+          <DowntimeIcon severe="high" />
         </div>
         <div>{$t(DOWNTIME_HIGHLIGHT1)}</div>
       </li>
