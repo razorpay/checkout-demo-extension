@@ -127,6 +127,7 @@
   #one-cc-cta {
     width: 100%;
     padding: 18px;
+    font-weight: bold;
     border-radius: 6px;
   }
 
