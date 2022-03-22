@@ -9,6 +9,10 @@
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { Events, DowntimeEvents, MetaProperties } from 'analytics/index';
+
+  // helper imports
+  import { isOneClickCheckout } from 'razorpay';
+
   // Props
   export let severe;
   export let showIcon = false;
@@ -28,7 +32,10 @@
   });
 </script>
 
-<div class={`downtime-callout downtime-${severe}`}>
+<div
+  class={`downtime-callout downtime-${severe}`}
+  class:downtime-callout-one-cc={isOneClickCheckout()}
+>
   {#if showIcon}
     <div class="downtime-icon">
       <DowntimeIcon {severe} />
@@ -74,5 +81,11 @@
   }
   .downtime-callout div {
     white-space: normal;
+  }
+
+  .downtime-callout-one-cc {
+    color: #f99d27;
+    background: #fef5e5;
+    border-radius: 2px;
   }
 </style>
