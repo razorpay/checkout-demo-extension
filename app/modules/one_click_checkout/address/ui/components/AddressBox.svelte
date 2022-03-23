@@ -1,18 +1,18 @@
 <script>
   // svelte imports
   import { createEventDispatcher } from 'svelte';
+
   // ui imports
-  import DropdownMenu from 'one_click_checkout/common/ui/DropdownMenu.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
+  import EditIcon from 'one_click_checkout/address/ui/components/EditIcon.svelte';
+
   // i18n imports
   import { t } from 'svelte-i18n';
   import {
-    EDIT_ADDRESS_LABEL,
     NON_SERVICEABLE_LABEL,
     SAVED_ADDRESS_LANDMARK_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
+
   // constant imports
-  import { getIcons } from 'one_click_checkout/sessionInterface';
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
 
   export let address;
@@ -22,9 +22,7 @@
   export let withBorder = true;
   export let isEditable = true;
 
-  const { kebab_menu } = getIcons();
   const dispatch = createEventDispatcher();
-  let dropdownTrigger;
 
   $: isServiceable = !(address.serviceability === false && checkServiceability);
 </script>
@@ -51,6 +49,14 @@
     class:selected-container={isSelected}
     on:click|preventDefault={() => dispatch('select')}
   >
+    {#if isEditable}
+      <div class="edit-cta">
+        <EditIcon
+          on:click={() => dispatch('select')}
+          on:editClick={() => dispatch('editClick', address)}
+        />
+      </div>
+    {/if}
     <div class:disabled={!isServiceable} class="box-header">
       <div class="box-title">
         <span class="address-name">
@@ -60,26 +66,6 @@
           <div class="address-tag">{address.tag}</div>
         {/if}
       </div>
-      {#if isEditable}
-        <div class="edit-cta">
-          <DropdownMenu
-            triggerElement={dropdownTrigger}
-            on:click={() => dispatch('select')}
-          >
-            <button bind:this={dropdownTrigger}>
-              <Icon icon={kebab_menu} />
-            </button>
-            <div slot="dropdown_menu">
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={() => dispatch('editClick', address)}
-                >{$t(EDIT_ADDRESS_LABEL)}</button
-              >
-            </div>
-          </DropdownMenu>
-        </div>
-      {/if}
     </div>
     <div class="address-text">
       <div class:disabled={!isServiceable}>
@@ -157,6 +143,7 @@
     position: absolute;
     top: 26px;
     right: 20px;
+    z-index: 1;
   }
 
   .box-title {
@@ -180,11 +167,6 @@
   .address-text {
     line-height: 22px;
     color: #8d97a1;
-  }
-
-  .dropdown-item {
-    font-weight: 500;
-    padding: 10px 20px;
   }
 
   .selected-container {

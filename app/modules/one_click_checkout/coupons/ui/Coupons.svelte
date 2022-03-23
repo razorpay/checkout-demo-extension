@@ -142,6 +142,14 @@
   function onViewDetailsClick() {
     document.getElementById('order-widget').scrollIntoView();
   }
+
+  function onAddressHeaderClick() {
+    let view = views.SAVED_ADDRESSES;
+    if ($savedAddresses.length <= 1) {
+      view = views.ADD_ADDRESS;
+    }
+    navigator.navigateTo({ path: view });
+  }
 </script>
 
 <Screen pad={false}>
@@ -156,8 +164,7 @@
         <AddressWidget
           loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
           address={$selectedAddress}
-          on:headerCtaClick={() =>
-            navigator.navigateTo({ path: views.SAVED_ADDRESSES })}
+          on:headerCtaClick={onAddressHeaderClick}
         />
       </div>
       <div class="separator" />
