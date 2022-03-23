@@ -1,15 +1,19 @@
 <script>
   // svelte imports
   import { createEventDispatcher } from 'svelte';
+
+  // ui imports
+  import EditIcon from 'one_click_checkout/address/ui/components/EditIcon.svelte';
+
   // i18n imports
   import { t } from 'svelte-i18n';
   import {
     NON_SERVICEABLE_LABEL,
     SAVED_ADDRESS_LANDMARK_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
+
   // constant imports
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
-  import EditIcon from './EditIcon.svelte';
 
   export let address;
   export let isSelected = false;
