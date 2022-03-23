@@ -32,6 +32,11 @@
   export let validCardForOffer = true;
   export let isCardSupportedForRecurring;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   // State
   let valid = false;
 
@@ -135,6 +140,10 @@
     on:autocomplete
     on:input={handleInput}
     on:input
+    {elemClasses}
+    {inputFieldClasses}
+    {labelClasses}
+    {labelUpperClasses}
   />
 </div>
 

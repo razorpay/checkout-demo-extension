@@ -5,6 +5,7 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { CVV_LABEL, CVV_HELP } from 'ui/labels/card';
+  import { isOneClickCheckout } from 'razorpay';
 
   export let ref = null;
 
@@ -18,10 +19,17 @@
   export let showPlaceholder = false; // Turns label into placeholder
   export let showHelp = true;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   let cvvPattern = '[0-9]{3}';
   let helpText = formatTemplateWithLocale(CVV_HELP, { length }, $locale);
   let placeholder;
   let label;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   $: {
     if (showHelp) {
@@ -82,6 +90,10 @@
   handleBlur
   handleFocus
   handleInput
+  {elemClasses}
+  {inputFieldClasses}
+  {labelClasses}
+  {labelUpperClasses}
 />
 
 <style>

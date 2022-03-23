@@ -71,6 +71,9 @@
   export let method;
   export let bankOptions;
 
+  // Other Imports
+  import { isOneClickCheckout } from 'razorpay';
+
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
   let showCorporateRadio;
@@ -109,6 +112,8 @@
 
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   export function getPayload() {
     return {
@@ -331,10 +336,25 @@
       </div>
 
       <div class="elem-wrap pad">
-        <div id="nb-elem" class="elem select" class:invalid>
-          <i class="select-arrow"></i>
+        <div
+          id="nb-elem"
+          class="elem select"
+          class:invalid
+          class:nb-one-cc-wrapper={isOneClickCheckoutEnabled}
+        >
+          <i
+            class="select-arrow"
+            class:nb-one-cc-arrow={isOneClickCheckoutEnabled}></i
+          >
           <!-- LABEL: Please select a bank -->
-          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
+          <div class="help">
+            {$t(NETBANKING_SELECT_HELP)}
+          </div>
+          {#if $selectedBank && isOneClickCheckoutEnabled}
+            <span class="nb-select-bank-text"
+              >{$t(NETBANKING_SELECT_LABEL)}</span
+            >
+          {/if}
           <button
             aria-label={`${
               $selectedBank
@@ -342,6 +362,7 @@
                 : $t(NETBANKING_SELECT_LABEL)
             }`}
             class="input dropdown-like dropdown-bank"
+            class:nb-one-cc-button={isOneClickCheckoutEnabled}
             type="button"
             id="bank-select"
             bind:this={bankSelect}
@@ -349,7 +370,9 @@
             on:keypress={handleEnterOnButton}
           >
             {#if $selectedBank}
-              <div>{selectedBankName}</div>
+              <div>
+                {selectedBankName}
+              </div>
               {#if !!downtimeSeverity}
                 <div>
                   <DowntimeIcon severe={downtimeSeverity} />
@@ -486,5 +509,41 @@
   .downtime-wrapper {
     width: 86%;
     margin: auto;
+  }
+
+  .nb-one-cc-wrapper {
+    border: 1px solid rgba(38, 50, 56, 0.3);
+    margin-top: 20px;
+    border-radius: 4px;
+    padding: 0px 12px;
+    height: 36px;
+    padding: 12px 16px;
+  }
+
+  .nb-one-cc-button {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 0px !important;
+    height: 100%;
+    display: inline-block;
+  }
+
+  .nb-one-cc-arrow {
+    position: absolute;
+    font-size: 20px;
+    bottom: 20px;
+    right: 10px;
+    color: #8f8f8f;
+  }
+
+  .nb-one-cc-wrapper::after {
+    border-bottom: none !important;
+  }
+
+  .nb-select-bank-text {
+    position: absolute;
+    top: -10px;
+    background: white;
+    padding: 0px 2px;
   }
 </style>

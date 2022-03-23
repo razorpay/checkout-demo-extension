@@ -15,7 +15,7 @@
   // Util imports
   import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
-  import { getPrefilledName, hasFeature } from 'razorpay';
+  import { getPrefilledName, hasFeature, isOneClickCheckout } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
@@ -47,6 +47,8 @@
   const PATTERN_WITH_HANDLE = '.+@.+';
 
   const session = getSession();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Computed
   export let pattern;
@@ -138,6 +140,20 @@
   $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
+
+  let label;
+  let placeholder;
+
+  $: {
+    // LABEL: VPA
+    if (isOneClickCheckoutEnabled) {
+      label = $t(UPI_COLLECT_ENTER_ID);
+      placeholder = null;
+    } else {
+      label = null;
+      placeholder = $t(UPI_COLLECT_ENTER_ID);
+    }
+  }
 </script>
 
 <!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
@@ -239,7 +255,10 @@
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
           on:blur
-          placeholder={$t(UPI_COLLECT_ENTER_ID)}
+          {placeholder}
+          {label}
+          inputFieldClasses={isOneClickCheckoutEnabled &&
+            'upi-vpa-field-one-cc'}
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">

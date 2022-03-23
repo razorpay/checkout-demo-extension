@@ -45,6 +45,7 @@
     isStrictlyRecurring,
     getRecurringMethods,
     isRecurring,
+    isOneClickCheckout,
   } from 'razorpay';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
@@ -91,13 +92,30 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
+
   const isSavedCardsEnabled = shouldRememberCustomer();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   const showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
 
   let cvvLength = 3;
   let showCardUnsupported = false;
   let lastIin = '';
+
+  let elemClasses = '';
+  let inputFieldClasses = '';
+  let labelClasses = '';
+  let labelUpperClasses = '';
+
+  $: {
+    if (isOneClickCheckoutEnabled) {
+      elemClasses = 'add-card-fields-one-cc-wrapper';
+      inputFieldClasses = 'add-card-fields-one-cc';
+      labelClasses = 'add-card-fields-label-one-cc';
+      labelUpperClasses = 'add-card-fields-label-upper-one-cc';
+    }
+  }
 
   let cardNumberHelpText;
   $: cardNumberHelpText =
@@ -497,7 +515,7 @@
 
 <div class="pad" id="add-card-container" class:faded>
   <div class="page-header">
-    <span class="card-title">{$t(ADD_NEW_CARD)}</span>
+    <span class="card-title">{$t(ADD_NEW_CARD)} </span>
     <span class="emi-plans-label">
       {#if tab === 'emi'}
         <div id="view-emi-plans" on:click={showEmiPlans}>
@@ -524,6 +542,10 @@
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled}
+        {elemClasses}
+        {inputFieldClasses}
+        {labelClasses}
+        {labelUpperClasses}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -536,6 +558,10 @@
           on:focus
           on:blur={trackExpiryFilled}
           on:filled={(_) => handleFilled('expiryField')}
+          {elemClasses}
+          {inputFieldClasses}
+          {labelClasses}
+          {labelUpperClasses}
         />
       </div>
     {/if}
@@ -550,6 +576,10 @@
         bind:this={nameField}
         on:focus
         on:blur={trackNameFilled}
+        {elemClasses}
+        {inputFieldClasses}
+        {labelClasses}
+        {labelUpperClasses}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -561,6 +591,10 @@
           bind:this={cvvField}
           on:focus
           on:blur={trackCvvFilled}
+          {elemClasses}
+          {inputFieldClasses}
+          {labelClasses}
+          {labelUpperClasses}
         />
       </div>
     {/if}
