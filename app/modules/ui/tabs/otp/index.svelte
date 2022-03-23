@@ -55,6 +55,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
+  import { getThemeColor } from 'checkoutstore/theme';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
@@ -297,7 +298,9 @@
         {:else}
           <div
             id="otp-elem"
-            style="width: {inputWidth};"
+            style="width: {inputWidth};{isOneClickCheckout()
+              ? `border-color: ${getThemeColor()};`
+              : ''}"
             class:compact
             class:hidden={!showInput}
           >
@@ -497,5 +500,11 @@
 
   #otp-prompt.otp-header {
     margin-bottom: 24px;
+  }
+
+  .tab-content-one-cc #otp-elem {
+    border-radius: 4px;
+    border: 1px solid;
+    width: 100% !important;
   }
 </style>
