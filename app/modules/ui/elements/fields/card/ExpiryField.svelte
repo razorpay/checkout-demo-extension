@@ -13,6 +13,11 @@
   export let id;
   export let name;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   let valid = false;
 
   $: {
@@ -68,4 +73,8 @@
   handleBlur
   handleFocus
   handleInput
+  {elemClasses}
+  {inputFieldClasses}
+  {labelClasses}
+  {labelUpperClasses}
 />

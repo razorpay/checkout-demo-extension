@@ -10,7 +10,7 @@ export default {
   international_state_label: 'State/Province',
   country_label: 'Country',
   house_label: 'House Number, Apartment',
-  area_label: 'Area, Colony, Street, Sector',
+  area_label: 'Area, Colony, Street, Sector*',
   landmark_label: 'Landmark',
   shipping_address_label: 'Delivery Address',
   save_label: 'Save As',

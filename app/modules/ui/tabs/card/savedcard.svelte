@@ -44,8 +44,8 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { getBankText } from 'ui/tabs/home/helpers';
   import { isRecurring } from 'razorpay';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Props
   export let card;
@@ -67,6 +67,9 @@
   let noCvvChecked = false;
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
+
   // Refs
   let cvvInput;
   let cvvInputFormatter;
@@ -184,7 +187,7 @@
         <DowntimeIcon severe={downtimeSeverity} />
       </div>
     {/if}
-    <div class="saved-cvv">
+    <div class="saved-cvv" class:saved-card-one-cc={isOneClickCheckoutEnabled}>
       {#if showCvv}
         <CvvField
           bind:value={cvvValue}
@@ -192,7 +195,12 @@
           bind:this={cvvInput}
           length={cvvDigits}
           showHelp={false}
-          showPlaceholder
+          showPlaceholder={!isOneClickCheckoutEnabled}
+          elemClasses={isOneClickCheckoutEnabled && 'cvv-one-cc-wrapper'}
+          inputFieldClasses={isOneClickCheckoutEnabled && 'cvv-one-cc'}
+          labelClasses={isOneClickCheckoutEnabled && 'cvv-one-cc-label'}
+          labelUpperClasses={isOneClickCheckoutEnabled &&
+            'cvv-one-cc-label-upper'}
         />
       {/if}
     </div>
