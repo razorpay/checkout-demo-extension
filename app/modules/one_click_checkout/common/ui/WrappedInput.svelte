@@ -7,6 +7,7 @@
 
   // helper imports
   import { isOneClickCheckout } from 'razorpay';
+  import { getScrollableParent } from 'one_click_checkout/helper';
 
   export let id;
   export let label = '';
@@ -37,6 +38,7 @@
   }
 
   function onFocus(event) {
+    inputField.scrollIntoView(true);
     focused = true;
     const { parentNode } = event.target || {};
     if (parentNode?.classList?.contains('focused')) {
@@ -59,6 +61,17 @@
     inputField.focus();
   }
 
+  function onInput(e) {
+    const parentNode = getScrollableParent(e.target);
+    const { bottom: parentBottom } = parentNode.getBoundingClientRect();
+    const { bottom: targetBottom } = e.target.getBoundingClientRect();
+    // if autocomplete input is at the end of screen, scroll it into view
+    if (parentBottom - targetBottom < 100) {
+      inputField.scrollIntoView(true);
+    }
+    dispatch('input', e);
+  }
+
   onMount(() => {
     if (autofocus) {
       inputField.focus();
@@ -76,7 +89,7 @@
     class:focused
     class:input-focused={focused}
     class:input-error={validationText !== ''}
-    on:input
+    on:input={onInput}
     on:focus={onFocus}
     on:blur={onBlur}
   >
