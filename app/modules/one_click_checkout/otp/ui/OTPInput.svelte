@@ -14,7 +14,7 @@
   export let isError;
 
   let otpContainer;
-  let autoCompleteMethod = 'off';
+  let autoCompleteMethod = 'new-otp'; // random string for browser to ignore autocomplete
 
   if (Safari) {
     autoCompleteMethod = 'one-time-code';
@@ -122,7 +122,7 @@
       on:focus={() => trackInput(i)}
       on:input={(e) => onOtpDigitInput(e, i)}
       on:keydown={(e) => onOtpDigitKeyDown(e, i)}
-      autocomplete={i === 0 && autoCompleteMethod}
+      autocomplete={autoCompleteMethod}
       on:paste={otpPaste}
       class:otp-error={isError}
     />
