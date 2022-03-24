@@ -8,7 +8,7 @@
   // Props
   export let pad = true;
   export let threshold = 16;
-
+  export let hideAccountTab;
   // Refs
   let contentRef;
 
@@ -68,7 +68,9 @@
   on:scroll={onScroll}
 >
   <slot />
-  <AccountTab />
+  {#if !hideAccountTab}
+    <AccountTab />
+  {/if}
 </div>
 <div class="shadow shadow-top" />
 <div class="shadow shadow-bottom" />
