@@ -374,4 +374,8 @@
   #otp-prompt {
     margin-bottom: 24px;
   }
+
+  .tab-content-one-cc .otp-title :global(.theme) {
+    font-weight: 600;
+  }
 </style>

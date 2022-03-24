@@ -24,7 +24,7 @@
 
   const dispatch = createEventDispatcher();
 
-  $: isServiceable = !(address.serviceability === false && checkServiceability);
+  $: isServiceable = !(!address.serviceability && checkServiceability);
 </script>
 
 {#if loading}
@@ -142,7 +142,7 @@
   .edit-cta {
     position: absolute;
     top: 26px;
-    right: 20px;
+    right: 16px;
     z-index: 1;
   }
 

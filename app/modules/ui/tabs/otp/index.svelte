@@ -55,7 +55,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
-  import { getThemeColor } from 'checkoutstore/theme';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';

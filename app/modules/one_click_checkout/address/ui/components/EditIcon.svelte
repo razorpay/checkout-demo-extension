@@ -34,6 +34,12 @@
 </DropdownMenu>
 
 <style>
+  * {
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    box-sizing: border-box;
+  }
   .dropdown-item {
     font-weight: 500;
     padding: 10px 20px;

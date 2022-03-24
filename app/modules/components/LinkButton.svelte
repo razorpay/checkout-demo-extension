@@ -3,15 +3,17 @@
 
   export let type = 'button';
   export let disabled = false;
+
+  const isOneCC = isOneClickCheckout();
 </script>
 
 <button
   {type}
   {...$$props}
   on:click
-  class="hc_border"
-  class:theme={isOneClickCheckout()}
-  class:one-cc-btn={isOneClickCheckout()}
+  class={isOneCC ? 'theme-border-color' : 'hc_border'}
+  class:theme={isOneCC}
+  class:one-cc-btn={isOneCC}
   {disabled}
 >
   <slot />
