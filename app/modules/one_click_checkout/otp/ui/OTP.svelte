@@ -61,6 +61,7 @@
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
   import { screensHistory } from 'one_click_checkout/routing/History';
+  import { views } from 'one_click_checkout/routing/constants';
 
   const { edit_paper } = getTheme().icons;
 
