@@ -141,7 +141,10 @@
     fetchAVSFlagForCard,
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
-  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import {
+    PAY_NOW_CTA_LABEL,
+    SELECT_EMI_PLAN_LABEL,
+  } from 'one_click_checkout/cta/i18n';
 
   let delayOTPExperiment;
 
@@ -1161,7 +1164,9 @@
     </Bottom>
     {#if renderCtaOneCC}
       <CTAOneCC on:click={() => session.preSubmit()}>
-        {$t(PAY_NOW_CTA_LABEL)}
+        {session.emiPlansForNewCard
+          ? $t(SELECT_EMI_PLAN_LABEL)
+          : $t(PAY_NOW_CTA_LABEL)}
       </CTAOneCC>
     {/if}
   </Screen>

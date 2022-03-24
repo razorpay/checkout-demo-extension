@@ -15,6 +15,7 @@
   import { getSession } from 'sessionmanager';
 
   // Store imports
+  import { isOneClickCheckout } from 'razorpay';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
@@ -27,6 +28,7 @@
   } from 'ui/labels/cardlessemi';
 
   const session = getSession();
+  const isOneCC = isOneClickCheckout();
   const icons = session.themeMeta.icons;
 
   const sectionMeta = {
@@ -135,14 +137,20 @@
   }
 </script>
 
-<div class="tab-content showable screen collapsible" id="form-cardless_emi">
+<div
+  class="tab-content showable screen collapsible"
+  class:one-cc={isOneCC}
+  id="form-cardless_emi"
+>
   <div class="cardless-emi-wrapper">
     <input type="hidden" name="emi_duration" />
     <input type="hidden" name="provider" />
     <input type="hidden" name="ott" />
     {#each sections as providerSection (providerSection)}
       <!-- TITLE: Select an option | Recommended | Other Options -->
-      <h3 class="emi-header">{$t(sectionTitle[providerSection])}</h3>
+      <h3 class="emi-header" class:one-cc={isOneCC}>
+        {$t(sectionTitle[providerSection])}
+      </h3>
       <div class="options emi-section">
         {#each filteredProviders[providerSection] as provider (provider.data.code)}
           <div class="cm-single-option">
@@ -220,5 +228,15 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  .tab-content.one-cc {
+    margin-top: 0;
+  }
+
+  .emi-header.one-cc {
+    font-weight: 600;
+    color: #263a4a;
+    text-transform: none;
   }
 </style>

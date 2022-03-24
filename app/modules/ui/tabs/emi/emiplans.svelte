@@ -26,7 +26,7 @@
     PLAN_LIST_CALLOUT_AGREEMENT,
     PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT,
   } from 'ui/labels/emi';
-  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { SELECT_EMI_PLAN_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Util imports
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
@@ -36,8 +36,8 @@
 
   // Utils imports
   import { isMethodUsable } from 'checkoutstore/methods';
-  import { isOneClickCheckout } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Props
   export let actions;
@@ -53,7 +53,7 @@
   // Computed
   export let showActions;
 
-  let ctaOneCCDisabled = true;
+  let ctaOneCCHidden = true;
   let renderCtaOneCC = false;
 
   // Constants
@@ -118,10 +118,10 @@
     const validContact = INDIAN_CONTACT_REGEX.test(contact);
     // Don't let the user continue if the contact is invalid.
     if (validContact) {
-      ctaOneCCDisabled = false;
+      ctaOneCCHidden = false;
       showCta();
     } else {
-      ctaOneCCDisabled = true;
+      ctaOneCCHidden = true;
       hideCta();
     }
     // However, invoke setContact everytime the value changes.
@@ -176,10 +176,14 @@
     }
   }
 
-  $: ctaOneCCDisabled = expanded === -1;
+  $: ctaOneCCHidden = expanded === -1;
 </script>
 
-<div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
+<div
+  id="form-emiplans"
+  class="tab-content showable screen pad vertical-pad"
+  class:one-cc={isOneClickCheckout()}
+>
   {#if currentView === Views.PLANS}
     <!-- LABEL: Select an EMI Plan -->
     <EmiPlanCards
@@ -258,13 +262,16 @@
     />
   {/if}
   {#if renderCtaOneCC}
-    <CTAOneCC disabled={ctaOneCCDisabled}>
-      {$t(PAY_NOW_CTA_LABEL)}
+    <CTAOneCC hidden={ctaOneCCHidden}>
+      {$t(SELECT_EMI_PLAN_LABEL)}
     </CTAOneCC>
   {/if}
 </div>
 
 <style>
+  #form-emiplans.one-cc {
+    margin-top: 0;
+  }
   .actionlink-container {
     margin: 12px 0;
   }
