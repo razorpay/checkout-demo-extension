@@ -11,9 +11,7 @@
   {type}
   {...$$props}
   on:click
-  class={isOneCC ? 'theme-border-color' : 'hc_border'}
-  class:theme={isOneCC}
-  class:one-cc-btn={isOneCC}
+  class={isOneCC ? 'theme theme-border-color one-cc-btn' : 'hc_border'}
   {disabled}
 >
   <slot />
