@@ -138,6 +138,7 @@
 
   let isRazorpayOTPAndOneCC;
   $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isOneClickCheckout();
+  let isOneCC = isOneClickCheckout();
 
   export function onShown() {
     setTabTitleLogo($tabLogo);
@@ -187,11 +188,11 @@
   class="tab-content screen"
   class:loading={$loading}
   class:showable={addShowableClass}
-  class:tab-content-one-cc={isOneClickCheckout()}
+  class:tab-content-one-cc={isOneCC}
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
-  <div class="otp-screen-contents" class:heading-1cc={isOneClickCheckout()}>
+  <div class="otp-screen-contents" class:heading-1cc={isOneCC}>
     {#if otpPromptVisible && $mode === 'HDFC_DC'}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
@@ -204,17 +205,17 @@
 
     <div
       class="otp-controls"
-      class:otp-controls-one-cc={isOneClickCheckout()}
+      class:otp-controls-one-cc={isOneCC}
       class:recurring-alignment={isRecurring() ? !allowSkipButton : false}
     >
-      <div id="otp-prompt" class:otp-header={isOneClickCheckout()}>
+      <div id="otp-prompt" class:otp-header={isOneCC}>
         {#if $loading}
           <AsyncLoading>
             {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
         {:else}
-          {#if isOneClickCheckout() && $headingText}
-            <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+          {#if isOneCC && $headingText}
+            <p class="otp-heading" class:heading-1cc={isOneCC}>
               {getOtpScreenHeading('default_login', $templateData, $locale)}
             </p>
           {/if}
@@ -298,10 +299,9 @@
         {:else}
           <div
             id="otp-elem"
-            style="width: {inputWidth};{isOneClickCheckout()
-              ? `border-color: ${getThemeColor()};`
-              : ''}"
+            style="width: {isOneCC ? '100%' : inputWidth};"
             class:compact
+            class={isOneCC ? 'theme-border-color' : 'border-bottom-grey'}
             class:hidden={!showInput}
           >
             <div class="help">{$t(OTP_FIELD_HELP)}</div>
@@ -322,7 +322,7 @@
         {/if}
       </div>
 
-      {#if isOneClickCheckout() && $errorMessage}
+      {#if isOneCC && $errorMessage}
         <div class="error-message" class:hidden={!showInput}>
           {$t($errorMessage)}
         </div>
@@ -502,9 +502,13 @@
     margin-bottom: 24px;
   }
 
+  .border-bottom-grey {
+    border-bottom: 1px solid #ccc;
+  }
+
   .tab-content-one-cc #otp-elem {
     border-radius: 4px;
-    border: 1px solid;
-    width: 100% !important;
+    border-width: 1px;
+    border-style: solid;
   }
 </style>
