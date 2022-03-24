@@ -112,10 +112,10 @@
     top: 0px;
     position: relative;
     animation-name: loader;
-    animation-duration: 3s;
+    animation-duration: 1s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    animation-direction: normal;
+    animation-direction: alternate;
     background-color: #b88c45;
   }
 
@@ -124,7 +124,7 @@
       left: 0px;
     }
     100% {
-      left: 100%;
+      left: 80%;
     }
   }
 </style>

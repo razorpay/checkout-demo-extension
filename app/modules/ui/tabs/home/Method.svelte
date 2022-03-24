@@ -25,6 +25,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
   import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Store imports
   import {
@@ -46,6 +47,7 @@
 
   const session = getSession();
   const dispatch = createEventDispatcher();
+  const isOneCC = isOneClickCheckout();
 
   const icons = session.themeMeta.icons;
   let _icon = getIconForDisplay();
@@ -145,8 +147,12 @@
       <Icon icon={_icon} />
     {/if}
   </i>
-  <div slot="title" class:cod-error={disabled}>{_title}</div>
-  <div slot="subtitle">{@html _subtitle}</div>
+  <div slot="title" class:cod-error={disabled} class:title-one-cc={isOneCC}>
+    {_title}
+  </div>
+  <div slot="subtitle" class:subtitle-one-cc={isOneCC}>
+    {@html _subtitle}
+  </div>
   <div slot="error">
     {#if disabled}
       <div class="error">
@@ -276,5 +282,16 @@
     opacity: 1;
     height: 16px;
     width: 16px;
+  }
+
+  div[slot='title'].title-one-cc {
+    font-weight: 400;
+    color: #263a4a;
+  }
+
+  div[slot='subtitle'].subtitle-one-cc {
+    font-weight: 400;
+    font-size: 12px;
+    color: #8d97a1;
   }
 </style>
