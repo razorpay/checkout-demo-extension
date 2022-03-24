@@ -733,8 +733,8 @@
     z-index: 3;
     border-radius: 2px;
     bottom: -60px;
-    pointer-events: none;
     margin: 0px 16px;
+    letter-spacing: 0.125px;
   }
   .save-address-tooltip::after {
     content: '';
