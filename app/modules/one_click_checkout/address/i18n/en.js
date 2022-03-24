@@ -2,7 +2,7 @@ import billingAddressLabels from 'one_click_checkout/address/billing_address/i18
 
 // Texts and labels
 export default {
-  name_label: 'Name',
+  name_label: 'Full Name',
   pincode_label: 'Pincode',
   city_label: 'City',
   state_label: 'State',

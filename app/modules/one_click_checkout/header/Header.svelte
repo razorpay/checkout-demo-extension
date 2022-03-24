@@ -70,8 +70,8 @@
 
   .header-title {
     font-weight: 600;
-    font-size: 18px;
-    line-height: 24px;
+    font-size: 14px;
+    line-height: 18px;
   }
 
   .header-body-wrapper {

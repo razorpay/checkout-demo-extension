@@ -150,6 +150,7 @@
     inputFieldClasses={isOneClickCheckoutEnabled
       ? 'country-code-one-click-checkout'
       : ''}
+    showDropDownIcon={true}
   />
   <!-- LABEL: Please enter a valid country code -->
 

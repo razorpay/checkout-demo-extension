@@ -697,9 +697,9 @@
   .input-one-click-checkout.phone-field-one-click-checkout {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
-    margin-left: -15%;
-    padding-right: 15%;
-    width: calc(100% + 15%);
+    margin-left: -8%;
+    padding-right: 10%;
+    width: calc(100% + 8%);
   }
 
   .label-one-click-checkout {
@@ -736,8 +736,9 @@
   }
 
   .label-one-click-checkout.contact-label {
-    left: -8%;
+    left: -2%;
   }
+
   .input-one-click-checkout:focus + .label-one-click-checkout.contact-label {
     left: -40%;
   }
