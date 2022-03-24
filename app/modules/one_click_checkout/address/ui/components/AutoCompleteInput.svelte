@@ -27,7 +27,7 @@
     debouncedFetch();
   }
 
-  function onInput(e) {
+  function onInput({ detail: e }) {
     dispatch('input', e);
     if (e.target.textContent.length > 3) {
       fetchSuggestions();

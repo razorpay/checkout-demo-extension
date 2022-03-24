@@ -57,3 +57,24 @@ export function clickOutside(node) {
     },
   };
 }
+
+export const isScrollable = (node) => {
+  const hasScrollableContent = node.scrollHeight > node.clientHeight;
+
+  const overflowYStyle = window.getComputedStyle(node).overflowY;
+  const isOverflowHidden = overflowYStyle.indexOf('hidden') !== -1;
+
+  return hasScrollableContent && !isOverflowHidden;
+};
+
+export const getScrollableParent = (node) => {
+  if (node === null) {
+    return null;
+  }
+
+  if (isScrollable(node)) {
+    return node;
+  } else {
+    return getScrollableParent(node.parentNode);
+  }
+};

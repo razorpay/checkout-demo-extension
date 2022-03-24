@@ -153,7 +153,8 @@
           required={input.required}
           validationText={errors[input.id] ? errors[input.id] : ''}
           on:blur={() => onBlur(input.id)}
-          on:input={(e) => handleInput(input.id, e.target.textContent)}
+          on:input={({ detail: e }) =>
+            handleInput(input.id, e.target.textContent)}
         />
       {:else if input.autocomplete}
         {#if input.id === 'landmark'}
@@ -166,8 +167,8 @@
               suggestionsResource={input.suggestionsResource}
               validationText={errors[input.id] ? errors[input.id] : ''}
               on:blur={() => onBlur(input.id)}
-              on:input={(e) =>
-                handleInput(input.id, e.detail.target.textContent)}
+              on:input={({ detail: e }) =>
+                handleInput(input.id, e.target.textContent)}
               on:select={input.onSelect}
               autofocus={true}
             />
