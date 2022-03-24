@@ -61,6 +61,7 @@
 
 <div
   class="screen screen-comp"
+  class:one-cc={isOneClickCheckout()}
   class:bottomShadow
   class:pad
   bind:this={contentRef}
@@ -82,6 +83,10 @@
     height: 100%;
     overflow: auto;
     position: relative;
+  }
+
+  .one-cc {
+    scroll-behavior: smooth;
   }
 
   /* @TODO */

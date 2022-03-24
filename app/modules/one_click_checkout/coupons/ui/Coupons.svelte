@@ -74,6 +74,7 @@
   const prefilledCoupon = getPrefilledCouponCode();
 
   let ctaDisabled = false;
+  let orderWidget;
 
   $: ctaDisabled =
     (!$contact && !isContactHidden()) ||
@@ -140,7 +141,9 @@
   });
 
   function onViewDetailsClick() {
-    document.getElementById('order-widget').scrollIntoView();
+    if (orderWidget) {
+      orderWidget.scrollIntoView();
+    }
   }
 
   function onAddressHeaderClick() {
@@ -178,7 +181,7 @@
     </div>
     <div class="separator" />
 
-    <div class="widget-wrapper" id="order-widget">
+    <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
       <OrderWidget />
     </div>
     <CTA on:click={onSubmit} {onViewDetailsClick} disabled={ctaDisabled} />
