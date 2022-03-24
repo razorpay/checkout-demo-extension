@@ -81,6 +81,10 @@
   import { views } from 'one_click_checkout/routing/constants';
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
+  import {
+    hideLoaderView,
+    showLoaderView,
+  } from 'one_click_checkout/loader/helper';
 
   import { clickOutside } from 'one_click_checkout/helper';
 
@@ -371,6 +375,7 @@
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
       }
       if (pinPattern.test(value)) {
+        showLoaderView();
         const payload = [
           {
             zipcode: value,
@@ -418,6 +423,9 @@
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             showToast(pincode_error_toast);
+          })
+          .finally(() => {
+            hideLoaderView();
           });
       } else if (INPUT_FORM[pinIndex][pinSubIndex]?.required) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';

@@ -52,11 +52,6 @@
   export let currentView;
   export let addressType;
 
-  let showCta = true;
-  $: showCta = Resource[addressType].checkServiceability
-    ? $selectedAddress.serviceability
-    : true;
-
   let addresses;
   $: {
     if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
@@ -205,9 +200,18 @@
     }
   }
 
-  $: disabled = ADDRESS_FORM_VIEWS.includes(currentView)
-    ? !isFormComplete
-    : !showCta;
+  $: {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
+      disabled = !isFormComplete;
+    } else if (
+      addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+      currentView === addressViews.SAVED_ADDRESSES
+    ) {
+      disabled = !$selectedAddress.serviceability;
+    } else {
+      disabled = false;
+    }
+  }
 </script>
 
 <div class="address-tab">
@@ -255,7 +259,7 @@
     <AccountTab />
   </div>
   <slot name="footer" />
-  <CTA on:click={onSubmit} {disabled} hidden={!showCta} />
+  <CTA on:click={onSubmit} {disabled} />
 </div>
 
 <style>

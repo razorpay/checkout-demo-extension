@@ -4,25 +4,45 @@
   import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
+  import { onMount } from 'svelte';
+  import { isMobile } from 'common/useragent';
 
   const theme = getTheme();
   let resizeBackdrop = false;
+  let isKeyboardOpen = false;
+  let layoutHeight;
 
   $: {
     if ($showLoader) {
       resizeBackdrop = !!document.getElementById('one-cc-cta');
     }
   }
+
+  onMount(() => {
+    layoutHeight = window.innerHeight;
+    window.onresize = function () {
+      // Assumption: On a mobile device, window height will change only when keyboard is shown/hidden
+      if (window.innerHeight < layoutHeight && isMobile()) {
+        isKeyboardOpen = true;
+      } else {
+        isKeyboardOpen = false;
+      }
+    };
+  });
 </script>
 
 {#if $showLoader}
   <div
     class="loader-backdrop"
-    class:resize-backdrop={resizeBackdrop}
+    class:resize-backdrop={resizeBackdrop && !isKeyboardOpen}
     in:fade={{ duration: 250 }}
     out:fade={{ duration: 250 }}
   />
-  <div class="card" transition:fly={{ duration: 250, y: 50 }}>
+  <div
+    class="card"
+    class:card-absolute={isKeyboardOpen}
+    transition:fly|local={{ duration: 250, y: 50 }}
+  >
     <div class="wrapper">
       <div class="bar" />
       <div class="content">
@@ -33,6 +53,10 @@
 {/if}
 
 <style>
+  .card.card-absolute {
+    bottom: 0;
+    position: absolute;
+  }
   .loader-backdrop.resize-backdrop {
     height: calc(100% - 96px);
   }
