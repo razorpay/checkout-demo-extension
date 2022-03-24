@@ -5,7 +5,10 @@
 
   // store imports
   import { getCurrency } from 'razorpay';
-  import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    checkServiceabilityStatus,
+    selectedAddressId,
+  } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
     isCouponApplied,
@@ -45,8 +48,9 @@
   const currency = getCurrency();
   const { order } = getIcons();
   const spaceAmoutWithSymbol = false;
-
+  let showTotal;
   $: {
+    showTotal = $selectedAddressId || $isCouponApplied;
     if ($savedAddresses?.length && $shippingCharge) {
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
     }
@@ -59,7 +63,7 @@
 </div>
 
 <div class="order-summary">
-  <div class="row justify-between color-gray">
+  <div class="row justify-between" class:color-gray={showTotal}>
     <p>{$t(AMOUNT_LABEL)}</p>
     <p>
       {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
@@ -98,16 +102,18 @@
       {/if}
     </div>
   {/if}
-  <hr class="split" />
-  <div class="row justify-between total-label">
-    {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
-      <Shimmer width="40%" />
-      <Shimmer width="20%" />
-    {:else}
-      <p>{$t(TOTAL_LABEL)}</p>
-      <p>{formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}</p>
-    {/if}
-  </div>
+  {#if showTotal}
+    <hr class="split" />
+    <div class="row justify-between total-label">
+      {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+        <Shimmer width="40%" />
+        <Shimmer width="20%" />
+      {:else}
+        <p>{$t(TOTAL_LABEL)}</p>
+        <p>{formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}</p>
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style>
