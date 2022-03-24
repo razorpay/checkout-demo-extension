@@ -54,6 +54,7 @@
   import {
     codChargeAmount,
     shippingCharge,
+    isShippingAddedToAmount,
   } from 'one_click_checkout/charges/store';
   import { country as countryCode } from 'checkoutstore/screens/home';
   import { isAutopopulateDisabled } from 'one_click_checkout/store';
@@ -600,6 +601,13 @@
   }
 
   onMount(() => {
+    if (
+      $activeRoute?.name === views.ADD_ADDRESS &&
+      !$formData.zipcode &&
+      !$formData.city
+    ) {
+      $isShippingAddedToAmount = false;
+    }
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
     }

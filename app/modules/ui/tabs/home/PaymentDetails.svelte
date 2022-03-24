@@ -20,6 +20,7 @@
     state,
     multiTpvOption,
     countryISOCode,
+    prevContact,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
 
@@ -66,6 +67,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { views } from 'one_click_checkout/routing/constants';
+  import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
 
   const entries = _Obj.entries;
@@ -82,6 +84,11 @@
   const isOneCCEnabled = isOneClickCheckout();
   const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
   const userContact = $contact;
+  $prevContact = {
+    country: $country,
+    phone: $phone,
+    email: $email,
+  };
   let disabled = true;
 
   function trackContactFilled() {
@@ -130,6 +137,7 @@
     if (isOneCCEnabled && isEditDetailScreen) {
       toggleHeader(false);
     }
+    setTabTitleLogo('');
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();

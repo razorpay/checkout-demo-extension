@@ -36,6 +36,7 @@
     setEmail,
     upiIntentInstrumentsForAnalytics,
   } from 'checkoutstore/screens/home';
+  import { activeRoute } from 'one_click_checkout/routing/store';
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isOneClickCheckout } from 'razorpay';
@@ -982,7 +983,10 @@
   }
 
   $: {
-    if (view === HOME_VIEWS.METHODS) {
+    if (
+      view === HOME_VIEWS.METHODS &&
+      $activeRoute?.name === HOME_VIEWS.METHODS
+    ) {
       $customer = session.getCustomer($contact);
     }
   }

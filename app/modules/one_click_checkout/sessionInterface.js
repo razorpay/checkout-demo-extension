@@ -63,6 +63,9 @@ export const handleBack = () => {
     return;
   }
   navigator.navigateBack();
+  if (navigator.currentActiveRoute.name === views.METHODS) {
+    redirectToMethods();
+  }
 };
 
 export function getLandingView() {

@@ -40,7 +40,7 @@
     if ($activeRoute?.hasOwnProperty('isBackEnabled')) {
       isBackEnabled = $activeRoute?.isBackEnabled;
       if (typeof isBackEnabled === 'function') {
-        isBackEnabled();
+        isBackEnabled = isBackEnabled();
       }
     } else {
       isBackEnabled = true;
@@ -80,7 +80,7 @@
       {#if $tabTitleLogo}
         <img class="title-logo" alt="Logo" src={$tabTitleLogo} />
       {:else if $activeRoute?.topbarTitle || !blackListedTabTitle?.includes($tabTitle)}
-        {$activeRoute.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
+        {$activeRoute?.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
       {/if}
     </div>
     {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$tabTitleLogo && !$activeRoute?.topbarTitle}

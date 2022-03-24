@@ -19,7 +19,6 @@
     cartAmount,
     cartDiscount,
     amount,
-    isShippingAddedToAmount,
     shippingCharge,
   } from 'one_click_checkout/charges/store';
 
@@ -53,6 +52,8 @@
     showTotal = $selectedAddressId || $isCouponApplied;
     if ($savedAddresses?.length && $shippingCharge) {
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
+    } else {
+      amount.set($cartAmount - $cartDiscount);
     }
   }
 </script>
@@ -83,7 +84,7 @@
       </p>
     </div>
   {/if}
-  {#if $isShippingAddedToAmount}
+  {#if $shippingCharge && $savedAddresses?.length}
     <div class="row justify-between color-gray">
       {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         <Shimmer width="40%" />

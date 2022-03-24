@@ -6,6 +6,10 @@
   import Icon from 'ui/elements/Icon.svelte';
   import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
 
+  // store imports
+  import { selectedAddress as selectedShippingAddress } from 'one_click_checkout/address/shipping_address/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
+
   // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
 
@@ -24,6 +28,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import { views } from 'one_click_checkout/routing/constants';
 
   // session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -67,7 +72,12 @@
       selectedAddressId.set(addresses[0].id);
     }
     dispatchServiceability();
-
+    if (
+      $activeRoute?.name === views.SAVED_ADDRESSES &&
+      $selectedShippingAddress?.id
+    ) {
+      postAddressSelection();
+    }
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.ADDRESS,

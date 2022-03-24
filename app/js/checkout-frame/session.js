@@ -3151,7 +3151,6 @@ Session.prototype = {
       discreet.offlineChallanTab.destroy();
     } else if (!this.tab) {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
-        discreet.ChargesHelper.removeShippingCharges();
         discreet.ChargesHelper.removeCodCharges();
         discreet.OneClickCheckoutInterface.handleBack();
         this.switchTab('home-1cc');
@@ -5486,7 +5485,9 @@ Session.prototype = {
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       if (appliedOffer.type !== 'read_only') {
         data.offer_id = appliedOffer.id;
-        this.r.display_amount = appliedOffer.amount;
+        this.r.display_amount = RazorpayHelper.isOneClickCheckout()
+          ? this.get('amount')
+          : appliedOffer.amount;
         updateScore('affordability_offers');
         Analytics.track('offers:applied_with_payment', {
           data: appliedOffer,

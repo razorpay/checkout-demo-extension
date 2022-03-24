@@ -475,6 +475,7 @@
   }
   .offerlist-one-cc {
     background-color: #fff;
+    padding-bottom: 130px;
   }
   .one-cc-label {
     padding: 24px 14px;

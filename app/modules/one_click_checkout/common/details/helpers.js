@@ -1,5 +1,11 @@
 import { get } from 'svelte/store';
-import { contact, email } from 'checkoutstore/screens/home';
+import {
+  contact,
+  email,
+  country,
+  phone,
+  prevContact,
+} from 'checkoutstore/screens/home';
 import { views } from 'one_click_checkout/routing/constants';
 import { history } from 'one_click_checkout/routing/store';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
@@ -118,4 +124,16 @@ export const handleDetailsOTP = () => {
       navigator.navigateTo({ path: views.ADD_ADDRESS });
     },
   };
+};
+
+export const handleBack = () => {
+  // Need to reset the previous Phone number & Email, if the user clicked back on Details screen
+  const {
+    country: prevContactCountry,
+    phone: prevContactPhone,
+    email: prevContactEmail,
+  } = get(prevContact) || {};
+  country.set(prevContactCountry);
+  phone.set(prevContactPhone);
+  email.set(prevContactEmail);
 };

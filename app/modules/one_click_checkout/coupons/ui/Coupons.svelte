@@ -30,8 +30,6 @@
     isBillingSameAsShipping,
     savedAddresses,
   } from 'one_click_checkout/address/store';
-  import { isShippingAddedToAmount } from 'one_click_checkout/charges/store';
-  import { removeCouponInStore } from 'one_click_checkout/coupons/store';
   import { isIndianCustomer } from 'checkoutstore';
 
   // i18n imports
@@ -97,9 +95,6 @@
         page_title: CATEGORIES.COUPONS,
       },
     });
-    if (!$isCouponApplied) {
-      removeCouponInStore();
-    }
 
     if (!isUserLoggedIn() && $isIndianCustomer) {
       navigator.navigateTo({ path: views.SAVED_ADDRESSES });
@@ -120,7 +115,6 @@
       if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
         loadAddressesWithServiceability();
       }
-      $isShippingAddedToAmount = true;
     }
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,

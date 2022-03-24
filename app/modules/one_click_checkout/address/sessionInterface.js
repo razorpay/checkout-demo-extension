@@ -12,6 +12,7 @@ import {
 import {
   shippingCharge,
   codChargeAmount,
+  isShippingAddedToAmount,
 } from 'one_click_checkout/charges/store';
 
 // utils imports
@@ -77,17 +78,19 @@ export function postAddressSelection(id, index) {
   const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
   shippingCharge.set(shipping_fee);
   codChargeAmount.set(cod_fee);
-
-  Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
-    id,
-    index,
-    serviceable: serviceability,
-  });
-  merchantAnalytics({
-    event: ACTIONS.SELECT_ADDRESS,
-    category: CATEGORIES.ADDRESS,
-    params: { zipcode },
-  });
+  isShippingAddedToAmount.set(true);
+  if (id) {
+    Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
+      id,
+      index,
+      serviceable: serviceability,
+    });
+    merchantAnalytics({
+      event: ACTIONS.SELECT_ADDRESS,
+      category: CATEGORIES.ADDRESS,
+      params: { zipcode },
+    });
+  }
 }
 
 /**

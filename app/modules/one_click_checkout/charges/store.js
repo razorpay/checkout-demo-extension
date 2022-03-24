@@ -54,12 +54,15 @@ export const isShippingAddedToAmount = writable(null);
 
 isShippingAddedToAmount.subscribe((isAdded) => {
   if (isAdded === true) {
-    amount.set(get(amount) + get(shippingCharge));
+    amount.set(get(cartAmount) - get(cartDiscount) + get(shippingCharge));
   } else if (isAdded === false) {
     amount.set(get(amount) - get(shippingCharge));
   }
 });
 
+shippingCharge.subscribe((shippingAmount) => {
+  amount.set(get(cartAmount) - get(cartDiscount) + (shippingAmount || 0));
+});
 // Stores to keep track of charges from api
 export function resetCharges() {
   shippingCharge.set(0);
