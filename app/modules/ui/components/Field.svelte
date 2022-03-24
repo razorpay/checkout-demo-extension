@@ -694,12 +694,12 @@
     border-bottom-right-radius: 0px;
   }
 
-  .phone-field-one-click-checkout {
+  .input-one-click-checkout.phone-field-one-click-checkout {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     margin-left: -15%;
     padding-right: 15%;
-    width: fill-available !important;
+    width: calc(100% + 15%);
   }
 
   .label-one-click-checkout {
