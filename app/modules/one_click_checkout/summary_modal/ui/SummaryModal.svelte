@@ -1,5 +1,10 @@
 <script>
+  // UI imports
   import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+
+  // i18n imports
   import { t } from 'svelte-i18n';
   import {
     AMOUNT_LABEL,
@@ -12,6 +17,8 @@
     FREE_LABEL,
     OFFER_LABEL,
   } from 'one_click_checkout/summary_modal/i18n/labels';
+
+  // store imports
   import {
     cartAmount,
     cartDiscount,
@@ -26,12 +33,18 @@
     isCouponApplied,
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'checkoutstore/offers';
+
+  // session imports
   import {
     formatAmountWithCurrency,
     createCodPayment,
   } from 'one_click_checkout/summary_modal/sessionInterface';
+
+  // analytics imports
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
+
+  // utils imports
   import { truncateString } from 'utils/strings';
 
   let visible = false;
@@ -70,65 +83,77 @@
 
 <Backdrop {visible} on:click={hide}>
   <div class="summary-modal">
-    <div class="summary-heading">{$t(MODAL_TITLE)}</div>
-    <div class="summary-table">
-      <div class="summary-row">
-        <div>{$t(AMOUNT_LABEL)}</div>
-        <div>{formatAmountWithCurrency($cartAmount)}</div>
+    <div class="summary-table-wrapper">
+      <div class="summary-heading-container">
+        <p class="summary-heading">
+          {$t(MODAL_TITLE)}
+        </p>
+        <div class="summary-close" on:click={hide}>
+          <Icon icon={close()} />
+        </div>
       </div>
-      {#if $isCouponApplied}
+      <hr class="summary-separator" />
+      <div class="summary-table">
         <div class="summary-row">
-          <div>
-            {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
-          </div>
-          <div class="text-green">
-            -{formatAmountWithCurrency($cartDiscount)}
-          </div>
+          <div>{$t(AMOUNT_LABEL)}</div>
+          <div>{formatAmountWithCurrency($cartAmount)}</div>
         </div>
-      {/if}
-      {#if $isShippingAddedToAmount}
-        <div class="summary-row" class:text-green={!$shippingCharge}>
-          <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
-          <div>
-            {$shippingCharge
-              ? formatAmountWithCurrency($shippingCharge)
-              : $t(FREE_LABEL)}
+        {#if $isCouponApplied}
+          <div class="summary-row">
+            <div>
+              {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
+            </div>
+            <div class="text-green">
+              -{formatAmountWithCurrency($cartDiscount)}
+            </div>
           </div>
-        </div>
-      {/if}
-      {#if $isCodAddedToAmount && $codChargeAmount}
-        <div class="summary-row">
-          <div>{$t(COD_CHARGES_LABEL)}</div>
-          <div>{formatAmountWithCurrency($codChargeAmount)}</div>
-        </div>
-      {/if}
-      {#if $appliedOffer?.amount}
-        <div class="summary-row">
-          <div>
-            {$t(OFFER_LABEL, {
-              values: {
-                offer_name: `(${truncateString(
-                  $appliedOffer.display_text,
-                  20
-                )})`,
-              },
-            })}
+        {/if}
+        {#if $isShippingAddedToAmount}
+          <div class="summary-row" class:text-green={!$shippingCharge}>
+            <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
+            <div>
+              {$shippingCharge
+                ? formatAmountWithCurrency($shippingCharge)
+                : $t(FREE_LABEL)}
+            </div>
           </div>
-          <div class="text-green">
-            -{formatAmountWithCurrency(offerAmount)}
+        {/if}
+        {#if $isCodAddedToAmount && $codChargeAmount}
+          <div class="summary-row">
+            <div>{$t(COD_CHARGES_LABEL)}</div>
+            <div>{formatAmountWithCurrency($codChargeAmount)}</div>
           </div>
+        {/if}
+        {#if $appliedOffer?.amount}
+          <div class="summary-row">
+            <div>
+              {$t(OFFER_LABEL, {
+                values: {
+                  offer_name: `(${truncateString(
+                    $appliedOffer.display_text,
+                    20
+                  )})`,
+                },
+              })}
+            </div>
+            <div class="text-green">
+              -{formatAmountWithCurrency(offerAmount)}
+            </div>
+          </div>
+        {/if}
+        <hr class="total-separator" />
+        <div class="summary-row total-charges-text">
+          <div>{$t(TOTAL_CHARGES_LABEL)}</div>
+          <div>{formatAmountWithCurrency($amount)}</div>
         </div>
-      {/if}
-      <hr />
-      <div class="summary-row total-charges-text">
-        <div>{$t(TOTAL_CHARGES_LABEL)}</div>
-        <div>{formatAmountWithCurrency($amount)}</div>
       </div>
     </div>
     {#if ctaVisible}
-      <button class="summary-modal-cta" on:click={onConfirm}>
-        {$t(CTA_LABEL)}
-      </button>
+      <div class="cta-wrapper">
+        <button class="summary-modal-cta" on:click={onConfirm}>
+          {$t(CTA_LABEL)}
+        </button>
+      </div>
     {/if}
   </div>
 </Backdrop>
@@ -141,30 +166,23 @@
     text-align: start;
     bottom: 0;
     width: 100%;
-    padding: 24px;
+    padding-top: 24px;
   }
 
+  .summary-table-wrapper {
+    padding: 0px 16px 14px;
+  }
   :global(.mobile) .summary-modal {
     bottom: 0;
   }
 
-  .summary-heading {
-    font-style: normal;
-    font-weight: normal;
-    font-size: 13px;
-    line-height: 16px;
-    text-transform: uppercase;
-    color: rgba(51, 51, 51, 0.6);
-    text-align: center;
-  }
-
   .summary-table {
-    font-size: 13px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 16px;
     letter-spacing: 0;
-    color: #757575;
+    color: #8d97a1;
   }
 
   .summary-row {
@@ -184,8 +202,57 @@
   .total-charges-text {
     font-style: normal;
     font-weight: 500;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 16px;
     color: #363636;
+  }
+
+  .summary-heading-container {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .summary-heading {
+    font-weight: 600;
+    line-height: 16px;
+    margin: 0px;
+  }
+
+  .summary-close {
+    cursor: pointer;
+  }
+
+  .summary-separator {
+    margin-bottom: 16px;
+    border: 1px solid #e1e5ea;
+    border-bottom: none;
+  }
+
+  .total-separator {
+    border: 1px dashed #e1e5ea;
+    border-bottom: none;
+    margin: 16px 0px;
+  }
+
+  .summary-modal-cta::after {
+    left: 0;
+    top: 0;
+    opacity: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    content: '';
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(0, 0, 0, 0.1)
+    );
+  }
+
+  .cta-wrapper {
+    padding: 24px 16px;
+    box-shadow: 0px -4px 4px rgba(166, 158, 158, 0.08);
   }
 </style>

@@ -202,7 +202,7 @@
     background: #fff;
     text-align: start;
     width: 100%;
-    padding: 24px;
+    padding: 24px 16px;
     bottom: -55px;
   }
   .account-menu {
