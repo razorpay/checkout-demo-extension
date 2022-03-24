@@ -8,6 +8,8 @@ import {
   upiBackCancel,
 } from 'common/upi';
 
+import { getMerchantKey } from 'razorpay';
+
 import Config from 'config/index.js';
 
 import { androidBrowser, iOS, android } from 'common/useragent';
@@ -313,6 +315,14 @@ var responseTypes = {
   },
 
   async: function (request, fullResponse) {
+    Analytics.track('metric:polling_started', {
+      data: {
+        data: fullResponse,
+        platform: Bridge.checkout.platform,
+        location: 'coproto:async',
+      },
+      immediately: true,
+    });
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -355,6 +365,14 @@ var responseTypes = {
 
       // Starting polling API for payment status.
       var request = payment.request;
+      Analytics.track('metric:polling_started', {
+        data: {
+          data: request,
+          platform: Bridge.checkout.platform,
+          location: 'coproto:responseType:application',
+        },
+        immediately: true,
+      });
       payment.ajax = fetch
         .jsonp({
           url: request.url,
@@ -366,6 +384,14 @@ var responseTypes = {
   },
 
   gpay_inapp: function (request) {
+    Analytics.track('metric:polling_started', {
+      data: {
+        data: request,
+        platform: Bridge.checkout.platform,
+        location: 'coproto:responseType:gpay_inapp',
+      },
+      immediately: true,
+    });
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -586,6 +612,14 @@ var responseTypes = {
             return; // Don't poll for status as the payment was cancelled.
           }
         }
+        Analytics.track('metric:polling_started', {
+          data: {
+            data: response,
+            platform: Bridge.checkout.platform,
+            location: 'coproto:responseType:intent:app.intent_response',
+          },
+          immediately: true,
+        });
         this.ajax = fetch
           .jsonp({
             url: request.url,
@@ -602,17 +636,38 @@ var responseTypes = {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-
+      Analytics.track('metric:polling_started', {
+        data: {
+          data: data,
+          platform: Bridge.checkout.platform,
+          location: 'coproto:responseType:intent:startPolling',
+        },
+        immediately: true,
+      });
       this.ajax = ra(data);
     };
-
-    if (Bridge.checkout.platform === 'ios') {
+    /**
+     * sometimes merchant key will not available( if payment is based invoice id/ subscription id hence pull key from url)
+     */
+    const affectedMerchantId = 'rzp_live_mPhBL8hs5QOt2B';
+    if (
+      getMerchantKey() === affectedMerchantId ||
+      (request && request.url && request.url.includes(affectedMerchantId))
+    ) {
       startPolling();
     } else {
-      this.on('upi.intent_success_response', startPolling);
+      if (Bridge.checkout.platform === 'ios') {
+        startPolling();
+      } else {
+        this.on('upi.intent_success_response', startPolling);
+      }
     }
 
     this.on('upi.intent_response', (data) => {
+      Analytics.track('upi_intent_response', {
+        data: data,
+        immediately: true,
+      });
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
         this.emit('upi.intent_success_response', data);
       } else {

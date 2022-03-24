@@ -5941,6 +5941,13 @@ Session.prototype = {
 
       this.r.on('payment.upi.pending', function (data) {
         if (data && data.flow === 'upi-intent') {
+          Analytics.track('upi_pending', {
+            data: {
+              data: data,
+              message: 'misc.payment_waiting_confirmation',
+            },
+            immediately: true,
+          });
           return that.showLoadError(
             I18n.format('misc.payment_waiting_confirmation')
           );
@@ -5975,6 +5982,12 @@ Session.prototype = {
       this.r.on('payment.app.coproto_response', function (coprotoResponse) {
         // Intent flow
         // Message: Redirecting you to the {app}...
+        Analytics.track('app_coproto_response', {
+          data: {
+            data: coprotoResponse,
+            message: 'misc.checking_payment_status',
+          },
+        });
         var message = I18n.formatTemplateWithLocale(
           'misc.redirecting_to_app',
           { app: appName },
@@ -5985,6 +5998,13 @@ Session.prototype = {
 
       this.r.on('payment.app.intent_response', function (intentResponse) {
         // Message: Checking the payment status...
+
+        Analytics.track('app_intent_response', {
+          data: {
+            data: intentResponse,
+            message: 'misc.checking_payment_status',
+          },
+        });
         var message = I18n.formatMessageWithLocale(
           'misc.checking_payment_status',
           locale
