@@ -20,7 +20,6 @@
   import { views } from 'one_click_checkout/routing/constants';
 
   // Helpers import
-  import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 
   // svelte imports
@@ -72,7 +71,7 @@
     if (checkoutTopbar) {
       checkoutTopbar.classList.add('hide-topbar');
     }
-    const view = determineLandingView();
+    const view = views.COUPONS;
     navigator.navigateTo({ path: view });
     contact.subscribe(updateTopBar);
   });

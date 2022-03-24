@@ -72,7 +72,6 @@
   // Props
   export let on = {};
   export let addShowableClass;
-  export let newCta;
   export let onSubmit;
   export let skipOTPHandle;
   export let resendOTPHandle;
@@ -276,7 +275,7 @@
       </span>
     {/if}
   </div>
-  {#if newCta && !$loading}
+  {#if !$loading}
     <CTA disabled={$disableCTA} on:click={onSubmit} showAmount={false} />
   {/if}
 </div>

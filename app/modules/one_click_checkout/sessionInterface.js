@@ -19,11 +19,7 @@ import {
   newUserAddress,
   showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
-import {
-  isEditContactFlow,
-  isLogoutFlow,
-  isCodForced,
-} from 'one_click_checkout/store';
+import { isEditContactFlow, isCodForced } from 'one_click_checkout/store';
 import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
@@ -87,7 +83,6 @@ export function handleEditContact(logoutFlow = false) {
   const params = { path: views.DETAILS };
   if (logoutFlow) {
     resetOrder(true);
-    isLogoutFlow.set(true);
     params.initialize = true;
   } else {
     isEditContactFlow.set(true);

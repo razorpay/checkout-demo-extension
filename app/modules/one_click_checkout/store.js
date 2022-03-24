@@ -5,7 +5,6 @@ import { getOption, getPreferences, isOneClickCheckout } from 'razorpay';
 
 export const isEditContactFlow = writable(false);
 
-export const isLogoutFlow = writable(false);
 /**
  * @returns boolean
  * Checks if 1CC enabled and show_address is true
