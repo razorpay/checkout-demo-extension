@@ -51,19 +51,21 @@
   import CardBox from 'ui/elements/CardBox.svelte';
   import OTPInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
   import CTA from 'one_click_checkout/cta/index.svelte';
-  import {
-    stopResendCountdown,
-    getTheme,
-  } from 'one_click_checkout/otp/sessionInterface';
   import Icon from 'ui/elements/Icon.svelte';
-  import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
+  // analytics
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
+
+  // helpers
   import { screensHistory } from 'one_click_checkout/routing/History';
   import { views } from 'one_click_checkout/routing/constants';
+  import { getThemeColor } from 'checkoutstore/theme';
+  import { getIcons } from 'ui/icons/payment-methods';
+  import { stopResendCountdown } from 'one_click_checkout/otp/sessionInterface';
+  import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
-  const { edit_paper } = getTheme().icons;
+  const { edit_paper } = getIcons({ backgroundColor: getThemeColor() });
 
   const { otpReason } = screensHistory.config[views.OTP].props;
 
@@ -356,7 +358,9 @@
     text-transform: initial;
   }
   .edit-contact-btn {
-    margin-left: 4px;
+    margin-left: 2px;
+    position: relative;
+    top: 1px;
     cursor: pointer;
   }
 
@@ -373,5 +377,9 @@
   }
   #otp-prompt {
     margin-bottom: 24px;
+  }
+
+  .tab-content-one-cc .otp-title :global(.theme) {
+    font-weight: 600;
   }
 </style>

@@ -115,6 +115,10 @@ export function loadAddressesWithServiceability(onSavedAddress) {
       selectedShippingAddressId.set(latestAddress.id);
       postAddressSelection();
     })
+    .catch(() => {
+      selectedShippingAddressId.set(addresses[0].id);
+      postAddressSelection();
+    })
     .finally(() => {
       checkServiceabilityStatus.set(SERVICEABILITY_STATUS.CHECKED);
     });
