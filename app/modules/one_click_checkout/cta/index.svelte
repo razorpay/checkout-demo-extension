@@ -9,8 +9,8 @@
   // helpers/store imports
   import { amount } from 'one_click_checkout/charges/store';
   import { showSummaryModal } from 'one_click_checkout/summary_modal';
-  import { formatAmountWithCurrency } from 'one_click_checkout/summary_modal/sessionInterface';
-  import { isOneClickCheckout } from 'razorpay';
+  import { getCurrency, isOneClickCheckout } from 'razorpay';
+  import { formatAmountWithSymbol } from 'common/currency';
 
   // Props
   export let hidden = false;
@@ -20,6 +20,7 @@
     showSummaryModal(false);
   };
 
+  const currency = getCurrency();
   const dispatch = createEventDispatcher();
 
   /**
@@ -42,7 +43,9 @@
   <div class="cta-container" class:hidden use:replaceNodeWithNewCta>
     {#if showAmount}
       <div class="flex-column">
-        <span class="price-label">{formatAmountWithCurrency($amount)}</span>
+        <span class="price-label">
+          {formatAmountWithSymbol($amount, currency, false)}
+        </span>
         <button
           id="cta-view-details"
           on:click|preventDefault={onViewDetailsClick}
@@ -127,7 +130,7 @@
   #one-cc-cta {
     width: 100%;
     padding: 18px;
-    font-weight: bold;
+    font-weight: 600;
     border-radius: 6px;
   }
 
