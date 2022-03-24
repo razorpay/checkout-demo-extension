@@ -7,6 +7,7 @@
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
   import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Store
   import {
@@ -38,6 +39,7 @@
     isOneClickCheckout,
   } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
 
   import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
@@ -64,6 +66,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { views } from 'one_click_checkout/routing/constants';
+  import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
 
   const entries = _Obj.entries;
 
@@ -75,7 +78,9 @@
   const order = getMerchantOrder();
   const accountName = getOption('prefill.bank_account[name]');
   const icons = getThemeMeta().icons;
-
+  const { user } = getIcons();
+  const isOneCCEnabled = isOneClickCheckout();
+  const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
   const userContact = $contact;
   let disabled = true;
 
@@ -122,7 +127,7 @@
     Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
       previousScreen: screensHistory.previousRoute(),
     });
-    if (isOneClickCheckout() && $activeRoute?.name === views.DETAILS) {
+    if (isOneCCEnabled && isEditDetailScreen) {
       toggleHeader(false);
     }
   });
@@ -144,14 +149,19 @@
 </script>
 
 <div
-  class:details-wrapper={isOneClickCheckout() &&
-    $activeRoute?.name === views.DETAILS}
+  class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
   {#if isLoginMandatory()}
     <div class="details-callout">{$t(MANDATORY_LOGIN_CALLOUT)}</div>
   {/if}
-  <div class="details-block" class:pd-1cc={isOneClickCheckout()}>
+  {#if isOneCCEnabled && isEditDetailScreen}
+    <div class="contact-title">
+      <Icon icon={user} />
+      <span class="contact-text">{$t(CONTACT_LABEL)}</span>
+    </div>
+  {/if}
+  <div class="details-block" class:pd-1cc={isOneCCEnabled}>
     {#if !isContactHidden()}
       <div class="contact-field">
         <ContactField
@@ -231,5 +241,17 @@
 
   .pd-1cc {
     padding: 8px 0px;
+  }
+
+  .contact-title {
+    display: flex;
+    align-items: center;
+    padding-bottom: 18px;
+  }
+
+  .contact-text {
+    padding-left: 10px;
+    font-weight: 600;
+    font-size: 14px;
   }
 </style>
