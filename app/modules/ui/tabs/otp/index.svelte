@@ -137,6 +137,8 @@
 
   let isRazorpayOTPAndOneCC;
   $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isOneClickCheckout();
+  let isNativeOTPAndOneCC;
+  $: isNativeOTPAndOneCC = !$isRazorpayOTP && isOneClickCheckout();
   let isOneCC = isOneClickCheckout();
 
   export function onShown() {
@@ -331,6 +333,7 @@
         <div
           class="otp-action-container"
           class:action-container-center={isRazorpayOTPAndOneCC}
+          class:action-native-otp={isNativeOTPAndOneCC}
         >
           {#if showInput}
             {#if $allowResend}
@@ -473,6 +476,10 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+  }
+
+  .action-native-otp :global(.one-cc-btn) {
+    font-size: 14px;
   }
 
   .tab-content-one-cc {

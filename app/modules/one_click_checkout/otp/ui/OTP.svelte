@@ -378,7 +378,7 @@
     margin-bottom: 24px;
   }
 
-  .tab-content-one-cc .otp-title :global(.theme) {
+  :global(.tab-content-one-cc .otp-title .theme) {
     font-weight: 600;
   }
 </style>
