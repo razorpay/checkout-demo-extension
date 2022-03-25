@@ -130,13 +130,18 @@
         </button>
       </div>
       <hr />
-      <div class="language-container">
+      <ul class="language-container">
         {#each $locales as locale}
-          <button class="account-menu" on:click={() => selectLanguage(locale)}>
-            {getLocaleName(locale)}
-          </button>
+          <li class="list-item">
+            <button
+              class="account-menu"
+              on:click={() => selectLanguage(locale)}
+            >
+              {getLocaleName(locale)}
+            </button>
+          </li>
         {/each}
-      </div>
+      </ul>
     {:else}
       <div class="account-heading-container">
         <p class="account-heading">
@@ -157,16 +162,18 @@
           </span>
           <span class="back-btn-text">{$t(BACK)}</span>
         </button>
-        <div class="language-container">
+        <ul class="language-container">
           {#each $locales as locale}
-            <button
-              class="account-menu"
-              on:click={() => selectLanguage(locale)}
-            >
-              {getLocaleName(locale)}
-            </button>
+            <li class="list-item">
+              <button
+                class="account-menu"
+                on:click={() => selectLanguage(locale)}
+              >
+                {getLocaleName(locale)}
+              </button>
+            </li>
           {/each}
-        </div>
+        </ul>
       {:else}
         {#if isLoggedIn}
           <p class="account-menu" on:click={handleEdit}>
@@ -210,8 +217,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    height: 36px;
+    padding: 0px 24px;
   }
+
   .account-heading {
     font-weight: 600;
     font-size: 16px;
@@ -222,30 +231,32 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0px 24px;
   }
   p {
     margin-block-start: 0;
     margin-block-end: 0;
   }
   hr {
-    margin-bottom: 18px;
     border: 1px solid #e1e5ea;
     border-bottom: none;
+    margin: 12px 24px;
   }
-  .account-separator {
-    margin: 26px 0px;
-  }
+
   .account-container {
     text-align: left;
   }
   .language-container {
     overflow-y: scroll;
     max-height: 140px;
+    list-style: none;
+    padding-inline-start: 0px;
+    margin: 0px;
   }
   .back-btn-container {
     color: #616161;
     font-size: 12px;
-    padding: 0px 0px 18px 6px;
+    padding: 0px 24px 18px;
     display: flex;
     align-items: center;
   }

@@ -119,6 +119,10 @@
     theme: TOAST_THEME.ERROR,
   };
 
+  const showPincodeToast = (pincode) => {
+    if (pincode) showToast(pincode_error_toast);
+  };
+
   let INPUT_FORM = [
     {
       id: 'name',
@@ -303,14 +307,15 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
-              showToast(pincode_error_toast);
+
+              showPincodeToast($formData.zipcode);
             }
             $formData.cod = res[$selectedCountryISO]?.cod;
           })
           .catch(() => {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
-            showToast(pincode_error_toast);
+            showPincodeToast($formData.zipcode);
           });
       }
     } else {
@@ -401,7 +406,7 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
-              showToast(pincode_error_toast);
+              showPincodeToast($formData.zipcode);
             }
             $formData.cod = res[value]?.cod;
             if (isShippingAddress) {
@@ -423,7 +428,7 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
-            showToast(pincode_error_toast);
+            showPincodeToast($formData.zipcode);
           })
           .finally(() => {
             hideLoaderView();
@@ -548,13 +553,13 @@
           } else {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
-            showToast(pincode_error_toast);
+            showPincodeToast($formData.zipcode);
           }
         })
         .catch(() => {
           INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
             UNSERVICEABLE_LABEL;
-          showToast(pincode_error_toast);
+          showPincodeToast($formData.zipcode);
         });
     }
     if (id === 'line1') {
@@ -760,5 +765,6 @@
   .tc-text {
     cursor: pointer;
     color: #3684d6;
+    text-decoration: underline;
   }
 </style>

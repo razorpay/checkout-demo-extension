@@ -7,6 +7,7 @@
     SERVICEABLE_LABEL,
     ADD_LANDMARK,
     OPTIONAL,
+    UNSERVICEABLE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
 
   import { country, phone } from 'checkoutstore/screens/home';
@@ -126,13 +127,18 @@
               placeholder={subInput.placeholder}
               loader={subInput.loader}
               validationText={errors[subInput.id] ? errors[subInput.id] : ''}
-              labelClasses="address-label"
+              labelClasses="address-label {!subInput?.hideStatusText &&
+                subInput.unserviceableText === UNSERVICEABLE_LABEL &&
+                'pincode-unserviceable-label'}"
               elemClasses={'address-elem'}
               handleInput
               autocomplete={subInput.autofillToken ?? 'off'}
               showServicableIcon={!subInput?.hideStatusText &&
                 subInput.unserviceableText === SERVICEABLE_LABEL}
               disabled={subInput.disabled}
+              inputFieldClasses={!subInput?.hideStatusText &&
+                subInput.unserviceableText === UNSERVICEABLE_LABEL &&
+                'pincode-unserviceable-wrapper'}
             />
           {/if}
         {/each}
