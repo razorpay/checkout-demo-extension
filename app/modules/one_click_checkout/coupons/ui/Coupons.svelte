@@ -64,6 +64,7 @@
   import { hideToast } from 'one_click_checkout/Toast';
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { isScrollableElement } from 'one_click_checkout/helper';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -72,6 +73,8 @@
   const prefilledCoupon = getPrefilledCouponCode();
 
   let ctaDisabled = false;
+  let couponEle;
+  let scrollable = false;
   let orderWidget;
 
   $: ctaDisabled =
@@ -109,6 +112,7 @@
   }
 
   onMount(() => {
+    scrollable = isScrollableElement(couponEle?.parentNode);
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
@@ -150,7 +154,11 @@
 </script>
 
 <Screen pad={false}>
-  <div class="coupon-container">
+  <div
+    class="coupon-container"
+    bind:this={couponEle}
+    class:coupon-scrollable={scrollable}
+  >
     <div class="widget-wrapper">
       <ContactWidget />
     </div>
@@ -190,5 +198,9 @@
 
   .widget-wrapper {
     padding: 28px 16px;
+  }
+
+  .coupon-scrollable {
+    min-height: 110%;
   }
 </style>

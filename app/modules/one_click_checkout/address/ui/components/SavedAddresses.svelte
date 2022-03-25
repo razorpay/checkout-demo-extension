@@ -37,11 +37,15 @@
     postAddressSelection,
   } from 'one_click_checkout/address/sessionInterface';
 
+  // util imports
+  import { screenScrollTop } from 'one_click_checkout/helper';
+
   export let addresses;
   export let checkServiceability = true;
   export let selectedAddressId;
   export let onAddAddressClick;
   export let addressType;
+  export let addressWrapperEle;
 
   const dispatch = createEventDispatcher();
 
@@ -63,6 +67,7 @@
   }
 
   onMount(() => {
+    screenScrollTop(addressWrapperEle);
     if (
       checkServiceability &&
       $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED

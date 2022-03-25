@@ -133,6 +133,7 @@ import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as TrustedBadgeHelper from 'trusted-badge/helper';
+import * as AccountTabStore from 'one_click_checkout/account_modal/store';
 
 import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
@@ -297,4 +298,5 @@ export default {
   CommonConstants,
   // Offline Challan
   offlineChallanTab,
+  AccountTabStore,
 };

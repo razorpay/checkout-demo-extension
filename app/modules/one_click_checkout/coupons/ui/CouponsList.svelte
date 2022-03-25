@@ -41,7 +41,7 @@
   }
 </script>
 
-<Screen pad={false} hideAccountTab={true}>
+<Screen pad={false} removeAccountTab={true}>
   <div class="coupon-container">
     <div class="coupon-input-container">
       <CouponInput

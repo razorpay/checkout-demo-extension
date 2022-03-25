@@ -14,6 +14,18 @@ export function clickOutside(node) {
   };
 }
 
+export function isScrollableElement(element) {
+  const { scrollHeight, offsetHeight } = element || {};
+  if (scrollHeight === offsetHeight) {
+    return true;
+  }
+}
+
+export function screenScrollTop(element) {
+  if (element) {
+    element.scrollTop = 0;
+  }
+}
 export const isScrollable = (node) => {
   const hasScrollableContent = node.scrollHeight > node.clientHeight;
 

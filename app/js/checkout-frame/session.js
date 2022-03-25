@@ -105,6 +105,7 @@ var preferences,
   merchantAnalytics = discreet.merchantAnalytics,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
   TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
+  AccountTabStore = discreet.AccountTabStore,
   SecurityUtils = discreet.SecurityUtils;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -3054,6 +3055,7 @@ Session.prototype = {
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
       TopbarMagicCheckoutStore.tabTitleLogo.set('');
+      AccountTabStore.showAccountTab.set(false);
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,

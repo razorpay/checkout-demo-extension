@@ -153,5 +153,6 @@
 
   .container {
     height: inherit;
+    overflow: auto;
   }
 </style>

@@ -1,6 +1,7 @@
 <script>
   // svelte imports
   import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
 
   // UI imports
   import CTA from 'one_click_checkout/cta/index.svelte';
@@ -26,6 +27,7 @@
     selectedAddressId as selectedShippingAddressId,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
+  import { showAccountTab } from 'one_click_checkout/account_modal/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -33,6 +35,8 @@
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
+  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
@@ -51,6 +55,9 @@
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
+
+  let addressWrapperEle;
+  let scrollable = false;
 
   let addresses;
   $: {
@@ -200,6 +207,14 @@
     }
   }
 
+  function onScroll() {
+    isShowAccountTab(addressWrapperEle);
+  }
+
+  onMount(() => {
+    scrollable = isScrollableElement(addressWrapperEle);
+  });
+
   $: {
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       disabled = !isFormComplete;
@@ -223,8 +238,10 @@
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
+    bind:this={addressWrapperEle}
+    on:scroll={onScroll}
   >
-    <div class="address-section">
+    <div class="address-section" class:address-scrollable={scrollable}>
       <slot name="header" />
       <slot name="inner-header" />
       <div class="label-container">
@@ -240,6 +257,7 @@
           onAddAddressClick={handleAddAddressClick}
           checkServiceability={Resource[addressType].checkServiceability}
           {addressType}
+          {addressWrapperEle}
         />
       {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
         <AddNewAddress
@@ -252,11 +270,14 @@
           {addressType}
           {selectedCountryISO}
           {currentView}
+          {addressWrapperEle}
         />
       {/if}
       <slot name="inner-footer" />
     </div>
-    <AccountTab />
+    {#if $showAccountTab}
+      <AccountTab />
+    {/if}
   </div>
   <slot name="footer" />
   <CTA on:click={onSubmit} {disabled} />
@@ -317,5 +338,9 @@
   .address-section {
     /* TODO: to replace left/right padding with variable */
     padding: 0px 16px 16px;
+  }
+
+  .address-scrollable {
+    min-height: 120%;
   }
 </style>

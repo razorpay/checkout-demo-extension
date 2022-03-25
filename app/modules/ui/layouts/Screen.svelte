@@ -3,12 +3,16 @@
   import { onMount } from 'svelte';
 
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import { isOneClickCheckout } from 'razorpay';
   import { shouldShowNewDesign } from 'one_click_checkout/store';
+  import { showAccountTab } from 'one_click_checkout/account_modal/store';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
+  import { isOneClickCheckout } from 'razorpay';
+
   // Props
   export let pad = true;
   export let threshold = 16;
-  export let hideAccountTab;
+  export let scrollable;
+  export let removeAccountTab;
   // Refs
   let contentRef;
 
@@ -30,6 +34,9 @@
     } = contentRef;
 
     const isContentOverflowing = scrollHeight > offsetHeight;
+
+    // Allowing the Scroll behavior only for 1CC screens, In 1CC Screen Component used by Coupons
+    isShowAccountTab(contentRef);
 
     if (isContentOverflowing && !shouldShowNewDesign()) {
       if (scrollHeight - offsetHeight - scrollTop >= threshold) {
@@ -68,7 +75,7 @@
   on:scroll={onScroll}
 >
   <slot />
-  {#if !hideAccountTab}
+  {#if $showAccountTab && !removeAccountTab}
     <AccountTab />
   {/if}
 </div>

@@ -87,7 +87,7 @@
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
 
-  import { clickOutside } from 'one_click_checkout/helper';
+  import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
 
   // props
   export let formData;
@@ -97,6 +97,7 @@
   export let addressType;
   export let selectedCountryISO;
   export let currentView;
+  export let addressWrapperEle;
 
   let errors = {};
   let selectedTag = $formData.tag;
@@ -606,6 +607,7 @@
   }
 
   onMount(() => {
+    screenScrollTop(addressWrapperEle);
     if (
       $activeRoute?.name === views.ADD_ADDRESS &&
       !$formData.zipcode &&
