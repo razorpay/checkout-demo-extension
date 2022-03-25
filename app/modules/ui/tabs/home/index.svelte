@@ -1349,4 +1349,9 @@
     background: white;
     order: -1;
   }
+
+  :global(#content.one-cc) .home-methods {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 </style>

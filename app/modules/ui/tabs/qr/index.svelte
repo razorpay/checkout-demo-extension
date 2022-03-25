@@ -271,4 +271,12 @@
     font-weight: 400;
     color: #8d97a1;
   }
+
+  :global(#content.one-cc #form-qr) {
+    padding-top: 12px;
+  }
+
+  :global(#content.one-cc) .message {
+    padding-bottom: 50px;
+  }
 </style>

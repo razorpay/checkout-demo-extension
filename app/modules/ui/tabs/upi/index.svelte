@@ -6,7 +6,7 @@
   // Util imports
   import { getSession } from 'sessionmanager';
   import { isPayout, shouldRememberCustomer } from 'checkoutstore';
-  import { getPrefilledVPA, hasFeature } from 'razorpay';
+  import { getPrefilledVPA, hasFeature, isOneClickCheckout } from 'razorpay';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -717,7 +717,7 @@
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
-  <Screen>
+  <Screen pad={!isOneClickCheckout()}>
     <div class="upi-container">
       {#if upiFlowStep === steps.preUpiPspBankSelection}
         <BankSelection bind:value={selectedBankForRecurring} />
@@ -951,5 +951,9 @@
 
   .upi-container {
     padding: 0px 12px 12px;
+  }
+
+  :global(#content.one-cc) .upi-container {
+    padding: 0px 16px 12px;
   }
 </style>

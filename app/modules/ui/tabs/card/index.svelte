@@ -53,7 +53,12 @@
   import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
 
-  import { isRecurring, getCardFeatures, isDynamicFeeBearer } from 'razorpay';
+  import {
+    isRecurring,
+    getCardFeatures,
+    isDynamicFeeBearer,
+    isOneClickCheckout,
+  } from 'razorpay';
 
   import {
     shouldRememberCustomer,
@@ -94,6 +99,7 @@
     AVS_INFO_MESSAGE_1,
     AVS_INFO_MESSAGE_2,
     AVS_INFO_MESSAGE_3,
+    CARDS_SAVED_LABEL_ONE_CC,
   } from 'ui/labels/card';
 
   import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
@@ -177,6 +183,7 @@
   }
 
   const cardDowntimes = getDowntimes().cards;
+  const isOneCC = isOneClickCheckout();
   let downtime = {
     network: false,
     issuer: false,
@@ -1078,7 +1085,9 @@
           {/if}
 
           <!-- LABEL: Your saved cards -->
-          <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
+          <h3 class:saved-card-header={isOneCC} class="pad">
+            {$t(isOneCC ? CARDS_SAVED_LABEL_ONE_CC : CARDS_SAVED_ON_RZP_LABEL)}
+          </h3>
           <div id="saved-cards-container">
             <SavedCards
               {tab}
@@ -1223,5 +1232,12 @@
 
   .apps-heading-container {
     margin-top: 26px;
+  }
+
+  .saved-card-header {
+    font-weight: 400;
+    font-size: 14px;
+    color: #263a4a;
+    text-transform: none;
   }
 </style>

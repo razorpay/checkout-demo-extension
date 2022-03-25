@@ -287,6 +287,7 @@
   div[slot='title'].title-one-cc {
     font-weight: 400;
     color: #263a4a;
+    font-size: 14px;
   }
 
   div[slot='subtitle'].subtitle-one-cc {

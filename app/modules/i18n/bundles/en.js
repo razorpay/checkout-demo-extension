@@ -228,6 +228,7 @@ export default {
     card_number_label: 'Card Number',
     cards_saved_on_apps_label: 'Pay with card on other apps',
     cards_saved_on_rzp_label: 'YOUR SAVED CARDS',
+    cards_saved_label_one_cc: 'All cards supported',
     checking_cred_eligibility: 'Checking you eligibility status on CRED',
     cvv_help: "It's a {length} digit code printed on the back of your card.",
     cvv_label: 'CVV',
@@ -1180,7 +1181,7 @@ export default {
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:
       "Please accept the request from Razorpay's VPA on your UPI app",
-    intent_block_heading: 'PAY USING APPS',
+    intent_block_heading: 'Pay Using Apps',
     intent_no_apps_error:
       'No UPI App on this device. Select other UPI option to proceed.',
     intent_select_app: 'Select UPI App in your device',

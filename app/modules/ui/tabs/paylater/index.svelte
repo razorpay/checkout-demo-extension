@@ -88,4 +88,16 @@
     flex-direction: column;
     height: 100%;
   }
+
+  :global(#content.one-cc) .paylater-header {
+    margin: 26px 28px 14px;
+    text-transform: capitalize;
+    color: #263a4a;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  :global(#content.one-cc) .paylater-section {
+    margin: 0px 16px 14px;
+  }
 </style>
