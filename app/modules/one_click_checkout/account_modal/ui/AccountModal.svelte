@@ -209,7 +209,7 @@
     background: #fff;
     text-align: start;
     width: 100%;
-    padding: 24px 16px;
+    padding: 24px 0px;
     bottom: -55px;
   }
   .account-menu {
