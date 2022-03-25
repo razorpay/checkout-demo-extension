@@ -153,6 +153,7 @@
           on:blur={() => onBlur(input.id)}
           on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
           on:select={input.onSelect}
+          handleValidation={onBlur}
         />
       {:else}
         <Field
