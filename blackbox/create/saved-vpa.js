@@ -79,7 +79,6 @@ module.exports = function (testFeatures) {
   )('Saved VPA tests', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.upi = true;
-      console.log({ preferences });
       if (dynamicFeeBearer) {
         preferences.fee_bearer = true;
         preferences.order = modifyPreferencesForDynamicFeeBearer();

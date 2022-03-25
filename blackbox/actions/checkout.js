@@ -72,7 +72,6 @@ function checkoutRequestHandler(request) {
 function forceTargetInitialization(browser) {
   Array.from(browser._targets.values()).forEach((t, i) => {
     if (!t._isInitialized) {
-      console.log('Forcing target initialization');
       browser._targetInfoChanged({
         targetInfo: { ...t._targetInfo, url: ' ' },
       });
