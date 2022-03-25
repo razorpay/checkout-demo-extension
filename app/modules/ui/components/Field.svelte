@@ -331,8 +331,7 @@
     {/if}
     <input
       class={`input-one-click-checkout ${inputFieldClasses} main`}
-      class:error-field-one-click-checkout={isOneClickCheckoutEnabled &&
-        validationText}
+      class:error-field-one-click-checkout={validationText}
       bind:this={input}
       id={identifier}
       type={inputType}
@@ -382,7 +381,7 @@
         class={`${labelClasses} label-one-click-checkout ${
           !focused && value ? `${labelUpperClasses}` : ''
         }`}
-        class:label-upper={!focused && value}
+        class:label-upper={focused || value}
         class:error-label-one-click-checkout={validationText}>{label}</label
       >
     {/if}
@@ -747,11 +746,13 @@
     border-color: var(--highlight-color);
   }
 
-  .error-field-one-click-checkout {
+  .error-field-one-click-checkout,
+  .pincode-unserviceable-wrapper {
     border-color: var(--error-validation-color);
   }
 
-  .error-field-one-click-checkout .label-one-click-checkout {
+  .error-field-one-click-checkout .label-one-click-checkout,
+  .pincode-unserviceable-label {
     color: var(--error-validation-color);
   }
 

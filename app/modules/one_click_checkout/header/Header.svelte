@@ -62,6 +62,7 @@
     display: flex;
     justify-content: space-between;
     padding: 18px 16px 0px;
+    align-items: center;
   }
 
   .header-title-wrapper-with-extra-padding {
