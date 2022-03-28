@@ -3,6 +3,7 @@ var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - 128;
 var themeMeta = arguments[1];
 var c = themeMeta.color;
+var color = themeMeta.color;
 var textColor = themeMeta.textColor;
 var highlightColor = themeMeta.highlightColor;
 var secondaryHighlightColor = themeMeta.secondaryHighlightColor;
@@ -365,7 +366,7 @@ color: `=c`;
 }
 
 #one-cc-cta {
-  background: `=backgroundColor`;
+  background: `=color`;
   color: `=textColor`;
 }
 
