@@ -720,4 +720,9 @@
   .maestro-card-block-label-text {
     margin-left: 5px;
   }
+
+  :global(#content.one-cc) .card-title {
+    font-weight: 600;
+    color: #263a4a;
+  }
 </style>

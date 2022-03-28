@@ -255,4 +255,8 @@
     flex-direction: column;
     height: 100%;
   }
+
+  :global(#content.one-cc) .border-list {
+    margin: 26px 16px 12px;
+  }
 </style>
