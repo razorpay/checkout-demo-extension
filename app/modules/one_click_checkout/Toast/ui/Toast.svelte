@@ -6,7 +6,7 @@
   let theme;
 
   export function show(options) {
-    const { delay, message, theme: selectedTheme } = options || {};
+    const { delay = 5000, message, theme: selectedTheme } = options || {};
     msg = message;
     shown = true;
     theme = selectedTheme;
@@ -50,5 +50,10 @@
   .error {
     background-color: #fae8e3;
     border-top: 2px solid #e7bbb4;
+  }
+
+  .info {
+    background-color: #e4f9ff;
+    border-top: 2px solid #b9d7df;
   }
 </style>

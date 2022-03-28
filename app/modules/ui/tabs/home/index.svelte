@@ -14,6 +14,7 @@
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import { showToast, TOAST_THEME } from 'one_click_checkout/Toast';
 
   import { HOME_VIEWS } from './constants';
 
@@ -98,17 +99,9 @@
     isMethodEnabled,
   } from 'checkoutstore/methods';
 
-  import {
-    isBillingSameAsShipping,
-    didSaveAddress,
-  } from 'one_click_checkout/address/store';
+  import { didSaveAddress } from 'one_click_checkout/address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
-  import {
-    selectedAddress as selectedShippingAddress,
-    codReason,
-  } from 'one_click_checkout/address/shipping_address/store';
-  import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
-
+  import { codReason } from 'one_click_checkout/address/shipping_address/store';
   import {
     getInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
@@ -1018,15 +1011,9 @@
       ? 'methods.descriptions.cod_charge_applied'
       : 'methods.descriptions.cod_charge_removed';
 
-    const snackBar = new Snackbar({
-      target: document.getElementById('form'),
-      props: {
-        align: 'bottom',
-        shown: true,
-        timer: 2000,
-        text: formatTemplateWithLocale(template, { charge }, $locale),
-        class: 'snackbar-cod',
-      },
+    showToast({
+      message: formatTemplateWithLocale(template, { charge }),
+      theme: TOAST_THEME.INFO,
     });
   }
 
