@@ -11,8 +11,6 @@
   } from 'ui/labels/upi';
   import { isOneClickCheckout } from 'razorpay';
 
-  import { isOneClickCheckout } from 'razorpay';
-
   export let title = '';
   export let method = '';
   export let reasons = [];
