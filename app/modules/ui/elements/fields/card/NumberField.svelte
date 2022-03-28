@@ -52,8 +52,10 @@
   }
 
   let helpTextToDisplay;
-  $: helpTextToDisplay =
-    (value && helpText) || (!valid ? getHelpText($locale) : undefined);
+  $: {
+    helpTextToDisplay =
+      (value && helpText) || (!valid ? getHelpText($locale) : undefined);
+  }
 
   function getHelpText(locale) {
     if (
@@ -125,6 +127,7 @@
     {id}
     formatter={{ type: 'card' }}
     helpText={helpTextToDisplay}
+    validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
     name="card[number]"
     required={true}
     {value}
@@ -163,7 +166,7 @@
   .icon-1cc {
     position: absolute;
     right: 6%;
-    top: 48%;
+    top: 25%;
     bottom: 0;
     width: 24px;
   }

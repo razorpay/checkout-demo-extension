@@ -64,6 +64,7 @@
   export let labelUpperClasses = '';
   export let showServicableIcon = false;
   export let showDropDownIcon = false;
+  export let isInvalid = false;
 
   /**
    * To show prediction as dropdown
@@ -81,6 +82,8 @@
     left: 'auto',
     right: 'auto',
   };
+
+  let showValidations = false;
 
   const singleCharacterWidth = 7;
   /**
@@ -216,6 +219,7 @@
 
   function handleInputBlur(event) {
     focused = false;
+    showValidations = true;
     setTimeout(() => {
       // prevent dropdown selection destroy before click
       dropDownSuggestion = [];
@@ -309,6 +313,9 @@
     }
     return true;
   }
+
+  const showFormValidationOneCC =
+    (validationText || isInvalid) && showValidations;
 </script>
 
 <!-- To Do: Refatoring Fields.js for 1cc post demo-->
@@ -331,7 +338,7 @@
     {/if}
     <input
       class={`input-one-click-checkout ${inputFieldClasses} main`}
-      class:error-field-one-click-checkout={validationText}
+      class:error-field-one-click-checkout={showFormValidationOneCC}
       bind:this={input}
       id={identifier}
       type={inputType}
@@ -382,7 +389,8 @@
           !focused && value ? `${labelUpperClasses}` : ''
         }`}
         class:label-upper={focused || value}
-        class:error-label-one-click-checkout={validationText}>{label}</label
+        class:error-label-one-click-checkout={showFormValidationOneCC}
+        >{label}</label
       >
     {/if}
     {#if extraLabel}
@@ -392,9 +400,6 @@
     {/if}
     {#if loader}
       <div class="spinner input-loader" />
-    {/if}
-    {#if helpText}
-      <div class="help">{helpText}</div>
     {/if}
     {#if downtimeSeverity}
       <div class="downtime-icon">
@@ -426,7 +431,7 @@
         {/each}
       </ul>
     {/if}
-    {#if validationText !== ''}
+    {#if validationText && showValidations}
       <div
         class={`input-validation-error validation-error-one-click-checkout ${errorValidationClasses}`}
       >
@@ -546,9 +551,6 @@
           </li>
         {/each}
       </ul>
-    {/if}
-    {#if validationText !== ''}
-      <div class="input-validation-error">{validationText}</div>
     {/if}
   </div>
 {/if}
@@ -722,14 +724,19 @@
     background-color: #fff;
   }
 
+  .label-upper {
+    color: #8d8d8d;
+  }
+
+  .label-upper.error-label-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
   .input-one-click-checkout:focus
     + .label-one-click-checkout.error-label-one-click-checkout {
     color: var(--error-validation-color);
   }
 
-  .label-upper {
-    color: #8d8d8d;
-  }
   .label-one-click-checkout.label-upper.contact-label {
     left: -40%;
   }

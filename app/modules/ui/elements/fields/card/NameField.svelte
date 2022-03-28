@@ -20,12 +20,16 @@
 
   const NAME_PATTERN = "^[a-zA-Z. 0-9'-]{1,100}$";
 
+  let helpTextToDisplay;
+
   function handleInput(event) {
     value = event.target.value;
   }
 
   export function isValid() {
-    return value !== '';
+    const result = Boolean(value !== '');
+    helpTextToDisplay = result ? undefined : $t(NAME_HELP);
+    return result;
   }
 </script>
 
@@ -51,4 +55,5 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
+  validationText={isOneClickCheckout() && helpTextToDisplay}
 />

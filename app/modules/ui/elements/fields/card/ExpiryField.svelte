@@ -50,7 +50,10 @@
     }
   }
 
+  let expirayValidationError;
+
   export function isValid() {
+    expirayValidationError = !valid;
     return valid;
   }
 </script>
@@ -77,4 +80,5 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
+  isInvalid={expirayValidationError}
 />

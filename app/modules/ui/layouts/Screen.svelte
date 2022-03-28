@@ -36,8 +36,8 @@
     const isContentOverflowing = scrollHeight > offsetHeight;
 
     if (isContentOverflowing && !isOneClickCheckout()) {
-    // Allowing the Scroll behavior only for 1CC screens, In 1CC Screen Component used by Coupons
-    isShowAccountTab(contentRef);
+      // Allowing the Scroll behavior only for 1CC screens, In 1CC Screen Component used by Coupons
+      isShowAccountTab(contentRef);
 
       if (scrollHeight - offsetHeight - scrollTop >= threshold) {
         // Content hidden on the bottom

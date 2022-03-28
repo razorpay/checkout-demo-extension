@@ -9,6 +9,7 @@
     CANCEL_REASON_BACK_ACTION,
     CANCEL_REASON_SUBMIT_ACTION,
   } from 'ui/labels/upi';
+  import { isOneClickCheckout } from 'razorpay';
 
   import { isOneClickCheckout } from 'razorpay';
 

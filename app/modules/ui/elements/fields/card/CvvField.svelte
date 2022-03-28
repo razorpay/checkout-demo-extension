@@ -63,8 +63,12 @@
     ref.blur();
   }
 
+  let helpTextToDisplay;
+
   export function isValid() {
-    return new RegExp(cvvPattern).test(value);
+    const result = new RegExp(cvvPattern).test(value);
+    helpTextToDisplay = result ? undefined : helpText;
+    return result;
   }
 </script>
 
@@ -94,6 +98,7 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
+  validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
 />
 
 <style>

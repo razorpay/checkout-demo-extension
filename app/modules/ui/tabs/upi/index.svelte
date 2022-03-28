@@ -123,6 +123,8 @@
   let downtimeSeverity;
   let downtimeInstrument;
 
+  let helpTextToDisplay;
+
   const banksThatSupportRecurring = [
     {
       name: 'ICICI Bank',
@@ -714,6 +716,9 @@
   export const processIntentOnMWeb = (intentUrl) => {
     upiIntent.processIntentOnMWeb(intentUrl);
   };
+
+  $: console.log('I am valid VPA', vpa, ' : ', isVpaValid(vpa));
+  $: console.log('Selected Token', selectedToken);
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
@@ -837,6 +842,7 @@
                 bind:value={vpaEntered}
                 bind:rememberVpa
                 bind:this={vpaField}
+                bind:helpTextToDisplay
               />
             </div>
           {/if}
@@ -893,7 +899,10 @@
       />
     </div>
     {#if renderCtaOneCC}
-      <CTAOneCC on:click={() => session.preSubmit()}>
+      <CTAOneCC
+        disabled={Boolean(helpTextToDisplay) && selectedToken === 'new'}
+        on:click={() => session.preSubmit()}
+      >
         {$t(PAY_NOW_CTA_LABEL)}
       </CTAOneCC>
     {/if}

@@ -24,6 +24,11 @@
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import { truncateString } from 'utils/strings';
+
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  const { solid_down_arrow } = getIcons();
 
   // i18n
   import {
@@ -324,7 +329,11 @@
 >
   <Screen pad={false}>
     <div>
-      <div id="netb-banks" class="clear grid count-3">
+      <div
+        id="netb-banks"
+        class="clear grid count-3"
+        class:netb-banks-one-cc={isOneClickCheckoutEnabled}
+      >
         {#each netbanks as { name, code } (code)}
           <GridItem
             name={getShortBankName(code, $locale)}
@@ -342,10 +351,10 @@
           class:invalid
           class:nb-one-cc-wrapper={isOneClickCheckoutEnabled}
         >
-          <i
-            class="select-arrow"
-            class:nb-one-cc-arrow={isOneClickCheckoutEnabled}></i
-          >
+          {#if !isOneClickCheckoutEnabled}
+            <i class="select-arrow"></i>
+          {/if}
+
           <!-- LABEL: Please select a bank -->
           <div class="help">
             {$t(NETBANKING_SELECT_HELP)}
@@ -355,6 +364,13 @@
               >{$t(NETBANKING_SELECT_LABEL)}</span
             >
           {/if}
+
+          {#if isOneClickCheckoutEnabled}
+            <span class="drop-down-icon-wrapper">
+              <Icon icon={solid_down_arrow} />
+            </span>
+          {/if}
+
           <button
             aria-label={`${
               $selectedBank
@@ -371,7 +387,7 @@
           >
             {#if $selectedBank}
               <div>
-                {selectedBankName}
+                {truncateString(selectedBankName, 28)}
               </div>
               {#if !!downtimeSeverity}
                 <div>
@@ -516,16 +532,17 @@
     margin-top: 20px;
     border-radius: 4px;
     padding: 0px 12px;
-    height: 36px;
+    height: 48px;
     padding: 12px 16px;
+    box-sizing: border-box;
   }
 
   .nb-one-cc-button {
     padding-top: 0px;
     padding-bottom: 0px;
-    margin: 0px !important;
     height: 100%;
-    display: inline-block;
+    display: flex;
+    margin-top: 2px !important;
   }
 
   .nb-one-cc-arrow {
@@ -545,5 +562,16 @@
     top: -10px;
     background: white;
     padding: 0px 2px;
+  }
+
+  .netb-banks-one-cc {
+    margin-top: 24px;
+    border-top: 1px solid #ebedf0;
+  }
+
+  .drop-down-icon-wrapper {
+    position: absolute;
+    right: 14px;
+    top: 14px;
   }
 </style>

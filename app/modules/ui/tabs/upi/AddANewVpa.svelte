@@ -40,6 +40,7 @@
   export let recurring = false;
   export let value = '';
   export let rememberVpa = true;
+  export let helpTextToDisplay;
 
   // Refs
   export let vpaField = null;
@@ -94,7 +95,9 @@
 
   function handleVpaInput() {
     checkAndAddDowntime();
-    if (isVpaValid(vpa) || !pspHandle) {
+    const isValidVPA = isVpaValid(vpa);
+    helpTextToDisplay = isValidVPA ? undefined : $t(UPI_COLLECT_NEW_VPA_HELP);
+    if (isValidVPA || !pspHandle) {
       value = vpa;
     } else {
       value = `${vpa}@${pspHandle}`;
@@ -265,6 +268,7 @@
           {label}
           inputFieldClasses={isOneClickCheckoutEnabled &&
             'upi-vpa-field-one-cc'}
+          validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
