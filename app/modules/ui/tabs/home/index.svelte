@@ -1026,7 +1026,9 @@
       params: { method },
     });
     showCODCharges(method);
-    if (method === 'cod') return;
+    if (method === 'cod') {
+      return;
+    }
     if (method === 'paypal') {
       createPaypalPayment();
       return;

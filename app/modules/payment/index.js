@@ -36,6 +36,7 @@ import updateScore from 'analytics/checkoutScore';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { shouldRedirectZestMoney } from 'common/emi';
+import { popupIframeCheck } from './helper';
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -718,7 +719,19 @@ Payment.prototype = {
         });
         return;
       }
-      _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
+      const request = {
+        url: makeRedirectUrl(payment.fees),
+        content: data,
+        method: 'post',
+      };
+      if (!popupIframeCheck(this, request)) {
+        _Doc.submitForm(
+          request.url,
+          request.content,
+          request.method,
+          popup.name
+        );
+      }
     }
   },
 
