@@ -3,8 +3,14 @@
   import Icon from 'ui/elements/Icon.svelte';
   import circleTick from 'card/icons/circle-tick';
   import shield from 'card/icons/shield';
-  import { getOption, isRecurring, isSubscription } from 'razorpay';
+  import {
+    getOption,
+    isOneClickCheckout,
+    isRecurring,
+    isSubscription,
+  } from 'razorpay';
   import { formatTemplateWithLocale } from 'i18n';
+  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
   // reusing the existing one
   import close from 'one_click_checkout/coupons/icons/close.js';
@@ -26,22 +32,34 @@
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
     SAVED_CARD_KNOW_MORE_CAW_CONTENT,
   } from 'ui/labels/card';
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 </script>
 
 <div class="secure-card-know-more-overlay" id="know-more-modal">
   <div class="secure-card-know-more-header">
-    <span class="secure-card-know-more-header-title">
+    <span
+      class="secure-card-know-more-header-title"
+      class:secure-card-know-more-header-one-cc={isOneClickCheckoutEnabled}
+    >
       {#if modalType === 'add-new-card'}
         {$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE)}
       {:else}
         {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE)}
       {/if}
     </span>
-    <span class="secure-card-know-more-header-close" on:click={onClick}
-      ><Icon icon={close()} /></span
-    >
+    <span class="secure-card-know-more-header-close" on:click={onClick}>
+      <Icon icon={close(isOneClickCheckoutEnabled ? '#757575' : '#000000')} />
+    </span>
   </div>
-  <div class="secure-card-know-more-content">
+  {#if isOneClickCheckoutEnabled}
+    <hr />
+  {/if}
+
+  <div
+    class="secure-card-know-more-content"
+    class:secure-card-know-more-content-one-cc={isOneClickCheckoutEnabled}
+  >
     {#if modalType === 'add-new-card'}
       <!-- If recurring -->
       {#if isRecurring()}
@@ -77,13 +95,21 @@
 
       <ul>
         <li>
-          <span class="know-more-modal-icon"><Icon icon={circleTick()} /></span>
+          <span class="know-more-modal-icon"
+            ><Icon
+              icon={isOneClickCheckoutEnabled ? circle_check() : circleTick()}
+            /></span
+          >
           <span>
             {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1)}
           </span>
         </li>
         <li>
-          <span class="know-more-modal-icon"><Icon icon={circleTick()} /></span>
+          <span class="know-more-modal-icon"
+            ><Icon
+              icon={isOneClickCheckoutEnabled ? circle_check() : circleTick()}
+            /></span
+          >
           <span>
             {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2)}
           </span>
@@ -109,6 +135,7 @@
   .secure-card-know-more-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   .secure-card-know-more-header-title {
@@ -125,6 +152,8 @@
     font-size: 12px;
     line-height: 14px;
     font-weight: bold;
+    height: 12px;
+    width: 12px;
   }
 
   .secure-card-know-more-content {
@@ -147,5 +176,23 @@
   .know-more-modal-icon {
     padding-right: 5px;
     padding-top: 2px;
+  }
+
+  /* CSS Added for 1cc */
+  .secure-card-know-more-header-one-cc {
+    font-size: 14px;
+    line-height: 150%;
+    color: #263a4a;
+    text-transform: none;
+  }
+
+  hr {
+    border: 1px solid #e1e5ea;
+    border-bottom: none;
+    margin: 14px 0px;
+  }
+
+  .secure-card-know-more-content-one-cc {
+    letter-spacing: 0.1px;
   }
 </style>

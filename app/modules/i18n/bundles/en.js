@@ -769,6 +769,7 @@ export default {
     contact_help_text: 'Please enter a valid contact number',
     contact_label_optional: 'Phone Number (Optional)',
     contact_label_required: 'Phone Number',
+    contact_label_mobile: 'Mobile Number',
     country_help_text: 'Please enter a valid country code',
     country_label: 'Country',
     country_search_all: 'All countries',

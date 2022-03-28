@@ -620,7 +620,10 @@
     </div>
   </div>
   {#if $showNoCvvCheckbox}
-    <div class="row maestro-card-block">
+    <div
+      class="row maestro-card-block"
+      class:maestro-card-block-one-cc={isOneClickCheckoutEnabled}
+    >
       <label id="nocvv-check" for="nocvv">
         <input
           type="checkbox"
@@ -701,6 +704,10 @@
   .maestro-card-block {
     /* margin-left: 5px; */
     margin-top: 15px;
+  }
+
+  .maestro-card-block-one-cc {
+    margin-top: 24px;
   }
 
   .maestro-card-block label {

@@ -167,7 +167,11 @@
   on:click={focusAfterTimeout}
   {selected}
 >
-  <div id={'new-vpa-field-' + paymentMethod} slot="title">
+  <div
+    id={'new-vpa-field-' + paymentMethod}
+    slot="title"
+    class:title-vpa-upi-one-cc={isOneClickCheckoutEnabled}
+  >
     <!-- LABEL: UPI ID -->
     <!-- LABEL: Add UPI ID -->
     {logged && canSaveVpa
@@ -178,6 +182,8 @@
   <div
     slot="subtitle"
     class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}
+    class:subtitle-vpa-upi-one-cc={isOneClickCheckoutEnabled &&
+      paymentMethod === 'upi'}
   >
     {#if paymentMethod === 'upi_otm' || recurring}
       <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
@@ -333,5 +339,20 @@
   .downtime-upi-icon {
     position: absolute;
     right: 20px;
+  }
+
+  /* 1CC Input Classes*/
+
+  .subtitle-vpa-upi-one-cc {
+    font-size: 12px;
+    line-height: 16px;
+    color: #8d97a1;
+    margin-top: 2px;
+    margin-bottom: -2px;
+  }
+
+  .title-vpa-upi-one-cc {
+    color: #263a4a;
+    font-weight: 600;
   }
 </style>
