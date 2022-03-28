@@ -313,9 +313,6 @@
     }
     return true;
   }
-
-  const showFormValidationOneCC =
-    (validationText || isInvalid) && showValidations;
 </script>
 
 <!-- To Do: Refatoring Fields.js for 1cc post demo-->
@@ -338,7 +335,8 @@
     {/if}
     <input
       class={`input-one-click-checkout ${inputFieldClasses} main`}
-      class:error-field-one-click-checkout={showFormValidationOneCC}
+      class:error-field-one-click-checkout={(validationText || isInvalid) &&
+        showValidations}
       bind:this={input}
       id={identifier}
       type={inputType}
@@ -389,8 +387,8 @@
           !focused && value ? `${labelUpperClasses}` : ''
         }`}
         class:label-upper={focused || value}
-        class:error-label-one-click-checkout={showFormValidationOneCC}
-        >{label}</label
+        class:error-label-one-click-checkout={(validationText || isInvalid) &&
+          showValidations}>{label}</label
       >
     {/if}
     {#if extraLabel}
