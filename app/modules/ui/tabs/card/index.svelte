@@ -295,7 +295,16 @@
   $: {
     if ($selectedCard) {
       $selectedApp = null;
-      $newCardInputFocused = false;
+
+      /**
+       * a. newCardInputFocused determines if supported cards
+       *    for recurring callout will be visible or not
+       * b. It is also dependant on the flag isCardSupportedForRecurring
+       * c. For all the other payments except recurring keeping as is.
+       */
+      $newCardInputFocused = !!isRecurring()
+        ? !isCardSupportedForRecurring
+        : false;
     }
     if ($selectedApp || $selectedCard || $newCardInputFocused) {
       // validate offer only for card-apps, to avoid breaks in existing flow.
