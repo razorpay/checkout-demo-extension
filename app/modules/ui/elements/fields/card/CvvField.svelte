@@ -28,8 +28,10 @@
   let helpText = formatTemplateWithLocale(CVV_HELP, { length }, $locale);
   let placeholder;
   let label;
+  let isInvalid;
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const CVV_REGEX = new RegExp(cvvPattern);
 
   $: {
     if (showHelp) {
@@ -66,10 +68,13 @@
   let helpTextToDisplay;
 
   export function isValid() {
-    const result = new RegExp(cvvPattern).test(value);
+    const result = CVV_REGEX.test(value);
     helpTextToDisplay = result ? undefined : helpText;
     return result;
   }
+
+  // Option Specific to 1cc
+  $: isInvalid = !CVV_REGEX.test(value);
 </script>
 
 <!-- TODO: make helpText support an image as well -->
@@ -99,6 +104,7 @@
   {labelClasses}
   {labelUpperClasses}
   validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+  {isInvalid}
 />
 
 <style>

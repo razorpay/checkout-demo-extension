@@ -1239,5 +1239,6 @@
     font-size: 14px;
     color: #263a4a;
     text-transform: none;
+    margin-top: 26px;
   }
 </style>

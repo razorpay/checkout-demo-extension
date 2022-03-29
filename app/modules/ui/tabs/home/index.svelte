@@ -1340,5 +1340,6 @@
   :global(#content.one-cc) .home-methods {
     padding-left: 16px;
     padding-right: 16px;
+    margin-top: 26px;
   }
 </style>

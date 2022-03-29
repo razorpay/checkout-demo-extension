@@ -565,7 +565,7 @@
   }
 
   .netb-banks-one-cc {
-    margin-top: 24px;
+    margin-top: 26px;
     border-top: 1px solid #ebedf0;
   }
 
