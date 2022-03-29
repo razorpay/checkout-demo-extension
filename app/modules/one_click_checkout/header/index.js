@@ -16,3 +16,14 @@ export function showHeader() {
     create();
   }
 }
+
+/**
+ * destroyHeader will be called when 1CC modal is closed
+ */
+export function destroyHeader() {
+  if (!header) {
+    return;
+  }
+  header.$destroy();
+  header = null;
+}

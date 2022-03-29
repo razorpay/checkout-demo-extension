@@ -21,6 +21,8 @@
 
   // Helpers import
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+  import { destroyHeader } from 'one_click_checkout/header';
+  import { destroyTopbar } from 'one_click_checkout/topbar';
 
   // svelte imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
@@ -125,6 +127,8 @@
 
   onDestroy(() => {
     resetRouting();
+    destroyHeader();
+    destroyTopbar();
   });
 </script>
 

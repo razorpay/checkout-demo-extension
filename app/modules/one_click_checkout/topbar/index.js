@@ -18,3 +18,14 @@ export function showTopbar() {
   }
   setTopbarBack(topbar);
 }
+
+/**
+ * destroyTopbar will be called when 1CC modal is closed
+ */
+export function destroyTopbar() {
+  if (!topbar) {
+    return;
+  }
+  topbar.$destroy();
+  topbar = null;
+}
