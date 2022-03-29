@@ -71,6 +71,12 @@
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
   import { SAVE_LABEL } from 'one_click_checkout/cta/i18n';
 
+  // Constants imports
+  import {
+    INDIA_CONTACT_ERROR_LABEL,
+    CONTACT_ERROR_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
+
   const entries = _Obj.entries;
 
   // Props
@@ -91,6 +97,7 @@
     email: $email,
   };
   let disabled = true;
+  let validationText;
 
   function trackContactFilled() {
     const valid = CONTACT_REGEX.test($contact);
@@ -102,6 +109,7 @@
       },
     });
     Events.TrackBehav(ContactDetailsEvents.CONTACT_INPUT);
+    validationText = getValidationText();
   }
 
   function trackEmailFilled() {
@@ -155,6 +163,17 @@
     const { country } = countryInfo.detail;
     $countryISOCode = country;
   }
+
+  // Phone Validation for 1CC
+  function getValidationText() {
+    if ($country === INDIA_COUNTRY_CODE) {
+      return !PHONE_REGEX_INDIA.test($phone)
+        ? $t(INDIA_CONTACT_ERROR_LABEL)
+        : null;
+    } else {
+      return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
+    }
+  }
 </script>
 
 <div
@@ -179,6 +198,7 @@
           isOptional={isContactOptional()}
           on:blur={trackContactFilled}
           on:countrySelect={handleCountrySelect}
+          {validationText}
         />
       </div>
     {/if}
