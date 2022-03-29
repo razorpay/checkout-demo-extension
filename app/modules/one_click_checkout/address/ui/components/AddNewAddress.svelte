@@ -32,6 +32,7 @@
     SAVE_ADDRESS_CONSENT_PRIVACY,
     SAVE_ADDRESS_CONSENT_AND,
     SAVE_ADDRESS_CONSENT_TOOLTIP,
+    ADDRESS_TAGS_HEADING,
   } from 'one_click_checkout/address/i18n/labels';
 
   // const import
@@ -700,6 +701,9 @@
       </div>
     {/if}
     {#if $isIndianCustomer && $shouldSaveAddress}
+      {#if currentView === addressViews.EDIT_ADDRESS}
+        <p class="tags-heading">{$t(ADDRESS_TAGS_HEADING)}</p>
+      {/if}
       <TagSelector on:select={(e) => updateTag(e.detail.label)} {selectedTag} />
     {/if}
   </div>
@@ -768,5 +772,11 @@
     cursor: pointer;
     color: #3684d6;
     text-decoration: underline;
+  }
+
+  .tags-heading {
+    font-weight: 400;
+    font-size: 14px;
+    margin: 8px 0px 6px;
   }
 </style>

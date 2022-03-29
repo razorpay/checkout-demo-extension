@@ -52,3 +52,4 @@ export const PINCODE_NON_SERVICEABLE_LABEL =
 export const ADD_LANDMARK = 'address.add_landmark';
 export const OPTIONAL = 'address.optional';
 export const SAVE_ADDRESS_CONSENT_TOOLTIP = 'address.save_consent_tooltip';
+export const ADDRESS_TAGS_HEADING = 'address.address_tags_heading';
