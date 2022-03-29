@@ -262,7 +262,6 @@
     color: #263a4a;
     font-size: 22px;
     font-weight: 600;
-    margin-bottom: 4px;
   }
 
   .cta-view-details {
