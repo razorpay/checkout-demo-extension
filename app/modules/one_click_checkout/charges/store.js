@@ -54,11 +54,9 @@ export const isShippingAddedToAmount = writable(null);
 
 isShippingAddedToAmount.subscribe((isAdded) => {
   if (isAdded === true) {
-    amount.set(
-      get(cartAmount) - get(cartDiscount) + (get(shippingCharge) || 0)
-    );
+    amount.set(get(cartAmount) - get(cartDiscount) + get(shippingCharge));
   } else if (isAdded === false) {
-    amount.set(get(amount) - (get(shippingCharge) || 0));
+    amount.set(get(amount) - get(shippingCharge));
   }
 });
 
