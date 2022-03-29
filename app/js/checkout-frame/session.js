@@ -3054,8 +3054,13 @@ Session.prototype = {
 
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
-      TopbarMagicCheckoutStore.tabTitleLogo.set('');
       AccountTabStore.showAccountTab.set(false);
+
+      var walletOtp = thisTab === 'wallet' && this.screen === 'otp';
+      var cardlessEmiOtp = thisTab === 'cardless_emi' && this.screen === 'otp';
+      if (!walletOtp && !cardlessEmiOtp) {
+        TopbarMagicCheckoutStore.tabTitleLogo.set('');
+      }
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
@@ -3193,6 +3198,8 @@ Session.prototype = {
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
+          TopbarMagicCheckoutStore.tabTitleLogo.set('');
+          discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
           });
