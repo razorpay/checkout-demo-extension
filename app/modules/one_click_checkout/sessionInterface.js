@@ -54,7 +54,10 @@ export const handleBack = () => {
   tabTitle.set('');
   tabTitleLogo.set('');
   const currHistory = get(history);
-  if (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) {
+  if (
+    (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) ||
+    get(activeRoute)?.name === views.COUPONS
+  ) {
     session.closeModal();
     return;
   }

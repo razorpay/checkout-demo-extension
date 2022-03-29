@@ -13,7 +13,7 @@ import { COUPON_LABEL } from 'one_click_checkout/coupons/i18n/labels';
 export const coupons = {
   name: views.COUPONS,
   component: Coupons,
-  isBackEnabled: false,
+  isBackEnabled: true,
   props: {},
   otpProps: {
     successHandler: couponOTPSuccessHandler,
