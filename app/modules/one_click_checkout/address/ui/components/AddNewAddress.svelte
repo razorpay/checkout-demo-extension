@@ -56,6 +56,7 @@
     codChargeAmount,
     shippingCharge,
     isShippingAddedToAmount,
+    resetCharges,
   } from 'one_click_checkout/charges/store';
   import { country as countryCode } from 'checkoutstore/screens/home';
   import { isAutopopulateDisabled } from 'one_click_checkout/store';
@@ -398,6 +399,7 @@
             if (res && res[value]?.serviceability) {
               codChargeAmount.set(res[value].cod_fee);
               shippingCharge.set(res[value].shipping_fee);
+              isShippingAddedToAmount.set(true);
               stateCode = res[value].state_code;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
@@ -437,6 +439,8 @@
           });
       } else if (INPUT_FORM[pinIndex][pinSubIndex]?.required) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+        codChargeAmount.set(0);
+        resetCharges();
       }
     } else if (
       !checkServiceability &&
