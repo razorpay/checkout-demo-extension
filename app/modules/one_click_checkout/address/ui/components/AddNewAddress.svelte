@@ -62,6 +62,9 @@
     shippingCharge,
     isShippingAddedToAmount,
     resetCharges,
+    amount,
+    cartAmount,
+    cartDiscount,
   } from 'one_click_checkout/charges/store';
   import { country as countryCode } from 'checkoutstore/screens/home';
   import { isAutopopulateDisabled } from 'one_click_checkout/store';
@@ -626,6 +629,16 @@
     ) {
       $isShippingAddedToAmount = false;
     }
+
+    // case when user comes back to add shipping address with last prefilled data
+    if (
+      $activeRoute?.name === views.ADD_ADDRESS &&
+      $shippingCharge &&
+      $formData?.zipcode
+    ) {
+      amount.set($cartAmount - $cartDiscount + $shippingCharge);
+    }
+
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
     }
