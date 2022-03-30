@@ -716,9 +716,6 @@
   export const processIntentOnMWeb = (intentUrl) => {
     upiIntent.processIntentOnMWeb(intentUrl);
   };
-
-  $: console.log('I am valid VPA', vpa, ' : ', isVpaValid(vpa));
-  $: console.log('Selected Token', selectedToken);
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
