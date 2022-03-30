@@ -67,6 +67,8 @@
   let currentTab;
   let renderCtaOneCC = false;
 
+  const isOneCCEnabled = isOneClickCheckout();
+
   $: {
     _El.keepClass(_Doc.querySelector('#header'), 'offer-fade', listActive);
     if (!listActive) {
@@ -178,7 +180,7 @@
 
     renderCtaOneCC = true;
 
-    if (isOneClickCheckout()) {
+    if (isOneCCEnabled) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.add('offers-fade');
     }
@@ -194,7 +196,7 @@
     if (shouldMountCta) {
       onHide();
     }
-    if (isOneClickCheckout()) {
+    if (isOneCCEnabled) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.remove('offers-fade');
     }
@@ -294,7 +296,7 @@
       </span>
     </header>
     {#if error}
-      <div class="error-container" class:one-cc={isOneClickCheckout()}>
+      <div class="error-container" class:one-cc={isOneCCEnabled}>
         <div class="error-desc">
           <!-- LABEL: The offer is not applicable on {error}. -->
           <b>
@@ -319,7 +321,7 @@
     {#if listActive}
       <main
         class="list"
-        class:main-one-cc={isOneClickCheckout()}
+        class:main-one-cc={isOneCCEnabled}
         transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
         <header class="close-offerlist" on:click={hideList}>
@@ -330,11 +332,11 @@
         </header>
         <div
           class="offerlist-container"
-          class:offerlist-one-cc={isOneClickCheckout()}
+          class:offerlist-one-cc={isOneCCEnabled}
         >
           {#if applicableOffers.length}
             <!-- LABEL: Available Offers -->
-            <legend class:one-cc-label={isOneClickCheckout()}
+            <legend class:one-cc-label={isOneCCEnabled}
               >{$t(AVAILABLE_OFFERS_HEADER)}</legend
             >
             <OfferItemList
@@ -344,7 +346,7 @@
               {selectOffer}
             />
           {:else}
-            <legend>
+            <legend class:one-cc-label={isOneCCEnabled}>
               <!-- LABEL: No offers available for this method. Please look at other offers
               available below -->
               <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
@@ -354,7 +356,7 @@
             {#if otherActive || !applicableOffers.length}
               {#if otherActive}
                 <!-- LABEL: Other Offers -->
-                <legend class:one-cc-label={isOneClickCheckout()}
+                <legend class:one-cc-label={isOneCCEnabled}
                   >{$t(OTHER_OFFERS_HEADER)}</legend
                 >
               {/if}
@@ -365,7 +367,7 @@
                 {selectOffer}
               />
             {:else}
-              <legend>
+              <legend class:one-cc-label={isOneCCEnabled}>
                 <!-- LABEL: + OTHER OFFERS -->
                 <span
                   class="theme-highlight"
