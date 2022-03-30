@@ -193,7 +193,7 @@ export function postServiceability(
           is_saved_address: onSavedAddress,
         });
         if (response.error) {
-          reject(response.error);
+          reject({ err: response.error, payload });
           hideLoaderView();
           return;
         }
@@ -353,11 +353,24 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
 
   const order_id = getOrderId();
 
-  return Promise.all(
+  return Promise.allSettled(
     Object.values(zipecodeHash).map((address) =>
       postServiceability([address], onSavedAddress, false)
     )
-  ).then(() =>
-    hydrateSamePincodeAddresses(addresses, serviceabilityCache[order_id])
-  );
+  ).then((res) => {
+    // done to ensure if any 1 pincode api fails, it doesn't mark unserviceable for all
+    const rejectedResponse = res
+      .filter(({ status }) => status === 'rejected')
+      .map(({ reason }) => ({
+        ...reason.payload.addresses[0],
+        serviceable: false,
+      }));
+
+    const unserviceablePincodes = formatResults(rejectedResponse);
+
+    return hydrateSamePincodeAddresses(addresses, {
+      ...serviceabilityCache[order_id],
+      ...unserviceablePincodes,
+    });
+  });
 }
