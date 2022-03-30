@@ -58,7 +58,7 @@
         {disabled}
         class:disabled
         id="one-cc-cta"
-        on:click={(e) => dispatch('click', e)}
+        on:click|preventDefault={(e) => dispatch('click', e)}
       >
         <slot>{$t(CTA_LABEL)}</slot>
       </button>
