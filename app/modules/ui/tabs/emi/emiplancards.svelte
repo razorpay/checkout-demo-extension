@@ -39,5 +39,10 @@
     font-weight: 600;
     color: #263a4a;
     text-transform: none;
+    margin-left: 12px;
+  }
+
+  :global(#content.one-cc) .emi-plans-list {
+    margin: 0px;
   }
 </style>

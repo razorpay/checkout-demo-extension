@@ -29,7 +29,7 @@
   export let address;
 </script>
 
-<div>
+<div class="address-widget-container">
   {#if !loading}
     <div
       class:mb-14={$savedAddresses.length <= 1}
@@ -57,7 +57,9 @@
     {/if}
   {/if}
   <AddressBox {address} {loading} withBorder={false} isEditable={false} />
-  {#if !loading} <SameBillingAndShipping --text-color="#8d97a1" />{/if}
+  {#if !loading && address.serviceability}
+    <SameBillingAndShipping />
+  {/if}
 </div>
 
 <style>
@@ -103,5 +105,9 @@
 
   .mb-14 {
     margin-bottom: 14px;
+  }
+
+  .address-widget-container :global(.same-address-checkbox .checkbox-text) {
+    color: #8d97a1;
   }
 </style>
