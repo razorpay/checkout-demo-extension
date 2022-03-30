@@ -79,7 +79,7 @@ describe('#getTimeStamp', () => {
   });
   test('when given more than maxTime ', () => {
     let value = getTimeStamp(moreThanMaxTime);
-    expect(value).toEqual(Math.floor(maxTime / 1000));
+    expect(value).toBeGreaterThanOrEqual(Math.floor(maxTime / 1000));
   });
   test('when given more than minTime and less than maxTime', () => {
     let value = getTimeStamp(inRange);

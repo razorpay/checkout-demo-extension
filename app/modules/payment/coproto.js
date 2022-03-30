@@ -8,7 +8,7 @@ import {
   upiBackCancel,
 } from 'common/upi';
 
-import Config from 'config/index.js';
+import { getMerchantKey } from 'razorpay';
 
 import { androidBrowser, iOS, android } from 'common/useragent';
 import Analytics, { Track } from 'analytics';
@@ -24,6 +24,7 @@ import popupTemplate from './popup/template';
 import { translatePaymentPopup } from 'i18n/popup';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
+import { popupIframeCheck } from './helper';
 
 const getParsedDataFromUrl = (url) => {
   const parsedData = {};
@@ -88,96 +89,6 @@ const handleAsyncStatusResponse = function (response) {
   }
   return response;
 };
-
-/**
- * popupIframeCheck check for given method is required to open in iframe inside
- * popup. If required it will do necessary steps to load the page
- */
-function popupIframeCheck(request) {
-  const popup = this.popup;
-  const data = this.data;
-  const isMobile = iOS || android;
-  const isSDK = !!global.CheckoutBridge;
-  const isMobileWebOnly = isMobile && !isSDK;
-  const popupDocument = popup.window?.document;
-  if (typeof popupDocument.write !== 'function') {
-    return false;
-  }
-  const isValidPopupFlow = checkValidFlow(data, FLOWS.POPUP_IFRAME);
-  /**
-   * For Mobile Web only for Valid flow like Paytm
-   */
-  if (isMobileWebOnly && isValidPopupFlow) {
-    popupDocument.write(`
-      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-      <html xmlns="http://www.w3.org/1999/xhtml">
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <title>Razorpay</title>
-          \x3Cscript>
-          window.addEventListener('message', event => {
-            // IMPORTANT: check the origin of the data!
-            if (event.origin.startsWith('https://api.razorpay.com')) {
-                const data = event.data;
-                if (!window.CheckoutBridge) {
-                  try { window.opener.onComplete(data) } catch(e){}
-                  try { (window.opener || window.parent).postMessage(data, '*') } catch(e){}
-                  setTimeout(window.close, 999);
-                }
-            } else {
-                // The data was NOT sent from your site!
-                // Be careful! Do not use it. This else branch is
-                // here just for clarity, you usually shouldn't need it.
-                return;
-            }
-        });
-          \x3C/script>
-          <style type="text/css">
-            body,
-            html {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-              overflow: hidden;
-            }
-            #content {
-              position: absolute;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              top: 0px;
-            }
-          </style>
-        </head>
-        <body>
-          <div id="content">
-            <iframe
-              id="frame"
-              width="100%"
-              height="100%"
-              frameborder="0"
-            ></iframe>
-          </div>
-        </body>
-      </html>
-    `);
-    const popupIframe = popupDocument.querySelector('#frame');
-    // To hide about:blank in popup just pushing url for display purpose only
-    if (popup.window.history) {
-      // url should be of same origin
-      const popupUrl = `razorpay.html?url=${request.url}`;
-      popup.window.history.pushState({ Url: popupUrl }, 'Razorpay', popupUrl);
-    }
-    submitForm({
-      doc: popupIframe.contentWindow.document,
-      path: request.url,
-      params: request.content,
-      method: request.method,
-    });
-    return true;
-  }
-  return false;
-}
 
 // returns true if coproto handled
 export const processCoproto = function (response) {
@@ -290,7 +201,7 @@ var responseTypes = {
         // direct is true for payzapp
         popup.write(content);
       } else {
-        if (!popupIframeCheck.call(this, request)) {
+        if (!popupIframeCheck(this, request)) {
           submitForm({
             doc: window.document,
             path: request.url,
@@ -313,6 +224,14 @@ var responseTypes = {
   },
 
   async: function (request, fullResponse) {
+    Analytics.track('metric:polling_started', {
+      data: {
+        data: fullResponse,
+        platform: Bridge.checkout.platform,
+        location: 'coproto:async',
+      },
+      immediately: true,
+    });
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -355,6 +274,14 @@ var responseTypes = {
 
       // Starting polling API for payment status.
       var request = payment.request;
+      Analytics.track('metric:polling_started', {
+        data: {
+          data: request,
+          platform: Bridge.checkout.platform,
+          location: 'coproto:responseType:application',
+        },
+        immediately: true,
+      });
       payment.ajax = fetch
         .jsonp({
           url: request.url,
@@ -366,6 +293,14 @@ var responseTypes = {
   },
 
   gpay_inapp: function (request) {
+    Analytics.track('metric:polling_started', {
+      data: {
+        data: request,
+        platform: Bridge.checkout.platform,
+        location: 'coproto:responseType:gpay_inapp',
+      },
+      immediately: true,
+    });
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -586,6 +521,14 @@ var responseTypes = {
             return; // Don't poll for status as the payment was cancelled.
           }
         }
+        Analytics.track('metric:polling_started', {
+          data: {
+            data: response,
+            platform: Bridge.checkout.platform,
+            location: 'coproto:responseType:intent:app.intent_response',
+          },
+          immediately: true,
+        });
         this.ajax = fetch
           .jsonp({
             url: request.url,
@@ -602,17 +545,38 @@ var responseTypes = {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-
+      Analytics.track('metric:polling_started', {
+        data: {
+          data: data,
+          platform: Bridge.checkout.platform,
+          location: 'coproto:responseType:intent:startPolling',
+        },
+        immediately: true,
+      });
       this.ajax = ra(data);
     };
-
-    if (Bridge.checkout.platform === 'ios') {
+    /**
+     * sometimes merchant key will not available( if payment is based invoice id/ subscription id hence pull key from url)
+     */
+    const affectedMerchantId = 'rzp_live_mPhBL8hs5QOt2B';
+    if (
+      getMerchantKey() === affectedMerchantId ||
+      (request && request.url && request.url.includes(affectedMerchantId))
+    ) {
       startPolling();
     } else {
-      this.on('upi.intent_success_response', startPolling);
+      if (Bridge.checkout.platform === 'ios') {
+        startPolling();
+      } else {
+        this.on('upi.intent_success_response', startPolling);
+      }
     }
 
     this.on('upi.intent_response', (data) => {
+      Analytics.track('upi_intent_response', {
+        data: data,
+        immediately: true,
+      });
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
         this.emit('upi.intent_success_response', data);
       } else {

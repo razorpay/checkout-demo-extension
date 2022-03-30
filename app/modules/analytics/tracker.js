@@ -208,9 +208,8 @@ export default function Track(r, event, data, immediately) {
     if (typeof handler === 'function') {
       options.handler = true;
     }
-
     var callback_url = r.get('callback_url');
-    if (typeof callback_url === 'string') {
+    if (callback_url && typeof callback_url === 'string') {
       options.callback_url = true;
     }
 

@@ -5,7 +5,11 @@ module.exports = {
     '^.+\\.(ts)$': 'ts-jest',
   },
   moduleFileExtensions: ['js', 'svelte', 'ts'],
-  roots: ['<rootDir>/app/modules'],
+  roots: [
+    '<rootDir>/app/modules',
+    '<rootDir>/app/js/checkout-frame',
+    '<rootDir>/app/js/lib',
+  ],
   modulePaths: ['<rootDir>/app/modules'],
   moduleDirectories: ['node_modules', 'app/modules'],
   setupFilesAfterEnv: [
@@ -21,7 +25,11 @@ module.exports = {
 
 function collectCoverageFrom() {
   if (process.env.__SVELTE_COVERAGE__) {
-    return ['<rootDir>/app/modules/**/*.*'];
+    return [
+      '<rootDir>/app/modules/**/*.*',
+      '<rootDir>/app/js/checkout-frame/**/*.*',
+      '<rootDir>/app/js/lib/**/*.*',
+    ];
   }
 
   // use the jest's default mechanism for collecting coverage,

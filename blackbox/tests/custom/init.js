@@ -40,7 +40,6 @@ const callback = readFileSync('blackbox/fixtures/callback.html', {
 function forceTargetInitialization(browser) {
   Array.from(browser._targets.values()).forEach((t, i) => {
     if (!t._isInitialized) {
-      console.log('Forcing target initialization');
       browser._targetInfoChanged({
         targetInfo: { ...t._targetInfo, url: ' ' },
       });
@@ -93,7 +92,6 @@ function checkoutRequestHandler(request) {
 // after page load request interceptor
 // function postLoadRequestHandler(request) {
 //   const url = request.url();
-//   console.log(url);
 // }
 
 function popupRequestHandler(request) {
@@ -191,11 +189,11 @@ module.exports = async ({
         rzp.callback_url = callback_url;
       }
       window.rp = new Razorpay(rzp)
-        .on('payment.error', function(resp) {
+        .on('payment.error', function (resp) {
           document.getElementById('status').innerText = 'failed';
           document.getElementById('response').innerText = JSON.stringify(resp);
         })
-        .on('payment.success', function(resp) {
+        .on('payment.success', function (resp) {
           document.getElementById('status').innerText = 'success';
           document.getElementById('response').innerText = JSON.stringify(resp);
         });
@@ -211,7 +209,7 @@ module.exports = async ({
     async popup() {
       const target = await page
         .browser()
-        .waitForTarget(t => t.opener() === pageTarget);
+        .waitForTarget((t) => t.opener() === pageTarget);
       const popupPage = await target.page();
       await popupPage.setRequestInterception(true);
       popupPage.on('request', popupRequestHandler.bind(data));

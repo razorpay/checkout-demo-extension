@@ -16,6 +16,8 @@
   export let suggestionsResource;
   export let autofocus;
 
+  export let handleValidation;
+
   let suggestions = [];
   const dispatch = createEventDispatcher();
 
@@ -46,6 +48,7 @@
       },
     });
     dispatch('select', { index: e.detail.index });
+    handleValidation(id);
   }
 </script>
 

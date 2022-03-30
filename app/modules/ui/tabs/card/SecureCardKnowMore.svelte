@@ -3,23 +3,16 @@
   import Icon from 'ui/elements/Icon.svelte';
   import circleTick from 'card/icons/circle-tick';
   import shield from 'card/icons/shield';
-  import {
-    getOption,
-    isOneClickCheckout,
-    isRecurring,
-    isSubscription,
-  } from 'razorpay';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { isOneClickCheckout, isRecurring } from 'razorpay';
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
   // reusing the existing one
   import close from 'one_click_checkout/coupons/icons/close.js';
   // i18n
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   // Export Statements
   export let onClick, modalType;
-  export let merchantName = getOption('name');
 
   // i18n labels
   import {
@@ -28,9 +21,10 @@
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE,
-    SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT,
+    SAVED_CARD_COMPLIANT_WITH_GUIDELINES,
     SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
     SAVED_CARD_KNOW_MORE_CAW_CONTENT,
+    SAVE_CARD_MODAL_CONTENT,
   } from 'ui/labels/card';
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
@@ -67,28 +61,18 @@
     {#if modalType === 'add-new-card'}
       <!-- If recurring -->
       {#if isRecurring()}
-        <div class="recurring-know-more-container">
-          <div class="recurring-shield">
-            <Icon icon={shield()} />
-          </div>
-          <div>
-            <p>
-              {formatTemplateWithLocale(
-                merchantName
-                  ? 'card.save_card_know_more_add_card_modal_content_recurring'
-                  : 'card.save_card_know_more_add_card_modal_content_recurring_without_merchant_name',
-                { merchantName },
-                $locale
-              )}
-            </p>
-
-            {#if isSubscription()}
-              <!-- If recurring and subscription -->
-              <p>{$t(SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT)}</p>
-            {:else}
-              <!-- If recurring and !subscription i.e caw-->
-              <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
-            {/if}
+        <div>
+          <p>
+            {$t(SAVE_CARD_MODAL_CONTENT)}
+          </p>
+          <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
+          <div class="recurring-know-more-container">
+            <div class="recurring-shield">
+              <Icon icon={shield()} />
+            </div>
+            <div>
+              <p>{$t(SAVED_CARD_COMPLIANT_WITH_GUIDELINES)}</p>
+            </div>
           </div>
         </div>
       {:else}

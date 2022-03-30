@@ -177,6 +177,7 @@
                 handleInput(input.id, e.target.textContent)}
               on:select={input.onSelect}
               autofocus={true}
+              handleValidation={onBlur}
             />
           {:else}
             <span
@@ -198,6 +199,7 @@
             on:blur={() => onBlur(input.id)}
             on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
             on:select={input.onSelect}
+            handleValidation={onBlur}
           />
         {/if}
       {:else}

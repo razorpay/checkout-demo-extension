@@ -22,6 +22,7 @@
   import { formatMessageWithLocale } from 'i18n';
   import { isOneClickCheckout } from 'razorpay';
   import { isIndianCustomer } from 'checkoutstore';
+  import { isSIHubEnabledMerchant } from 'ui/tabs/card/utils';
 
   export let value = '';
   export let type = null;
@@ -62,7 +63,8 @@
       $isIndianCustomer && // Card ristricutions are for domestic users only
       recurring &&
       value &&
-      !isCardSupportedForRecurring
+      !isCardSupportedForRecurring &&
+      !isSIHubEnabledMerchant()
     ) {
       // LABEL: Card does not support recurring payments.
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);

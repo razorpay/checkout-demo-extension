@@ -97,7 +97,7 @@
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 
-  const showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
+  let showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
 
   let cvvLength = 3;
   let showCardUnsupported = false;
@@ -129,6 +129,15 @@
 
   let validCardForOffer = true;
   $: {
+    /**
+     * If user goes back from add card screen, and change contact number
+     * (IN->non-IN, non-IN->IN)
+     * and comes again to add card screen, show remember card check
+     * don't update
+     * FIX: adding this assignment in reactive block, so every update has
+     *      correct valie
+     */
+    showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
     if (!$isCardValidForOffer && isOfferForced()) {
       validCardForOffer = false;
       setCardNumberValidity(false);

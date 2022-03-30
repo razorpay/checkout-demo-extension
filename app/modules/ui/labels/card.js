@@ -71,7 +71,13 @@ export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1 =
 export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT2 =
   'card.save_card_know_more_add_card_modal_content2';
 export const SAVED_CARD_CHECKBOX_TOOLTIP = 'card.saved_card_checkbox_tooltip';
-export const SAVED_CARD_KNOW_MORE_SUBSCRIPTION_CONTENT =
-  'card.save_card_know_more_add_card_modal_subscription_content';
 export const SAVED_CARD_KNOW_MORE_CAW_CONTENT =
   'card.save_card_know_more_add_card_modal_recurring_content';
+export const SAVED_CARD_COMPLIANT_WITH_GUIDELINES =
+  'card.save_card_compliant_with_guidelines';
+export const SAVE_CARD_MODAL_CONTENT =
+  'card.save_card_know_more_add_card_modal_content_recurring';
+export const SAVE_CARD_SUBTITLE_SUBSCRIPTION =
+  'card.save_card_know_more_add_card_modal_subtitle_subscription';
+export const SAVE_CARD_SUBTITLE_SUBSCRIPTION_CAW =
+  'card.save_card_know_more_add_card_modal_subtitle_caw';

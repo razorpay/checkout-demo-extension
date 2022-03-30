@@ -20,10 +20,12 @@
 
   //i18n
   import {
-    SAVE_CARD_TEXT,
     KNOW_MORE,
+    SAVE_CARD_TEXT,
+    RECURRING_CALLOUT,
     SAVE_CARD_TEXT_NEW_CARD,
     SAVED_CARD_CHECKBOX_TOOLTIP,
+    SAVE_CARD_SUBTITLE_SUBSCRIPTION,
   } from 'ui/labels/card';
 
   // Export statements
@@ -162,24 +164,12 @@
               <!-- For subscription links message is different -->
               {#if isSubscription()}
                 <div class="save-card-subtext">
-                  {formatTemplateWithLocale(
-                    merchantName
-                      ? 'card.save_card_know_more_add_card_modal_subtitle_subscription'
-                      : 'card.save_card_know_more_add_card_modal_subtitle_subscription_without_merchant_name',
-                    { merchantName },
-                    $locale
-                  )}
+                  {$t(SAVE_CARD_SUBTITLE_SUBSCRIPTION)}
                 </div>
               {:else}
                 <!-- For caw links message is different -->
                 <div class="save-card-subtext">
-                  {formatTemplateWithLocale(
-                    !merchantName || !maxAmount
-                      ? 'card.save_card_know_more_add_card_modal_subtitle_caw_without_merchant_name'
-                      : 'card.save_card_know_more_add_card_modal_subtitle_caw',
-                    { merchantName, maxAmount },
-                    $locale
-                  )}
+                  {$t(RECURRING_CALLOUT)}
                 </div>
               {/if}
             {/if}

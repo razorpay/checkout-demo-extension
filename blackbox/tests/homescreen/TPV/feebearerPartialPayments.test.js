@@ -52,16 +52,10 @@ describe.each(
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
     await verifyAutoSelectBankTPV(context, 'State Bank of India');
-    console.log('1');
     await verifyPartialAmount(context, '₹ 100');
-    console.log('2');
     await submit(context);
-    console.log('3');
     await handleFeeBearer(context);
-    console.log('4');
     await passRequestNetbanking(context);
-    console.log('5');
     await handleMockSuccessDialog(context);
-    console.log('6');
   });
 });
