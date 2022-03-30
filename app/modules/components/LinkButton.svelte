@@ -11,14 +11,14 @@
   {type}
   {...$$props}
   on:click
-  class={isOneCC ? 'one-cc-btn theme theme-border' : 'button hc_border'}
+  class={isOneCC ? 'one-cc-btn theme theme-border' : 'standard-btn hc_border'}
   {disabled}
 >
   <slot />
 </button>
 
 <style>
-  .button {
+  .standard-btn {
     padding: 3px 1px;
     font-size: 12px;
     border-bottom: 1px solid;

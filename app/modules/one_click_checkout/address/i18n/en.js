@@ -50,5 +50,6 @@ export default {
     'This pincode is not serviceable. Try again with another address',
   add_landmark: 'Add Landmark',
   optional: '(Optional)',
+  address_tags_heading: 'Save address as',
   ...billingAddressLabels,
 };
