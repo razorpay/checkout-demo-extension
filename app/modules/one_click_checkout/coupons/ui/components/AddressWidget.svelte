@@ -57,7 +57,9 @@
     {/if}
   {/if}
   <AddressBox {address} {loading} withBorder={false} isEditable={false} />
-  {#if !loading} <SameBillingAndShipping --text-color="#8d97a1" />{/if}
+  {#if !loading && address.serviceability}
+    <SameBillingAndShipping --text-color="#8d97a1" />
+  {/if}
 </div>
 
 <style>
