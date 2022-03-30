@@ -9,7 +9,7 @@ export const OTP_LABELS = {
     loading: false,
     showInput: true,
     action: false,
-    allowSkip: false,
+    allowSkip: true,
     otp: '',
     skipTextLabel: 'skip_saved_address',
   },
