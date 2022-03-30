@@ -353,12 +353,13 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
 
   const order_id = getOrderId();
 
+  // Promise.allSettled to ensure if any 1 pincode api fails, it doesn't mark unserviceable for all
   return Promise.allSettled(
     Object.values(zipecodeHash).map((address) =>
       postServiceability([address], onSavedAddress, false)
     )
   ).then((res) => {
-    // done to ensure if any 1 pincode api fails, it doesn't mark unserviceable for all
+    // capturing all failed / rejected api requests and marking them as unserviceable
     const rejectedResponse = res
       .filter(({ status }) => status === 'rejected')
       .map(({ reason }) => ({
