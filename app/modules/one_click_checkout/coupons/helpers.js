@@ -23,7 +23,7 @@ import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
-import { showToast, TOAST_THEME } from 'one_click_checkout/Toast';
+import { showToast, TOAST_THEME, TOAST_SCREEN } from 'one_click_checkout/Toast';
 import { COUPON_TOAST_MESSAGE } from 'one_click_checkout/coupons/i18n/labels';
 import { getCurrency } from 'razorpay';
 import { formatAmountWithSymbol } from 'common/currency';
@@ -102,6 +102,7 @@ export function applyCouponCode(code) {
             get(locale)
           ),
           theme: TOAST_THEME.SUCCESS,
+          screen: TOAST_SCREEN.ONE_CC,
         });
       },
       onInvalid: (error) => {

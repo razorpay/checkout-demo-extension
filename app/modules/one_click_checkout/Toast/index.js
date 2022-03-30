@@ -5,9 +5,9 @@ let toast;
 /**
  * Creates a new Toast
  */
-function create() {
+function create(element) {
   toast = new Toast({
-    target: document.getElementById('bottom'),
+    target: document.getElementById(`form-${element}`),
   });
 }
 
@@ -17,9 +17,8 @@ function create() {
  * @returns
  */
 export function showToast(options) {
-  if (!toast) {
-    create();
-  }
+  const { screen } = options || {};
+  create(screen);
   toast.show(options);
 }
 
@@ -36,4 +35,9 @@ export const TOAST_THEME = {
   SUCCESS: 'success',
   ERROR: 'error',
   INFO: 'info',
+};
+
+export const TOAST_SCREEN = {
+  ONE_CC: 'home-1cc', // for 1CC screens
+  COMMON: 'common', // for payment method screen
 };

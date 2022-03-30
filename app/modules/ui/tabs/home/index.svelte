@@ -14,7 +14,11 @@
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
-  import { showToast, TOAST_THEME } from 'one_click_checkout/Toast';
+  import {
+    showToast,
+    TOAST_THEME,
+    TOAST_SCREEN,
+  } from 'one_click_checkout/Toast';
 
   import { HOME_VIEWS } from './constants';
 
@@ -1014,6 +1018,7 @@
     showToast({
       message: formatTemplateWithLocale(template, { charge }),
       theme: TOAST_THEME.INFO,
+      screen: TOAST_SCREEN.COMMON,
     });
   }
 

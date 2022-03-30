@@ -40,6 +40,11 @@
     font-size: 13px;
     padding: 12px 24px;
     color: #79747e;
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .success {

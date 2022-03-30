@@ -7,7 +7,12 @@
   import AddressFormBuilder from 'one_click_checkout/address/ui/components/AddressFormBuilder.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import TagSelector from 'one_click_checkout/address/ui/components/TagSelector.svelte';
-  import { showToast, hideToast, TOAST_THEME } from 'one_click_checkout/Toast';
+  import {
+    showToast,
+    hideToast,
+    TOAST_THEME,
+    TOAST_SCREEN,
+  } from 'one_click_checkout/Toast';
   import Icon from 'ui/elements/Icon.svelte';
   import info from 'ui/icons/payment-methods/info';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
@@ -120,6 +125,7 @@
   const pincode_error_toast = {
     message: $t(PINCODE_NON_SERVICEABLE_LABEL),
     theme: TOAST_THEME.ERROR,
+    screen: TOAST_SCREEN.ONE_CC,
   };
 
   const showPincodeToast = (pincode) => {
