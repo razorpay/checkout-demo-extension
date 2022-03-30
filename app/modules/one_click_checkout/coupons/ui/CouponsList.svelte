@@ -64,7 +64,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #424242;
+    color: #263a4a;
   }
 
   p {

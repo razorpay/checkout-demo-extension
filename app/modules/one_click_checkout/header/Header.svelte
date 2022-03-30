@@ -71,13 +71,13 @@
 
   .header-title {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 18px;
   }
 
   .header-body-wrapper {
     display: flex;
     justify-content: space-between;
-    padding: 8px 16px 16px;
+    padding: 12px 16px 16px;
   }
 </style>

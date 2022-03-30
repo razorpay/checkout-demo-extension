@@ -69,7 +69,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
-  import { SAVE_LABEL } from 'one_click_checkout/cta/i18n';
+  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Constants imports
   import {
@@ -243,7 +243,7 @@
   {/if}
   {#if newCta}
     <CTAOneCC on:click={onSubmitClick} {disabled} showAmount={false}>
-      {$t(SAVE_LABEL)}
+      {$t(CTA_LABEL)}
     </CTAOneCC>
   {/if}
 </div>

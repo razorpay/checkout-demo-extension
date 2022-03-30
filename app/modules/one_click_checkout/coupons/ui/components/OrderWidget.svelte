@@ -134,8 +134,7 @@
   }
 
   .order-summary {
-    margin-bottom: 14px;
-    padding: 12px 0px;
+    padding: 12px 0px 0px;
     font-size: 14px;
   }
 
@@ -144,7 +143,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #424242;
+    color: #263a4a;
   }
 
   p {
@@ -171,6 +170,6 @@
     margin: 16px 0px;
   }
   .total-label {
-    font-weight: 600;
+    font-weight: 500;
   }
 </style>

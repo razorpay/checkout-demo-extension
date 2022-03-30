@@ -352,11 +352,11 @@
     line-height: 16px;
     color: #8d97a1;
     margin-top: 2px;
-    margin-bottom: -2px;
+    margin-bottom: 10px;
   }
 
   .title-vpa-upi-one-cc {
     color: #263a4a;
-    font-weight: 600;
+    font-weight: 400;
   }
 </style>

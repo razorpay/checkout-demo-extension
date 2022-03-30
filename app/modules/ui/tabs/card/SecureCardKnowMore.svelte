@@ -36,7 +36,11 @@
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 </script>
 
-<div class="secure-card-know-more-overlay" id="know-more-modal">
+<div
+  class="secure-card-know-more-overlay"
+  id="know-more-modal"
+  class:secure-card-know-more-overlay-one-cc={isOneClickCheckoutEnabled}
+>
   <div class="secure-card-know-more-header">
     <span
       class="secure-card-know-more-header-title"
@@ -194,5 +198,9 @@
 
   .secure-card-know-more-content-one-cc {
     letter-spacing: 0.1px;
+  }
+
+  .secure-card-know-more-overlay-one-cc {
+    padding: 16px 16px 4px;
   }
 </style>

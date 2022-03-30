@@ -159,7 +159,7 @@
     bind:this={couponEle}
     class:coupon-scrollable={scrollable}
   >
-    <div class="widget-wrapper">
+    <div class="widget-wrapper contact-wrapper">
       <ContactWidget />
     </div>
     <div class="separator" />
@@ -183,7 +183,11 @@
     </div>
     <div class="separator" />
 
-    <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
+    <div
+      class="widget-wrapper order-summary-wrapper"
+      id="order-widget"
+      bind:this={orderWidget}
+    >
       <OrderWidget />
     </div>
     <CTA on:click={onSubmit} {onViewDetailsClick} disabled={ctaDisabled} />
@@ -197,7 +201,15 @@
   }
 
   .widget-wrapper {
-    padding: 28px 16px;
+    padding: 20px 16px;
+  }
+
+  .contact-wrapper {
+    padding-top: 26px;
+  }
+
+  .order-summary-wrapper {
+    padding-bottom: 26px;
   }
 
   .coupon-scrollable {

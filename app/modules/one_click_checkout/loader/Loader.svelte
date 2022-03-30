@@ -107,13 +107,13 @@
     flex-direction: column;
   }
   .bar {
-    width: 20%;
+    width: 50px;
     height: 5px;
     top: 0px;
     position: relative;
     animation-name: loader;
-    animation-duration: 1s;
-    animation-timing-function: linear;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     animation-direction: alternate;
     background-color: #b88c45;
@@ -124,7 +124,7 @@
       left: 0px;
     }
     100% {
-      left: 80%;
+      left: calc(100% - 50px);
     }
   }
 </style>

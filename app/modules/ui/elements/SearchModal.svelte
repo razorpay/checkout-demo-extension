@@ -566,6 +566,7 @@
 
   .list-item-1cc {
     border-bottom: none;
+    color: #263a4a;
   }
 
   .list-header-1cc {

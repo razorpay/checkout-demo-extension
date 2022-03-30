@@ -166,11 +166,11 @@
     text-align: start;
     bottom: 0;
     width: 100%;
-    padding-top: 24px;
+    padding-top: 16px;
   }
 
   .summary-table-wrapper {
-    padding: 0px 16px 14px;
+    padding: 0px 16px 4px;
   }
   :global(.mobile) .summary-modal {
     bottom: 0;

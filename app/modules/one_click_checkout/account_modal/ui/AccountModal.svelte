@@ -209,7 +209,7 @@
     background: #fff;
     text-align: start;
     width: 100%;
-    padding: 24px 0px;
+    padding: 16px 0px;
     bottom: -55px;
   }
   .account-menu {
@@ -218,7 +218,7 @@
     justify-content: space-between;
     align-items: center;
     height: 36px;
-    padding: 0px 24px;
+    padding: 0px 16px;
   }
 
   .account-heading {
@@ -231,7 +231,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 24px;
+    padding: 0px 16px;
   }
   p {
     margin-block-start: 0;
@@ -240,7 +240,7 @@
   hr {
     border: 1px solid #e1e5ea;
     border-bottom: none;
-    margin: 12px 24px;
+    margin: 12px 16px;
   }
 
   .account-container {
@@ -261,7 +261,6 @@
     align-items: center;
   }
   .account-toggle-icon {
-    width: 14px;
     height: 14px;
     transform: rotate(270deg);
     cursor: pointer;

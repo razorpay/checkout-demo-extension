@@ -134,7 +134,7 @@
 
   #coupon-input {
     padding: 12px;
-    color: #424242;
+    color: #263a4a;
     flex: 1;
     min-width: 0;
     font-size: 14px;
@@ -257,7 +257,7 @@
     padding: 12px;
     border-radius: 4px;
     font-size: 15px;
-    color: #424242;
+    color: #263a4a;
     width: 205px;
   }
   .label {

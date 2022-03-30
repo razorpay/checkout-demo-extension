@@ -225,8 +225,7 @@
     outline: none;
     padding: 12px;
     border-radius: 4px;
-    font-size: 16px;
-    color: #424242;
+    color: #263a4a;
     margin-bottom: 0px;
   }
   .label {
@@ -284,7 +283,7 @@
     font-weight: 500;
     font-size: 14px;
     line-height: 16px;
-    color: #424242;
+    color: #263a4a;
   }
 
   .dropdown-one-cc .description {
