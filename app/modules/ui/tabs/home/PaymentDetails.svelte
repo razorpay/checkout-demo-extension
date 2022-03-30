@@ -67,7 +67,6 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { views } from 'one_click_checkout/routing/constants';
-  import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
   import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
@@ -146,7 +145,6 @@
     if (isOneCCEnabled && isEditDetailScreen) {
       toggleHeader(false);
     }
-    setTabTitleLogo('');
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();

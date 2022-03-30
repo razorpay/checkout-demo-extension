@@ -32,7 +32,6 @@
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
 
   // Utils imports
   import { isMethodUsable } from 'checkoutstore/methods';
@@ -141,7 +140,6 @@
   export function onShown() {
     renderCtaOneCC = true;
     toggleHeader(true);
-    setTabTitleLogo('');
     showPlansView();
   }
 

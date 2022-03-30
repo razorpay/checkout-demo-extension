@@ -28,8 +28,6 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
-  import { setTabTitleLogo } from 'one_click_checkout/topbar/helper';
-  import { toggleHeader } from 'one_click_checkout/header/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -141,11 +139,6 @@
   $: isNativeOTPAndOneCC = !$isRazorpayOTP && isOneClickCheckout();
   let isOneCC = isOneClickCheckout();
 
-  export function onShown() {
-    setTabTitleLogo($tabLogo);
-    toggleHeader(false);
-  }
-
   export function invoke(type, event) {
     const method = on[type];
 
@@ -219,6 +212,9 @@
             <p class="otp-heading" class:heading-1cc={isOneCC}>
               {getOtpScreenHeading('default_login', $templateData, $locale)}
             </p>
+          {/if}
+          {#if $tabLogo && isOneCC}
+            <img class="title-logo" alt="Logo" src={$tabLogo} />
           {/if}
           <div class="otp-title">
             {#if isRazorpayOTPAndOneCC}
@@ -516,5 +512,10 @@
     border-radius: 4px;
     border-width: 1px;
     border-style: solid;
+  }
+
+  .title-logo {
+    height: 18px;
+    margin-bottom: 18px;
   }
 </style>

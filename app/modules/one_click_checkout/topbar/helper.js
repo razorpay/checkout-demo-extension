@@ -2,16 +2,7 @@
 import { get } from 'svelte/store';
 
 // store imports
-import { tabTitleLogo, breadcrumbItems } from 'one_click_checkout/topbar/store';
-
-// utils imports
-import { isOneClickCheckout } from 'razorpay';
-
-export function setTabTitleLogo(tabLogo) {
-  if (isOneClickCheckout()) {
-    tabTitleLogo.set(tabLogo);
-  }
-}
+import { breadcrumbItems } from 'one_click_checkout/topbar/store';
 
 export function addTabInBreadcrumbs(label) {
   const addressTabIndex = get(breadcrumbItems).indexOf(label);

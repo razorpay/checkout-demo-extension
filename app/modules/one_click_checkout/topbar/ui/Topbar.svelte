@@ -8,11 +8,7 @@
   // store imports
   import { getAmount, showFeeLabel } from 'checkoutstore';
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import {
-    breadcrumbItems,
-    tabTitle,
-    tabTitleLogo,
-  } from 'one_click_checkout/topbar/store';
+  import { breadcrumbItems, tabTitle } from 'one_click_checkout/topbar/store';
   import { headerVisible } from 'one_click_checkout/header/store';
 
   // i18n imports
@@ -77,13 +73,11 @@
           <Icon icon={back_arrow} />
         </span>
       {/if}
-      {#if $tabTitleLogo}
-        <img class="title-logo" alt="Logo" src={$tabTitleLogo} />
-      {:else if $activeRoute?.topbarTitle || !blackListedTabTitle?.includes($tabTitle)}
+      {#if $activeRoute?.topbarTitle || !blackListedTabTitle?.includes($tabTitle)}
         {$activeRoute?.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
       {/if}
     </div>
-    {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$tabTitleLogo && !$activeRoute?.topbarTitle}
+    {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$activeRoute?.topbarTitle}
       <div class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
           <span

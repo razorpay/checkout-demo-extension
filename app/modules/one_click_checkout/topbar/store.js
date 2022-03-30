@@ -12,5 +12,3 @@ export const breadcrumbItems = writable([
 ]);
 
 export const tabTitle = writable('');
-
-export const tabTitleLogo = writable('');

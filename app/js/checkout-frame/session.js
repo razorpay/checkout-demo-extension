@@ -3059,12 +3059,6 @@ Session.prototype = {
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
       AccountTabStore.showAccountTab.set(false);
-
-      var walletOtp = thisTab === 'wallet' && this.screen === 'otp';
-      var cardlessEmiOtp = thisTab === 'cardless_emi' && this.screen === 'otp';
-      if (!walletOtp && !cardlessEmiOtp) {
-        TopbarMagicCheckoutStore.tabTitleLogo.set('');
-      }
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
@@ -4174,9 +4168,6 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       this.otpView.setTextView(textView, templateData);
-      if (RazorpayHelper.isOneClickCheckout()) {
-        this.otpView.view.onShown();
-      }
       this.otpView.updateScreen({
         headingText: headingText,
       });
