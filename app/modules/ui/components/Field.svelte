@@ -677,6 +677,7 @@
   }
 
   .input-one-click-checkout {
+    position: relative;
     border: 1px solid #e0e0e0;
     margin-top: 8px;
     padding: 15px 16px;
