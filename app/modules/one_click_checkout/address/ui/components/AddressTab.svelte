@@ -28,6 +28,7 @@
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
   import { showAccountTab } from 'one_click_checkout/account_modal/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -50,6 +51,7 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import { views } from 'one_click_checkout/routing/constants';
 
   export let error;
   export let onSubmitCallback;
@@ -277,6 +279,9 @@
     </div>
     {#if $showAccountTab}
       <AccountTab />
+      {#if $activeRoute?.name === views.SAVED_ADDRESSES}
+        <hr class="separator" />
+      {/if}
     {/if}
   </div>
   <slot name="footer" />
@@ -342,5 +347,10 @@
 
   .address-scrollable {
     min-height: 120%;
+  }
+
+  .separator {
+    border-top: 1px solid #e0e0e0;
+    margin-bottom: 12px;
   }
 </style>
