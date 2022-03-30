@@ -139,6 +139,8 @@ import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 
+import * as UrlUtils from 'common/urls';
+
 export default {
   RazorpayConfig,
   updateScore,
@@ -299,4 +301,6 @@ export default {
   // Offline Challan
   offlineChallanTab,
   AccountTabStore,
+
+  UrlUtils,
 };

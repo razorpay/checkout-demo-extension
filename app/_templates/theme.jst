@@ -2,6 +2,7 @@
 var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - 128;
 var themeMeta = arguments[1];
+var getCdnUrl = arguments[2];
 var c = themeMeta.color;
 var color = themeMeta.color;
 var textColor = themeMeta.textColor;
@@ -12,6 +13,46 @@ var backgroundColor = themeMeta.backgroundColor;
 var activeStateColor = themeMeta.activeStateColor;
 var highlightBorderColor = themeMeta.highlightBorderColor;
 `
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('`=getCdnUrl()+'/fonts/Inter-Light.ttf'`') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url('`=getCdnUrl()+'/fonts/Inter.ttf'`') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('`=getCdnUrl()+'/fonts/Inter-Medium.ttf'`') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('`=getCdnUrl()+'/fonts/Inter-SemiBold.ttf'`') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: bold;
+  font-display: swap;
+  src: url('`=getCdnUrl()+'/fonts/Inter-Bold.ttf'`') format('truetype');
+}
 
 .qr-action {
   color: `=c`;

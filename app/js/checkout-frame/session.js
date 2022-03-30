@@ -2067,7 +2067,11 @@ Session.prototype = {
 
       this.setTheme();
 
-      var rules = templates.theme(getter, this.themeMeta);
+      var rules = templates.theme(
+        getter,
+        this.themeMeta,
+        discreet.UrlUtils.getCdnUrl
+      );
       if (style.styleSheet) {
         style.styleSheet.cssText = rules;
       } else {
