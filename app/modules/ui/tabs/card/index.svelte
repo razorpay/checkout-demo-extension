@@ -57,8 +57,8 @@
   import {
     shouldRememberCustomer,
     isDCCEnabled,
-    isShowMORTncEnabled,
     isSiftJSEnabled,
+    isCyberSourceJsEnabled,
     isInternational,
     isPartialPayment,
     getAmount,
@@ -118,6 +118,7 @@
     isAmex,
     addDowntimesToSavedCards,
     injectSiftScript,
+    injectCyberSourceScript,
   } from 'common/card';
 
   import { getSubtextForInstrument } from 'subtext';
@@ -256,23 +257,38 @@
       isSavedCardsEnabled = shouldRememberCustomer();
     });
 
-    if (isSiftJSEnabled() && session.r.isLiveMode()) {
-      if (isInternational()) {
+    if (isInternational() && session.r.isLiveMode()) {
+      if (isSiftJSEnabled()) {
         // load sift js
         injectSiftScript(session.id).catch((_e) => {
           // Do nothing
         });
       }
 
-      defaultDCCCurrency.subscribe((currency) => {
-        if (currency && currency !== 'INR') {
-          // load sift js
+      if (isCyberSourceJsEnabled()) {
+        // load cyber source js
+        injectCyberSourceScript(session.id).catch((_e) => {
+          // Do nothing
+        });
+      }
+    }
+
+    const unbsubscribe = defaultDCCCurrency.subscribe((currency) => {
+      if (currency && currency !== 'INR' && session.r.isLiveMode()) {
+        if (isSiftJSEnabled()) {
           injectSiftScript(session.id).catch((_e) => {
             // Do nothing
           });
         }
-      });
-    }
+        if (isCyberSourceJsEnabled()) {
+          injectCyberSourceScript(session.id).catch((_e) => {
+            // Do nothing
+          });
+        }
+      }
+    });
+
+    return unbsubscribe;
   });
 
   onDestroy(() => {

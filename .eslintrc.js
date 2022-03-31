@@ -12,6 +12,7 @@ module.exports = {
     _: true,
     fetch: true,
     __SIFT_BEACON_KEY__: true,
+    __CYBER_SOURCE_RZP_ORG_ID__: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
