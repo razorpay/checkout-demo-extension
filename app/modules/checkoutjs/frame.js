@@ -97,6 +97,17 @@ function sanitizeImage(options) {
   }
 }
 
+function getNewDesignUrl() {
+  let url = '/checkout.html?branch=1cc/v1_5_beta';
+  if (
+    location.hostname.endsWith('razorpay.com') ||
+    location.hostname.endsWith('razorpay.in')
+  ) {
+    url = `/test/checkout.html?branch=1cc/v1_5_beta`;
+  }
+  return url;
+}
+
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
   // const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
@@ -104,6 +115,10 @@ function makeCheckoutUrl(rzp) {
   //   : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;
+
+  if (rzp?.get('v_1_5_experiment_enabled')) {
+    url = getNewDesignUrl();
+  }
 
   // const useCanary = _.random() < CANARY_PERCENTAGE;
 
@@ -352,7 +367,7 @@ CheckoutFrame.prototype = {
     }
     response.id = this.rzp.id;
     response = _Obj.stringify(response);
-    this.el.contentWindow.postMessage(response, '*');
+    this.el?.contentWindow?.postMessage(response, '*');
   },
 
   onmessage: function (e) {
