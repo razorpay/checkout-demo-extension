@@ -132,8 +132,11 @@
       <hr />
       <ul class="language-container">
         {#each $locales as locale}
-          <li class="list-item" on:click={() => selectLanguage(locale)}>
-            <button class="account-menu">
+          <li class="list-item">
+            <button
+              class="account-menu"
+              on:click={() => selectLanguage(locale)}
+            >
               {getLocaleName(locale)}
             </button>
           </li>
@@ -161,8 +164,11 @@
         </button>
         <ul class="language-container">
           {#each $locales as locale}
-            <li class="list-item" on:click={() => selectLanguage(locale)}>
-              <button class="account-menu">
+            <li class="list-item">
+              <button
+                class="account-menu"
+                on:click={() => selectLanguage(locale)}
+              >
                 {getLocaleName(locale)}
               </button>
             </li>
@@ -281,7 +287,7 @@
     padding-left: 10px;
   }
 
-  .list-item {
-    cursor: pointer;
+  .list-item .account-menu {
+    width: 100%;
   }
 </style>
