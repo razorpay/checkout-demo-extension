@@ -167,6 +167,11 @@
     );
   }
 
+  function onSubmit() {
+    session.preSubmit();
+    renderCtaOneCC = false;
+  }
+
   onMount(() => {
     Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
   });
@@ -226,7 +231,7 @@
     {/if}
   </Bottom>
   {#if renderCtaOneCC}
-    <CTAOneCC on:click={() => session.preSubmit()}>
+    <CTAOneCC on:click={onSubmit}>
       {$t(PAY_NOW_CTA_LABEL)}
     </CTAOneCC>
   {/if}

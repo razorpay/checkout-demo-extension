@@ -67,6 +67,7 @@
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
   import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 

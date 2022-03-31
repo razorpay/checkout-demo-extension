@@ -2284,6 +2284,9 @@ Session.prototype = {
     } else if (this.tab === 'paylater') {
       this.askPayLaterOtp('resend');
     } else if (isWallet) {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
@@ -3207,6 +3210,10 @@ Session.prototype = {
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
+          self.otpView.updateScreen({
+            showCtaOneCC: false,
+          });
+          TopbarMagicCheckoutStore.tabTitleLogo.set('');
           discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
@@ -6017,6 +6024,8 @@ Session.prototype = {
       this.r.on('payment.otp.required', function (message) {
         askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
+          showCtaOneCC: true,
+          ctaOneCCDisabled: false,
           allowSkip: false,
         });
       });
