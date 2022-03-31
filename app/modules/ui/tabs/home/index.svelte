@@ -13,7 +13,7 @@
   import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
-  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isElementUnscrollable } from 'one_click_checkout/helper';
   import {
     showToast,
     TOAST_THEME,
@@ -773,7 +773,8 @@
     if (!isOneCCEnabled) {
       showHome = true;
     }
-    scrollable = isScrollableElement(methodEle);
+    // TODO: 120px as hack for payment methods to make the screen scrollable
+    scrollable = isElementUnscrollable(methodEle?.parentNode, 120);
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
       hideCta();

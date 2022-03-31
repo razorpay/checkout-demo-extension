@@ -35,7 +35,7 @@
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
-  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isElementUnscrollable } from 'one_click_checkout/helper';
   import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // constants imports
@@ -214,7 +214,7 @@
   }
 
   onMount(() => {
-    scrollable = isScrollableElement(addressWrapperEle);
+    scrollable = isElementUnscrollable(addressWrapperEle);
   });
 
   $: {

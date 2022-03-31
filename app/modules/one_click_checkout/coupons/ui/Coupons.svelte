@@ -64,7 +64,7 @@
   import { hideToast } from 'one_click_checkout/Toast';
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isElementUnscrollable } from 'one_click_checkout/helper';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -112,7 +112,7 @@
   }
 
   onMount(() => {
-    scrollable = isScrollableElement(couponEle?.parentNode);
+    scrollable = isElementUnscrollable(couponEle?.parentNode);
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
