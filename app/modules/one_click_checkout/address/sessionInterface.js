@@ -76,9 +76,10 @@ export { showSavedAddressCta };
 export function postAddressSelection(id, index) {
   const selectedAddress = get(selectedShippingAddress);
   const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
-  shippingCharge.set(shipping_fee || 0);
+  const shippingAmount = serviceability ? shipping_fee : 0;
+  shippingCharge.set(shippingAmount || 0);
   codChargeAmount.set(cod_fee);
-  isShippingAddedToAmount.set(true);
+  isShippingAddedToAmount.set(!!serviceability);
   if (id) {
     Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
       id,

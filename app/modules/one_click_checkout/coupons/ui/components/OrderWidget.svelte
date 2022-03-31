@@ -5,10 +5,7 @@
 
   // store imports
   import { getCurrency } from 'razorpay';
-  import {
-    checkServiceabilityStatus,
-    selectedAddressId,
-  } from 'one_click_checkout/address/shipping_address/store';
+  import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
     isCouponApplied,
@@ -20,6 +17,7 @@
     cartDiscount,
     amount,
     shippingCharge,
+    isShippingAddedToAmount,
   } from 'one_click_checkout/charges/store';
 
   // i18n imports
@@ -49,7 +47,7 @@
   const spaceAmoutWithSymbol = false;
   let showTotal;
   $: {
-    showTotal = $selectedAddressId || $isCouponApplied;
+    showTotal = $isShippingAddedToAmount || $isCouponApplied;
     if ($savedAddresses?.length && $shippingCharge) {
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
     } else {
@@ -84,7 +82,7 @@
       </p>
     </div>
   {/if}
-  {#if $shippingCharge && $savedAddresses?.length}
+  {#if $isShippingAddedToAmount && $savedAddresses?.length}
     <div class="row justify-between color-gray">
       {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         <Shimmer width="40%" />
