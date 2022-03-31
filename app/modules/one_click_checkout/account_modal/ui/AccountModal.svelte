@@ -85,7 +85,7 @@
 
   onMount(() => {
     new Loader({
-      target: document.querySelector('#footer'),
+      target: document.querySelector('#one-cc-account'),
     });
   });
 
