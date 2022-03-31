@@ -757,37 +757,13 @@
     }
   }
 
-  export function addressNext(showSnackbar) {
+  export function addressNext() {
     $isShippingAddedToAmount = true;
     showHome = true;
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
     });
-    if (showSnackbar) {
-      const charge = session.formatAmountWithCurrency($shippingCharge);
-      const text = [];
-      if ($didSaveAddress) {
-        text.push($t(SAVED_ADDRESS_LABEL));
-      }
-      if ($shippingCharge) {
-        text.push(
-          formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, { charge }, $locale)
-        );
-      }
-      if (text.length) {
-        const snackBar = new Snackbar({
-          target: document.getElementById('form'),
-          props: {
-            align: 'bottom',
-            shown: true,
-            timer: 2000,
-            text: text,
-            class: 'snackbar-cod',
-          },
-        });
-      }
-    }
     setTimeout(() => {
       hideCta();
     });

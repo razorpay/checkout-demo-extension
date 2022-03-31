@@ -3235,9 +3235,9 @@ Session.prototype = {
     this.topBar.show();
   },
 
-  oneClickCheckoutRedirection: function (showSnackbar) {
+  oneClickCheckoutRedirection: function () {
     this.switchTab('');
-    this.homeTab.addressNext(showSnackbar);
+    this.homeTab.addressNext();
     this.homeTab.next(views.METHODS);
   },
 
