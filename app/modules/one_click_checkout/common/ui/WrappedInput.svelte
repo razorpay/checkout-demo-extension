@@ -99,7 +99,7 @@
     for="inputField"
     class="label"
     class:label-upper={value}
-    class:label-error={validationText}
+    class:label-error={validationText && (value || focused)}
     on:click={handleClickLabel}
   >
     {$t(label)}
@@ -293,7 +293,7 @@
     background-color: #e0e0e0;
   }
 
-  .label-error.label-upper {
+  .label-error {
     color: var(--error-validation-color) !important;
   }
 </style>
