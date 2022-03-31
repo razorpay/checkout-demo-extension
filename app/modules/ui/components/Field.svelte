@@ -896,6 +896,5 @@
     position: absolute;
     right: 14px;
     top: 22px;
-    z-index: 1;
   }
 </style>
