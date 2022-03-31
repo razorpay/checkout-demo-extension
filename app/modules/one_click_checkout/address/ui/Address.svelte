@@ -3,7 +3,11 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
-  import { showToast, TOAST_THEME } from 'one_click_checkout/Toast';
+  import {
+    showToast,
+    TOAST_SCREEN,
+    TOAST_THEME,
+  } from 'one_click_checkout/Toast';
   import AddressTab from 'one_click_checkout/address/ui/components/AddressTab.svelte';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
 
@@ -141,6 +145,7 @@
   $: {
     if ($shippingCharge) {
       showToast({
+        screen: TOAST_SCREEN.ONE_CC,
         theme: TOAST_THEME.INFO,
         message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
           charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
