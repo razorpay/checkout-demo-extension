@@ -3196,7 +3196,6 @@ Session.prototype = {
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
-          TopbarMagicCheckoutStore.tabTitleLogo.set('');
           discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',

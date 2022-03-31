@@ -24,7 +24,7 @@ import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
-import { tabTitle, tabTitleLogo } from 'one_click_checkout/topbar/store';
+import { tabTitle } from 'one_click_checkout/topbar/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
@@ -52,7 +52,6 @@ export const handleBack = () => {
     handleBack();
   }
   tabTitle.set('');
-  tabTitleLogo.set('');
   const currHistory = get(history);
   if (
     (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) ||
