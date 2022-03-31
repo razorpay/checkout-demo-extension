@@ -131,7 +131,7 @@
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
-  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isElementUnscrollable } from 'one_click_checkout/helper';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -926,7 +926,7 @@
   }
 
   function isScreenScrollable() {
-    $cardScreenScrollable = isScrollableElement(cardEle?.parentNode);
+    $cardScreenScrollable = isElementUnscrollable(cardEle?.parentNode);
   }
 
   export function onShown() {

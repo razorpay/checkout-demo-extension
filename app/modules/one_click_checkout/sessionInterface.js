@@ -201,7 +201,8 @@ export function redirectToPaymentMethods(
         }
       });
   } else {
-    session.oneClickCheckoutRedirection(showSnackbar);
+    session.oneClickCheckoutRedirection();
+    navigator.navigateTo({ path: views.METHODS });
   }
 }
 

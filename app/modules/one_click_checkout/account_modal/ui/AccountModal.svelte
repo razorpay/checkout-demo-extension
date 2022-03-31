@@ -85,7 +85,7 @@
 
   onMount(() => {
     new Loader({
-      target: document.querySelector('#footer'),
+      target: document.querySelector('#one-cc-account'),
     });
   });
 
@@ -132,11 +132,8 @@
       <hr />
       <ul class="language-container">
         {#each $locales as locale}
-          <li class="list-item">
-            <button
-              class="account-menu"
-              on:click={() => selectLanguage(locale)}
-            >
+          <li class="list-item" on:click={() => selectLanguage(locale)}>
+            <button class="account-menu">
               {getLocaleName(locale)}
             </button>
           </li>
@@ -164,11 +161,8 @@
         </button>
         <ul class="language-container">
           {#each $locales as locale}
-            <li class="list-item">
-              <button
-                class="account-menu"
-                on:click={() => selectLanguage(locale)}
-              >
+            <li class="list-item" on:click={() => selectLanguage(locale)}>
+              <button class="account-menu">
                 {getLocaleName(locale)}
               </button>
             </li>
@@ -285,5 +279,9 @@
     font-size: 12px;
     font-weight: 300;
     padding-left: 10px;
+  }
+
+  .list-item {
+    cursor: pointer;
   }
 </style>

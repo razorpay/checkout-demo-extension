@@ -195,6 +195,7 @@
           bind:phone={$phone}
           isOptional={isContactOptional()}
           on:blur={trackContactFilled}
+          on:input={trackContactFilled}
           on:countrySelect={handleCountrySelect}
           {validationText}
         />

@@ -260,8 +260,10 @@
 
   .error {
     margin-top: 4px;
-    color: #ee1a32 !important;
+    color: #8d97a1cc !important;
     overflow: visible;
+    font-size: 12px;
+    line-height: 16px;
   }
   .error-container {
     display: flex;
@@ -275,7 +277,7 @@
   }
 
   .cod-error {
-    color: #858585 !important;
+    color: #263a4a99 !important;
   }
 
   .cod-loader {

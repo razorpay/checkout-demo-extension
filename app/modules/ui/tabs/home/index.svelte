@@ -11,10 +11,9 @@
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
-  import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
-  import { isScrollableElement } from 'one_click_checkout/helper';
+  import { isElementUnscrollable } from 'one_click_checkout/helper';
   import {
     showToast,
     TOAST_THEME,
@@ -63,7 +62,6 @@
   } from 'one_click_checkout/charges/store';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { blocks } from 'checkoutstore/screens/home';
   import { showOffers as showMethodOffers } from 'checkoutstore/offers';
 
   // i18n
@@ -73,10 +71,6 @@
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     TPV_METHODS_NOT_AVAILABLE,
   } from 'ui/labels/home';
-  import {
-    SHIPPING_CHARGES_LABEL,
-    SAVED_ADDRESS_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
   import { t, locale } from 'svelte-i18n';
 
   // Utils imports
@@ -104,7 +98,6 @@
     isMethodEnabled,
   } from 'checkoutstore/methods';
 
-  import { didSaveAddress } from 'one_click_checkout/address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
   import { codReason } from 'one_click_checkout/address/shipping_address/store';
   import {
@@ -172,6 +165,7 @@
     PAY_NOW_CTA_LABEL,
     PLACE_ORDER_CTA_LABEL,
   } from 'one_click_checkout/cta/i18n';
+  import { headerVisible } from 'one_click_checkout/header/store';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -774,11 +768,13 @@
   }
 
   export function onShown() {
+    $headerVisible = true;
     renderCtaOneCC = true;
     if (!isOneCCEnabled) {
       showHome = true;
     }
-    scrollable = isScrollableElement(methodEle);
+    // TODO: 120px as hack for payment methods to make the screen scrollable
+    scrollable = isElementUnscrollable(methodEle?.parentNode, 120);
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
       hideCta();
