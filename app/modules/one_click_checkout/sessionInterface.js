@@ -107,7 +107,7 @@ export function getTheme() {
  * Redirecting the flow from 1cc to payment screens
  */
 export function redirectToPaymentMethods(
-  { shouldUpdateOrder } = {
+  { shouldUpdateOrder, showSnackbar } = {
     shouldUpdateOrder: true,
     showSnackbar: true,
   }
