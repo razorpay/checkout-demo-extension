@@ -27,7 +27,6 @@
     selectedAddressId as selectedShippingAddressId,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
-  import { showAccountTab } from 'one_click_checkout/account_modal/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
 
   // helpers imports
@@ -84,6 +83,7 @@
     },
   } = Resource[addressType];
   let isFormComplete = false;
+  let showAccountTab;
   const { location } = getIcons();
 
   export function handleAddAddressClick() {
@@ -210,7 +210,7 @@
   }
 
   function onScroll() {
-    isShowAccountTab(addressWrapperEle);
+    showAccountTab = isShowAccountTab(addressWrapperEle);
   }
 
   onMount(() => {
@@ -277,11 +277,9 @@
       {/if}
       <slot name="inner-footer" />
     </div>
-    {#if $showAccountTab}
-      <AccountTab />
-      {#if $activeRoute?.name === views.SAVED_ADDRESSES}
-        <hr class="separator" />
-      {/if}
+    <AccountTab {showAccountTab} />
+    {#if $activeRoute?.name === views.SAVED_ADDRESSES}
+      <hr class="separator" />
     {/if}
   </div>
   <slot name="footer" />

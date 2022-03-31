@@ -720,7 +720,7 @@
 
 <Tab {method} pad={false} shown={isPayout()}>
   <Screen pad={!isOneClickCheckout()}>
-    <div class="upi-container">
+    <div class="upi-container" class:screen-one-cc={isOneClickCheckout()}>
       {#if upiFlowStep === steps.preUpiPspBankSelection}
         <BankSelection bind:value={selectedBankForRecurring} />
       {:else if upiFlowStep === steps.upi}
@@ -957,6 +957,9 @@
 
   .upi-container {
     padding: 0px 12px 12px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
   }
 
   :global(#content.one-cc) .upi-container {

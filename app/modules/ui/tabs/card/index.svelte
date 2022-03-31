@@ -41,6 +41,7 @@
     defaultDCCCurrency,
     cardCountry,
     showSavedCardTooltip,
+    cardScreenScrollable,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -126,10 +127,11 @@
     addDowntimesToSavedCards,
     injectSiftScript,
   } from 'common/card';
-
+  import { isOneClickCheckout } from 'razorpay';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
+  import { isScrollableElement } from 'one_click_checkout/helper';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -157,13 +159,14 @@
   } from 'one_click_checkout/cta/i18n';
 
   let delayOTPExperiment;
-
+  let cardEle;
   $: {
     delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
   }
 
   const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
+  const isOneCCEnabled = isOneClickCheckout();
 
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -922,11 +925,16 @@
     Events.TrackBehav(eventName, eventData);
   }
 
+  function isScreenScrollable() {
+    $cardScreenScrollable = isScrollableElement(cardEle?.parentNode);
+  }
+
   export function onShown() {
     //#region cards-tokenization
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
+    setTimeout(isScreenScrollable, 0);
     renderCtaOneCC = true;
     $selectedCard = null;
     showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
@@ -975,7 +983,10 @@
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div>
+    <div
+      bind:this={cardEle}
+      class:screen-one-cc={isOneCCEnabled && $cardScreenScrollable}
+    >
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta && !delayOTPExperiment}
@@ -1039,6 +1050,8 @@
             {downtimeInstrument}
             {delayOTPExperiment}
             {isCardSupportedForRecurring}
+            {cardEle}
+            {isScreenScrollable}
           />
           {#if showEmiCta}
             <EmiActions
@@ -1247,6 +1260,9 @@
 
   .apps-heading-container {
     margin-top: 26px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
   }
 
   .saved-card-header {

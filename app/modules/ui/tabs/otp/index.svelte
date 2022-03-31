@@ -30,6 +30,7 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -88,6 +89,8 @@
   let otpPromptVisible;
   let compact;
   let allowSkipButton = $allowSkip;
+  let otpEle;
+  let showAccountTab;
   const session = getSession();
   // As of Jan 2021, Safari is the only browser that supports one-time-code
   let autoCompleteMethod = 'off';
@@ -179,6 +182,10 @@
     Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
     invoke('resend', event);
   }
+
+  function onScroll() {
+    showAccountTab = isShowAccountTab(otpEle);
+  }
 </script>
 
 <div
@@ -187,10 +194,16 @@
   class:loading={$loading}
   class:showable={addShowableClass}
   class:tab-content-one-cc={isOneCC}
+  on:scroll={onScroll}
+  bind:this={otpEle}
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
-  <div class="otp-screen-contents" class:heading-1cc={isOneCC}>
+  <div
+    class="otp-screen-contents"
+    class:heading-1cc={isOneCC}
+    class:otp-wrapper-1cc={isOneCC}
+  >
     {#if otpPromptVisible && $mode === 'HDFC_DC'}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
@@ -400,7 +413,7 @@
       {$t(VERIFY_LABEL)}
     </CTAOneCC>
   {/if}
-  <AccountTab />
+  <AccountTab {showAccountTab} />
 </div>
 
 <style>
@@ -527,6 +540,9 @@
     border-style: solid;
   }
 
+  .otp-wrapper-1cc {
+    min-height: 110%;
+  }
   .title-logo {
     height: 18px;
     margin-bottom: 18px;

@@ -3069,7 +3069,7 @@ Session.prototype = {
 
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
-      AccountTabStore.showAccountTab.set(false);
+      CardScreenStore.cardScreenScrollable.set(false);
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,

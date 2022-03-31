@@ -328,7 +328,7 @@
   hasMessage={!!downtimeSeverity}
 >
   <Screen pad={false}>
-    <div>
+    <div class:screen-one-cc={isOneClickCheckoutEnabled}>
       <div
         id="netb-banks"
         class="clear grid count-3"
@@ -562,6 +562,9 @@
     top: -10px;
     background: white;
     padding: 0px 2px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
   }
 
   .netb-banks-one-cc {

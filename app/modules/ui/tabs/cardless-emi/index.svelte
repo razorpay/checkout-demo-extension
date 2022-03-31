@@ -13,9 +13,10 @@
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
   import { getSession } from 'sessionmanager';
+  import { isOneClickCheckout } from 'razorpay';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // Store imports
-  import { isOneClickCheckout } from 'razorpay';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
@@ -28,7 +29,6 @@
   } from 'ui/labels/cardlessemi';
 
   const session = getSession();
-  const isOneCC = isOneClickCheckout();
   const icons = session.themeMeta.icons;
 
   const sectionMeta = {
@@ -46,6 +46,7 @@
     acc[section].push(current);
     return acc;
   }, {});
+  const isOneCCEnabled = isOneClickCheckout();
 
   let sectionTitle = {
     default:
@@ -54,6 +55,8 @@
         : OTHER_OPTIONS,
     recommended: SELECT_RECOMMENDED_TITLE,
   };
+  let cardlessEmiEle;
+  let showAccountTab;
 
   /**
    * Returns _all_ Cardless EMI providers
@@ -135,20 +138,27 @@
     }
     return code;
   }
+
+  function onScroll() {
+    showAccountTab = isShowAccountTab(cardlessEmiEle);
+  }
 </script>
 
 <div
   class="tab-content showable screen collapsible"
-  class:one-cc={isOneCC}
   id="form-cardless_emi"
+  class:content-one-cc={isOneCCEnabled}
+  on:scroll={onScroll}
+  bind:this={cardlessEmiEle}
+  class:one-cc={isOneCCEnabled}
 >
-  <div class="cardless-emi-wrapper">
+  <div class="cardless-emi-wrapper" class:screen-one-cc={isOneCCEnabled}>
     <input type="hidden" name="emi_duration" />
     <input type="hidden" name="provider" />
     <input type="hidden" name="ott" />
     {#each sections as providerSection (providerSection)}
       <!-- TITLE: Select an option | Recommended | Other Options -->
-      <h3 class="emi-header" class:one-cc={isOneCC}>
+      <h3 class="emi-header" class:one-cc={isOneCCEnabled}>
         {$t(sectionTitle[providerSection])}
       </h3>
       <div class="options emi-section">
@@ -180,7 +190,7 @@
         {/each}
       </div>
     {/each}
-    <AccountTab />
+    <AccountTab {showAccountTab} />
   </div>
 </div>
 
@@ -230,6 +240,16 @@
     height: 100%;
   }
 
+  #form-cardless_emi .screen-one-cc .options {
+    min-height: inherit;
+    overflow: unset;
+  }
+  .screen-one-cc {
+    min-height: 110%;
+  }
+  .content-one-cc {
+    margin-top: 0px;
+  }
   .tab-content.one-cc {
     margin-top: 0;
   }

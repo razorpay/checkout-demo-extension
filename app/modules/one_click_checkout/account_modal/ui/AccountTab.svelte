@@ -15,10 +15,27 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { showAccountModal } from 'one_click_checkout/account_modal';
 
+  export let showAccountTab;
+
+  let accountTabVisible;
+
   const { rzp_brand_logo } = getIcons();
+
+  $: {
+    if (showAccountTab) {
+      setTimeout(() => {
+        accountTabVisible = true;
+      }, 500);
+    }
+
+    // Intentionally Checking this condition hidding the Account Tab based on showAccountTab value is falsy
+    if (showAccountTab === false) {
+      accountTabVisible = false;
+    }
+  }
 </script>
 
-{#if isOneClickCheckout()}
+{#if isOneClickCheckout() && accountTabVisible}
   <div class="account-tab-container">
     <div class="account-wrapper">
       <div class="account-section" on:click={showAccountModal}>
@@ -46,7 +63,7 @@
     justify-content: space-between;
     padding: 12px 24px;
     border-top: 1px solid #c4c4c4;
-    margin-top: 50px;
+    margin-top: 20%;
   }
   .brand-text {
     font-size: 12px;

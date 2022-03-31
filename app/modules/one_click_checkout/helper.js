@@ -16,7 +16,8 @@ export function clickOutside(node) {
 
 export function isScrollableElement(element) {
   const { scrollHeight, offsetHeight } = element || {};
-  if (scrollHeight === offsetHeight) {
+  // Assuming the element is scrollable if the scrollHeight height is more than 5px compared to offsetHeight
+  if (scrollHeight - offsetHeight <= 5) {
     return true;
   }
 }

@@ -14,6 +14,7 @@
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import { isScrollableElement } from 'one_click_checkout/helper';
   import {
     showToast,
     TOAST_THEME,
@@ -180,6 +181,8 @@
   let showHome = false;
   let renderCtaOneCC = false;
   let ctaOneCCDisabled = true;
+  let methodEle;
+  let scrollable;
 
   // TPV
   const tpv = getTPV();
@@ -196,6 +199,7 @@
   const prefilledBank = getOption('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
+  const isOneCCEnabled = isOneClickCheckout();
 
   let expSourceSet = false;
 
@@ -734,7 +738,7 @@
   }
 
   export function codActions() {
-    if (isOneClickCheckout() && getMerchantOffers()?.length) {
+    if (isOneCCEnabled && getMerchantOffers()?.length) {
       showMethodOffers.set(true);
     }
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
@@ -771,9 +775,10 @@
 
   export function onShown() {
     renderCtaOneCC = true;
-    if (!isOneClickCheckout()) {
+    if (!isOneCCEnabled) {
       showHome = true;
     }
+    scrollable = isScrollableElement(methodEle);
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
       hideCta();
@@ -889,7 +894,7 @@
   }
 
   view = determineLandingView();
-  if (!isOneClickCheckout()) {
+  if (!isOneCCEnabled) {
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
@@ -1090,7 +1095,7 @@
     showUserDetailsStrip =
       ($isContactPresent || $email) &&
       !isContactEmailHidden() &&
-      !isOneClickCheckout();
+      !isOneCCEnabled;
   }
 
   export function onSelectInstrument(event) {
@@ -1141,7 +1146,11 @@
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
   <Screen pad={false}>
-    <div class="screen-main">
+    <div
+      class="screen-main"
+      class:screen-one-cc={scrollable && isOneCCEnabled}
+      bind:this={methodEle}
+    >
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}
@@ -1152,7 +1161,7 @@
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
           <!-- We dont want it to show in 1cc flow-->
-          {#if !isOneClickCheckout()}
+          {#if !isOneCCEnabled}
             <TrustedBadge />
           {/if}
 
@@ -1160,7 +1169,7 @@
             <div
               use:touchfix
               class="details-container"
-              class:details-container-1cc={isOneClickCheckout()}
+              class:details-container-1cc={isOneCCEnabled}
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}
             >
               {#if showUserDetailsStrip}
@@ -1328,5 +1337,9 @@
     padding-right: 16px;
     margin-bottom: 26px;
     margin-top: 26px;
+  }
+
+  .screen-one-cc {
+    min-height: 120%;
   }
 </style>

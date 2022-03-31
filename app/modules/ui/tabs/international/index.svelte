@@ -23,6 +23,8 @@
   import { Events } from 'analytics';
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
+  import { isOneClickCheckout } from 'razorpay';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   //UI Imports
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -51,6 +53,7 @@
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
+  const isOneCCEnabled = isOneClickCheckout();
 
   export let directlyToNVS = false;
 
@@ -70,6 +73,8 @@
   let NVSInfo = [];
 
   let tabVisible = false;
+  let internationalEle;
+  let showAccountTab;
 
   const handleProviderSelect = (provider) => {
     directlyToNVS = false;
@@ -214,12 +219,21 @@
   onMount(() => {
     Events.Track(EVENTS.SCREEN_LOAD);
   });
+
+  function onScroll() {
+    showAccountTab = isShowAccountTab(internationalEle);
+  }
 </script>
 
 <Tab method="international" pad={false} overrideMethodCheck>
-  <div class="international-wrapper">
+  <div
+    class="international-wrapper"
+    on:scroll={onScroll}
+    bind:this={internationalEle}
+    class:international-one-cc={isOneCCEnabled}
+  >
     {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
-      <div class="border-list collapsable">
+      <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
         {#each filteredProviders as provider, i (provider.code)}
           <SlottedRadioOption
             name={provider.code}
@@ -247,7 +261,7 @@
         {/each}
       </div>
     {:else if currentView === VIEWS_MAP.NVS_FORM}
-      <div id="nvsContainer">
+      <div id="nvsContainer" class:screen-one-cc={isOneCCEnabled}>
         {#if selectedProvider}
           <div class="nvs-provider-info">
             <Icon icon={selectedProvider.logo} />
@@ -272,7 +286,7 @@
         />
       </div>
     {/if}
-    <AccountTab />
+    <AccountTab {showAccountTab} />
   </div>
   <Bottom tab="international">
     {#if $selectedInternationalProvider}
@@ -339,5 +353,11 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+  .international-one-cc {
+    overflow: auto;
+  }
+  .screen-one-cc {
+    min-height: 110%;
   }
 </style>

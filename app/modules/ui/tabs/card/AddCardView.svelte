@@ -92,6 +92,7 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
+  export let isScreenScrollable;
 
   const isSavedCardsEnabled = shouldRememberCustomer();
 
@@ -147,6 +148,7 @@
   }
 
   onMount(() => {
+    isScreenScrollable();
     Events.TrackBehav(CardEvents.ADD_NEW_CARD, {
       PayWithSavedCard: delayOTPExperiment,
     });
