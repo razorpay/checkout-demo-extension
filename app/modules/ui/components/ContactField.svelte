@@ -176,7 +176,10 @@
     label={$t(label)}
     icon=""
     modifyIconPosition={!!validationText}
-    on:input={(e) => (phone = e.target.value)}
+    on:input={(e) => {
+      phone = e.target.value;
+      dispatch('input', e);
+    }}
     on:blur
     value={phone}
     elemClasses={inAddress ? 'address-elem' : ''}
