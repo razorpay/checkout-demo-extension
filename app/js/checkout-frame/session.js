@@ -1674,6 +1674,9 @@ Session.prototype = {
     this.setOneCCTabLogo(topbarImages);
 
     var locale = I18n.getCurrentLocale();
+    this.otpView.updateScreen({
+      showCtaOneCC: false,
+    });
     this.commenceOTP('cardlessemi_sending', 'cardless_emi_enter', {
       phone: getPhone(),
       provider: I18n.getCardlessEmiProviderName(providerCode, locale),
@@ -1697,6 +1700,8 @@ Session.prototype = {
       });
       self.otpView.updateScreen({
         allowSkip: false,
+        showCtaOneCC: true,
+        ctaOneCCDisabled: false,
       });
     };
 
@@ -3193,6 +3198,12 @@ Session.prototype = {
       tab === 'wallet' && this.screen === 'otp' && this.r._payment;
     var cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
+    if (cardlessEmiOtpPage) {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
+    }
+
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
@@ -4444,6 +4455,9 @@ Session.prototype = {
 
         callback = function (msg, data) {
           if (msg) {
+            this.otpView.updateScreen({
+              showCtaOneCC: true,
+            });
             this.fetchCardlessEmiPlans({
               incorrect: true,
             });
@@ -4456,10 +4470,13 @@ Session.prototype = {
             CardlessEmiStore.ott[providerCode] = data.ott;
             CardlessEmiStore.lenderBranding[providerCode] =
               data.lender_branding_url;
-
             this.showCardlessEmiPlans();
           }
         };
+
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
       }
 
       if (this.tab === 'upi') {

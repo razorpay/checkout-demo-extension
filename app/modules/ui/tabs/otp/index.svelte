@@ -20,6 +20,8 @@
     headingText,
     errorMessage,
     isRazorpayOTP,
+    showCtaOneCC,
+    ctaOneCCDisabled,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
@@ -62,10 +64,9 @@
   import ResendButton from 'ui/elements/ResendButton.svelte';
   import ResendButtonOneCC from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
-  import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
-
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 
@@ -387,6 +388,13 @@
       </span>
     {/if}
   </div>
+  {#if $showCtaOneCC}
+    <CTAOneCC
+      showAmount={false}
+      disabled={$ctaOneCCDisabled}
+      on:click={() => session.preSubmit()}
+    />
+  {/if}
   <AccountTab />
 </div>
 

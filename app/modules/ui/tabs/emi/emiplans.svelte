@@ -37,6 +37,7 @@
   import { isMethodUsable } from 'checkoutstore/methods';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { isOneClickCheckout } from 'razorpay';
+  import { getSession } from 'sessionmanager';
 
   // Props
   export let actions;
@@ -260,7 +261,7 @@
     />
   {/if}
   {#if renderCtaOneCC}
-    <CTAOneCC hidden={ctaOneCCHidden}>
+    <CTAOneCC hidden={ctaOneCCHidden} on:click={() => getSession().preSubmit()}>
       {$t(SELECT_EMI_PLAN_LABEL)}
     </CTAOneCC>
   {/if}
