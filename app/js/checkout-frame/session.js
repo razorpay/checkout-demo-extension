@@ -2264,6 +2264,9 @@ Session.prototype = {
     });
 
     if (this.headless) {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
       this.commenceOTP('resending_otp');
       this.hideTimer();
 
@@ -4357,6 +4360,9 @@ Session.prototype = {
       this.commenceOTP('verifying_otp');
 
       if (isWallet || this.headless) {
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
         return this.r.submitOTP(otp);
       }
 
@@ -5854,6 +5860,7 @@ Session.prototype = {
       }
 
       if (shouldUseNativeOTP) {
+        var session = this;
         var params = {
           extraProps: {
             reason: 'native_otp_enter',
@@ -5862,8 +5869,12 @@ Session.prototype = {
 
         this.headless = true;
         Analytics.track('native_otp:attempt');
+        session.tabs.card.onHide();
         this.setScreen('otp', params);
         this.r.on('payment.otp.required', function (data) {
+          session.otpView.updateScreen({
+            showCtaOneCC: true,
+          });
           askOTP(that.otpView, data);
         });
         this.r.on('payment.3ds.required', function () {

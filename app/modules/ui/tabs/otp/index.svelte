@@ -72,6 +72,7 @@
   import { Events } from 'analytics';
 
   import { Safari } from 'common/useragent';
+  import { VERIFY_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let on = {};
@@ -171,6 +172,7 @@
     $resendTimeout = null;
     $ipAddress = '';
     $accessTime = '';
+    $showCtaOneCC = false;
   }
 
   function onResend(event) {
@@ -394,7 +396,9 @@
       showAmount={false}
       disabled={$ctaOneCCDisabled}
       on:click={() => session.preSubmit()}
-    />
+    >
+      {$t(VERIFY_LABEL)}
+    </CTAOneCC>
   {/if}
   <AccountTab />
 </div>

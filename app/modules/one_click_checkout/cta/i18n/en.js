@@ -5,4 +5,5 @@ export default {
   place_order: 'Place Order',
   select_emi_plan: 'Select EMI Plan',
   save: 'SAVE',
+  verify: 'Verify',
 };

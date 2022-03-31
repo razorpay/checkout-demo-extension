@@ -26,4 +26,4 @@ export const renderCtaOneCC = writable(true);
 export const isRazorpayOTP = writable(false);
 
 export const showCtaOneCC = writable(false);
-export const ctaOneCCDisabled = writable(true);
+export const ctaOneCCDisabled = writable(false);
