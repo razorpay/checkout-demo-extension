@@ -7,7 +7,7 @@
   import { showCta, hideCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
-  import { isDynamicWalletFlow } from 'checkoutstore';
+  import { isDynamicWalletFlow, isOneClickCheckout } from 'checkoutstore';
 
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
@@ -220,8 +220,8 @@
     <AccountTab />
   </div>
   <Bottom tab="wallet">
-    <!-- skip dcc check as paypal cc doesn't depend upon dcc -->
-    {#if $selectedWallet === 'paypal'}
+    <!-- skip dcc check as paypal 1cc doesn't depend upon dcc -->
+    {#if $selectedWallet === 'paypal' && !isOneClickCheckout()}
       <DynamicCurrencyView tabVisible view={$selectedWallet} />
     {/if}
   </Bottom>
