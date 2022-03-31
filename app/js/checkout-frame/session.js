@@ -3216,7 +3216,6 @@ Session.prototype = {
           self.otpView.updateScreen({
             showCtaOneCC: false,
           });
-          TopbarMagicCheckoutStore.tabTitleLogo.set('');
           discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
@@ -6412,9 +6411,15 @@ Session.prototype = {
             session.handleDiscount();
           },
           onShown: function () {
-            var instance = session.getCurrentTabInstance();
-            if (instance && instance.onHide) {
-              instance.onHide();
+            if (session.screen === 'otp') {
+              session.otpView.updateScreen({
+                showCtaOneCC: false,
+              });
+            } else {
+              var instance = session.getCurrentTabInstance();
+              if (instance && instance.onHide) {
+                instance.onHide();
+              }
             }
             Analytics.track(
               'offers:list_view:screen:' + (session.screen || 'home'),
@@ -6424,9 +6429,15 @@ Session.prototype = {
             );
           },
           onHide: function () {
-            var instance = session.getCurrentTabInstance();
-            if (instance && instance.onShown) {
-              instance.onShown();
+            if (session.screen === 'otp') {
+              session.otpView.updateScreen({
+                showCtaOneCC: true,
+              });
+            } else {
+              var instance = session.getCurrentTabInstance();
+              if (instance && instance.onShown) {
+                instance.onShown();
+              }
             }
           },
         },
