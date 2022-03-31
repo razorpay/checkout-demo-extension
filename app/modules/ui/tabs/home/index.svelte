@@ -1236,7 +1236,10 @@
       {/if}
     </Bottom>
     {#if renderCtaOneCC}
-      <CTAOneCC disabled={ctaOneCCDisabled}>
+      <CTAOneCC
+        disabled={ctaOneCCDisabled}
+        on:click={() => session.preSubmit()}
+      >
         {selectedMethod === 'cod'
           ? $t(PLACE_ORDER_CTA_LABEL)
           : $t(PAY_NOW_CTA_LABEL)}
