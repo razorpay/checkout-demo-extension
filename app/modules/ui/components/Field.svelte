@@ -880,6 +880,10 @@
     top: 20px;
   }
 
+  .upi-vpa-label-upper-one-cc {
+    top: 0px;
+  }
+
   /* For the Icons needed for 1cc */
   .servicibility-icon-wrapper {
     position: absolute;

@@ -270,6 +270,8 @@
             'upi-vpa-field-one-cc'}
           validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
           labelClasses={isOneClickCheckoutEnabled && 'upi-vpa-labal-one-cc'}
+          labelUpperClasses={isOneClickCheckoutEnabled &&
+            'upi-vpa-label-upper-one-cc'}
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
