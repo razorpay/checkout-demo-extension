@@ -107,7 +107,7 @@ export function getTheme() {
  * Redirecting the flow from 1cc to payment screens
  */
 export function redirectToPaymentMethods(
-  { shouldUpdateOrder, showSnackbar } = {
+  { shouldUpdateOrder } = {
     shouldUpdateOrder: true,
     showSnackbar: true,
   }
@@ -201,7 +201,8 @@ export function redirectToPaymentMethods(
         }
       });
   } else {
-    session.oneClickCheckoutRedirection(showSnackbar);
+    session.oneClickCheckoutRedirection();
+    navigator.navigateTo({ path: views.METHODS });
   }
 }
 
