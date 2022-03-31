@@ -328,7 +328,7 @@
     font-size: 12px;
   }
   .otp-heading {
-    margin: 34px 0 26px;
+    margin: 34px 0 22px;
     text-align: center;
     color: #263a4a;
     text-transform: capitalize;

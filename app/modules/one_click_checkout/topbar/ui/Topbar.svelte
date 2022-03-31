@@ -125,7 +125,7 @@
     align-items: center;
   }
   .breadcrumb-text {
-    padding: 0px 6px;
+    padding: 0px 2px;
   }
   .title-section {
     display: flex;

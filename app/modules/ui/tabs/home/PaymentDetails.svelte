@@ -269,13 +269,13 @@
   }
 
   .pd-1cc {
-    padding: 8px 0px;
+    padding: 8px 0px 8px;
   }
 
   .contact-title {
     display: flex;
     align-items: center;
-    padding-bottom: 18px;
+    padding-bottom: 6px;
   }
 
   .contact-text {

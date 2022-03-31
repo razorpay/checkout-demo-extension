@@ -28,8 +28,8 @@
     margin: auto 0px;
     cursor: pointer;
   }
-
   .selected-langauage {
     margin-right: 6px;
+    font-size: 13px;
   }
 </style>

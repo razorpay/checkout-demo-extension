@@ -269,6 +269,7 @@
           inputFieldClasses={isOneClickCheckoutEnabled &&
             'upi-vpa-field-one-cc'}
           validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+          labelClasses={isOneClickCheckoutEnabled && 'upi-vpa-labal-one-cc'}
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">

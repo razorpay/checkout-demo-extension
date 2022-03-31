@@ -67,15 +67,15 @@
         {/if}
       </div>
     </div>
-    <div class="address-text">
+    <div>
       <div class:disabled={!isServiceable}>
         {#if address.contact}
-          <p>{address.contact}</p>
+          <p class="address-phone-number">{address.contact}</p>
         {/if}
-        <p>{address.formattedLine1}</p>
-        <p>{address.formattedLine2}</p>
+        <p class="address-text">{address.formattedLine1}</p>
+        <p class="address-text">{address.formattedLine2}</p>
         {#if address.landmark}
-          <div class="address-landmark">
+          <div class="address-text address-landmark ">
             {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:
             {address.landmark}
           </div>
@@ -107,12 +107,12 @@
     font-size: 12px;
   }
   .address-serviceability-error {
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 12px;
     color: #eb001b;
     background: #fff1f1;
     border-radius: 1px;
-    padding: 4px 8px;
+    padding: 6px 8px;
     opacity: 1;
   }
   .address-container {
@@ -131,7 +131,7 @@
   .card-border {
     border: 1px solid #e0e0e0;
     border-radius: 2px;
-    padding: 26px 16px 20px;
+    padding: 22px 16px 20px;
   }
 
   .box-header {
@@ -157,7 +157,7 @@
   .address-tag {
     font-size: 10px;
     color: #263a4a;
-    background: #f2f6fb;
+    background: #eef4f9;
     border-radius: 2px;
     padding: 2px 4px 3px;
     align-self: baseline;
@@ -165,7 +165,7 @@
     line-height: 14px;
   }
   .address-text {
-    line-height: 22px;
+    line-height: 20px;
     color: #8d97a1;
   }
 
@@ -183,5 +183,10 @@
 
   .spacing-6 {
     height: 6px;
+  }
+
+  .address-phone-number {
+    line-height: 22px;
+    margin-bottom: 4px;
   }
 </style>

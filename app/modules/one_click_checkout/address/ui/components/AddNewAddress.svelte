@@ -767,14 +767,14 @@
     transform: translateY(-10px);
     color: #fff;
     position: absolute;
-    line-height: 16px;
+    line-height: 17px;
     padding: 12px;
     font-size: 12px;
     background: #2d313a;
     box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
     z-index: 3;
     border-radius: 2px;
-    bottom: -60px;
+    bottom: -62px;
     margin: 0px 16px;
     letter-spacing: 0.125px;
   }
@@ -787,7 +787,7 @@
     border-style: solid;
     border-color: transparent transparent #2d313a;
     bottom: 100%;
-    left: 37%;
+    left: 104px;
     margin: 0 0 -1px -10px;
   }
 
@@ -801,5 +801,11 @@
     font-weight: 400;
     font-size: 14px;
     margin: 8px 0px 6px;
+  }
+
+  @media (max-width: 340px) {
+    .save-address-tooltip {
+      bottom: -80px;
+    }
   }
 </style>

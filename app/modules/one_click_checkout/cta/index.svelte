@@ -68,8 +68,8 @@
 
 <style>
   .one-cc-cta-wrapper {
-    width: 64%;
-    min-width: 64%;
+    width: 70%;
+    min-width: 70%;
     margin-left: auto;
     position: relative;
   }
@@ -110,6 +110,8 @@
   .price-label {
     color: #263a4a;
     font-size: 16px;
+    font-weight: 600;
+    line-height: 18px;
   }
 
   #cta-view-details {
@@ -123,8 +125,13 @@
     display: flex;
     padding: 22px 16px;
     align-items: center;
+    box-shadow: 0px -4px 8px #6b6c6d20;
+  }
 
-    box-shadow: 0px -4px 8px #6b6c6d26;
+  @media (min-width: 992px) {
+    .cta-container {
+      padding: 20px 16px;
+    }
   }
 
   #one-cc-cta {

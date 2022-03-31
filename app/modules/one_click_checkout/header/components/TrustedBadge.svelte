@@ -43,7 +43,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <Icon icon={badge(24, 24)} />
+        <Icon icon={badge(22, 22)} />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
@@ -51,7 +51,7 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <Icon icon={badge(24, 24)} />
+        <Icon icon={badge(22, 22)} />
       </div>
       <div class="rtb-down-arrow-wrapper">
         <Icon icon={arrow_down(10, 8)} />
@@ -62,14 +62,14 @@
 
 <style>
   .rtb-icon-wrapper {
-    height: 24px;
+    height: 22px;
   }
 
   /* Styles for expended RTB */
   .rtb-expanded-wrapper {
     background: #e7f7f1;
     border-radius: 4px;
-    padding: 6px 10px;
+    padding: 4px 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -79,7 +79,7 @@
     font-size: 12px;
     line-height: 150%;
     font-weight: 600;
-    margin: 0px 6px 0px 2px;
+    margin: 0px 6px 0px 4px;
   }
 
   /* Styles for collapsed RTB */

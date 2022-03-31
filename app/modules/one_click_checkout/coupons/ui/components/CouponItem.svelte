@@ -177,4 +177,8 @@
   .terms-section {
     font-style: normal;
   }
+
+  .apply-button {
+    font-weight: 600;
+  }
 </style>

@@ -253,6 +253,7 @@
 
   .form-input {
     display: flex;
+    margin-bottom: 6px;
   }
 
   form :global(.filled:not(.input-radio) label) {

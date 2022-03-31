@@ -873,6 +873,11 @@
   /* For UPI Page 1cc */
   .upi-vpa-field-one-cc {
     background-color: #fff !important;
+    height: 42px;
+  }
+
+  .upi-vpa-labal-one-cc {
+    top: 20px;
   }
 
   /* For the Icons needed for 1cc */

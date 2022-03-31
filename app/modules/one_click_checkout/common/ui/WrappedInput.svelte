@@ -99,6 +99,7 @@
     for="inputField"
     class="label"
     class:label-upper={value}
+    class:label-error={validationText}
     on:click={handleClickLabel}
   >
     {$t(label)}
@@ -167,10 +168,6 @@
     color: var(--highlight-color);
   }
 
-  .label-error {
-    color: var(--error-validation-color);
-  }
-
   .suggestion-dropdown {
     width: 100%;
     position: absolute;
@@ -217,10 +214,6 @@
     font-size: 12px;
   }
 
-  .invalid:not(.focused) {
-    color: var(--error-validation-color);
-  }
-
   .input {
     outline: none;
     padding: 12px;
@@ -242,7 +235,6 @@
   }
   .input-group.invalid .input:focus {
     border: 1px solid var(--error-validation-color);
-    color: var(--error-validation-color);
   }
 
   .input-group .input:focus + .label {
@@ -253,6 +245,7 @@
     color: var(--highlight-color);
     transition: all ease-out 0.2s;
   }
+
   .input-group .input:valid + .label {
     top: -8px;
     padding: 0 4px;
@@ -298,5 +291,9 @@
     margin-top: 20px;
     height: 1px;
     background-color: #e0e0e0;
+  }
+
+  .label-error.label-upper {
+    color: var(--error-validation-color) !important;
   }
 </style>

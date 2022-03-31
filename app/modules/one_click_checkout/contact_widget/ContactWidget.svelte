@@ -55,7 +55,7 @@
       {/if}
     </div>
     {#if showEditUserDetails}
-      <div class="contact-wrapper">
+      <div>
         <PaymentDetails />
       </div>
     {:else}
@@ -99,11 +99,7 @@
   }
   .email-text {
     color: #8d97a1;
-    padding-top: 6px;
+    padding-top: 4px;
     line-height: 20px;
-  }
-
-  .contact-wrapper {
-    padding-top: 14px;
   }
 </style>

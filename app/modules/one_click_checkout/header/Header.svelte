@@ -61,12 +61,12 @@
   .header-title-wrapper {
     display: flex;
     justify-content: space-between;
-    padding: 18px 16px 0px;
+    padding: 26px 16px 0px;
     align-items: center;
   }
 
   .header-title-wrapper-with-extra-padding {
-    padding: 18px 16px;
+    padding: 26px 16px 20px;
   }
 
   .header-title {
