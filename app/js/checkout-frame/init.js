@@ -20,7 +20,6 @@ var Token = discreet.Token;
 var SessionManager = discreet.SessionManager;
 var Checkout = discreet.Checkout;
 var Bridge = discreet.Bridge;
-var Curtain = discreet.Curtain;
 var P13n = discreet.P13n;
 var Store = discreet.Store;
 var _Arr = discreet._Arr;
