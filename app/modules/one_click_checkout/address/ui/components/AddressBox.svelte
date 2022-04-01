@@ -15,6 +15,9 @@
   // constant imports
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
 
+  // utils imports
+  import { findCountryCode } from 'common/countrycodes';
+
   export let address;
   export let isSelected = false;
   export let checkServiceability = true;
@@ -23,8 +26,14 @@
   export let isEditable = true;
 
   const dispatch = createEventDispatcher();
+  let phoneCode = '';
+  let phoneNum = '';
 
   $: isServiceable = !(!address.serviceability && checkServiceability);
+
+  $: if (typeof address.contact === 'string') {
+    ({ code: phoneCode, phone: phoneNum } = findCountryCode(address?.contact));
+  }
 </script>
 
 {#if loading}
@@ -70,7 +79,7 @@
     <div>
       <div class:disabled={!isServiceable}>
         {#if address.contact}
-          <p class="address-phone-number">{address.contact}</p>
+          <p class="address-phone-number">+{phoneCode} {phoneNum}</p>
         {/if}
         <p class="address-text">{address.formattedLine1}</p>
         <p class="address-text">{address.formattedLine2}</p>
