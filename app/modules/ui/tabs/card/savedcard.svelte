@@ -56,7 +56,6 @@
   export let selected;
   export let tab;
   export let isTokenised;
-  export let autoSelect;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
@@ -141,15 +140,6 @@
     dispatch('click', payload);
   }
   //#region cards-tokenization
-
-  $: {
-    if (autoSelect && !$selectedCard) {
-      // if the card is not tokenized and nothing is selected on ui select the card.
-      tick().then((_) => {
-        handleClick({}, true);
-      });
-    }
-  }
 
   //#endregion
 </script>
