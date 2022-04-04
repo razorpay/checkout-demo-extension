@@ -98,12 +98,9 @@ function sanitizeImage(options) {
 }
 
 function getNewDesignUrl() {
-  let url = '/checkout.html?branch=1cc/v1_5_beta';
-  if (
-    location.hostname.endsWith('razorpay.com') ||
-    location.hostname.endsWith('razorpay.in')
-  ) {
-    url = `/test/checkout.html?branch=1cc/v1_5_beta`;
+  let url = `${RazorpayConfig.api}test/checkout.html?branch=1cc/v1_5_beta`;
+  if (location.hostname === 'localhost') {
+    url = '/checkout.html?branch=1cc/v1_5_beta';
   }
   return url;
 }
