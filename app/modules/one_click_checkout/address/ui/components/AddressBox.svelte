@@ -174,6 +174,7 @@
     line-height: 14px;
   }
   .address-text {
+    font-size: 14px;
     line-height: 20px;
     color: #8d97a1;
   }
@@ -195,6 +196,7 @@
   }
 
   .address-phone-number {
+    font-size: 14px;
     line-height: 22px;
     margin-bottom: 4px;
   }
