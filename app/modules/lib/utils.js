@@ -211,3 +211,15 @@ export function debounce(cb, delay) {
 export function returnAsIs(_) {
   return _;
 }
+
+/**
+ * given a string, returns safe html representation of it
+ * * @param {string} string to sanitize
+ *
+ * @returns {string} safe html
+ */
+export function escapeHtml(str) {
+  var escapeDiv = document.createElement('div');
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}

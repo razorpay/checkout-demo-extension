@@ -4,7 +4,6 @@
 
 /* global discreet */
 /* global Razorpay */
-/* global $ */
 /* global Analytics */
 /* global AnalyticsTypes */
 /* global gel */
@@ -40,6 +39,7 @@
 var ua = navigator.userAgent;
 
 var preferences,
+  $ = discreet.$,
   WebPaymentsApi = discreet.WebPaymentsApi,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
@@ -167,13 +167,6 @@ function fillData(container, returnObj) {
       returnObj[el.name] = el.value;
     }
   });
-}
-
-// TODO: Move to CFU
-function escapeHtml(str) {
-  var escapeDiv = document.createElement('div');
-  escapeDiv.appendChild(document.createTextNode(str));
-  return escapeDiv.innerHTML;
 }
 
 /**
@@ -4037,7 +4030,7 @@ Session.prototype = {
     }
 
     // Break sentences into new lines
-    var formattedText = escapeHtml(text).replace(/\.\s/g, '.<br/>');
+    var formattedText = UTILS.escapeHtml(text).replace(/\.\s/g, '.<br/>');
 
     $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));

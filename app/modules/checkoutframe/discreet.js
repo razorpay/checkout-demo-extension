@@ -1,6 +1,7 @@
 import 'entry/checkout-frame';
 import RazorpayConfig from 'common/RazorpayConfig';
 
+import $ from 'lib/$';
 import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import ErrorService from 'error-service';
@@ -137,6 +138,7 @@ import * as SecurityUtils from 'utils/security';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 
 export default {
+  $,
   RazorpayConfig,
   updateScore,
   fetch,
