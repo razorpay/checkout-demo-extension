@@ -2708,6 +2708,13 @@ Session.prototype = {
   setScreen: function (screen, params) {
     var extraProps = params && params.extraProps;
 
+    // Remove CTA for all cases, if moving away from otp screen
+    if (screen !== 'otp' && this.screen === 'otp') {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
+    }
+
     if (screen) {
       var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
@@ -3204,18 +3211,10 @@ Session.prototype = {
       tab === 'wallet' && this.screen === 'otp' && this.r._payment;
     var cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
-    if (cardlessEmiOtpPage) {
-      this.otpView.updateScreen({
-        showCtaOneCC: false,
-      });
-    }
 
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
-          self.otpView.updateScreen({
-            showCtaOneCC: false,
-          });
           discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
