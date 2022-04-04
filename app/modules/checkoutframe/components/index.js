@@ -2,9 +2,9 @@
 import PoweredBy from 'ui/components/PoweredBy.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
+import NavigationStack from 'navstack';
 
 import { isPayout } from 'checkoutstore';
-import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 
@@ -15,16 +15,30 @@ export function render() {
     target: _Doc.querySelector('#container'),
   });
 
-  const topbar = (componentsMap.topbar = new TopBar({
+  const navStack = new NavigationStack({
+    target: _Doc.querySelector('#root'),
+  });
+
+  componentsMap.navStack = navStack;
+
+  const topbar = new TopBar({
     target: _Doc.querySelector('#topbar-wrap'),
-  }));
+  });
+
+  componentsMap.topbar = topbar;
 
   const session = getSession();
   session.topBar = topbar;
   if (isPayout()) {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {
-    topbar.$on('back', session.back.bind(session));
+    topbar.$on('back', () => {
+      if (navStack.isActive()) {
+        navStack.backPressed();
+      } else {
+        session.back();
+      }
+    });
   }
 }
 
