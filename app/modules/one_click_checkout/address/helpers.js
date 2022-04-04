@@ -30,6 +30,8 @@ import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
 import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+import { views as addressViews } from 'one_click_checkout/address/constants';
+import { updateAddressesInStore } from './sessionInterface';
 
 /**
  * Checks for the address form if there are any errors and returns the obj
@@ -158,22 +160,31 @@ export const saveAddress = () => {
       !billing_address
     ) {
       if (
-        shipping_address?.formView === views.EDIT_ADDRESS ||
-        billing_address?.formView === views.EDIT_ADDRESS
+        shipping_address?.formView === addressViews.EDIT_ADDRESS ||
+        billing_address?.formView === addressViews.EDIT_ADDRESS
       )
-        return putCustomerAddress(payload);
-      return postCustomerAddress(payload);
+        return putCustomerAddress(payload).then((res) => {
+          updateAddressesInStore(Object.values(res));
+          return res;
+        });
+      return postCustomerAddress(payload).then((res) => {
+        updateAddressesInStore(Object.values(res));
+        return res;
+      });
     } else {
       let postPayload = { shipping_address };
       let putPayload = { billing_address };
-      if (payload.shipping_address?.formView === views.EDIT_ADDRESS) {
+      if (payload.shipping_address?.formView === addressViews.EDIT_ADDRESS) {
         postPayload = { billing_address };
         putPayload = { shipping_address };
       }
       return Promise.all([
         postCustomerAddress(postPayload),
         putCustomerAddress(putPayload),
-      ]);
+      ]).then((response) => {
+        response.forEach((res) => updateAddressesInStore(Object.values(res)));
+        return response;
+      });
     }
   }
   return Promise.resolve(false);

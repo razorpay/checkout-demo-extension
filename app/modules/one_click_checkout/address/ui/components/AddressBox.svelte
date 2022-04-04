@@ -83,6 +83,7 @@
         {/if}
         <p class="address-text">{address.formattedLine1}</p>
         <p class="address-text">{address.formattedLine2}</p>
+        <p class="address-text">{address.formattedLine3}</p>
         {#if address.landmark}
           <div class="address-text address-landmark ">
             {$t(SAVED_ADDRESS_LANDMARK_LABEL)}:

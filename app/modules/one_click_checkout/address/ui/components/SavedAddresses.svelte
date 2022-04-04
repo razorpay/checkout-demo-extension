@@ -73,7 +73,10 @@
       $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
     ) {
       loadAddressesWithServiceability(true);
-    } else if (!$selectedAddressId) {
+    } else if (
+      !$selectedAddressId ||
+      addresses.findIndex((addr) => addr.id === $selectedAddressId) === -1
+    ) {
       selectedAddressId.set(addresses[0].id);
     }
     dispatchServiceability();

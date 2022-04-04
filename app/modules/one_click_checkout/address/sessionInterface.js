@@ -32,7 +32,10 @@ import {
 } from 'one_click_checkout/merchant-analytics/constant';
 
 // constant imports
-import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+import {
+  ADDRESS_LONG_TYPES,
+  SERVICEABILITY_STATUS,
+} from 'one_click_checkout/address/constants';
 
 // service imports
 import { getServiceabilityOfAddresses } from 'one_click_checkout/address/service';
@@ -127,3 +130,36 @@ export function loadAddressesWithServiceability(onSavedAddress) {
       checkServiceabilityStatus.set(SERVICEABILITY_STATUS.CHECKED);
     });
 }
+
+/**
+ *
+ * @param {_addresses} _addresses: array of addresses to be updated in store ( savedAddresses )
+ * updates savedAddresses in store by
+ *  - adding address entity from post response
+ *  - updating existing address entity from put response
+ *
+ */
+export const updateAddressesInStore = (_addresses) => {
+  const _savedAddresses = get(savedAddresses);
+
+  _addresses.forEach((addr) => {
+    if (!Object.values(ADDRESS_LONG_TYPES).includes(addr.type)) return;
+
+    const addressIndex = _savedAddresses.findIndex(
+      (savedAddr) => savedAddr.id === addr.id
+    );
+    const updatedAddress = {
+      ...formatApiAddress(addr, addr.type),
+      id: addr.id,
+    };
+
+    if (addressIndex === -1) {
+      _savedAddresses.unshift(updatedAddress);
+    } else {
+      _savedAddresses[addressIndex] = updatedAddress;
+    }
+  });
+
+  checkServiceabilityStatus.set(SERVICEABILITY_STATUS.UNCHECKED);
+  savedAddresses.set([..._savedAddresses]);
+};
