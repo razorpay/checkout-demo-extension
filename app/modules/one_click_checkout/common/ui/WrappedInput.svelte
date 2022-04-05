@@ -267,14 +267,14 @@
   }
 
   .dropdown-one-cc .suggestion-item {
-    padding: 20px 16px 0px;
+    padding: 14px 16px 0px;
     border-bottom: none;
   }
 
   .dropdown-one-cc .leading {
     font-family: 'Inter';
     font-weight: 500;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 16px;
     color: #263a4a;
   }
@@ -284,11 +284,12 @@
     font-family: 'Inter';
     font-size: 12px;
     font-weight: 200;
-    color: #757575;
+    line-height: 16px;
+    color: #8d97a1;
   }
 
   .separator {
-    margin-top: 20px;
+    margin-top: 14px;
     height: 1px;
     background-color: #e0e0e0;
   }
