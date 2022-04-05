@@ -31,6 +31,7 @@
     savedAddresses,
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore';
+  import { shouldShowCoupons } from 'one_click_checkout/store';
 
   // i18n imports
   import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
@@ -175,14 +176,15 @@
       <div class="separator" />
     {/if}
 
-    <div class="widget-wrapper">
-      <AvailableCouponsButton
-        applyCoupon={(code) => applyCouponCode(code)}
-        removeCoupon={removeCouponCode}
-      />
-    </div>
-    <div class="separator" />
-
+    {#if shouldShowCoupons()}
+      <div class="widget-wrapper">
+        <AvailableCouponsButton
+          applyCoupon={(code) => applyCouponCode(code)}
+          removeCoupon={removeCouponCode}
+        />
+      </div>
+      <div class="separator" />
+    {/if}
     <div
       class="widget-wrapper order-summary-wrapper"
       id="order-widget"
@@ -190,6 +192,7 @@
     >
       <OrderWidget />
     </div>
+    <div class="separator" />
     <CTA on:click={onSubmit} {onViewDetailsClick} disabled={ctaDisabled} />
   </div>
 </Screen>
