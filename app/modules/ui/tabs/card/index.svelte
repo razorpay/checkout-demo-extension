@@ -615,7 +615,7 @@
     tabVisible = false;
     if (AVSData) {
       if (AVSData.header) {
-        session.setRawAmountInHeader(AVSData.header);
+        session.setRawAmountInHeader(AVSData.header, true);
         showAmount(AVSData.cta);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();

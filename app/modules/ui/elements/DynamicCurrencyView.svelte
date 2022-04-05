@@ -51,7 +51,11 @@
 
   import { getIin } from 'common/card';
 
-  import { formatAmount, formatAmountWithSymbol } from 'common/currency';
+  import {
+    formatAmount,
+    formatAmountWithSymbol,
+    formatAmountWithSymbolRawHtml,
+  } from 'common/currency';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -258,8 +262,8 @@
           }
         }
         updateAmountInHeaderAndCTA(
-          formatAmountWithSymbol(amount, selectedCurrency),
-          formatAmountWithSymbol(dccAmount, selectedCurrency)
+          formatAmountWithSymbolRawHtml(amount, selectedCurrency),
+          formatAmountWithSymbolRawHtml(dccAmount, selectedCurrency)
         );
       } else if (!offer) {
         updateAmountInHeaderAndCTA();
@@ -374,7 +378,7 @@
   function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
       if (displayAmount) {
-        session.setRawAmountInHeader(displayAmount);
+        session.setRawAmountInHeader(displayAmount, true);
         showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
         if (isCtaShown()) {
@@ -534,9 +538,9 @@
               {/if}
             {/if}
           {:else}
-            <b dir="ltr"
-              >{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b
-            >
+            <b dir="ltr">
+              {@html formatAmountWithSymbolRawHtml(dccAmount, selectedCurrency)}
+            </b>
             {#if selectedCurrency !== originalCurrency && currencies[originalCurrency]}
               <span class="small-text">
                 ({formatAmountWithSymbol(

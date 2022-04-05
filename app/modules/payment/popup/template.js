@@ -1,4 +1,7 @@
-import { displayAmount, getConvertedAmount } from 'common/currency';
+import {
+  formatAmountWithSymbolRawHtml,
+  getConvertedAmount,
+} from 'common/currency';
 import css from './popupStyle.js';
 import { Track } from 'analytics';
 
@@ -57,20 +60,20 @@ export default function popupTemplate(_, t) {
 
   var title =
     get('name') || get('description') || t(REDIRECTING) |> sanitizeHtmlEntities;
-  var amount = displayAmount(
-    _.r,
-    _.data && _.data.amount,
-    _.data && _.data.currency
-  );
 
+  var payloadAmount = _.data && _.data.amount;
+  var payloadCurrency = _.data && _.data.currency;
   var dccCurrency = _.data && _.data.dcc_currency;
   if (dccCurrency) {
     var dccAmount = getConvertedAmount(
       _.r.display_amount || _.data.amount,
       dccCurrency
     );
-    amount = displayAmount(_.r, dccAmount, dccCurrency, true);
+    payloadAmount = dccAmount;
+    payloadCurrency = dccCurrency;
   }
+
+  var amount = formatAmountWithSymbolRawHtml(payloadAmount, payloadCurrency);
 
   var hideAmount =
     _.data && _.data.method === 'emandate' ? 'display: none;' : '';

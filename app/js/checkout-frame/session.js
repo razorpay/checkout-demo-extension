@@ -878,8 +878,12 @@ Session.prototype = {
    *
    * @param {String} html
    */
-  setRawAmountInHeader: function (html) {
-    $('#amount .original-amount').html(html);
+  setRawAmountInHeader: function (html, isRawHtml) {
+    if (isRawHtml) {
+      $('#amount .original-amount').rawHtml(html);
+    } else {
+      $('#amount .original-amount').html(html);
+    }
   },
 
   /**
