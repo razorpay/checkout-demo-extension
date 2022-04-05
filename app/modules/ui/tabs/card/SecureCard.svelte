@@ -5,6 +5,7 @@
   import { onMount } from 'svelte';
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import { pushOverlay } from 'navstack';
 
   import { Events, CardEvents } from 'analytics/index';
   import Tooltip from 'ui/elements/Tooltip.svelte';
@@ -39,15 +40,6 @@
   );
   export let cvvRef;
   export let network;
-  // Function for hiding the modal
-  const hidSecureCardKnowMoreDialog = () => {
-    if (secureCardKnowMoreView) {
-      hideOverlayMessage();
-    }
-    if (cvvRef) {
-      cvvRef.focus();
-    }
-  };
 
   // Function for showing the modal
   const showSecureCardKnowMoreDialog = (e) => {
@@ -58,31 +50,19 @@
     if (cvvRef) {
       cvvRef.blur();
     }
-    const secureCardDiv = document.getElementById('secure-card-know-more-wrap');
 
-    // deleting the instance of the know more modal if already present
-    const previousInstance = document.getElementById('know-more-modal');
-    if (secureCardDiv.contains(previousInstance)) {
-      previousInstance.parentElement.removeChild(previousInstance);
-      secureCardKnowMoreView = undefined;
-    }
-
-    // creating a new instance of child
-    if (!secureCardKnowMoreView) {
-      secureCardKnowMoreView = new SecureCardKnowMore({
-        target: secureCardDiv,
-        props: {
-          onClick: hidSecureCardKnowMoreDialog,
-          modalType,
-        },
-      });
-    }
+    pushOverlay({
+      component: SecureCardKnowMore,
+      props: {
+        modalType,
+        cvvRef,
+      },
+    });
 
     Events.TrackBehav(CardEvents.TOKENIZATION_KNOW_MORE_MODAL, {
       action: 'opened',
       modalType,
     });
-    showOverlay([secureCardDiv]);
   };
   function trackUserConsentForTokenization(event) {
     $showSavedCardTooltip = false;

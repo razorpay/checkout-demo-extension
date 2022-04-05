@@ -1,9 +1,12 @@
 <script>
+  import { fly } from 'svelte/transition';
+
   // Utils imports
   import Icon from 'ui/elements/Icon.svelte';
   import circleTick from 'card/icons/circle-tick';
   import shield from 'card/icons/shield';
   import { isRecurring } from 'razorpay';
+  import { popStack } from 'navstack';
 
   // reusing the existing one
   import close from 'one_click_checkout/coupons/icons/close.js';
@@ -11,7 +14,7 @@
   import { t } from 'svelte-i18n';
 
   // Export Statements
-  export let onClick, modalType;
+  export let cvvRef, modalType;
 
   // i18n labels
   import {
@@ -25,9 +28,21 @@
     SAVED_CARD_KNOW_MORE_CAW_CONTENT,
     SAVE_CARD_MODAL_CONTENT,
   } from 'ui/labels/card';
+
+  export function preventBack() {
+    cvvRef?.focus();
+  }
+
+  function onClose() {
+    popStack();
+    preventBack();
+  }
 </script>
 
-<div class="secure-card-know-more-overlay" id="know-more-modal">
+<div
+  class="secure-card-know-more-overlay"
+  transition:fly={{ duration: 200, y: 20 }}
+>
   <div class="secure-card-know-more-header">
     <span class="secure-card-know-more-header-title">
       {#if modalType === 'add-new-card'}
@@ -36,7 +51,7 @@
         {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE)}
       {/if}
     </span>
-    <span class="secure-card-know-more-header-close" on:click={onClick}
+    <span class="secure-card-know-more-header-close" on:click={onClose}
       ><Icon icon={close()} /></span
     >
   </div>

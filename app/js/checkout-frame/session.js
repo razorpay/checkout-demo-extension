@@ -314,14 +314,6 @@ function hideFeeWrap() {
   }
   return wasShown;
 }
-function hideSecureCardKnowMoreWrap() {
-  var secureCardWrap = $('#secure-card-know-more-wrap');
-  var wasShown = secureCardWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(secureCardWrap);
-  }
-  return wasShown;
-}
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
@@ -329,7 +321,6 @@ function hideOverlayMessage() {
   if (
     !hideEmi() &&
     !hideRecurringCardsOverlay() &&
-    !hideSecureCardKnowMoreWrap() &&
     !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
