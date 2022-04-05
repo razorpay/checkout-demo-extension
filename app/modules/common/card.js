@@ -3,6 +3,7 @@ import RazorpayConfig from 'common/RazorpayConfig';
 import { makeAuthUrl } from 'common/helper';
 import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
+import loadScript from 'common/loadScript';
 
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
 
@@ -496,4 +497,18 @@ export function injectSiftScript(sessionId, beaconKey = __SIFT_BEACON_KEY__) {
     script.addEventListener('load', resolve);
     document.body.appendChild(script);
   });
+}
+
+/**
+ * Integration for CyberSource fingerprint javascript library. Slowly we will remove sift script over a period of approx 3 months.
+ * @param {*} sessionId
+ * @param {*} orgId
+ * @returns Promise
+ */
+export function injectCyberSourceScript(
+  sessionId,
+  orgId = __CYBER_SOURCE_RZP_ORG_ID__
+) {
+  const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=${sessionId}`;
+  return loadScript(csUrl, 'cyberSourceScript');
 }

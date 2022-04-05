@@ -67,6 +67,10 @@ export function isSiftJSEnabled() {
   return hasFeature('disable_sift_js', false) !== true;
 }
 
+export function isCyberSourceJsEnabled() {
+  return hasFeature('shield_cbs_rollout', false);
+}
+
 export function isContactOptional() {
   return (preferences.optional || []).includes('contact');
 }
