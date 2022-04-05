@@ -187,7 +187,7 @@
       <span class="contact-text">{$t(CONTACT_LABEL)}</span>
     </div>
   {/if}
-  <div class="details-block" class:pd-1cc={isOneCCEnabled}>
+  <div class="details-block" class:p-1cc={isOneCCEnabled}>
     {#if !isContactHidden()}
       <div class="contact-field">
         <ContactField
@@ -269,7 +269,7 @@
     font-weight: 700;
   }
 
-  .pd-1cc {
+  .p-1cc {
     padding: 8px 0px 8px;
   }
 

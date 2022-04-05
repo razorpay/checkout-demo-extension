@@ -138,7 +138,7 @@
     flex: 1;
     min-width: 0;
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 500;
     caret-color: var(--background-color, #3684d6);
   }
 

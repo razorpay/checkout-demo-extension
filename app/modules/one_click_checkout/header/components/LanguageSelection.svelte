@@ -30,6 +30,6 @@
   }
   .selected-langauage {
     margin-right: 6px;
-    font-size: 13px;
+    font-size: 12px;
   }
 </style>

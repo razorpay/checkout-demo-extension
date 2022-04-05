@@ -50,14 +50,16 @@
     </div>
   </div>
   {#if selected === offer}
-    {#if getOfferDescription(offer)}
-      <!-- Only show the description if offer description is set. -->
-      <div class="offer-detail">{getOfferDescription(offer)}</div>
-    {/if}
-    {#if offer.type === 'deferred'}
-      <!-- LABEL: Cashback would be credited to source mode of payment. -->
-      <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
-    {/if}
+    <div class="available-offers">
+      {#if getOfferDescription(offer)}
+        <!-- Only show the description if offer description is set. -->
+        <div class="offer-detail">{getOfferDescription(offer)}</div>
+      {/if}
+      {#if offer.type === 'deferred'}
+        <!-- LABEL: Cashback would be credited to source mode of payment. -->
+        <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
+      {/if}
+    </div>
   {/if}
   {#if $appliedOffer === offer}
     <!-- LABEL: Remove Offer -->
@@ -97,8 +99,7 @@
     border-top: 1px solid #e6e7e8;
     color: #666;
     font-size: 14px;
-    margin-top: 14px;
-    padding-top: 14px;
+    padding: 8px 0px;
   }
   .remove-offer {
     margin-top: 12px;
@@ -137,5 +138,12 @@
   }
   .checkbox {
     margin-top: 2px;
+  }
+
+  .available-offers {
+    margin-top: 10px;
+  }
+  .offer-item .offer-detail:last-child {
+    padding-bottom: 0px;
   }
 </style>

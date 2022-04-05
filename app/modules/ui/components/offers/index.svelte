@@ -480,7 +480,7 @@
     padding-bottom: 130px;
   }
   .one-cc-label {
-    padding: 24px 14px;
+    padding: 20px 16px 16px;
     text-transform: capitalize;
     font-size: 14px;
   }

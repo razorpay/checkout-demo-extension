@@ -130,7 +130,7 @@
 
   @media (min-width: 992px) {
     .cta-container {
-      padding: 20px 16px;
+      padding: 16px;
     }
   }
 

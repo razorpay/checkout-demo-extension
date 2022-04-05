@@ -102,13 +102,12 @@
     font-style: normal;
     font-size: 12px;
     line-height: 16px;
-    color: #263a4a;
-    margin-bottom: 8px;
+    color: #8d97a1;
     text-transform: capitalize;
   }
 
   .coupon-item-summary {
-    font-weight: bold;
+    font-weight: 500;
     font-size: 12px;
     line-height: 16px;
     color: #263a4a;
@@ -168,6 +167,7 @@
   li {
     line-height: 16px;
     padding-bottom: 4px;
+    color: #8d97a1;
   }
 
   .show-details {
