@@ -70,6 +70,11 @@ export const ADDRESS_TYPES = {
   BILLING_ADDRESS: 'billing',
 };
 
+export const ADDRESS_LONG_TYPES = {
+  SHIPPING_ADDRESS: 'shipping_address',
+  BILLING_ADDRESS: 'billing_address',
+};
+
 const INITIAL_ADDRESS = {
   name: '',
   contact: {
