@@ -33,10 +33,7 @@
 {#if $headerVisible}
   <div id="header-1cc">
     {#if routeName === views.COUPONS}
-      <div
-        class="header-wrapper"
-        class:header-title-wrapper-with-extra-padding={!isRTBEnabled}
-      >
+      <div class="header-wrapper" class:header-when-no-rtb={!isRTBEnabled}>
         {#if !isRTBEnabled}
           <button class="modal-close close-section" on:click={handleModalClose}>
             <Icon icon={closeIcon} />
@@ -156,5 +153,9 @@
     justify-content: flex-end;
     display: flex;
     margin-bottom: 12px;
+  }
+
+  .header-when-no-rtb {
+    padding: 8px 16px 18px;
   }
 </style>
