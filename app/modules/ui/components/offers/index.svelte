@@ -241,6 +241,10 @@
   function selectOffer(offer) {
     selected = offer;
   }
+
+  const ctaRef = document.getElementById('one-cc-footer');
+
+  $: error ? (ctaRef.style.display = 'none') : (ctaRef.style.display = 'block');
 </script>
 
 {#if $showOffers}
@@ -515,7 +519,7 @@
   }
 
   .one-cc.error-container {
-    bottom: 96px;
+    bottom: 0px;
   }
   .error-desc {
     padding: 16px 24px;
