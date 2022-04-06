@@ -43,7 +43,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <Icon icon={badge(22, 22)} />
+        <TrustedBadgeIcon />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
