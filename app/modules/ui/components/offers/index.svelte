@@ -249,6 +249,7 @@
     id="offers-container"
     hidden={applicableOffers.length + otherOffers.length === 0}
     class:has-error={error}
+    class:offers-container-one-cc={isOneCCEnabled}
   >
     <header
       on:click={showList}
@@ -542,5 +543,9 @@
   }
   legend span {
     cursor: pointer;
+  }
+
+  .offers-container-one-cc {
+    z-index: 2;
   }
 </style>
