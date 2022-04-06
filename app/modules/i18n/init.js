@@ -203,7 +203,10 @@ function handleLocaleChanged(value) {
 
 // TODO: Remove this once overlay is moved to Svelte
 function updateRetryBtnText() {
-  querySelector('#fd-hide').innerText = get(t)('misc.retry');
+  const retryButtonEl = querySelector('#fd-hide');
+  if (retryButtonEl) {
+    retryButtonEl.innerText = get(t)('misc.retry');
+  }
 }
 
 function setupMissingMessageInterception() {
