@@ -20,8 +20,7 @@ import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { submitForm } from 'common/form';
 
 import { supportedWebPaymentsMethodsForApp } from 'payment/adapters';
-import popupTemplate from './popup/template';
-import { translatePaymentPopup } from 'i18n/popup';
+import { writePopup, updatePopup } from './popup/template';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { popupIframeCheck } from './helper';
@@ -183,10 +182,10 @@ var responseTypes = {
         this.forceIframeElement = IframeElement;
       }
       // hide modal & show iframe
-      IframeElement?.window?.focus();
+      IframeElement.window.focus();
       this.popup = IframeElement;
-      const template = popupTemplate(this, translatePaymentPopup);
-      IframeElement.contentDocument.write(template);
+      writePopup(IframeElement.contentWindow, this);
+
       // post submit to iframe
       submitForm({
         doc: IframeElement.contentDocument,
@@ -200,7 +199,7 @@ var responseTypes = {
       }
       if (direct) {
         // direct is true for payzapp
-        popup.write(content);
+        updatePopup(popup.window, content);
       } else {
         if (!popupIframeCheck(this, request)) {
           submitForm({

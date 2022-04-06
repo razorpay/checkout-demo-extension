@@ -85,12 +85,6 @@ Popup.prototype = {
     this.listeners.push(global |> _El.on(event, func));
   },
 
-  write: function (html) {
-    var pdoc = this.window.document;
-    pdoc.write(html);
-    pdoc.close();
-  },
-
   beforeunload: function (e) {
     e.returnValue = 'Your payment is incomplete.';
     return e.returnValue;

@@ -1290,7 +1290,13 @@ export function formatAmountWithSymbolRawHtml(amount, currency) {
   } ${formatAmount(amount, currency)}</span>`;
 }
 
-export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
+export function displayAmount(
+  razorpay,
+  payloadAmount,
+  payloadCurrency,
+  isDCC,
+  getRawHTML = false
+) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   let displayAmount = parseFloat(get('display_amount'));
@@ -1311,7 +1317,10 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
   if (isDCC && payloadAmount) {
     amount = payloadAmount;
   }
-  return formatAmountWithSymbol(amount, payloadCurrency || get('currency'));
+  const fn = getRawHTML
+    ? formatAmountWithSymbolRawHtml
+    : formatAmountWithSymbol;
+  return fn(amount, payloadCurrency || get('currency'));
 }
 
 /**

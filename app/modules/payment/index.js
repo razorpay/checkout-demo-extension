@@ -10,7 +10,7 @@ import { returnAsIs, toTitleCase } from 'lib/utils';
 import { submitForm } from 'common/form';
 
 import { Track } from 'analytics';
-import popupTemplate from 'payment/popup/template';
+import { writePopup, updatePopup } from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
@@ -707,9 +707,10 @@ Payment.prototype = {
       data['_[request_index]'] = Analytics.updateRequestIndex('submit');
       if (this.forceIframeElement) {
         // show iframe in view and hide modal
-        this.forceIframeElement?.window?.focus();
+        this.forceIframeElement.window.focus();
+
         // show loading screen in iframe
-        this.forceIframeElement.contentDocument.write(popupTemplate(this, t));
+        writePopup(this.forceIframeElement.contentWindow, this);
         data['_[iframe_mode]'] = true;
         submitForm({
           doc: this.forceIframeElement.contentWindow.document,
@@ -787,7 +788,9 @@ Payment.prototype = {
     }
     // In type: first JSON response, we get HTML page which redirects to bank.
     // Write HTML into popup.
-    this.popup.write(this.gotoBankHtml);
+    if (this.popup) {
+      updatePopup(this.popup.window, this.gotoBankHtml);
+    }
   },
 
   gotoBankUsingRequest: function () {
@@ -838,8 +841,7 @@ Payment.prototype = {
   writePopup: function () {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this, t));
-      popup.window.deserialize = docUtil.obj2formhtml;
+      writePopup(popup.window, this);
     }
   },
 
