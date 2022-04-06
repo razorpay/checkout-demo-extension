@@ -54,19 +54,6 @@ export const hasOwnProp = _.curry2((o, prop) => o && o.hasOwnProperty(prop));
 export const getOwnProp = _.curry2((o, prop) => hasOwnProp(o, prop) && o[prop]);
 
 /**
- * Set the property of the given object with the given value
- * @param {*} subject
- * @param {Object} o
- * @param {string} key
- *
- * @returns {*}
- */
-export const setPropOf = _.curry3((subject, o, key) => {
-  o[key] = subject;
-  return subject;
-});
-
-/**
  * Set property of an object with the given key value pair
  * @param {Object} o
  * @param {string} key

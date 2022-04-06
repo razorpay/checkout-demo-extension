@@ -427,9 +427,8 @@ Payment.prototype = {
     formatPayment(this);
 
     let setCompleteHandler = (_) => {
-      this.complete.bind(this)
-        |> _Obj.setPropOf(window, 'onComplete')
-        |> pollPaymentData;
+      window.onComplete = this.complete.bind(this);
+      pollPaymentData(window.onComplete);
     };
 
     const isExternalSDKPayment =

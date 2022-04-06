@@ -1687,7 +1687,7 @@ Session.prototype = {
     this.getCurrentCustomer(phone).checkStatus(
       function (response) {
         self.updateCustomerInStore();
-        if (_Obj.hasOwnProp(response, 'saved')) {
+        if (response.hasOwnProperty('saved')) {
           if (response.saved) {
             callback();
           } else {

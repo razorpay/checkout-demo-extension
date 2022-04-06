@@ -18,12 +18,11 @@ function render() {
 
   if (isEMandateEnabled()) {
     method = 'emandate';
-    banks =
-      getEMandateBanks()
-      |> _Obj.reduce((banks, bank, code) => {
-        banks[code] = bank.name;
-        return banks;
-      }, {});
+    const eMandateBanksObj = getEMandateBanks();
+    banks = Object.keys(eMandateBanksObj).reduce((banks, code) => {
+      banks[code] = eMandateBanksObj[code].name;
+      return banks;
+    }, {});
   } else if (isMethodEnabled('netbanking')) {
     method = 'netbanking';
     banks = getMerchantMethods().netbanking;

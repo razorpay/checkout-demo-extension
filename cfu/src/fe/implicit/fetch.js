@@ -211,10 +211,11 @@ const fetchPrototype = {
       callback(resp);
     };
 
-    headers
-      |> _Obj.setTruthyProp(sessionIdHeader, sessionId)
-      |> _Obj.setTruthyProp(trackIdHeader, trackId)
-      |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
+    if (sessionId) headers[sessionIdHeader] = sessionId;
+
+    if (trackId) headers[trackIdHeader] = trackId;
+
+    headers |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
 
     xhr.send(data);
   },

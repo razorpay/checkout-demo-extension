@@ -37,7 +37,7 @@ export const setShieldParams = (params) => {
 export const formatPayment = function (payment) {
   let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
     (allParams, param) => {
-      if (payment |> _Obj.hasOwnProp(param)) {
+      if (payment.hasOwnProperty(param)) {
         allParams[param] = payment[param];
       }
       return allParams;
@@ -87,7 +87,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'recurring_token.max_amount',
     'recurring_token.expire_by',
   ].forEach((field) => {
-    if (!(data |> _Obj.hasOwnProp(field))) {
+    if (!data.hasOwnProperty(field)) {
       var val = getOption(field);
       if (val) {
         // send boolean value true as 1
