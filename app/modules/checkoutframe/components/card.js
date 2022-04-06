@@ -103,7 +103,9 @@ export function setEmiPlansCta(screen, tab) {
       break;
 
     default: {
-      if (get(isAVSEnabledForEntity)) return; // prevent CTA update in post AVS OTP screen[saved card]
+      if (get(isAVSEnabledForEntity)) {
+        return;
+      } // prevent CTA update in post AVS OTP screen[saved card]
       setAppropriateCtaText();
     }
   }

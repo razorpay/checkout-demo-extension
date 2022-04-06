@@ -317,7 +317,7 @@
        * b. It is also dependant on the flag isCardSupportedForRecurring
        * c. For all the other payments except recurring keeping as is.
        */
-      $newCardInputFocused = !!isRecurring()
+      $newCardInputFocused = isRecurring()
         ? !isCardSupportedForRecurring
         : false;
     }

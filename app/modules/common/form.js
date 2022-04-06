@@ -92,7 +92,7 @@ export function flatten(data = {}) {
     } else if (Array.isArray(cur)) {
       for (var i = 0, l = cur.length; i < l; i++)
         recurse(cur[i], prop + '[' + i + ']');
-      if (l == 0) result[prop] = [];
+      if (l === 0) result[prop] = [];
     } else {
       var isEmpty = true;
       for (var p in cur) {

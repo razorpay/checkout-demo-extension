@@ -32,7 +32,7 @@ export const getCustomerDetails = () => {
       delete data.contact;
     }
   } else if (data.contact) {
-    data.contact = data.contact.replace(/\ /g, '');
+    data.contact = data.contact.replace(/ /g, '');
   }
 
   if (isEmailOptional()) {

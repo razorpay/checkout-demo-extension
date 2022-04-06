@@ -6,11 +6,9 @@
   import { getAmount, showFeeLabel } from 'checkoutstore';
 
   import { getOption, isCustomerFeeBearer } from 'razorpay';
-  import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
-  import { makeAuthUrl } from 'common/helper';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
   import { getSession } from 'sessionmanager';

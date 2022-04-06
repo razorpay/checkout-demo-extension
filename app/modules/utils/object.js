@@ -6,7 +6,9 @@
  * @returns {any}
  */
 export function get(object, path, defval = null) {
-  if (typeof path === 'string') path = path.split('.');
+  if (typeof path === 'string') {
+    path = path.split('.');
+  }
   return path.reduce(
     (xs, x) => (xs && typeof xs[x] !== 'undefined' ? xs[x] : defval),
     object

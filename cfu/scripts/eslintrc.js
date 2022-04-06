@@ -2,7 +2,14 @@ let globals = require('./rollup-injects');
 const eslintRecommended = require('eslint/conf/eslint-recommended');
 
 delete globals.include;
-globals = ['window', 'console'].concat(Object.keys(globals));
+const globalRollupReplace = [
+  '__SIFT_BEACON_KEY__',
+  '__CYBER_SOURCE_RZP_ORG_ID__',
+  '__BUILD_NUMBER__',
+];
+globals = ['window', 'console']
+  .concat(Object.keys(globals))
+  .concat(globalRollupReplace);
 
 const blacklistVars = globals.map((g) => `VariableDeclarator[id.name=${g}]`);
 
@@ -42,7 +49,7 @@ module.exports = {
     'no-extend-native': 2, // disallow meddling with built-in object prototypes
     'no-proto': 2, // disable __proto__
     'no-prototype-builtins': 0, // Access Object.prototype method 'hasOwnProperty' from target object
-    curly: 2, // Require curly braces
+    curly: 0, // Require curly braces
     'linebreak-style': [2, 'unix'],
 
     // disable getters and setters
@@ -50,10 +57,10 @@ module.exports = {
       2,
       // allows treeshake.propertyReadSideEffects = false
       'Property[kind=/^[gs]et$/]',
-      'MethodDefinition[kind=/^[gs]et$/]',
+      // 'MethodDefinition[kind=/^[gs]et$/]', we support get set
 
-      'SpreadElement',
-      'Identifier[name=/^(Symbol|Proxy|Map)$/]',
+      // allows 'SpreadElement',
+      'Identifier[name=/^(Symbol|Proxy)$/]', // support Map
 
       'FunctionExpression[generator=true]',
 

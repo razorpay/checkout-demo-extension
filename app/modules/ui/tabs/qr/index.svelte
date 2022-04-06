@@ -40,7 +40,6 @@
   export let error = null;
   export let down = false;
   export let onSuccess;
-  let disabled = false;
 
   const session = getSession();
 
