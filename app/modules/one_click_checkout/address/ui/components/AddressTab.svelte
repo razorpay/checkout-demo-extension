@@ -323,14 +323,12 @@
     padding: 8px 0px 12px;
     /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
     height: calc(
-      100% - 55px + 20px + 16px
+      100% - 55px + 20px
     ); /* 16 is because of the reduced vertical padding */
   }
 
   .shipping-address-wrapper {
-    height: calc(
-      100% - 55px + 20px + 10px
-    ); /* add 10 for the reduced padding-bottom */
+    height: calc(100% - 55px + 20px);
     padding-bottom: 8px;
   }
 
