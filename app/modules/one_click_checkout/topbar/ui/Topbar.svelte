@@ -4,6 +4,7 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
+  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
   // store imports
   import { getAmount, showFeeLabel } from 'checkoutstore';
@@ -14,6 +15,9 @@
   // i18n imports
   import { t } from 'svelte-i18n';
   import { PAYMENTS_LABEL } from 'one_click_checkout/topbar/i18n/label';
+
+  // session imports
+  import { handleModalClose } from 'one_click_checkout/header/sessionInterface';
 
   // utils imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -77,6 +81,11 @@
         {$activeRoute?.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
       {/if}
     </div>
+    {#if $activeRoute?.topbarTitle}
+      <button class="modal-close" on:click={handleModalClose}>
+        <Icon icon={close()} />
+      </button>
+    {/if}
     {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$activeRoute?.topbarTitle}
       <div class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
@@ -143,5 +152,9 @@
 
   .breadcrumb-icon {
     padding: 2px 8px 0px;
+  }
+
+  .modal-close {
+    height: 20px;
   }
 </style>
