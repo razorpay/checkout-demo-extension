@@ -26,7 +26,7 @@
   //Utils
   import { Events } from 'analytics';
   import rtbEvents from 'one_click_checkout/header/analytics';
-  import TrustedBadge from 'one_click_checkout/common/ui/TrustedBadge.svelte';
+  import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
 
   $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
   onMount(() => {
@@ -42,7 +42,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadge />
+        <TrustedBadgeIcon />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
@@ -50,7 +50,7 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadge />
+        <TrustedBadgeIcon />
       </div>
       <div class="rtb-down-arrow-wrapper">
         <Icon icon={arrow_down(10, 8)} />
