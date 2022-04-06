@@ -37,13 +37,15 @@ import {
 
 import { isStandardCheckout } from 'common/helper';
 
+import { getElementById } from 'utils/doc';
+
 let CheckoutBridge = window.CheckoutBridge;
 
 const showModal = (session) => {
   Razorpay.sendMessage({ event: 'render' });
 
   if (CheckoutBridge) {
-    const containerBox = _Doc.getElementById('container');
+    const containerBox = getElementById('container');
     if (containerBox) {
       const rect = containerBox.getBoundingClientRect();
       Bridge.checkout.callAndroid(
@@ -52,7 +54,7 @@ const showModal = (session) => {
         Math.floor(rect.height)
       );
     }
-    _Doc.getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
+    getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
   }
 
   const qpmap = _Obj.unflatten(_.getQueryParams());

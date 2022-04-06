@@ -78,6 +78,7 @@
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
   import { isCardValidForOffer } from 'checkoutstore/offers';
+  import { querySelector } from 'utils/doc';
 
   const dispatch = createEventDispatcher();
 
@@ -198,7 +199,7 @@
 
   function showEmiPlans() {
     // TODO: Update showOverlay once session.js is refactored.
-    showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
+    showOverlay({ 0: querySelector('#emi-wrap') });
 
     Analytics.track('emi:plans:view:all', {
       type: AnalyticsTypes.BEHAV,

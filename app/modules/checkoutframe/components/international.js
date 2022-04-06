@@ -2,12 +2,12 @@ import { setView, destroyView } from './index';
 import { getSession } from 'sessionmanager';
 
 import InternationalTab from 'ui/tabs/international/index.svelte';
-
+import { querySelector } from 'utils/doc';
 const COMPONENT_KEY = 'internationalTab';
 
 export function render(props = {}) {
   const internationalTab = new InternationalTab({
-    target: _Doc.querySelector('#form-fields'),
+    target: querySelector('#form-fields'),
     props,
   });
 

@@ -2,6 +2,7 @@
 
 import { Track } from 'analytics';
 import Bridge from './bridge';
+import { documentElement } from 'utils/doc';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
@@ -33,7 +34,7 @@ export const hasCheckoutBridge = () => Boolean(getCheckoutBridge());
 
 export const iosLegacyMethod = (method) => {
   let CheckoutBridge = getCheckoutBridge();
-  let doc = _Doc.documentElement;
+  let doc = documentElement;
 
   return function (data) {
     /* setting up js → ios communication by loading custom protocol inside

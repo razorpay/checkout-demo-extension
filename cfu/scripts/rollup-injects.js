@@ -19,7 +19,6 @@ let injects = {
   _Arr: ['fe/implicit/_Arr', '*'],
   _Obj: ['fe/implicit/_Obj', '*'],
   _El: ['fe/implicit/_El', '*'],
-  _Doc: ['fe/implicit/_Doc', '*'],
 };
 
 globalInjects.forEach((g) => {

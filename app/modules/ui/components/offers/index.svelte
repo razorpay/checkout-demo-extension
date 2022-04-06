@@ -49,6 +49,7 @@
     isCardValidForOffer,
     showOffers,
   } from 'checkoutstore/offers';
+  import { querySelector } from 'utils/doc';
 
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
@@ -65,12 +66,12 @@
   let currentTab;
 
   $: {
-    _El.keepClass(_Doc.querySelector('#header'), 'offer-fade', listActive);
+    _El.keepClass(querySelector('#header'), 'offer-fade', listActive);
     if (!listActive) {
       otherActive = false;
     }
   }
-  $: _El.keepClass(_Doc.querySelector('#header'), 'offer-error', error);
+  $: _El.keepClass(querySelector('#header'), 'offer-error', error);
 
   $: $selectedInstrument, switchInstrument();
 

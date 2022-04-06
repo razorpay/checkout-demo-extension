@@ -2,7 +2,6 @@ import * as _ from '../../../cfu/src/fe/implicit/_.js';
 import * as _Arr from '../../../cfu/src/fe/implicit/_Arr.js';
 import * as _Obj from '../../../cfu/src/fe/implicit/_Obj.js';
 import * as _El from '../../../cfu/src/fe/implicit/_El.js';
-import * as _Doc from '../../../cfu/src/fe/implicit/_Doc.js';
 
 import initI18n from './init-i18n';
 import 'jest-canvas-mock';
@@ -22,4 +21,3 @@ global._ = _;
 global._Arr = _Arr;
 global._Obj = _Obj;
 global._El = _El;
-global._Doc = _Doc;

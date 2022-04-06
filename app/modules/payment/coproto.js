@@ -25,6 +25,7 @@ import { translatePaymentPopup } from 'i18n/popup';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { popupIframeCheck } from './helper';
+import { redirectTo } from 'utils/doc';
 
 const getParsedDataFromUrl = (url) => {
   const parsedData = {};
@@ -666,7 +667,7 @@ var responseTypes = {
   // prettier-ignore
   'return': function (request) {
     request.target = this.r.get('target');
-    _Doc.redirect(request);
+    redirectTo(request);
   },
 
   respawn: function (request, fullResponse) {

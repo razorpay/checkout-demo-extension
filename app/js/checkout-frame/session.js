@@ -64,7 +64,7 @@ var preferences,
   _Arr = discreet._Arr,
   _ = discreet._,
   _Obj = discreet._Obj,
-  _Doc = discreet._Doc,
+  docUtil = discreet.docUtil,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   Form = discreet.Form,
@@ -1197,9 +1197,9 @@ Session.prototype = {
     this.setBackdrop();
     if (Store.isBlockedDeactivated() && this.r.isLiveMode()) {
       new BlockedDeactivatedMerchant({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
-      _Doc.getElementById('header').remove();
+      docUtil.getElementById('header').remove();
       return;
     }
     this.setSvelteComponents();
@@ -1379,7 +1379,7 @@ Session.prototype = {
   setEmandate: function () {
     if (MethodStore.isEMandateEnabled()) {
       this.emandateView = new discreet.EmandateTab({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
     }
   },
@@ -1441,7 +1441,7 @@ Session.prototype = {
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
       this.cardlessEmiView = new discreet.CardlessEmiView({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
 
       this.cardlessEmiView.$on('select', function (event) {
@@ -1483,7 +1483,7 @@ Session.prototype = {
   setNach: function () {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
     }
   },
@@ -1497,7 +1497,7 @@ Session.prototype = {
     }
 
     this.payLaterView = new PayLaterView({
-      target: _Doc.querySelector('#form-fields'),
+      target: docUtil.querySelector('#form-fields'),
     });
 
     this.payLaterView.$on('select', function (event) {
@@ -1513,7 +1513,7 @@ Session.prototype = {
     }
 
     this.emiScreenView = new discreet.emiScreenView({
-      target: _Doc.querySelector('#form-emi'),
+      target: docUtil.querySelector('#form-emi'),
     });
 
     this.emiScreenView.$on('editplan', this.showEmiPlansForBajaj.bind(this));
@@ -1900,7 +1900,7 @@ Session.prototype = {
   setBackdrop: function () {
     var session = this;
     Backdrop.setup({
-      target: _Doc.querySelector('#modal-inner'),
+      target: docUtil.querySelector('#modal-inner'),
       props: {
         onClick: function (e) {
           if (Confirm.isVisible()) {
@@ -3182,7 +3182,7 @@ Session.prototype = {
     var valid = this.checkCommonValid();
 
     if (!valid) {
-      var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
+      var fields = docUtil.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
       var invalidValues = {};
@@ -4090,13 +4090,13 @@ Session.prototype = {
 
   setUpiCancelReasonPicker: function () {
     this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
-      target: _Doc.querySelector('#cancel_upi'),
+      target: docUtil.querySelector('#cancel_upi'),
     });
   },
 
   setNbCancelReasonPicker: function () {
     this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
-      target: _Doc.querySelector('#error-message'),
+      target: docUtil.querySelector('#error-message'),
     });
   },
 
@@ -4110,7 +4110,7 @@ Session.prototype = {
 
   setSvelteOverlay: function () {
     this.svelteOverlay = new discreet.Overlay({
-      target: _Doc.querySelector('#modal-inner'),
+      target: docUtil.querySelector('#modal-inner'),
     });
   },
 
@@ -4513,7 +4513,7 @@ Session.prototype = {
     preventDefault(e);
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
-    var cta = _Doc.querySelector('#footer-cta + span');
+    var cta = docUtil.querySelector('#footer-cta + span');
     if (cta && e && e.type === 'submit') {
       return cta.click();
     }
@@ -4854,7 +4854,7 @@ Session.prototype = {
          * Add cvv to data from the currently selected instrument
          */
         var instrumentInDom = _El.closest(
-          _Doc.querySelector(
+          docUtil.querySelector(
             '.home-methods input[value="' + selectedInstrument.id + '"]'
           ),
           '.instrument'
@@ -6255,7 +6255,7 @@ Session.prototype = {
   },
 
   setLanguageDropdown: function () {
-    var target = _Doc.querySelector('#language-dropdown');
+    var target = docUtil.querySelector('#language-dropdown');
     this.languageSelectionView = new discreet.languageSelectionView({
       target: target,
     });

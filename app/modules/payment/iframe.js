@@ -1,6 +1,7 @@
 import { displayAmount } from 'common/currency';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { querySelector } from 'utils/doc';
 
 const CLASS_IFRAME_ACTIVE = 'iframe-active';
 
@@ -28,7 +29,7 @@ export default function Iframe(src, name, payment) {
         razorpayOptions.name || razorpayOptions.description
       )
     )
-    |> _El.appendTo(_Doc.querySelector('#modal-inner'));
+    |> _El.appendTo(querySelector('#modal-inner'));
 
   Analytics.track('iframe:create');
 
@@ -36,7 +37,7 @@ export default function Iframe(src, name, payment) {
     this.el.querySelector('iframe').contentWindow |> _Obj.setProp('name', name);
 
   const closeListener =
-    _Doc.querySelector('.iframe-close')
+    querySelector('.iframe-close')
     |> _El.on('click', () => {
       Analytics.track('iframe:cancel:click', {
         type: AnalyticsTypes.BEHAV,
@@ -66,7 +67,7 @@ Iframe.prototype = {
       this.listeners.forEach((l) => l());
       this.listeners = [];
       this.el |> _El.detach;
-      _Doc.querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);
+      querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);
 
       Analytics.track('iframe:close');
       Analytics.removeMeta('iframe', false);
@@ -75,7 +76,7 @@ Iframe.prototype = {
 
   show: function () {
     this.el |> _El.setDisplay('block');
-    const modalEl = _Doc.querySelector('#modal');
+    const modalEl = querySelector('#modal');
     const bbox = modalEl |> _El.bbox;
 
     modalEl

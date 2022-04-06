@@ -7,22 +7,23 @@ import NavigationStack from 'navstack';
 import { isPayout } from 'checkoutstore';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
+import { querySelector } from 'utils/doc';
 
 let componentsMap = {};
 
 export function render() {
   componentsMap.poweredBy = new PoweredBy({
-    target: _Doc.querySelector('#container'),
+    target: querySelector('#container'),
   });
 
   const navStack = new NavigationStack({
-    target: _Doc.querySelector('#root'),
+    target: querySelector('#root'),
   });
 
   componentsMap.navStack = navStack;
 
   const topbar = new TopBar({
-    target: _Doc.querySelector('#topbar-wrap'),
+    target: querySelector('#topbar-wrap'),
   });
 
   componentsMap.topbar = topbar;
@@ -70,7 +71,7 @@ export const bankTransferTab = {
   render() {
     setView(
       BANK_TRANSFER_KEY,
-      new BankTransferScreen({ target: _Doc.querySelector('#form-fields') })
+      new BankTransferScreen({ target: querySelector('#form-fields') })
     );
   },
 

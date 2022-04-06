@@ -1,4 +1,5 @@
 import { updateActionAreaContentAndCTA } from './common';
+import { querySelector } from 'utils/doc';
 
 const AUTH_PENDING_MSG =
   'Payment is pending authorization. Request for authorization from approver.';
@@ -15,6 +16,6 @@ export function replaceRetryIfCorporateNetbanking(session, message) {
 
     updateActionAreaContentAndCTA(session, 'OK', null, true);
   } else {
-    _Doc.querySelector('#fd-hide').focus();
+    querySelector('#fd-hide').focus();
   }
 }

@@ -23,13 +23,14 @@ import {
   isAVSEnabledForEntity,
 } from 'checkoutstore/screens/card';
 import CardTab from 'ui/tabs/card/index.svelte';
+import { querySelector } from 'utils/doc';
 
 const CARD_KEY = 'svelteCardTab';
 
 export function render() {
   if (isCardOrEMIEnabled) {
     const cardTab = new CardTab({
-      target: _Doc.querySelector('#form-fields'),
+      target: querySelector('#form-fields'),
     });
     setView(CARD_KEY, cardTab);
     return cardTab;

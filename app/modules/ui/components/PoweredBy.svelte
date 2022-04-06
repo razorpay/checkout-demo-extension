@@ -3,7 +3,9 @@
   import { onMount } from 'svelte';
   import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';
 
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
+
+  import { querySelector } from 'utils/doc';
 
   const customLogo = getOption('partnership_logo');
   const { isOrgRazorpay, checkout_logo_url } = getOrgDetails() || {};
@@ -19,7 +21,7 @@
 
   function applyFont(anchor, retryCount) {
     if (anchor.offsetWidth / anchor.offsetHeight > 3) {
-      _El.addClass(_Doc.querySelector('#container'), 'font-loaded');
+      _El.addClass(querySelector('#container'), 'font-loaded');
       fontLoaded = true;
     } else if (retryCount < 25) {
       fontTimeout = setTimeout(

@@ -13,6 +13,7 @@ import {
 import { getUPIIntentApps, setUpiApps } from 'checkoutstore/native';
 
 import UpiTab from 'ui/tabs/upi/index.svelte';
+import { querySelector } from 'utils/doc';
 const UPI_KEY = 'upiTab';
 
 /**
@@ -52,7 +53,7 @@ export function checkForPossibleWebPaymentsForUpi() {
 
 export function render(props = {}) {
   const upiTab = new UpiTab({
-    target: _Doc.querySelector('#form-fields'),
+    target: querySelector('#form-fields'),
     props,
   });
   setView(UPI_KEY, upiTab);

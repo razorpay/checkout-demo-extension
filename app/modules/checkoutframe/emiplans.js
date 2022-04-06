@@ -6,6 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import { getSession } from 'sessionmanager';
 import { INDIAN_CONTACT_REGEX } from 'common/constants';
 import { returnAsIs } from 'lib/utils';
+import { querySelector } from 'utils/doc';
 
 const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};
@@ -156,7 +157,7 @@ emiPlansView.prototype = {
       });
 
       this.selectedPlan = plan;
-      _Doc.querySelector('#body') |> _El.addClass('sub');
+      querySelector('#body') |> _El.addClass('sub');
     };
 
     on.setContact = (contact) => {
@@ -179,7 +180,7 @@ emiPlansView.prototype = {
     };
 
     if (!this.view) {
-      const target = _Doc.querySelector(TARGET_QS);
+      const target = querySelector(TARGET_QS);
       this.view = new EMIPlansView({
         target,
         props,

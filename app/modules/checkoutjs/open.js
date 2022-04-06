@@ -4,6 +4,7 @@ import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import BrowserStorage from 'browserstorage';
+import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -29,7 +30,7 @@ function needBody(func) {
 const currentScript =
   document.currentScript ||
   (function () {
-    var scripts = _Doc.querySelectorAll('script');
+    var scripts = querySelectorAll('script');
     return scripts[scripts.length - 1];
   })();
 
@@ -42,7 +43,7 @@ const currentScript =
 function defaultAutoPostHandler(data) {
   currentScript
     |> _El.parent
-    |> _El.append(_El.create() |> _El.setContents(_Doc.obj2formhtml(data)))
+    |> _El.append(_El.create() |> _El.setContents(obj2formhtml(data)))
     |> _Obj.setProp('onsubmit', returnAsIs)
     |> _El.submit;
 }
@@ -72,7 +73,7 @@ var addAutoCheckoutButton = function (rzp) {
       ) {
         var request = {
           url: action,
-          content: _Doc.form2obj(form),
+          content: form2obj(form),
           method: _.isString(method) ? method : 'get',
           target: _.isString(target) && target,
         };

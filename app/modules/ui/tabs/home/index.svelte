@@ -168,6 +168,7 @@
     CATEGORIES,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
+  import { querySelector } from 'utils/doc';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -670,7 +671,7 @@
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
-    const topbarRight = _Doc.querySelector('#topbar #top-right');
+    const topbarRight = querySelector('#topbar #top-right');
 
     if (topbarRight) {
       _El.keepClass(topbarRight, 'logged', loggedIn);
@@ -1130,7 +1131,7 @@
       selectMethod(instrument.method, instrument.vendor_vpa);
     } else {
       // Bring instrument into view if it's not visible
-      const domElement = _Doc.querySelector(
+      const domElement = querySelector(
         `.home-methods .methods-block [data-id="${instrument.id}"]`
       );
       showCODCharges(instrument.method);

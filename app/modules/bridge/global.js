@@ -3,6 +3,7 @@ import { didUPIIntentSucceed, parseUPIIntentResponse } from 'common/upi';
 import { processPaymentCreate } from 'payment/coproto';
 import { otp as $otp } from 'checkoutstore/screens/otp';
 import { getUPIIntentApps } from 'checkoutstore/native';
+import { querySelector } from 'utils/doc';
 
 import { backPressed } from './back';
 
@@ -27,11 +28,11 @@ function handleOTP(otp) {
   otp = matches ? matches[0] : '';
   otp = String(otp).replace(/\D/g, '');
   var session = getSession();
-  var otpEl = _Doc.querySelector('#otp');
+  var otpEl = querySelector('#otp');
   if (session && otpEl && !otpEl.value) {
     $otp.set(otp);
 
-    _Doc.querySelector('#otp-elem') |> _El.removeClass('invalid');
+    querySelector('#otp-elem') |> _El.removeClass('invalid');
   }
 }
 

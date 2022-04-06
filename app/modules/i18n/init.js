@@ -19,6 +19,7 @@ import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { ignoreFirstCall } from 'svelte-utils';
 import BrowserStorage from 'browserstorage';
+import { querySelector } from 'utils/doc';
 
 const LOCALES = {
   en: 'English',
@@ -202,7 +203,7 @@ function handleLocaleChanged(value) {
 
 // TODO: Remove this once overlay is moved to Svelte
 function updateRetryBtnText() {
-  _Doc.querySelector('#fd-hide').innerText = get(t)('misc.retry');
+  querySelector('#fd-hide').innerText = get(t)('misc.retry');
 }
 
 function setupMissingMessageInterception() {

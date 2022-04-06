@@ -12,6 +12,7 @@ import { CtaViews } from 'ui/labels/cta';
 import { locale } from 'svelte-i18n';
 import { formatTemplateWithLocale } from 'i18n';
 import { debounce } from 'lib/utils';
+import { querySelector } from 'utils/doc';
 
 export const ctaInfo = writable({
   view: '',
@@ -34,7 +35,7 @@ export function init() {
 
 function initSuscription() {
   cta.subscribe((text) => {
-    const span = _Doc.querySelector('#footer > span');
+    const span = querySelector('#footer > span');
 
     if (span) {
       _El.setContents(span, text);
@@ -215,7 +216,7 @@ const trackCTAVisibility = debounce(function () {
   setTimeout(function () {
     const session = getSession();
 
-    const el = _Doc.querySelector('#footer-cta');
+    const el = querySelector('#footer-cta');
     if (!el) {
       return;
     }

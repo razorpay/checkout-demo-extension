@@ -1,4 +1,5 @@
 import Timer from 'ui/elements/Timer.svelte';
+import { querySelector } from 'utils/doc';
 
 /**
  * returns a new svelte components mounted on `#bottom`
@@ -9,7 +10,7 @@ import Timer from 'ui/elements/Timer.svelte';
  */
 export default function showTimer(expiry, onExpire) {
   return new Timer({
-    target: _Doc.querySelector('#bottom'),
+    target: querySelector('#bottom'),
     props: {
       expiry,
       onExpire,

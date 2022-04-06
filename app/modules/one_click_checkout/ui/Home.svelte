@@ -30,6 +30,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import { querySelector } from 'utils/doc';
 
   let topbar;
   let isBackEnabled;
@@ -58,7 +59,7 @@
       event: ACTIONS.INITIATECHECKOUT,
     });
     new Loader({
-      target: discreet._Doc.querySelector('#one-cc-loader'),
+      target: querySelector('#one-cc-loader'),
     });
     const view = determineLandingView();
     navigator.navigateTo({ path: view });

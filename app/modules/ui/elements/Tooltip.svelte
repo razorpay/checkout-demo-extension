@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { onMount, onDestroy } from 'svelte';
+  import { querySelector } from 'utils/doc';
 
   // Props
   export let className;
@@ -200,7 +201,7 @@
       return;
     }
 
-    const boundingElem = _Doc.querySelector(bindTo);
+    const boundingElem = querySelector(bindTo);
 
     if (!boundingElem || !tooltip) {
       return;

@@ -1,6 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
-
+import { querySelector } from 'utils/doc';
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
  *
@@ -63,6 +63,6 @@ export function updateAmountFontSize() {
 
   let fontSize = getNormalizedAmountFontSize(amount_figure, hasFee, hasOffer);
 
-  let amountElement = _Doc.querySelector('#amount');
+  let amountElement = querySelector('#amount');
   if (amountElement?.style) amountElement.style.fontSize = fontSize + 'px';
 }

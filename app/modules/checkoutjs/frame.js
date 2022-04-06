@@ -7,6 +7,13 @@ import {
   ACTIONS,
   CATEGORIES,
 } from 'one_click_checkout/merchant-analytics/constant';
+import {
+  smoothScrollTo,
+  querySelectorAll,
+  resolveElement,
+  redirectTo,
+  submitForm,
+} from 'utils/doc';
 
 const { screen, scrollTo } = global;
 
@@ -39,17 +46,17 @@ var merchantMarkup = {
     if (global.innerHeight < containerHeight) {
       var maxY = containerHeight - global.innerHeight;
       if (global.pageYOffset > maxY + 120) {
-        _Doc.smoothScrollTo(maxY);
+        smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
-      _Doc.smoothScrollTo(0);
+      smoothScrollTo(0);
     }
   },
 };
 
 function getMetas() {
   if (!merchantMarkup.metas) {
-    merchantMarkup.metas = _Doc.querySelectorAll(
+    merchantMarkup.metas = querySelectorAll(
       'head meta[name=viewport],' + 'head meta[name="theme-color"]'
     );
   }
@@ -223,7 +230,7 @@ CheckoutFrame.prototype = {
       });
     var parent = rzp.get('parent');
     if (parent) {
-      parent = _Doc.resolveElement(parent);
+      parent = resolveElement(parent);
     }
     var parent2 = parent || CheckoutFrame.container;
     appendLoader(parent2, parent);
@@ -463,7 +470,7 @@ CheckoutFrame.prototype = {
 
     /**
      * redirect top window if no redirection target specified by merchant
-     * else _Doc.redirect will result into an error due to confusion over which
+     * else redirectTo will result into an error due to confusion over which
      * frame to redirect if checkout.js resides within another iframe
      *
      * Also, the reason we can't change default value of "target" option itself
@@ -474,7 +481,7 @@ CheckoutFrame.prototype = {
     if (!data.target) {
       data.target = this.rzp.get('target') || '_top';
     }
-    _Doc.redirect(data);
+    redirectTo(data);
   },
 
   onsubmit: function (data) {
@@ -576,7 +583,7 @@ CheckoutFrame.prototype = {
           data.error.metadata = JSON.stringify(data.error.metadata);
         }
 
-        _Doc.redirect({
+        redirectTo({
           url: callbackUrl,
           content: data,
           method: 'post',
@@ -627,7 +634,7 @@ CheckoutFrame.prototype = {
     const redirect = this.rzp.get('redirect') || shouldRedirect;
 
     if (redirect && callbackUrl) {
-      _Doc.submitForm(
+      submitForm(
         callbackUrl,
         {
           error: data,

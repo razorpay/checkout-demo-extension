@@ -137,6 +137,8 @@ import * as SecurityUtils from 'utils/security';
 
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 
+import * as docUtil from 'utils/doc';
+
 export default {
   $,
   RazorpayConfig,
@@ -248,7 +250,7 @@ export default {
   BrowserStorage,
 
   _Arr,
-  _Doc,
+  docUtil,
   _El,
   _Obj,
   _,

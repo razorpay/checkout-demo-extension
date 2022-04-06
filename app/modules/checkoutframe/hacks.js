@@ -1,3 +1,4 @@
+import { querySelector } from 'utils/doc';
 import * as UserAgent from 'common/useragent';
 import { compareSemver } from 'lib/utils';
 
@@ -83,11 +84,11 @@ function decreaseWebViewHeightForAndroidTablets() {
     global.screen.height + osElements >= webViewDefaultHeight;
 
   const reduceHeight = () => {
-    const html = _Doc.querySelector('html');
+    const html = querySelector('html');
     _El.setStyle(html, 'max-height', `${global.screen.height - osElements}px`);
   };
   const unsetHeight = () => {
-    const html = _Doc.querySelector('html');
+    const html = querySelector('html');
     _El.setStyle(html, 'max-height', 'unset');
   };
   const updateHeight = () => {
@@ -131,7 +132,7 @@ const SHORTEST_IPHONE_HEIGHT = 568; // iPhone 5S
 function shiftIosPayButtonOnSmallerHeights() {
   if (UserAgent.iPhone) {
     setTimeout(() => {
-      const footer = _Doc.querySelector('#footer');
+      const footer = querySelector('#footer');
       /**
        * On Portrait mode,
        * if the device is short,
@@ -152,7 +153,7 @@ function shiftIosPayButtonOnSmallerHeights() {
           return;
         }
 
-        const footer = _Doc.querySelector('#footer');
+        const footer = querySelector('#footer');
 
         /**
          * If portrait,
@@ -181,8 +182,8 @@ function reduceUnneededPaddingIfLandscape() {
 
   if (isLandscape && isMobile) {
     setTimeout(() => {
-      const header = _Doc.querySelector('#header');
-      const formCommon = _Doc.querySelector('#form-common');
+      const header = querySelector('#header');
+      const formCommon = querySelector('#form-common');
       const iosPayFixClassName = 'ios-paybtn-landscape-fix';
 
       _El.addClass(header, iosPayFixClassName);
@@ -201,6 +202,6 @@ export function initPostRenderHacks() {
 
   // overflow: auto; is set on #body as a fix for firefox, which is breaking Checkout on iOS Safari. This is a temporary ~fix~ hack.
   if (UserAgent.iOS && UserAgent.isMobile()) {
-    _Doc.querySelector('#body').style.overflow = 'unset';
+    querySelector('#body').style.overflow = 'unset';
   }
 }

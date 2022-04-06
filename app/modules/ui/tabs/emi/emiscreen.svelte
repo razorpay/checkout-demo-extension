@@ -22,6 +22,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import { querySelector } from 'utils/doc';
 
   import {
     getPrefilledName,
@@ -44,9 +45,7 @@
   };
 
   onMount(() => {
-    const emi_el_card = _Doc.querySelector(
-      '#form-emi input[name="card[number]"]'
-    );
+    const emi_el_card = querySelector('#form-emi input[name="card[number]"]');
 
     session.delegator
       .add('card', emi_el_card)

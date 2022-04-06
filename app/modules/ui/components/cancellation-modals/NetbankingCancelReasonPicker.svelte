@@ -10,10 +10,11 @@
   } from 'ui/labels/netbanking';
 
   import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
+  import { querySelector } from 'utils/doc';
 
   const session = getSession();
 
-  const cancellationReasonsContainer = _Doc.querySelector('#error-message');
+  const cancellationReasonsContainer = querySelector('#error-message');
   const method = 'netbanking';
   const cancellationReasons = [
     {

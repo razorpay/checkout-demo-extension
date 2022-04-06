@@ -1,5 +1,7 @@
+import { querySelector } from 'utils/doc';
+
 export const shake = () => {
-  const modal = _Doc.querySelector('#modal-inner');
+  const modal = querySelector('#modal-inner');
   if (modal) {
     modal |> _El.removeClass('shake');
     modal |> _El.offsetWidth; // force reflow
@@ -11,7 +13,7 @@ export const shake = () => {
   } catch (err) {}
 };
 
-const getActiveForm = () => _Doc.querySelector('.tab-content.screen.drishy');
+const getActiveForm = () => querySelector('.tab-content.screen.drishy');
 
 export const validateForm = () => {
   const invalid = getActiveForm()?.querySelector('[name]:invalid');

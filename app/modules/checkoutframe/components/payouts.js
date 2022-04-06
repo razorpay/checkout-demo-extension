@@ -10,6 +10,7 @@ import {
 } from 'checkoutframe/payouts';
 import PayoutInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import updateScore from 'analytics/checkoutScore';
+import { querySelector } from 'utils/doc';
 
 export default function ({ topbar }) {
   const session = getSession();
@@ -21,7 +22,7 @@ export default function ({ topbar }) {
   );
 
   const payoutsView = new PayoutInstruments({
-    target: _Doc.querySelector('#form-fields'),
+    target: querySelector('#form-fields'),
     props: {
       topbar,
       amount: getDisplayAmount(),

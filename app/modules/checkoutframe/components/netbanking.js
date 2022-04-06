@@ -8,6 +8,7 @@ import { selectedBank } from 'checkoutstore/screens/netbanking';
 import { getSession } from 'sessionmanager';
 import { setView, destroyView } from './';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import { querySelector } from 'utils/doc';
 
 const NETBANKING_KEY = 'netbankingTab';
 
@@ -30,7 +31,7 @@ function render() {
 
   if (method) {
     const netbankingTab = new NetbankingTab({
-      target: _Doc.querySelector('#form-fields'),
+      target: querySelector('#form-fields'),
       props: {
         bankOptions: getOption('method.netbanking'),
         banks: banks,

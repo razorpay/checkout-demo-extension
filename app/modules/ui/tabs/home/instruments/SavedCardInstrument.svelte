@@ -32,6 +32,7 @@
   import { locale } from 'svelte-i18n';
 
   import { selectedCardFromHome } from 'checkoutstore/screens/card';
+  import { querySelector } from 'utils/doc';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -130,7 +131,7 @@
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
-          _Doc.querySelector(`.home-methods input[value="${instrument.id}"]`),
+          querySelector(`.home-methods input[value="${instrument.id}"]`),
           '.instrument'
         );
         const cvvInput = instrumentInDom.querySelector('.cvv-input');
