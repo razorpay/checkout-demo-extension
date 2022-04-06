@@ -18,7 +18,6 @@
   // utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { getMerchantName } from 'razorpay';
-  import TrustedBadgeIcon from 'trusted-badge/ui/component/TrustedBadgeIcon.svelte';
 
   const { circle_check, rtb_close } = getIcons();
   const merchantName = getMerchantName();
@@ -50,7 +49,7 @@
       <div class="rtb-icon">
         <!-- It is done intentionally. Both RTB Badges styles were getting else wise over lapped-->
         {#if visible}
-          <TrustedBadgeIcon height="60" width="60" />
+          <Icon icon={badge(60, 60)} />
         {/if}
       </div>
       <div class="rtb-header-section">

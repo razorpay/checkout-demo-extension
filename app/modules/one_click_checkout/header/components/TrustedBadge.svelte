@@ -17,7 +17,6 @@
 
   // Imports releated to icons
   import Icon from 'ui/elements/Icon.svelte';
-  import TrustedBadgeIcon from 'trusted-badge/ui/component/TrustedBadgeIcon.svelte';
   import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
   import info from 'ui/icons/payment-methods/info';
 
@@ -43,7 +42,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadgeIcon />
+        <Icon icon={badge(22, 22)} />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
