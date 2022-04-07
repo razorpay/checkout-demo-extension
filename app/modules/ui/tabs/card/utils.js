@@ -1,11 +1,7 @@
-import {
-  hasFeature,
-  getCustomSubtextForMethod,
-  getMerchantKey,
-} from 'razorpay';
+import { hasFeature, getCustomSubtextForMethod } from 'razorpay';
+import { hasFeature } from 'checkoutstore';
 
 import { getAppProviderSubtext } from 'i18n';
-import { merchantsEnabledOnSIHub } from './constant';
 
 export function getAppInstrumentSubtext(provider, locale) {
   return (
@@ -27,7 +23,7 @@ export const isCardTokenized = (card) => Boolean(card.consent_taken);
  * @returns boolean
  */
 export const isSIHubEnabledMerchant = () => {
-  return merchantsEnabledOnSIHub.includes(getMerchantKey());
+  return hasFeature('allow_billdesk_sihub', false);
 };
 
 /**
