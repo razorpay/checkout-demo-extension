@@ -998,7 +998,7 @@ Session.prototype = {
 
     // Switch to the respective tab/ prefilled method if exists
     // If tab is empty, then it will switche to home
-    if (tab === 'emandate' && !this.get('prefill.bank')) {
+    if (tab === 'emandate' && !discreet.NetbankingHelper.getPrefillBank()) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
       tab = 'netbanking';

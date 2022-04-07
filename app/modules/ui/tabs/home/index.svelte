@@ -161,6 +161,7 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
   import { querySelector } from 'utils/doc';
+  import { getPrefillBank } from 'netbanking/helper';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -180,7 +181,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
-  const prefilledBank = getOption('prefill.bank');
+  const prefilledBank = getPrefillBank();
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 

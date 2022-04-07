@@ -13,7 +13,6 @@ import { querySelector } from 'utils/doc';
 const NETBANKING_KEY = 'netbankingTab';
 
 function render() {
-  const prefilledBank = getOption('prefill.bank');
   var method, banks;
 
   if (isEMandateEnabled()) {

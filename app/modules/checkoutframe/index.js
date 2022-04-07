@@ -363,7 +363,6 @@ function setSessionPreferences(session, preferences) {
   RazorpayStore.updateInstance(razorpayInstance);
 
   updateOptions(preferences);
-  updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
 
@@ -499,29 +498,6 @@ function updateOptions(preferences) {
   // set orderid as it is required while creating payments
   if (preferences.invoice) {
     setOption('order_id', preferences.invoice.order_id);
-  }
-}
-
-function updateEmandatePrefill() {
-  const order = getMerchantOrder();
-  if (!order) {
-    return;
-  }
-
-  if (order.auth_type) {
-    setOption('prefill.auth_type', order.auth_type);
-  }
-
-  const bank_account = order.bank_account;
-  if (bank_account) {
-    ['ifsc', 'name', 'account_number', 'account_type'].forEach((key) => {
-      if (bank_account[key]) {
-        setOption(`prefill.bank_account[${key}]`, bank_account[key]);
-      }
-    });
-  }
-  if (order.bank) {
-    setOption('prefill.bank', order.bank);
   }
 }
 

@@ -140,6 +140,7 @@ import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 import * as _El from 'utils/DOM';
 
 import * as docUtil from 'utils/doc';
+import * as NetbankingHelper from 'netbanking/helper';
 
 export default {
   $,
@@ -300,4 +301,5 @@ export default {
 
   // Offline Challan
   offlineChallanTab,
+  NetbankingHelper,
 };
