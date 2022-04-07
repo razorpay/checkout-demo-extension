@@ -141,6 +141,7 @@
           <li class="list-item">
             <button
               class="account-menu"
+              data-test-id="lang-{getLocaleName(locale)}"
               on:click={() => selectLanguage(locale)}
             >
               {getLocaleName(locale)}
@@ -173,6 +174,7 @@
             <li class="list-item">
               <button
                 class="account-menu"
+                data-test-id="lang-{getLocaleName(locale)}"
                 on:click={() => selectLanguage(locale)}
               >
                 {getLocaleName(locale)}
@@ -187,7 +189,11 @@
           </p>
         {/if}
         {#if showChangeLanguage}
-          <p class="account-menu" on:click={handleChangeLanguage}>
+          <p
+            data-test-id="account-lang-cta"
+            class="account-menu"
+            on:click={handleChangeLanguage}
+          >
             {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
             <span class="language-btn">
               <Icon icon={arrow_left(11, 11, '#616161')} />
@@ -196,10 +202,18 @@
         {/if}
         {#if isLoggedIn}
           <hr class="account-separator" />
-          <p class="account-menu" on:click={handleLogoutClick}>
+          <p
+            data-test-id="account-logout-cta"
+            class="account-menu"
+            on:click={handleLogoutClick}
+          >
             {$t(LOGOUT_ACTION)}
           </p>
-          <p class="account-menu" on:click={handleLogoutAllDevicesClick}>
+          <p
+            data-test-id="account-logoutall-cta"
+            class="account-menu"
+            on:click={handleLogoutAllDevicesClick}
+          >
             {$t(LOGOUT_ALL_DEVICES_ACTION)}
           </p>
         {/if}

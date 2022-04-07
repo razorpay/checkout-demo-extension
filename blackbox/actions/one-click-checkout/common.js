@@ -200,6 +200,16 @@ async function checkInvalidOTP(context) {
   ).toEqual('Entered OTP was incorrect. Re-enter to proceed.');
 }
 
+function getDataAttrSelector(context, selectorValue) {
+  return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
+}
+
+function scrollToEnd(context, node = window) {
+  return context.page.evaluate((_node) => {
+    _node.scrollBy(0, _node.scrollHeight);
+  }, node);
+}
+
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -210,4 +220,6 @@ module.exports = {
   handleVerifyOTPReq,
   handleSkipOTP,
   checkInvalidOTP,
+  getDataAttrSelector,
+  scrollToEnd,
 };
