@@ -7,7 +7,6 @@ module.exports = {
   },
   globals: {
     _Obj: true,
-    _El: true,
     _Arr: true,
     _: true,
     fetch: true,

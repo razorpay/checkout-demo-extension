@@ -1,4 +1,4 @@
-import Analytics from 'analytics';
+import * as _El from 'utils/DOM';
 
 /**
  * Simple wrapper component around `window.open()`.

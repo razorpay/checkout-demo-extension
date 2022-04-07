@@ -137,6 +137,7 @@ import * as SecurityUtils from 'utils/security';
 
 import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
+import * as _El from 'utils/DOM';
 
 import * as docUtil from 'utils/doc';
 

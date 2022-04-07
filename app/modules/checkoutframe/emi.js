@@ -2,6 +2,7 @@
 import EmiView from 'ui/components/emi.svelte';
 import { getSession } from 'sessionmanager';
 import { getEMIBanks } from 'checkoutstore/methods';
+import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 
 const bankOverrides = {

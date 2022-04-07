@@ -6,7 +6,7 @@
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
-
+  import * as _El from 'utils/DOM';
   import {
     getOffersForTab,
     getOffersForInstrument,

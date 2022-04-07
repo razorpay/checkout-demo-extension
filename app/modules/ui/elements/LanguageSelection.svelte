@@ -3,6 +3,7 @@
   import { getLocaleName } from 'i18n/init';
   import { onMount, onDestroy } from 'svelte';
   import { shouldUseVernacular } from 'checkoutstore/methods';
+  import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
 
   const overlayEl = querySelector('#body-overlay');

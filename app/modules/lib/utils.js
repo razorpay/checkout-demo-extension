@@ -1,3 +1,4 @@
+import * as _El from 'utils/DOM';
 /**
  * Scrolls the element into view if it is not completely visible.
  * @param el {Element}

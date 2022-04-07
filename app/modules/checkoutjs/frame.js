@@ -7,6 +7,7 @@ import {
   ACTIONS,
   CATEGORIES,
 } from 'one_click_checkout/merchant-analytics/constant';
+import * as _El from 'utils/DOM';
 import {
   smoothScrollTo,
   querySelectorAll,
@@ -182,7 +183,7 @@ function appendLoader($parent, parent) {
         style += 'position:absolute;left:50%;top:50%;';
       }
       loader.setAttribute('style', style);
-      loader |> _El.appendTo($parent);
+      _El.appendTo(loader, $parent);
     } catch (e) {}
   }
 }
@@ -237,7 +238,7 @@ CheckoutFrame.prototype = {
 
     if (rzp !== this.rzp) {
       if (_El.parent(el) !== parent2) {
-        parent2 |> _El.append(el);
+        _El.append(parent2, el);
       }
       this.rzp = rzp;
     }

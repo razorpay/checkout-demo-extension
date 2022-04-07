@@ -13,6 +13,7 @@
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import * as _El from 'utils/DOM';
 
   import { HOME_VIEWS } from './constants';
 

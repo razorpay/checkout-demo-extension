@@ -32,6 +32,7 @@
   import { locale } from 'svelte-i18n';
 
   import { selectedCardFromHome } from 'checkoutstore/screens/card';
+  import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
   // Props
   export let instrument = {};

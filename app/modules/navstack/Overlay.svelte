@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { isCtaShown } from 'checkoutstore/cta';
+  import * as _El from 'utils/DOM';
 
   export let backPressed: () => void;
   const long = isCtaShown();

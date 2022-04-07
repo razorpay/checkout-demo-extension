@@ -4,7 +4,7 @@
   import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';
 
   import { t } from 'svelte-i18n';
-
+  import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
 
   const customLogo = getOption('partnership_logo');
