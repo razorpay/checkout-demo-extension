@@ -337,3 +337,7 @@ export function isBlockedDeactivated() {
   }
   return preferences.blocked || !preferences.activated;
 }
+
+export function isHDFCVASMerchant() {
+  return hasFeature('hdfc_checkout_2', false);
+}

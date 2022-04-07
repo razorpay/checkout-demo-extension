@@ -38,7 +38,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isOneClickCheckout } from 'razorpay';
+  import { getOption, isOneClickCheckout, isHDFCVASMerchant } from 'razorpay';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -683,7 +683,12 @@
 
   function shouldUsePersonalization() {
     // Merchant has asked to disable
-    if (session.get().personalization === false) {
+    if (getOption('personalization') === false) {
+      return false;
+    }
+
+    // if hdfc VAS merchant
+    if (isHDFCVASMerchant()) {
       return false;
     }
 
