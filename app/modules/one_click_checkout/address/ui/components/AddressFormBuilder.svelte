@@ -212,6 +212,7 @@
           {:else}
             <span
               on:click={() => handleLandmarkToggle()}
+              data-test-id="toggle-landmark-cta"
               class="show-landmark-label"
             >
               + {$t(ADD_LANDMARK)}

@@ -94,7 +94,7 @@
 </script>
 
 <Backdrop {visible} on:click={hide}>
-  <div class="summary-modal">
+  <div data-test-id="summary-modal" class="summary-modal">
     <div class="summary-table-wrapper">
       <div class="summary-heading-container">
         <p class="summary-heading">
@@ -108,14 +108,16 @@
       <div class="summary-table">
         <div class="summary-row">
           <div>{$t(AMOUNT_LABEL)}</div>
-          <div>{formatAmountWithCurrency($cartAmount)}</div>
+          <div data-test-id="cart-amount">
+            {formatAmountWithCurrency($cartAmount)}
+          </div>
         </div>
         {#if $isCouponApplied}
           <div class="summary-row">
-            <div>
+            <div data-test-id="applied-coupon-label">
               {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
             </div>
-            <div class="text-green">
+            <div data-test-id="discount-amount" class="text-green">
               -{formatAmountWithCurrency($cartDiscount)}
             </div>
           </div>
@@ -123,7 +125,7 @@
         {#if $isShippingAddedToAmount}
           <div class="summary-row" class:text-green={!$shippingCharge}>
             <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
-            <div>
+            <div data-test-id="shipping-amount">
               {$shippingCharge
                 ? formatAmountWithCurrency($shippingCharge)
                 : $t(FREE_LABEL)}
@@ -133,7 +135,9 @@
         {#if $isCodAddedToAmount && $codChargeAmount}
           <div class="summary-row">
             <div>{$t(COD_CHARGES_LABEL)}</div>
-            <div>{formatAmountWithCurrency($codChargeAmount)}</div>
+            <div data-test-id="cod-amount">
+              {formatAmountWithCurrency($codChargeAmount)}
+            </div>
           </div>
         {/if}
         {#if $appliedOffer?.amount}
@@ -148,7 +152,7 @@
                 },
               })}
             </div>
-            <div class="text-green">
+            <div data-test-id="offer-amount" class="text-green">
               -{formatAmountWithCurrency(offerAmount)}
             </div>
           </div>
@@ -156,7 +160,9 @@
         <hr class="total-separator" />
         <div class="summary-row total-charges-text">
           <div>{$t(TOTAL_CHARGES_LABEL)}</div>
-          <div>{formatAmountWithCurrency($amount)}</div>
+          <div data-test-id="total-amount">
+            {formatAmountWithCurrency($amount)}
+          </div>
         </div>
       </div>
     </div>

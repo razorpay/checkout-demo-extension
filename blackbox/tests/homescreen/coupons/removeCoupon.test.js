@@ -8,4 +8,5 @@ createCouponsTest({
   removeCoupon: true,
   serviceable: true,
   isSaveAddress: false,
+  couponCode: 'WELCOME10',
 });

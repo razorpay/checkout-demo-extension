@@ -21,6 +21,7 @@ const {
   handleCreateOTPReq,
   handleVerifyOTPReq,
   handleTypeOTP,
+  proceedOneCC,
 } = require('../../actions/one-click-checkout/common');
 const { selectPaymentMethod } = require('../../tests/homescreen/actions');
 const {
@@ -30,11 +31,9 @@ const {
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
-const { proceed } = require('../../tests/homescreen/sharedActions');
 const { delay } = require('../../util');
 const {
   selectBank,
-  submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
 } = require('../../actions/common');
@@ -64,15 +63,15 @@ module.exports = function (testFeatures) {
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
     // skipping tests because some are failing randomly
-    test.skip(title, async () => {
+    test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
 
-      await handleCouponView(context);
       await handleAvailableCouponReq(context, availableCoupons);
+      await handleCouponView(context);
       if (personalised) {
         await applyCoupon(context, couponCode);
         await handleApplyCouponReq(
@@ -84,13 +83,13 @@ module.exports = function (testFeatures) {
         await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
         await handleCreateOTPReq(context);
         await handleTypeOTP(context);
-        await proceed(context);
+        await delay(200);
+        await proceedOneCC(context);
         await handleVerifyOTPReq(context);
         await handleAvailableCouponReq(context, availableCoupons);
         await handleApplyCouponReq(context, true, discountAmount);
-        await handleAvailableCouponReq(context, availableCoupons);
-        await context.page.click('#footer');
         await handleShippingInfo(context, false, true);
+        await handleAvailableCouponReq(context, availableCoupons);
       } else {
         if (couponValid || availableCoupons) {
           await verifyValidCoupon(context, features);
@@ -102,20 +101,20 @@ module.exports = function (testFeatures) {
           await handleRemoveCoupon(context, amount);
         }
 
-        await proceed(context);
         await fillUserDetails(context);
-        await proceed(context);
+        await delay(200);
+        await proceedOneCC(context);
         await handleCustomerStatusReq(context);
         await fillUserAddress(context, { isSaveAddress, serviceable });
       }
-      await proceed(context);
+      await proceedOneCC(context);
       await handleUpdateOrderReq(context, options.order_id);
       await handleThirdWatchReq(context);
       await delay(200);
       await handleFeeSummary(context, features);
       await selectPaymentMethod(context, 'netbanking');
       await selectBank(context, 'SBIN');
-      await submit(context, false);
+      await proceedOneCC(context);
       await passRequestNetbanking(context);
       await handleMockSuccessDialog(context);
     });
