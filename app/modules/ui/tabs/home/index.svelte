@@ -42,11 +42,7 @@
     merchantAnalytics,
     merchantFBStandardAnalytics,
   } from 'one_click_checkout/merchant-analytics';
-  import {
-    isDCCEnabled,
-    isDynamicFeeBearer,
-    isIndianCustomer,
-  } from 'checkoutstore';
+  import { isIndianCustomer } from 'checkoutstore';
   import {
     isCodAddedToAmount,
     codChargeAmount,
@@ -55,7 +51,6 @@
   } from 'one_click_checkout/charges/store';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { blocks } from 'checkoutstore/screens/home';
   import { showOffers as showMethodOffers } from 'checkoutstore/offers';
 
   // i18n
@@ -74,9 +69,11 @@
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
-  import { isAddressEnabled, getMerchantConfig } from 'checkoutstore';
+  import { getMerchantConfig } from 'checkoutstore';
 
   import {
+    isAddressEnabled,
+    isDCCEnabled,
     isPartialPayment as getIsPartialPayment,
     isRecurring,
     isContactEmailReadOnly,
@@ -87,6 +84,7 @@
     isEmailOptional,
     isContactEmailOptional,
     getMerchantOffers,
+    isDynamicFeeBearer,
   } from 'razorpay';
 
   import {
@@ -96,16 +94,9 @@
     isMethodEnabled,
   } from 'checkoutstore/methods';
 
-  import {
-    isBillingSameAsShipping,
-    didSaveAddress,
-  } from 'one_click_checkout/address/store';
+  import { didSaveAddress } from 'one_click_checkout/address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
-  import {
-    selectedAddress as selectedShippingAddress,
-    codReason,
-  } from 'one_click_checkout/address/shipping_address/store';
-  import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
+  import { codReason } from 'one_click_checkout/address/shipping_address/store';
 
   import {
     getInstrumentsForCustomer,

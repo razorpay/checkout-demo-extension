@@ -14,13 +14,14 @@ export const getPreferences = (path, defaultValue) => {
   return get(RazorpayStore.preferences, path, defaultValue);
 };
 
-export const getOption = (path, needFunction = false) => {
-  if (needFunction) {
-    return () => getOption(path, false);
-  }
+export const getOption = (path) => {
   return !path
     ? RazorpayStore.triggerInstanceMethod('get')
     : RazorpayStore.get(path);
+};
+
+const getOptionCurry = (path) => {
+  return () => getOption(path);
 };
 
 export const setOption = RazorpayStore.set;
@@ -47,11 +48,16 @@ export const isGlobalVault = () => getPreferences('global');
 export const isPartialPayment = () => getPreferences('order.partial_payment');
 export const hasFeature = (feature, fallbackValue) =>
   getPreferences(`features.${feature}`, fallbackValue);
+export const getBanks = () => getPreferences('methods.netbanking');
 
 /**
  * Recurring related helper function
  */
 export const getRecurringMethods = () => getPreferences('methods.recurring');
+
+export function getSubscription() {
+  return getPreferences('subscription');
+}
 export function isRecurring() {
   if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
@@ -64,6 +70,39 @@ export function isStrictlyRecurring() {
 export function isSubscription() {
   return isRecurring() && getPreferences('subscription');
 }
+
+export function isASubscription(method = null) {
+  if (!getPreferences('subscription')) {
+    return false;
+  }
+
+  // return true if no method is specified. This is a subscription session
+  if (!method) {
+    return true;
+  } else {
+    const preferences = getPreferences();
+    return (
+      preferences.subscription[method] &&
+      preferences.subscription[method] !== false
+    );
+  }
+}
+
+/**
+ * Customer related
+ */
+
+export function shouldStoreCustomerInStorage() {
+  const globalCustomer = getPreferences('global');
+  const rememberCustomer = getMerchantOption('remember_customer');
+
+  return globalCustomer && rememberCustomer;
+}
+
+export function isAddressEnabled() {
+  return hasFeature('customer_address', false);
+}
+
 /**
  * Offers related helper function
  */
@@ -100,13 +139,28 @@ export const getLanguageCode = () =>
  * Options related helpers
  */
 
-export const getCallbackUrl = getOption('callback_url', true);
+export function isPayout() {
+  return getOption('payout');
+}
 
+export const getCallbackUrl = getOptionCurry('callback_url');
+
+/** currency related */
 export const getCurrency = () => {
   const entityWithAmountData =
     entityWithAmount.find((entity) => getPreferences(entity)) || {};
   return entityWithAmountData?.currency || getOption('currency');
 };
+
+export function isInternational() {
+  return getOption('currency') !== 'INR';
+}
+
+export function isDCCEnabled() {
+  return hasFeature('dcc', false);
+}
+
+/** end of currency related fn */
 
 function getConfigFromGetOption() {
   if (getOption('config') === null) {
@@ -174,16 +228,16 @@ export function isContactEmailHidden() {
 /**
  * order related
  */
-export const getOrderId = getOption('order_id', true);
+export const getOrderId = getOptionCurry('order_id');
 
 /**
  * prefill related
  */
-export const getPrefilledContact = getOption('prefill.contact', true);
-export const getPrefilledEmail = getOption('prefill.email', true);
-export const getPrefilledName = getOption('prefill.name', true);
-export const getPrefilledCardNumber = getOption('prefill.card[number]', true);
-export const getPrefilledVPA = getOption('prefill.vpa', true);
+export const getPrefilledContact = getOptionCurry('prefill.contact');
+export const getPrefilledEmail = getOptionCurry('prefill.email');
+export const getPrefilledName = getOptionCurry('prefill.name');
+export const getPrefilledCardNumber = getOptionCurry('prefill.card[number]');
+export const getPrefilledVPA = getOptionCurry('prefill.vpa');
 
 export const getPrefillBillingAddress = (nvs = false) => {
   const prefill = {
@@ -201,6 +255,16 @@ export const getPrefillBillingAddress = (nvs = false) => {
   }
 
   return prefill;
+};
+
+// @TODO return amount based on partial payment
+// @TODO use everywhere instead of session.get('amount')
+// @TODO start using entityWithAmount
+export const getAmount = () => {
+  return getOption('amount');
+};
+export const getName = () => {
+  return getOption('name');
 };
 
 // formatting
@@ -240,10 +304,6 @@ export function getDynamicFeeBearerMerchantMessage() {
   return getPreferences('order.convenience_fee_config.checkout_message', '');
 }
 
-export function getSubscription() {
-  return getPreferences('subscription');
-}
-
 /**
  * 1cc
  */
@@ -264,3 +324,16 @@ export const isFacebookAnalyticsEnabled = () =>
   getOption('enable_fb_analytics');
 
 export const getCustomerCart = () => getOption('customer_cart');
+
+/** misc */
+
+export function isBlockedDeactivated() {
+  const preferences = getPreferences();
+  if (
+    !preferences.hasOwnProperty('blocked') ||
+    !preferences.hasOwnProperty('activated')
+  ) {
+    return false;
+  }
+  return preferences.blocked || !preferences.activated;
+}

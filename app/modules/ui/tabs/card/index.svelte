@@ -52,18 +52,18 @@
   import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
 
-  import { isRecurring, getCardFeatures, isDynamicFeeBearer } from 'razorpay';
-
   import {
-    shouldRememberCustomer,
-    isDCCEnabled,
-    isSiftJSEnabled,
-    isCyberSourceJsEnabled,
-    isInternational,
-    isPartialPayment,
     getAmount,
-    isIndianCustomer,
-  } from 'checkoutstore';
+    isRecurring,
+    getCardFeatures,
+    isDynamicFeeBearer,
+    isPartialPayment,
+    hasFeature,
+    isInternational,
+    isDCCEnabled,
+  } from 'razorpay';
+
+  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
 
   import {
     isMethodEnabled,
@@ -238,6 +238,14 @@
    * cardAVSFlowsMap is being used to store the AVS flag fetched for the selected cards.
    */
   let cardAVSFlowsMap = {};
+
+  function isSiftJSEnabled() {
+    return hasFeature('disable_sift_js', false) !== true;
+  }
+
+  function isCyberSourceJsEnabled() {
+    return hasFeature('shield_cbs_rollout', false);
+  }
 
   onMount(() => {
     // Prefill

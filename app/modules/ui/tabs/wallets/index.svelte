@@ -7,7 +7,7 @@
   import { showCta, hideCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
-  import { isDynamicWalletFlow } from 'checkoutstore';
+  import { isDynamicWalletFlow } from 'wallet/helper';
   import Bottom from 'ui/layouts/Bottom.svelte';
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';

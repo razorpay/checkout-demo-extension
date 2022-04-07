@@ -24,7 +24,7 @@
   import { customer } from 'checkoutstore/customer';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
+  import { isDynamicFeeBearer } from 'razorpay';
 
   // i18n
   import { getInstrumentTitle } from 'i18n';

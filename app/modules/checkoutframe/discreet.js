@@ -135,6 +135,7 @@ import * as TrustedBadgeHelper from 'trusted-badge/helper';
 
 import * as SecurityUtils from 'utils/security';
 
+import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 
 import * as docUtil from 'utils/doc';
@@ -280,6 +281,7 @@ export default {
   OneClickCheckoutMetaProperties,
   RazorpayHelper,
   views,
+  WalletHelper,
 
   CardViews,
   OTP_TEMPLATES,

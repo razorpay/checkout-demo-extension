@@ -12,7 +12,7 @@
   } from 'checkoutstore/screens/international';
   import { AVSDccPayload } from 'checkoutstore/screens/card';
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
-  import { getAmount, isPartialPayment } from 'checkoutstore';
+  import { isPartialPayment, getAmount } from 'razorpay';
 
   // i18n
   import { getAppProviderName, getAppProviderSubtext } from 'i18n';

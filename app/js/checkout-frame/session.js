@@ -178,7 +178,7 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
   var prefilledEmail = session.get('prefill.email');
 
-  if (Store.shouldStoreCustomerInStorage()) {
+  if (RazorpayHelper.shouldStoreCustomerInStorage()) {
     var storedUserDetails = discreet.ContactStorage.get();
 
     // Pick details from storage if not given in prefill
@@ -604,7 +604,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   };
 
-  if (Store.isASubscription()) {
+  if (RazorpayHelper.isASubscription()) {
     _Obj.extend(otpProperties, {
       allowSkip: session.get('subscription_card_change') ? false : true,
     });
@@ -1195,7 +1195,7 @@ Session.prototype = {
     es6components.render();
     this.setModal();
     this.setBackdrop();
-    if (Store.isBlockedDeactivated() && this.r.isLiveMode()) {
+    if (RazorpayHelper.isBlockedDeactivated() && this.r.isLiveMode()) {
       new BlockedDeactivatedMerchant({
         target: docUtil.querySelector('#form-fields'),
       });
@@ -1203,7 +1203,7 @@ Session.prototype = {
       return;
     }
     this.setSvelteComponents();
-    if (!Store.isPayout()) {
+    if (!RazorpayHelper.isPayout()) {
       this.fillData();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
@@ -1338,7 +1338,7 @@ Session.prototype = {
     if (RazorpayHelper.isOneClickCheckout() && isCouponsOrAddressEnabled) {
       this.setOneClickCheckoutHome();
     }
-    if (!Store.isPayout()) {
+    if (!RazorpayHelper.isPayout()) {
       this.setHomeTab();
     }
     this.setSvelteCardTab();
@@ -1976,7 +1976,7 @@ Session.prototype = {
        * For forced offers, we need to skip the home screen if the contact and
        * email is optional
        */
-      if (forcedOffer && method && Store.isContactEmailOptional()) {
+      if (forcedOffer && method && RazorpayHelper.isContactEmailOptional()) {
         this.set('prefill.method', method);
       }
     }
@@ -3348,7 +3348,7 @@ Session.prototype = {
       if (
         !(
           tab === 'upi' &&
-          Store.isASubscription() &&
+          RazorpayHelper.isASubscription() &&
           !this.getCurrentCustomer().logged
         )
       ) {
@@ -3924,7 +3924,7 @@ Session.prototype = {
       }
 
       // For a QR Payment in 1CC Flow, set the amount.
-      if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
+      if (this.tab === 'qr' && RazorpayHelper.isOneClickCheckout()) {
         var offer = this.getAppliedOffer();
         var hasDiscount = offer && offer.amount !== offer.original_amount;
 
@@ -5082,7 +5082,7 @@ Session.prototype = {
     var session = this;
     var request = {
       feesRedirect: preferences.fee_bearer && !('fee' in data),
-      optional: Store.getOptionalObject(),
+      optional: RazorpayHelper.getOptionalObject(),
       external: {},
       paused: this.get().paused,
       downtimeSeverity: this.downtimeSeverity,
@@ -5092,7 +5092,7 @@ Session.prototype = {
     if (session_options.force_terminal_id) {
       data.force_terminal_id = session_options.force_terminal_id;
     }
-    if (this.tab === 'emandate' && Store.isASubscription('emandate')) {
+    if (this.tab === 'emandate' && RazorpayHelper.isASubscription('emandate')) {
       // recurring token
       data.recurring_token =
         preferences.subscription && preferences.subscription.recurring_token;
@@ -5327,7 +5327,7 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-    if (Store.isAddressEnabled()) {
+    if (RazorpayHelper.isAddressEnabled()) {
       var notes = (data.notes = clone(this.get('notes')) || {});
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
@@ -5361,7 +5361,7 @@ Session.prototype = {
 
     // added rewardIds to the create payment request
     var reward = storeGetter(rewardsStore);
-    if (reward && reward.reward_id && !Store.isEmailOptional()) {
+    if (reward && reward.reward_id && !RazorpayHelper.isEmailOptional()) {
       data.reward_ids = [reward.reward_id];
     }
 
@@ -5540,7 +5540,7 @@ Session.prototype = {
     // for paypal and trustly dcc enable is not required
     if (
       discreet.storeGetter(CardScreenStore.currencyRequestId) &&
-      ((data.method === 'card' && Store.isDCCEnabled()) ||
+      ((data.method === 'card' && RazorpayHelper.isDCCEnabled()) ||
         (data.method === 'wallet' && data.wallet === 'paypal') ||
         (data.method === 'international' && data.provider === NVSEntity))
     ) {
@@ -5741,8 +5741,7 @@ Session.prototype = {
         request.nativeotp = true;
       }
     }
-
-    var isDynamicWalletFlow = discreet.Store.isDynamicWalletFlow();
+    var isDynamicWalletFlow = discreet.WalletHelper.isDynamicWalletFlow();
 
     if (
       !isDynamicWalletFlow &&

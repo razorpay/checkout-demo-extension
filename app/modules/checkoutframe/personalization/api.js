@@ -2,7 +2,7 @@ import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
 
-import { getAmount } from 'checkoutstore';
+import { getAmount } from 'razorpay';
 import { setTrustedBadgeVariant } from 'trusted-badge/helper';
 
 import { makeAuthUrl } from 'common/helper';

@@ -14,7 +14,7 @@
     isContactHidden,
     isEmailHidden,
     isContactEmailHidden,
-  } from 'checkoutstore';
+  } from 'razorpay';
   import { reward } from 'checkoutstore/rewards';
 
   export let onEdit;

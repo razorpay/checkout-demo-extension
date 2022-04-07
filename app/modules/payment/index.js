@@ -19,7 +19,7 @@ import Razorpay from 'common/Razorpay';
 import { makeAuthUrl, makeUrl } from 'common/helper';
 import { ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
-import { isDynamicWalletFlow } from 'checkoutstore';
+import { isDynamicWalletFlow } from 'wallet/helper';
 import { checkPaymentAdapter } from 'payment/adapters';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';

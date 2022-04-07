@@ -1,6 +1,8 @@
-import { getCustomSubtextForMethod, getMerchantKey } from 'razorpay';
-
-import { isShowMORTncEnabled } from 'checkoutstore';
+import {
+  hasFeature,
+  getCustomSubtextForMethod,
+  getMerchantKey,
+} from 'razorpay';
 
 import { getAppProviderSubtext } from 'i18n';
 import { merchantsEnabledOnSIHub } from './constant';
@@ -39,7 +41,7 @@ export const isSIHubEnabledMerchant = () => {
  */
 export const shouldShowTnc = (currency, country) => {
   return (
-    isShowMORTncEnabled() &&
+    hasFeature('show_mor_tnc', false) &&
     (currency === 'USD' || (!currency && country === 'US'))
   );
 };

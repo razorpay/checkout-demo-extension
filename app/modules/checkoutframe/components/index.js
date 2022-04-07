@@ -4,7 +4,7 @@ import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
 import NavigationStack from 'navstack';
 
-import { isPayout } from 'checkoutstore';
+import { isPayout } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 import { querySelector } from 'utils/doc';

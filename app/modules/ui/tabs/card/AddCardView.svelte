@@ -34,19 +34,16 @@
 
   import { methodInstrument } from 'checkoutstore/screens/home';
 
+  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
   import {
     isNameReadOnly,
-    shouldRememberCustomer,
-    isIndianCustomer,
-  } from 'checkoutstore';
-  import {
     getCardFeatures,
     isOfferForced,
     isStrictlyRecurring,
     getRecurringMethods,
     isRecurring,
+    isDynamicFeeBearer,
   } from 'razorpay';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
   import {
     isAMEXEnabled,

@@ -1,5 +1,5 @@
 <script>
-  import { getAmount } from 'checkoutstore';
+  import { getAmount } from 'razorpay';
 
   // i18n
   import { t, locale } from 'svelte-i18n';

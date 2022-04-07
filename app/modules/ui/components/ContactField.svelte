@@ -1,6 +1,6 @@
 <script>
   // Utils
-  import { isContactReadOnly } from 'checkoutstore';
+  import { isContactReadOnly } from 'razorpay';
   import { createEventDispatcher } from 'svelte';
 
   // UI imports

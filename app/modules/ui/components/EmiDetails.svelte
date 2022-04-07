@@ -16,7 +16,7 @@
   } from 'ui/labels/emi-details';
 
   // Util imports
-  import { getAmount } from 'checkoutstore';
+  import { getAmount } from 'razorpay';
   import { getCurrency } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
 

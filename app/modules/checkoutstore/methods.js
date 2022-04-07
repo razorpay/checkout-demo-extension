@@ -3,13 +3,10 @@ import Config, { FLOWS } from 'config';
 import { get } from 'svelte/store';
 
 import {
-  isInternational,
-  getAmount,
   isPayout,
+  isInternational,
   isASubscription,
-} from 'checkoutstore';
-
-import {
+  getAmount,
   getMerchantOrder,
   getMerchantOrderDueAmount,
   getOption,

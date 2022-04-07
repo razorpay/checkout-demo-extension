@@ -44,7 +44,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount } from 'checkoutstore';
+  import { getAmount } from 'razorpay';
   import { getCurrencies } from 'card/helper/dcc';
 
   import { getCurrency, isPartialPayment } from 'razorpay';

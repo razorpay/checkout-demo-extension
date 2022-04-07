@@ -10,13 +10,9 @@
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
-  import {
-    userConsentForTokenization,
-    selectedCard,
-  } from 'checkoutstore/screens/card';
+  import { userConsentForTokenization } from 'checkoutstore/screens/card';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -44,8 +40,7 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { getBankText } from 'ui/tabs/home/helpers';
-  import { isRecurring } from 'razorpay';
+  import { isDynamicFeeBearer, isRecurring } from 'razorpay';
 
   // Props
   export let card;

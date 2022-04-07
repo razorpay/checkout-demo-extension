@@ -1,5 +1,5 @@
 import { generateTextFromList } from 'i18n/text-utils';
-import { getBanks } from 'checkoutstore';
+import { getBanks } from 'razorpay';
 import { getShortBankName } from 'i18n';
 
 /**

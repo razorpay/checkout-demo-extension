@@ -25,8 +25,8 @@
   import { fly } from 'svelte/transition';
 
   // Utils imports
-  import { isAddressEnabled } from 'checkoutstore';
   import {
+    isAddressEnabled,
     isEmailHidden,
     isContactHidden,
     isPartialPayment,

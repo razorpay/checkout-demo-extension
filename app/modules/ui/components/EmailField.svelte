@@ -18,7 +18,7 @@
   export let value;
 
   // Utils
-  import { isEmailReadOnly, isEmailOptional } from 'checkoutstore';
+  import { isEmailReadOnly, isEmailOptional } from 'razorpay';
 
   const isOptional = isEmailOptional();
   const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;

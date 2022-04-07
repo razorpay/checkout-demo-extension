@@ -1,13 +1,9 @@
 import { get } from 'svelte/store';
 import { cardsSeparation } from 'card/experiments';
 import { toTitleCase } from 'lib/utils';
-import { getBanks } from 'checkoutstore';
+import { getBanks, isDynamicFeeBearer } from 'razorpay';
 
-import {
-  creditCardConfig,
-  debitCardConfig,
-  MAX_CHAR_LIMIT_FOR_BANK,
-} from './constants';
+import { creditCardConfig, debitCardConfig } from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
 
 import { blocks } from 'checkoutstore/screens/home';
@@ -16,7 +12,6 @@ import { blocks } from 'checkoutstore/screens/home';
 import { getLongBankName, formatTemplateWithLocale } from 'i18n';
 // Dynamic Fee Bearer
 import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
-import { isDynamicFeeBearer } from 'checkoutstore/index';
 
 function getSplitConfig() {
   const config = [];

@@ -6,7 +6,8 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
 
   // Store imports
-  import { showFeeLabel, isDynamicFeeBearer } from 'checkoutstore/index.js';
+  import { isDynamicFeeBearer } from 'razorpay';
+  import { showFeeLabel } from 'checkoutstore/index.js';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
   // Utils imports
