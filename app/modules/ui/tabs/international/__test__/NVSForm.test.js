@@ -20,6 +20,9 @@ jest.mock('sessionmanager', () => {
     getSession: () => ({
       get: jest.fn(),
       r: razorpayInstance,
+      themeMeta: {
+        icons: {},
+      },
     }),
   };
 });
