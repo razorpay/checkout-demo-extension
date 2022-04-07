@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'common/helper';
+import { makeAuthUrl } from 'checkoutstore';
 import type Razorpay from 'common/Razorpay';
 import { getOption } from 'razorpay';
 
@@ -107,7 +107,6 @@ export function getBankTransferUrl(
     ? getTimeStamp(getCustomExpiry() as number)
     : null;
   return makeAuthUrl(
-    instance,
     `orders/${order_id}/virtual_accounts${expiry ? `?close_by=${expiry}` : ''}`
   );
 }

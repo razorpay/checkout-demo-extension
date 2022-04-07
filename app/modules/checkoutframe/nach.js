@@ -1,6 +1,7 @@
-import { makeAuthUrl } from 'common/helper';
+import { makeAuthUrl } from 'checkoutstore';
 
 import { toTitleCase } from 'lib/utils';
+import { getOption } from 'razorpay';
 
 export const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
 export const ALLOWED_MAX_SIZE_IN_MB = 5;
@@ -71,7 +72,7 @@ export function getValidityError(file) {
  *
  * @returns {promise: Promise, abort: Function} [promise, abort]
  */
-export function uploadDocument(razorpay, file) {
+export function uploadDocument(file) {
   let ajax;
 
   // Aborts the upload request
@@ -84,13 +85,10 @@ export function uploadDocument(razorpay, file) {
 
   // Promise that gets fulfilled when upload n/w request is complete
   const promise = new Promise((resolve, reject) => {
-    const url = makeAuthUrl(
-      razorpay,
-      'token.registration/paper_mandate/authenticate'
-    );
+    const url = makeAuthUrl('token.registration/paper_mandate/authenticate');
     const data = new FormData();
-    const order_id = razorpay.get('order_id');
-    const auth_link_id = razorpay.get('auth_link_id');
+    const order_id = getOption('order_id');
+    const auth_link_id = getOption('auth_link_id');
 
     data.append('form_uploaded', file);
 

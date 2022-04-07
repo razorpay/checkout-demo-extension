@@ -15,9 +15,16 @@ export const getPreferences = (path, defaultValue) => {
 };
 
 export const getOption = (path) => {
-  return !path
+  const value = !path
     ? RazorpayStore.triggerInstanceMethod('get')
     : RazorpayStore.get(path);
+
+  if (path === 'order_id') {
+    /** if invoice then pick order Id from preference else from option */
+    return getPreferences('invoice.order_id') || value;
+  }
+
+  return value;
 };
 
 const getOptionCurry = (path) => {
