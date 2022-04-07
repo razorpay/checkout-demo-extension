@@ -306,22 +306,12 @@ function hideDowntimeAlert() {
   return wasShown;
 }
 
-function hideFeeWrap() {
-  var feeWrap = $('#fee-wrap');
-  var wasShown = feeWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(feeWrap);
-  }
-  return wasShown;
-}
-
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
   if (
     !hideEmi() &&
     !hideRecurringCardsOverlay() &&
-    !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
   ) {
@@ -4129,28 +4119,12 @@ Session.prototype = {
   },
 
   /**
-   * Show fees UI if `fee` is missing in payload and return whether the UI was
-   * shown or not.
-   *
-   * It will internally create an instance of `FeeBearerView` if not created
-   * and use the existing instance if already created.
-   *
-   * @return {Boolean} Whether or not the UI was shown
+   * Show fees UI if `fee` is missing in payload
    */
   showFeesUi: function () {
     var session = this;
     var data = session.payload;
     var isFeeMissing = !('fee' in data);
-    var feeBearerDiv = document.getElementsByClassName('fee-bearer');
-    var feeBearerBankTransferDiv = document.getElementsByClassName(
-      'fee-bearer-bank-transfer'
-    );
-    if (feeBearerBankTransferDiv.length > 0) {
-      feeBearerBankTransferDiv[0].style.display = 'none';
-    }
-    if (feeBearerDiv.length > 0) {
-      feeBearerDiv[0].removeAttribute('style');
-    }
 
     /**
      * Check here if 'fee' is set in payload,
@@ -4165,43 +4139,19 @@ Session.prototype = {
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
 
-      if (this.feeBearerView) {
-        this.feeBearerView.fetchFees(paymentData);
-      } else {
-        this.feeBearerView = new discreet.FeeBearerView({
-          target: gel('fee-wrap'),
-          props: {
-            paymentData: paymentData,
-          },
-        });
-
-        // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.$on('continue', function (event) {
-          var bearer = event.detail;
-
-          hideOverlay($('#fee-wrap'));
-
+      discreet.showFeeBearer({
+        paymentData: paymentData,
+        onContinue: function (bearer) {
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
           session.payload.fee = bearer.fee;
 
           // Don't redirect to fees route now
           session.feesRedirect = false;
-
           session.submit();
-        });
-
-        this.feeBearerView.$on('error', function () {
-          makeHidden('#fee-wrap');
-        });
-      }
-
-      showOverlay($('#fee-wrap'));
-
-      return true;
+        },
+      });
     }
-
-    return false;
   },
 
   closeModal: function () {
@@ -6080,7 +6030,6 @@ Session.prototype = {
       'emi',
       'emiPlansView',
       'emiScreenView',
-      'feeBearerView',
       'homeTab',
       'nachScreen',
       'otpView',

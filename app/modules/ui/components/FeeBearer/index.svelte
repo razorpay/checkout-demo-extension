@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
@@ -13,6 +13,7 @@
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
+  import { popStack } from 'navstack';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -33,10 +34,12 @@
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
-  export let isBankTransferView;
+  export let onContinue;
+  export let navstack;
 
   const entries = _Obj.entries;
-  const dispatch = createEventDispatcher();
+
+  const isOverlay = navstack?.isOverlay;
   const session = getSession();
   const fee_label = session.get('fee_label');
   const allowedKeys = ['original_amount', 'razorpay_fee', 'tax', 'amount'];
@@ -78,8 +81,10 @@
       response.error.description,
       $locale
     );
-    session.showLoadError(errorMessage, response.error);
-    dispatch('error', errorMessage);
+    if (isOverlay) {
+      popStack(); // @TODO future - replaceStack(ErrorScreen);
+      session.showLoadError(errorMessage, response.error);
+    }
   }
 
   export function fetchFees(paymentData) {
@@ -95,9 +100,16 @@
     loading = true;
     session.r.calculateFees(paymentData).then(onSuccess).catch(onError);
   }
+
+  function handleCTA() {
+    if (isOverlay) {
+      popStack();
+    }
+    onContinue?.(bearer);
+  }
 </script>
 
-<div class={isBankTransferView ? 'fee-bearer-bank-transfer' : 'fee-bearer'}>
+<div class="fee-bearer">
   {#if loading}
     <AsyncLoading>
       <!-- LABEL: Loading fees breakup... -->
@@ -134,9 +146,17 @@
         {/if}
       {/each}
     </div>
-    <div class="btn" on:click={() => dispatch('continue', bearer)}>
+    <div class="btn" on:click={handleCTA}>
       <!-- LABEL: Continue -->
-      {!isBankTransferView ? $t(CONTINUE_ACTION) : $t(CLOSE_ACTION)}
+      <!-- LABEL: Close -->
+      {$t(onContinue ? CONTINUE_ACTION : CLOSE_ACTION)}
     </div>
   {/if}
 </div>
+
+<style>
+  .fee-bearer {
+    padding: 20px;
+    box-sizing: border-box;
+  }
+</style>

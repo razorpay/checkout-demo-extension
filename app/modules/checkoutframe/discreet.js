@@ -15,7 +15,7 @@ import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'ui/components/feebearer.svelte';
+import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
@@ -215,7 +215,7 @@ export default {
   emiScreenView,
   emiPlansView,
 
-  FeeBearerView,
+  showFeeBearer,
   Backdrop,
   Overlay,
   AuthOverlay,

@@ -2,7 +2,7 @@
 import PoweredBy from 'ui/components/PoweredBy.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
-import NavigationStack from 'navstack';
+import NavigationStack, { isStackPopulated } from 'navstack';
 
 import { isPayout } from 'razorpay';
 import { getSession } from 'sessionmanager';
@@ -34,7 +34,7 @@ export function render() {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {
     topbar.$on('back', () => {
-      if (navStack.isActive()) {
+      if (isStackPopulated()) {
         navStack.backPressed();
       } else {
         session.back();
