@@ -854,15 +854,11 @@ Session.prototype = {
     if (!this.el) {
       this.setTheme();
       this.mainModal = new discreet.MainModal({ target: document.body });
+
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-      // if ((window.MSInputMethodContext && document.documentMode)) {
-      //   var s = document.createElement('script');
-      //   s.type = 'text/javascript';
-      //   s.src =
-      //     'https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js';
-      //   $('head').append(s);
-      // }
+
+      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },
@@ -1885,6 +1881,7 @@ Session.prototype = {
   setTheme: function () {
     // update r.themeMeta based on prefs color
     this.r.postInit();
+
     // ThemeMeta in razorpay.js contains only
     // color, textColor, highlightColor
     discreet.Theme.setThemeColor(this.r.themeMeta.color);
