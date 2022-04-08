@@ -131,7 +131,7 @@ export function updatePopup(popupWindow, content) {
  * @param {PaymentInstance} paymentInstance
  */
 export function writePopup(win, paymentInstance) {
-  const { setTimeout, document, addEventListener } = win;
+  const { setTimeout, document } = win;
   const gel = document.getElementById.bind(document);
   /*jshint evil:true */
   document.write(popupTemplate(paymentInstance));
@@ -146,8 +146,10 @@ export function writePopup(win, paymentInstance) {
 
   timeouts.push(
     setTimeout(() => {
-      gel('title').innerHTML = `${t(TRYING_TO_LOAD)}`;
-      gel('msg').innerHTML = `${t(TRYING_BANK_PAGE_MSG)}`;
+      try {
+        gel('title').innerHTML = `${t(TRYING_TO_LOAD)}`;
+        gel('msg').innerHTML = `${t(TRYING_BANK_PAGE_MSG)}`;
+      } catch (e) {}
     }, 1e4)
   );
 
@@ -159,20 +161,9 @@ export function writePopup(win, paymentInstance) {
 
   trackPopup('load');
 
-  addEventListener('beforeunload', () => {
+  win.addEventListener('beforeunload', () => {
     timeouts.forEach(win.clearTimeout);
     trackPopup('unload');
-  });
-
-  // This will only work if the error occurs after executing this.
-  addEventListener('error', function (event) {
-    var properties = {
-      message: event.message,
-      line: event.line,
-      col: event.col,
-      stack: event.error && event.error.stack,
-    };
-    trackPopup('js_error', properties);
   });
 }
 
