@@ -889,8 +889,6 @@ Session.prototype = {
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-
-      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },
