@@ -4,10 +4,7 @@
 
   // Store
   import { t, locale } from 'svelte-i18n';
-  import {
-    codReason,
-    showCodLoader,
-  } from 'one_click_checkout/address/shipping_address/store';
+  import { codReason, showCodLoader } from 'one_click_checkout/address/shipping_address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
 
   // UI imports
@@ -33,6 +30,7 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let method = null; // Name of the method
@@ -47,7 +45,8 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let _icon = getIconForDisplay();
 
   let _subtitle;
@@ -122,16 +121,11 @@
   // let showWalnutBanner = false;
   // $: showWalnutBanner = instrument.showWalnutBanner;
   let walnutBannerText = '';
-  $: walnutBannerText = formatMessageWithLocale(
-    'cardless_emi.walnut_banner_text',
-    $locale
-  );
+  $: walnutBannerText = formatMessageWithLocale('cardless_emi.walnut_banner_text', $locale);
 </script>
 
 <SlottedOption
-  className={`new-method has-tooltip ${
-    $selectedInstrumentId === instrument.id && 'selected'
-  }`}
+  className={`new-method has-tooltip ${$selectedInstrumentId === instrument.id && 'selected'}`}
   defaultStyles={false}
   on:click={select}
   attributes={{ method }}

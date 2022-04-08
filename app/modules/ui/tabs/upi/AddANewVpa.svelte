@@ -13,7 +13,6 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Util imports
-  import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
   import { getPrefilledName, hasFeature } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
@@ -31,6 +30,7 @@
   } from 'ui/labels/upi';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let selected = false;
@@ -46,7 +46,7 @@
 
   const PATTERN_WITH_HANDLE = '.+@.+';
 
-  const session = getSession();
+  const themeMeta = getThemeMeta();
 
   // Computed
   export let pattern;
@@ -74,11 +74,7 @@
     }
     const vpaEntered = vpa.split('@')[1];
     if (vpaEntered) {
-      const currentDowntime = checkDowntime(
-        upiDowntimes,
-        'vpa_handle',
-        vpaEntered
-      );
+      const currentDowntime = checkDowntime(upiDowntimes, 'vpa_handle', vpaEntered);
       if (currentDowntime) {
         downtimeSeverity = currentDowntime;
         downtimeInstrument = vpaEntered;
@@ -114,16 +110,8 @@
     vpaField.focus();
   }
 
-  export function setSelectionRange(
-    selectionStart,
-    selectionEnd,
-    selectionDirection = 'none'
-  ) {
-    vpaField.setSelectionRange(
-      selectionStart,
-      selectionEnd,
-      selectionDirection
-    );
+  export function setSelectionRange(selectionStart, selectionEnd, selectionDirection = 'none') {
+    vpaField.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
   }
 
   function focusAfterTimeout() {
@@ -154,21 +142,16 @@
   <div id={'new-vpa-field-' + paymentMethod} slot="title">
     <!-- LABEL: UPI ID -->
     <!-- LABEL: Add UPI ID -->
-    {logged && canSaveVpa
-      ? $t(NEW_VPA_TITLE_LOGGED_IN)
-      : $t(NEW_VPA_TITLE_LOGGED_OUT)}
+    {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
-  <div
-    slot="subtitle"
-    class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}
-  >
+  <div slot="subtitle" class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}>
     {#if paymentMethod === 'upi_otm' || recurring}
       <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
   <i slot="icon" class="top">
-    <Icon icon={session.themeMeta.icons.upi} />
+    <Icon icon={themeMeta.icons.upi} />
   </i>
 
   <div slot="body">
@@ -209,12 +192,8 @@
               atIndex < currentVaue.length - 1
             ) {
               const predictionInput = currentVaue.substr(atIndex + 1);
-              const predictions = suggestionVPA.filter((vpa) =>
-                vpa.startsWith(predictionInput)
-              );
-              const value = `${currentVaue.substr(0, atIndex)}@${
-                predictions?.[0] || ''
-              }`;
+              const predictions = suggestionVPA.filter((vpa) => vpa.startsWith(predictionInput));
+              const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
               if (predictions?.length > 0) {
                 return {
                   value,
@@ -243,15 +222,9 @@
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
-            <label
-              id={'should-save-vpa-' + paymentMethod}
-              for={'save-vpa-' + paymentMethod}
-            >
+            <label id={'should-save-vpa-' + paymentMethod} for={'save-vpa-' + paymentMethod}>
               <!-- LABEL: Securely save your UPI ID -->
-              <Checkbox
-                bind:checked={rememberVpa}
-                id={'save-vpa-' + paymentMethod}
-              >
+              <Checkbox bind:checked={rememberVpa} id={'save-vpa-' + paymentMethod}>
                 {$t(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>
@@ -262,11 +235,7 @@
   </div>
   <div slot="downtime" class="downtime-upi">
     {#if selected && !!downtimeSeverity}
-      <DowntimeCallout
-        showIcon={true}
-        severe={downtimeSeverity}
-        {downtimeInstrument}
-      />
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
     {/if}
   </div>
 </SlottedRadioOption>

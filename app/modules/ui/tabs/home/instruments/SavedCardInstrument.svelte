@@ -11,10 +11,7 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import {
-    getBankText,
-    addConsentDetailsToInstrument,
-  } from 'ui/tabs/home/helpers';
+  import { getBankText, addConsentDetailsToInstrument } from 'ui/tabs/home/helpers';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { isCardTokenized } from 'ui/tabs/card/utils.js';
@@ -34,6 +31,7 @@
   import { selectedCardFromHome } from 'checkoutstore/screens/card';
   import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
+  import { getThemeMeta } from 'checkoutstore/theme';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -46,13 +44,14 @@
   $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
+  const themeMeta = getThemeMeta();
   const isEmiInstrument = instrument.method === 'emi';
 
   function getIcon(card) {
     if (card && card.network && card.network !== 'unknown') {
       return getNetworkIcon(findCodeByNetworkName(card.network));
     } else {
-      return session.themeMeta.icons.card;
+      return themeMeta.icons.card;
     }
   }
 
@@ -64,9 +63,7 @@
   let cardKnown = false;
 
   const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
-  const savedCard = savedCards.find(
-    (card) => card.id === individualInstrument.token_id
-  );
+  const savedCard = savedCards.find((card) => card.id === individualInstrument.token_id);
 
   if (savedCard) {
     // User is logged in
@@ -88,12 +85,7 @@
 
     if (individualInstrument.issuer) {
       // We know stuff about the card.
-      title = getBankText(
-        individualInstrument,
-        false,
-        isEmiInstrument,
-        $locale
-      );
+      title = getBankText(individualInstrument, false, isEmiInstrument, $locale);
       icon = getIcon(individualInstrument);
       hasCvv = false;
     } else {
@@ -204,11 +196,7 @@
   </div>
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
-      <DowntimeCallout
-        showIcon={false}
-        severe={downtimeSeverity}
-        {downtimeInstrument}
-      />
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity} {downtimeInstrument} />
     {/if}
   </div>
 </svelte:component>

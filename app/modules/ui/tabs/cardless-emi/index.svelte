@@ -2,7 +2,7 @@
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
 
-  import { getThemeColor } from 'checkoutstore/theme';
+  import { getThemeColor, getThemeMeta } from 'checkoutstore/theme';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
@@ -12,7 +12,6 @@
     isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
-  import { getSession } from 'sessionmanager';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -26,8 +25,8 @@
     OTHER_OPTIONS,
   } from 'ui/labels/cardlessemi';
 
-  const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const sectionMeta = {
     default: { order: 1 },
@@ -46,10 +45,7 @@
   }, {});
 
   let sectionTitle = {
-    default:
-      Object.keys(sectionProviderMap).length <= 1
-        ? SELECT_OPTION_TITLE
-        : OTHER_OPTIONS,
+    default: Object.keys(sectionProviderMap).length <= 1 ? SELECT_OPTION_TITLE : OTHER_OPTIONS,
     recommended: SELECT_RECOMMENDED_TITLE,
   };
 
@@ -115,10 +111,7 @@
     });
     // if after filter, some instrument removed then we may need to update the title accordingly
     sectionTitle = {
-      default:
-        Object.keys(filteredProviders).length <= 1
-          ? SELECT_OPTION_TITLE
-          : OTHER_OPTIONS,
+      default: Object.keys(filteredProviders).length <= 1 ? SELECT_OPTION_TITLE : OTHER_OPTIONS,
       recommended: SELECT_RECOMMENDED_TITLE,
     };
     // sort section by order
@@ -146,23 +139,13 @@
       {#each filteredProviders[providerSection] as provider (provider.data.code)}
         <div class="cm-single-option">
           <NextOption {...provider} on:select>
-            {getCardlessEmiProviderName(
-              getOverriddenProviderCode(provider.data.code),
-              $locale
-            )}
+            {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
             <span class="cm-side-label"
-              >{getCardlessEmiProviderData(
-                provider.data.code,
-                'sideLabel',
-                $locale
-              )}</span
+              >{getCardlessEmiProviderData(provider.data.code, 'sideLabel', $locale)}</span
             >
           </NextOption>
           {#if Boolean(provider.highlightLabel)}
-            <div
-              class="cm-highlightLabel"
-              style={`background:${getThemeColor()}1a;`}
-            >
+            <div class="cm-highlightLabel" style={`background:${getThemeColor()}1a;`}>
               <Icon icon={icons.tick_flag} />
               <span>{$t(provider.highlightLabel) || ''}</span>
             </div>

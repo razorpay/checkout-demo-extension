@@ -4,28 +4,20 @@
   import Icon from 'ui/elements/Icon.svelte';
   import RewardsIcon from 'ui/components/rewards/Icon.svelte';
 
-  // Session imports
-  import { getSession } from 'sessionmanager';
-
   // Store
   import { contact, isContactPresent, email } from 'checkoutstore/screens/home';
-  import {
-    isEmailOptional,
-    isContactHidden,
-    isEmailHidden,
-    isContactEmailHidden,
-  } from 'razorpay';
+  import { isEmailOptional, isContactHidden, isEmailHidden, isContactEmailHidden } from 'razorpay';
   import { reward } from 'checkoutstore/rewards';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   export let onEdit;
 
-  const session = getSession();
-  const { edit } = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const { edit } = themeMeta.icons;
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip =
-      ($isContactPresent || $email) && !isContactEmailHidden();
+    showUserDetailsStrip = ($isContactPresent || $email) && !isContactEmailHidden();
   }
 </script>
 

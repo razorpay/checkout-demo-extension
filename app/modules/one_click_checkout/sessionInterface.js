@@ -8,10 +8,7 @@ import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'razorpay';
 import { history } from 'one_click_checkout/routing/store';
-import {
-  savedAddresses,
-  isBillingSameAsShipping,
-} from 'one_click_checkout/address/store';
+import { savedAddresses, isBillingSameAsShipping } from 'one_click_checkout/address/store';
 import {
   selectedAddress as selectedShippingAddress,
   selectedAddressId as selectedShippingAddressId,
@@ -19,11 +16,7 @@ import {
   newUserAddress,
   showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
-import {
-  isEditContactFlow,
-  isLogoutFlow,
-  isCodForced,
-} from 'one_click_checkout/store';
+import { isEditContactFlow, isLogoutFlow, isCodForced } from 'one_click_checkout/store';
 import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
@@ -32,15 +25,13 @@ import {
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 // service imports
-import {
-  updateOrder,
-  thirdWatchCodServiceability,
-} from 'one_click_checkout/address/service';
+import { updateOrder, thirdWatchCodServiceability } from 'one_click_checkout/address/service';
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
 
 import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 export const historyExists = () => get(history).length;
 
@@ -85,14 +76,13 @@ export function handleEditContact(logoutFlow = false) {
 }
 
 export function getIcons() {
-  const session = getSession();
-  return session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  return themeMeta.icons;
 }
 
 export function getTheme() {
-  const session = getSession();
-
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 }
 
 /**
@@ -115,10 +105,7 @@ export function redirectToPaymentMethods(
   }
 
   Analytics.setMeta(MetaProperties.IS_USER_LOGGED_IN, customer.logged);
-  Analytics.setMeta(
-    MetaProperties.SAVED_ADDRESS_COUNT,
-    get(savedAddresses).length
-  );
+  Analytics.setMeta(MetaProperties.SAVED_ADDRESS_COUNT, get(savedAddresses).length);
   const { country, state, city, zipcode, contact, id } = address;
   if (id) {
     Analytics.setMeta(MetaProperties.ADDRESS_ID, id);
@@ -129,14 +116,8 @@ export function redirectToPaymentMethods(
   Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_CITY, city);
   Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_PINCODE, zipcode);
   Analytics.setMeta(MetaProperties.SHIPPING_ADDRESS_CONTACT, contact);
-  Analytics.setMeta(
-    MetaProperties.COUNTRY_CODE,
-    contact?.countryCode || INDIA_COUNTRY_CODE
-  );
-  Analytics.setMeta(
-    MetaProperties.COUNTRY,
-    country || get(selectedShippingCountryISO)
-  );
+  Analytics.setMeta(MetaProperties.COUNTRY_CODE, contact?.countryCode || INDIA_COUNTRY_CODE);
+  Analytics.setMeta(MetaProperties.COUNTRY, country || get(selectedShippingCountryISO));
 
   // If navigating from methods->details->methods we need not to update the order
   if (shouldUpdateOrder) {
@@ -164,8 +145,7 @@ export function redirectToPaymentMethods(
               });
               savedAddresses.set(newAddresses);
             } else {
-              const newAddressServiceability =
-                get(newUserAddress).cod && res?.cod;
+              const newAddressServiceability = get(newUserAddress).cod && res?.cod;
               newUserAddress.set({
                 ...get(newUserAddress),
                 cod: newAddressServiceability,
@@ -180,9 +160,7 @@ export function redirectToPaymentMethods(
       .catch((e) => {
         session.updateOrderFailure();
         const currhis = get(history);
-        const savedAddArr = currhis.find(
-          (item) => item.name === views.SAVED_ADDRESSES
-        );
+        const savedAddArr = currhis.find((item) => item.name === views.SAVED_ADDRESSES);
         if (savedAddArr && Object.keys(savedAddArr).length > 0) {
           navigator.navigateBack(views.SAVED_ADDRESSES);
         } else if (get(savedAddresses)?.length) {

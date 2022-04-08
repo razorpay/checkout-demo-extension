@@ -21,6 +21,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   let merchantName = getOption('name');
 
@@ -30,7 +31,8 @@
     'https://razorpay.com/links/covid19?ref=checkout_covid_donations#hs_cos_wrapper_widget_1585571452797';
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let secondsRemaining = 10;
 
   function finishCheckout() {

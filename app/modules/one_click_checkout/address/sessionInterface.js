@@ -2,7 +2,7 @@
 import { savedAddresses } from 'one_click_checkout/address/store';
 import { showSavedAddressCta } from 'one_click_checkout/address/shipping_address/store';
 import { formatAddress } from 'one_click_checkout/address/helpersExtra';
-import { getSession } from 'sessionmanager';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 /**
  *
@@ -28,8 +28,8 @@ function formatAddresses(addresses, type) {
  * Returns session theme
  */
 export const getTheme = () => {
-  const session = getSession();
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 };
 
 export { showSavedAddressCta };

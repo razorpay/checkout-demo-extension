@@ -28,6 +28,7 @@
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
   import { tryOpeningIntentUrl } from 'upi/helper';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let apps;
@@ -47,7 +48,8 @@
   let upiDowntimes = getDowntimes().upi;
 
   const session = getSession();
-  let otherAppsIcon = session.themeMeta.icons.othermethods;
+  const themeMeta = getThemeMeta();
+  let otherAppsIcon = themeMeta.icons.othermethods;
 
   $: {
     if (apps.length <= 5 || showAll) {
@@ -147,11 +149,7 @@
         {#if !!downtimeSeverity && app.package_name === selected}
           <div class="downtime-upi-intent-wrapper">
             <div class="downtime-upi-intent">
-              <DowntimeCallout
-                showIcon={true}
-                severe={downtimeSeverity}
-                {downtimeInstrument}
-              />
+              <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
             </div>
           </div>
         {/if}
