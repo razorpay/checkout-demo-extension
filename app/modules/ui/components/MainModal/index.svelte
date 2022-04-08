@@ -7,13 +7,12 @@
     isIRCTC,
   } from 'razorpay';
   import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
-  import { getAmount, getBrandImage, disableAnimation } from './helper';
+  import { getAmount, disableAnimation } from './helper';
   import { getStore } from 'checkoutstore/cta';
 
   const emiBanks = getEMIBanks();
   const cta = getStore();
   const noanim = disableAnimation();
-  const brandImage = getBrandImage();
 </script>
 
 <div
@@ -82,12 +81,6 @@
             {/if}
           </div>
           <div id="language-dropdown" />
-          {#if brandImage}
-            <div
-              id="cob-image"
-              style={`background-image: url('${brandImage}')`}
-            />
-          {/if}
         </div>
         <div id="body" class="sub">
           <div id="topbar-wrap" />
@@ -120,13 +113,6 @@
             <div id="footer" role="button" class="button">
               <span id="footer-cta">{cta}</span>
             </div>
-            {#if getOption('theme.branding')}
-              <img
-                id="cob-rzp"
-                src="https://cdn.razorpay.com/logo.svg"
-                alt=""
-              />
-            {/if}
             <button type="submit" />
           </form>
         </div>
