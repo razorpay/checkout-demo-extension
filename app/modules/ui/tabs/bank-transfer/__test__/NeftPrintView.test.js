@@ -1,4 +1,4 @@
-import { getMerchantKey, getOption } from 'razorpay';
+import { getMerchantKey, getOption, getOrderId } from 'razorpay';
 import { render } from '@testing-library/svelte';
 import {
   isCustomChallan,
@@ -59,6 +59,15 @@ function MockJSPDF() {
   this.splitTextToSize = jest.fn();
 }
 
+beforeEach(() => {
+  getOption
+    .mockReturnValueOnce('Dummy description')
+    .mockReturnValueOnce(false)
+    .mockReturnValueOnce('Dummy Name');
+
+  getOrderId.mockReturnValue('dummyOrderId');
+});
+
 describe('Generate Challan Standard', () => {
   test('Should be generated', async () => {
     let img = new window.Image();
@@ -73,12 +82,6 @@ describe('Generate Challan Standard', () => {
     };
 
     const spy = jest.spyOn(window, 'close').mockReturnValue(true);
-
-    getOption
-      .mockReturnValueOnce('Dummy description')
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce('dummyOrderId')
-      .mockReturnValueOnce('Dummy Name');
 
     getSDKMeta.mockReturnValueOnce({
       platform: 'web',
@@ -112,11 +115,6 @@ describe('Generate Challan Customised', () => {
 
     const spy = jest.spyOn(window, 'close').mockReturnValue(true);
 
-    getOption
-      .mockReturnValueOnce('Dummy description')
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce('dummyOrderId')
-      .mockReturnValueOnce('Dummy Name');
     isCustomChallan.mockReturnValue(true);
     getCustomFields.mockImplementation(() => {
       return [
@@ -168,11 +166,6 @@ describe('Download & Save Challan on Android SDK', () => {
 
     const spy = jest.spyOn(window, 'close').mockReturnValue(true);
 
-    getOption
-      .mockReturnValueOnce('Dummy description')
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce('dummyOrderId')
-      .mockReturnValueOnce('Dummy Name');
     isCustomChallan.mockReturnValue(true);
     getCustomFields.mockImplementation(() => {
       return [
@@ -222,11 +215,6 @@ describe('Download & Save Challan on IOS SDK', () => {
 
     const spy = jest.spyOn(window, 'close').mockReturnValue(true);
 
-    getOption
-      .mockReturnValueOnce('Dummy description')
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce('dummyOrderId')
-      .mockReturnValueOnce('Dummy Name');
     isCustomChallan.mockReturnValue(true);
     getCustomFields.mockImplementation(() => {
       return [
