@@ -109,7 +109,6 @@ var preferences,
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var ua_iPhone = /iPhone/.test(ua);
-var isIE = /MSIE |Trident\//.test(ua);
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -885,55 +884,15 @@ Session.prototype = {
     return this.r._payment;
   },
 
-  getClasses: function () {
-    var classes = [];
-    if (isMobile()) {
-      classes.push('mobile');
-    }
-
-    var getter = this.get;
-    var setter = this.set;
-
-    if (!this.r.isLiveMode()) {
-      classes.push('test');
-    }
-
-    if (getter('theme.hide_topbar')) {
-      classes.push('notopbar');
-    }
-
-    if (!getter('image')) {
-      classes.push('noimage');
-    }
-
-    if (isIE || !getter('modal.animation')) {
-      classes.push('noanim');
-    }
-
-    return classes.join(' ');
-  },
-
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      var classes = this.getClasses();
-      var div = document.createElement('div');
-      var styleEl = this.renderCss();
-      div.innerHTML = templates.modal(this, {
-        Store: Store,
-        RazorpayHelper: RazorpayHelper,
-        MethodStore: MethodStore,
-        SecurityUtils: SecurityUtils,
-        cta: storeGetter(Cta.getStore()),
-      });
-      this.el = div.firstChild;
-      document.body.appendChild(this.el);
+      document.body.appendChild(this.renderCss());
 
-      this.el.appendChild(styleEl);
+      this.mainModal = new discreet.MainModal({ target: document.body });
 
+      this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-
-      $(this.el).addClass(classes);
     }
     return this.el;
   },
@@ -1177,7 +1136,6 @@ Session.prototype = {
     this.isOpen = true;
 
     this.setExperiments();
-    this.improviseModalOptions();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1901,22 +1859,6 @@ Session.prototype = {
         },
       },
     });
-  },
-
-  improviseModalOptions: function () {
-    /**
-     * We want to disable animations on IRCTC WebView.
-     * IRCTC disables h/w acceleration on their WebViews
-     * which makes our animations stutter.
-     *
-     * There isn't a reliable way to detect h/w acceleration
-     * state in the browser, so we're doing this based on merchants.
-     *
-     * TODO: Move to Checkout feature
-     */
-    if (RazorpayHelper.isIRCTC() && discreet.UserAgent.AndroidWebView) {
-      this.set('modal.animation', false);
-    }
   },
 
   improvisePaymentOptions: function () {
