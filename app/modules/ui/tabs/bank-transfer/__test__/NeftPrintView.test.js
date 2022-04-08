@@ -11,6 +11,7 @@ import { getCheckoutBridge, getNewIosBridge } from 'bridge';
 import { getSession } from 'sessionmanager';
 
 jest.mock('razorpay', () => ({
+  getOrderId: jest.fn(),
   getOption: jest.fn(),
   getMerchantKey: jest.fn(),
 }));
