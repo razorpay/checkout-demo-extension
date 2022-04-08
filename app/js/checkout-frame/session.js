@@ -15,8 +15,6 @@
 /* global Wallet */
 /* global each */
 /* global abortAjax */
-/* global invokeEach */
-/* global invokeOnEach */
 /* global bind */
 /* global isString */
 /* global clone */
@@ -30,7 +28,6 @@
 /* global doc */
 /* global now */
 /* global roll */
-/* global toggleInvalid */
 
 // from init checkout-frame
 /* global SessionManager */
@@ -2542,7 +2539,7 @@ Session.prototype = {
         valid = new RegExp(pattern).test(value);
       }
     }
-    toggleInvalid($parent, valid);
+    $parent.toggleClass('invalid', !valid);
   },
 
   refresh: function () {
@@ -4076,7 +4073,7 @@ Session.prototype = {
      * Otherwise, show the fee breakup.
      */
     if (isFeeMissing) {
-      var paymentData = clone(this.payload);
+      var paymentData = _Obj.clone(this.payload);
 
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
@@ -5220,7 +5217,7 @@ Session.prototype = {
       data.wallet = 'paypal';
     }
     if (RazorpayHelper.isAddressEnabled()) {
-      var notes = (data.notes = clone(this.get('notes')) || {});
+      var notes = (data.notes = _Obj.clone(this.get('notes')) || {});
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);
@@ -6028,9 +6025,13 @@ Session.prototype = {
 
       try {
         this.delegator.destroy();
-        invokeEach(this.listeners);
+        this.listeners.forEach(function (unlisten) {
+          unlisten();
+        });
       } catch (e) {}
-      invokeOnEach('off', this.bits);
+      this.bits.forEach(function (bit) {
+        bit.off();
+      });
       this.listeners = [];
       this.bits = [];
       if (this.modal) {
