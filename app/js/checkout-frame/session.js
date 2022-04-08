@@ -682,6 +682,7 @@ function askOTP(
                 '<img class="native-otp-bank" src="' +
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
+              thisSession.setOneCCTabLogo(bankLogo);
             }
 
             view.updateScreen({
@@ -3112,6 +3113,7 @@ Session.prototype = {
         this.confirmClose().then(function (close) {
           if (close) {
             self.back(true);
+            this.setOneCCTabLogo('');
           }
         });
         return;
