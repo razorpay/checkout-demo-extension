@@ -152,7 +152,7 @@
   }
 
   :global(.one-cc) .confirm-container {
-    padding: 22px 16px;
+    padding: 20px 16px;
   }
 
   :global(.one-cc) .confirm-heading {
