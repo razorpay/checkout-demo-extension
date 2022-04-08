@@ -6,7 +6,12 @@
 
   // Store
   import { contact, isContactPresent, email } from 'checkoutstore/screens/home';
-  import { isEmailOptional, isContactHidden, isEmailHidden, isContactEmailHidden } from 'razorpay';
+  import {
+    isEmailOptional,
+    isContactHidden,
+    isEmailHidden,
+    isContactEmailHidden,
+  } from 'razorpay';
   import { reward } from 'checkoutstore/rewards';
   import { getThemeMeta } from 'checkoutstore/theme';
 
@@ -17,7 +22,8 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = ($isContactPresent || $email) && !isContactEmailHidden();
+    showUserDetailsStrip =
+      ($isContactPresent || $email) && !isContactEmailHidden();
   }
 </script>
 

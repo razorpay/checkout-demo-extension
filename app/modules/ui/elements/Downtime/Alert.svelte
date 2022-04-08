@@ -57,11 +57,19 @@
         <div>
           {#if $selectedInstrument?.method === 'card'}
             <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_CARD_HIGHLIGHT2, { instrument }, $locale)}
+              text={formatTemplateWithLocale(
+                DOWNTIME_CARD_HIGHLIGHT2,
+                { instrument },
+                $locale
+              )}
             />
           {:else}
             <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_HIGHLIGHT2, { instrument }, $locale)}
+              text={formatTemplateWithLocale(
+                DOWNTIME_HIGHLIGHT2,
+                { instrument },
+                $locale
+              )}
             />
           {/if}
         </div>
@@ -75,7 +83,8 @@
     </ul>
     <div class="buttons">
       <button class="back-button" on:click={handleBack}>Back</button>
-      <button class="continue-button" on:click={handleContinue}>Continue</button>
+      <button class="continue-button" on:click={handleContinue}>Continue</button
+      >
     </div>
   </div>
 </div>
@@ -119,7 +128,11 @@
   }
   .continue-button {
     padding: 12px 60px;
-    background: linear-gradient(97.84deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%),
+    background: linear-gradient(
+        97.84deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(0, 0, 0, 0.2) 100%
+      ),
       #3a97fc;
     color: #ffffff;
   }

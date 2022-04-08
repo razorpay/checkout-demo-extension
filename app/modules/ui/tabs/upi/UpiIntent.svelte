@@ -149,7 +149,11 @@
         {#if !!downtimeSeverity && app.package_name === selected}
           <div class="downtime-upi-intent-wrapper">
             <div class="downtime-upi-intent">
-              <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+              <DowntimeCallout
+                showIcon={true}
+                severe={downtimeSeverity}
+                {downtimeInstrument}
+              />
             </div>
           </div>
         {/if}

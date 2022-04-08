@@ -11,7 +11,10 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import { getBankText, addConsentDetailsToInstrument } from 'ui/tabs/home/helpers';
+  import {
+    getBankText,
+    addConsentDetailsToInstrument,
+  } from 'ui/tabs/home/helpers';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { isCardTokenized } from 'ui/tabs/card/utils.js';
@@ -63,7 +66,9 @@
   let cardKnown = false;
 
   const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
-  const savedCard = savedCards.find((card) => card.id === individualInstrument.token_id);
+  const savedCard = savedCards.find(
+    (card) => card.id === individualInstrument.token_id
+  );
 
   if (savedCard) {
     // User is logged in
@@ -85,7 +90,12 @@
 
     if (individualInstrument.issuer) {
       // We know stuff about the card.
-      title = getBankText(individualInstrument, false, isEmiInstrument, $locale);
+      title = getBankText(
+        individualInstrument,
+        false,
+        isEmiInstrument,
+        $locale
+      );
       icon = getIcon(individualInstrument);
       hasCvv = false;
     } else {
@@ -196,7 +206,11 @@
   </div>
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity} {downtimeInstrument} />
+      <DowntimeCallout
+        showIcon={false}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
     {/if}
   </div>
 </svelte:component>

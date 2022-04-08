@@ -1,6 +1,10 @@
 <script lang="ts">
   import { isMobile } from 'common/useragent';
-  import RazorpayStore, { getOption, isOneClickCheckout, isIRCTC } from 'razorpay';
+  import RazorpayStore, {
+    getOption,
+    isOneClickCheckout,
+    isIRCTC,
+  } from 'razorpay';
   import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
   import { getAmount, disableAnimation } from './helper';
   import { getStore } from 'checkoutstore/cta';
@@ -36,7 +40,11 @@
       <div id="options-wrap" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
-          <img style="width:35px;" src="https://cdn.razorpay.com/app/googlepay.svg" alt="" />
+          <img
+            style="width:35px;"
+            src="https://cdn.razorpay.com/app/googlepay.svg"
+            alt=""
+          />
           <div id="overlay-close" class="close">×</div>
         </div>
         <div id="fd-t" />
@@ -89,7 +97,10 @@
             <div id="form-fields">
               <div id="body-overlay" />
               {#if isIRCTC()}
-                <div class="recurring-message" style="right: 0;left: 0;border-radius:0 0 3px 3px">
+                <div
+                  class="recurring-message"
+                  style="right: 0;left: 0;border-radius:0 0 3px 3px"
+                >
                   <span>&#x2139;</span>
                   *Payment charges and taxes as applicable.
                 </div>

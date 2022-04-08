@@ -42,7 +42,12 @@
     showSavedCardTooltip,
   } from 'checkoutstore/screens/card';
 
-  import { methodInstrument, blocks, phone, selectedInstrument } from 'checkoutstore/screens/home';
+  import {
+    methodInstrument,
+    blocks,
+    phone,
+    selectedInstrument,
+  } from 'checkoutstore/screens/home';
 
   import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
@@ -95,7 +100,11 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
-  import Analytics, { Events, CardEvents, MetaProperties } from 'analytics/index';
+  import Analytics, {
+    Events,
+    CardEvents,
+    MetaProperties,
+  } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
   import {
     sortBasedOnTokenization,
@@ -195,7 +204,11 @@
   // hide the apps. It clearly indicates that the user doesn't want to use apps.
   let userWantsApps = true;
   $: {
-    if (savedCards.length && lastView === Views.SAVED_CARDS && currentView === Views.ADD_CARD) {
+    if (
+      savedCards.length &&
+      lastView === Views.SAVED_CARDS &&
+      currentView === Views.ADD_CARD
+    ) {
       userWantsApps = false;
     } else {
       userWantsApps = true;
@@ -314,7 +327,9 @@
        * b. It is also dependant on the flag isCardSupportedForRecurring
        * c. For all the other payments except recurring keeping as is.
        */
-      $newCardInputFocused = isRecurring() ? !isCardSupportedForRecurring : false;
+      $newCardInputFocused = isRecurring()
+        ? !isCardSupportedForRecurring
+        : false;
     }
     if ($selectedApp || $selectedCard || $newCardInputFocused) {
       // validate offer only for card-apps, to avoid breaks in existing flow.
@@ -348,7 +363,9 @@
     } else if (!last4 && currentView === Views.AVS && $selectedCardFromHome) {
       // incase user directly come to avs screen from preferred method (saved card)
       last4 = $selectedCardFromHome?.card?.last4;
-      selectedCardNetwork = findCodeByNetworkName($selectedCardFromHome?.card?.network);
+      selectedCardNetwork = findCodeByNetworkName(
+        $selectedCardFromHome?.card?.network
+      );
     }
   }
 
@@ -363,7 +380,9 @@
       if (lastView) {
         tabVisible = true;
       }
-      setView(lastView || (savedCards.length ? Views.SAVED_CARDS : Views.ADD_CARD));
+      setView(
+        lastView || (savedCards.length ? Views.SAVED_CARDS : Views.ADD_CARD)
+      );
       return true;
     }
     $selectedCard = null; // De-select saved card
@@ -426,9 +445,13 @@
       }
 
       // If there is no issuer present, it means match all issuers.
-      const issuerMatches = hasIssuers ? issuers.includes(token.card.issuer) : true;
+      const issuerMatches = hasIssuers
+        ? issuers.includes(token.card.issuer)
+        : true;
 
-      const networkMatches = hasNetworks ? networks.includes(token.card.network) : true;
+      const networkMatches = hasNetworks
+        ? networks.includes(token.card.network)
+        : true;
 
       const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
@@ -443,7 +466,10 @@
   $: {
     let _savedCards = getSavedCardsForDisplay(allSavedCards, tab);
 
-    _savedCards = filterSavedCardsAgainstInstrument(_savedCards, $methodInstrument);
+    _savedCards = filterSavedCardsAgainstInstrument(
+      _savedCards,
+      $methodInstrument
+    );
 
     savedCards = sortBasedOnTokenization(_savedCards);
   }
@@ -477,7 +503,13 @@
     // get IIN for new card
     const iin = getIin($cardNumber);
 
-    if (iin && !cardAVSFlowsMap[iin] && $cardCountry && $cardCountry !== 'IN' && !isDCCEnabled()) {
+    if (
+      iin &&
+      !cardAVSFlowsMap[iin] &&
+      $cardCountry &&
+      $cardCountry !== 'IN' &&
+      !isDCCEnabled()
+    ) {
       fetchAVSFlagForCard({ iin });
       cardAVSFlowsMap[iin] = 1;
     }
@@ -506,7 +538,9 @@
       return false;
     }
 
-    const block = $blocks.find((block) => block.instruments.includes($methodInstrument));
+    const block = $blocks.find((block) =>
+      block.instruments.includes($methodInstrument)
+    );
 
     return block && block.code !== 'rzp.cluster';
   }
@@ -810,7 +844,11 @@
           $newCardEmiDuration = '';
         }
 
-        showAppropriateEmiDetailsForNewCard(session.tab, emiObj, trimmedVal.length);
+        showAppropriateEmiDetailsForNewCard(
+          session.tab,
+          emiObj,
+          trimmedVal.length
+        );
 
         isCardSupportedForRecurring = checkCardSupportForRecurring(features);
       });
@@ -944,7 +982,11 @@
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta && !delayOTPExperiment}
-            <div id="show-saved-cards" on:click={showSavedCardsView} class="text-btn left-card">
+            <div
+              id="show-saved-cards"
+              on:click={showSavedCardsView}
+              class="text-btn left-card"
+            >
               <div
                 class="cardtype"
                 class:multiple={savedCards && savedCards.length > 1}
@@ -982,7 +1024,10 @@
           {/if}
 
           {#if showRecurringCallout}
-            <div class="pad" transition:fly={getAnimationOptions({ duration: 250, y: -10 })}>
+            <div
+              class="pad"
+              transition:fly={getAnimationOptions({ duration: 250, y: -10 })}
+            >
               <RecurringCardsCallout />
             </div>
           {/if}
@@ -1030,7 +1075,9 @@
         <div id="avsContainer">
           <div class="avs-card-info">
             <div class="cardtype" cardtype={selectedCardNetwork} />
-            <span class="card-info">Card ending with <span class="last4">{last4}</span></span>
+            <span class="card-info"
+              >Card ending with <span class="last4">{last4}</span></span
+            >
           </div>
           <div class="avs-title">
             {$t(AVS_HEADING)}
@@ -1041,7 +1088,11 @@
             >
           </div>
           <AvsForm direct={directlyOpenAVS} {lastView} />
-          <Info bind:show={showAVSInfo} title={$t(AVS_INFO_TITLE)} data={AVSInfo} />
+          <Info
+            bind:show={showAVSInfo}
+            title={$t(AVS_INFO_TITLE)}
+            data={AVSInfo}
+          />
         </div>
       {:else}
         <div in:fade={getAnimationOptions({ duration: 100 })}>
@@ -1054,9 +1105,17 @@
           <!-- LABEL: Your saved cards -->
           <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
           <div id="saved-cards-container">
-            <SavedCards {tab} cards={savedCards} on:viewPlans={handleViewPlans} />
+            <SavedCards
+              {tab}
+              cards={savedCards}
+              on:viewPlans={handleViewPlans}
+            />
           </div>
-          <div id="show-add-card" class="text-btn left-card" on:click={showAddCardView}>
+          <div
+            id="show-add-card"
+            class="text-btn left-card"
+            on:click={showAddCardView}
+          >
             <!-- LABEL: Add another card -->
             {$t(ADD_ANOTHER_CARD_BTN)}
           </div>
@@ -1102,7 +1161,11 @@
       {#if isDCCEnabled() && !isDynamicFeeBearer()}
         <DynamicCurrencyView
           {tabVisible}
-          view={$selectedApp ? Views.CARD_APP : currentView === Views.AVS ? lastView : currentView}
+          view={$selectedApp
+            ? Views.CARD_APP
+            : currentView === Views.AVS
+            ? lastView
+            : currentView}
           isAVS={currentView === Views.AVS}
         />
       {/if}

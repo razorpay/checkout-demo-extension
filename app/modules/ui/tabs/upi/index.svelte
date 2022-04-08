@@ -7,7 +7,11 @@
   import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
   import { isPayout, getPrefilledVPA, hasFeature } from 'razorpay';
-  import { isMethodEnabled, isUPIFlowEnabled, isUPIOtmFlowEnabled } from 'checkoutstore/methods';
+  import {
+    isMethodEnabled,
+    isUPIFlowEnabled,
+    isUPIOtmFlowEnabled,
+  } from 'checkoutstore/methods';
   import {
     isVpaValid,
     OTHER_INTENT_APPS,
@@ -19,7 +23,10 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCta } from 'checkoutstore/cta';
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { intentVpaPrefill, intentVpaPrefilledFromPreferences } from 'checkoutstore/screens/upi';
+  import {
+    intentVpaPrefill,
+    intentVpaPrefilledFromPreferences,
+  } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
 
@@ -250,7 +257,11 @@
       return apps;
     }
 
-    if (!instrument.flows || !instrument.apps || !instrument.flows.includes('intent')) {
+    if (
+      !instrument.flows ||
+      !instrument.apps ||
+      !instrument.flows.includes('intent')
+    ) {
       return getUPIIntentApps().filtered;
     }
 
@@ -266,10 +277,14 @@
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
-  $: intent = (availableFlows.intent || availableFlows.intentUrl) && preferIntent;
+  $: intent =
+    (availableFlows.intent || availableFlows.intentUrl) && preferIntent;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    availableFlows.qr && isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
+    availableFlows.qr &&
+    isMethodEnabled('qr') &&
+    !selectedApp &&
+    selectedApp !== null;
   $: shouldShowCollect = availableFlows.collect;
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
@@ -367,7 +382,11 @@
 
   function addDowntime() {
     tokens.map((item) => {
-      const currentDowntime = checkDowntime(upiDowntimes, 'vpa_handle', item.vpa.handle);
+      const currentDowntime = checkDowntime(
+        upiDowntimes,
+        'vpa_handle',
+        item.vpa.handle
+      );
       if (currentDowntime) {
         item.downtimeSeverity = currentDowntime;
         item.downtimeInstrument = item.vpa.handle;
@@ -479,7 +498,8 @@
     if (_token) {
       const { downtimeSeverity, downtimeInstrument } = _token;
       if (downtimeSeverity || getComponentProps(_token, 'downtimeSeverity')) {
-        data.downtimeSeverity = downtimeSeverity || getComponentProps(_token, 'downtimeSeverity');
+        data.downtimeSeverity =
+          downtimeSeverity || getComponentProps(_token, 'downtimeSeverity');
         data.downtimeInstrument =
           downtimeInstrument || getComponentProps(_token, 'downtimeInstrument');
       }
@@ -590,7 +610,11 @@
   }
 
   export function shouldRememberVpa() {
-    return _Obj.getSafely($customer, 'logged') && hasFeature('save_vpa') && rememberVpa ? 1 : 0;
+    return _Obj.getSafely($customer, 'logged') &&
+      hasFeature('save_vpa') &&
+      rememberVpa
+      ? 1
+      : 0;
   }
 
   export function trackHandleSelection(event) {
@@ -636,7 +660,9 @@
         vpa: vpaEntered,
       };
     } else {
-      const upi_app = isOtherIntentApp(intentAppSelected) ? null : intentAppSelected;
+      const upi_app = isOtherIntentApp(intentAppSelected)
+        ? null
+        : intentAppSelected;
 
       data = {
         '_[flow]': 'intent',
@@ -693,7 +719,9 @@
         <div class="border-list">
           <SlottedOption className="upi-selected-bank" id="user-details">
             <i slot="icon">
-              <Icon icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`} />
+              <Icon
+                icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`}
+              />
             </i>
             <div slot="title"><span>{selectedBankForRecurring.name}</span></div>
             <div
@@ -719,7 +747,8 @@
             payUsingApps={availableFlows.intentUrl}
             bind:this={upiIntent}
             on:select={(e) => {
-              const { downtimeInstrument, downtimeSeverity, packageName } = e.detail;
+              const { downtimeInstrument, downtimeSeverity, packageName } =
+                e.detail;
               onUpiAppSelection({
                 detail: {
                   id: 'intent',
@@ -771,7 +800,8 @@
                 </div>
                 <i slot="icon">
                   <Icon
-                    icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || themeMeta.icons.upi}
+                    icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon ||
+                      themeMeta.icons.upi}
                   />
                 </i>
                 <div slot="downtime" class="downtime-saved-vpa">
@@ -825,7 +855,8 @@
               tabindex="0"
               attributes={{
                 role: 'button',
-                'aria-label': 'Show QR Code - Scan the QR code using your UPI app',
+                'aria-label':
+                  'Show QR Code - Scan the QR code using your UPI app',
               }}
               on:select={selectQrMethod}
             >

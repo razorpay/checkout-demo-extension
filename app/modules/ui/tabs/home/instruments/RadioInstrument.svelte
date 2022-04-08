@@ -26,7 +26,10 @@
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { isDebitEMIEnabled, isContactRequiredForInstrument } from 'checkoutstore/methods';
+  import {
+    isDebitEMIEnabled,
+    isContactRequiredForInstrument,
+  } from 'checkoutstore/methods';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import { isEligibilityCheckInProgress } from 'checkoutframe/cred';
 
@@ -57,7 +60,8 @@
   let selected = false;
   $: selected = $selectedInstrumentId === instrument.id;
 
-  let contactRequired = isContactRequiredForInstrument(instrument) && isContactOptional();
+  let contactRequired =
+    isContactRequiredForInstrument(instrument) && isContactOptional();
 
   const themeMeta = getThemeMeta();
   const dispatch = createEventDispatcher();
@@ -87,7 +91,9 @@
       icon: provider.logo,
       code: provider.code,
       subtitle:
-        provider?.code === 'cred' ? getAppInstrumentSubtext(provider.code, locale) || '' : '',
+        provider?.code === 'cred'
+          ? getAppInstrumentSubtext(provider.code, locale) || ''
+          : '',
     };
   }
 
@@ -101,7 +107,11 @@
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
     const banks = getBanks();
-    const bankName = getLongBankName(instrument.bank, locale, banks[instrument.bank]);
+    const bankName = getLongBankName(
+      instrument.bank,
+      locale,
+      banks[instrument.bank]
+    );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(instrument.bank),
@@ -125,7 +135,10 @@
       title = getInstrumentTitle('upiqr', null, locale);
       icon = themeMeta.icons['qr'];
     } else if (instrument.flow === 'intent') {
-      const app = getUPIIntentApps().all.find((app) => app.package_name === instrument.app) || {};
+      const app =
+        getUPIIntentApps().all.find(
+          (app) => app.package_name === instrument.app
+        ) || {};
 
       // In case of ios, app name might be missing if not sent by the sdk
       let appName = app.app_name || 'Unknown app';
@@ -143,7 +156,11 @@
         icon = '&#xe70e;';
       }
     } else {
-      title = getInstrumentTitle('upi', getVpaFromInstrument(instrument), locale);
+      title = getInstrumentTitle(
+        'upi',
+        getVpaFromInstrument(instrument),
+        locale
+      );
       icon = '&#xe70e;';
     }
 
@@ -317,7 +334,11 @@
     </div>
     <div slot="downtime" class="downtime-preferred-method">
       {#if !!downtimeSeverity}
-        <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+        <DowntimeCallout
+          showIcon={true}
+          severe={downtimeSeverity}
+          {downtimeInstrument}
+        />
       {/if}
     </div>
   </SlottedRadioOption>

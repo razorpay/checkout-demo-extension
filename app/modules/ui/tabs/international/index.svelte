@@ -113,7 +113,9 @@
     // If a provider was selected and has been filtered out, deselect it
     if (
       $selectedInternationalProvider &&
-      !filteredProviders.some((provider) => provider.code === $selectedInternationalProvider)
+      !filteredProviders.some(
+        (provider) => provider.code === $selectedInternationalProvider
+      )
     ) {
       updateSelectedProvider(null);
     }
@@ -123,7 +125,11 @@
      * select it automatically to reduce a user click.
      * Of course, do this only when there's nothing preselected.
      */
-    if (!directlyToNVS && !$selectedInternationalProvider && filteredProviders.length) {
+    if (
+      !directlyToNVS &&
+      !$selectedInternationalProvider &&
+      filteredProviders.length
+    ) {
       onProviderSelection(filteredProviders[0].code);
     }
   }
@@ -227,8 +233,12 @@
             bind:this={providerRefs[provider.code]}
             id={`international-radio-${provider.code}`}
           >
-            <span class="title">{getAppProviderName(provider.code, $locale)}</span>
-            <span class="subtitle">{getAppProviderSubtext(provider.code, $locale)}</span>
+            <span class="title"
+              >{getAppProviderName(provider.code, $locale)}</span
+            >
+            <span class="subtitle"
+              >{getAppProviderSubtext(provider.code, $locale)}</span
+            >
           </div>
           <i slot="icon" class="top">
             <Icon icon={provider.logo} />

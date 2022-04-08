@@ -4,7 +4,10 @@
 
   // Store
   import { t, locale } from 'svelte-i18n';
-  import { codReason, showCodLoader } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    codReason,
+    showCodLoader,
+  } from 'one_click_checkout/address/shipping_address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
 
   // UI imports
@@ -121,11 +124,16 @@
   // let showWalnutBanner = false;
   // $: showWalnutBanner = instrument.showWalnutBanner;
   let walnutBannerText = '';
-  $: walnutBannerText = formatMessageWithLocale('cardless_emi.walnut_banner_text', $locale);
+  $: walnutBannerText = formatMessageWithLocale(
+    'cardless_emi.walnut_banner_text',
+    $locale
+  );
 </script>
 
 <SlottedOption
-  className={`new-method has-tooltip ${$selectedInstrumentId === instrument.id && 'selected'}`}
+  className={`new-method has-tooltip ${
+    $selectedInstrumentId === instrument.id && 'selected'
+  }`}
   defaultStyles={false}
   on:click={select}
   attributes={{ method }}

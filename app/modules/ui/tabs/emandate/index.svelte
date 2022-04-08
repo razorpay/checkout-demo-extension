@@ -13,7 +13,13 @@
   import { fade } from 'svelte/transition';
 
   // Store imports
-  import { accountNumber, name, ifsc, accountType, authType } from 'checkoutstore/screens/emandate';
+  import {
+    accountNumber,
+    name,
+    ifsc,
+    accountType,
+    authType,
+  } from 'checkoutstore/screens/emandate';
 
   import { selectedBank } from 'checkoutstore/screens/netbanking';
 
@@ -49,7 +55,11 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
   import { getAnimationOptions } from 'svelte-utils';
-  import { getAuthType, getPrefillBank, getPrefillBankDetails } from 'netbanking/helper';
+  import {
+    getAuthType,
+    getPrefillBank,
+    getPrefillBankDetails,
+  } from 'netbanking/helper';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   const session = getSession();
@@ -62,9 +72,11 @@
   const prefilledIfsc = getPrefillBankDetails('ifsc');
   const prefilledAuthType = getAuthType();
 
-  const isPrefilledBankAvailable = prefilledBank && isEMandateBankEnabled(prefilledBank);
+  const isPrefilledBankAvailable =
+    prefilledBank && isEMandateBankEnabled(prefilledBank);
   const isPrefilledAuthTypeAvailable =
-    prefilledAuthType && isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
+    prefilledAuthType &&
+    isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
 
   let prefilledAccountType = getPrefillBankDetails('account_type');
 
@@ -335,7 +347,10 @@
           </div>
         </div>
       {:else if currentView === Views.BANK_DETAILS}
-        <div class="emandate-fields" in:fade={getAnimationOptions({ duration: 200, delay: 200 })}>
+        <div
+          class="emandate-fields"
+          in:fade={getAnimationOptions({ duration: 200, delay: 200 })}
+        >
           <AccountNumberField
             name="bank_account[account_number]"
             id="nb-acc-no"
