@@ -1,6 +1,5 @@
-<script>
+<script lang="ts">
   import { isMobile } from 'common/useragent';
-  import { getSession } from 'sessionmanager';
   import RazorpayStore, {
     getOption,
     isOneClickCheckout,
@@ -10,16 +9,18 @@
   import { getAmount, disableAnimation } from './helper';
   import { getStore } from 'checkoutstore/cta';
 
-  const emiBanks = getEMIBanks();
+  const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
+
+  const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
 </script>
 
 <div
   id="container"
   class="mfix"
   class:mobile={isMobile()}
-  class:test={!RazorpayStore.razorpayInstance.isLiveMode()}
+  class:test={!isLiveMode}
   class:notopbar={getOption('theme.hide_topbar')}
   class:noimage={!getOption('image')}
   class:noanim
@@ -90,7 +91,7 @@
             method="POST"
             novalidate
             autocomplete="off"
-            onsubmit="return false"
+            on:submit|preventDefault={() => false}
           >
             <div id="root" />
             <div id="form-fields">
