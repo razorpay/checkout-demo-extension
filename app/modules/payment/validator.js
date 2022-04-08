@@ -16,7 +16,7 @@ export const formatPayment = function (payment) {
     {}
   );
 
-  payment.data = formatPayload(payment.data, payment.r, params);
+  payment.data = formatPayload(payment.data, params);
   validateData(payment.data);
 };
 
@@ -30,7 +30,7 @@ function validateData(data) {
   }
 }
 
-export const formatPayload = function (payload, razorpayInstance, params = {}) {
+export const formatPayload = function (payload, params = {}) {
   var data = _Obj.clone(payload);
 
   // Set view for fees.
@@ -93,7 +93,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'integration_parent_version',
   ];
   integrationKeys.forEach((key) => {
-    const value = razorpayInstance.get(`_.${key}`);
+    const value = getOption(`_.${key}`);
     if (value) {
       data[`_[${key}]`] = value;
     }
