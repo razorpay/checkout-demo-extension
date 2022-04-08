@@ -41,35 +41,6 @@ export const ensureFunction = (func) =>
   };
 
 /**
- * Creates and returns a debounced version of the function.
- * @param {Function} func
- * @param {number} wait
- *
- * @returns {Function}
- */
-export const debounce = (func, wait) => {
-  var timerId, args, context, timerFn, result;
-  var later = function () {
-    var last = timerFn();
-    if (last < wait && last >= 0) {
-      timerId = _.timeout(later, wait - last);
-    } else {
-      timerId = null;
-      result = func.apply(context, args);
-      if (!timerId) context = args = null;
-    }
-  };
-
-  return function () {
-    context = this;
-    args = arguments;
-    timerFn = _.timer();
-    if (!timerId) timerId = _.timeout(later, wait);
-    return result;
-  };
-};
-
-/**
  * Returns a negated version of a function, i.e. if the original function
  * returned true, the negated function returns false.
  *

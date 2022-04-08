@@ -1,6 +1,7 @@
 import { querySelector } from 'utils/doc';
 import * as UserAgent from 'common/useragent';
 import { compareSemver } from 'lib/utils';
+import * as _El from 'utils/DOM';
 
 const Orientation = {
   LANDSCAPE: 'landscape',

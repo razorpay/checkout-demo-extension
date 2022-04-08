@@ -15,8 +15,6 @@
 /* global Wallet */
 /* global each */
 /* global abortAjax */
-/* global invokeEach */
-/* global invokeOnEach */
 /* global bind */
 /* global isString */
 /* global clone */
@@ -30,7 +28,6 @@
 /* global doc */
 /* global now */
 /* global roll */
-/* global toggleInvalid */
 
 // from init checkout-frame
 /* global SessionManager */
@@ -306,22 +303,12 @@ function hideDowntimeAlert() {
   return wasShown;
 }
 
-function hideFeeWrap() {
-  var feeWrap = $('#fee-wrap');
-  var wasShown = feeWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(feeWrap);
-  }
-  return wasShown;
-}
-
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
   if (
     !hideEmi() &&
     !hideRecurringCardsOverlay() &&
-    !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
   ) {
@@ -1008,7 +995,7 @@ Session.prototype = {
 
     // Switch to the respective tab/ prefilled method if exists
     // If tab is empty, then it will switche to home
-    if (tab === 'emandate' && !this.get('prefill.bank')) {
+    if (tab === 'emandate' && !discreet.NetbankingHelper.getPrefillBank()) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
       tab = 'netbanking';
@@ -2610,7 +2597,7 @@ Session.prototype = {
         valid = new RegExp(pattern).test(value);
       }
     }
-    toggleInvalid($parent, valid);
+    $parent.toggleClass('invalid', !valid);
   },
 
   refresh: function () {
@@ -4129,28 +4116,12 @@ Session.prototype = {
   },
 
   /**
-   * Show fees UI if `fee` is missing in payload and return whether the UI was
-   * shown or not.
-   *
-   * It will internally create an instance of `FeeBearerView` if not created
-   * and use the existing instance if already created.
-   *
-   * @return {Boolean} Whether or not the UI was shown
+   * Show fees UI if `fee` is missing in payload
    */
   showFeesUi: function () {
     var session = this;
     var data = session.payload;
     var isFeeMissing = !('fee' in data);
-    var feeBearerDiv = document.getElementsByClassName('fee-bearer');
-    var feeBearerBankTransferDiv = document.getElementsByClassName(
-      'fee-bearer-bank-transfer'
-    );
-    if (feeBearerBankTransferDiv.length > 0) {
-      feeBearerBankTransferDiv[0].style.display = 'none';
-    }
-    if (feeBearerDiv.length > 0) {
-      feeBearerDiv[0].removeAttribute('style');
-    }
 
     /**
      * Check here if 'fee' is set in payload,
@@ -4160,48 +4131,24 @@ Session.prototype = {
      * Otherwise, show the fee breakup.
      */
     if (isFeeMissing) {
-      var paymentData = clone(this.payload);
+      var paymentData = _Obj.clone(this.payload);
 
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
 
-      if (this.feeBearerView) {
-        this.feeBearerView.fetchFees(paymentData);
-      } else {
-        this.feeBearerView = new discreet.FeeBearerView({
-          target: gel('fee-wrap'),
-          props: {
-            paymentData: paymentData,
-          },
-        });
-
-        // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.$on('continue', function (event) {
-          var bearer = event.detail;
-
-          hideOverlay($('#fee-wrap'));
-
+      discreet.showFeeBearer({
+        paymentData: paymentData,
+        onContinue: function (bearer) {
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
           session.payload.fee = bearer.fee;
 
           // Don't redirect to fees route now
           session.feesRedirect = false;
-
           session.submit();
-        });
-
-        this.feeBearerView.$on('error', function () {
-          makeHidden('#fee-wrap');
-        });
-      }
-
-      showOverlay($('#fee-wrap'));
-
-      return true;
+        },
+      });
     }
-
-    return false;
   },
 
   closeModal: function () {
@@ -5328,7 +5275,7 @@ Session.prototype = {
       data.wallet = 'paypal';
     }
     if (RazorpayHelper.isAddressEnabled()) {
-      var notes = (data.notes = clone(this.get('notes')) || {});
+      var notes = (data.notes = _Obj.clone(this.get('notes')) || {});
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);
@@ -6080,7 +6027,6 @@ Session.prototype = {
       'emi',
       'emiPlansView',
       'emiScreenView',
-      'feeBearerView',
       'homeTab',
       'nachScreen',
       'otpView',
@@ -6137,9 +6083,13 @@ Session.prototype = {
 
       try {
         this.delegator.destroy();
-        invokeEach(this.listeners);
+        this.listeners.forEach(function (unlisten) {
+          unlisten();
+        });
       } catch (e) {}
-      invokeOnEach('off', this.bits);
+      this.bits.forEach(function (bit) {
+        bit.off();
+      });
       this.listeners = [];
       this.bits = [];
       if (this.modal) {

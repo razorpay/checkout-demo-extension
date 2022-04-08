@@ -105,15 +105,6 @@ export const Views = {
 
 export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
 
-/**
- * Hard coding merchant keys for which allow_billdesk_sihub feature is enabled
- * TODO: Add allow_billdesk_sihub feature in preference API features, (Planned in coming sprint)
- */
-export const merchantsEnabledOnSIHub = [
-  'rzp_live_9Qu1tSl2h2N1DZ',
-  'rzp_live_BYGeDqibuIvHiA',
-  'rzp_live_AszWiojo0lJxxX',
-];
 export const cardWithRecurringSupport = {
   CIUB: { credit: true, debit: true },
   ESFB: { credit: false, debit: true },

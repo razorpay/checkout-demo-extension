@@ -37,6 +37,7 @@ import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { shouldRedirectZestMoney } from 'common/emi';
 import { popupIframeCheck } from './helper';
+import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import { getOption } from 'razorpay';
 

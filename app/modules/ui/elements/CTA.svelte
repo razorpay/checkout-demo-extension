@@ -1,7 +1,7 @@
 <script>
   import { afterUpdate, createEventDispatcher } from 'svelte';
   import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
-
+  import * as _El from 'utils/DOM';
   // if passed, creates an exclusive control on showing/hiding
   // of #footer for the lifecycle of <CTA>
   // expects Boolean

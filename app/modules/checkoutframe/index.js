@@ -363,7 +363,6 @@ function setSessionPreferences(session, preferences) {
   RazorpayStore.updateInstance(razorpayInstance);
 
   updateOptions(preferences);
-  updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
 
@@ -494,29 +493,6 @@ function updateOptions(preferences) {
     if (order.currency) {
       setOption('currency', order.currency);
     }
-  }
-}
-
-function updateEmandatePrefill() {
-  const order = getMerchantOrder();
-  if (!order) {
-    return;
-  }
-
-  if (order.auth_type) {
-    setOption('prefill.auth_type', order.auth_type);
-  }
-
-  const bank_account = order.bank_account;
-  if (bank_account) {
-    ['ifsc', 'name', 'account_number', 'account_type'].forEach((key) => {
-      if (bank_account[key]) {
-        setOption(`prefill.bank_account[${key}]`, bank_account[key]);
-      }
-    });
-  }
-  if (order.bank) {
-    setOption('prefill.bank', order.bank);
   }
 }
 

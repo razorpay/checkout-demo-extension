@@ -6,6 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import { getSession } from 'sessionmanager';
 import { INDIAN_CONTACT_REGEX } from 'common/constants';
 import { returnAsIs } from 'lib/utils';
+import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 
 const TARGET_QS = '#form-fields';

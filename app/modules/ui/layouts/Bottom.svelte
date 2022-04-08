@@ -1,4 +1,5 @@
 <script>
+  import * as _El from 'utils/DOM';
   export let tab;
 
   function replaceNode(node) {

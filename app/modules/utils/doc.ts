@@ -1,3 +1,5 @@
+import * as _El from './DOM';
+
 export const documentElement = document.documentElement;
 export const body = document.body;
 export const innerWidth = global.innerWidth;
@@ -37,7 +39,7 @@ export const resolveElement = (el: string | HTMLElement) =>
  * @returns {string}
  */
 export function resolveUrl(relativeUrl: string) {
-  link = _El.create('a');
+  link = _El.create('a') as HTMLAnchorElement;
   link.href = relativeUrl;
   return link.href;
 }
@@ -105,7 +107,10 @@ export function submitForm(
  *
  * @returns {string}
  */
-export function obj2formhtml(data: { [x: string]: any }, key?: string) {
+export function obj2formhtml(
+  data: string | { [x: string]: any },
+  key?: string
+) {
   if (_.isNonNullObject(data)) {
     var str = '';
     _Obj.loop(data, function (value: any, name: string) {
@@ -116,10 +121,10 @@ export function obj2formhtml(data: { [x: string]: any }, key?: string) {
     });
     return str;
   }
-  var input = _El.create('input');
+  var input = _El.create('input') as HTMLInputElement;
   input.type = 'hidden';
-  input.value = data;
-  input.name = key;
+  input.value = data as string;
+  input.name = key as string;
   return input.outerHTML;
 }
 

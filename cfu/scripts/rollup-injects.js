@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { execSync } = require('child_process');
 const globalContents = fs
   .readFileSync(__dirname + '/../src/fe/implicit/global.js')
   .toString();
@@ -18,7 +17,6 @@ let injects = {
   Promise: 'fe/implicit/Promise',
   _Arr: ['fe/implicit/_Arr', '*'],
   _Obj: ['fe/implicit/_Obj', '*'],
-  _El: ['fe/implicit/_El', '*'],
 };
 
 globalInjects.forEach((g) => {

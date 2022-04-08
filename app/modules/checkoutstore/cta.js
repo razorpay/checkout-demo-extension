@@ -12,6 +12,7 @@ import { CtaViews } from 'ui/labels/cta';
 import { locale } from 'svelte-i18n';
 import { formatTemplateWithLocale } from 'i18n';
 import { debounce } from 'lib/utils';
+import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 
 export const ctaInfo = writable({

@@ -33,6 +33,9 @@
         this={element.component}
         {...element.props}
         bind:this={ref}
+        navstack={{
+          isOverlay: element.overlay,
+        }}
       />
     {:else}
       <svelte:component this={element.component} {...element.props} />

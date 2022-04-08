@@ -4,6 +4,7 @@ import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import BrowserStorage from 'browserstorage';
+import * as _El from 'utils/DOM';
 import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
 
 const RazorProto = _.prototypeOf(Razorpay);
@@ -250,7 +251,7 @@ function getPreloadedFrame(rzp) {
   function setFrame() {
     preloadedFrame = new CheckoutFrame(rzp);
     global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
-    frameContainer |> _El.append(preloadedFrame.el);
+    _El.append(frameContainer, preloadedFrame.el);
   }
 
   if (rzp && rzp.get('one_click_checkout')) {

@@ -4,7 +4,7 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-
+  import * as _El from 'utils/DOM';
   // Actions
   import {
     focus as focusAction,

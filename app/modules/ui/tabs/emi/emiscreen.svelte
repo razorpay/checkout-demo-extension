@@ -1,11 +1,10 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
-
+  import * as _El from 'utils/DOM';
   //i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   import {
     CARD_DETAILS_HEADER,
@@ -13,7 +12,6 @@
     CARD_NUMBER_HELP,
     NAME_LABEL,
     NAME_HELP,
-    CALLOUT,
   } from 'ui/labels/bajaj-emi';
 
   import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';

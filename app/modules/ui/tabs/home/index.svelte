@@ -13,6 +13,7 @@
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import * as _El from 'utils/DOM';
 
   import { HOME_VIEWS } from './constants';
 
@@ -37,7 +38,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isOneClickCheckout } from 'razorpay';
+  import { getOption, isOneClickCheckout, isHDFCVASMerchant } from 'razorpay';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -160,6 +161,7 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
   import { querySelector } from 'utils/doc';
+  import { getPrefillBank } from 'netbanking/helper';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -179,7 +181,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
-  const prefilledBank = getOption('prefill.bank');
+  const prefilledBank = getPrefillBank();
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
@@ -682,7 +684,12 @@
 
   function shouldUsePersonalization() {
     // Merchant has asked to disable
-    if (session.get().personalization === false) {
+    if (getOption('personalization') === false) {
+      return false;
+    }
+
+    // if hdfc VAS merchant
+    if (isHDFCVASMerchant()) {
       return false;
     }
 

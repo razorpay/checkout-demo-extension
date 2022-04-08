@@ -1,6 +1,7 @@
 import { displayAmount } from 'common/currency';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 
 const CLASS_IFRAME_ACTIVE = 'iframe-active';

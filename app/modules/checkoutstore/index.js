@@ -1,11 +1,13 @@
 import { get } from 'svelte/store';
 import { writable, derived } from 'svelte/store';
 import { contact, phone } from 'checkoutstore/screens/home';
+import hdfcVASDisplayConfig from 'constants/hdfcVASDisplayConfig';
 
 import RazorpayStore, {
   getCheckoutConfig,
   getOption,
   isContactOptional,
+  isHDFCVASMerchant,
 } from 'razorpay/index';
 
 import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
@@ -52,12 +54,18 @@ function getConfigFromOptions() {
 export function getMerchantConfig() {
   const configFromOptions = getConfigFromOptions();
   const configFromPreferences = getCheckoutConfig();
+  const isHDFCMerchant = isHDFCVASMerchant();
 
-  const displayFromOptions = _Obj.getSafely(configFromOptions, 'display');
+  let displayFromOptions = _Obj.getSafely(configFromOptions, 'display');
+
   const displayFromPreferences = _Obj.getSafely(
     configFromPreferences,
     'display'
   );
+  if (isHDFCMerchant) {
+    // hdfc config have highest priority for hdfc VAS merchant
+    displayFromOptions = hdfcVASDisplayConfig;
+  }
 
   // Restrictions can only come from preferences
   const restrictions = {

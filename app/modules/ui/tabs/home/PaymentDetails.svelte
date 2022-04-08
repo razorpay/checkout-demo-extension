@@ -56,6 +56,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import { getPrefillBankDetails } from 'netbanking/helper';
 
   const entries = _Obj.entries;
 
@@ -65,7 +66,7 @@
   export let onSubmit;
 
   const order = getMerchantOrder();
-  const accountName = getOption('prefill.bank_account[name]');
+  const accountName = getPrefillBankDetails('name');
   const icons = getThemeMeta().icons;
 
   const userContact = $contact;
