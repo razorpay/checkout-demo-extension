@@ -495,11 +495,6 @@ function updateOptions(preferences) {
       setOption('currency', order.currency);
     }
   }
-
-  // set orderid as it is required while creating payments
-  if (preferences.invoice) {
-    setOption('order_id', preferences.invoice.order_id);
-  }
 }
 
 function updateEmandatePrefill() {

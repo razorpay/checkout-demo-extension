@@ -3,6 +3,7 @@ import { flattenProp } from 'common/options';
 import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
+import { getOption } from 'razorpay';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
@@ -66,9 +67,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
   if (params.feesRedirect) {
     data.view = 'html';
   }
-
   // fill data from options if empty
-  var getOption = razorpayInstance.get;
 
   [
     'amount',
