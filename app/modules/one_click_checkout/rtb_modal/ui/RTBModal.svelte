@@ -2,8 +2,6 @@
   // UI Imports
   import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import badge from 'one_click_checkout/rtb_modal/icons/badge';
-
   //i18n Imports
   import {
     TRUSTED_BADGE_HEADER,
@@ -18,6 +16,7 @@
   // utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { getMerchantName } from 'razorpay';
+  import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
 
   const { circle_check, rtb_close } = getIcons();
   const merchantName = getMerchantName();
@@ -49,7 +48,7 @@
       <div class="rtb-icon">
         <!-- It is done intentionally. Both RTB Badges styles were getting else wise over lapped-->
         {#if visible}
-          <Icon icon={badge(60, 60)} />
+          <TrustedBadgeIcon height="62" width="60" />
         {/if}
       </div>
       <div class="rtb-header-section">

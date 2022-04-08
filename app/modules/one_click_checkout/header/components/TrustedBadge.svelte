@@ -4,7 +4,6 @@
 
   // Imports Related to RTB
   import { RTB } from 'checkoutstore/rtb';
-  import badge from 'one_click_checkout/rtb_modal/icons/badge';
   import { showRTBModal } from 'one_click_checkout/rtb_modal';
   import {
     getTrustedBadgeHighlights,
@@ -17,7 +16,6 @@
 
   // Imports releated to icons
   import Icon from 'ui/elements/Icon.svelte';
-  import TrustedBadgeIcon from 'trusted-badge/ui/component/TrustedBadgeIcon.svelte';
   import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
   import info from 'ui/icons/payment-methods/info';
 
@@ -28,6 +26,7 @@
   //Utils
   import { Events } from 'analytics';
   import rtbEvents from 'one_click_checkout/header/analytics';
+  import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
 
   $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
   onMount(() => {
@@ -43,7 +42,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <Icon icon={badge(22, 22)} />
+        <TrustedBadgeIcon />
       </div>
       <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
@@ -51,7 +50,7 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={showRTBModal}>
       <div class="rtb-icon-wrapper">
-        <Icon icon={badge(22, 22)} />
+        <TrustedBadgeIcon />
       </div>
       <div class="rtb-down-arrow-wrapper">
         <Icon icon={arrow_down(10, 8)} />

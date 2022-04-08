@@ -261,6 +261,8 @@ export function hydrateSamePincodeAddresses(addresses, zipcodeHash) {
     return {
       ...item,
       ...zipcodeHash[item.zipcode],
+      city: zipcodeHash[item.zipcode].city || item.city,
+      state: zipcodeHash[item.zipcode].state || item.state,
     };
   });
 }

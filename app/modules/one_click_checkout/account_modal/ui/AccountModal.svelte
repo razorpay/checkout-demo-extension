@@ -289,5 +289,8 @@
 
   .list-item .account-menu {
     width: 100%;
+    border-radius: 0px;
+    color: #424242;
+    font-size: 14px;
   }
 </style>

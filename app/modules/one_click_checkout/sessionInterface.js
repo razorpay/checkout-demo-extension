@@ -39,6 +39,13 @@ import { views } from 'one_click_checkout/routing/constants';
 import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
 
+// i18n imports
+import {
+  CONFIRM_CANCEL_HEADING,
+  CONFIRM_CANCEL_MESSAGE,
+} from 'one_click_checkout/misc/i18n/label';
+import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
+
 export const historyExists = () => get(history).length;
 
 /**
@@ -57,7 +64,14 @@ export const handleBack = () => {
     (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) ||
     get(activeRoute)?.name === views.COUPONS
   ) {
-    session.closeModal();
+    const locale = getCurrentLocale();
+    Confirm.show({
+      heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
+      message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
+      onPositiveClick: function () {
+        session.closeModal();
+      },
+    });
     return;
   }
   navigator.navigateBack();

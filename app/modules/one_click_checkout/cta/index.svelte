@@ -123,20 +123,15 @@
   .cta-container {
     gap: 8px;
     display: flex;
-    padding: 22px 16px;
+    padding: 14px 16px;
     align-items: center;
     box-shadow: 0px -4px 8px #6b6c6d20;
-  }
-
-  @media (min-width: 992px) {
-    .cta-container {
-      padding: 20px 16px;
-    }
   }
 
   #one-cc-cta {
     width: 100%;
     padding: 18px;
+    font-size: 14px;
     font-weight: 600;
     border-radius: 6px;
   }

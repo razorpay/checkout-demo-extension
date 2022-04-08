@@ -513,6 +513,8 @@
             },
             'api'
           ).then(({ identified, instruments: instrumentsFromApi }) => {
+            // Recalculate the screen size after Preferred Payment Methods loaded due to layout shift happens
+            scrollable = isElementUnscrollable(methodEle?.parentNode);
             userIdentified = identified;
 
             if (instrumentsFromApi.length) {

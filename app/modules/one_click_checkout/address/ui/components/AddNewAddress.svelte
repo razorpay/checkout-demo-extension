@@ -775,7 +775,6 @@
     z-index: 3;
     border-radius: 2px;
     bottom: -62px;
-    margin: 0px 16px;
     letter-spacing: 0.125px;
   }
   .save-address-tooltip::after {
@@ -787,7 +786,7 @@
     border-style: solid;
     border-color: transparent transparent #2d313a;
     bottom: 100%;
-    left: 104px;
+    left: 122px;
     margin: 0 0 -1px -10px;
   }
 

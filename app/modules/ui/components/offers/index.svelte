@@ -241,6 +241,10 @@
   function selectOffer(offer) {
     selected = offer;
   }
+
+  const ctaRef = document.getElementById('one-cc-footer');
+
+  $: error ? (ctaRef.style.display = 'none') : (ctaRef.style.display = 'block');
 </script>
 
 {#if $showOffers}
@@ -249,6 +253,7 @@
     id="offers-container"
     hidden={applicableOffers.length + otherOffers.length === 0}
     class:has-error={error}
+    class:offers-container-one-cc={isOneCCEnabled}
   >
     <header
       on:click={showList}
@@ -480,7 +485,7 @@
     padding-bottom: 130px;
   }
   .one-cc-label {
-    padding: 24px 14px;
+    padding: 20px 16px 16px;
     text-transform: capitalize;
     font-size: 14px;
   }
@@ -514,7 +519,7 @@
   }
 
   .one-cc.error-container {
-    bottom: 96px;
+    bottom: 0px;
   }
   .error-desc {
     padding: 16px 24px;
@@ -542,5 +547,9 @@
   }
   legend span {
     cursor: pointer;
+  }
+
+  .offers-container-one-cc {
+    z-index: 2;
   }
 </style>

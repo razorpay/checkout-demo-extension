@@ -39,7 +39,6 @@
     display: inline-flex;
     margin-top: 12px;
     font-size: 13px;
-    padding-bottom: 8px;
   }
 
   .checkbox-text {

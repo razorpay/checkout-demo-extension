@@ -22,17 +22,25 @@
   // Utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { findCountryCode } from 'common/countrycodes';
 
   // Constant Imports
   import { views } from 'one_click_checkout/routing/constants';
 
   let showUserDetailsStrip;
   let showEditUserDetails = !$isContactPresent && !$email;
+  let phoneCode = '';
+  let phoneNum = '';
 
   $: {
     showUserDetailsStrip =
       ($isContactPresent || $email) && !isContactEmailHidden();
   }
+
+  $: {
+    ({ code: phoneCode, phone: phoneNum } = findCountryCode($contact));
+  }
+
   const { user } = getIcons();
 
   function editContact() {
@@ -61,7 +69,7 @@
     {:else}
       <div class="contact-info">
         {#if $isContactPresent && !isContactHidden()}
-          <div class="phone-text">{$contact}</div>
+          <div class="phone-text">+{phoneCode} {phoneNum}</div>
         {/if}
         {#if $email && !isEmailHidden()}
           <div class="email-text">{$email}</div>

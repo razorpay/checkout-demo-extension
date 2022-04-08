@@ -62,7 +62,11 @@
 </div>
 
 <div class="order-summary">
-  <div class="row justify-between" class:color-gray={showTotal}>
+  <div
+    class="row justify-between"
+    class:color-gray={showTotal}
+    class:price-label={!showTotal}
+  >
     <p>{$t(AMOUNT_LABEL)}</p>
     <p>
       {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
@@ -169,5 +173,9 @@
   }
   .total-label {
     font-weight: 500;
+  }
+
+  .price-label {
+    margin: 0px;
   }
 </style>
