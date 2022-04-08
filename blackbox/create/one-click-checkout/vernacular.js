@@ -6,7 +6,7 @@ const { getTestData } = require('../../actions');
 const {
   openVernacularFromHeader,
   selectLanguage,
-  verifyVernacularString,
+  assertVernacularString,
 } = require('../../actions/one-click-checkout/vernacular');
 const { delay } = require('../../util.js');
 const { scrollToEnd } = require('../../actions/one-click-checkout/common.js');
@@ -50,7 +50,7 @@ module.exports = function (testFeatures) {
       }
       await selectLanguage(context, languageToTest);
       await delay(200);
-      await verifyVernacularString(context, languageToTest);
+      await assertVernacularString(context, languageToTest);
     });
   });
 };

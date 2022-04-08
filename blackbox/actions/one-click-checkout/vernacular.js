@@ -13,7 +13,7 @@ async function selectLanguage(context, lang) {
   await langEle.click();
 }
 
-async function verifyVernacularString(context, langString) {
+async function assertVernacularString(context, langString) {
   const langEle = await getDataAttrSelector(context, 'vernacular-text');
   const langEleText = await context.page.evaluate(
     (ele) => ele.textContent,
@@ -25,5 +25,5 @@ async function verifyVernacularString(context, langString) {
 module.exports = {
   openVernacularFromHeader,
   selectLanguage,
-  verifyVernacularString,
+  assertVernacularString,
 };
