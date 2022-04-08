@@ -852,17 +852,17 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      if ((window.MSInputMethodContext && document.documentMode) || true) {
-        var s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.src =
-          'https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js';
-        $('head').append(s);
-      }
       this.setTheme();
       this.mainModal = new discreet.MainModal({ target: document.body });
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
+      // if ((window.MSInputMethodContext && document.documentMode)) {
+      //   var s = document.createElement('script');
+      //   s.type = 'text/javascript';
+      //   s.src =
+      //     'https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js';
+      //   $('head').append(s);
+      // }
     }
     return this.el;
   },

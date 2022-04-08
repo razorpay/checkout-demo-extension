@@ -1,26 +1,14 @@
-class CSSVar {
-  cssVars: Map<string, string>;
-  constructor() {
-    this.cssVars = new Map();
-  }
+import cssVars from 'css-vars-ponyfill';
 
-  refresh() {
-    let values: string[] = [];
-    this.cssVars.forEach(function (value, key) {
-      values.push(`--${key}:${value}`);
-    });
-    document.documentElement.style.cssText = values.join(';');
+export function setRootCSSVariable(obj: { [x: string]: any }) {
+  let values: string[] = [];
+  for (let key in obj) {
+    values.push(`--${key}:${obj[key]}`);
   }
-  set(name: string, value: string) {
-    this.cssVars.set(name, value);
-    this.refresh();
-  }
-
-  del(name: string) {
-    this.cssVars.delete(name);
-    this.refresh();
-  }
+  document.documentElement.style.cssText = values.join(';');
+  // FOR IE polyfill
+  cssVars({
+    include: 'link',
+    variables: obj,
+  });
 }
-
-const CSSVariable = new CSSVar();
-export default CSSVariable;
