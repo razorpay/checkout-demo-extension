@@ -1,4 +1,5 @@
 export default {
-  confirm_cancel_heading: 'Cancel Order?',
-  confirm_cancel_message: 'Are you sure you want to cancel the order?',
+  confirm_cancel_heading: 'Cancel order?',
+  confirm_cancel_message:
+    'All progress will be lost and the order will not be completed.',
 };

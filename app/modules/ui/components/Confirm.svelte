@@ -157,7 +157,7 @@
 
   :global(.one-cc) .confirm-heading {
     letter-spacing: normal;
-    text-transform: capitalize;
+    text-transform: none;
     color: #263a4a;
     font-weight: 600;
     border-bottom: 1px solid #e1e5ea;
