@@ -94,7 +94,7 @@ export function setInstrumentsForCustomer(
 function getInstrumentsFromApi(customer) {
   const session = getSession();
 
-  const url = _.appendParamsToUrl(makeAuthUrl('personalisation'), {
+  const url = _.appendParamsToUrl(makeAuthUrl(session.r, 'personalisation'), {
     contact: customer.contact,
     amount: getAmount(),
   });
