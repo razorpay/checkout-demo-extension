@@ -28,7 +28,6 @@ import * as I18n from 'i18n';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
 import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/NetbankingCancelReasonPicker.svelte';
-import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodes';
@@ -152,7 +151,6 @@ export default {
   AnalyticsTypes,
   UPIUtils,
   UTILS,
-  setShieldParams,
   GPay,
   Color,
   _PaymentMethodIcons,
