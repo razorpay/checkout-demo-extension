@@ -1,5 +1,5 @@
 import { getExperimentsFromStorage } from 'experiments';
-import { getOption } from 'razorpay';
+import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -188,7 +188,7 @@ export default function Track(r, event, data, immediately) {
     var context = getCommonTrackingData(r);
     context.user_agent = null;
     context.mode = 'live';
-    var order_id = getOption('order_id');
+    var order_id = getOrderId();
     if (order_id) {
       context.order_id = order_id;
     }

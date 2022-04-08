@@ -39,7 +39,7 @@ import { shouldRedirectZestMoney } from 'common/emi';
 import { popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
-import { getOption } from 'razorpay';
+import { getOption, getOrderId } from 'razorpay';
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -867,8 +867,8 @@ Payment.prototype = {
     const metadata = {};
     if (this.payment_id) {
       metadata.payment_id = this.payment_id;
-      if (getOption('order_id')) {
-        metadata.order_id = getOption('order_id');
+      if (getOrderId()) {
+        metadata.order_id = getOrderId();
       }
       return metadata;
     }

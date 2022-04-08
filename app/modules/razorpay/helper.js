@@ -15,16 +15,9 @@ export const getPreferences = (path, defaultValue) => {
 };
 
 export const getOption = (path) => {
-  const value = !path
+  return !path
     ? RazorpayStore.triggerInstanceMethod('get')
     : RazorpayStore.get(path);
-
-  if (path === 'order_id') {
-    /** if invoice then pick order Id from preference else from option */
-    return getPreferences('invoice.order_id') || value;
-  }
-
-  return value;
 };
 
 const getOptionCurry = (path) => {
@@ -234,8 +227,11 @@ export function isContactEmailHidden() {
 }
 /**
  * order related
+ * // set orderid as it is required while creating payments
+ * // if invoice then pick order Id from preference else from option
  */
-export const getOrderId = getOptionCurry('order_id');
+export const getOrderId = () =>
+  getPreferences('invoice.order_id') || getOption('order_id');
 
 /**
  * prefill related
