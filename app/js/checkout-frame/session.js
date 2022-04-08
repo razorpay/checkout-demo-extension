@@ -887,12 +887,12 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      document.body.appendChild(this.renderCss());
-
       this.mainModal = new discreet.MainModal({ target: document.body });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
+
+      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },

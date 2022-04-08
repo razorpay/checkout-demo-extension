@@ -9,7 +9,7 @@ export function getAmount() {
   const display_currency = getOption('display_currency');
 
   if (display_amount && display_currency) {
-    return `${displayCurrencies[displayCurrency]} ${display_amount}`;
+    return displayCurrencies[display_currency] + display_amount;
   } else {
     return getSession().formatAmountWithCurrency(amount);
   }
