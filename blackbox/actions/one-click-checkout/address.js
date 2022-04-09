@@ -96,7 +96,7 @@ function getCustomerAddressResponse() {
   return resp;
 }
 
-async function handleShippingInfo(context, options) {
+async function handleShippingInfo(context, options = {}) {
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('merchant/shipping_info');

@@ -218,10 +218,20 @@ function getDataAttrSelector(context, selectorValue) {
   return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
 }
 
-function scrollToEnd(context, node = window) {
-  return context.page.evaluate((_node) => {
-    _node.scrollBy(0, _node.scrollHeight);
-  }, node);
+function scrollToEnd(context, selectorOrElem) {
+  if (typeof selectorOrElem === 'string') {
+    return page.$eval(selectorOrElem, (_node) =>
+      _node.scrollBy(0, _node.scrollHeight)
+    );
+  }
+
+  try {
+    return context.page.evaluate((_node) => {
+      _node.scrollBy(0, _node.scrollHeight);
+    }, selectorOrElem || window);
+  } catch (err) {
+    return undefined;
+  }
 }
 
 function formatTextToNumber(str) {
@@ -231,6 +241,27 @@ function formatTextToNumber(str) {
 async function proceedOneCC(context) {
   const cta = await context.page.waitForSelector('#one-cc-cta');
   await cta.click();
+}
+
+async function goBack(context) {
+  const backBtn = await context.page.waitForSelector('.back');
+  await backBtn.click();
+}
+
+async function handleLogoutReq(context, logoutAll) {
+  const req = await context.expectRequest();
+  expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
+  expect(req.method).toBe('DELETE');
+  expect(req.url).toContain('apps/logout');
+  await context.respondJSON([]);
+}
+
+async function handleResetReq(context, orderId) {
+  await context.getRequest(`/v1/orders/1cc/${orderId}/reset`);
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('orders/1cc');
+  await context.respondJSON([]);
 }
 
 module.exports = {
@@ -247,4 +278,7 @@ module.exports = {
   scrollToEnd,
   formatTextToNumber,
   proceedOneCC,
+  goBack,
+  handleLogoutReq,
+  handleResetReq,
 };

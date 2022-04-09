@@ -191,6 +191,7 @@
 </script>
 
 <div
+  data-test-id="payment-details-block"
   class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
