@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
@@ -6,14 +7,41 @@
     isIRCTC,
   } from 'razorpay';
   import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
-  import { getAmount, disableAnimation } from './helper';
+  import { getAmount, disableAnimation, bringInputIntoView } from './helper';
+  import { returnAsIs } from 'lib/utils';
+  import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
-
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
+
+  export let onClose;
+
+  onMount(() => {
+    window.addEventListener('resize', bringInputIntoView);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener('resize', bringInputIntoView);
+  });
+
+  function handleBackdropClick() {
+    var $overlayStack = get(overlayStack);
+    if ($overlayStack.length > 0) {
+      var last = $overlayStack[$overlayStack.length - 1];
+      last.back({
+        from: 'overlay',
+      });
+    } else if (getOption('modal.backdropclose')) {
+      onClose();
+    }
+  }
+
+  export function animation() {
+    return !noanim;
+  }
 </script>
 
 <div
@@ -25,7 +53,7 @@
   class:noimage={!getOption('image')}
   class:noanim
 >
-  <div id="backdrop" />
+  <div id="backdrop" on:click={handleBackdropClick} />
   <div id="tnc-wrap" />
   <div id="modal" class="mchild">
     <div id="modal-inner">
