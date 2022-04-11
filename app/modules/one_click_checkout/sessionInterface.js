@@ -1,12 +1,13 @@
 // session imports
 import { getSession } from 'sessionmanager';
+
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
 // store imports
 import { get } from 'svelte/store';
-import { isOneClickCheckout } from 'razorpay';
 import { history, activeRoute } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,
@@ -25,19 +26,22 @@ import {
   selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
 import { tabTitle } from 'one_click_checkout/topbar/store';
+
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import OneCCEvents from 'one_click_checkout/analytics';
+
 // service imports
 import {
   updateOrder,
   thirdWatchCodServiceability,
 } from 'one_click_checkout/address/service';
+
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
-
-import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
+import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
 
 // i18n imports
 import {
@@ -45,6 +49,10 @@ import {
   CONFIRM_CANCEL_MESSAGE,
 } from 'one_click_checkout/misc/i18n/label';
 import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
+
+// utils imports
+import { isOneClickCheckout } from 'razorpay';
+import { showSummaryModal } from 'one_click_checkout/summary_modal';
 
 export const historyExists = () => get(history).length;
 
@@ -60,6 +68,12 @@ export const handleBack = () => {
   }
   tabTitle.set('');
   const currHistory = get(history);
+  const tab = session.tab;
+  const currentScreen =
+    tab === 'home-1cc' ? get(activeRoute).name : tab || 'methods';
+  Events.TrackBehav(OneCCEvents.BACK_BUTTON_CLICKED, {
+    screen_name: SCREEN_LIST[currentScreen],
+  });
   if (
     (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) ||
     get(activeRoute)?.name === views.COUPONS

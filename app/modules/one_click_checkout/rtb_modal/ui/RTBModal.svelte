@@ -13,10 +13,15 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
 
+  // Analytics imports
+  import { Events } from 'analytics';
+  import RTBEvents from 'one_click_checkout/rtb_modal/analytics';
+
   // utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { getMerchantName } from 'razorpay';
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
   const { circle_check, rtb_close } = getIcons();
   const merchantName = getMerchantName();
@@ -32,6 +37,9 @@
   }
 
   export function hide() {
+    Events.TrackBehav(RTBEvents.RTB_BADGE_DISMISSED, {
+      screen_name: getCurrentScreen(),
+    });
     visible = false;
   }
 

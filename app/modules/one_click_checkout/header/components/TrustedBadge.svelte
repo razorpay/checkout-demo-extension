@@ -23,10 +23,14 @@
   export let expanded;
   export let sendAnalytics = true;
 
-  //Utils
+  // Analytics imports
   import { Events } from 'analytics';
+  import RTBEvents from 'one_click_checkout/rtb_modal/analytics';
+
+  //Utils
   import rtbEvents from 'one_click_checkout/header/analytics';
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
   $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
   onMount(() => {
@@ -36,11 +40,18 @@
       });
     }
   });
+
+  const handleRTBClick = () => {
+    Events.TrackBehav(RTBEvents.RTB_BADGE_CLICKED, {
+      screen_name: getCurrentScreen(),
+    });
+    showRTBModal();
+  };
 </script>
 
 {#if trustedBadgeHighlights}
   {#if expanded}
-    <div class="rtb-expanded-wrapper" on:click={showRTBModal}>
+    <div class="rtb-expanded-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
         <TrustedBadgeIcon />
       </div>
@@ -48,7 +59,7 @@
       <Icon icon={info('#263A4A')} />
     </div>
   {:else}
-    <div class="rtb-collapsed-wrapper" on:click={showRTBModal}>
+    <div class="rtb-collapsed-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
         <TrustedBadgeIcon />
       </div>

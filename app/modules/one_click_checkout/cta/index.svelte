@@ -11,12 +11,20 @@
   import { showSummaryModal } from 'one_click_checkout/summary_modal';
   import { getCurrency, isOneClickCheckout } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+
+  // Analytics imports
+  import { Events } from 'analytics';
+  import CTAEvents from 'one_click_checkout/cta/analytics';
 
   // Props
   export let hidden = false;
   export let disabled = false;
   export let showAmount = true;
   export let onViewDetailsClick = function () {
+    Events.TrackBehav(CTAEvents.VIEW_DETAILS_CLICKED, {
+      screen_name: getCurrentScreen(),
+    });
     showSummaryModal(false);
   };
 
