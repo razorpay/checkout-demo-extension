@@ -165,8 +165,8 @@ Customer.prototype = {
           has_saved_cards: hasSavedCards,
           has_saved_addresses: !!data.saved_address,
         };
-        if (response?.error) {
-          eventProperties['error_reason'] = response?.error;
+        if (data?.error) {
+          eventProperties['error_reason'] = data?.error;
         }
         Events.TrackMetric(
           MiscEvents.CUSTOMER_STATUS_API_COMPLETED,

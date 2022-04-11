@@ -40,6 +40,7 @@
   // analytics imports
   import { Events } from 'analytics';
   import { ACCOUNT_VARIANT } from 'one_click_checkout/account_modal/constants';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
   import AccountEvents from 'one_click_checkout/account_modal/analytics';
 
   let isLoggedIn;
@@ -96,6 +97,11 @@
   }
 
   function selectLanguage(code) {
+    if (variant === ACCOUNT_VARIANT.LANGUAGE_ONLY) {
+      Events.TrackBehav(CouponEvents.SUMMARY_LANGUAGE_CHANGED, {
+        new_language_selected: code,
+      });
+    }
     Events.TrackBehav(AccountEvents.LANGUAGE_CLICKED, { screen_name });
     $locale = code;
     // In order to insure the bottom sheet get closes...when different language is chosen

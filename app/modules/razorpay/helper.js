@@ -327,6 +327,9 @@ export const getCustomerCart = () => getOption('customer_cart');
 
 export const getMerchantName = () => getOption('name');
 
+export const getCODEnabled = () =>
+  getPreferences('preferences.methods.cod') || false;
+
 /** misc */
 
 export function isBlockedDeactivated() {

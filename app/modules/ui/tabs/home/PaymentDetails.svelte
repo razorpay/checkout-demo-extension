@@ -1,4 +1,7 @@
 <script>
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI imports
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import Address from 'ui/elements/address.svelte';
@@ -40,14 +43,35 @@
   } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-
   import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { getAnimationOptions } from 'svelte-utils';
+  import { screensHistory } from 'one_click_checkout/routing/History';
 
+  // analytics imports
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { ContactDetailsEvents } from 'analytics/home/events';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
+  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import {
+    INDIA_CONTACT_ERROR_LABEL,
+    CONTACT_ERROR_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
+  import { getPrefillBankDetails } from 'netbanking/helper';
+
+  // Constants imports
+  import {
+    CATEGORIES,
+    ACTIONS,
+  } from 'one_click_checkout/merchant-analytics/constant';
+  import { views } from 'one_click_checkout/routing/constants';
+  import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
   import {
     CONTACT_REGEX,
     EMAIL_REGEX,
@@ -55,26 +79,6 @@
     INDIA_COUNTRY_CODE,
     PHONE_REGEX_INDIA,
   } from 'common/constants';
-  import { onMount } from 'svelte';
-  import { screensHistory } from 'one_click_checkout/routing/History';
-
-  import { t } from 'svelte-i18n';
-  import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-  import {
-    CATEGORIES,
-    ACTIONS,
-  } from 'one_click_checkout/merchant-analytics/constant';
-  import { views } from 'one_click_checkout/routing/constants';
-  import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
-  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
-
-  // Constants imports
-  import {
-    INDIA_CONTACT_ERROR_LABEL,
-    CONTACT_ERROR_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
-  import { getPrefillBankDetails } from 'netbanking/helper';
 
   const entries = _Obj.entries;
 
@@ -89,6 +93,7 @@
   const { user } = getIcons();
   const isOneCCEnabled = isOneClickCheckout();
   const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
+  const isSummaryScreen = $activeRoute?.name === views.COUPONS;
   const userContact = $contact;
   $prevContact = {
     country: $country,
@@ -107,6 +112,12 @@
         value: $contact,
       },
     });
+    if (isSummaryScreen && valid) {
+      Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
+        country_code: $country,
+        contact_number: $phone,
+      });
+    }
     Events.TrackBehav(ContactDetailsEvents.CONTACT_INPUT);
     validationText = getValidationText();
   }
@@ -121,6 +132,11 @@
       },
     });
     Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
+    if (isSummaryScreen) {
+      Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
+        email_id: $email,
+      });
+    }
   }
 
   $: {

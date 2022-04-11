@@ -55,6 +55,9 @@ export function fetchCoupons() {
       Events.TrackRender(CouponEvents.COUPONS_SCREEN, {
         coupons_count: get(availableCoupons).length,
       });
+      Events.TrackRender(CouponEvents.SUMMARY_COUPONS_COUNT, {
+        count_coupons_available: get(availableCoupons)?.length,
+      });
     });
 }
 

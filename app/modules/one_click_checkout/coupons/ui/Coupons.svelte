@@ -16,10 +16,14 @@
     getPrefilledCouponCode,
     isContactHidden,
     isEmailHidden,
+    getPrefilledContact,
+    getPrefilledEmail,
+    getCODEnabled,
   } from 'razorpay';
   import {
     checkServiceabilityStatus,
     selectedAddress,
+    selectedAddressId,
   } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
@@ -31,10 +35,16 @@
     savedAddresses,
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore';
-  import { shouldShowCoupons } from 'one_click_checkout/store';
+  import {
+    shouldShowCoupons,
+    isCodForced,
+    isLoginMandatory,
+  } from 'one_click_checkout/store';
+  import { RTB } from 'checkoutstore/rtb';
 
   // i18n imports
   import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
+  import { locale } from 'svelte-i18n';
 
   // session imports
   import {
@@ -66,12 +76,14 @@
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isElementUnscrollable } from 'one_click_checkout/helper';
+  import { getTrustedBadgeHighlights } from 'trusted-badge/helper';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
 
   const prefilledCoupon = getPrefilledCouponCode();
+  const showCoupons = shouldShowCoupons();
 
   let ctaDisabled = false;
   let couponEle;
@@ -86,6 +98,14 @@
   function onSubmit() {
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
     Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
+    Events.TrackBehav(CouponEvents.SUMMARY_CONTINUE_CTA_CLICKED, {
+      coupon_code_applied: $appliedCoupon,
+      address_id: $selectedAddressId,
+      address_country: $selectedAddress?.country,
+      meta: {
+        is_saved_address: !!$savedAddresses?.length,
+      },
+    });
     Events.Track(CouponEvents.COUPONS_SUBMIT, {
       input_source: $couponInputSource,
     });
@@ -112,13 +132,41 @@
     showAmountInTopBar();
   }
 
+  function summaryLoadedEvent() {
+    Analytics.setMeta(
+      'is_RTB_live_on_merchant',
+      getTrustedBadgeHighlights($RTB)
+    );
+    Analytics.setMeta('is_cod_enabled', getCODEnabled());
+    Analytics.setMeta('is_force_cod_enabled', isCodForced());
+    Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
+    Analytics.setMeta('is_coupons_enabled', showCoupons);
+    Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
+    Analytics.setMeta('summary_screen_default_language', $locale);
+
+    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
+      is_CTA_enabled: ctaDisabled,
+      prefill_contact_number: getPrefilledContact(),
+      prefill_email: getPrefilledEmail(),
+    });
+  }
+
   onMount(() => {
     scrollable = isElementUnscrollable(couponEle?.parentNode);
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
       if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
-        loadAddressesWithServiceability();
+        loadAddressesWithServiceability().finally(() => {
+          summaryLoadedEvent();
+          Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
+            pre_selected_saved_address_id: $selectedAddressId,
+          });
+          Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
+            checked_billing_address_same_as_delivery_address:
+              $isBillingSameAsShipping,
+          });
+        });
       }
     }
     merchantAnalytics({
@@ -132,6 +180,9 @@
     fetchCoupons();
     if (prefilledCoupon) {
       applyCouponCode(prefilledCoupon);
+    }
+    if (!isUserLoggedIn()) {
+      summaryLoadedEvent();
     }
   });
 
@@ -176,7 +227,7 @@
       <div class="separator" />
     {/if}
 
-    {#if shouldShowCoupons()}
+    {#if showCoupons}
       <div class="widget-wrapper">
         <AvailableCouponsButton
           applyCoupon={(code) => applyCouponCode(code)}

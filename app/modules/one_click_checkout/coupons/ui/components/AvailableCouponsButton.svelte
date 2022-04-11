@@ -17,6 +17,10 @@
     APPLIED_LABEL,
   } from 'one_click_checkout/coupons/i18n/labels';
 
+  // analytics imports
+  import { Events } from 'analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
 
@@ -29,7 +33,12 @@
 
   const { offers, circle_arrow_next } = getIcons();
   const showAvailableCoupons = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_COUPON_CLICKED);
     navigator.navigateTo({ path: views.COUPONS_LIST });
+  };
+  const handleRemoveCoupon = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_COUPON_REMOVE_CLICKED);
+    removeCoupon();
   };
 </script>
 
@@ -43,7 +52,10 @@
     <div class="coupons-available-text">
       ‘{$appliedCoupon}’ {$t(APPLIED_LABEL)}
     </div>
-    <span class="coupon-remove-text" on:click|preventDefault={removeCoupon}>
+    <span
+      class="coupon-remove-text"
+      on:click|preventDefault={handleRemoveCoupon}
+    >
       {$t(REMOVE_LABEL)}
     </span>
   {:else}

@@ -29,6 +29,7 @@
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
+  import { Events } from 'analytics';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -37,6 +38,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { querySelector } from 'utils/doc';
 
   let topbar;
@@ -60,6 +62,7 @@
     .join(';');
 
   onMount(() => {
+    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,

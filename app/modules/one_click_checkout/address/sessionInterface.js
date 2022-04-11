@@ -106,29 +106,33 @@ export function postAddressSelection(id, index) {
 export function loadAddressesWithServiceability(onSavedAddress) {
   checkServiceabilityStatus.set(SERVICEABILITY_STATUS.LOADING);
   const addresses = get(savedAddresses);
-  getServiceabilityOfAddresses(addresses, onSavedAddress)
-    .then((_addresses) => {
-      savedAddresses.set(_addresses);
+  return new Promise((resolve, reject) => {
+    getServiceabilityOfAddresses(addresses, onSavedAddress)
+      .then((_addresses) => {
+        resolve();
+        savedAddresses.set(_addresses);
 
-      let latestAddress;
-      if (onSavedAddress) {
-        // to set first address as selected even if unserviceable
-        latestAddress = _addresses[0];
-      } else {
-        // to set last updated serviceable address as selected
-        latestAddress =
-          getLatestServiceableAddress(_addresses) || _addresses[0];
-      }
-      selectedShippingAddressId.set(latestAddress.id);
-      postAddressSelection();
-    })
-    .catch(() => {
-      selectedShippingAddressId.set(addresses[0].id);
-      postAddressSelection();
-    })
-    .finally(() => {
-      checkServiceabilityStatus.set(SERVICEABILITY_STATUS.CHECKED);
-    });
+        let latestAddress;
+        if (onSavedAddress) {
+          // to set first address as selected even if unserviceable
+          latestAddress = _addresses[0];
+        } else {
+          // to set last updated serviceable address as selected
+          latestAddress =
+            getLatestServiceableAddress(_addresses) || _addresses[0];
+        }
+        selectedShippingAddressId.set(latestAddress.id);
+        postAddressSelection();
+      })
+      .catch(() => {
+        reject();
+        selectedShippingAddressId.set(addresses[0].id);
+        postAddressSelection();
+      })
+      .finally(() => {
+        checkServiceabilityStatus.set(SERVICEABILITY_STATUS.CHECKED);
+      });
+  });
 }
 
 /**

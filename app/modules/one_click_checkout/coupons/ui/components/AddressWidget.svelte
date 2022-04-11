@@ -22,8 +22,21 @@
   import { formatTemplateWithLocale } from 'i18n';
   import { locale, t } from 'svelte-i18n';
 
+  // analytics imports
+  import { Events } from 'analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+
   const { location } = getIcons();
   const dispatch = createEventDispatcher();
+
+  const handleChangeAddress = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_EDIT_ADDRESS_CLICKED);
+    dispatch('headerCtaClick');
+  };
+
+  const handleToggle = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_ADDRESS_SHIPPING_UNCHECKED);
+  };
 
   export let loading;
   export let address;
@@ -39,10 +52,7 @@
         <Icon icon={location} />
         <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
       </div>
-      <button
-        on:click={() => dispatch('headerCtaClick')}
-        class="label-cta theme"
-      >
+      <button on:click={handleChangeAddress} class="label-cta theme">
         {$t(ADDRESS_CTA_LABEL)}
       </button>
     </div>
@@ -58,7 +68,7 @@
   {/if}
   <AddressBox {address} {loading} withBorder={false} isEditable={false} />
   {#if !loading && address.serviceability}
-    <SameBillingAndShipping />
+    <SameBillingAndShipping on:toggle={handleToggle} />
   {/if}
 </div>
 
