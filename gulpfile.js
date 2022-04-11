@@ -27,7 +27,6 @@ function assetPath(path) {
 
 let paths = {
   js: assetPath('js/**/*.js'),
-  templates: assetPath('_templates/**/*.jst'),
   css: assetPath('css/**/*.styl'),
   moduleCss: assetPath('js/**/*.styl'),
   images: assetPath('images/**/*'),
