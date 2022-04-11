@@ -884,7 +884,7 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      const session = this;
+      var session = this;
       this.mainModal = new discreet.MainModal({
         target: document.body,
         props: {
