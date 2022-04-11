@@ -13,11 +13,9 @@
   import {
     handleLogout,
     handleLogoutAllDevices,
-    getSessionTab,
   } from 'one_click_checkout/account_modal/sessionInterface';
 
   // store imports
-  import { activeRoute } from 'one_click_checkout/routing/store';
   import { shouldUseVernacular } from 'checkoutstore/methods';
 
   // i18n imports
@@ -37,10 +35,12 @@
 
   // helper imports
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
   // analytics imports
-  import { Events, MiscEvents } from 'analytics';
+  import { Events } from 'analytics';
   import { ACCOUNT_VARIANT } from 'one_click_checkout/account_modal/constants';
+  import AccountEvents from 'one_click_checkout/account_modal/analytics';
 
   let isLoggedIn;
   let showLanguageList;
@@ -48,18 +48,11 @@
   let variant = ACCOUNT_VARIANT.DEFAULT;
 
   const showChangeLanguage = shouldUseVernacular();
+  let screen_name;
   let visible = false;
 
-  function handleLogoutAnalytics() {
-    const tab = getSessionTab();
-    const current_screen =
-      tab === 'home-1cc' ? $activeRoute.name : tab || 'methods';
-    Events.Track(MiscEvents.LOGOUT_CLICKED, {
-      current_screen,
-    });
-  }
-
   export function show(options) {
+    screen_name = getCurrentScreen();
     const { variant: variantType } = options || {};
     variant = variantType;
     isLoggedIn = isUserLoggedIn();
@@ -68,6 +61,7 @@
   }
 
   export function hide() {
+    Events.TrackBehav(AccountEvents.SCREEN_DISMISSED, { screen_name });
     visible = false;
   }
 
@@ -78,8 +72,8 @@
   }
 
   function handleLogoutClick() {
+    Events.TrackBehav(AccountEvents.LOGOUT_CLICKED, { screen_name });
     handleLogout();
-    handleLogoutAnalytics();
     hide();
   }
 
@@ -90,8 +84,10 @@
   });
 
   function handleLogoutAllDevicesClick() {
+    Events.TrackBehav(AccountEvents.LOGOUT_ALL_DEVICES_CLICKED, {
+      screen_name,
+    });
     handleLogoutAllDevices();
-    handleLogoutAnalytics();
     hide();
   }
 
@@ -100,6 +96,7 @@
   }
 
   function selectLanguage(code) {
+    Events.TrackBehav(AccountEvents.LANGUAGE_CLICKED, { screen_name });
     $locale = code;
     // In order to insure the bottom sheet get closes...when different language is chosen
     if (Object.keys(getBundle(code))?.length) {
@@ -113,6 +110,9 @@
   }
 
   function handleEdit() {
+    Events.TrackBehav(AccountEvents.EDIT_PERSONAL_DETAILS_CLICKED, {
+      screen_name,
+    });
     handleEditContact(false);
     hide();
   }

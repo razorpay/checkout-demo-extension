@@ -14,6 +14,11 @@
   import { isOneClickCheckout } from 'razorpay';
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { showAccountModal } from 'one_click_checkout/account_modal';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+
+  // analytics imports
+  import { Events } from 'analytics';
+  import AccountEvents from 'one_click_checkout/account_modal/analytics';
 
   export let showAccountTab;
 
@@ -33,12 +38,19 @@
       accountTabVisible = false;
     }
   }
+
+  function handleAccountModal() {
+    Events.TrackBehav(AccountEvents.ACCOUNT_CTA_CLICKED, {
+      screen_name: getCurrentScreen(),
+    });
+    showAccountModal();
+  }
 </script>
 
 {#if isOneClickCheckout() && accountTabVisible}
   <div class="account-tab-container">
     <div class="account-wrapper">
-      <div class="account-section" on:click={showAccountModal}>
+      <div class="account-section" on:click={handleAccountModal}>
         {$t(ACCOUNT)}
         <span class="account-toggle-icon">
           <Icon icon={arrow_left(13, 13, '#212121')} />
