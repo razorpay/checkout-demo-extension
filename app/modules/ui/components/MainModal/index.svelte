@@ -115,7 +115,12 @@
               {/if}
             </div>
             <div id="bottom" />
-            <div id="footer" role="button" class="button">
+            <div
+              id="footer"
+              role="button"
+              class="button"
+              class:hidden={isOneClickCheckoutEnabled}
+            >
               <span id="footer-cta">{cta}</span>
             </div>
             <div id="one-cc-loader" />
