@@ -68,8 +68,6 @@
   function deselectInstrument() {
     $selectedInstrumentId = null;
   }
-
-  $: console.log('Blocks +++++', $blocks);
 </script>
 
 {#each $blocks as block}
