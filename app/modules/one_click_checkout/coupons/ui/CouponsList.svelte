@@ -12,6 +12,8 @@
     appliedCoupon,
     isCouponApplied,
     error,
+    availableCoupons,
+    couponListTimer,
   } from 'one_click_checkout/coupons/store';
   import { cartAmount, amount } from 'one_click_checkout/charges/store';
 
@@ -22,10 +24,19 @@
   import { applyCouponCode } from 'one_click_checkout/coupons/helpers';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideCta } from 'checkoutstore/cta';
+  import { timer } from 'utils/timer';
+
+  // analytics imports
+  import { Events } from 'analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
 
   onMount(() => {
     hideCta();
     toggleHeader(false);
+    Events.TrackRender(CouponEvents.COUPON_SCREEN_LOADED, {
+      count_coupons_available: $availableCoupons?.length,
+    });
+    $couponListTimer = timer();
   });
 
   function onCouponInput() {

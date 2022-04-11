@@ -42,8 +42,16 @@
     Events.TrackRender(CouponEvents.AVAILABLE_COUPONS_MODAL);
   });
 
-  const handleCouponCode = (couponCode) => {
+  const handleCouponCode = (couponCode, couponIndex) => {
     Events.Track(CouponEvents.AVAILABLE_COUPON_CLICKED);
+    Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
+      coupon_code_index: couponIndex,
+      meta: {
+        coupon_code: couponCode,
+        chosen_coupon_available: 1,
+      },
+    });
+
     merchantAnalytics({
       event: ACTIONS.COUPON_AVAILABLE_CLICKED,
       category: CATEGORIES.COUPONS,
@@ -69,11 +77,11 @@
     </div>
 
     <div class="coupons-list">
-      {#each $availableCoupons as coupon, i}
+      {#each $availableCoupons as coupon, index}
         <CouponItem
           selected={coupon.code === $appliedCoupon}
           {coupon}
-          on:apply={() => handleCouponCode(coupon.code)}
+          on:apply={() => handleCouponCode(coupon.code, index)}
           on:remove={removeCoupon}
         />
       {/each}

@@ -72,6 +72,8 @@ export function applyCouponCode(code) {
   if (input) {
     applyCoupon(input, source, {
       onValid: () => {
+        Analytics.setMeta('is_coupon_valid', true);
+        Analytics.setMeta('coupon_code', input);
         merchantAnalytics({
           event: ACTIONS.COUPONS_APPLIED_SUCCESS,
           category: CATEGORIES.COUPONS,
@@ -87,6 +89,7 @@ export function applyCouponCode(code) {
             coupon_code: input,
           },
         });
+        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED);
         navigator.navigateTo({ path: views.COUPONS });
         showToast({
           delay: 5000,
@@ -106,6 +109,8 @@ export function applyCouponCode(code) {
         });
       },
       onInvalid: (error) => {
+        Analytics.setMeta('is_coupon_valid', false);
+        Analytics.setMeta('coupon_code', input);
         merchantAnalytics({
           event: ACTIONS.COUPONS_APPLIED_FAILED,
           category: CATEGORIES.COUPONS,
@@ -113,6 +118,10 @@ export function applyCouponCode(code) {
             page_title: CATEGORIES.COUPONS,
             coupon_code: input,
           },
+        });
+        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
+          error_reason: error?.error?.reason,
+          error_description: error?.error?.description,
         });
         if (error.failure_code === ERROR_USER_NOT_LOGGED_IN) {
           showDetailsOverlay(true);

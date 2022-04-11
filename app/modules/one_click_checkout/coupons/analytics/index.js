@@ -20,6 +20,11 @@ const events = {
   COUPONS_SUBMIT: 'checkoutCouponSubmitted',
   COUPON_VALIDITY_START: 'checkoutCouponValidationStarted',
   COUPON_VALIDITY_END: 'checkoutCouponValidationCompleted',
+  COUPON_SCREEN_LOADED: '1cc_coupons_screen_loaded',
+  COUPON_BACK_BUTTON_CLICKED: '1cc_coupons_screen_back_button_clicked',
+  CUSTOM_COUPON_ENTERED: '1cc_coupons_screen_custom_coupon_entered',
+  COUPON_APPLY_BUTTON_CLICKED: '1cc_coupons_screen_coupon_applied',
+  COUPON_VALIDATION_COMPLETED: '1cc_coupons_screen_coupon_validation_completed',
 };
 
 export default events;

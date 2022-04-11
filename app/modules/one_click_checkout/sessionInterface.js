@@ -26,12 +26,12 @@ import {
   selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
 import { tabTitle } from 'one_click_checkout/topbar/store';
-
+import { couponListTimer } from 'one_click_checkout/coupons/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import CouponEvents from 'one_click_checkout/coupons/analytics';
 import OneCCEvents from 'one_click_checkout/analytics';
-
 // service imports
 import {
   updateOrder,
@@ -68,6 +68,11 @@ export const handleBack = () => {
   }
   tabTitle.set('');
   const currHistory = get(history);
+  if (get(activeRoute)?.name === views.COUPONS_LIST) {
+    Events.TrackBehav(CouponEvents.COUPON_BACK_BUTTON_CLICKED, {
+      time: get(couponListTimer)(),
+    });
+  }
   const tab = session.tab;
   const currentScreen =
     tab === 'home-1cc' ? get(activeRoute).name : tab || 'methods';

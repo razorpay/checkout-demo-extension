@@ -41,6 +41,9 @@
       Events.TrackBehav(CouponEvents.INPUT, {
         couponCode: $couponInputValue,
       });
+      Events.TrackBehav(CouponEvents.CUSTOM_COUPON_ENTERED, {
+        coupon_code: $couponInputValue,
+      });
       merchantAnalytics({
         event: ACTIONS.COUPONS_MANUAL_INPUT,
         category: CATEGORIES.COUPONS,
@@ -54,6 +57,20 @@
   function handleClickLabel() {
     couponField.focus();
   }
+
+  const handleApplyCoupon = () => {
+    Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {
+      index: $couponAppliedIndex,
+    });
+    if ($couponInputValue) {
+      Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
+        meta: {
+          coupon_code: $couponInputValue,
+        },
+      });
+    }
+    applyCoupon();
+  };
 
   export let removeCoupon;
   export let applyCoupon;
@@ -85,12 +102,7 @@
       disabled={!$couponInputValue}
       id="coupon-apply-btn"
       class="theme coupon-apply-btn"
-      on:click|preventDefault={() => {
-        Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {
-          index: $couponAppliedIndex,
-        });
-        applyCoupon();
-      }}
+      on:click|preventDefault={handleApplyCoupon}
     >
       {$t(APPLY_LABEL)}
     </button>
