@@ -7,7 +7,9 @@
  * @return {String} str  The sanitized string
  */
 export function sanitizeHTML(str) {
-  if (typeof str !== 'string') return str;
+  if (typeof str !== 'string') {
+    return str;
+  }
 
   return str.replace(/[^-\w. ]/gi, function (c) {
     return '&#' + c.charCodeAt(0) + ';';

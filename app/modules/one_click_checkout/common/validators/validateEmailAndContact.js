@@ -7,7 +7,7 @@ import {
   isContactOptional,
   isEmailOptional,
   isContactEmailOptional,
-} from 'checkoutstore';
+} from 'razorpay';
 
 import { country, phone, contact, email } from 'checkoutstore/screens/home';
 import { get } from 'svelte/store';

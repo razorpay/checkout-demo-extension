@@ -16,7 +16,7 @@
     isContactHidden,
     isEmailHidden,
     isContactEmailHidden,
-  } from 'checkoutstore';
+  } from 'razorpay';
   import { isEditContactFlow } from 'one_click_checkout/store';
 
   // Utils Imports

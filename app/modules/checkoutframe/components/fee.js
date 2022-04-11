@@ -1,10 +1,10 @@
 import FeeLabel from 'ui/components/FeeLabel.svelte';
-
+import { querySelector } from 'utils/doc';
 let feeLabel = null;
 
 export function show(props) {
   feeLabel = new FeeLabel({
-    target: _Doc.querySelector('.fee'),
+    target: querySelector('.fee'),
     props,
   });
 }

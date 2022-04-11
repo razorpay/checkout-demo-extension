@@ -3,6 +3,9 @@ import { makeUrl } from 'common/helper';
 import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
+import BrowserStorage from 'browserstorage';
+import * as _El from 'utils/DOM';
+import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -28,7 +31,7 @@ function needBody(func) {
 const currentScript =
   document.currentScript ||
   (function () {
-    var scripts = _Doc.querySelectorAll('script');
+    var scripts = querySelectorAll('script');
     return scripts[scripts.length - 1];
   })();
 
@@ -41,7 +44,7 @@ const currentScript =
 function defaultAutoPostHandler(data) {
   currentScript
     |> _El.parent
-    |> _El.append(_El.create() |> _El.setContents(_Doc.obj2formhtml(data)))
+    |> _El.append(_El.create() |> _El.setContents(obj2formhtml(data)))
     |> _Obj.setProp('onsubmit', returnAsIs)
     |> _El.submit;
 }
@@ -71,7 +74,7 @@ var addAutoCheckoutButton = function (rzp) {
       ) {
         var request = {
           url: action,
-          content: _Doc.form2obj(form),
+          content: form2obj(form),
           method: _.isString(method) ? method : 'get',
           target: _.isString(target) && target,
         };
@@ -219,14 +222,76 @@ function createTestRibbon(parent) {
   );
 }
 
+function fetchNewDesignExp(rzp) {
+  let uuid = BrowserStorage.getItem('v_1_5_experiment_enabled');
+  if (!uuid) {
+    uuid = Track.makeUid();
+  }
+  return new Promise(function (resolve, reject) {
+    fetch.post({
+      url: 'https://api.razorpay.com/v1/splitz/evaluate',
+      callback: function (data) {
+        BrowserStorage.setItem('v_1_5_experiment_enabled', uuid);
+        resolve(data);
+      },
+      data: {
+        id: uuid,
+        experiment_id: 'JARUK3l9b4GF7f',
+        request_data: JSON.stringify({
+          merchant_key_id: rzp.get('key') || '',
+        }),
+      },
+    });
+  });
+}
+
 var preloadedFrame;
+var preloadedFramePromise;
 function getPreloadedFrame(rzp) {
-  if (preloadedFrame) {
-    preloadedFrame.openRzp(rzp);
-  } else {
+  function setFrame() {
     preloadedFrame = new CheckoutFrame(rzp);
     global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
-    frameContainer |> _El.append(preloadedFrame.el);
+    _El.append(frameContainer, preloadedFrame.el);
+  }
+
+  if (rzp && rzp.get('one_click_checkout')) {
+    rzp.set('v_1_5_experiment_enabled', false);
+    preloadedFramePromise = fetchNewDesignExp(rzp).then((data) => {
+      if (data?.response?.variant?.name === 'enable_1_5') {
+        rzp.set('v_1_5_experiment_enabled', true);
+      }
+      const currentFrames = document.getElementsByClassName(
+        'razorpay-checkout-frame'
+      );
+      while (currentFrames.length) {
+        currentFrames[0].remove();
+      }
+      setFrame();
+      intialInstrumentation(rzp, preloadedFrame);
+      return preloadedFrame;
+    });
+
+    if (preloadedFrame && preloadedFrame.openRzp) {
+      preloadedFrame.openRzp(rzp);
+    } else {
+      preloadedFramePromise = new Promise(function (resolve, reject) {
+        setFrame();
+        resolve(preloadedFrame);
+      });
+    }
+  } else {
+    if (preloadedFramePromise) {
+      preloadedFramePromise.then(() => {
+        if (rzp) {
+          preloadedFrame.openRzp(rzp);
+        }
+      });
+      return preloadedFrame;
+    }
+    preloadedFramePromise = new Promise(function (resolve, reject) {
+      setFrame();
+      resolve(preloadedFrame);
+    });
   }
   return preloadedFrame;
 }
@@ -254,14 +319,11 @@ RazorProto.onNew = function (event, callback) {
   }
 };
 
-RazorProto.open = needBody(function () {
-  if (!this.metadata) {
-    this.metadata = {};
-  }
-  this.metadata.openedAt = Date.now();
-
-  var frame = (this.checkoutFrame = getPreloadedFrame(this));
-  Track(this, 'open');
+function intialInstrumentation(that, checkoutFrame) {
+  var frame = (that.checkoutFrame = checkoutFrame);
+  Track(that, 'open', {
+    v_1_5_experiment_enabled: that.get('v_1_5_experiment_enabled') || false,
+  });
 
   if (!frame.el.contentWindow) {
     frame.close();
@@ -272,7 +334,20 @@ RazorProto.open = needBody(function () {
   }
 
   if (currentScript.src.slice(-7) === '-new.js') {
-    Track(this, 'oldscript', location.href);
+    Track(that, 'oldscript', location.href);
+  }
+}
+
+RazorProto.open = needBody(function () {
+  if (!this.metadata) {
+    this.metadata = {};
+  }
+  this.metadata.openedAt = Date.now();
+  var checkoutFrame = getPreloadedFrame(this);
+  var that = this;
+
+  if (checkoutFrame && !that?.get('one_click_checkout')) {
+    intialInstrumentation(that, checkoutFrame);
   }
 
   return this;

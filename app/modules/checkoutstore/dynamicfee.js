@@ -3,7 +3,7 @@ import { Views } from 'ui/tabs/card/constant';
 import {
   getConvenienceFeeConfig,
   getDynamicFeeBearerMerchantMessage,
-} from './index';
+} from 'razorpay';
 export const dynamicFeeObject = writable({});
 export const showFeesIncl = writable({});
 export const merchantMessage = writable('');

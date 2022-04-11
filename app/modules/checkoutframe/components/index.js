@@ -4,21 +4,30 @@ import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
 import { showTopbar } from 'one_click_checkout/topbar';
 import { showHeader } from 'one_click_checkout/header';
-import { isPayout } from 'checkoutstore';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
-import { isOneClickCheckout } from 'razorpay';
+import { isOneClickCheckout, isPayout } from 'razorpay';
+import NavigationStack, { isStackPopulated } from 'navstack';
+import { querySelector } from 'utils/doc';
 
 let componentsMap = {};
 
 export function render() {
   componentsMap.poweredBy = new PoweredBy({
-    target: _Doc.querySelector('#container'),
+    target: querySelector('#container'),
   });
 
-  const topbar = (componentsMap.topbar = new TopBar({
-    target: document.querySelector('#topbar-wrap'),
-  }));
+  const navStack = new NavigationStack({
+    target: querySelector('#root'),
+  });
+
+  componentsMap.navStack = navStack;
+
+  const topbar = new TopBar({
+    target: querySelector('#topbar-wrap'),
+  });
+
+  componentsMap.topbar = topbar;
 
   const session = getSession();
   session.topBar = topbar;
@@ -31,7 +40,13 @@ export function render() {
   if (isPayout()) {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {
-    topbar.$on('back', session.back.bind(session));
+    topbar.$on('back', () => {
+      if (isStackPopulated()) {
+        navStack.backPressed();
+      } else {
+        session.back();
+      }
+    });
   }
 }
 
@@ -63,7 +78,7 @@ export const bankTransferTab = {
   render() {
     setView(
       BANK_TRANSFER_KEY,
-      new BankTransferScreen({ target: _Doc.querySelector('#form-fields') })
+      new BankTransferScreen({ target: querySelector('#form-fields') })
     );
   },
 

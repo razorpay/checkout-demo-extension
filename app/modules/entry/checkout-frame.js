@@ -5,6 +5,7 @@ import 'checkoutjs/options';
 import 'payment';
 import 'analytics/track-errors';
 import { Track } from 'analytics';
+import { resolveUrl } from 'utils/doc';
 
 Track.props.library = 'checkoutjs';
 
@@ -12,4 +13,4 @@ const trafficEnv = String('__TRAFFIC_ENV__'); // eslint-disable-line no-undef
 if (trafficEnv) {
   Track.props.env = trafficEnv;
 }
-RazorpayConfig.api = _Doc.resolveUrl(RazorpayConfig.frameApi);
+RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);

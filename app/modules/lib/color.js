@@ -1,3 +1,4 @@
+import * as _El from 'utils/DOM';
 /*
  * All color inspection/manipulation functions go here
  */

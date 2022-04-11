@@ -10,13 +10,9 @@
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
-  import {
-    userConsentForTokenization,
-    selectedCard,
-  } from 'checkoutstore/screens/card';
+  import { userConsentForTokenization } from 'checkoutstore/screens/card';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -44,8 +40,11 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { isRecurring } from 'razorpay';
-  import { isOneClickCheckout } from 'razorpay';
+  import {
+    isDynamicFeeBearer,
+    isRecurring,
+    isOneClickCheckout,
+  } from 'razorpay';
 
   // Props
   export let card;
@@ -56,7 +55,6 @@
   export let selected;
   export let tab;
   export let isTokenised;
-  export let autoSelect;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
@@ -144,15 +142,6 @@
     dispatch('click', payload);
   }
   //#region cards-tokenization
-
-  $: {
-    if (autoSelect && !$selectedCard) {
-      // if the card is not tokenized and nothing is selected on ui select the card.
-      tick().then((_) => {
-        handleClick({}, true);
-      });
-    }
-  }
 
   //#endregion
 </script>

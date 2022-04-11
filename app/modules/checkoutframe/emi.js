@@ -2,6 +2,8 @@
 import EmiView from 'ui/components/emi.svelte';
 import { getSession } from 'sessionmanager';
 import { getEMIBanks } from 'checkoutstore/methods';
+import * as _El from 'utils/DOM';
+import { querySelector } from 'utils/doc';
 
 const bankOverrides = {
   SBIN: {
@@ -56,7 +58,7 @@ export default function emiView() {
 
 emiView.prototype = {
   render() {
-    const wrap = _Doc.querySelector('#emi-wrap');
+    const wrap = querySelector('#emi-wrap');
     const banks = useBankOverrides(this.opts.banks);
 
     let defaultBank = _Obj.keys(banks)[0];
@@ -71,7 +73,7 @@ emiView.prototype = {
   },
 
   on: function (event, sel, listener) {
-    const el = _Doc.querySelector(sel);
+    const el = querySelector(sel);
 
     this.listeners.push(el |> _El.on(event, listener));
   },

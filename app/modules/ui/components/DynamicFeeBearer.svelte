@@ -4,7 +4,7 @@
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   //Store imports
-  import { isDynamicFeeBearer } from 'checkoutstore/index.js';
+  import { isDynamicFeeBearer } from 'razorpay';
 
   import {
     merchantMessage,
@@ -15,8 +15,7 @@
   //Util imports
   import { getSession } from 'sessionmanager';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getAmount } from 'checkoutstore';
-  import { getCurrency, isOneClickCheckout } from 'razorpay';
+  import { getCurrency, getAmount, isOneClickCheckout } from 'razorpay';
 
   const session = getSession();
   const DYNAMIC_FEE_BEARER_VIEW_TIME = 6000;

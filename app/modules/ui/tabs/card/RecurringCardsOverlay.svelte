@@ -221,7 +221,7 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 45%;
+    min-width: 40%;
   }
 
   .recurring-cards-col ~ * {

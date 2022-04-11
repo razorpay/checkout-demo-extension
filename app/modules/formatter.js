@@ -2,6 +2,7 @@ import * as Card from 'common/card';
 import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
+import { preventEvent } from 'utils/doc';
 
 const alphanumericRaw = function (value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -373,7 +374,7 @@ formatterProto.run = function (values) {
     //    prevent by default all the time and set value manually.
     //    this takes effect for keypress, keydown events
 
-    _Doc.preventEvent(values.e);
+    preventEvent(values.e);
 
     // check if value was changed at all
     shouldUpdateDOM = pretty !== this.prettyValue;

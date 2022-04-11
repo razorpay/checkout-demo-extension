@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<!-- Don't Modify, this page is required only for local-checkout<>sdk dev-connection. Ref: #3325 PR -->
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <title>Razorpay Checkout</title>
+    <link rel="icon" href="data:;base64,=">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
+</head>
+
+<body>
+    <div style="font-family:'lato';visibility:hidden;position:absolute;">.</div>
+</body>
+<style>
+    @font-face {
+        font-family: 'lato';
+        src: url("https://cdn.razorpay.com/lato.eot?#iefix") format('embedded-opentype'), url("https://cdn.razorpay.com/lato.woff2") format('woff2'), url("https://cdn.razorpay.com/lato.woff") format('woff'), url("https://cdn.razorpay.com/lato.ttf") format('truetype'), url("https://cdn.razorpay.com/lato.svg#lato") format('svg');
+        font-weight: normal;
+        font-style: normal
+    }
+</style>
+<link rel="stylesheet" href="dist/v1/css/checkout.css">
+<script>
+    function appendScript(element) {
+        var script = document.createElement('script');
+        script.src = element.src;
+        document.body.appendChild(script);
+    }
+</script>
+<!-- 
+    config.js file actually has frameApi and api slightly modified 
+    hence without them local server cannot actually detect the api vs asset calls
+ -->
+<script src="config.js" crossorigin></script>
+<script src="dist/v1/checkout-frame.js" crossorigin onerror="appendScript(this)"></script>
+
+</html>

@@ -44,14 +44,18 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount } from 'checkoutstore';
+  import { getAmount } from 'razorpay';
   import { getCurrencies } from 'card/helper/dcc';
 
   import { getCurrency, isPartialPayment, isOneClickCheckout } from 'razorpay';
 
   import { getIin } from 'common/card';
 
-  import { formatAmount, formatAmountWithSymbol } from 'common/currency';
+  import {
+    formatAmount,
+    formatAmountWithSymbol,
+    formatAmountWithSymbolRawHtml,
+  } from 'common/currency';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -260,16 +264,8 @@
           }
         }
         updateAmountInHeaderAndCTA(
-          formatAmountWithSymbol(
-            amount,
-            selectedCurrency,
-            spaceAmoutWithSymbol
-          ),
-          formatAmountWithSymbol(
-            dccAmount,
-            selectedCurrency,
-            spaceAmoutWithSymbol
-          )
+          formatAmountWithSymbolRawHtml(amount, selectedCurrency),
+          formatAmountWithSymbolRawHtml(dccAmount, selectedCurrency)
         );
       } else if (!offer) {
         updateAmountInHeaderAndCTA();
@@ -384,7 +380,7 @@
   function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
       if (displayAmount) {
-        session.setRawAmountInHeader(displayAmount);
+        session.setRawAmountInHeader(displayAmount, true);
         showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
         if (isCtaShown()) {
@@ -548,13 +544,9 @@
               {/if}
             {/if}
           {:else}
-            <b dir="ltr"
-              >{formatAmountWithSymbol(
-                dccAmount,
-                selectedCurrency,
-                spaceAmoutWithSymbol
-              )}</b
-            >
+            <b dir="ltr">
+              {@html formatAmountWithSymbolRawHtml(dccAmount, selectedCurrency)}
+            </b>
             {#if selectedCurrency !== originalCurrency && currencies[originalCurrency]}
               <span class="small-text">
                 ({formatAmountWithSymbol(

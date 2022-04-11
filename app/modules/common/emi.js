@@ -1,4 +1,4 @@
-import { hasFeature } from 'checkoutstore';
+import { hasFeature } from 'razorpay';
 import { emiBanks } from 'common/bank';
 
 // convert emiBanks array to map keyed by bank-code

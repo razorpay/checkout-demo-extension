@@ -5,8 +5,13 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import { isPayout, shouldRememberCustomer } from 'checkoutstore';
-  import { getPrefilledVPA, hasFeature, isOneClickCheckout } from 'razorpay';
+  import { shouldRememberCustomer } from 'checkoutstore';
+  import {
+    isPayout,
+    getPrefilledVPA,
+    hasFeature,
+    isOneClickCheckout,
+  } from 'razorpay';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -22,7 +27,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCta } from 'checkoutstore/cta';
-  import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import {
     intentVpaPrefill,
@@ -30,7 +34,6 @@
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
-  import { getName, isASubscription } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -54,7 +57,13 @@
   // Store
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
-  import { isRecurring, getMerchantOrder, getSubscription } from 'razorpay';
+  import {
+    getName,
+    isRecurring,
+    getMerchantOrder,
+    getSubscription,
+    isASubscription,
+  } from 'razorpay';
 
   import {
     UPI_COLLECT_BLOCK_HEADING,

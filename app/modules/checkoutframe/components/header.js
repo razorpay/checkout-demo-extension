@@ -1,6 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
-
+import { querySelector } from 'utils/doc';
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
  *
@@ -17,14 +17,22 @@ export function getNormalizedAmountFontSize(
   const MAX_FONT_SIZE = isOneClickCheckout() ? 20 : 24;
   const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
 
-  if (!amount) return MAX_FONT_SIZE;
+  if (!amount) {
+    return MAX_FONT_SIZE;
+  }
 
   // start decreasing fontsize when number of chars exceed this
   let autoscaleThreasholdChars = 12;
 
-  if (hasFee) autoscaleThreasholdChars = 10;
-  if (hasOffer) autoscaleThreasholdChars = 7;
-  if (hasFee && hasOffer) autoscaleThreasholdChars = 6;
+  if (hasFee) {
+    autoscaleThreasholdChars = 10;
+  }
+  if (hasOffer) {
+    autoscaleThreasholdChars = 7;
+  }
+  if (hasFee && hasOffer) {
+    autoscaleThreasholdChars = 6;
+  }
 
   return Math.max(
     MIN_FONT_SIZE,
@@ -55,7 +63,9 @@ export function updateAmountFontSize() {
     ? session.formatAmountWithCurrency(originalAmount)
     : '';
 
-  if (!discountString && !originalAmountString) return;
+  if (!discountString && !originalAmountString) {
+    return;
+  }
 
   let amount_figure = discountString ? discountString : originalAmountString;
   // to get the actual sense of length, remove chars which barely take any space
@@ -63,6 +73,8 @@ export function updateAmountFontSize() {
 
   let fontSize = getNormalizedAmountFontSize(amount_figure, hasFee, hasOffer);
 
-  let amountElement = _Doc.querySelector('#amount');
-  if (amountElement?.style) amountElement.style.fontSize = fontSize + 'px';
+  let amountElement = querySelector('#amount');
+  if (amountElement?.style) {
+    amountElement.style.fontSize = fontSize + 'px';
+  }
 }

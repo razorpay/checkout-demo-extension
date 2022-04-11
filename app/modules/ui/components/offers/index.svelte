@@ -6,7 +6,7 @@
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
-
+  import * as _El from 'utils/DOM';
   import {
     getOffersForTab,
     getOffersForInstrument,
@@ -50,6 +50,7 @@
     isCardValidForOffer,
     showOffers,
   } from 'checkoutstore/offers';
+  import { querySelector } from 'utils/doc';
 
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
@@ -70,12 +71,12 @@
   const isOneCCEnabled = isOneClickCheckout();
 
   $: {
-    _El.keepClass(_Doc.querySelector('#header'), 'offer-fade', listActive);
+    _El.keepClass(querySelector('#header'), 'offer-fade', listActive);
     if (!listActive) {
       otherActive = false;
     }
   }
-  $: _El.keepClass(_Doc.querySelector('#header'), 'offer-error', error);
+  $: _El.keepClass(querySelector('#header'), 'offer-error', error);
 
   $: $selectedInstrument, switchInstrument();
 

@@ -10,7 +10,7 @@
 
   import { UPI_OTM_CALLOUT } from 'ui/labels/upi';
 
-  import { getAmount, getName } from 'checkoutstore';
+  import { getAmount, getName } from 'razorpay';
 
   export let isOtm = false;
   export let isUpiRecurringCAW = false;

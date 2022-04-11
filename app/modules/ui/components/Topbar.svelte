@@ -4,8 +4,8 @@
   import { fly } from 'svelte/transition';
 
   // Store
-  import { getAmount, showFeeLabel } from 'checkoutstore';
-  import { isIRCTC, isOneClickCheckout } from 'razorpay';
+  import { showFeeLabel } from 'checkoutstore';
+  import { getAmount, isIRCTC, isOneClickCheckout } from 'razorpay';
   import { isContactPresent } from 'checkoutstore/screens/home';
   import {
     dynamicFeeObject,

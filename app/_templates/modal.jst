@@ -22,13 +22,12 @@ else
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild `?RazorpayHelper.isOneClickCheckout()`one-cc`?`">
     <div id="modal-inner">
-      <div id="overlay" class="showable"></div>
+      <div id="overlay"></div>
       <div id="nocost-overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
       <div id="emi-wrap" class="overlay showable mfix"></div>
       <div id="recurring-cards-wrap" class="overlay showable mfix"></div>
       <div id="fee-wrap" class="overlay showable mfix"></div>
-      <div id="secure-card-know-more-wrap" class="overlay showable mfix"></div>
       <div id="one-cc-summary"></div>
       <div id="one-cc-account"></div>
       <div id="one-cc-rtb"></div>
@@ -81,13 +80,10 @@ else
         </div>
         <div id="body" class="sub">
           <div id="topbar-wrap"></div>
-          <div id="topbar-onecc-wrap"></div>
-          <div id="curtain">
-            <div id="curtain-container-parent"></div>
-            <div id="curtain-overlay"></div>
-          </div>
+           <div id="topbar-onecc-wrap"></div>
           <div id="messages"></div>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
+            <div id="root"></div>
             <div id="form-fields">
               <div id="body-overlay"></div>
               `?RazorpayHelper.isIRCTC()`

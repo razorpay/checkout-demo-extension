@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { onMount, onDestroy } from 'svelte';
+  import { querySelector } from 'utils/doc';
 
   // Props
   export let className;
@@ -9,7 +10,7 @@
   export let autoAlign = true; // Should align automatically after mounting?
   export let align = ['right']; // Default alignment directions
   export let alignOnHover = true; // Should we align again when parent is hovered on?
-
+  import * as _El from 'utils/DOM';
   // Refs
   let tooltip = null;
 
@@ -200,7 +201,7 @@
       return;
     }
 
-    const boundingElem = _Doc.querySelector(bindTo);
+    const boundingElem = querySelector(bindTo);
 
     if (!boundingElem || !tooltip) {
       return;

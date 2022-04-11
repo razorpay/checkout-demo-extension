@@ -1,6 +1,7 @@
 import 'entry/checkout-frame';
 import RazorpayConfig from 'common/RazorpayConfig';
 
+import $ from 'lib/$';
 import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import ErrorService from 'error-service';
@@ -14,7 +15,7 @@ import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'ui/components/feebearer.svelte';
+import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
@@ -27,8 +28,6 @@ import * as I18n from 'i18n';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
 import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/NetbankingCancelReasonPicker.svelte';
-import * as Curtain from 'components/curtain';
-import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodes';
@@ -137,11 +136,18 @@ import * as AccountTabStore from 'one_click_checkout/account_modal/store';
 
 import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
+
+import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
+import * as _El from 'utils/DOM';
+
+import * as docUtil from 'utils/doc';
+import * as NetbankingHelper from 'netbanking/helper';
 
 import * as UrlUtils from 'common/urls';
 
 export default {
+  $,
   RazorpayConfig,
   updateScore,
   fetch,
@@ -150,7 +156,6 @@ export default {
   AnalyticsTypes,
   UPIUtils,
   UTILS,
-  setShieldParams,
   GPay,
   Color,
   _PaymentMethodIcons,
@@ -215,7 +220,7 @@ export default {
   emiScreenView,
   emiPlansView,
 
-  FeeBearerView,
+  showFeeBearer,
   Backdrop,
   Overlay,
   AuthOverlay,
@@ -229,7 +234,6 @@ export default {
   CancelReasonPicker,
   NetbankingCancelReasonPicker,
   PayLaterView,
-  Curtain,
   commonBanks,
   timer: _.timer,
   QRScreen,
@@ -252,7 +256,7 @@ export default {
   BrowserStorage,
 
   _Arr,
-  _Doc,
+  docUtil,
   _El,
   _Obj,
   _,
@@ -282,6 +286,7 @@ export default {
   OneClickCheckoutMetaProperties,
   RazorpayHelper,
   views,
+  WalletHelper,
 
   CardViews,
   OTP_TEMPLATES,
@@ -303,4 +308,5 @@ export default {
   AccountTabStore,
 
   UrlUtils,
+  NetbankingHelper,
 };

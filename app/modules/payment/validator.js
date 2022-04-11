@@ -4,40 +4,10 @@ import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
 
-/* cotains mapping of sdk keys to shield key names */
-const sdkToShieldMap = {
-  'network.cellular_network_type': 'cellular_network_type',
-  'network.connectivity_type': 'data_network_type',
-  locale: 'locale',
-  'os.name': 'os',
-};
-
-let shieldParams = {};
-
-export const setShieldParams = (params) => {
-  params = _Obj.clone(params);
-
-  /* flatten SDK object, single level */
-  params
-    |> _Obj.loop((value, key) => {
-      if (typeof value === 'object') {
-        flattenProp(params, key, '.');
-      }
-    });
-
-  params
-    |> _Obj.loop((value, key) => {
-      let newKey = sdkToShieldMap[key];
-      if (newKey) {
-        shieldParams[newKey] = value;
-      }
-    });
-};
-
 export const formatPayment = function (payment) {
   let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
     (allParams, param) => {
-      if (payment |> _Obj.hasOwnProp(param)) {
+      if (payment.hasOwnProperty(param)) {
         allParams[param] = payment[param];
       }
       return allParams;
@@ -87,7 +57,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'recurring_token.max_amount',
     'recurring_token.expire_by',
   ].forEach((field) => {
-    if (!(data |> _Obj.hasOwnProp(field))) {
+    if (!data.hasOwnProperty(field)) {
       var val = getOption(field);
       if (val) {
         // send boolean value true as 1
@@ -141,11 +111,6 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
   }
 
   data['_[shield][tz]'] = -new Date().getTimezoneOffset();
-
-  shieldParams
-    |> _Obj.loop((value, key) => {
-      data[`_[shield][${key}]`] = value;
-    });
 
   // eslint-disable-next-line no-undef
   data['_[build]'] = __BUILD_NUMBER__ || 0;

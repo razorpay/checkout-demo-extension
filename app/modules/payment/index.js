@@ -10,7 +10,7 @@ import { returnAsIs, toTitleCase } from 'lib/utils';
 import { submitForm } from 'common/form';
 
 import { Track } from 'analytics';
-import popupTemplate from 'payment/popup/template';
+import { writePopup, updatePopup } from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Iframe from 'payment/iframe';
 import { formatPayment } from 'payment/validator';
@@ -19,7 +19,7 @@ import Razorpay from 'common/Razorpay';
 import { makeAuthUrl, makeUrl } from 'common/helper';
 import { ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
-import { isDynamicWalletFlow } from 'checkoutstore';
+import { isDynamicWalletFlow } from 'wallet/helper';
 import { checkPaymentAdapter } from 'payment/adapters';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
@@ -37,6 +37,8 @@ import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { shouldRedirectZestMoney } from 'common/emi';
 import { popupIframeCheck } from './helper';
+import * as _El from 'utils/DOM';
+import * as docUtil from 'utils/doc';
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -388,7 +390,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
       if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame())) {
-        _Doc.redirect({
+        docUtil.redirectTo({
           url: makeRedirectUrl(this.feesRedirect),
           content: data,
           method: 'post',
@@ -426,9 +428,8 @@ Payment.prototype = {
     formatPayment(this);
 
     let setCompleteHandler = (_) => {
-      this.complete.bind(this)
-        |> _Obj.setPropOf(window, 'onComplete')
-        |> pollPaymentData;
+      window.onComplete = this.complete.bind(this);
+      pollPaymentData(window.onComplete);
     };
 
     const isExternalSDKPayment =
@@ -707,9 +708,10 @@ Payment.prototype = {
       data['_[request_index]'] = Analytics.updateRequestIndex('submit');
       if (this.forceIframeElement) {
         // show iframe in view and hide modal
-        this.forceIframeElement?.window?.focus();
+        this.forceIframeElement.window.focus();
+
         // show loading screen in iframe
-        this.forceIframeElement.contentDocument.write(popupTemplate(this, t));
+        writePopup(this.forceIframeElement.contentWindow, this);
         data['_[iframe_mode]'] = true;
         submitForm({
           doc: this.forceIframeElement.contentWindow.document,
@@ -725,7 +727,7 @@ Payment.prototype = {
         method: 'post',
       };
       if (!popupIframeCheck(this, request)) {
-        _Doc.submitForm(
+        docUtil.submitForm(
           request.url,
           request.content,
           request.method,
@@ -739,7 +741,7 @@ Payment.prototype = {
     // If we're in SDK and not in an iframe, redirect directly
     // Not using Bridge.hasCheckoutBridge since bridge.js imports session
     if (global.CheckoutBridge) {
-      _Doc.submitForm(url, content, method);
+      docUtil.submitForm(url, content, method);
     }
     // Otherwise, use sendMessage
     else {
@@ -776,7 +778,7 @@ Payment.prototype = {
       // Show loading UI in popup till the bank page loads.
       this.writePopup();
       // Open bank url in the popup
-      _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
+      docUtil.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
     }
   },
 
@@ -787,7 +789,9 @@ Payment.prototype = {
     }
     // In type: first JSON response, we get HTML page which redirects to bank.
     // Write HTML into popup.
-    this.popup.write(this.gotoBankHtml);
+    if (this.popup) {
+      updatePopup(this.popup.window, this.gotoBankHtml);
+    }
   },
 
   gotoBankUsingRequest: function () {
@@ -798,7 +802,7 @@ Payment.prototype = {
     // In type: first JSON response, we got request data.
     // Append form into popup and submit.
     const request = this.gotoBankRequest;
-    _Doc.submitForm(
+    docUtil.submitForm(
       request.url,
       request.content,
       request.method,
@@ -824,7 +828,7 @@ Payment.prototype = {
           this.data.method === 'netbanking' &&
           Track.props.library === 'checkoutjs'
         ) {
-          const modal = _Doc.querySelector('#error-message');
+          const modal = docUtil.querySelector('#error-message');
           _El.addClass(modal, 'cancel_netbanking');
           return;
         }
@@ -838,8 +842,7 @@ Payment.prototype = {
   writePopup: function () {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this, t));
-      popup.window.deserialize = _Doc.obj2formhtml;
+      writePopup(popup.window, this);
     }
   },
 
@@ -1140,7 +1143,7 @@ razorpayProto.topupWallet = function () {
     callback: (response) => {
       var request = response.request;
       if (isRedirect && !response.error && request) {
-        _Doc.redirect({
+        docUtil.redirectTo({
           url: request.url,
           content: request.content,
           method: request.method || 'post',

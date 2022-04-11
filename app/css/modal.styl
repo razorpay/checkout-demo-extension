@@ -1034,6 +1034,14 @@ i {
   height: 100%;
 }
 
+#root {
+  overflow: auto;
+}
+
+#root:not(:empty) + #form-fields {
+  display: none;
+}
+
 #form-fields {
   position: relative;
   z-index: 1;

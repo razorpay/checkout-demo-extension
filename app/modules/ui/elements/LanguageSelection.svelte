@@ -3,9 +3,10 @@
   import { getLocaleName } from 'i18n/init';
   import { onMount, onDestroy } from 'svelte';
   import { shouldUseVernacular } from 'checkoutstore/methods';
+  import * as _El from 'utils/DOM';
+  import { querySelector } from 'utils/doc';
 
-  const entries = _Obj.entries;
-  const overlayEl = _Doc.querySelector('#body-overlay');
+  const overlayEl = querySelector('#body-overlay');
 
   const shouldShowDropdown = shouldUseVernacular();
 
@@ -38,7 +39,7 @@
     dropdownShown = false;
   }
 
-  const header = _Doc.querySelector('#header');
+  const header = querySelector('#header');
 
   // Since it occupies the bottom of header, we need to remove header's padding
   onMount(() => {

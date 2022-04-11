@@ -447,7 +447,7 @@ function addDowntimeToBlock(block) {
   let downtimeSeverity = '';
   let downtimeInstrument = '';
   switch (block.method) {
-    case 'netbanking':
+    case 'netbanking': {
       if (!block.banks || block.banks.length === 0) {
         return block;
       }
@@ -458,7 +458,8 @@ function addDowntimeToBlock(block) {
       );
       downtimeInstrument = block.banks[0];
       break;
-    case 'upi':
+    }
+    case 'upi': {
       if (block.apps && block.apps.length > 0) {
         const appName = getAppFromPackageName(block.apps[0]).shortcode;
         downtimeSeverity = checkDowntime(downtimes.upi, 'psp', appName);
@@ -472,7 +473,8 @@ function addDowntimeToBlock(block) {
         downtimeInstrument = block.vpas && block.vpas[0]?.split('@')[1];
       }
       break;
-    case 'card':
+    }
+    case 'card': {
       const downtimesArr = ['low', 'medium', 'high'];
       let issuerDowntime;
       let networkDowntime;
@@ -511,6 +513,7 @@ function addDowntimeToBlock(block) {
           : block.networks[0];
       }
       break;
+    }
   }
   if (downtimeSeverity) {
     block.downtimeSeverity = downtimeSeverity;

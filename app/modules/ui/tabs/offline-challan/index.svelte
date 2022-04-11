@@ -3,9 +3,9 @@
   import { onDestroy, onMount } from 'svelte';
 
   // Store imports
-  import { getAmount, showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore';
 
-  import { getOption } from 'razorpay';
+  import { getAmount, getOption } from 'razorpay';
   import { Events, OfflineChallanEvents } from 'analytics';
 
   // Utils imports

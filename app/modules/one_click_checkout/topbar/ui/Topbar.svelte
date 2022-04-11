@@ -7,10 +7,11 @@
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
   // store imports
-  import { getAmount, showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { breadcrumbItems, tabTitle } from 'one_click_checkout/topbar/store';
   import { headerVisible } from 'one_click_checkout/header/store';
+  import { getAmount } from 'razorpay';
 
   // i18n imports
   import { t } from 'svelte-i18n';

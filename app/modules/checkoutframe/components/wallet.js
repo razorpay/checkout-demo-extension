@@ -3,13 +3,14 @@ import { getSession } from 'sessionmanager';
 
 import WalletTab from 'ui/tabs/wallets/index.svelte';
 import { METHODS } from 'checkoutframe/constants';
+import { querySelector } from 'utils/doc';
 
 const WALLET_KEY = 'walletTab';
 
 export function render(props = {}) {
   const session = getSession();
   const walletTab = new WalletTab({
-    target: _Doc.querySelector('#form-fields'),
+    target: querySelector('#form-fields'),
     props,
   });
 

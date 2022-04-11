@@ -105,22 +105,13 @@ export const Views = {
 
 export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
 
-/**
- * Hard coding merchant keys for which allow_billdesk_sihub feature is enabled
- * TODO: Add allow_billdesk_sihub feature in preference API features, (Planned in coming sprint)
- */
-export const merchantsEnabledOnSIHub = [
-  'rzp_live_9Qu1tSl2h2N1DZ',
-  'rzp_live_BYGeDqibuIvHiA',
-  'rzp_live_AszWiojo0lJxxX',
-];
 export const cardWithRecurringSupport = {
   CIUB: { credit: true, debit: true },
   ESFB: { credit: false, debit: true },
   HSBC: { credit: true, debit: false },
   KVBL: { credit: true, debit: true },
   PUNB: { credit: true, debit: false },
-  IOBA: { credit: false, debit: true },
+  IOBA: { credit: true, debit: true },
   // OneCard exclusive banks - start
   IDFB: { credit: true, debit: false },
   SIBL: { credit: true, debit: false },
@@ -154,6 +145,7 @@ export const supportedNetworksAndProviders = {
   },
   IOBA: {
     debit: ['VISA', 'MC'],
+    credit: ['VISA'],
   },
   KVBL: {
     credit: ['VISA'],

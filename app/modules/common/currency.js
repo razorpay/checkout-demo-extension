@@ -174,6 +174,7 @@ const currenciesConfig = {
   },
 
   BHD: {
+    dir: 'rtl',
     decimals: 3,
     minor: 'fils',
   },
@@ -477,6 +478,7 @@ const currenciesConfig = {
   },
 
   KWD: {
+    dir: 'rtl',
     decimals: 3,
     minor: 'fil',
   },
@@ -631,6 +633,7 @@ const currenciesConfig = {
   },
 
   OMR: {
+    dir: 'rtl',
     minor: 'baiza',
     decimals: 3,
   },
@@ -896,6 +899,7 @@ export const supportedCurrencies = [
   'AWG',
   'BBD',
   'BDT',
+  'BHD',
   'BMD',
   'BND',
   'BOB',
@@ -934,6 +938,7 @@ export const supportedCurrencies = [
   'KES',
   'KGS',
   'KHR',
+  'KWD',
   'KYD',
   'KZT',
   'LAK',
@@ -958,6 +963,7 @@ export const supportedCurrencies = [
   'NOK',
   'NPR',
   'NZD',
+  'OMR',
   'PEN',
   'PGK',
   'PHP',
@@ -1277,7 +1283,20 @@ export function formatAmountWithSymbol(amount, currency, space = true) {
   );
 }
 
-export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
+export function formatAmountWithSymbolRawHtml(amount, currency) {
+  const config = getCurrencyConfig(currency);
+  return `<span dir="${config.dir || 'ltr'}">${
+    displayCurrencies[currency]
+  } ${formatAmount(amount, currency)}</span>`;
+}
+
+export function displayAmount(
+  razorpay,
+  payloadAmount,
+  payloadCurrency,
+  isDCC,
+  getRawHTML = false
+) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   let displayAmount = parseFloat(get('display_amount'));
@@ -1298,7 +1317,10 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
   if (isDCC && payloadAmount) {
     amount = payloadAmount;
   }
-  return formatAmountWithSymbol(amount, payloadCurrency || get('currency'));
+  const fn = getRawHTML
+    ? formatAmountWithSymbolRawHtml
+    : formatAmountWithSymbol;
+  return fn(amount, payloadCurrency || get('currency'));
 }
 
 /**

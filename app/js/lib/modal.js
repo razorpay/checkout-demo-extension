@@ -152,7 +152,9 @@
     },
 
     destroy: function () {
-      invokeEach(this.listeners);
+      this.listeners.forEach(function (l) {
+        l();
+      });
       this.listeners = [];
     },
   };

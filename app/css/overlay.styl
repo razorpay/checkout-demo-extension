@@ -60,3 +60,34 @@
 #fd-paypal {
   text-transform: initial;
 }
+
+#overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 11; // above cta
+
+  &:empty {
+    display: none;
+  }
+
+  > div {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    &:last-child {
+      background: rgba(0,0,0,0.3);
+    }
+    > * {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      background: #fff;
+    }
+  }
+}
+
+#container:not(.mobile) #overlay > div {
+  overflow: hidden;
+  border-radius: $br;
+}

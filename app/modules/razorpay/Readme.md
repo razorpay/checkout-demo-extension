@@ -63,10 +63,6 @@ getOption(path?: string, needFunction?: boolean): any | ()=> any
 getOption() // returns all options
 
 getOption('prefill.name') // return option.prefill.name if not exist then returns undefined
-
-// get function which returns particular option
-const getOrderId = getOption('order_id', true);
-getOrderId() // returns option.order_id
 ```
 
 * getMerchantOption

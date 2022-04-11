@@ -10,6 +10,8 @@ import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { isOneClickCheckout } from 'razorpay';
+import { getView } from 'checkoutframe/components';
+import { isStackPopulated } from 'navstack';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is
@@ -71,6 +73,8 @@ export function backPressed(callback) {
     Backdrop.show();
   } else if (TermsCurtain.isVisible()) {
     TermsCurtain.hide();
+  } else if (isStackPopulated()) {
+    getView('navStack').backPressed();
   } else if (
     session.tab &&
     !(session.get('prefill.method') && session.get('theme.hide_topbar'))
@@ -93,7 +97,7 @@ export function backPressed(callback) {
       session.back();
     }
   } else {
-    if (session.homeTab && session.homeTab.canGoBack()) {
+    if (session.homeTab?.canGoBack()) {
       session.homeTab.hideMethods();
     } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
@@ -135,12 +139,7 @@ function backHandlerForWeb() {
   backPressed();
 
   // Hide iframe if created for flows like capital flow & trigger cancel flow
-  if (
-    session &&
-    typeof session?.r?._payment?.forceIframeElement?.window?.hide === 'function'
-  ) {
-    session.r._payment.forceIframeElement.window.hide();
-  }
+  session.r._payment?.forceIframeElement?.window.hide();
 
   /**
    * The modal may have closed.
@@ -171,7 +170,7 @@ function shouldHandleBackPresses() {
  * Adds a dummy state to the page history.
  */
 function addDummyState() {
-  window.history.pushState({}, null, '');
+  window.history.pushState(null, '');
 }
 
 function isModalVisible() {

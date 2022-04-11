@@ -38,39 +38,7 @@ function isNonNullObject(x) {
   return x && typeof x === 'object';
 }
 
-function isArray(x) {
-  return x instanceof Array;
-}
-
-function isNode(x) {
-  return x instanceof Element;
-}
-
-function isEmptyObject(obj) {
-  if (isNonNullObject(obj)) {
-    for (var i in obj) {
-      if (obj.hasOwnProperty(i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
 /* Collections */
-
-function arr2obj(array) {
-  var obj = {};
-  return (
-    (array &&
-      array.reduce(function (prev, next) {
-        prev[next] = 1;
-        return prev;
-      }, obj)) ||
-    obj
-  );
-}
-
 function each(iteratee, eachFunc, thisArg) {
   var i;
   if (arguments.length < 3) {
@@ -99,26 +67,6 @@ function each(iteratee, eachFunc, thisArg) {
   }
 }
 
-function indexOf(arr, item) {
-  if (arrayProto.indexOf) {
-    return arr.indexOf(item);
-  } else {
-    var len = arr.length >>> 0;
-    var from = Number(arguments[1]) || 0;
-    from = from < 0 ? Math.ceil(from) : Math.floor(from);
-    if (from < 0) {
-      from += len;
-    }
-
-    for (; from < len; from++) {
-      if (from in arr && arr[from] === item) {
-        return from;
-      }
-    }
-    return -1;
-  }
-}
-
 function find(arr, predicate) {
   if (arrayProto.find) {
     return arr.find(predicate, arguments[2]);
@@ -137,16 +85,6 @@ function find(arr, predicate) {
   }
 }
 
-function findBy(arr, prop, value) {
-  if (!arr) {
-    arr = [];
-  }
-
-  return find(arr, function (item) {
-    return item[prop] === value;
-  });
-}
-
 /* Functions */
 
 function bind(func, thisArg, arg) {
@@ -162,20 +100,6 @@ function bind(func, thisArg, arg) {
   return function () {
     return func.apply(thisArg, arguments);
   };
-}
-
-function defer(func, timeout) {
-  if (arguments.length === 1) {
-    timeout = 0;
-  }
-  if (arguments.length < 3) {
-    setTimeout(func, timeout);
-  } else {
-    var args = arguments;
-    setTimeout(function () {
-      func.apply(null, slice.call(args, 2));
-    }, timeout);
-  }
 }
 
 function invoke(handler, thisArg, param, timeout) {
@@ -201,78 +125,6 @@ function invoke(handler, thisArg, param, timeout) {
     }
   }
 }
-
-function debounce(func, wait) {
-  if (!wait) {
-    return func;
-  }
-  var basetime = now();
-
-  return function () {
-    var args = arguments;
-
-    function later() {
-      func.apply(this, args);
-    }
-
-    // is current timestamp > basetime + waiting duration
-    var since = basetime + wait - now();
-    if (since <= 0) {
-      since = null;
-    }
-    return invoke(later, this, null, since);
-  };
-}
-
-function invokeEach(iteratee, thisArg) {
-  each(
-    iteratee,
-    function (key, func) {
-      func.call(thisArg);
-    },
-    thisArg
-  );
-}
-
-function invokeOnEach(func, map) {
-  each(map, function (key, val) {
-    if (isString(func)) {
-      func = val[func];
-    }
-    func.call(val);
-  });
-}
-
-// possible values
-// {}, this, function
-// {}, this, 'func'
-// {}, function
-// {}, 'func'
-// e.g. invokeEachWith(event, this, 'on', el, useCapture);
-
-function invokeEachWith(map, func) {
-  var args = arguments;
-  var thisArg = this;
-  var declaredArgs = 2;
-  if (!isFunction(func)) {
-    declaredArgs = 3;
-    thisArg = arguments[2];
-  }
-  if (isString(func)) {
-    func = thisArg[func];
-  }
-  each(map, function (key, val) {
-    func.apply(thisArg, [key, val].concat(slice.call(args, declaredArgs)));
-  });
-}
-
-/* Objects */
-
-function clone(target) {
-  return JSON.parse(stringify(target));
-}
-
-var stringify = bind(JSON.stringify, JSON);
 
 /* DOM */
 
@@ -332,12 +184,6 @@ function preventDefault(e) {
   return false;
 }
 
-/* Formatting */
-
-function toggleInvalid($el, isValid) {
-  $el.toggleClass('invalid', !isValid);
-}
-
 function abortAjax(ajax) {
   if (ajax) {
     if (ajax.abort) {
@@ -348,28 +194,4 @@ function abortAjax(ajax) {
       ajax[0] = null;
     }
   }
-}
-
-//Return rgba value for hex color code
-function hexToRgb(hex, alpha) {
-  if (!hex) {
-    return null;
-  }
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        red: (parseInt(result[1], 16) / 255).toFixed(1),
-        green: (parseInt(result[2], 16) / 255).toFixed(1),
-        blue: (parseInt(result[3], 16) / 255).toFixed(1),
-        alpha: alpha || 1,
-      }
-    : null;
-}
-
-function titleCase(str) {
-  if (!str) {
-    return str;
-  }
-
-  return str[0].toUpperCase() + str.slice(1);
 }

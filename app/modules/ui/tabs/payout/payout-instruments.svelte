@@ -11,8 +11,8 @@
   import PayoutAddAccount from 'ui/tabs/payout/payout-account.svelte';
   import UPITab from 'ui/tabs/upi/index.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
-  import Screen from 'ui/layouts/Screen.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import { querySelector } from 'utils/doc';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -74,7 +74,7 @@
         onSubmit({
           account_type: 'vpa',
           vpa: {
-            address: _Doc.querySelector('#vpa-upi').value,
+            address: querySelector('#vpa-upi').value,
           },
         });
       } else {

@@ -11,6 +11,7 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   const { circle_check, solid_down_arrow } = getIcons();
 
+  import * as _El from 'utils/DOM';
   // Actions
   import {
     focus as focusAction,

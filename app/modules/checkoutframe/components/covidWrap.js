@@ -1,8 +1,9 @@
 /* global templates, showOverlay, hideEmi, Event */
 import CovidDonation from 'ui/components/covid-donations/index.svelte';
+import { querySelector } from 'utils/doc';
 // Rendering the covid donation bottom sheet
 export function render(cb) {
-  const wrap = _Doc.querySelector('#modal-inner');
+  const wrap = querySelector('#modal-inner');
   return new CovidDonation({
     target: wrap,
     props: {

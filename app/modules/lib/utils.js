@@ -1,3 +1,4 @@
+import * as _El from 'utils/DOM';
 /**
  * Scrolls the element into view if it is not completely visible.
  * @param el {Element}
@@ -210,4 +211,16 @@ export function debounce(cb, delay) {
  */
 export function returnAsIs(_) {
   return _;
+}
+
+/**
+ * given a string, returns safe html representation of it
+ * * @param {string} string to sanitize
+ *
+ * @returns {string} safe html
+ */
+export function escapeHtml(str) {
+  var escapeDiv = document.createElement('div');
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
 }

@@ -12,7 +12,7 @@
   } from 'checkoutstore/screens/international';
   import { AVSDccPayload } from 'checkoutstore/screens/card';
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
-  import { getAmount, isPartialPayment } from 'checkoutstore';
+  import { isPartialPayment, getAmount } from 'razorpay';
 
   // i18n
   import { getAppProviderName, getAppProviderSubtext } from 'i18n';
@@ -173,7 +173,7 @@
     const AVSData = get(AVSDccPayload);
     if (AVSData) {
       if (AVSData.header) {
-        session.setRawAmountInHeader(AVSData.header);
+        session.setRawAmountInHeader(AVSData.header, true);
         showAmount(AVSData.cta);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();

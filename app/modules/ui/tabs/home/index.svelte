@@ -19,6 +19,7 @@
     TOAST_THEME,
     TOAST_SCREEN,
   } from 'one_click_checkout/Toast';
+  import * as _El from 'utils/DOM';
 
   import { HOME_VIEWS } from './constants';
 
@@ -44,16 +45,12 @@
   import { activeRoute } from 'one_click_checkout/routing/store';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isOneClickCheckout } from 'razorpay';
+  import { getOption, isOneClickCheckout, isHDFCVASMerchant } from 'razorpay';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
   } from 'one_click_checkout/merchant-analytics';
-  import {
-    isDCCEnabled,
-    isDynamicFeeBearer,
-    isIndianCustomer,
-  } from 'checkoutstore';
+  import { isIndianCustomer } from 'checkoutstore';
   import {
     isCodAddedToAmount,
     codChargeAmount,
@@ -76,9 +73,11 @@
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
-  import { isAddressEnabled, getMerchantConfig } from 'checkoutstore';
+  import { getMerchantConfig } from 'checkoutstore';
 
   import {
+    isAddressEnabled,
+    isDCCEnabled,
     isPartialPayment as getIsPartialPayment,
     isRecurring,
     isContactEmailReadOnly,
@@ -89,6 +88,7 @@
     isEmailOptional,
     isContactEmailOptional,
     getMerchantOffers,
+    isDynamicFeeBearer,
   } from 'razorpay';
 
   import {
@@ -166,6 +166,8 @@
     PLACE_ORDER_CTA_LABEL,
   } from 'one_click_checkout/cta/i18n';
   import { headerVisible } from 'one_click_checkout/header/store';
+  import { querySelector } from 'utils/doc';
+  import { getPrefillBank } from 'netbanking/helper';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -190,7 +192,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
-  const prefilledBank = getOption('prefill.bank');
+  const prefilledBank = getPrefillBank();
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
   const isOneCCEnabled = isOneClickCheckout();
@@ -676,7 +678,7 @@
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
-    const topbarRight = _Doc.querySelector('#topbar #top-right');
+    const topbarRight = querySelector('#topbar #top-right');
 
     if (topbarRight) {
       _El.keepClass(topbarRight, 'logged', loggedIn);
@@ -696,7 +698,12 @@
 
   function shouldUsePersonalization() {
     // Merchant has asked to disable
-    if (session.get().personalization === false) {
+    if (getOption('personalization') === false) {
+      return false;
+    }
+
+    // if hdfc VAS merchant
+    if (isHDFCVASMerchant()) {
       return false;
     }
 
@@ -1121,7 +1128,7 @@
       selectMethod(instrument.method, instrument.vendor_vpa);
     } else {
       // Bring instrument into view if it's not visible
-      const domElement = _Doc.querySelector(
+      const domElement = querySelector(
         `.home-methods .methods-block [data-id="${instrument.id}"]`
       );
       showCODCharges(instrument.method);

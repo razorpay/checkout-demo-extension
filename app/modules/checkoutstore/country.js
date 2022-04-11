@@ -75,7 +75,7 @@ export const getStateByName = (countryCode, stateName) => {
   return (
     (countryCode &&
       get(allStates)[countryCode]?.find(
-        (state) => state.stateName.toLowerCase() == stateName?.toLowerCase()
+        (state) => state.stateName.toLowerCase() === stateName?.toLowerCase()
       )) ||
     null
   );

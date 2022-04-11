@@ -1,6 +1,7 @@
 import { iPhone } from 'common/useragent';
 import Razorpay from 'common/Razorpay';
 import { scrollIntoView } from 'lib/utils';
+import * as _El from 'utils/DOM';
 
 function onFocus(event) {
   _El.addClass(event.target.parentNode, 'focused');

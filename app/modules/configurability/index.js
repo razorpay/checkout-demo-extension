@@ -18,9 +18,7 @@ import {
   getAppProviders,
 } from 'checkoutstore/methods';
 
-import { shouldSeparateDebitCard } from 'checkoutstore';
-
-import { getMerchantMethods, isRecurring } from 'razorpay';
+import { getMerchantMethods, isRecurring, getOption } from 'razorpay';
 
 import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
@@ -40,7 +38,7 @@ function getAvailableDefaultMethods() {
   }
 
   // Separate out debit and credit cards
-  if (shouldSeparateDebitCard()) {
+  if (getOption('theme.debit_card')) {
     available = available.filter((method) => method !== 'card');
     available = ['credit_card', 'debit_card'].concat(available);
   }

@@ -9,7 +9,9 @@ import Analytics from './base-analytics';
  */
 
 export const getEventsName = (prefix, events) => {
-  if (!prefix) return events;
+  if (!prefix) {
+    return events;
+  }
   const returnObj = {};
   Object.keys(events).forEach((key) => {
     const value = events[key];

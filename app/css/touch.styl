@@ -49,18 +49,6 @@ $mobile-view() {
     flex: 1;
   }
 
-  // #container and &#container is needed because
-  // this function applies to a media query (root)
-  // as well as .mobile (ampersand)
-
-  #body.sub,
-  #container.one-method #body:not([tab]),
-  &#container.one-method #body:not([tab]) {
-    #curtain-container-parent {
-      bottom: $footerh;
-    }
-  }
-
   #container #modal #body,
   &#container #modal #body {
     &.emi-focus {
@@ -70,10 +58,7 @@ $mobile-view() {
     }
   }
 
-  #overlay,
   #error-message,
-  #fee-wrap,
-  #secure-card-know-more-wrap,
   #overlay-wrap {
     bottom: 0;
   }

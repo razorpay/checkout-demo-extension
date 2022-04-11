@@ -1,7 +1,4 @@
-import * as _ from './_';
-import * as _Arr from './_Arr';
-import * as _El from './_El';
-import * as _Obj from './_Obj';
+import * as _El from './DOM';
 
 export const documentElement = document.documentElement;
 export const body = document.body;
@@ -24,7 +21,7 @@ var link;
  *
  * @returns {boolean}
  */
-export const isEvent = (x) => _.is(x, EventConstructor);
+export const isEvent = (x: Event) => x instanceof EventConstructor;
 
 /**
  * Resolves given string to an element.
@@ -32,7 +29,8 @@ export const isEvent = (x) => _.is(x, EventConstructor);
  *
  * @returns {Element}
  */
-export const resolveElement = (el) => (_.isString(el) ? querySelector(el) : el);
+export const resolveElement = (el: string | HTMLElement) =>
+  typeof el === 'string' ? querySelector(el) : el;
 
 /**
  * Resolve relative url to an absolute url.
@@ -40,8 +38,8 @@ export const resolveElement = (el) => (_.isString(el) ? querySelector(el) : el);
  *
  * @returns {string}
  */
-export function resolveUrl(relativeUrl) {
-  link = _El.create('a');
+export function resolveUrl(relativeUrl: string) {
+  link = _El.create('a') as HTMLAnchorElement;
   link.href = relativeUrl;
   return link.href;
 }
@@ -50,7 +48,12 @@ export function resolveUrl(relativeUrl) {
  * Redirect page to the target url.
  * @param {Object} data
  */
-export function redirect(data) {
+export function redirectTo(data: {
+  target: string;
+  url: string;
+  content: any;
+  method: string;
+}) {
   if (!data.target && global !== global.parent) {
     return global.Razorpay.sendMessage({
       event: 'redirect',
@@ -67,7 +70,12 @@ export function redirect(data) {
  * @param {string} method
  * @param {string} target
  */
-export function submitForm(action, data, method, target) {
+export function submitForm(
+  action: string,
+  data: any,
+  method: string,
+  target: string = ''
+) {
   if (method && method.toLowerCase() === 'get') {
     action = _.appendParamsToUrl(action, data);
     if (target) {
@@ -76,17 +84,19 @@ export function submitForm(action, data, method, target) {
       global.location = action;
     }
   } else {
-    let attr = { action, method };
+    let attr: { action: string; method: string; target?: string } = {
+      action,
+      method,
+    };
     if (target) {
       attr.target = target;
     }
-
-    _El.create('form')
-      |> _El.setAttributes(attr)
-      |> _El.setContents(data |> obj2formhtml)
-      |> _El.appendTo(documentElement)
-      |> _El.submit
-      |> _El.detach;
+    const form = _El.create('form');
+    _El.setAttributes(form, attr);
+    _El.setContents(form, obj2formhtml(data));
+    _El.appendTo(form, documentElement);
+    _El.submit(form);
+    _El.detach(form);
   }
 }
 
@@ -97,10 +107,13 @@ export function submitForm(action, data, method, target) {
  *
  * @returns {string}
  */
-export function obj2formhtml(data, key) {
+export function obj2formhtml(
+  data: string | { [x: string]: any },
+  key?: string
+) {
   if (_.isNonNullObject(data)) {
     var str = '';
-    _Obj.loop(data, function (value, name) {
+    _Obj.loop(data, function (value: any, name: string) {
       if (key) {
         name = key + '[' + name + ']';
       }
@@ -108,10 +121,10 @@ export function obj2formhtml(data, key) {
     });
     return str;
   }
-  var input = _El.create('input');
+  var input = _El.create('input') as HTMLInputElement;
   input.type = 'hidden';
-  input.value = data;
-  input.name = key;
+  input.value = data as string;
+  input.name = key as string;
   return input.outerHTML;
 }
 
@@ -121,22 +134,21 @@ export function obj2formhtml(data, key) {
  *
  * @returns {Object}
  */
-export function form2obj(form) {
-  return _Arr.reduce(
-    form.querySelectorAll('[name]'),
-    (obj, el) => {
+export function form2obj(form: HTMLFormElement) {
+  let obj: { [x: string]: any } = {};
+  form
+    ?.querySelectorAll<HTMLInputElement>('[name]')
+    .forEach((el: HTMLInputElement) => {
       obj[el.name] = el.value;
-      return obj;
-    },
-    {}
-  );
+    });
+  return obj;
 }
 
 /**
  * Prevents default event from firing
  * @param {Event} e
  */
-export function preventEvent(e) {
+export function preventEvent(e: Event) {
   if (isEvent(e)) {
     e.preventDefault();
     e.stopPropagation();
@@ -148,18 +160,18 @@ export function preventEvent(e) {
  * Smoothly scroll to given point
  * @param {number} y
  */
-export function smoothScrollTo(y) {
+export function smoothScrollTo(y: number) {
   smoothScrollBy(y - pageYOffset);
 }
 
-var scrollTimeout;
+let scrollTimeout: ReturnType<typeof setTimeout>;
 const pi = Math.PI;
 
 /**
  * Smoothly scroll by given point
  * @param {number} y
  */
-export function smoothScrollBy(y) {
+export function smoothScrollBy(y: number) {
   if (!global.requestAnimationFrame) {
     return scrollBy(0, y);
   }
@@ -173,7 +185,7 @@ export function smoothScrollBy(y) {
     var scrollCount = 0;
     var oldTimestamp = global.performance.now();
 
-    function step(newTimestamp) {
+    function step(newTimestamp: number) {
       scrollCount += (newTimestamp - oldTimestamp) / 300;
       if (scrollCount >= 1) {
         return scrollTo(0, target);

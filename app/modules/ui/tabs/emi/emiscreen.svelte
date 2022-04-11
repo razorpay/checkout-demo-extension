@@ -1,11 +1,10 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
-
+  import * as _El from 'utils/DOM';
   //i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   import {
     CARD_DETAILS_HEADER,
@@ -13,7 +12,6 @@
     CARD_NUMBER_HELP,
     NAME_LABEL,
     NAME_HELP,
-    CALLOUT,
   } from 'ui/labels/bajaj-emi';
 
   import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';
@@ -22,6 +20,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import { querySelector } from 'utils/doc';
 
   import {
     getPrefilledName,
@@ -44,9 +43,7 @@
   };
 
   onMount(() => {
-    const emi_el_card = _Doc.querySelector(
-      '#form-emi input[name="card[number]"]'
-    );
+    const emi_el_card = querySelector('#form-emi input[name="card[number]"]');
 
     session.delegator
       .add('card', emi_el_card)

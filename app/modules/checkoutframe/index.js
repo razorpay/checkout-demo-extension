@@ -7,7 +7,6 @@ import Razorpay, {
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
-import { setRazorpayInstance } from 'checkoutstore';
 import RazorpayStore, { getMerchantOrder, setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
@@ -37,13 +36,15 @@ import {
 
 import { isStandardCheckout } from 'common/helper';
 
+import { getElementById } from 'utils/doc';
+
 let CheckoutBridge = window.CheckoutBridge;
 
 const showModal = (session) => {
   Razorpay.sendMessage({ event: 'render' });
 
   if (CheckoutBridge) {
-    const containerBox = _Doc.getElementById('container');
+    const containerBox = getElementById('container');
     if (containerBox) {
       const rect = containerBox.getBoundingClientRect();
       Bridge.checkout.callAndroid(
@@ -52,7 +53,7 @@ const showModal = (session) => {
         Math.floor(rect.height)
       );
     }
-    _Doc.getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
+    getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
   }
 
   const qpmap = _Obj.unflatten(_.getQueryParams());
@@ -360,10 +361,8 @@ function setSessionPreferences(session, preferences) {
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
   RazorpayStore.updateInstance(razorpayInstance);
-  setRazorpayInstance(razorpayInstance);
 
   updateOptions(preferences);
-  updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
 
@@ -499,29 +498,6 @@ function updateOptions(preferences) {
   // set orderid as it is required while creating payments
   if (preferences.invoice) {
     setOption('order_id', preferences.invoice.order_id);
-  }
-}
-
-function updateEmandatePrefill() {
-  const order = getMerchantOrder();
-  if (!order) {
-    return;
-  }
-
-  if (order.auth_type) {
-    setOption('prefill.auth_type', order.auth_type);
-  }
-
-  const bank_account = order.bank_account;
-  if (bank_account) {
-    ['ifsc', 'name', 'account_number', 'account_type'].forEach((key) => {
-      if (bank_account[key]) {
-        setOption(`prefill.bank_account[${key}]`, bank_account[key]);
-      }
-    });
-  }
-  if (order.bank) {
-    setOption('prefill.bank', order.bank);
   }
 }
 

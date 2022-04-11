@@ -55,22 +55,18 @@
   import { customer } from 'checkoutstore/customer';
 
   import {
+    getAmount,
     isRecurring,
     getCardFeatures,
     isDynamicFeeBearer,
     isOneClickCheckout,
+    isPartialPayment,
+    hasFeature,
+    isInternational,
+    isDCCEnabled,
   } from 'razorpay';
 
-  import {
-    shouldRememberCustomer,
-    isDCCEnabled,
-    isShowMORTncEnabled,
-    isSiftJSEnabled,
-    isInternational,
-    isPartialPayment,
-    getAmount,
-    isIndianCustomer,
-  } from 'checkoutstore';
+  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
 
   import {
     isMethodEnabled,
@@ -126,8 +122,8 @@
     isAmex,
     addDowntimesToSavedCards,
     injectSiftScript,
+    injectCyberSourceScript,
   } from 'common/card';
-  import { isOneClickCheckout } from 'razorpay';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -190,7 +186,6 @@
   }
 
   const cardDowntimes = getDowntimes().cards;
-  const isOneCC = isOneClickCheckout();
   let downtime = {
     network: false,
     issuer: false,
@@ -249,13 +244,20 @@
   let emiCtaView;
 
   let showSavedCardsCta = false;
-  let showFirstNonTokenizedCard = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
   /**
    * cardAVSFlowsMap is being used to store the AVS flag fetched for the selected cards.
    */
   let cardAVSFlowsMap = {};
+
+  function isSiftJSEnabled() {
+    return hasFeature('disable_sift_js', false) !== true;
+  }
+
+  function isCyberSourceJsEnabled() {
+    return hasFeature('shield_cbs_rollout', false);
+  }
 
   onMount(() => {
     // Prefill
@@ -274,23 +276,38 @@
       isSavedCardsEnabled = shouldRememberCustomer();
     });
 
-    if (isSiftJSEnabled() && session.r.isLiveMode()) {
-      if (isInternational()) {
+    if (isInternational() && session.r.isLiveMode()) {
+      if (isSiftJSEnabled()) {
         // load sift js
         injectSiftScript(session.id).catch((_e) => {
           // Do nothing
         });
       }
 
-      defaultDCCCurrency.subscribe((currency) => {
-        if (currency && currency !== 'INR') {
-          // load sift js
+      if (isCyberSourceJsEnabled()) {
+        // load cyber source js
+        injectCyberSourceScript(session.id).catch((_e) => {
+          // Do nothing
+        });
+      }
+    }
+
+    const unbsubscribe = defaultDCCCurrency.subscribe((currency) => {
+      if (currency && currency !== 'INR' && session.r.isLiveMode()) {
+        if (isSiftJSEnabled()) {
           injectSiftScript(session.id).catch((_e) => {
             // Do nothing
           });
         }
-      });
-    }
+        if (isCyberSourceJsEnabled()) {
+          injectCyberSourceScript(session.id).catch((_e) => {
+            // Do nothing
+          });
+        }
+      }
+    });
+
+    return unbsubscribe;
   });
 
   onDestroy(() => {
@@ -320,7 +337,7 @@
        * b. It is also dependant on the flag isCardSupportedForRecurring
        * c. For all the other payments except recurring keeping as is.
        */
-      $newCardInputFocused = !!isRecurring()
+      $newCardInputFocused = isRecurring()
         ? !isCardSupportedForRecurring
         : false;
     }
@@ -618,7 +635,7 @@
     tabVisible = false;
     if (AVSData) {
       if (AVSData.header) {
-        session.setRawAmountInHeader(AVSData.header);
+        session.setRawAmountInHeader(AVSData.header, true);
         showAmount(AVSData.cta);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();
@@ -937,7 +954,6 @@
     setTimeout(isScreenScrollable, 0);
     renderCtaOneCC = true;
     $selectedCard = null;
-    showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
     //#endregion
     tab = session.tab;
     onCardInput();
@@ -1113,15 +1129,18 @@
           {/if}
 
           <!-- LABEL: Your saved cards -->
-          <h3 class:saved-card-header={isOneCC} class="pad">
-            {$t(isOneCC ? CARDS_SAVED_LABEL_ONE_CC : CARDS_SAVED_ON_RZP_LABEL)}
+          <h3 class:saved-card-header={isOneCCEnabled} class="pad">
+            {$t(
+              isOneCCEnabled
+                ? CARDS_SAVED_LABEL_ONE_CC
+                : CARDS_SAVED_ON_RZP_LABEL
+            )}
           </h3>
           <div id="saved-cards-container">
             <SavedCards
               {tab}
               cards={savedCards}
               on:viewPlans={handleViewPlans}
-              {showFirstNonTokenizedCard}
             />
           </div>
           <div

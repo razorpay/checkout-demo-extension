@@ -5,11 +5,13 @@ import { ownerWindow } from 'common/constants';
 import Analytics, { Track, MetaProperties } from 'analytics';
 import { getSession } from 'sessionmanager';
 import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
+import * as _El from 'utils/DOM';
+import { body } from 'utils/doc';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
  * @param  {String} method name of iOS bridge method to be invoked
- * @param  {Any}    data   Extra data to be sent to the method
+ * @param  {any}    data   Extra data to be sent to the method
  */
 function handleNewIOSMethods(method, data) {
   var color = {
@@ -76,7 +78,7 @@ const platformSpecific = {
   },
 
   android: () => {
-    _Doc.body
+    body
       |> _El.setStyles({
         background: 'rgba(0, 0, 0, 0.6)',
       });
@@ -136,7 +138,7 @@ export function initIframe() {
   const platform = qpmap.platform;
 
   if (platform) {
-    _Doc.body |> _El.addClass(platform);
+    body |> _El.addClass(platform);
 
     const platformFn = platformSpecific[platform];
 

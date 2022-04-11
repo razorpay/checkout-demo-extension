@@ -3,7 +3,6 @@ const trackIdHeader = 'X-Razorpay-TrackId';
 const Xhr = XMLHttpRequest;
 import * as _ from './_';
 import * as _El from './_El';
-import * as _Doc from './_Doc';
 import * as _Obj from './_Obj';
 const networkError = _.rzpError('Network error');
 let jsonp_cb = 0;
@@ -212,10 +211,11 @@ const fetchPrototype = {
       callback(resp);
     };
 
-    headers
-      |> _Obj.setTruthyProp(sessionIdHeader, sessionId)
-      |> _Obj.setTruthyProp(trackIdHeader, trackId)
-      |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
+    if (sessionId) headers[sessionIdHeader] = sessionId;
+
+    if (trackId) headers[trackIdHeader] = trackId;
+
+    headers |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
 
     xhr.send(data);
   },
@@ -375,7 +375,7 @@ function jsonp(options) {
         onload,
         onreadystatechange: onload,
       })
-      |> _El.appendTo(_Doc.documentElement);
+      |> _El.appendTo(document.documentElement);
   };
 
   return request;

@@ -3,14 +3,12 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getAmount, showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore';
 
-  import { getOption, isCustomerFeeBearer } from 'razorpay';
-  import { getCustomerDetails } from 'checkoutstore/screens/home';
+  import { getAmount, getOption, isCustomerFeeBearer } from 'razorpay';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
-  import { makeAuthUrl } from 'common/helper';
   import { timeConverter } from 'common/formatDate';
   import { copyToClipboard } from 'common/clipboard';
   import { getSession } from 'sessionmanager';
@@ -24,7 +22,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
-  import FeeBearerView from 'ui/components/feebearer.svelte';
+  import showFeeBearer from 'ui/components/FeeBearer';
 
   // i18n
   import {
@@ -79,7 +77,6 @@
   export let neftDetails = null;
 
   let copied = false;
-  let feeBearerView;
   const session = getSession();
   const order_id = getOption('order_id');
   const customerFeeBearerFlag = isCustomerFeeBearer();
@@ -212,34 +209,13 @@
   init();
 
   const fetchFees = () => {
-    const feeWrapDiv = document.getElementById('fee-wrap');
-    let feeBearerDiv = document.getElementsByClassName('fee-bearer');
-    let feeBearerBankTransferDiv = document.getElementsByClassName(
-      'fee-bearer-bank-transfer'
-    );
-    if (feeBearerDiv.length > 0) {
-      feeBearerDiv[0].style.display = 'none';
-    }
-    if (feeBearerBankTransferDiv.length > 0) {
-      feeBearerBankTransferDiv[0].removeAttribute('style');
-    }
-    if (!feeBearerView) {
-      feeBearerView = new FeeBearerView({
-        target: feeWrapDiv,
-        props: {
-          paymentData: {
-            currency: getOption('currency') || 'INR',
-            method: 'bank_transfer',
-            order_id,
-            amount: data.amount,
-          },
-          isBankTransferView: true,
-        },
-      });
-    }
-    showOverlay([feeWrapDiv]);
-    feeBearerView.$on('continue', function (event) {
-      hideOverlayMessage();
+    showFeeBearer({
+      paymentData: {
+        currency: getOption('currency') || 'INR',
+        method: 'bank_transfer',
+        order_id,
+        amount: data.amount,
+      },
     });
   };
 </script>

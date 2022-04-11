@@ -9,21 +9,20 @@ import { getSession } from 'sessionmanager';
 import { setView, destroyView } from './';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
 import { METHODS } from 'checkoutframe/constants';
+import { querySelector } from 'utils/doc';
 
 const NETBANKING_KEY = 'netbankingTab';
 
 function render() {
-  const prefilledBank = getOption('prefill.bank');
   var method, banks;
 
   if (isEMandateEnabled()) {
     method = 'emandate';
-    banks =
-      getEMandateBanks()
-      |> _Obj.reduce((banks, bank, code) => {
-        banks[code] = bank.name;
-        return banks;
-      }, {});
+    const eMandateBanksObj = getEMandateBanks();
+    banks = Object.keys(eMandateBanksObj).reduce((banks, code) => {
+      banks[code] = eMandateBanksObj[code].name;
+      return banks;
+    }, {});
   } else if (isMethodEnabled('netbanking')) {
     method = 'netbanking';
     banks = getMerchantMethods().netbanking;
@@ -31,7 +30,7 @@ function render() {
 
   if (method) {
     const netbankingTab = new NetbankingTab({
-      target: _Doc.querySelector('#form-fields'),
+      target: querySelector('#form-fields'),
       props: {
         bankOptions: getOption('method.netbanking'),
         banks: banks,

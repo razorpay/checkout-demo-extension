@@ -1,4 +1,3 @@
-import { setRazorpayInstance } from 'checkoutstore';
 import RazorpayStore from 'razorpay';
 import { getPreferences } from '../../../mock-api/mocks/preferences';
 
@@ -14,8 +13,6 @@ export const setupPreferences = (
     ...rInstance,
   };
 
-  // \_?_/ not sure why we are maintaining two instances of razorpay
-  setRazorpayInstance(rzpInstance);
   RazorpayStore.updateInstance(rzpInstance);
 };
 

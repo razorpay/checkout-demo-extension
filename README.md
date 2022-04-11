@@ -139,4 +139,14 @@ check_run() {
 check_run package-lock.json "npm install"
 ```
 
-THIS IS FOR TEST
+**SDK Local Development**
+
+If you would like to connect your local development server with SDK,
+
+- Just connect your emulator/debug device to same WiFi and identify your `device IP:checkout-app-port`, ex: `192.168.0.107:8000`
+- Run checkout application server as `dev-start` or `live-start` or etc...
+- **Android** :
+  - Set `PUBLIC_CHECKOUT_URL` in `CheckoutConstants.java` to `<server-address>/public.html` (ex: `192.168.0.107:8000/public.html`)
+  - Modify `if (host != null && host.endsWith("razorpay.com")) {` **to** `if (host != null ) {` in `CheckoutPresenterImpl.java`
+  - Add `android:usesCleartextTraffic="true"` to <application> in Manifest. This is to avoid HTTP blockage.
+  - Run your android app in device/emulator.

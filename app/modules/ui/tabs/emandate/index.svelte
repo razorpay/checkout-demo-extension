@@ -57,17 +57,21 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
   import { getAnimationOptions } from 'svelte-utils';
+  import {
+    getAuthType,
+    getPrefillBank,
+    getPrefillBankDetails,
+  } from 'netbanking/helper';
 
   const session = getSession();
 
   // Prefill
-  const prefilledBank = getOption('prefill.bank');
-  const prefillledBankAccount = getOption(
-    'prefill.bank_account[account_number]'
-  );
-  const prefilledName = getOption('prefill.bank_account[name]');
-  const prefilledIfsc = getOption('prefill.bank_account[ifsc]');
-  const prefilledAuthType = getOption('prefill.auth_type');
+  const prefilledBank = getPrefillBank();
+  const prefillledBankAccount = getPrefillBankDetails('account_number');
+
+  const prefilledName = getPrefillBankDetails('name');
+  const prefilledIfsc = getPrefillBankDetails('ifsc');
+  const prefilledAuthType = getAuthType();
 
   const isPrefilledBankAvailable =
     prefilledBank && isEMandateBankEnabled(prefilledBank);
@@ -75,7 +79,7 @@
     prefilledAuthType &&
     isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
 
-  let prefilledAccountType = getOption('prefill.bank_account[account_type]');
+  let prefilledAccountType = getPrefillBankDetails('account_type');
 
   const AuthTypes = {
     NETBANKING: 'netbanking',

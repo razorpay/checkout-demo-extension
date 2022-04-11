@@ -12,8 +12,8 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
-  import CTA from 'ui/elements/CTA.svelte';
   import { isOneClickCheckout } from 'razorpay';
+  import * as _El from 'utils/DOM';
 
   // Store imports
   import { overlayStack } from 'checkoutstore/back';

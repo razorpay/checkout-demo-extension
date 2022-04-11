@@ -1,4 +1,4 @@
-import Analytics from 'analytics';
+import * as _El from 'utils/DOM';
 
 /**
  * Simple wrapper component around `window.open()`.
@@ -83,12 +83,6 @@ export default function Popup(src, name) {
 Popup.prototype = {
   on: function (event, func) {
     this.listeners.push(global |> _El.on(event, func));
-  },
-
-  write: function (html) {
-    var pdoc = this.window.document;
-    pdoc.write(html);
-    pdoc.close();
   },
 
   beforeunload: function (e) {

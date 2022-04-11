@@ -2,12 +2,12 @@ import { setView, destroyView } from './index';
 import { getSession } from 'sessionmanager';
 
 import OfflineChallanTab from 'ui/tabs/offline-challan/index.svelte';
-
+import { querySelector } from 'utils/doc';
 const COMPONENT_KEY = 'offlineTab';
 
 export function render(props = {}) {
   const offlineChallanTab = new OfflineChallanTab({
-    target: _Doc.querySelector('#form-fields'),
+    target: querySelector('#form-fields'),
     props,
   });
 

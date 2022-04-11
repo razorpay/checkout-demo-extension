@@ -4,7 +4,6 @@
 
 /* global discreet */
 /* global Razorpay */
-/* global $ */
 /* global Analytics */
 /* global AnalyticsTypes */
 /* global gel */
@@ -16,8 +15,6 @@
 /* global Wallet */
 /* global each */
 /* global abortAjax */
-/* global invokeEach */
-/* global invokeOnEach */
 /* global bind */
 /* global isString */
 /* global clone */
@@ -31,7 +28,6 @@
 /* global doc */
 /* global now */
 /* global roll */
-/* global toggleInvalid */
 
 // from init checkout-frame
 /* global SessionManager */
@@ -40,6 +36,7 @@
 var ua = navigator.userAgent;
 
 var preferences,
+  $ = discreet.$,
   WebPaymentsApi = discreet.WebPaymentsApi,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
@@ -64,7 +61,7 @@ var preferences,
   _Arr = discreet._Arr,
   _ = discreet._,
   _Obj = discreet._Obj,
-  _Doc = discreet._Doc,
+  docUtil = discreet.docUtil,
   _El = discreet._El,
   Hacks = discreet.Hacks,
   Form = discreet.Form,
@@ -173,13 +170,6 @@ function fillData(container, returnObj) {
   });
 }
 
-// TODO: Move to CFU
-function escapeHtml(str) {
-  var escapeDiv = document.createElement('div');
-  escapeDiv.appendChild(document.createTextNode(str));
-  return escapeDiv.innerHTML;
-}
-
 /**
  * Improvise the contact from prefill
  * This is right place to call methods that require updated contact all time (pre-filled/edited/API-filled)
@@ -189,7 +179,7 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
   var prefilledEmail = session.get('prefill.email');
 
-  if (Store.shouldStoreCustomerInStorage()) {
+  if (RazorpayHelper.shouldStoreCustomerInStorage()) {
     var storedUserDetails = discreet.ContactStorage.get();
 
     // Pick details from storage if not given in prefill
@@ -317,31 +307,12 @@ function hideDowntimeAlert() {
   return wasShown;
 }
 
-function hideFeeWrap() {
-  var feeWrap = $('#fee-wrap');
-  var wasShown = feeWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(feeWrap);
-  }
-  return wasShown;
-}
-function hideSecureCardKnowMoreWrap() {
-  var secureCardWrap = $('#secure-card-know-more-wrap');
-  var wasShown = secureCardWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(secureCardWrap);
-  }
-  return wasShown;
-}
-
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
   if (
     !hideEmi() &&
     !hideRecurringCardsOverlay() &&
-    !hideSecureCardKnowMoreWrap() &&
-    !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
   ) {
@@ -633,7 +604,8 @@ function askOTP(
     errorMessage: errorMessage,
     isRazorpayOTP: !!isRazorpayOTP,
   };
-  if (Store.isASubscription()) {
+
+  if (RazorpayHelper.isASubscription()) {
     _Obj.extend(otpProperties, {
       allowSkip: session.get('subscription_card_change') ? false : true,
     });
@@ -922,8 +894,12 @@ Session.prototype = {
    *
    * @param {String} html
    */
-  setRawAmountInHeader: function (html) {
-    $('#amount .original-amount').html(html);
+  setRawAmountInHeader: function (html, isRawHtml) {
+    if (isRawHtml) {
+      $('#amount .original-amount').rawHtml(html);
+    } else {
+      $('#amount .original-amount').html(html);
+    }
   },
 
   /**
@@ -1048,7 +1024,7 @@ Session.prototype = {
 
     // Switch to the respective tab/ prefilled method if exists
     // If tab is empty, then it will switche to home
-    if (tab === 'emandate' && !this.get('prefill.bank')) {
+    if (tab === 'emandate' && !discreet.NetbankingHelper.getPrefillBank()) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
       tab = 'netbanking';
@@ -1235,15 +1211,15 @@ Session.prototype = {
     es6components.render();
     this.setModal();
     this.setBackdrop();
-    if (Store.isBlockedDeactivated() && this.r.isLiveMode()) {
+    if (RazorpayHelper.isBlockedDeactivated() && this.r.isLiveMode()) {
       new BlockedDeactivatedMerchant({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
-      _Doc.getElementById('header').remove();
+      docUtil.getElementById('header').remove();
       return;
     }
     this.setSvelteComponents();
-    if (!Store.isPayout()) {
+    if (!RazorpayHelper.isPayout()) {
       this.fillData();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
@@ -1378,7 +1354,7 @@ Session.prototype = {
     if (RazorpayHelper.isOneClickCheckout() && isCouponsOrAddressEnabled) {
       this.setOneClickCheckoutHome();
     }
-    if (!Store.isPayout()) {
+    if (!RazorpayHelper.isPayout()) {
       this.setHomeTab();
     }
     this.setSvelteCardTab();
@@ -1419,7 +1395,7 @@ Session.prototype = {
   setEmandate: function () {
     if (MethodStore.isEMandateEnabled()) {
       this.emandateView = new discreet.EmandateTab({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
     }
   },
@@ -1481,7 +1457,7 @@ Session.prototype = {
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
       this.cardlessEmiView = new discreet.CardlessEmiView({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
 
       this.cardlessEmiView.$on('select', function (event) {
@@ -1523,7 +1499,7 @@ Session.prototype = {
   setNach: function () {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
       });
     }
   },
@@ -1537,7 +1513,7 @@ Session.prototype = {
     }
 
     this.payLaterView = new PayLaterView({
-      target: _Doc.querySelector('#form-fields'),
+      target: docUtil.querySelector('#form-fields'),
     });
 
     this.payLaterView.$on('select', function (event) {
@@ -1563,7 +1539,7 @@ Session.prototype = {
     }
 
     this.emiScreenView = new discreet.emiScreenView({
-      target: _Doc.querySelector('#form-emi'),
+      target: docUtil.querySelector('#form-emi'),
     });
 
     this.emiScreenView.$on('editplan', this.showEmiPlansForBajaj.bind(this));
@@ -1742,7 +1718,7 @@ Session.prototype = {
     this.getCurrentCustomer(phone).checkStatus(
       function (response) {
         self.updateCustomerInStore();
-        if (_Obj.hasOwnProp(response, 'saved')) {
+        if (response.hasOwnProperty('saved')) {
           if (response.saved) {
             callback();
           } else {
@@ -1956,7 +1932,7 @@ Session.prototype = {
   setBackdrop: function () {
     var session = this;
     Backdrop.setup({
-      target: _Doc.querySelector('#modal-inner'),
+      target: docUtil.querySelector('#modal-inner'),
       props: {
         onClick: function (e) {
           if (Confirm.isVisible()) {
@@ -2032,7 +2008,7 @@ Session.prototype = {
        * For forced offers, we need to skip the home screen if the contact and
        * email is optional
        */
-      if (forcedOffer && method && Store.isContactEmailOptional()) {
+      if (forcedOffer && method && RazorpayHelper.isContactEmailOptional()) {
         this.set('prefill.method', method);
       }
     }
@@ -2684,7 +2660,7 @@ Session.prototype = {
         valid = new RegExp(pattern).test(value);
       }
     }
-    toggleInvalid($parent, valid);
+    $parent.toggleClass('invalid', !valid);
   },
 
   refresh: function () {
@@ -3277,7 +3253,7 @@ Session.prototype = {
     var valid = this.checkCommonValid();
 
     if (!valid) {
-      var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
+      var fields = docUtil.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
       var invalidValues = {};
@@ -3451,7 +3427,7 @@ Session.prototype = {
       if (
         !(
           tab === 'upi' &&
-          Store.isASubscription() &&
+          RazorpayHelper.isASubscription() &&
           !this.getCurrentCustomer().logged
         )
       ) {
@@ -4039,7 +4015,7 @@ Session.prototype = {
       }
 
       // For a QR Payment in 1CC Flow, set the amount.
-      if (this.tab === 'qr' && discreet.Store.isOneClickCheckout()) {
+      if (this.tab === 'qr' && RazorpayHelper.isOneClickCheckout()) {
         var offer = this.getAppliedOffer();
         var hasDiscount = offer && offer.amount !== offer.original_amount;
 
@@ -4140,7 +4116,7 @@ Session.prototype = {
     }
 
     // Break sentences into new lines
-    var formattedText = escapeHtml(text).replace(/\.\s/g, '.<br/>');
+    var formattedText = UTILS.escapeHtml(text).replace(/\.\s/g, '.<br/>');
 
     $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
@@ -4205,13 +4181,13 @@ Session.prototype = {
 
   setUpiCancelReasonPicker: function () {
     this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
-      target: _Doc.querySelector('#cancel_upi'),
+      target: docUtil.querySelector('#cancel_upi'),
     });
   },
 
   setNbCancelReasonPicker: function () {
     this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
-      target: _Doc.querySelector('#error-message'),
+      target: docUtil.querySelector('#error-message'),
     });
   },
 
@@ -4225,7 +4201,7 @@ Session.prototype = {
 
   setSvelteOverlay: function () {
     this.svelteOverlay = new discreet.Overlay({
-      target: _Doc.querySelector('#modal-inner'),
+      target: docUtil.querySelector('#modal-inner'),
     });
   },
 
@@ -4244,28 +4220,12 @@ Session.prototype = {
   },
 
   /**
-   * Show fees UI if `fee` is missing in payload and return whether the UI was
-   * shown or not.
-   *
-   * It will internally create an instance of `FeeBearerView` if not created
-   * and use the existing instance if already created.
-   *
-   * @return {Boolean} Whether or not the UI was shown
+   * Show fees UI if `fee` is missing in payload
    */
   showFeesUi: function () {
     var session = this;
     var data = session.payload;
     var isFeeMissing = !('fee' in data);
-    var feeBearerDiv = document.getElementsByClassName('fee-bearer');
-    var feeBearerBankTransferDiv = document.getElementsByClassName(
-      'fee-bearer-bank-transfer'
-    );
-    if (feeBearerBankTransferDiv.length > 0) {
-      feeBearerBankTransferDiv[0].style.display = 'none';
-    }
-    if (feeBearerDiv.length > 0) {
-      feeBearerDiv[0].removeAttribute('style');
-    }
 
     /**
      * Check here if 'fee' is set in payload,
@@ -4275,48 +4235,24 @@ Session.prototype = {
      * Otherwise, show the fee breakup.
      */
     if (isFeeMissing) {
-      var paymentData = clone(this.payload);
+      var paymentData = _Obj.clone(this.payload);
 
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
 
-      if (this.feeBearerView) {
-        this.feeBearerView.fetchFees(paymentData);
-      } else {
-        this.feeBearerView = new discreet.FeeBearerView({
-          target: gel('fee-wrap'),
-          props: {
-            paymentData: paymentData,
-          },
-        });
-
-        // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.$on('continue', function (event) {
-          var bearer = event.detail;
-
-          hideOverlay($('#fee-wrap'));
-
+      discreet.showFeeBearer({
+        paymentData: paymentData,
+        onContinue: function (bearer) {
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
           session.payload.fee = bearer.fee;
 
           // Don't redirect to fees route now
           session.feesRedirect = false;
-
           session.submit();
-        });
-
-        this.feeBearerView.$on('error', function () {
-          makeHidden('#fee-wrap');
-        });
-      }
-
-      showOverlay($('#fee-wrap'));
-
-      return true;
+        },
+      });
     }
-
-    return false;
   },
 
   closeModal: function () {
@@ -4662,7 +4598,7 @@ Session.prototype = {
     preventDefault(e);
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
-    var cta = _Doc.querySelector('#footer-cta + span');
+    var cta = docUtil.querySelector('#footer-cta + span');
     if (cta && e && e.type === 'submit') {
       return cta.click();
     }
@@ -5003,7 +4939,7 @@ Session.prototype = {
          * Add cvv to data from the currently selected instrument
          */
         var instrumentInDom = _El.closest(
-          _Doc.querySelector(
+          docUtil.querySelector(
             '.home-methods input[value="' + selectedInstrument.id + '"]'
           ),
           '.instrument'
@@ -5231,7 +5167,7 @@ Session.prototype = {
     var session = this;
     var request = {
       feesRedirect: preferences.fee_bearer && !('fee' in data),
-      optional: Store.getOptionalObject(),
+      optional: RazorpayHelper.getOptionalObject(),
       external: {},
       paused: this.get().paused,
       downtimeSeverity: this.downtimeSeverity,
@@ -5241,7 +5177,7 @@ Session.prototype = {
     if (session_options.force_terminal_id) {
       data.force_terminal_id = session_options.force_terminal_id;
     }
-    if (this.tab === 'emandate' && Store.isASubscription('emandate')) {
+    if (this.tab === 'emandate' && RazorpayHelper.isASubscription('emandate')) {
       // recurring token
       data.recurring_token =
         preferences.subscription && preferences.subscription.recurring_token;
@@ -5476,8 +5412,8 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-    if (Store.isAddressEnabled()) {
-      var notes = (data.notes = clone(this.get('notes')) || {});
+    if (RazorpayHelper.isAddressEnabled()) {
+      var notes = (data.notes = _Obj.clone(this.get('notes')) || {});
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);
@@ -5510,7 +5446,7 @@ Session.prototype = {
 
     // added rewardIds to the create payment request
     var reward = storeGetter(rewardsStore);
-    if (reward && reward.reward_id && !Store.isEmailOptional()) {
+    if (reward && reward.reward_id && !RazorpayHelper.isEmailOptional()) {
       data.reward_ids = [reward.reward_id];
     }
 
@@ -5701,7 +5637,7 @@ Session.prototype = {
     // for paypal and trustly dcc enable is not required
     if (
       discreet.storeGetter(CardScreenStore.currencyRequestId) &&
-      ((data.method === 'card' && Store.isDCCEnabled()) ||
+      ((data.method === 'card' && RazorpayHelper.isDCCEnabled()) ||
         (data.method === 'wallet' && data.wallet === 'paypal') ||
         (data.method === 'international' && data.provider === NVSEntity))
     ) {
@@ -5907,8 +5843,7 @@ Session.prototype = {
         request.nativeotp = true;
       }
     }
-
-    var isDynamicWalletFlow = discreet.Store.isDynamicWalletFlow();
+    var isDynamicWalletFlow = discreet.WalletHelper.isDynamicWalletFlow();
 
     if (
       !isDynamicWalletFlow &&
@@ -6251,7 +6186,6 @@ Session.prototype = {
       'emi',
       'emiPlansView',
       'emiScreenView',
-      'feeBearerView',
       'homeTab',
       'nachScreen',
       'otpView',
@@ -6308,9 +6242,13 @@ Session.prototype = {
 
       try {
         this.delegator.destroy();
-        invokeEach(this.listeners);
+        this.listeners.forEach(function (unlisten) {
+          unlisten();
+        });
       } catch (e) {}
-      invokeOnEach('off', this.bits);
+      this.bits.forEach(function (bit) {
+        bit.off();
+      });
       this.listeners = [];
       this.bits = [];
       if (this.modal) {
@@ -6447,7 +6385,7 @@ Session.prototype = {
   },
 
   setLanguageDropdown: function () {
-    var target = _Doc.querySelector('#language-dropdown');
+    var target = docUtil.querySelector('#language-dropdown');
     this.languageSelectionView = new discreet.languageSelectionView({
       target: target,
     });

@@ -4,7 +4,7 @@
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  import FeeBearer from 'ui/components/feebearer.svelte';
+  import FeeBearer from 'ui/components/FeeBearer/index.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Utils imports
@@ -45,7 +45,6 @@
   export let error = null;
   export let down = false;
   export let onSuccess;
-  let disabled = false;
 
   const session = getSession();
 
@@ -95,12 +94,12 @@
     getSession().errorHandler(data);
   }
 
-  function createPaymentWithFees(event) {
-    const bearer = event.detail;
-
-    paymentData.amount = bearer.amount;
-    paymentData.fee = bearer.fee;
-
+  function createPaymentWithFees(bearer) {
+    paymentData = {
+      ...paymentData,
+      amount: bearer.amount,
+      fee: bearer.fee,
+    };
     createPayment();
   }
 
@@ -145,7 +144,7 @@
 
 <Tab method="qr">
   {#if view === 'fee'}
-    <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
+    <FeeBearer {paymentData} onContinue={createPaymentWithFees} />
   {:else if view === 'qr'}
     {#if loading}
       <!-- LABEL: Generating QR Code... -->

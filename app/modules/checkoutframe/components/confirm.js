@@ -1,4 +1,5 @@
 import Confirm from 'ui/components/Confirm.svelte';
+import { querySelector } from 'utils/doc';
 
 let confirm = null;
 
@@ -11,7 +12,7 @@ export function isVisible() {
 
 export function show(props) {
   confirm = new Confirm({
-    target: _Doc.querySelector('#modal-inner'),
+    target: querySelector('#modal-inner'),
     props,
   });
   confirm.show();

@@ -1,4 +1,6 @@
 import TermsCurtain from 'ui/elements/TermsCurtain.svelte';
+import { querySelector } from 'utils/doc';
+
 const TARGET_QS = '#tnc-wrap';
 let view;
 
@@ -7,7 +9,7 @@ export const show = (props = {}) => {
 
   if (!view) {
     view = new TermsCurtain({
-      target: _Doc.querySelector(TARGET_QS),
+      target: querySelector(TARGET_QS),
       props,
     });
   } else {

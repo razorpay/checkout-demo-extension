@@ -10,6 +10,7 @@ module.exports = {
     'no-console': 0,
     'no-iterator': 2,
     'no-prototype-builtins': 0,
+    curly: 0,
   },
   globals: ['window', 'console'],
 };

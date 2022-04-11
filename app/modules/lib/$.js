@@ -1,3 +1,5 @@
+import { escapeHtml, scrollIntoView } from 'lib/utils';
+
 var $ = function (el) {
   if (isString(el)) {
     return $(document.querySelector(el));
@@ -22,54 +24,24 @@ $.prototype = {
     if (!isFunction(callback)) {
       return;
     }
-    var shouldAddListener = window.addEventListener;
-    if (shouldAddListener) {
-      ref = function (e) {
-        if (e.target.nodeType === 3) {
-          e.target = e.target.parentNode; // textNode target
-        }
-        return callback.call(thisArg || this, e);
-      };
-    } else {
-      ref = function (e) {
-        if (!e) {
-          e = window.event;
-        }
-        if (!e.target) {
-          e.target = e.srcElement || document;
-        }
-        if (!e.preventDefault) {
-          e.preventDefault = function () {
-            this.returnValue = false;
-          };
-        }
-        if (!e.stopPropagation) {
-          e.stopPropagation = e.preventDefault;
-        }
-        if (!e.currentTarget) {
-          e.currentTarget = el;
-        }
-        return callback.call(thisArg || el, e);
-      };
-    }
-    each(event.split(' '), function (i, evt) {
-      if (shouldAddListener) {
-        el.addEventListener(evt, ref, !!capture);
-      } else {
-        el.attachEvent('on' + evt, ref);
+    ref = function (e) {
+      if (e.target.nodeType === 3) {
+        e.target = e.target.parentNode; // textNode target
       }
+      return callback.call(thisArg || this, e);
+    };
+
+    each(event.split(' '), function (i, evt) {
+      el.addEventListener(evt, ref, !!capture);
     });
+
     return bind(function () {
       this.off(event, ref, capture);
     }, this);
   },
 
   off: function (event, callback, capture) {
-    if (window.removeEventListener) {
-      this[0].removeEventListener(event, callback, !!capture);
-    } else if (window.detachEvent) {
-      this[0].detachEvent('on' + event, callback);
-    }
+    this[0].removeEventListener(event, callback, !!capture);
   },
 
   prop: function (prop, val) {
@@ -131,34 +103,25 @@ $.prototype = {
   },
 
   hasClass: function (str) {
-    return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
+    return this[0].classList.contains(str);
   },
 
   addClass: function (str) {
     var el = this[0];
     if (str && el) {
-      if (!el.className) {
-        el.className = str;
-      } else if (!this.hasClass(str)) {
-        el.className += ' ' + str;
-      }
+      str.split(' ').forEach(function (newClass) {
+        el.classList.add(newClass);
+      });
     }
     return this;
   },
 
   removeClass: function (str) {
-    var el = this[0];
-    if (el) {
-      var className = (' ' + el.className + ' ')
-        .replace(' ' + str + ' ', ' ')
-        .replace(/^ | $/g, '');
-      if (el.className !== className) {
-        el.className = className;
-      }
-    }
+    this[0]?.classList.remove(str);
     return this;
   },
 
+  // this has to continue without classList.toggle cuz IE11
   toggleClass: function (className, condition) {
     if (arguments.length === 1) {
       condition = !this.hasClass(className);
@@ -309,11 +272,7 @@ $.prototype = {
   scrollIntoView: function () {
     if (this[0]) {
       var el = this[0];
-      try {
-        if (!isElementCompletelyVisible(el)) {
-          bringIntoView(el);
-        }
-      } catch (e) {}
+      scrollIntoView(el);
     }
 
     return this;
@@ -336,80 +295,4 @@ $.prototype = {
   },
 };
 
-/**
- * Brings a DOMNode into the view by scrolling
- * parents until it's in the view.
- * @param {DOMNode} el
- */
-function bringIntoView(el) {
-  var scrollTop;
-  var parent = el.offsetParent || el.parentElement;
-
-  while (parent && !isElementCompletelyVisible(el)) {
-    if (
-      parent.id === 'modal' ||
-      parent.style.overflow === 'hidden' ||
-      parent.style.overflowY === 'hidden'
-    ) {
-      // Don't scroll div#modal as well as any element that cannot be scrolled back into position by the user.
-      parent = parent.offsetParent || parent.parentElement;
-
-      continue;
-    }
-
-    scrollTop = el.getBoundingClientRect().y - parent.getBoundingClientRect().y;
-
-    parent.scroll(0, scrollTop);
-
-    parent = parent.offsetParent || parent.parentElement;
-  }
-}
-
-function isElementCompletelyVisible(el) {
-  var rect = el.getBoundingClientRect();
-
-  return (
-    rect.top + rect.height <= window.innerHeight &&
-    rect.left + rect.width <= window.innerWidth
-  );
-}
-
-function smoothScrollTo(y) {
-  smoothScrollBy(y - pageYOffset);
-}
-
-var scrollTimeout;
-function smoothScrollBy(y) {
-  if (!window.requestAnimationFrame) {
-    return scrollBy(0, y);
-  }
-  if (scrollTimeout) {
-    clearTimeout(scrollTimeout);
-  }
-  scrollTimeout = setTimeout(function () {
-    var y0 = pageYOffset;
-    var target = Math.min(y0 + y, $(document.body).height() - innerHeight);
-    y = target - y0;
-    var scrollCount = 0;
-    var oldTimestamp = performance.now();
-
-    function step(newTimestamp) {
-      scrollCount += (newTimestamp - oldTimestamp) / 300;
-      if (scrollCount >= 1) {
-        return scrollTo(0, target);
-      }
-      var sin = Math.sin((pi * scrollCount) / 2);
-      scrollTo(0, y0 + Math.round(y * sin));
-      oldTimestamp = newTimestamp;
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }, 100);
-}
-
-var escapeDiv = document.createElement('div');
-function escapeHtml(str) {
-  escapeDiv.innerHTML = '';
-  escapeDiv.appendChild(document.createTextNode(str));
-  return escapeDiv.innerHTML;
-}
+export default $;

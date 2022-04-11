@@ -73,10 +73,9 @@ function getCommonTrackingData(r) {
     'platform',
     'referer',
   ]
-    |> _Arr.loop(
-      (propName) =>
-        props |> _Obj.setTruthyProp(propName, trackingProps[propName])
-    );
+    |> _Arr.loop((propName) => {
+      if (trackingProps[propName]) props[propName] = trackingProps[propName];
+    });
 
   return props;
 }

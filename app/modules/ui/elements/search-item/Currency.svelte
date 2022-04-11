@@ -1,10 +1,14 @@
 <script>
+  import { getCurrencyConfig } from 'common/currency';
+
   export let item;
+
+  $: dir = getCurrencyConfig(item.currency)?.dir;
 </script>
 
 <div class="left">{item.currency}</div>
 <div class="middle">{item.name}</div>
-<div class="right">{item.symbol}</div>
+<div class="right" {dir}>{item.symbol}</div>
 
 <style>
   .middle {

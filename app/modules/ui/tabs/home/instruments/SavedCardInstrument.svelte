@@ -1,6 +1,5 @@
 <script>
   // UI imports
-  import { onMount, tick, createEventDispatcher } from 'svelte';
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
@@ -24,7 +23,7 @@
   import { customer } from 'checkoutstore/customer';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
+  import { isDynamicFeeBearer } from 'razorpay';
 
   // i18n
   import { getInstrumentTitle } from 'i18n';
@@ -32,6 +31,8 @@
   import { locale } from 'svelte-i18n';
 
   import { selectedCardFromHome } from 'checkoutstore/screens/card';
+  import * as _El from 'utils/DOM';
+  import { querySelector } from 'utils/doc';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -39,7 +40,6 @@
   // Other Imports
   import { isOneClickCheckout } from 'razorpay';
 
-  let dispatch = createEventDispatcher();
   let downtimeSeverity;
   let downtimeInstrument = '';
   let cvvRef;
@@ -125,7 +125,7 @@
   }
   $: collectCardTokenisationConsent = selected && !isTokenised;
 
-  function selectionHandler(avoidFocus = false) {
+  function selectionHandler() {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', savedCard?.card?.type);
     }
@@ -137,12 +137,12 @@
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
-          _Doc.querySelector(`.home-methods input[value="${instrument.id}"]`),
+          querySelector(`.home-methods input[value="${instrument.id}"]`),
           '.instrument'
         );
         const cvvInput = instrumentInDom.querySelector('.cvv-input');
 
-        if (!avoidFocus && cvvInput) {
+        if (cvvInput) {
           cvvInput.focus();
         }
       });
@@ -153,19 +153,6 @@
       });
     }
   }
-  // #region cards-tokenization
-  onMount(() => {
-    if (!isTokenised && savedCard && !selected && !$selectedInstrumentId) {
-      tick().then((_) => {
-        selectionHandler(true);
-        // this dispatch is required to select the instrument in homescreen
-        dispatch('click');
-        // if we set selected to true here it will focus cvv hence avoid as we don;t want to focus cvv
-      });
-      selected = true;
-    }
-  });
-  //#endregion
 </script>
 
 <svelte:component
@@ -176,7 +163,7 @@
   className="instrument"
   radio={false}
   value={instrument.id}
-  on:click={(event) => selectionHandler()}
+  on:click={selectionHandler}
   on:click
 >
   <i slot="icon">

@@ -28,13 +28,12 @@
   import { fly } from 'svelte/transition';
 
   // Utils imports
-  import { isAddressEnabled } from 'checkoutstore';
   import {
+    isAddressEnabled,
     isEmailHidden,
     isContactHidden,
     isPartialPayment,
     getMerchantOrder,
-    getOption,
     isContactEmailOptional,
     isContactOptional,
     isOneClickCheckout,
@@ -75,6 +74,7 @@
     INDIA_CONTACT_ERROR_LABEL,
     CONTACT_ERROR_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
+  import { getPrefillBankDetails } from 'netbanking/helper';
 
   const entries = _Obj.entries;
 
@@ -84,7 +84,7 @@
   export let onSubmit;
 
   const order = getMerchantOrder();
-  const accountName = getOption('prefill.bank_account[name]');
+  const accountName = getPrefillBankDetails('name');
   const icons = getThemeMeta().icons;
   const { user } = getIcons();
   const isOneCCEnabled = isOneClickCheckout();

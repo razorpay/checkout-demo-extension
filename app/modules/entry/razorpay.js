@@ -4,6 +4,7 @@ import 'analytics/track-errors';
 
 import { Track } from 'analytics';
 import { returnAsIs } from 'lib/utils';
+import { submitForm } from 'utils/doc';
 
 Track.props.library = 'razorpayjs';
 
@@ -19,7 +20,7 @@ Razorpay.payment.validate = returnAsIs;
 Razorpay.sendMessage = function (message) {
   if (message && message.event === 'redirect') {
     var data = message.data;
-    _Doc.submitForm(data.url, data.content, data.method);
+    submitForm(data.url, data.content, data.method);
   }
 };
 

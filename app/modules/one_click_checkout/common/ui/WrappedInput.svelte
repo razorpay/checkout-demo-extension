@@ -191,7 +191,6 @@
   }
 
   .leading {
-    font-family: Mulish;
     font-style: normal;
     font-weight: normal;
     font-size: 13px;
@@ -200,7 +199,6 @@
   }
 
   .description {
-    font-family: Mulish;
     font-style: normal;
     font-weight: normal;
     font-size: 10px;

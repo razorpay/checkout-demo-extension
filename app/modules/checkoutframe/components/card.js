@@ -25,6 +25,7 @@ import {
 import CardTab from 'ui/tabs/card/index.svelte';
 import { getSession } from 'sessionmanager';
 import { METHODS } from 'checkoutframe/constants';
+import { querySelector } from 'utils/doc';
 
 const CARD_KEY = 'svelteCardTab';
 
@@ -32,7 +33,7 @@ export function render() {
   const session = getSession();
   if (isCardOrEMIEnabled) {
     const cardTab = new CardTab({
-      target: _Doc.querySelector('#form-fields'),
+      target: querySelector('#form-fields'),
     });
     setView(CARD_KEY, cardTab);
     session.tabs = {
@@ -110,7 +111,9 @@ export function setEmiPlansCta(screen, tab) {
       break;
 
     default: {
-      if (get(isAVSEnabledForEntity)) return; // prevent CTA update in post AVS OTP screen[saved card]
+      if (get(isAVSEnabledForEntity)) {
+        return;
+      } // prevent CTA update in post AVS OTP screen[saved card]
       setAppropriateCtaText();
     }
   }

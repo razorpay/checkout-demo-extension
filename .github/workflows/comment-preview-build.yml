@@ -40,7 +40,7 @@ jobs:
             ### Standard Checkout
             [Public Docs](https://razorpay.com/docs/payment-gateway/web-integration/standard/)
 
-            
+
             #### API-Test Layout
 
             `layout.php` links for different API environments (opening in incognito mode is recommended):
@@ -53,6 +53,19 @@ jobs:
 
             #### Frame Alone ( +SDK )
 
+            **SDK Local Development**
+            If you would like to connect your local development server with SDK,
+
+            - Just connect your emulator/debug device to same WiFi and identify your `device IP:checkout-app-port`, ex: `192.168.0.107:8000`
+            - Run checkout application server as `dev-start` or `live-start` or etc...
+
+            - **Android** : 
+              - Set `PUBLIC_CHECKOUT_URL` in `CheckoutConstants.java` to `<server-address>/public.html` (ex: `192.168.0.107:8000/public.html`)
+              - Modify `if (host != null && host.endsWith("razorpay.com")) {` **to** `if (host != null ) {` in `CheckoutPresenterImpl.java`
+              - Add `android:usesCleartextTraffic="true"` to <application> in Manifest. This is to avoid HTTP blockage.
+              - Run your android app in device/emulator.
+               
+            **Remote Development**   
             `checkout.html` links for different API environments:
 
             > To use this branch on a mobile SDK, point the SDK page to one of these URLs

@@ -21,9 +21,11 @@ import getOwnPropertyDescriptor from './prototypes/getownpropertydescriptors';
         },
         set: function (value) {
           if (value) {
-            return el.prototype.setAttribute.call(this, 'disabled', '');
+            el.prototype.setAttribute.call(this, 'disabled', '');
+            return;
           } else {
-            return el.prototype.removeAttribute.call(this, 'disabled');
+            el.prototype.removeAttribute.call(this, 'disabled');
+            return;
           }
         },
       });

@@ -1,9 +1,6 @@
-import { getCustomSubtextForMethod, getMerchantKey } from 'razorpay';
-
-import { isShowMORTncEnabled } from 'checkoutstore';
+import { hasFeature, getCustomSubtextForMethod } from 'razorpay';
 
 import { getAppProviderSubtext } from 'i18n';
-import { merchantsEnabledOnSIHub } from './constant';
 
 export function getAppInstrumentSubtext(provider, locale) {
   return (
@@ -25,7 +22,7 @@ export const isCardTokenized = (card) => Boolean(card.consent_taken);
  * @returns boolean
  */
 export const isSIHubEnabledMerchant = () => {
-  return merchantsEnabledOnSIHub.includes(getMerchantKey());
+  return hasFeature('allow_billdesk_sihub', false);
 };
 
 /**
@@ -39,7 +36,7 @@ export const isSIHubEnabledMerchant = () => {
  */
 export const shouldShowTnc = (currency, country) => {
   return (
-    isShowMORTncEnabled() &&
+    hasFeature('show_mor_tnc', false) &&
     (currency === 'USD' || (!currency && country === 'US'))
   );
 };

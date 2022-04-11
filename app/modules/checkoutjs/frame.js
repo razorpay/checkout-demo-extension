@@ -7,6 +7,14 @@ import {
   ACTIONS,
   CATEGORIES,
 } from 'one_click_checkout/merchant-analytics/constant';
+import * as _El from 'utils/DOM';
+import {
+  smoothScrollTo,
+  querySelectorAll,
+  resolveElement,
+  redirectTo,
+  submitForm,
+} from 'utils/doc';
 
 const { screen, scrollTo } = global;
 
@@ -39,17 +47,17 @@ var merchantMarkup = {
     if (global.innerHeight < containerHeight) {
       var maxY = containerHeight - global.innerHeight;
       if (global.pageYOffset > maxY + 120) {
-        _Doc.smoothScrollTo(maxY);
+        smoothScrollTo(maxY);
       }
     } else if (!this.isFocused) {
-      _Doc.smoothScrollTo(0);
+      smoothScrollTo(0);
     }
   },
 };
 
 function getMetas() {
   if (!merchantMarkup.metas) {
-    merchantMarkup.metas = _Doc.querySelectorAll(
+    merchantMarkup.metas = querySelectorAll(
       'head meta[name=viewport],' + 'head meta[name="theme-color"]'
     );
   }
@@ -97,6 +105,14 @@ function sanitizeImage(options) {
   }
 }
 
+function getNewDesignUrl() {
+  let url = `${RazorpayConfig.api}test/checkout.html?branch=1cc/v1_5_beta`;
+  if (location.hostname === 'localhost') {
+    url = '/checkout.html?branch=1cc/v1_5_beta';
+  }
+  return url;
+}
+
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
   // const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
@@ -104,6 +120,10 @@ function makeCheckoutUrl(rzp) {
   //   : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;
+
+  if (rzp?.get('v_1_5_experiment_enabled')) {
+    url = getNewDesignUrl();
+  }
 
   // const useCanary = _.random() < CANARY_PERCENTAGE;
 
@@ -163,7 +183,7 @@ function appendLoader($parent, parent) {
         style += 'position:absolute;left:50%;top:50%;';
       }
       loader.setAttribute('style', style);
-      loader |> _El.appendTo($parent);
+      _El.appendTo(loader, $parent);
     } catch (e) {}
   }
 }
@@ -211,14 +231,14 @@ CheckoutFrame.prototype = {
       });
     var parent = rzp.get('parent');
     if (parent) {
-      parent = _Doc.resolveElement(parent);
+      parent = resolveElement(parent);
     }
     var parent2 = parent || CheckoutFrame.container;
     appendLoader(parent2, parent);
 
     if (rzp !== this.rzp) {
       if (_El.parent(el) !== parent2) {
-        parent2 |> _El.append(el);
+        _El.append(parent2, el);
       }
       this.rzp = rzp;
     }
@@ -352,7 +372,7 @@ CheckoutFrame.prototype = {
     }
     response.id = this.rzp.id;
     response = _Obj.stringify(response);
-    this.el.contentWindow.postMessage(response, '*');
+    this.el?.contentWindow?.postMessage(response, '*');
   },
 
   onmessage: function (e) {
@@ -451,7 +471,7 @@ CheckoutFrame.prototype = {
 
     /**
      * redirect top window if no redirection target specified by merchant
-     * else _Doc.redirect will result into an error due to confusion over which
+     * else redirectTo will result into an error due to confusion over which
      * frame to redirect if checkout.js resides within another iframe
      *
      * Also, the reason we can't change default value of "target" option itself
@@ -462,7 +482,7 @@ CheckoutFrame.prototype = {
     if (!data.target) {
       data.target = this.rzp.get('target') || '_top';
     }
-    _Doc.redirect(data);
+    redirectTo(data);
   },
 
   onsubmit: function (data) {
@@ -564,7 +584,7 @@ CheckoutFrame.prototype = {
           data.error.metadata = JSON.stringify(data.error.metadata);
         }
 
-        _Doc.redirect({
+        redirectTo({
           url: callbackUrl,
           content: data,
           method: 'post',
@@ -615,7 +635,7 @@ CheckoutFrame.prototype = {
     const redirect = this.rzp.get('redirect') || shouldRedirect;
 
     if (redirect && callbackUrl) {
-      _Doc.submitForm(
+      submitForm(
         callbackUrl,
         {
           error: data,

@@ -34,20 +34,17 @@
 
   import { methodInstrument } from 'checkoutstore/screens/home';
 
+  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
   import {
     isNameReadOnly,
-    shouldRememberCustomer,
-    isIndianCustomer,
-  } from 'checkoutstore';
-  import {
     getCardFeatures,
     isOfferForced,
     isStrictlyRecurring,
     getRecurringMethods,
     isRecurring,
     isOneClickCheckout,
+    isDynamicFeeBearer,
   } from 'razorpay';
-  import { isDynamicFeeBearer } from 'checkoutstore/index';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
   import {
     isAMEXEnabled,
@@ -79,6 +76,7 @@
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
   import { isCardValidForOffer } from 'checkoutstore/offers';
+  import { querySelector } from 'utils/doc';
 
   const dispatch = createEventDispatcher();
 
@@ -221,7 +219,7 @@
 
   function showEmiPlans() {
     // TODO: Update showOverlay once session.js is refactored.
-    showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
+    showOverlay({ 0: querySelector('#emi-wrap') });
 
     Analytics.track('emi:plans:view:all', {
       type: AnalyticsTypes.BEHAV,
