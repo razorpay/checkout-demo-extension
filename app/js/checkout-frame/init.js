@@ -1,5 +1,4 @@
 var Razorpay = window.Razorpay;
-var templates = {};
 
 var RazorpayConfig = discreet.RazorpayConfig;
 var fetch = discreet.fetch;
