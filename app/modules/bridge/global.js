@@ -4,7 +4,7 @@ import { processPaymentCreate } from 'payment/coproto';
 import { otp as $otp } from 'checkoutstore/screens/otp';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { querySelector } from 'utils/doc';
-
+import * as _El from 'utils/DOM';
 import { backPressed } from './back';
 
 export function defineGlobals() {

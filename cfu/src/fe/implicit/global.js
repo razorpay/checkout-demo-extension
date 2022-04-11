@@ -22,4 +22,3 @@ export const location = global.location;
 export const XMLHttpRequest = global.XMLHttpRequest;
 export const NodeList = global.NodeList;
 export const FormData = global.FormData;
-export const ArrayBuffer = global.ArrayBuffer;

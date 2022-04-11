@@ -127,18 +127,9 @@
 {/if}
 
 <style>
-  .upi-gpay {
-    display: block;
-  }
-
   .legend {
     margin-top: 10px;
     padding: 12px 0 8px 12px;
-  }
-
-  .info {
-    font-size: 12px;
-    color: rgb(117, 117, 117);
   }
 
   .error {
