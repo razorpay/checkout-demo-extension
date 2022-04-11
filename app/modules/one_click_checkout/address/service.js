@@ -1,7 +1,24 @@
-// api calls
+// svelte imports
+import { get } from 'svelte/store';
+
+// store imports
 import { makeAuthUrl } from 'checkoutstore';
-import { getOrderId } from 'razorpay';
+import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
+import { getContactPayload } from 'one_click_checkout/store';
+import { didSaveAddress } from 'one_click_checkout/address/store';
+
+// analytics import
+import { Events } from 'analytics';
+import AddressEvents from 'one_click_checkout/address/analytics';
+
+// utils import
 import { makeUrl } from 'common/helper';
+import { getOrderId } from 'razorpay';
+import { timer } from 'utils/timer';
+import {
+  showLoaderView,
+  hideLoaderView,
+} from 'one_click_checkout/loader/helper';
 import {
   getCustomerAddressApiPayload,
   getServiceabilityPayload,
@@ -10,21 +27,12 @@ import {
   getDevicePayload,
   hydrateSamePincodeAddresses,
 } from 'one_click_checkout/address/helpersExtra';
-// analytics import
-import { Events } from 'analytics';
-import AddressEvents from 'one_click_checkout/address/analytics';
-// utils import
-import { timer } from 'utils/timer';
-import { getContactPayload } from 'one_click_checkout/store';
+
+// i18n imports
 import {
   UPDATE_ADDRESS_LABEL,
   CHECK_PIN_LABEL,
 } from 'one_click_checkout/loader/i18n/labels';
-import { didSaveAddress } from 'one_click_checkout/address/store';
-import {
-  showLoaderView,
-  hideLoaderView,
-} from 'one_click_checkout/loader/helper';
 
 const addressCache = {};
 let serviceabilityCache = {};
@@ -169,7 +177,7 @@ export function postServiceability(
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
     is_saved_address: onSavedAddress,
   });
-
+  Events.TrackMetric(AddressEvents.SHIPPING_INFO_API_INITIATED);
   const order_id = getOrderId();
 
   const serviceabilityApiTimer = timer();
@@ -187,6 +195,17 @@ export function postServiceability(
       url: makeAuthUrl('merchant/shipping_info'),
       data: payload,
       callback: (response) => {
+        const eventProperties = {
+          response_time: serviceabilityApiTimer(),
+          is_saved_address: onSavedAddress,
+        };
+        if (response?.error) {
+          eventProperties['error_reason'] = response?.error;
+        }
+        Events.TrackMetric(
+          AddressEvents.SHIPPING_INFO_API_COMPLETED,
+          eventProperties
+        );
         Events.TrackMetric(AddressEvents.SERVICEABILITY_END, {
           time: serviceabilityApiTimer(),
           response,
@@ -223,6 +242,7 @@ export function postServiceability(
 export function thirdWatchCodServiceability(address) {
   const serviceabilityApiTimer = timer();
   Events.TrackMetric(AddressEvents.TW_START);
+  Events.TrackMetric(AddressEvents.THRIDWARTCH_API_INITIATED);
   const orderId = getOrderId();
   const formattedPayload = formatAddress(address);
   const payload = {
@@ -235,6 +255,21 @@ export function thirdWatchCodServiceability(address) {
       url: makeUrl('1cc/check_cod_eligibility'),
       data: payload,
       callback: (response) => {
+        const eventProperties = {
+          response_time: serviceabilityApiTimer(),
+          address_id: address?.id,
+          is_COD_available: response?.cod,
+        };
+        if (!get(selectedShippingAddressId)) {
+          eventProperties['address'] = address;
+        }
+        if (response?.error) {
+          eventProperties['error_reason'] = response?.error;
+        }
+        Events.TrackMetric(
+          AddressEvents.THRIDWARTCH_API_COMPLETED,
+          eventProperties
+        );
         Events.TrackMetric(AddressEvents.TW_END, {
           time: serviceabilityApiTimer(),
           response,

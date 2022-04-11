@@ -146,6 +146,7 @@ Customer.prototype = {
 
     const getDuration = timer();
     Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_START);
+    Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_API_INITIATED);
 
     fetch({
       url: url,
@@ -158,7 +159,19 @@ Customer.prototype = {
           MetaProperties.HAS_SAVED_CARDS_STATUS_CHECK,
           hasSavedCards
         );
-
+        const eventProperties = {
+          response_time: getDuration(),
+          api_response: data,
+          has_saved_cards: hasSavedCards,
+          has_saved_addresses: !!data.saved_address,
+        };
+        if (response?.error) {
+          eventProperties['error_reason'] = response?.error;
+        }
+        Events.TrackMetric(
+          MiscEvents.CUSTOMER_STATUS_API_COMPLETED,
+          eventProperties
+        );
         Events.setMeta(
           MetaProperties.HAS_SAVED_ADDRESSES,
           !!data.saved_address

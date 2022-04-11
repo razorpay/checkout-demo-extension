@@ -40,6 +40,10 @@ const address = {
   STATES_API_END: 'checkoutStatesAPICompleted',
   PINCODE_MISSING_CITY: 'checkoutPincodeMissingCity',
   PINCODE_MISSING_STATE: 'checkoutPincodeMissingState',
+  SHIPPING_INFO_API_INITIATED: '1cc_shipping_info_api_call_initiated',
+  SHIPPING_INFO_API_COMPLETED: '1cc_shipping_info_api_call_completed',
+  THRIDWARTCH_API_INITIATED: '1cc_Thridwartch_API_Call_initiated',
+  THRIDWARTCH_API_COMPLETED: '1cc_Thridwartch_API_Call_Completed',
 };
 
 export default address;
