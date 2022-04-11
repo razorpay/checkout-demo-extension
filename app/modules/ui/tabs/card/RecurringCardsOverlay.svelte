@@ -229,10 +229,6 @@
     text-align: right;
   }
 
-  .recurring-cards-heading {
-    font-weight: bold;
-  }
-
   .recurring-cards-close-icon {
     padding: 8px;
     font-size: 18px;

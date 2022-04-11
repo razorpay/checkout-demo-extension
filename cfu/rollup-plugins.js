@@ -103,8 +103,6 @@ const getPlugins = ({ lint = true, src }) => {
           },
         },
       ],
-      dev: !isProd,
-      accessors: true,
     }),
 
     pCSS({

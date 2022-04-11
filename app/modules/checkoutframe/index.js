@@ -1,3 +1,4 @@
+import Analytics from 'analytics';
 import * as Bridge from 'bridge';
 import Razorpay, {
   makePrefParams,

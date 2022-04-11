@@ -102,8 +102,6 @@
 
   let tokens = [];
   let selectedToken = null;
-  let isANewVpa = false;
-  let rememberVpaCheckbox;
   let intentAppSelected = null;
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
