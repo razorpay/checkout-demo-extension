@@ -14,6 +14,7 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
+import MainModal from 'ui/components/MainModal/index.svelte';
 import emiView from 'checkoutframe/emi';
 import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
@@ -210,6 +211,7 @@ export default {
   getCustomer,
   sanitizeTokens,
 
+  MainModal,
   emiView,
   CardlessEmiView,
   emiScreenView,

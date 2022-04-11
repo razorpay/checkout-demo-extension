@@ -1,5 +1,4 @@
 `
-var close = _('theme.close_button');
 var bodyHeight = window.innerHeight - 128;
 var themeMeta = arguments[1];
 var c = themeMeta.color;
@@ -173,12 +172,6 @@ color: `=c`;
 .auth-option:hover {
   background-color: `=hoverStateColor` !important;
 }
-
-`?!close`
-#modal-close{
-  display: none;
-}
-`?`
 
 .grid :checked+label {
   background-color: `=activeStateColor` !important;
