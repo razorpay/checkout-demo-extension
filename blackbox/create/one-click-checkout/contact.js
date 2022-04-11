@@ -16,9 +16,6 @@ const { delay, randomContact } = require('../../util.js');
 const {
   proceedOneCC,
   handleCustomerStatusReq,
-  handleUpdateOrderReq,
-  handleThirdWatchReq,
-  handleFeeSummary,
   handleResetReq,
   handleCreateOTPReq,
   handleTypeOTP,
@@ -26,19 +23,12 @@ const {
   goBack,
   scrollToEnd,
   handleLogoutReq,
+  mockPaymentSteps,
 } = require('../../actions/one-click-checkout/common.js');
 const {
   fillUserAddress,
   handleShippingInfo,
 } = require('../../actions/one-click-checkout/address.js');
-const {
-  selectBank,
-  handleMockSuccessDialog,
-} = require('../../actions/shared-actions.js');
-const { passRequestNetbanking } = require('../../actions/common.js');
-const {
-  selectPaymentMethod,
-} = require('../../tests/homescreen/homeActions.js');
 const {
   openAccounTab,
   openContactFromAccountTab,
@@ -115,15 +105,7 @@ module.exports = function (testFeatures) {
         serviceable: true,
       });
       await proceedOneCC(context);
-      await handleUpdateOrderReq(context, options.order_id);
-      await handleThirdWatchReq(context);
-      await delay(200);
-      await handleFeeSummary(context, features);
-      await selectPaymentMethod(context, 'netbanking');
-      await selectBank(context, 'SBIN');
-      await proceedOneCC(context);
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
+      await mockPaymentSteps(context, options, features);
     });
   });
 };

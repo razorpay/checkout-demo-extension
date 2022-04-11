@@ -1,4 +1,9 @@
+const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
 const { delay } = require('../../util');
+const { passRequestNetbanking } = require('../common');
+const { fillUserDetails } = require('../home-page-actions');
+const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
+const { handleShippingInfo } = require('./address');
 
 function getVerifyOTPResponse(inValidOTP) {
   const successResp = {
@@ -264,6 +269,36 @@ async function handleResetReq(context, orderId) {
   await context.respondJSON([]);
 }
 
+async function login(context) {
+  await fillUserDetails(context, '9952395555');
+  await delay(200);
+  await proceedOneCC(context);
+  await handleCustomerStatusReq(context, true);
+  await handleCreateOTPReq(context);
+  await handleTypeOTP(context);
+  await delay(200);
+  await proceedOneCC(context);
+  await handleVerifyOTPReq(context);
+  await handleShippingInfo(context);
+}
+
+async function mockPaymentSteps(context, options, features) {
+  await handleUpdateOrderReq(context, options.order_id);
+  await handleThirdWatchReq(context);
+  await delay(200);
+  await handleFeeSummary(context, features);
+  await selectPaymentMethod(context, 'netbanking');
+  await selectBank(context, 'SBIN');
+  await proceedOneCC(context);
+  await passRequestNetbanking(context);
+  await handleMockSuccessDialog(context);
+}
+
+async function closeModal(context) {
+  const crossCTA = await context.page.waitForSelector('.modal-close');
+  await crossCTA.click();
+}
+
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -281,4 +316,7 @@ module.exports = {
   goBack,
   handleLogoutReq,
   handleResetReq,
+  login,
+  mockPaymentSteps,
+  closeModal,
 };

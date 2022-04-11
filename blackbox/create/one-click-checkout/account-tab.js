@@ -6,23 +6,15 @@ const { getTestData } = require('../../actions');
 const { delay, assertVisible } = require('../../util.js');
 const {
   scrollToEnd,
-  handleCreateOTPReq,
-  proceedOneCC,
-  handleCustomerStatusReq,
-  handleTypeOTP,
-  handleVerifyOTPReq,
   goBack,
   handleLogoutReq,
   handleResetReq,
+  login,
 } = require('../../actions/one-click-checkout/common.js');
 const {
   openAccounTab,
   logoutFromAccountTab,
 } = require('../../actions/one-click-checkout/account-tab');
-const { fillUserDetails } = require('../../actions/home-page-actions.js');
-const {
-  handleShippingInfo,
-} = require('../../actions/one-click-checkout/address');
 const {
   handleAvailableCouponReq,
 } = require('../../actions/one-click-checkout/coupons.js');
@@ -53,16 +45,7 @@ module.exports = function (testFeatures) {
         await handleAvailableCouponReq(context);
 
         if (logout || logoutAll) {
-          await fillUserDetails(context, '9952395555');
-          await delay(200);
-          await proceedOneCC(context);
-          await handleCustomerStatusReq(context, true);
-          await handleCreateOTPReq(context);
-          await handleTypeOTP(context);
-          await delay(200);
-          await proceedOneCC(context);
-          await handleVerifyOTPReq(context);
-          await handleShippingInfo(context);
+          await login(context);
           await goBack(context);
           await handleAvailableCouponReq(context);
         }
