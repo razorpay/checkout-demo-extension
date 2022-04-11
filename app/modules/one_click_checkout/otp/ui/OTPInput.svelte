@@ -12,6 +12,7 @@
 
   export let hidden;
   export let isError;
+  export let onBlur;
 
   let otpContainer;
   let autoCompleteMethod = 'new-otp'; // random string for browser to ignore autocomplete
@@ -125,6 +126,7 @@
       autocomplete={autoCompleteMethod}
       on:paste={otpPaste}
       class:otp-error={isError}
+      on:blur={onBlur}
     />
   {/each}
 </div>

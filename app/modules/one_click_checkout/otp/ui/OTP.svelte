@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { get } from 'svelte/store';
+
   // Store imports
   import {
     action,
@@ -22,6 +25,8 @@
   import { isOneClickCheckout } from 'razorpay';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
+  import { resendAttemptIndex } from 'one_click_checkout/otp/store';
+
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
 
@@ -54,7 +59,7 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   // analytics
-  import otpEvents from 'ui/tabs/otp/analytics';
+  import otpEvents from 'one_click_checkout/otp/analytics';
   import { Events } from 'analytics';
 
   // helpers
@@ -104,7 +109,7 @@
   }
 
   function onSkip(event) {
-    Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
+    Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otp_reason: otpReason });
     if (skipOTPHandle) {
       skipOTPHandle();
     } else {
@@ -113,13 +118,23 @@
   }
 
   function onResend(event) {
-    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
+    resendAttemptIndex.set(get(resendAttemptIndex) + 1);
+    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, {
+      otp_reason: otpReason,
+      resend_attempt_index: $resendAttemptIndex,
+    });
     if (resendOTPHandle) {
       resendOTPHandle();
     } else {
       invoke('resend', event);
     }
   }
+
+  const handleOnBlur = () => {
+    Events.TrackBehav(otpEvents.OTP_ENTERED, {
+      otp_reason: otpReason,
+    });
+  };
 </script>
 
 <!-- // TODO: showable logic -->
@@ -228,7 +243,11 @@
             </div>
           {/if}
         {/if}
-        <OTPInput hidden={!showInput} isError={$errorMessage} />
+        <OTPInput
+          hidden={!showInput}
+          isError={$errorMessage}
+          onBlur={handleOnBlur}
+        />
       </div>
 
       <div class="error-message" class:hidden={!showInput}>

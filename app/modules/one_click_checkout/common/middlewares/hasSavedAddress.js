@@ -2,7 +2,7 @@ import {
   getCustomerDetails,
   isUserLoggedIn,
 } from 'one_click_checkout/common/helpers/customer';
-import otpEvents from 'ui/tabs/otp/analytics';
+import otpEvents from 'one_click_checkout/otp/analytics';
 import { Events } from 'analytics';
 import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
@@ -74,8 +74,8 @@ const hasSavedAddresses =
       customer.checkStatus(
         function () {
           if (customer.saved_address && !customer.logged) {
-            Events.Track(otpEvents.OTP_LOAD, {
-              otp_skip_visible: get(OtpScreenStore.allowSkip),
+            Events.TrackRender(otpEvents.OTP_LOAD, {
+              is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
               otp_reason: reason,
             });
 
