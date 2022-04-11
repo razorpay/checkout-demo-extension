@@ -8,6 +8,7 @@
 
   // store imports
   import { selectedAddress as selectedShippingAddress } from 'one_click_checkout/address/shipping_address/store';
+  import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
 
   // service import
@@ -59,6 +60,23 @@
   }
 
   function handleRadioClick(id, index) {
+    if ($activeRoute?.name === views.SAVED_ADDRESSES) {
+      Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
+        address_id: id,
+        address_position_index: index,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
+        top_shown_address: !index,
+      });
+    } else {
+      Events.TrackBehav(AddressEvents.SAVED_BILLING_ADDRESS_SELECTED, {
+        address_id: id,
+        address_position_index: index,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_BILLING_ADDRESS, {
+        top_shown_address: !index,
+      });
+    }
     selectedAddressId.set(id);
     if (!checkServiceability) return;
 
@@ -80,10 +98,29 @@
       selectedAddressId.set(addresses[0].id);
     }
     dispatchServiceability();
+    if ($activeRoute?.name === views.SAVED_BILLING_ADDRESS) {
+      Events.TrackBehav(AddressEvents.SAVED_BILLING_ADDRESS_SELECTED, {
+        address_id: $selectedBillingAddressId,
+        address_position_index: 0,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_BILLING_ADDRESS, {
+        top_shown_address: true,
+      });
+    }
     if (
       $activeRoute?.name === views.SAVED_ADDRESSES &&
       $selectedShippingAddress?.id
     ) {
+      Events.TrackRender(AddressEvents.SAVED_SHIPPING_ADDRESS_LOADED, {
+        count_saved_addresses: addresses?.length,
+      });
+      Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
+        address_id: $selectedShippingAddress?.id,
+        address_position_index: 0,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
+        top_shown_address: true,
+      });
       postAddressSelection();
     }
     merchantAnalytics({

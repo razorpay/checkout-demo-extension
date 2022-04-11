@@ -40,6 +40,12 @@ const address = {
   STATES_API_END: 'checkoutStatesAPICompleted',
   PINCODE_MISSING_CITY: 'checkoutPincodeMissingCity',
   PINCODE_MISSING_STATE: 'checkoutPincodeMissingState',
+  SAVED_SHIPPING_ADDRESS_LOADED: '1cc_saved_shipping_address_screen_loaded',
+  SAVED_SHIPPING_ADDRESS_SELECTED: '1cc_saved_shipping_address_selected',
+  TOP_SHOWN_SHIPPING_ADDRESS: '1cc_used_top_shown_shipping_address',
+  SAVED_BILLING_ADDRESS_LOADED: '1cc_saved_billing_address_screen_loaded',
+  SAVED_BILLING_ADDRESS_SELECTED: '1cc_saved_billing_address_selected',
+  TOP_SHOWN_BILLING_ADDRESS: '1cc_used_top_shown_billing_address',
   // New Events
   NEW_ADDRESS_SCREEN_LOADED_V2: '1cc_add_new_address_screen_loaded_completed',
   INPUT_ENTERED_name_V2: '1cc_add_new_address_name_entered',

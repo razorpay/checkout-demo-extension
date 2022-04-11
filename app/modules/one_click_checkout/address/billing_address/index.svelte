@@ -18,6 +18,7 @@
     shouldSaveAddress as shouldSaveBillingAddress,
     addressCompleted as billingAddressCompleted,
   } from 'one_click_checkout/address/billing_address/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -104,6 +105,9 @@
       ADDRESS_TYPES.BILLING_ADDRESS
     );
     Events.Track(AddressEvents.ADDRESS_SCREEN);
+    Events.TrackRender(AddressEvents.SAVED_BILLING_ADDRESS_LOADED, {
+      count_saved_addresses: $savedAddresses?.length,
+    });
   });
 </script>
 
