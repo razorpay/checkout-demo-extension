@@ -12,7 +12,10 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
-  import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import {
+    getAvailableMethods,
+    getSectionsDisplayed,
+  } from 'ui/tabs/home/helpers';
   import { isElementUnscrollable } from 'one_click_checkout/helper';
   import {
     showToast,
@@ -41,6 +44,7 @@
     setContact,
     setEmail,
     upiIntentInstrumentsForAnalytics,
+    blocks,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
 
@@ -183,6 +187,7 @@
   let ctaOneCCDisabled = true;
   let methodEle;
   let scrollable;
+  let preferredMethods;
 
   // TPV
   const tpv = getTPV();
@@ -626,13 +631,10 @@
       sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
       // Get the methods for which a preferred instrument was shown
-      const preferredMethods = setPreferredInstruments.reduce(
-        (acc, instrument) => {
-          acc[`_${instrument.method}`] = true;
-          return acc;
-        },
-        {}
-      );
+      preferredMethods = setPreferredInstruments.reduce((acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      }, {});
 
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
@@ -753,6 +755,13 @@
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
     });
+    Events.TrackRender(HOME_EVENTS.HOME_LOADED_V2, {
+      is_cod_enabled: $isCodAvailable,
+      cod_unavailable_reason: $codReason,
+      available_methods: getAvailableMethods(),
+      sections: getSectionsDisplayed($blocks),
+      p13n_instruments: Object.keys(preferredMethods),
+    });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.PAYMENT_METHODS,
@@ -765,6 +774,9 @@
     });
     if (isMethodEnabled('cod')) {
       Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
+      Events.TrackRender(COD_EVENTS.COD_SHOWN_V2, {
+        is_cod_enabled: $isCodAvailable,
+      });
     }
   }
 
@@ -1112,6 +1124,13 @@
     const instrument = event.detail;
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
       instrument,
+    });
+    Events.TrackBehav(HOME_EVENTS.PAYMENT_INSTRUMENT_SELECTED_V2, {
+      instrument,
+    });
+    Events.TrackBehav(HOME_EVENTS.PAYMENT_METHOD_SELECTED_V2, {
+      method: instrument.method,
+      section: instrument.section,
     });
     updateScore('instrumentSelected');
 

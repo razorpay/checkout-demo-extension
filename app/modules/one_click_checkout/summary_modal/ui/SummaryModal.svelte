@@ -62,6 +62,7 @@
   // Sets visible variable to false and makes backdrop and modal visible
   export function hide() {
     Events.Track(events.ORDER_SUMMARY_HIDDEN);
+    Events.Track(events.ORDER_SUMMARY_HIDDEN_V2);
     visible = false;
   }
   $: {
@@ -76,6 +77,7 @@
   }
 
   function onConfirm() {
+    Events.TrackRender(events.ORDER_SUMMARY_LOAD_V2);
     Events.Track(events.ORDER_SUMMARY_CTA_CLICK);
     createCodPayment();
   }

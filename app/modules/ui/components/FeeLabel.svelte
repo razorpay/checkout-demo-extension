@@ -1,41 +1,22 @@
 <script>
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
-  import InfoIcon from 'ui/elements/InfoIcon.svelte';
   import DynamicFeeBearer from './DynamicFeeBearer.svelte';
 
   //Store imports
   import { showFeeLabel } from 'checkoutstore/index.js';
 
-  import {
-    isCustomerFeeBearer,
-    isDynamicFeeBearer,
-    isOneClickCheckout,
-  } from 'razorpay';
+  import { isCustomerFeeBearer, isDynamicFeeBearer } from 'razorpay';
 
-  import { showSummaryModal } from 'one_click_checkout/summary_modal';
-  import SummaryModalEvents from 'one_click_checkout/summary_modal/analytics';
-  import { Events } from 'analytics';
-
-  const showInfo = isOneClickCheckout();
   const isFeeBearer = isCustomerFeeBearer();
 
   let showFeeDetails = false;
   function handleClick() {
     showFeeDetails = !showFeeDetails;
   }
-
-  function handleInfoClick() {
-    Events.Track(SummaryModalEvents.ORDER_SUMMARY_ICON_CLICK);
-    showSummaryModal(false);
-  }
 </script>
 
-{#if showInfo}
-  <button class="label" on:click={handleInfoClick}>
-    <InfoIcon />
-  </button>
-{:else if isFeeBearer}
+{#if isFeeBearer}
   {#if $showFeeLabel}
     {#if isDynamicFeeBearer()}
       <DynamicFeeBearer />

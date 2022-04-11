@@ -91,6 +91,7 @@
       <div role="list" class="border-list">
         {#each block.instruments as instrument, index (instrument.id)}
           <Instrument
+            {block}
             {instrument}
             on:click={() => trackInstrumentSelection(instrument, index)}
             on:selectInstrument

@@ -15,9 +15,11 @@
   import SkeletonInstrument from './SkeletonInstrument.svelte';
   import UpiAppMethodInstrument from './UpiAppMethodInstrument.svelte';
   import { oneClickUPIIntent } from 'upi/helper';
+  import { getSectionCategoryForBlock } from '../helpers';
 
   // Props
   export let instrument;
+  export let block;
 
   const isInstrumentLoading = instrument._loading;
   const dispatch = createEventDispatcher();
@@ -32,6 +34,7 @@
 
   function dispatchSelect() {
     instrument.skipCTAClick = skipCTAClick;
+    instrument.section = getSectionCategoryForBlock(block);
     dispatch('selectInstrument', instrument);
   }
 </script>

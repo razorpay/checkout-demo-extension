@@ -43,9 +43,28 @@ export function updateBlocksForExperiments(allBlocks) {
 }
 
 export function getAvailableMethods() {
-  return get(blocks).map((block) =>
-    block.instruments.map((instrument) => instrument.method)
+  return get(blocks).reduce(
+    (methods, block) =>
+      methods.concat(block.instruments.map((instrument) => instrument.method)),
+    []
   );
+}
+
+export function getSectionsDisplayed(blocks) {
+  return blocks.reduce(
+    (sections, block) => [...sections, getSectionCategoryForBlock(block)],
+    []
+  );
+}
+
+export function getSectionCategoryForBlock(block) {
+  let section = 'custom';
+  if (block.code === 'rzp.preferred') {
+    section = 'p13n';
+  } else if (block.code === 'rzp.cluster') {
+    section = 'generic';
+  }
+  return section;
 }
 
 export function setDynamicFees(instrument, forType) {
