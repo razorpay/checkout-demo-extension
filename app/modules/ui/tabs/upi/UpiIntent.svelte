@@ -28,6 +28,7 @@
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
   import { tryOpeningIntentUrl } from 'upi/helper';
+  import { Events } from 'analytics';
 
   // Props
   export let apps;
@@ -108,6 +109,7 @@
 
   onMount(() => {
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
+    Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
   });
 </script>
 

@@ -49,7 +49,7 @@
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
-  import Analytics from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
@@ -304,6 +304,7 @@
 
   onMount(() => {
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+    Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD_V2);
     renderCtaOneCC = true;
   });
 
@@ -312,6 +313,8 @@
   });
 
   export function onShown() {
+    Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+    Events.TrackRender(NETBANKING_EVENTS.SCREEN_LOAD_V2);
     renderCtaOneCC = true;
   }
 
@@ -466,6 +469,9 @@
       component={BankSearchItem}
       on:close={hideSearch}
       on:select={({ detail }) => {
+        Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
+          bank_selected: detail.code,
+        });
         $selectedBank = detail.code;
         hideSearch();
       }}

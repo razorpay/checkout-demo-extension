@@ -6,6 +6,8 @@
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
+  import { EVENTS as ONE_CC_EVENTS } from 'analytics/offers/events';
+
   import * as _El from 'utils/DOM';
   import {
     getOffersForTab,
@@ -240,7 +242,19 @@
   }
 
   function selectOffer(offer) {
+    Events.TrackBehav(ONE_CC_EVENTS.OFFERS_CLICKED, {
+      offer: {
+        id: offer.id,
+        type: offer.type,
+        method: offer.payment_method,
+      },
+    });
     selected = offer;
+  }
+
+  function onCloseClick() {
+    Events.TrackBehav(ONE_CC_EVENTS.OFFERS_DISMISSED);
+    hideList(true);
   }
 
   const ctaRef = document.getElementById('one-cc-footer');
@@ -330,7 +344,7 @@
         class:main-one-cc={isOneCCEnabled}
         transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
-        <header class="close-offerlist" on:click={hideList}>
+        <header class="close-offerlist" on:click={onCloseClick}>
           <!-- LABEL: Select an offer -->
           {$t(SELECT_OFFER_HEADER)}
           <!-- LABEL: Hide -->

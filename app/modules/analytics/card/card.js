@@ -8,7 +8,10 @@ const addNewCardScreen = {
 
 const cardScreen = {
   APP_SELECT: 'app:select',
+  ADD_CARD_SCREEN_RENDERED: '1cc_payments_add_new_card_screen_loaded',
+  SAVED_CARD_SCREEN_RENDERED: '1cc_payments_saved_card_screen_loaded',
 };
+
 // All card related events
 const events = {
   ...addNewCardScreen,

@@ -982,9 +982,6 @@
   }
 
   export function setTabVisible(status = true) {
-    if (currentView === Views.SAVED_CARDS && status) {
-      Analytics.track(SAVED_CARD_EVENTS.SCREEN_LOAD);
-    }
     tabVisible = status;
   }
 
@@ -994,6 +991,20 @@
 
   function toggleAppListOnSavedCard() {
     appsListExpandedOnSavedCard = !appsListExpandedOnSavedCard;
+  }
+
+  $: {
+    if (tabVisible) {
+      if (currentView === Views.ADD_CARD) {
+        Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
+      } else if (
+        currentView === Views.SAVED_CARDS &&
+        isSavedCardsEnabled &&
+        savedCards.length
+      ) {
+        Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
+      }
+    }
   }
 </script>
 

@@ -16,7 +16,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import Analytics from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import WALLET_EVENTS from 'ui/tabs/wallets/events';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
@@ -107,6 +107,9 @@
   const walletReferences = {};
 
   export function onWalletSelection(code) {
+    Events.TrackBehav(WALLET_EVENTS.WALLET_SELECTED, {
+      wallet_option_selected: code,
+    });
     const offerError = !session.validateOffers(code, function (removeOffer) {
       if (removeOffer) {
         $selectedWallet = code;
@@ -134,6 +137,8 @@
   }
 
   export function onShown() {
+    Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
+    Events.TrackRender(WALLET_EVENTS.SCREEN_LOAD_V2);
     if ($selectedWallet) {
       renderCtaOneCC = true;
       showCta();
@@ -177,10 +182,6 @@
     session.preSubmit();
     renderCtaOneCC = false;
   }
-
-  onMount(() => {
-    Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
-  });
 
   onDestroy(() => {
     renderCtaOneCC = false;

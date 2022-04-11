@@ -214,6 +214,15 @@ export function returnAsIs(_) {
 }
 
 /**
+ * Returns keys of input object which have truthy values
+ * @param {object}   A key-value pair object
+ * @returns {array}  An array with keys which have truthy values
+ */
+export function filterTruthyKeys(o) {
+  return Object.keys(o).filter((key) => !!o[key]);
+}
+
+/**
  * given a string, returns safe html representation of it
  * * @param {string} string to sanitize
  *

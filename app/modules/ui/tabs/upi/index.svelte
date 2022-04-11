@@ -23,7 +23,7 @@
     getUPIAppDataFromHandle,
     isOtherIntentApp,
   } from 'common/upi';
-  import Analytics from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCta } from 'checkoutstore/cta';
@@ -85,6 +85,7 @@
 
   // Constant imports
   import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { filterTruthyKeys } from 'lib/utils';
 
   // Props
   export let selectedApp = undefined;
@@ -408,6 +409,7 @@
   }
 
   export function selectQrMethod() {
+    Events.TrackBehav(UPI_EVENTS.QR_SELECTED);
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -424,6 +426,14 @@
   }
 
   export function onShown() {
+    Events.TrackRender(UPI_EVENTS.SCREEN_LOAD_V2, {
+      sections: filterTruthyKeys({
+        intent,
+        collect: shouldShowCollect,
+        omnichannel: shouldShowOmnichannel,
+        qr: shouldShowQr,
+      }),
+    });
     renderCtaOneCC = true;
     setDefaultTokenValue();
     determineCtaVisibility();

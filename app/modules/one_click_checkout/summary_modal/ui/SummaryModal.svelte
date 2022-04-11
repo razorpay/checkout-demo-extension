@@ -56,13 +56,22 @@
     Events.Track(events.ORDER_SUMMARY_LOAD, {
       ctaVisible,
     });
+    if (ctaVisible) {
+      Events.TrackRender(events.CONFIRM_ORDER_SUMMARY_LOAD);
+    } else {
+      Events.TrackRender(events.ORDER_SUMMARY_LOAD_V2);
+    }
     visible = true;
   }
 
   // Sets visible variable to false and makes backdrop and modal visible
   export function hide() {
+    if (ctaVisible) {
+      Events.TrackRender(events.CONFIRM_ORDER_SUMMARY_HIDDEN);
+    } else {
+      Events.TrackBehav(events.ORDER_SUMMARY_HIDDEN_V2);
+    }
     Events.Track(events.ORDER_SUMMARY_HIDDEN);
-    Events.Track(events.ORDER_SUMMARY_HIDDEN_V2);
     visible = false;
   }
   $: {
@@ -79,6 +88,7 @@
   function onConfirm() {
     Events.TrackRender(events.ORDER_SUMMARY_LOAD_V2);
     Events.Track(events.ORDER_SUMMARY_CTA_CLICK);
+    Events.TrackBehav(events.ORDER_SUMMARY_CTA_CLICK_V2);
     createCodPayment();
   }
 </script>
