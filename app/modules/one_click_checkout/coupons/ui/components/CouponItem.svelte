@@ -30,7 +30,7 @@
     </div>
     <button
       id="coupon-item-apply"
-      class="theme-highlight apply-button"
+      class="theme apply-button"
       on:click|preventDefault={() => dispatch('apply')}
     >
       {$t(APPLY_LABEL)}

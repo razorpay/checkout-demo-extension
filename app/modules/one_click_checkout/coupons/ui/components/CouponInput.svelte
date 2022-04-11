@@ -84,7 +84,7 @@
     <button
       disabled={!$couponInputValue}
       id="coupon-apply-btn"
-      class="theme-highlight coupon-apply-btn"
+      class="theme coupon-apply-btn"
       on:click|preventDefault={() => {
         Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {
           index: $couponAppliedIndex,
