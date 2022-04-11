@@ -150,9 +150,8 @@
   }
 
   .close-section {
-    justify-content: flex-end;
-    display: flex;
     margin-bottom: 12px;
+    align-self: flex-end;
   }
 
   .header-when-no-rtb {
