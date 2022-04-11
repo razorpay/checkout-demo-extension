@@ -24,6 +24,7 @@
   import AddressEvents from 'one_click_checkout/address/analytics';
   // constant imports
   import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
+  import Address from 'ui/elements/address.svelte';
 
   export let INPUT_FORM;
   export let formData;
@@ -47,11 +48,36 @@
     value.extra ? onUpdate(id, value.val, value.extra) : onUpdate(id, value);
   };
 
-  const onBlur = (id, e) => {
+  const onBlur = (id) => {
     dispatch('blur', { id });
 
     if (id === 'landmark' && !formData[id]) {
       showLandmark = false;
+    }
+
+    // Analytics Event
+
+    const fieldError = errors[id];
+    const fieldData = formData[id];
+
+    if (!fieldError) {
+      let data = {};
+
+      if (['city', 'state'].includes(id)) {
+        data = {
+          meta: { [id]: fieldData },
+          is_prefilled: formData?.zipcode ? 2 : 0,
+        };
+      }
+
+      if (id === 'country_name') {
+        data = {
+          [id]: fieldData,
+          is_prefilled: 2,
+        };
+      }
+
+      Events.TrackBehav(AddressEvents[`INPUT_ENTERED_${id}_V2`], data);
     }
   };
 
@@ -71,6 +97,10 @@
         country_code: countryCode,
       });
     }
+
+    Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
+      is_prefilled: 1,
+    });
   });
 
   let showLandmark = false;

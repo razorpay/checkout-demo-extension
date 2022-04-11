@@ -276,10 +276,17 @@
         index: e?.detail?.index,
         field: id,
       });
+
+      Events.TrackBehav(AddressEvents.SUGGESTION_SELECTED_V2);
     };
   }
 
   function handleCountrySelect(name, iso) {
+    if (!$formData?.zipCode) {
+      Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
+        is_prefilled: 1,
+      });
+    }
     // show number keypad for pincode if country is India
     if (iso === INDIA_COUNTRY_ISO_CODE) {
       INPUT_FORM[pinIndex][pinSubIndex].type = 'tel';
@@ -372,6 +379,8 @@
       !value
     ) {
       Events.Track(AddressEvents.SUGGESTION_CLEARED, { field: key });
+
+      Events.TrackBehav(AddressEvents.SUGGESTION_CLEARED_V2);
     }
     // If invalid field, then re-validate the input and update error messages
     if (errors[key]) {
@@ -621,31 +630,33 @@
   }
 
   onMount(() => {
+    const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
+    const address_type = isShippingAddress ? 'shipping' : 'billing';
+
     screenScrollTop(addressWrapperEle);
-    if (
-      $activeRoute?.name === views.ADD_ADDRESS &&
-      !$formData.zipcode &&
-      !$formData.city
-    ) {
+    if (isShippingAddress && !$formData.zipcode && !$formData.city) {
       $isShippingAddedToAmount = false;
     }
 
     // case when user comes back to add shipping address with last prefilled data
-    if (
-      $activeRoute?.name === views.ADD_ADDRESS &&
-      $shippingCharge &&
-      $formData?.zipcode
-    ) {
+    if (isShippingAddress && $shippingCharge && $formData?.zipcode) {
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
     }
 
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
     }
+
+    // Anaytics Events
     Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {
       meta: { saved_address_count: $savedAddresses?.length },
       type: addressType,
     });
+
+    Events.TrackRender(AddressEvents.NEW_ADDRESS_SCREEN_LOADED_V2, {
+      address_type,
+    });
+
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,

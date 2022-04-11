@@ -52,18 +52,40 @@ export function getCityState(pincode, country) {
   const cachedAddress = addressCache[pincode];
   showLoaderView();
   Events.TrackMetric(AddressEvents.CITY_STATE_START);
+  Events.TrackMetric(AddressEvents.CITY_STATE_START_V2);
 
   return new Promise((resolve, reject) => {
     if (!cachedAddress) {
       fetch({
         url: makeAuthUrl(`locations/country/${country}/pincode/${pincode}`),
         callback: (response) => {
+          // If request was successful, save response in cache
+
           Events.TrackMetric(AddressEvents.CITY_STATE_END, {
             time: cityStateApiTimer(),
           });
-          // If request was successful, save response in cache
+
+          Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
+            response_time: cityStateApiTimer,
+            city: response?.city,
+            state: response?.state,
+          });
+
+          Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+            is_prefilled: 1,
+          });
+
+          Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+            is_prefilled: 1,
+          });
+
+          Events.TrackMetric(AddressEvents.CITY_STATE_END_V2);
+
           hideLoaderView();
           if (response.error) {
+            Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
+              error_code: response.error,
+            });
             reject(response.error);
             return;
           }
@@ -90,6 +112,7 @@ export function putCustomerAddress({ shipping_address, billing_address }) {
   showLoaderView(UPDATE_ADDRESS_LABEL);
   const addressApiTimer = timer();
   Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
+  Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START_V2);
   const payload = getCustomerAddressApiPayload(
     {
       shipping_address,
@@ -108,8 +131,14 @@ export function putCustomerAddress({ shipping_address, billing_address }) {
           failure_reason: response?.error?.description,
           address_id: response?.shipping_address?.id,
         });
+        Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END_V2, {
+          address_id: response?.shipping_address?.id,
+        });
         if (response.error) {
           reject(response.error);
+          Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END_V2, {
+            error_reason: response?.error,
+          });
           hideLoaderView();
           return;
         }
@@ -133,6 +162,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
   showLoaderView(UPDATE_ADDRESS_LABEL);
   const addressApiTimer = timer();
   Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START);
+  Events.TrackMetric(AddressEvents.SAVE_ADDRESS_START_V2);
   const payload = getCustomerAddressApiPayload({
     shipping_address,
     billing_address,
@@ -149,8 +179,14 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
           failure_reason: response?.error?.description,
           address_id: response?.shipping_address?.id,
         });
+        Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END_V2, {
+          address_id: response?.shipping_address?.id,
+        });
         if (response.error) {
           reject(response.error);
+          Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END_V2, {
+            error_reason: response?.error,
+          });
           hideLoaderView();
           return;
         }
@@ -318,6 +354,7 @@ export function fetchAutocompleteSuggestions(query, zipcode, country) {
     country,
     zipcode,
   });
+  Events.TrackMetric(AddressEvents.SUGGESTIONS_API_START_V2);
   return new Promise((resolve, reject) => {
     fetch({
       url: makeAuthUrl(
@@ -328,6 +365,7 @@ export function fetchAutocompleteSuggestions(query, zipcode, country) {
           success: !response.error,
           result_count: response.predictions?.length || 0,
         });
+        Events.TrackMetric(AddressEvents.SUGGESTIONS_API_END_V2);
         if (response.error) {
           reject(response.error);
           return;

@@ -171,6 +171,13 @@
       };
     }
     Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, analyticsData);
+    Events.TrackBehav(AddressEvents.ADDRESS_SUBMIT_CLICKED_V2, {
+      meta: {
+        is_user_opted_to_save_address: !!$shouldSaveAddress,
+      },
+      '1cc_category_of_saved_address': $selectedAddress?.tag,
+    });
+
     if (currentView === addressViews.SAVED_ADDRESSES) {
       merchantAnalytics({
         event: `saved_address_${ACTIONS.CTA_CLICKED}`,
