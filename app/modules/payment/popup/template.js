@@ -95,9 +95,14 @@ function popupTemplate(paymentInstance) {
 <div id="ldr"></div>
 <div id="txt">
   <div style="display:inline-block;vertical-align:middle;white-space:normal;">
-    <h2 id='title'>${t(LOADING_METHOD_PAGE, {
-      method,
-    })}</h2><p id='msg'>${message}</p>
+    <div class="initial">
+      <h2>${t(LOADING_METHOD_PAGE, { method })}</h2>
+      <p>${message}</p>
+    </div>
+    <div class="later">
+      <h2>${t(TRYING_TO_LOAD)}</h2>
+      <p>${t(TRYING_BANK_PAGE_MSG)}</p>
+    </div>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
@@ -131,27 +136,10 @@ export function updatePopup(popupWindow, content) {
  * @param {PaymentInstance} paymentInstance
  */
 export function writePopup(win, paymentInstance) {
-  const { setTimeout, document } = win;
-  const gel = document.getElementById.bind(document);
+  const doc = win.document;
   /*jshint evil:true */
-  document.write(popupTemplate(paymentInstance));
-  document.close();
-
-  const timeouts = [];
-  timeouts.push(
-    setTimeout(() => {
-      document.body.className = 'loaded';
-    }, 10)
-  );
-
-  timeouts.push(
-    setTimeout(() => {
-      try {
-        gel('title').innerHTML = `${t(TRYING_TO_LOAD)}`;
-        gel('msg').innerHTML = `${t(TRYING_BANK_PAGE_MSG)}`;
-      } catch (e) {}
-    }, 1e4)
-  );
+  doc.write(popupTemplate(paymentInstance));
+  doc.close();
 
   const trackPopup = (event, props = {}) => {
     const page = 'checkout_popup';
@@ -162,7 +150,6 @@ export function writePopup(win, paymentInstance) {
   trackPopup('load');
 
   win.addEventListener('beforeunload', () => {
-    timeouts.forEach(win.clearTimeout);
     trackPopup('unload');
   });
 }
