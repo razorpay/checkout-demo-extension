@@ -38,7 +38,11 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isOneClickCheckout, isHDFCVASMerchant } from 'razorpay';
+  import {
+    isOneClickCheckout,
+    isHDFCVASMerchant,
+    getMerchantOption,
+  } from 'razorpay';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -684,7 +688,7 @@
 
   function shouldUsePersonalization() {
     // Merchant has asked to disable
-    if (getOption('personalization') === false) {
+    if (getMerchantOption('personalization') === false) {
       return false;
     }
 
