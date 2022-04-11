@@ -67,4 +67,8 @@
   .backdrop.sub {
     bottom: -55px;
   }
+
+  :global(.one-cc) .backdrop {
+    border-radius: 0px;
+  }
 </style>
