@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
