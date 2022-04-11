@@ -2,6 +2,7 @@ import { displayCurrencies } from 'common/currency';
 import { isIRCTC, getOption } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { internetExplorer, AndroidWebView } from 'common/useragent';
+import { scrollIntoView } from 'lib/utils';
 
 export function getAmount(): string {
   const amount = getOption('amount');

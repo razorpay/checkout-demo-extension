@@ -884,7 +884,15 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      this.mainModal = new discreet.MainModal({ target: document.body });
+      const session = this;
+      this.mainModal = new discreet.MainModal({
+        target: document.body,
+        props: {
+          onClose: function () {
+            session.closeModal();
+          },
+        },
+      });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
