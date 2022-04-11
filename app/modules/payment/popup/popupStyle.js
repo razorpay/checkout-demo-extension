@@ -65,16 +65,19 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 0%;
-  transition: 20s cubic-bezier(0, 0.1, 0, 1);
+}
+#ldr:after {
+  width: 90%;
+  animation: ldrbar 20s cubic-bezier(0, 0.1, 0, 1);
 }
 #ldr:before {
   width: 100%;
   top: 1px;
   border-top: 1px solid #bcbcbc;
 }
-.loaded #ldr:after {
-  width: 90%;
+@keyframes ldrbar {
+  0% { width: 0%; }
+  100% { width: 90%; }
 }
 #logo {
   width: 48px;
@@ -115,26 +118,42 @@ body {
   line-height: 20px;
 }
 #txt {
+  position: relative;
   height: 200px;
   text-align: center;
 }
-#title {
+h2 {
   font-size: 20px;
   line-height: 24px;
   margin-bottom: 8px;
   letter-spacing: -0.3px;
 }
-#msg,
-#cncl {
+p{
   font-size: 14px;
   line-height: 20px;
   color: #757575;
   margin-bottom: 8px;
   letter-spacing: -0.3px;
 }
-#cncl {
-  text-decoration: underline;
-  cursor: pointer;
+.later {
+  position: absolute;
+  animation: appear 10s;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  left: 50%;
+  width: 100%;
+}
+.initial {
+  opacity: 0;
+  animation: vanish 10s;
+}
+@keyframes appear {
+  0% { opacity: 0; }
+  98% { opacity: 0; }
+}
+@keyframes vanish {
+  0% { opacity: 1; }
+  98% { opacity: 1; }
 }
 #logo img {
   max-width: 100%;
