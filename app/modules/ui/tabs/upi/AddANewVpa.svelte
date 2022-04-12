@@ -271,27 +271,9 @@
   </div>
 </SlottedRadioOption>
 
-<style>
-  .ref-pspName {
-    color: #424242;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    line-height: 40px;
-    z-index: 1;
-  }
-
+<style lang="scss">
   .should-save-vpa-container {
     margin-top: 12px;
-
-    #should-save-vpa-upi span.checkbox,
-    #should-save-vpa-upi_otm span.checkbox {
-      display: inline-block;
-    }
-  }
-
-  .legend {
-    padding: 12px 0 8px 12px;
   }
 
   [slot='icon'].top {
@@ -310,9 +292,5 @@
 
   .downtime-upi {
     margin-top: 8px;
-  }
-  .downtime-upi-icon {
-    position: absolute;
-    right: 20px;
   }
 </style>

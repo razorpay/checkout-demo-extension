@@ -38,7 +38,6 @@
   export let loading = false;
   export let qrImage = null;
   export let error = null;
-  export let down = false;
   export let onSuccess;
 
   const session = getSession();
@@ -217,15 +216,8 @@
     display: block;
     position: relative;
   }
-  .refresh {
-    color: #999;
-    line-height: 22px;
-  }
   .error {
     margin-top: 20px;
-  }
-  .error + .refresh {
-    display: none;
   }
   .btn {
     display: inline-block;

@@ -329,10 +329,6 @@
 </div>
 
 <style>
-  h3 {
-    margin: 10px 0;
-  }
-
   .otp-title {
     margin: 0 40px;
     line-height: 150%;

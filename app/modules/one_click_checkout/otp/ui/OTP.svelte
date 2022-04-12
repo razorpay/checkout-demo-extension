@@ -60,6 +60,7 @@
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
   import { screensHistory } from 'one_click_checkout/routing/History';
+  import { views } from 'one_click_checkout/routing/constants';
 
   const { edit_phone } = getTheme().icons;
 
@@ -279,9 +280,6 @@
 </div>
 
 <style>
-  h3 {
-    margin: 10px 0;
-  }
   .otp-title {
     /* margin: 0 40px; */
     line-height: 164%;
@@ -310,9 +308,6 @@
   /* If otp controls is not the first thing in the screen, avoid unnecessary padding */
   .otp-screen-contents:first-child {
     margin-top: 12px;
-  }
-  #otp-elem.compact .help {
-    display: none;
   }
   .security-text {
     background: #fafafa;

@@ -11,7 +11,7 @@
 
 <div class="flow-selection-container">
   <!-- LABEL: Complete Payment Using -->
-  <label>{$t(AUTH_TYPE_HEADER)}</label>
+  <div class="label">{$t(AUTH_TYPE_HEADER)}</div>
   <div class="flow input-radio">
     <input
       type="radio"
@@ -42,7 +42,7 @@
   </div>
 </div>
 
-<style>
+<style lang="css">
   .flow-selection-container {
     margin: 16px 0 8px 0;
     display: flex;
@@ -53,7 +53,7 @@
     flex-grow: 1;
   }
 
-  .flow-selection-container > label {
+  .label {
     text-transform: uppercase;
     color: rgba(0, 0, 0, 0.64);
     font-size: 12px;
