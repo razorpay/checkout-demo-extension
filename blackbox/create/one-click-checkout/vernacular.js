@@ -29,7 +29,7 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout Vernacular test', ({ preferences, title, options }) => {
-    test(title, async () => {
+    test.skip(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,

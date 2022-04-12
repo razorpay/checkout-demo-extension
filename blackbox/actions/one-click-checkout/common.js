@@ -233,10 +233,6 @@ async function proceedOneCC(context) {
   await cta.click();
 }
 
-function generateTestIdSelector(value) {
-  return `[datat-test-id=${value}]`;
-}
-
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -251,5 +247,4 @@ module.exports = {
   scrollToEnd,
   formatTextToNumber,
   proceedOneCC,
-  generateTestIdSelector,
 };
