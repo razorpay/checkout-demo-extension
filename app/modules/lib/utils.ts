@@ -197,11 +197,11 @@ export function getFormattedDateTime(timestamp: number) {
  */
 
 export function debounce(cb: (...args: any) => void, delay: number) {
-  let timeout: NodeJS.Timeout;
+  let timeout: NodeJS.Timeout | number;
   return function (this: any) {
     const context = this;
     const args: any = arguments;
-    clearTimeout(timeout);
+    clearTimeout(timeout as any);
     timeout = setTimeout(cb.bind(context, ...args), delay);
   };
 }
