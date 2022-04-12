@@ -19,7 +19,7 @@
   if (Array.prototype.some) {
     ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(
       function (i) {
-        if (isString(document.documentElement.style[i])) {
+        if (typeof document.documentElement.style[i] === 'string') {
           transitionProperty = i + 'Duration';
           return true;
         }
@@ -32,7 +32,8 @@
   };
 
   var Modal = (window.Modal = function (element, options) {
-    each(defaults, function (key, val) {
+    Object.keys(defaults).forEach(function (key) {
+      var val = defaults[key];
       if (!(key in options)) {
         options[key] = val;
       }
@@ -77,7 +78,9 @@
         self.hidden();
       }, this.animationDuration);
 
-      invoke(this.options.onhide);
+      if (typeof this.options.onhide === 'function') {
+        this.options.onhide();
+      }
     },
 
     handleBackdropClick: function () {
@@ -97,7 +100,9 @@
 
     hidden: function () {
       clearTimeout();
-      invoke(this.options.onhidden);
+      if (typeof this.options.onhidden === 'function') {
+        this.options.onhidden();
+      }
     },
 
     on: function (event, target, callback) {
@@ -148,7 +153,11 @@
         });
       }
 
-      this.on('click', gel('backdrop'), this.handleBackdropClick);
+      this.on(
+        'click',
+        document.getElementById('backdrop'),
+        this.handleBackdropClick
+      );
     },
 
     destroy: function () {

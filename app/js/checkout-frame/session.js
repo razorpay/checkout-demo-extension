@@ -6,32 +6,18 @@
 /* global Razorpay */
 /* global Analytics */
 /* global AnalyticsTypes */
-/* global gel */
 /* global P13n */
 
 // The following are globals from app/js/lib/util
 // These have to be removed while refactoring
 
 /* global Wallet */
-/* global each */
-/* global abortAjax */
-/* global bind */
-/* global isString */
-/* global clone */
-/* global preventDefault */
-/* global qs */
-/* global invoke */
-/* global noop */
-/* global isNonNullObject */
-/* global $$ */
-/* global emo */
-/* global doc */
-/* global now */
-/* global roll */
 
 // from init checkout-frame
 /* global SessionManager */
 /* global templates */
+
+var emo = {};
 
 var ua = navigator.userAgent;
 
@@ -155,7 +141,7 @@ function doesContactHaveValidCharacters(contact) {
 }
 
 function fillData(container, returnObj) {
-  each($(container).find('input[name],select[name]'), function (i, el) {
+  UTILS.each($(container).find('input[name],select[name]'), function (i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
       return;
     }
@@ -319,9 +305,9 @@ function hideOverlayMessage() {
 
     if (
       $('#confirmation-dialog').hasClass('animate') ||
-      gel('options-wrap').children.length
+      docUtil.getElementById('options-wrap').children.length
     ) {
-      makeHidden(gel('error-message'));
+      makeHidden(docUtil.getElementById('error-message'));
     } else {
       hideOverlay($('#error-message'));
     }
@@ -330,7 +316,7 @@ function hideOverlayMessage() {
 
 // this === Session
 function errorHandler(response) {
-  if (isString(response)) {
+  if (_.isString(response)) {
     try {
       response = JSON.parse(response);
     } catch (e) {
@@ -348,7 +334,7 @@ function errorHandler(response) {
    * for which one more level of parsing is required.
    * For web and other cases, error is an object
    */
-  if (isString(error)) {
+  if (_.isString(error)) {
     try {
       error = JSON.parse(error);
     } catch (e) {
@@ -546,7 +532,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
     paymentData = {
       timestamp: Date.now(),
     };
-    if (isNonNullObject(origText) && !origText.error) {
+    if (_.isNonNullObject(origText) && !origText.error) {
       if (thisSession.headless) {
         paymentData.goToBank = origText.redirect;
       }
@@ -578,7 +564,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
       };
     }
   }
-  if (isNonNullObject(textView)) {
+  if (_.isNonNullObject(textView)) {
     textView = textView.error && textView.error.description;
   }
 
@@ -616,7 +602,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
         textView = 'otp_sent_no_phone';
-        if (isNonNullObject(origText)) {
+        if (_.isNonNullObject(origText)) {
           if (origText.metadata) {
             var metadata = origText.metadata;
             thisSession.headlessMetadata = metadata;
@@ -631,7 +617,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
             }
 
             if (bankLogo) {
-              qs('#tab-title').innerHTML =
+              docUtil.querySelector('#tab-title').innerHTML =
                 '<img class="native-otp-bank" src="' +
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
@@ -677,7 +663,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
 
           if (!thisSession.get('timeout')) {
             thisSession.timer = discreet.showTimer(
-              now() + 3 * 60 * 1000,
+              Date.now() + 3 * 60 * 1000,
               function () {
                 thisSession.hideTimer();
                 thisSession.back(true);
@@ -755,14 +741,14 @@ function Session(message) {
   this.set = this.r.set;
   this.tab = this.screen = '';
 
-  each(message, function (key, val) {
+  UTILS.each(message, function (key, val) {
     if (key !== 'options') {
       self[key] = val;
     }
   });
 
   if (this.embedded) {
-    $(doc).addClass('embedded');
+    $(docUtil.documentElement).addClass('embedded');
   }
 
   this.states = Constants.STATES;
@@ -919,7 +905,7 @@ Session.prototype = {
       var valid = true;
       var fields = ['contact', 'email'];
 
-      each(fields, function (optionKey, option) {
+      UTILS.each(fields, function (optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
           errorHandler.call(SessionManager.getSession(), {
@@ -1034,7 +1020,7 @@ Session.prototype = {
          */
         if (
           isActivityRecreated &&
-          now() - pendingPaymentTimestamp <=
+          Date.now() - pendingPaymentTimestamp <=
             Constants.MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
         ) {
           pollUrl = StorageBridge.getString(Constants.UPI_POLL_URL);
@@ -1059,10 +1045,10 @@ Session.prototype = {
           url: pollUrl,
           callback: function (response) {
             if (response.razorpay_payment_id) {
-              invoke(successHandler, self, response);
+              successHandler.call(self, response);
             } else {
               var errorObj = response.error;
-              if (!isNonNullObject(errorObj) && !errorObj.description) {
+              if (!_.isNonNullObject(errorObj) && !errorObj.description) {
                 response = discreet.error('Payment failed');
               }
 
@@ -1097,7 +1083,7 @@ Session.prototype = {
   },
 
   setParamsInStorage: function (params) {
-    each(params, function (key, val) {
+    UTILS.each(params, function (key, val) {
       try {
         StorageBridge.setString(key, val);
       } catch (e) {}
@@ -1252,13 +1238,13 @@ Session.prototype = {
 
   setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
-      target: gel('form-fields'),
+      target: docUtil.getElementById('form-fields'),
     });
   },
 
   setOneClickCheckoutHome: function () {
     this.oneClickCheckoutHome = new discreet.OneClickCheckoutHomeTab({
-      target: gel('form-fields'),
+      target: docUtil.getElementById('form-fields'),
     });
   },
 
@@ -1297,7 +1283,9 @@ Session.prototype = {
     this.setSvelteOverlay();
     this.setFeeLabel();
     // make bottom the last element
-    gel('form-fields').appendChild(gel('bottom'));
+    docUtil
+      .getElementById('form-fields')
+      .appendChild(docUtil.getElementById('bottom'));
   },
 
   // this does not apply if options.timeout was passed
@@ -1512,7 +1500,7 @@ Session.prototype = {
       branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
-        back: bind(function (confirmedCancel) {
+        back: function (confirmedCancel) {
           var payment = self.r._payment;
 
           if (confirmedCancel !== true && payment) {
@@ -1528,7 +1516,7 @@ Session.prototype = {
           }
 
           return true;
-        }, this),
+        }.bind(this),
 
         select: function (value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
@@ -1775,28 +1763,28 @@ Session.prototype = {
   setOtpScreen: function () {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
-        target: gel('form-fields'),
+        target: docUtil.getElementById('form-fields'),
 
         props: {
           addShowableClass: true,
           on: {
-            closeAndDismiss: bind(this.closeAndDismiss, this),
-            chooseMethod: bind(function () {
+            closeAndDismiss: this.closeAndDismiss.bind(this),
+            chooseMethod: function () {
               this.switchTab();
-            }, this),
-            addFunds: bind(this.addFunds, this),
-            resend: bind(this.resendOTP, this),
-            retry: bind(this.back, this),
-            secondary: bind(this.secAction, this),
-            retryWithPaypal: bind(this.retryWithPaypal, this),
-            cancelRetryWithPaypal: bind(function () {
+            }.bind(this),
+            addFunds: this.addFunds.bind(this),
+            resend: this.resendOTP.bind(this),
+            retry: this.back.bind(this),
+            secondary: this.secAction.bind(this),
+            retryWithPaypal: this.retryWithPaypal.bind(this),
+            cancelRetryWithPaypal: function () {
               this.back();
               Analytics.track('paypal_retry:cancel_click', {
                 data: {
                   currentScreen: this.screen,
                 },
               });
-            }, this),
+            }.bind(this),
           },
         },
       });
@@ -1834,10 +1822,10 @@ Session.prototype = {
         onhide: function () {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
-        onhidden: bind(function () {
+        onhidden: function () {
           this.saveAndClose();
           Razorpay.sendMessage({ event: 'hidden' });
-        }, this),
+        }.bind(this),
       });
     }
   },
@@ -1953,7 +1941,7 @@ Session.prototype = {
         style.appendChild(document.createTextNode(rules));
       }
     } catch (e) {
-      roll('renderCss', e);
+      // error {e}
     }
     return style;
   },
@@ -2065,8 +2053,8 @@ Session.prototype = {
   on: function (event, selector, delegateClass, listener, useCapture) {
     var listeners = this.listeners;
     if (!listener || listener === true) {
-      each(
-        $$(selector),
+      UTILS.each(
+        docUtil.querySelectorAll(selector),
         function (i, element) {
           listeners.push($(element).on(event, delegateClass, listener, this));
         },
@@ -2087,7 +2075,9 @@ Session.prototype = {
 
               if ($(target).hasClass(delegateClass)) {
                 e.delegateTarget = target;
-                invoke(listener, self, e);
+                if (_.isFunction(listener)) {
+                  listener.call(self, e);
+                }
                 break;
               }
               target = target.parentNode;
@@ -2205,7 +2195,7 @@ Session.prototype = {
     }
   },
 
-  addFunds: function (event) {
+  addFunds: function () {
     Analytics.track('wallet:balance:add', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2518,7 +2508,7 @@ Session.prototype = {
     }
 
     var value = el.value;
-    var required = isString(el.getAttribute('required'));
+    var required = _.isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
     var $parent = $(el.parentNode);
 
@@ -2544,9 +2534,12 @@ Session.prototype = {
 
   refresh: function () {
     var self = this;
-    each($$('.input:not(.no-refresh)'), function (i, el) {
-      self.input(el);
-    });
+    UTILS.each(
+      docUtil.querySelectorAll('.input:not(.no-refresh)'),
+      function (i, el) {
+        self.input(el);
+      }
+    );
   },
 
   setFormatting: function () {
@@ -2555,7 +2548,7 @@ Session.prototype = {
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
     delegator.otp = delegator
-      .add('number', gel('otp'))
+      .add('number', docUtil.getElementById('otp'))
       .on('change', function () {
         self.input(this.el);
       });
@@ -2599,10 +2592,10 @@ Session.prototype = {
 
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
-        target: qs('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
         props: {
           paymentData: this.getFormData(),
-          onSuccess: bind(successHandler, this),
+          onSuccess: successHandler.bind(this),
         },
       });
     } else if (this.currentScreen) {
@@ -2661,9 +2654,10 @@ Session.prototype = {
      *
      * Temp check, will be fixed when old homescreen is removed.
      */
+    var invalidInput = docUtil.querySelector(screenEl + ' .invalid input');
     if (screen === '') {
-      if (this.homeTab && this.homeTab.onDetailsScreen()) {
-        invoke('focus', qs(screenEl + ' .invalid input'));
+      if (this.homeTab && this.homeTab.onDetailsScreen() && invalidInput) {
+        invalidInput.focus();
       }
     } else if (
       !(
@@ -2678,9 +2672,10 @@ Session.prototype = {
           appliedOffer &&
           appliedOffer.issuer === 'cred' &&
           this.tab === appliedOffer.payment_method
-        )
+        ) &&
+        invalidInput
       ) {
-        invoke('focus', qs(screenEl + ' .invalid input'));
+        invalidInput.focus();
       }
     }
 
@@ -3454,13 +3449,13 @@ Session.prototype = {
       },
       contactRequiredForEMI: contactRequiredForEMI,
       on: {
-        back: bind(function () {
+        back: function () {
           self.switchTab(prevTab);
           self.setScreen(prevScreen);
           self.svelteCardTab.showAddCardView();
 
           return true;
-        }),
+        },
 
         payWithoutEmi: function () {
           Analytics.track('emi:pay_without', {
@@ -3768,7 +3763,7 @@ Session.prototype = {
         },
       });
 
-      each(invalids, function (i, field) {
+      UTILS.each(invalids, function (i, field) {
         $(field).addClass('mature');
       });
       return true;
@@ -3816,7 +3811,7 @@ Session.prototype = {
       }
 
       // Delete all the auth_type-* keys
-      each(data, function (key, val) {
+      UTILS.each(data, function (key, val) {
         if (key.indexOf('auth_type-') === 0) {
           delete data[key];
         }
@@ -3847,7 +3842,7 @@ Session.prototype = {
           upiData = this.upiTab.getPayload();
         }
 
-        each(upiData, function (key, value) {
+        UTILS.each(upiData, function (key, value) {
           data[key] = value;
         });
       }
@@ -3987,14 +3982,12 @@ Session.prototype = {
     });
 
     if (!action) {
-      invoke(
+      setTimeout(
         function () {
           if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
             Cta.showVerify();
           }
-        },
-        this,
-        null,
+        }.bind(this),
         200
       );
     }
@@ -4278,7 +4271,7 @@ Session.prototype = {
       }
       this.getCurrentCustomer().submitOTP(
         submitPayload,
-        bind(callback, this),
+        callback.bind(this),
         queryParams
       );
     } else {
@@ -4293,7 +4286,7 @@ Session.prototype = {
 
   clearRequest: function (extra) {
     this.hideTimer();
-    var powerotp = gel('powerotp');
+    var powerotp = docUtil.getElementById('powerotp');
     if (powerotp) {
       powerotp.value = '';
     }
@@ -4319,7 +4312,7 @@ Session.prototype = {
     params[Constants.PENDING_PAYMENT_TS] = '0';
     this.setParamsInStorage(params);
 
-    abortAjax(this.ajax);
+    UTILS.abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -4399,7 +4392,10 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function (e, payload) {
-    preventDefault(e);
+    if (e instanceof Event) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
     var cta = docUtil.querySelector('#footer-cta + span');
@@ -5684,9 +5680,9 @@ Session.prototype = {
 
     var payment = this.r.createPayment(data, request);
     payment
-      .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this))
-      .on('payment.cancel', bind(cancelHandler, this));
+      .on('payment.success', successHandler.bind(this))
+      .on('payment.error', errorHandler.bind(this))
+      .on('payment.cancel', cancelHandler.bind(this));
 
     if (data.method === 'wallet' && isDynamicWalletFlow) {
       /**
@@ -5760,7 +5756,7 @@ Session.prototype = {
       });
       this.r.on(
         'payment.wallet.topup',
-        bind(function () {
+        function () {
           Analytics.track('wallet:balance:insufficient', {
             data: {
               wallet: this.payload && this.payload.wallet,
@@ -5785,7 +5781,7 @@ Session.prototype = {
             addFunds: true,
           });
           this.otpView.setTextView('wallet_insufficient_balance');
-        }, this)
+        }.bind(this)
       );
     } else if (data.method === 'upi') {
       sub_link.html(I18n.format('misc.cancel_action'));
@@ -5803,7 +5799,7 @@ Session.prototype = {
       this.r.on('payment.upi.coproto_response', function (response) {
         var params = {};
         params[Constants.UPI_POLL_URL] = response.request.url;
-        params[Constants.PENDING_PAYMENT_TS] = now() + '';
+        params[Constants.PENDING_PAYMENT_TS] = Date.now() + '';
         that.setParamsInStorage(params);
 
         /**
@@ -5910,7 +5906,7 @@ Session.prototype = {
       }
       if (RazorpayHelper.isRecurring()) {
         var recurringValue = this.get('recurring');
-        data.recurring = isString(recurringValue) ? recurringValue : 1;
+        data.recurring = _.isString(recurringValue) ? recurringValue : 1;
       }
     }
 
@@ -6016,7 +6012,7 @@ Session.prototype = {
 
       var cancelReason = this.getCancelReason();
 
-      abortAjax(this.ajax);
+      UTILS.abortAjax(this.ajax);
       this.clearRequest(cancelReason);
       this.isOpen = false;
 
@@ -6067,7 +6063,7 @@ Session.prototype = {
 
   showNoCostExplainer: function (plan) {
     this.nocostModal = new discreet.NoCostExplainer({
-      target: gel('nocost-overlay'),
+      target: docUtil.getElementById('nocost-overlay'),
       props: {
         plan: plan,
         formatter: this.formatAmountWithCurrency.bind(this),
@@ -6122,7 +6118,7 @@ Session.prototype = {
       };
       var session = this;
       this.offers = new discreet.OffersView({
-        target: gel('bottom'),
+        target: docUtil.getElementById('bottom'),
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function (offer, shouldNavigate) {

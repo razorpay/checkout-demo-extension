@@ -107,6 +107,13 @@ gulp.task('uglify', (done) => {
 
     jshint(fileContents, jshintOptions);
 
+    /**
+     * using spread operator in typescript causing issue __spreadArray has bug where
+     * they don't declare ar properly
+     */
+    jshint.errors = jshint.errors?.filter(
+      (x) => x.reason !== "'ar' used out of scope."
+    );
     if (jshint.errors.length > 0) {
       jshintStylish(jshint.errors.map((error) => ({ file, error })));
       throw 'Jshint failed';
