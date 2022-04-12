@@ -3,7 +3,7 @@ import AvailableCoupons from 'one_click_checkout/coupons/ui/AvailableCoupons.sve
 import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
 import { hideToast } from 'one_click_checkout/Toast';
 import { showBackdrop } from 'checkoutstore/backdrop';
-import { Events } from 'analytics';
+import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { hideCta } from 'checkoutstore/cta';
 import { activeRoute } from 'one_click_checkout/routing/store';
@@ -124,6 +124,8 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
  * @param {function} callback
  */
 export function removeCouponCode(callback) {
+  Analytics.removeMeta('coupon_code');
+  Analytics.removeMeta('is_coupon_valid');
   hideToast();
   const index = get(couponRemovedIndex) + 1;
   couponRemovedIndex.set(index);

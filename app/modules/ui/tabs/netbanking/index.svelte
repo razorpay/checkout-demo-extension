@@ -294,6 +294,10 @@
         },
       });
 
+      Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
+        bank_selected: bankCode,
+      });
+
       dispatch('bankSelected', {
         bank: {
           code: bankCode,
@@ -469,9 +473,6 @@
       component={BankSearchItem}
       on:close={hideSearch}
       on:select={({ detail }) => {
-        Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
-          bank_selected: detail.code,
-        });
         $selectedBank = detail.code;
         hideSearch();
       }}

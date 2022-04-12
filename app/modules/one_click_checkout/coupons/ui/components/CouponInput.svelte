@@ -66,6 +66,7 @@
       Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
         meta: {
           coupon_code: $couponInputValue,
+          chosen_coupon_available: 0,
         },
       });
     }

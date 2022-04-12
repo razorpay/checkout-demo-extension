@@ -12,6 +12,7 @@ import { Events } from 'analytics';
 import AddressEvents from 'one_click_checkout/address/analytics';
 
 // utils import
+import { SOURCE } from 'one_click_checkout/address/constants';
 import { makeUrl } from 'common/helper';
 import { getOrderId } from 'razorpay';
 import { timer } from 'utils/timer';
@@ -72,11 +73,11 @@ export function getCityState(pincode, country) {
           });
 
           Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
-            is_prefilled: 1,
+            is_prefilled: SOURCE.PREFILLED,
           });
 
           Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
-            is_prefilled: 1,
+            is_prefilled: SOURCE.PREFILLED,
           });
 
           Events.TrackMetric(AddressEvents.CITY_STATE_END_V2);

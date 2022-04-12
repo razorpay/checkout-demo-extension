@@ -43,6 +43,7 @@
   // const import
   import {
     ADDRESS_TYPES,
+    SOURCE,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
@@ -284,7 +285,7 @@
   function handleCountrySelect(name, iso) {
     if (!$formData?.zipCode) {
       Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
-        is_prefilled: 1,
+        is_prefilled: SOURCE.PREFILLED,
       });
     }
     // show number keypad for pincode if country is India

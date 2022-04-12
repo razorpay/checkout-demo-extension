@@ -112,3 +112,9 @@ export const SERVICEABILITY_STATUS = {
   CHECKED: 'checked',
   LOADING: 'loading',
 };
+
+export const SOURCE = {
+  ENTERED_BEFORE_AUTOCOMPLETE: 'entered_before_autocomplete', // 0
+  PREFILLED: 'prefilled', // 1
+  OVERIDDEN: 'overidden', // 2
+};

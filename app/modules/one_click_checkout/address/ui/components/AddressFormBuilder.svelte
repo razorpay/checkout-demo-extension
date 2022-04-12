@@ -23,7 +23,7 @@
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   // constant imports
-  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
+  import { ADDRESS_TYPES, SOURCE } from 'one_click_checkout/address/constants';
   import Address from 'ui/elements/address.svelte';
 
   export let INPUT_FORM;
@@ -66,14 +66,16 @@
       if (['city', 'state'].includes(id)) {
         data = {
           meta: { [id]: fieldData },
-          is_prefilled: formData?.zipcode ? 2 : 0,
+          is_prefilled: formData?.zipcode
+            ? SOURCE.OVERIDDEN
+            : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
         };
       }
 
       if (id === 'country_name') {
         data = {
-          [id]: fieldData,
-          is_prefilled: 2,
+          country: fieldData,
+          is_prefilled: SOURCE.OVERIDDEN,
         };
       }
 
@@ -99,7 +101,7 @@
     }
 
     Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
-      is_prefilled: 1,
+      is_prefilled: SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
     });
   });
 

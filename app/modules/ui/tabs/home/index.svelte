@@ -121,7 +121,7 @@
     showNext,
   } from 'checkoutstore/cta';
 
-  import {
+  import Analytics, {
     P13NEvents,
     OrderEvents,
     Events,
@@ -129,6 +129,7 @@
     MetaProperties,
     MiscEvents,
   } from 'analytics';
+  import * as MetaPropertiesOneCC from 'one_click_checkout/analytics/metaProperties';
   import { intentVpaPrefill } from 'checkoutstore/screens/upi';
 
   import updateScore from 'analytics/checkoutScore';
@@ -747,6 +748,7 @@
   }
 
   export function codActions() {
+    Analytics.setMeta(MetaPropertiesOneCC.IS_COD_ENABLED, $isCodAvailable);
     if (isOneCCEnabled && getMerchantOffers()?.length) {
       showMethodOffers.set(true);
     }
