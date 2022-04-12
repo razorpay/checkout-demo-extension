@@ -11,7 +11,6 @@ if (process.env.NODE_ENV === 'dev') {
       watch: [
         'app/js/generated',
         'app/css/generated',
-        'app/templates',
         'app/index.html',
         'app/checkout.html',
         'app/custom.html',

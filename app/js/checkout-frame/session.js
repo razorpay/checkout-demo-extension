@@ -31,7 +31,6 @@
 
 // from init checkout-frame
 /* global SessionManager */
-/* global templates */
 
 var ua = navigator.userAgent;
 
