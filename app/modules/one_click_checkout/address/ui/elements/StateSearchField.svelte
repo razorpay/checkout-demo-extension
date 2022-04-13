@@ -10,6 +10,7 @@
     STATE_SEARCH_PLACEHOLDER,
   } from 'one_click_checkout/address/i18n/labels';
   import { truncateString } from 'utils/strings';
+  import { createEventDispatcher } from 'svelte';
 
   export let items = [];
   export let onChange;
@@ -22,6 +23,7 @@
   let stateField;
   let id = 'state';
 
+  const dispatch = createEventDispatcher();
   const searchIdentifier = `state_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
 
   function openStateModal(event) {
@@ -62,7 +64,8 @@
   {id}
   name="state"
   autocomplete="off"
-  value={truncateString(stateName, 12)}
+  value={stateName}
+  displayValue={truncateString(stateName, 12)}
   on:click={openStateModal}
   on:keydown={downArrowHandler}
   required

@@ -24,7 +24,6 @@
   import AddressEvents from 'one_click_checkout/address/analytics';
   // constant imports
   import { ADDRESS_TYPES, SOURCE } from 'one_click_checkout/address/constants';
-  import Address from 'ui/elements/address.svelte';
 
   export let INPUT_FORM;
   export let formData;
@@ -63,7 +62,7 @@
     if (!fieldError) {
       let data = {};
 
-      if (['city', 'state'].includes(id)) {
+      if ('city' === id) {
         data = {
           meta: { [id]: fieldData },
           is_prefilled: formData?.zipcode
@@ -71,11 +70,16 @@
             : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
         };
       }
-
       if (id === 'country_name') {
         data = {
           country: fieldData,
           is_prefilled: SOURCE.OVERIDDEN,
+        };
+      }
+
+      if (id === 'zipcode') {
+        data = {
+          pincode: fieldData,
         };
       }
 

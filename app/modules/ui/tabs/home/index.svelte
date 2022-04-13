@@ -129,7 +129,7 @@
     MetaProperties,
     MiscEvents,
   } from 'analytics';
-  import * as MetaPropertiesOneCC from 'one_click_checkout/analytics/metaProperties';
+  import MetaPropertiesOneCC from 'one_click_checkout/analytics/metaProperties';
   import { intentVpaPrefill } from 'checkoutstore/screens/upi';
 
   import updateScore from 'analytics/checkoutScore';

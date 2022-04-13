@@ -423,6 +423,15 @@
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
+                Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { city: res[value].city },
+                });
+
+                Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { state: res[value].state },
+                });
                 onUpdate('city', toTitleCase(res[value].city) || '');
                 onUpdate('state', toTitleCase(res[value].state) || '');
               }
@@ -508,6 +517,15 @@
 
     if (key === 'contact' && pinIndex !== -1) {
       changePincodeStateLabel();
+    }
+
+    if (key === 'state' && value) {
+      Events.TrackBehav(AddressEvents[`INPUT_ENTERED_${key}_V2`], {
+        meta: { [key]: value },
+        is_prefilled: $formData?.zipcode
+          ? SOURCE.OVERIDDEN
+          : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+      });
     }
 
     dispatch('formCompletion', {

@@ -67,20 +67,10 @@ export function getCityState(pincode, country) {
           });
 
           Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
-            response_time: cityStateApiTimer,
+            response_time: cityStateApiTimer(),
             city: response?.city,
             state: response?.state,
           });
-
-          Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
-            is_prefilled: SOURCE.PREFILLED,
-          });
-
-          Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
-            is_prefilled: SOURCE.PREFILLED,
-          });
-
-          Events.TrackMetric(AddressEvents.CITY_STATE_END_V2);
 
           hideLoaderView();
           if (response.error) {
@@ -98,6 +88,13 @@ export function getCityState(pincode, country) {
       hideLoaderView();
       resolve(cachedAddress);
     }
+    Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+      is_prefilled: SOURCE.PREFILLED,
+    });
+
+    Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+      is_prefilled: SOURCE.PREFILLED,
+    });
   });
 }
 
