@@ -1,5 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
-import ErrorService from 'error-service';
+import * as ErrorService from 'error-service';
 
 const cdnUrl = RazorpayConfig.cdn;
 

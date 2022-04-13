@@ -6,6 +6,7 @@ import 'payment';
 import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
+import { startErrorCapturing } from 'error-service';
 
 Track.props.library = 'checkoutjs';
 
@@ -14,3 +15,5 @@ if (trafficEnv) {
   Track.props.env = trafficEnv;
 }
 RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
+
+startErrorCapturing();
