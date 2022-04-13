@@ -77,7 +77,7 @@
 <style>
   .one-cc-cta-wrapper {
     width: 70%;
-    min-width: 70%;
+    max-width: 70%;
     margin-left: auto;
     position: relative;
   }
