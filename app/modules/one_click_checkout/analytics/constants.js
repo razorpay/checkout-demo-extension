@@ -33,3 +33,8 @@ export const SCREEN_LIST = {
   [EMI_PLANS]: 'payment_l1_screen',
   [NETBANKING]: 'payment_l1_screen',
 };
+
+export const CLOSE_MODAL_OPTIONS = {
+  POSITIVE: 'yes',
+  NEGATIVE: 'no',
+};
