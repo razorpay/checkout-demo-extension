@@ -1294,27 +1294,10 @@
     flex-direction: column;
   }
 
-  .secured-message {
-    display: flex;
-    align-items: center;
-    padding: 12px 0 12px 24px;
-    font-size: 13px;
-    color: rgba(51, 51, 51, 0.6);
-  }
-  i {
-    margin-right: 8px;
-    position: relative;
-    top: 2px;
-  }
-
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
     margin-top: 28px;
-  }
-
-  .home-methods-oneclickcheckout {
-    margin-top: 68px;
   }
 
   .details-container {
@@ -1347,10 +1330,6 @@
     margin-left: 8px;
     padding-left: 8px;
     border-left: solid 1px #757575;
-  }
-
-  .details-strip {
-    display: flex;
   }
 
   :global(#user-details) {

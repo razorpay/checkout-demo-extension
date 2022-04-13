@@ -149,7 +149,7 @@
       });
     } else {
       if (!$selectedAddressId) {
-        alert('Please Select the address');
+        window.alert('Please Select the address');
         return;
       }
     }

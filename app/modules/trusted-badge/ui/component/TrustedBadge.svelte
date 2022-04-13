@@ -154,9 +154,6 @@
     margin-left: 9px;
     position: relative;
   }
-  .trusted-badge-header-labels > span {
-    font-size: 11px;
-  }
   .trusted-badge-arrow {
     float: right;
     cursor: pointer;

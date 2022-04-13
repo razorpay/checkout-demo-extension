@@ -1,4 +1,5 @@
 import { getSession } from 'sessionmanager';
+import { views } from 'one_click_checkout/routing/constants';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import { isOneClickCheckout } from 'razorpay/helper';
