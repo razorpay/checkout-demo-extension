@@ -1045,7 +1045,7 @@ Session.prototype = {
           url: pollUrl,
           callback: function (response) {
             if (response.razorpay_payment_id) {
-              successHandler.call(self, response);
+              self.successHandler(response);
             } else {
               var errorObj = response.error;
               if (!_.isNonNullObject(errorObj) && !errorObj.description) {
@@ -1516,7 +1516,7 @@ Session.prototype = {
           }
 
           return true;
-        }.bind(this),
+        },
 
         select: function (value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
@@ -4286,10 +4286,6 @@ Session.prototype = {
 
   clearRequest: function (extra) {
     this.hideTimer();
-    var powerotp = docUtil.getElementById('powerotp');
-    if (powerotp) {
-      powerotp.value = '';
-    }
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
