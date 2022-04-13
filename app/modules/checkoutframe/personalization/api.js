@@ -1,6 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
+import { getCustomerCountryISOCode } from 'checkoutstore/screens/home';
 
 import { getAmount } from 'razorpay';
 import { setTrustedBadgeVariant } from 'trusted-badge/helper';
@@ -97,6 +98,7 @@ function getInstrumentsFromApi(customer) {
   const url = _.appendParamsToUrl(makeAuthUrl(session.r, 'personalisation'), {
     contact: customer.contact,
     amount: getAmount(),
+    country_code: getCustomerCountryISOCode().toLocaleLowerCase(),
   });
 
   const p13nFetchStart = new Date();
