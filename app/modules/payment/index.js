@@ -281,7 +281,7 @@ export default function Payment(data, params = {}, r) {
           avoidPopup = false;
         } else if (!data.contact) {
           avoidPopup = false;
-        } else if (shouldRedirectZestMoney()) {
+        } else if (data.provider === 'zestmoney' && shouldRedirectZestMoney()) {
           avoidPopup = false;
         } else {
           if (data.emi_duration) {
