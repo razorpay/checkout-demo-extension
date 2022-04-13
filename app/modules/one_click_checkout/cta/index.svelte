@@ -17,6 +17,9 @@
   import { Events } from 'analytics';
   import CTAEvents from 'one_click_checkout/cta/analytics';
 
+  // util imports
+  import * as _El from 'utils/DOM';
+
   // Props
   export let hidden = false;
   export let disabled = false;
