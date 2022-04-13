@@ -1,7 +1,7 @@
 import { displayCurrencies } from 'common/currency';
 import { isIRCTC, getOption } from 'razorpay';
 import { getSession } from 'sessionmanager';
-import { internetExplorer, AndroidWebView } from 'common/useragent';
+import { AndroidWebView } from 'common/useragent';
 
 export function getAmount(): string {
   const amount = getOption('amount');
@@ -26,6 +26,6 @@ export function getAmount(): string {
  * state in the browser, so we're doing this based on merchants.
  */
 export function disableAnimation(): boolean {
-  const irctcWebview = AndroidWebView || isIRCTC();
-  return internetExplorer || irctcWebview || !getOption('modal.animation');
+  const irctcWebview = AndroidWebView && isIRCTC();
+  return irctcWebview || !getOption('modal.animation');
 }

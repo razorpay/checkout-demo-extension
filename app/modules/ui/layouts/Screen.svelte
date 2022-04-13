@@ -9,7 +9,6 @@
   // Refs
   let contentRef;
 
-  let topShadow = false;
   let bottomShadow = false;
 
   /**
@@ -36,17 +35,8 @@
         // We've scrolled to the bottom
         bottomShadow = false;
       }
-
-      if (scrollTop >= threshold) {
-        // Content hidden on the top
-        topShadow = true;
-      } else {
-        // We've scrolled to the top
-        topShadow = false;
-      }
     } else {
       // Content doesn't overflow, no need for shadows
-      topShadow = false;
       bottomShadow = false;
     }
   }
@@ -81,10 +71,6 @@
   }
 
   /* @TODO */
-  .screen-bottom:not(.noShadow) > :global([slot='bottom']:not(:empty)) {
-    box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
-  }
-
   .shadow {
     position: absolute;
     transition: max-height 0.3s cubic-bezier(0.14, 1.12, 0.44, 0.93);
@@ -120,10 +106,6 @@
       rgba(255, 255, 255, 0) 100%
     );
     /* background: linear-gradient(0deg, rgba(255,255,255,0.8477766106442577) 0%, rgba(255,255,255,0.8309698879551821) 51%, rgba(255,255,255,0.43881302521008403) 82%, rgba(255,255,255,0) 100%); */
-  }
-
-  .topShadow ~ .shadow-top {
-    max-height: 24px;
   }
 
   .bottomShadow ~ .shadow-bottom {

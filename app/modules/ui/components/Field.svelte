@@ -304,7 +304,7 @@
     </i>
   {/if}
   {#if leftImage}
-    <img class="left-img" src={leftImage} />
+    <img alt="left-img" class="left-img" src={leftImage} />
   {/if}
   <input
     class="input main"
@@ -360,7 +360,7 @@
       class="input prediction-input"
     />
   {/if}
-  {#if label}<label class={labelClasses}>{label}</label>{/if}
+  {#if label}<label for={identifier} class={labelClasses}>{label}</label>{/if}
   {#if extraLabel}
     <div class={`${extraLabelClass} input-extralabel`}>
       {$t(extraLabel)}

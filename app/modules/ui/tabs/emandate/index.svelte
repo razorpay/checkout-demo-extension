@@ -495,24 +495,6 @@
     color: #777;
   }
 
-  #emandate-options .auth-option.disabled {
-    color: #80859b;
-    background: #efefef;
-    cursor: not-allowed;
-  }
-
-  #emandate-options .auth-option.disabled .desc {
-    display: none;
-  }
-
-  #emandate-options .auth-option.disabled:hover label {
-    background: #efefef;
-  }
-
-  #emandate-options .auth-option.disabled .theme {
-    color: #80859b;
-  }
-
   .emandate-auth-selection {
     padding-top: 12px;
   }

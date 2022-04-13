@@ -298,9 +298,6 @@
 </Tab>
 
 <style>
-  .loading {
-    text-align: center;
-  }
   .bank_transfer-container {
     padding: 15px 0;
     font-size: 13px;
@@ -356,8 +353,5 @@
     text-align: left;
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
-  }
-  .challan-wrapper {
-    display: none;
   }
 </style>
