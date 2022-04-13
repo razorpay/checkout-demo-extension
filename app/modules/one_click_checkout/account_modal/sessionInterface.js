@@ -1,12 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
-export function getSessionTab() {
-  const session = getSession();
-
-  return session.tab;
-}
-
 export function handleLogout() {
   const session = getSession();
 
