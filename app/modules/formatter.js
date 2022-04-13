@@ -252,7 +252,6 @@ Formatter.rules = {
       return this.oldValue || value;
     },
     pretty: function (value) {
-      debugger;
       this.oldValue = value;
       return truncateString(value, 12);
     },
