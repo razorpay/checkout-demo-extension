@@ -56,7 +56,7 @@ import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
 import { showSummaryModal } from 'one_click_checkout/summary_modal';
-import { getCurrentScreen } from './analytics/helpers';
+import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
 export const historyExists = () => get(history).length;
 
