@@ -19,9 +19,11 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let snackBar;
   let shown = true;
 

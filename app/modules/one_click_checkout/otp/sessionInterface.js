@@ -1,5 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { resendTimeout } from 'checkoutstore/screens/otp';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 export function isWalletPayment() {
   const session = getSession();
@@ -30,7 +31,6 @@ export function startResendCountdown() {
 }
 
 export function getTheme() {
-  const session = getSession();
-
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 }
