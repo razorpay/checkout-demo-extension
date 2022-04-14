@@ -5,7 +5,12 @@
   //Store imports
   import { showFeeLabel } from 'checkoutstore';
 
-  import { getAmount, getOption, isCustomerFeeBearer } from 'razorpay';
+  import {
+    getAmount,
+    getOption,
+    getOrderId,
+    isCustomerFeeBearer,
+  } from 'razorpay';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -78,7 +83,7 @@
 
   let copied = false;
   const session = getSession();
-  const order_id = getOption('order_id');
+  const order_id = getOrderId();
   const customerFeeBearerFlag = isCustomerFeeBearer();
 
   function getPayloadForVirtualAccounts() {

@@ -1,5 +1,4 @@
 import { setupPreferences } from 'tests/setupPreferences';
-import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 
 // testable module
@@ -14,15 +13,6 @@ const razorpayInstance = {
   get: (arg) => arg,
   getMode: () => 'test',
 };
-
-jest.mock('sessionmanager', () => {
-  return {
-    getSession: () => ({
-      get: jest.fn(),
-      r: razorpayInstance,
-    }),
-  };
-});
 
 global.fetch = {
   post: jest.fn((options) => {
@@ -43,8 +33,7 @@ describe('Test createVirtualAccount', () => {
   });
 
   test('Should create virtual account', async () => {
-    const session = getSession();
-    createVirtualAccount(session, 'test_orderId').then((response) => {
+    createVirtualAccount('test_orderId').then((response) => {
       expect(response).toStrictEqual({
         name: 'virtual accounts',
       });

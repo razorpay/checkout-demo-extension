@@ -22,6 +22,7 @@ import {
   isCustomerFeeBearer,
   isPartialPayment,
   isOneClickCheckout,
+  getOrderId,
 } from 'razorpay';
 
 import {
@@ -267,7 +268,7 @@ const ALL_METHODS = {
       !isInternational() &&
       getOption('method.bank_transfer') &&
       partialPaymentCheck &&
-      getOption('order_id')
+      getOrderId()
     );
   },
 
@@ -278,7 +279,7 @@ const ALL_METHODS = {
       getAmount() &&
       getMerchantMethods().offline &&
       getOption('method.offline_challan') &&
-      getOption('order_id')
+      getOrderId()
     );
   },
 

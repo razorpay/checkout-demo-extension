@@ -1,6 +1,7 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import { appendParamsToUrl } from 'common/form';
 import { Track } from 'analytics';
+import { getOption } from 'razorpay';
 
 export function isStandardCheckout() {
   return ['checkoutjs', 'hosted'].includes(Track.props.library);
@@ -62,20 +63,19 @@ export const backendEntityIds = [
   'contact_id',
   'checkout_config_id',
 ];
-
+// TODO remove first param from usage of makeAuthUrl
 export function makeAuthUrl(r, url) {
   url = makeUrl(url);
-
   for (var i = 0; i < backendEntityIds.length; i++) {
     var prop = backendEntityIds[i];
-    var value = r.get(prop);
+    var value = getOption(prop);
     if (prop === 'key') {
       prop = 'key_id';
     } else {
       prop = 'x_entity_id';
     }
     if (value) {
-      var account_id = r.get('account_id');
+      var account_id = getOption('account_id');
       if (account_id) {
         value += '&account_id=' + account_id;
       }

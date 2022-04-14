@@ -6,7 +6,7 @@ import {
 
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
-import { returnAsIs, toTitleCase } from 'lib/utils';
+import { returnAsIs } from 'lib/utils';
 import { submitForm } from 'common/form';
 
 import { Track } from 'analytics';
@@ -39,6 +39,7 @@ import { shouldRedirectZestMoney } from 'common/emi';
 import { popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
+import { getOption, getOrderId } from 'razorpay';
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -380,8 +381,6 @@ Payment.prototype = {
   },
 
   checkRedirect: function () {
-    var getOption = this.r.get;
-
     if (!this.iframe && getOption('redirect')) {
       var data = this.data;
       // add callback_url if redirecting
@@ -449,7 +448,7 @@ Payment.prototype = {
       }, 100);
     }
 
-    if (this.shouldPopup() && !this.popup && this.r.get('callback_url')) {
+    if (this.shouldPopup() && !this.popup && getOption('callback_url')) {
       this.r.set('redirect', true);
     }
 
@@ -494,17 +493,17 @@ Payment.prototype = {
     // for iframe mode manually handle redirect flow
     if (
       this.forceIframeElement &&
-      this.r.get('redirect') &&
-      this.r.get('callback_url')
+      getOption('redirect') &&
+      getOption('callback_url')
     ) {
-      const url = this.r.get('callback_url');
+      const url = getOption('callback_url');
       const doc = window?.parent?.document || window.document;
       submitForm({
         doc,
         path: url,
         params: data,
         method: 'POST',
-        target: this.r.get('target') || '_top',
+        target: getOption('target') || '_top',
       });
       return;
     }
@@ -767,7 +766,7 @@ Payment.prototype = {
   },
 
   gotoBankUsingUrl: function () {
-    if (this.r.get('redirect')) {
+    if (getOption('redirect')) {
       // For redirect mode where we do not have a popup, redirect using POST
       this.redirect({ url: this.gotoBankUrl, method: 'post' });
     } else {
@@ -855,7 +854,7 @@ Payment.prototype = {
       return false;
     }
 
-    return !(this.r.get('redirect') || this.avoidPopup);
+    return !(getOption('redirect') || this.avoidPopup);
   },
 
   tryPopup: function () {
@@ -868,8 +867,8 @@ Payment.prototype = {
     const metadata = {};
     if (this.payment_id) {
       metadata.payment_id = this.payment_id;
-      if (this.r.get('order_id')) {
-        metadata.order_id = this.r.get('order_id');
+      if (getOrderId()) {
+        metadata.order_id = getOrderId();
       }
       return metadata;
     }

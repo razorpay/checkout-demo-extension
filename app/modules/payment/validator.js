@@ -3,6 +3,7 @@ import { flattenProp } from 'common/options';
 import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
+import { getOption, getOrderId } from 'razorpay';
 
 export const formatPayment = function (payment) {
   let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
@@ -15,7 +16,7 @@ export const formatPayment = function (payment) {
     {}
   );
 
-  payment.data = formatPayload(payment.data, payment.r, params);
+  payment.data = formatPayload(payment.data, params);
   validateData(payment.data);
 };
 
@@ -29,16 +30,14 @@ function validateData(data) {
   }
 }
 
-export const formatPayload = function (payload, razorpayInstance, params = {}) {
+export const formatPayload = function (payload, params = {}) {
   var data = _Obj.clone(payload);
 
   // Set view for fees.
   if (params.feesRedirect) {
     data.view = 'html';
   }
-
   // fill data from options if empty
-  var getOption = razorpayInstance.get;
 
   [
     'amount',
@@ -58,7 +57,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'recurring_token.expire_by',
   ].forEach((field) => {
     if (!data.hasOwnProperty(field)) {
-      var val = getOption(field);
+      var val = field === 'order_id' ? getOrderId() : getOption(field);
       if (val) {
         // send boolean value true as 1
         // 0 wouldn't react this line
@@ -94,7 +93,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'integration_parent_version',
   ];
   integrationKeys.forEach((key) => {
-    const value = razorpayInstance.get(`_.${key}`);
+    const value = getOption(`_.${key}`);
     if (value) {
       data[`_[${key}]`] = value;
     }

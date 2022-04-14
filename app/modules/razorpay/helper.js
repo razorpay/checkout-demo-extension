@@ -227,8 +227,11 @@ export function isContactEmailHidden() {
 }
 /**
  * order related
+ * // set orderid as it is required while creating payments
+ * // if invoice then pick order Id from preference else from option
  */
-export const getOrderId = getOptionCurry('order_id');
+export const getOrderId = () =>
+  getPreferences('invoice.order_id') || getOption('order_id');
 
 /**
  * prefill related
