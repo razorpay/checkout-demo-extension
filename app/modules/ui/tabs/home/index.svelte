@@ -984,10 +984,7 @@
   }
 
   $: {
-    if (
-      view === HOME_VIEWS.METHODS &&
-      $activeRoute?.name === HOME_VIEWS.METHODS
-    ) {
+    if (view === HOME_VIEWS.METHODS) {
       $customer = session.getCustomer($contact);
     }
   }

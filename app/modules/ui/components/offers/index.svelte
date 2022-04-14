@@ -181,11 +181,11 @@
       selected = $appliedOffer;
     }
 
-    renderCtaOneCC = true;
-
     if (isOneCCEnabled) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.add('offers-fade');
+
+      renderCtaOneCC = true;
     }
     onShown();
   }

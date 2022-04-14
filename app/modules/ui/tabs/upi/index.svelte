@@ -305,6 +305,8 @@
     ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
+    if (selectedToken) return;
+
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
     const hasTokens = tokens && tokens.length;
 
