@@ -18,10 +18,12 @@
   } from 'ui/labels/downtime';
 
   import { Events, DowntimeEvents, MetaProperties } from 'analytics';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   let instrument;
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const handleContinue = () => {
     session.hideOverlayMessage();

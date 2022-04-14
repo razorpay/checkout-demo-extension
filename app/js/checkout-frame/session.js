@@ -25,7 +25,6 @@
 /* global roll */
 
 // from init checkout-frame
-/* global templates */
 
 var ua = navigator.userAgent;
 
@@ -885,12 +884,11 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
+      this.setTheme();
       this.mainModal = new discreet.MainModal({ target: document.body });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-
-      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },
@@ -1932,33 +1930,6 @@ Session.prototype = {
     }
   },
 
-  renderCss: function () {
-    var div = document.createElement('div');
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    try {
-      var getter = this.get;
-
-      div.style.color = getter('theme.color');
-
-      if (!div.style.color) {
-        getter()['theme.color'] = '';
-      }
-
-      this.setTheme();
-
-      var rules = templates.theme(getter, this.themeMeta);
-      if (style.styleSheet) {
-        style.styleSheet.cssText = rules;
-      } else {
-        style.appendChild(document.createTextNode(rules));
-      }
-    } catch (e) {
-      roll('renderCss', e);
-    }
-    return style;
-  },
-
   setTheme: function () {
     // update r.themeMeta based on prefs color
     this.r.postInit();
@@ -1966,8 +1937,6 @@ Session.prototype = {
     // ThemeMeta in razorpay.js contains only
     // color, textColor, highlightColor
     discreet.Theme.setThemeColor(this.r.themeMeta.color);
-
-    this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
   hideErrorMessage: function (confirmedCancel) {

@@ -2,7 +2,7 @@
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
 
-  import { getThemeColor } from 'checkoutstore/theme';
+  import { getThemeColor, getThemeMeta } from 'checkoutstore/theme';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
@@ -12,7 +12,6 @@
     isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
-  import { getSession } from 'sessionmanager';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -26,8 +25,8 @@
     OTHER_OPTIONS,
   } from 'ui/labels/cardlessemi';
 
-  const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const sectionMeta = {
     default: { order: 1 },

@@ -1,5 +1,5 @@
 <script>
-  import { getOption, getMerchantKey } from 'razorpay';
+  import { getOption, getMerchantKey, getOrderId } from 'razorpay';
   //store
   import { phone, email } from 'checkoutstore/screens/home';
 
@@ -42,7 +42,7 @@
   export let amount;
   const description = getOption('description');
   let merchant_logo = getOption('image');
-  const orderId = getOption('order_id');
+  const orderId = getOrderId();
   let merchantLogoUrl;
   let orgLogoUrl;
   let isHDFC = false;
