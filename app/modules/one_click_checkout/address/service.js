@@ -232,6 +232,7 @@ export function postServiceability(
         const eventProperties = {
           response_time: serviceabilityApiTimer(),
           is_saved_address: onSavedAddress,
+          is_address_serviceable: response?.addresses?.[0]?.serviceable,
         };
         if (response?.error) {
           eventProperties['error_reason'] = response?.error;

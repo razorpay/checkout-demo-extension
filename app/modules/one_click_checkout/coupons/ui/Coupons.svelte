@@ -143,12 +143,14 @@
     Analytics.setMeta('is_coupons_enabled', showCoupons);
     Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
     Analytics.setMeta('summary_screen_default_language', $locale);
+    Analytics.setMeta('is_cod_enabled', getCODEnabled());
 
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
       prefill_contact_number: getPrefilledContact(),
       prefill_email: getPrefilledEmail(),
       count_coupons_available: $availableCoupons.length,
+      pre_selected_saved_address_id: $selectedAddressId,
     });
   }
 
