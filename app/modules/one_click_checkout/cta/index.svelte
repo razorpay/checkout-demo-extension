@@ -59,6 +59,7 @@
         </span>
         <button
           id="cta-view-details"
+          data-test-id="cta-view-details"
           on:click|preventDefault={onViewDetailsClick}
           >{$t(VIEW_DETAILS_LABEL)}</button
         >

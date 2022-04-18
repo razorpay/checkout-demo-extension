@@ -1,4 +1,5 @@
 const { setState, delay } = require('../../util');
+const { getDataAttrSelector } = require('./common');
 
 async function handleStateReq(context, country = 'in') {
   const req = await context.expectRequest();
@@ -131,6 +132,7 @@ async function fillUserAddress(
     serviceable,
     codFee,
     diffBillShipAddr,
+    addLandmark = false,
   }
 ) {
   await context.page.waitForSelector('.address-new');
@@ -148,7 +150,12 @@ async function fillUserAddress(
   }
   await context.page.type('#line1', 'SJR Cyber Laskar');
   await context.page.type('#line2', 'Hosur Road');
-  await context.page.type('#landmark', 'Adugodi');
+  if (addLandmark) {
+    const landmarkCta = await getDataAttrSelector('toggle-landmark-cta');
+    await landmarkCta.click();
+    await delay(200);
+    await context.page.type('#landmark', 'Adugodi');
+  }
   if (!isSaveAddress) {
     await delay(200);
     await context.page.waitForSelector('#address-consent-checkbox');

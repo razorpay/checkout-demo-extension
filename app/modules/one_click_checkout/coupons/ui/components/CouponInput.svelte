@@ -118,7 +118,7 @@
 {/if}
 
 {#if $error}
-  <div id="error-feedback">{$error}</div>
+  <div data-test-id="error-feedback" id="error-feedback">{$error}</div>
 {/if}
 
 <style>

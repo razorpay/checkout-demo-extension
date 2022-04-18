@@ -50,7 +50,11 @@
 {#if isOneClickCheckout() && accountTabVisible}
   <div class="account-tab-container">
     <div class="account-wrapper">
-      <div class="account-section" on:click={handleAccountModal}>
+      <div
+        data-test-id="account-tab-btn"
+        class="account-section"
+        on:click={handleAccountModal}
+      >
         {$t(ACCOUNT)}
         <span class="account-toggle-icon">
           <Icon icon={arrow_left(13, 13, '#212121')} />

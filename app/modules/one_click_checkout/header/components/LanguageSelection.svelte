@@ -18,8 +18,14 @@
   }
 </script>
 
-<div class="wrapper" on:click|stopPropagation={handleAccountModal}>
-  <span class="selected-langauage">{getLocaleName($locale)}</span>
+<div
+  data-test-id="vernacular-cta"
+  class="wrapper"
+  on:click|stopPropagation={handleAccountModal}
+>
+  <span data-test-id="vernacular-text" class="selected-langauage"
+    >{getLocaleName($locale)}</span
+  >
   <Icon icon={arrow_down(9, 9)} />
 </div>
 

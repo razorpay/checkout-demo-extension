@@ -29,6 +29,7 @@
       <p>{coupon.code}</p>
     </div>
     <button
+      data-test-id="coupon-{coupon.code}"
       id="coupon-item-apply"
       class="theme apply-button"
       on:click|preventDefault={() => dispatch('apply')}

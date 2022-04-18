@@ -86,40 +86,45 @@ async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
 }
 
 async function getSummaryInfo(context, isValidCoupon, codFee) {
-  const orderInfo = await context.page.$eval(
-    '.summary-modal',
+  const summaryModalEle = await getDataAttrSelector(context, 'summary-modal');
+  const orderInfo = await context.page.evaluate(
     (element, isValidCoupon, codFee) => {
-      const priceEle = element.getElementsByClassName('summary-row')[0];
-      const price = priceEle.getElementsByTagName('div')[1].innerText;
+      const cartAmount = element.querySelector(
+        '[data-test-id=cart-amount]'
+      ).innerText;
+      const shippingAmount = element.querySelector(
+        '[data-test-id=shipping-amount]'
+      ).innerText;
+      const totalAmount = element.querySelector(
+        '[data-test-id=total-amount]'
+      ).innerText;
+
       if (isValidCoupon) {
-        const couponEle = element.getElementsByClassName('summary-row')[1];
-        const couponText = couponEle.getElementsByTagName('div')[0].innerText;
-        const discountPrice =
-          couponEle.getElementsByTagName('div')[1].innerText;
-        const shippingEle = element.getElementsByClassName('summary-row')[2];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, discountPrice, total, couponText, shippingAmount };
+        const discountAmount = element.querySelector(
+          '[data-test-id=discount-amount]'
+        ).innerText;
+        const couponText = element.querySelector(
+          '[data-test-id=applied-coupon-label]'
+        ).innerText;
+
+        return {
+          cartAmount,
+          discountAmount,
+          totalAmount,
+          couponText,
+          shippingAmount,
+        };
       } else if (codFee) {
-        const shippingEle = element.getElementsByClassName('summary-row')[1];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const codEle = element.getElementsByClassName('summary-row')[2];
-        const codAmount = codEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, codAmount, total, shippingAmount };
+        const codAmount = element.querySelector(
+          '[data-test-id=cod-amount]'
+        ).innerText;
+
+        return { cartAmount, codAmount, totalAmount, shippingAmount };
       } else {
-        const shippingEle = element.getElementsByClassName('summary-row')[1];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[2];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, total, shippingAmount };
+        return { cartAmount, totalAmount, shippingAmount };
       }
     },
+    summaryModalEle,
     isValidCoupon,
     codFee
   );
@@ -138,41 +143,50 @@ async function handleFeeSummary(context, features) {
   } = features;
   await delay(200);
   if (!isSelectCOD) {
-    await context.page.waitForSelector('.fee');
-    await context.page.click('.fee');
+    const viewDetailsCta = await getDataAttrSelector(
+      context,
+      'cta-view-details'
+    );
+    viewDetailsCta.click();
   }
   await context.page.waitForSelector('.summary-modal');
   const { shippingFee, codFee } = context.state;
   if (couponValid && !removeCoupon) {
-    const { price, discountPrice, total, couponText, shippingAmount } =
-      await getSummaryInfo(context, couponValid);
+    const {
+      cartAmount,
+      discountAmount: _discountAmount,
+      totalAmount,
+      couponText,
+      shippingAmount,
+    } = await getSummaryInfo(context, couponValid);
     if (!shippingFee) {
       expect('FREE').toEqual(shippingAmount);
     }
-    expect(price).toEqual(`₹ ${amount / 100}`);
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
     expect(`Coupon (${couponCode})`).toEqual(couponText);
-    expect(discountPrice).toEqual(`-₹ ${discountAmount / 100}`);
+    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
     const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
-    expect(total).toEqual(`₹ ${calcTotalAmount}`);
+    expect(formatTextToNumber(totalAmount)).toEqual(calcTotalAmount);
   } else if (isSelectCOD) {
-    const { price, total, shippingAmount, codAmount } = await getSummaryInfo(
-      context,
-      false,
-      codFee
+    const { cartAmount, totalAmount, shippingAmount, codAmount } =
+      await getSummaryInfo(context, false, codFee);
+    if (!shippingFee) {
+      expect('FREE').toEqual(shippingAmount);
+    }
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+    expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
+    expect(formatTextToNumber(totalAmount)).toEqual(
+      amount / 100 + codFee / 100
+    );
+  } else {
+    const { cartAmount, totalAmount, shippingAmount } = await getSummaryInfo(
+      context
     );
     if (!shippingFee) {
       expect('FREE').toEqual(shippingAmount);
     }
-    expect(price).toEqual(`₹ ${amount / 100}`);
-    expect(codAmount).toEqual(`₹ ${codFee / 100}`);
-    expect(total).toEqual(`₹ ${amount / 100 + codFee / 100}`);
-  } else {
-    const { price, total, shippingAmount } = await getSummaryInfo(context);
-    if (!shippingFee) {
-      expect('FREE').toEqual(shippingAmount);
-    }
-    expect(price).toEqual(`₹ ${amount / 100}`);
-    expect(total).toEqual(`₹ ${amount / 100}`);
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+    expect(formatTextToNumber(totalAmount)).toEqual(amount / 100);
   }
   if (isSelectCOD) {
     await context.page.click('.summary-modal-cta');
@@ -200,6 +214,25 @@ async function checkInvalidOTP(context) {
   ).toEqual('Entered OTP was incorrect. Re-enter to proceed.');
 }
 
+function getDataAttrSelector(context, selectorValue) {
+  return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
+}
+
+function scrollToEnd(context, node = window) {
+  return context.page.evaluate((_node) => {
+    _node.scrollBy(0, _node.scrollHeight);
+  }, node);
+}
+
+function formatTextToNumber(str) {
+  return str ? +`${str}`.replace(/\D/g, '') : null;
+}
+
+async function proceedOneCC(context) {
+  const cta = await context.page.waitForSelector('#one-cc-cta');
+  await cta.click();
+}
+
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -210,4 +243,8 @@ module.exports = {
   handleVerifyOTPReq,
   handleSkipOTP,
   checkInvalidOTP,
+  getDataAttrSelector,
+  scrollToEnd,
+  formatTextToNumber,
+  proceedOneCC,
 };

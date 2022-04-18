@@ -61,14 +61,14 @@
   {$t(SUMMARY_LABEL)}
 </div>
 
-<div class="order-summary">
+<div data-test-id="order-summary" class="order-summary">
   <div
     class="row justify-between"
     class:color-gray={showTotal}
     class:price-label={!showTotal}
   >
     <p>{$t(AMOUNT_LABEL)}</p>
-    <p>
+    <p data-test-id="cart-amount">
       {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
     </p>
   </div>
@@ -77,7 +77,7 @@
       <p>
         {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
       </p>
-      <p class="color-green">
+      <p data-test-id="discount-amount" class="color-green">
         - {formatAmountWithSymbol(
           $cartDiscount,
           currency,
@@ -93,7 +93,7 @@
         <Shimmer width="20%" />
       {:else}
         <p>{$t(SHIPPING_CHARGES_LABEL)}</p>
-        <p>
+        <p data-test-id="shipping-amount">
           {$shippingCharge
             ? formatAmountWithSymbol(
                 $shippingCharge,
@@ -113,7 +113,9 @@
         <Shimmer width="20%" />
       {:else}
         <p>{$t(TOTAL_LABEL)}</p>
-        <p>{formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}</p>
+        <p data-test-id="total-amount">
+          {formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}
+        </p>
       {/if}
     </div>
   {/if}
