@@ -1,4 +1,5 @@
 <script lang="ts">
+  import _$ from 'lib/$';
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
@@ -19,13 +20,30 @@
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
 
   export let onClose: any = returnAsIs;
+  export let embedded = false;
+
+  function handleKeyInput(e: KeyboardEvent) {
+    if ((e.which || e.keyCode) === 27) {
+      // Element wants to handle "Escape" by itself
+      if (_$(e.target).hasClass('no-escape')) {
+        return;
+      }
+      if (onClose) {
+        onClose();
+      }
+    }
+  }
 
   onMount(() => {
     window.addEventListener('resize', bringInputIntoView);
+    if (getOption('modal.escape') && !embedded) {
+      window.addEventListener('keyup', handleKeyInput);
+    }
   });
 
   onDestroy(() => {
     window.removeEventListener('resize', bringInputIntoView);
+    window.removeEventListener('keyup', handleKeyInput);
   });
 
   function handleBackdropClick() {

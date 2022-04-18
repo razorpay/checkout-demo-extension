@@ -888,6 +888,7 @@ Session.prototype = {
       this.mainModal = new discreet.MainModal({
         target: document.body,
         props: {
+          embedded: this.embedded,
           onClose: function () {
             session.closeModal();
           },

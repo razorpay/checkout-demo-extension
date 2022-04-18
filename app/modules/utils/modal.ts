@@ -1,5 +1,7 @@
-(function () {
-  var timeout;
+import $ from 'lib/$';
+
+export function Modal() {
+  var timeout: NodeJS.Timeout | null;
 
   var clearTimeout = function () {
     if (timeout) {
@@ -8,7 +10,10 @@
     timeout = null;
   };
 
-  var Modal = (window.Modal = function (element, options) {
+  var Modal = ((window as any).Modal = function (
+    element: HTMLElement,
+    options: any
+  ) {
     this.options = options;
     this.container = $(element);
     this.show();
@@ -39,11 +44,16 @@
         this.options.animation ? 300 : 0
       );
 
-      invoke(this.options.onhide);
+      if (typeof this.options.onhide === 'function') {
+        this.options.onhide();
+      }
     },
 
     hidden: function () {
-      invoke(this.options.onhidden);
+      if (typeof this.options.onhidden === 'function') {
+        this.options.onhidden();
+      }
     },
   };
-})();
+}
+Modal();
