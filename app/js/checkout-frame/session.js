@@ -5989,8 +5989,9 @@ Session.prototype = {
       });
       this.listeners = [];
       this.bits = [];
-      this.mainModal.$destroy();
-
+      if (this.mainModal) {
+        this.mainModal.$destroy();
+      }
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
       window.setPaymentID = window.onComplete = null;
