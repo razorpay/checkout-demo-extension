@@ -1,23 +1,15 @@
 <script>
   // Declarations and Import Statements
   import SecureCardKnowMore from './SecureCardKnowMore.svelte';
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import Razorpay from 'common/Razorpay';
-  import { getSession } from 'sessionmanager';
   import { pushOverlay } from 'navstack';
 
   import { Events, CardEvents } from 'analytics/index';
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import { showSavedCardTooltip } from 'checkoutstore/screens/card';
-  let secureCardKnowMoreView;
-  import {
-    isRecurring,
-    getOption,
-    isSubscription,
-    getPreferences,
-  } from 'razorpay';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { isRecurring, isSubscription } from 'razorpay';
 
   //i18n
   import {
@@ -34,10 +26,6 @@
   export let savedcard;
   export let modalType;
   export let name = 'save';
-  export let merchantName = getOption('name');
-  export let maxAmount = getSession().formatAmountWithCurrency(
-    getPreferences('order.max_amount')
-  );
   export let cvvRef;
   export let network;
 

@@ -112,8 +112,6 @@
 
   let tokens = [];
   let selectedToken = null;
-  let isANewVpa = false;
-  let rememberVpaCheckbox;
   let intentAppSelected = null;
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
@@ -307,6 +305,8 @@
     ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
+    if (selectedToken) return;
+
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
     const hasTokens = tokens && tokens.length;
 

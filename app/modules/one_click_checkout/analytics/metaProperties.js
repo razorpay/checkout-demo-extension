@@ -2,6 +2,7 @@ export default {
   ADDRESS_ENABLED: 'address_enabled',
   COUPONS_ENABLED: 'coupons_enabled',
   COD_ENABLED: 'cod_enabled',
+  IS_COD_ENABLED: 'is_cod_enabled',
   IS_THIRDWATCH_INSURED: 'is_thirdwatch_insured',
   IS_MANDATORY_SIGNUP: 'is_mandatory_signup',
   IS_ONE_CLICK_CHECKOUT: 'is_one_click_checkout_enabled',

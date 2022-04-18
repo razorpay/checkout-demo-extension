@@ -300,9 +300,6 @@
 </div>
 
 <style>
-  h3 {
-    margin: 10px 0;
-  }
   .otp-title {
     color: #263a4a;
     text-align: center;
@@ -329,9 +326,6 @@
   /* If otp controls is not the first thing in the screen, avoid unnecessary padding */
   .otp-screen-contents:first-child {
     margin-top: 12px;
-  }
-  #otp-elem.compact .help {
-    display: none;
   }
   .security-text {
     background: #fafafa;

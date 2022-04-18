@@ -11,9 +11,19 @@ import {
   CONFIRM_CANCEL_MESSAGE,
 } from 'ui/labels/confirm';
 
+// Analytics imports
+import { CLOSE_MODAL_OPTIONS } from 'one_click_checkout/analytics/constants';
+import OneCCEvents from 'one_click_checkout/analytics';
+import { Events } from 'analytics';
+import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+
 export const handleModalClose = () => {
   const session = getSession();
   const locale = getCurrentLocale();
+
+  Events.TrackBehav(OneCCEvents.CLOSE_MODAL, {
+    screen_name: getCurrentScreen(),
+  });
 
   Confirm.show({
     heading: formatTemplateWithLocale(
@@ -31,7 +41,17 @@ export const handleModalClose = () => {
       locale
     ),
     onPositiveClick: function () {
+      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+        screen_name: getCurrentScreen(),
+        option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
+      });
       session.closeModal();
+    },
+    onNegativeClick: function () {
+      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+        screen_name: getCurrentScreen(),
+        option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
+      });
     },
   });
 };

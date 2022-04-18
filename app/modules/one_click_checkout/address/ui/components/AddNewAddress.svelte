@@ -43,6 +43,7 @@
   // const import
   import {
     ADDRESS_TYPES,
+    SOURCE,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
@@ -284,7 +285,7 @@
   function handleCountrySelect(name, iso) {
     if (!$formData?.zipCode) {
       Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
-        is_prefilled: 1,
+        is_prefilled: SOURCE.PREFILLED,
       });
     }
     // show number keypad for pincode if country is India
@@ -422,6 +423,15 @@
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
+                Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { city: res[value].city },
+                });
+
+                Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { state: res[value].state },
+                });
                 onUpdate('city', toTitleCase(res[value].city) || '');
                 onUpdate('state', toTitleCase(res[value].state) || '');
               }
@@ -467,6 +477,13 @@
       !isCityStateAutopopulateDisabled
     ) {
       getCityState(value, $selectedCountryISO).then((response) => {
+        Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
+
+        Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
         onUpdate('city', toTitleCase(response.city) || '');
         onUpdate('state', toTitleCase(response.state) || '');
       });
@@ -507,6 +524,15 @@
 
     if (key === 'contact' && pinIndex !== -1) {
       changePincodeStateLabel();
+    }
+
+    if (key === 'state' && value) {
+      Events.TrackBehav(AddressEvents[`INPUT_ENTERED_${key}_V2`], {
+        meta: { [key]: value },
+        is_prefilled: $formData?.zipcode
+          ? SOURCE.OVERIDDEN
+          : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+      });
     }
 
     dispatch('formCompletion', {

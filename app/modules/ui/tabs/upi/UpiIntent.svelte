@@ -8,6 +8,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
+  import Analytics from 'analytics';
 
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
@@ -35,7 +36,6 @@
   export let showAll = false;
   export let selected = null;
   export let showRecommendedUPIApp;
-  export let selectedApp;
   export let skipCTA = false;
   export let payUsingApps = true;
 
@@ -186,7 +186,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   /**
    * TODO: sit with designers and enforce a standard design for all
    * the lists
@@ -246,27 +246,12 @@
     }
   }
 
-  #upi-apps .ref-collect {
-    :global(.option-icon) {
-      left: 20px;
-      top: 20px;
-    }
-
-    :global(.option-icon i) {
-      font-size: 22px;
-    }
-  }
-
   .options {
     box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.04);
   }
 
   em {
     color: rgba(81, 89, 120, 0.54);
-  }
-
-  .ref-collect {
-    margin-top: 12px;
   }
 
   .ref-title {
@@ -276,13 +261,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .ref-submessage {
-    color: rgba(81, 89, 120, 0.54);
-    font-size: 12px;
-    line-height: 15px;
-    margin-top: 4px;
   }
 
   .legend {
@@ -297,9 +275,5 @@
   }
   .downtime-upi-intent-wrapper {
     margin-bottom: 54px;
-  }
-  .downtime-upi-intent-icon {
-    float: right;
-    margin-right: 8px;
   }
 </style>

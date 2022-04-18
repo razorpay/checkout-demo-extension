@@ -14,6 +14,7 @@ const {
 } = views;
 
 const { UPI, EMI, CARD, WALLET, PAYLATER, EMI_PLANS, NETBANKING } = METHODSLIST;
+const QR = 'qr';
 
 export const SCREEN_LIST = {
   [COUPONS]: 'summary_screen',
@@ -32,4 +33,10 @@ export const SCREEN_LIST = {
   [PAYLATER]: 'payment_l1_screen',
   [EMI_PLANS]: 'payment_l1_screen',
   [NETBANKING]: 'payment_l1_screen',
+  [QR]: 'payment_l1_screen',
+};
+
+export const CLOSE_MODAL_OPTIONS = {
+  POSITIVE: 'yes',
+  NEGATIVE: 'no',
 };
