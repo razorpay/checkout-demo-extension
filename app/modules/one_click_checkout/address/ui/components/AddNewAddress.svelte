@@ -477,6 +477,13 @@
       !isCityStateAutopopulateDisabled
     ) {
       getCityState(value, $selectedCountryISO).then((response) => {
+        Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
+
+        Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
         onUpdate('city', toTitleCase(response.city) || '');
         onUpdate('state', toTitleCase(response.state) || '');
       });
