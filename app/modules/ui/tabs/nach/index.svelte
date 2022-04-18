@@ -241,7 +241,7 @@
     // LABEL: 'Uploading your NACH form'
     session.showLoadError($t(UPLOADING_MESSAGE));
 
-    const { promise: uploadRequest, abort } = uploadDocument(session.r, file);
+    const { promise: uploadRequest, abort } = uploadDocument(file);
 
     abortUploadRequest = abort;
 

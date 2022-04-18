@@ -33,6 +33,7 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let method = null; // Name of the method
@@ -47,7 +48,8 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let _icon = getIconForDisplay();
 
   let _subtitle;
@@ -168,22 +170,6 @@
       <div class="spinner cod-loader" />
     {/if}
   </div>
-  <!-- <div slot="banner">
-    {#if showWalnutBanner}
-      <div
-        class="banner"
-        style={`background:${getThemeColor()}1a; color:${getThemeColor()}`}
-      >
-        <img
-          class="banner-img"
-          src={'https://cdn.razorpay.com/cardless_emi/walnut369.svg'}
-          alt=""
-        />
-        <span>{walnutBannerText}</span>
-        <Icon icon={icons.new_window} />
-      </div>
-    {/if}
-  </div> -->
 </SlottedOption>
 
 <style>
@@ -191,31 +177,6 @@
   :global(.new-method) {
     padding: 16px;
   }
-
-  .banner-img {
-    height: 10px;
-    margin-right: 10px;
-  }
-
-  .banner {
-    position: relative;
-    top: 16px;
-    height: 26px;
-    left: -16px;
-    background: rgba(58, 151, 252, 0.1);
-    width: calc(100% + 32px);
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    box-sizing: border-box;
-    font-size: 10px;
-    line-height: 12px;
-  }
-
-  .banner span {
-    margin-right: 4px;
-  }
-
   /* Icon styles */
   i {
     display: flex;
@@ -263,9 +224,6 @@
   }
   .error-label {
     margin-right: 4px;
-  }
-  .error-icon {
-    display: inline-flex;
   }
 
   .cod-error {

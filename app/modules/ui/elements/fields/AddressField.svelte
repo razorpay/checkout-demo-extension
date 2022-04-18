@@ -13,7 +13,7 @@
   <!-- LABEL: Address should be at least 10 characters long -->
   <div class="help">{$t(ADDRESS_HELP)}</div>
   <!-- LABEL: Address -->
-  <label>{$t(ADDRESS_LABEL)}</label>
+  <label for="address">{$t(ADDRESS_LABEL)}</label>
   <textarea
     class="input no-validate no-focus no-blur"
     name="address"

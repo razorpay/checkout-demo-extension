@@ -209,7 +209,6 @@
     color: #3684d6;
   }
 
-  .bajaj .checked .checkbox::after,
   :not(.checkbox--square):checked + .checkbox::after {
     content: '';
     width: 7px;

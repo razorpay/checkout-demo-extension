@@ -143,6 +143,7 @@
     fetchAVSFlagForCard,
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   let delayOTPExperiment;
 
@@ -154,7 +155,8 @@
   const appsAvailable = apps.length;
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let isSavedCardsEnabled = shouldRememberCustomer();
 
   $: {

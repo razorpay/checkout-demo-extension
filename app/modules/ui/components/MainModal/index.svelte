@@ -18,7 +18,7 @@
   const noanim = disableAnimation();
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
 
-  export let onClose;
+  export let onClose: any = returnAsIs;
 
   onMount(() => {
     window.addEventListener('resize', bringInputIntoView);
@@ -29,9 +29,9 @@
   });
 
   function handleBackdropClick() {
-    var $overlayStack = get(overlayStack);
+    const $overlayStack = get(overlayStack);
     if ($overlayStack.length > 0) {
-      var last = $overlayStack[$overlayStack.length - 1];
+      const last: any = $overlayStack[$overlayStack.length - 1];
       last.back({
         from: 'overlay',
       });
@@ -89,7 +89,7 @@
             <div id="modal-close" class="close">×</div>
           {/if}
           {#if getOption('image')}
-            <div id="logo">
+            <div id="logo" class:image-frame={!getOption('theme.image_frame')}>
               <img src={getOption('image')} alt="" />
             </div>
           {/if}
@@ -150,3 +150,13 @@
     </div>
   </div>
 </div>
+
+<style lang="css">
+  #logo.image-frame {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    width: 80px;
+    height: 80px;
+  }
+</style>

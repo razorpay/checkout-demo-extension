@@ -1,4 +1,4 @@
-/* global templates, showOverlay, hideEmi, Event */
+/* global showOverlay, hideEmi, Event */
 import CovidDonation from 'ui/components/covid-donations/index.svelte';
 import { querySelector } from 'utils/doc';
 // Rendering the covid donation bottom sheet

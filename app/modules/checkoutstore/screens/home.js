@@ -178,3 +178,5 @@ export const isContactPresent = derived(
 );
 
 export const upiIntentInstrumentsForAnalytics = writable([]);
+
+export const getCustomerCountryISOCode = () => get(countryISOCode);

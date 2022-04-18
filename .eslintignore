@@ -3,5 +3,5 @@ app/modules/**/*.test.js
 app/modules/**/*.test.ts
 cfu/src/fe/implicit/global.js
 app/modules/**/__tests__/*.*
-app/modules/tests/*.*
+app/modules/tests/**/*.*
 app/js/generated/*.*

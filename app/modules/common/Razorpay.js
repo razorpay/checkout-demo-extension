@@ -3,8 +3,7 @@ import Eventer from 'eventer';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import * as AnalyticsTypes from 'analytics-types';
 import { formatPayload } from 'payment/validator';
-import RazorpayConfig from 'common/RazorpayConfig';
-
+import RazorpayStore, { getOption } from 'razorpay';
 import { returnAsIs } from 'lib/utils';
 
 import {
@@ -80,6 +79,8 @@ export default function Razorpay(overrides) {
     _.throwMessage('No key passed');
   }
 
+  // this will set rzp instance to helper for both checkout.js & rzp.js
+  RazorpayStore.updateInstance(this);
   this.postInit();
 }
 
@@ -138,7 +139,11 @@ function getPrefsJsonp(data, callback) {
   return fetch.jsonp({
     url: makeUrl('preferences'),
     data: data,
-    callback: callback,
+    callback: function (response) {
+      /** for razorpay.js set preference to razorpaystore */
+      RazorpayStore.preferenceResponse = response;
+      callback(response);
+    },
   });
 }
 
@@ -327,13 +332,11 @@ function isValidAmount(amt, min = 100) {
 
 export function makePrefParams(rzp) {
   if (rzp) {
-    var getter = rzp.get;
     var params = {};
-
     /**
      * Set Key
      */
-    var key_id = getter('key');
+    var key_id = getOption('key');
     if (key_id) {
       params.key_id = key_id;
     }
@@ -350,18 +353,15 @@ export function makePrefParams(rzp) {
      * based on the payment currency, which it
      * expects to always be at index 0.
      */
-    const currency = [getter('currency')];
-
-    const display_currency = getter('display_currency');
-    const display_amount = getter('display_amount');
-
+    const currency = [getOption('currency')];
+    const display_currency = getOption('display_currency');
+    const display_amount = getOption('display_amount');
     // Display currency is only valid when a display amount is present
     if (display_currency && `${display_amount}`.length) {
       currency.push(display_currency);
     }
 
     params.currency = currency;
-
     [
       'order_id',
       'customer_id',
@@ -376,7 +376,7 @@ export function makePrefParams(rzp) {
       'checkout_config_id',
       'amount',
     ].forEach(function (key) {
-      var value = getter(key);
+      var value = getOption(key);
       if (value) {
         params[key] = value;
       }

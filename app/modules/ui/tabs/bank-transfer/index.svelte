@@ -5,7 +5,12 @@
   //Store imports
   import { showFeeLabel } from 'checkoutstore';
 
-  import { getAmount, getOption, isCustomerFeeBearer } from 'razorpay';
+  import {
+    getAmount,
+    getOption,
+    getOrderId,
+    isCustomerFeeBearer,
+  } from 'razorpay';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -78,7 +83,7 @@
 
   let copied = false;
   const session = getSession();
-  const order_id = getOption('order_id');
+  const order_id = getOrderId();
   const customerFeeBearerFlag = isCustomerFeeBearer();
 
   function getPayloadForVirtualAccounts() {
@@ -293,9 +298,6 @@
 </Tab>
 
 <style>
-  .loading {
-    text-align: center;
-  }
   .bank_transfer-container {
     padding: 15px 0;
     font-size: 13px;
@@ -351,8 +353,5 @@
     text-align: left;
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
-  }
-  .challan-wrapper {
-    display: none;
   }
 </style>

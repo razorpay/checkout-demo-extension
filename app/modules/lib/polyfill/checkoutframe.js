@@ -167,7 +167,7 @@ if (!_.isFunction(Object.getOwnPropertyDescriptors)) {
 if (!Array.prototype.find) {
   Object.defineProperty(Array.prototype, 'find', {
     value: function (predicate) {
-      if (this == null) {
+      if (this === null) {
         throw TypeError('"this" is null or not defined');
       }
 

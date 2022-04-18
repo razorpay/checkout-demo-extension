@@ -1,3 +1,4 @@
+import Analytics from 'analytics';
 import * as Bridge from 'bridge';
 import Razorpay, {
   makePrefParams,
@@ -493,11 +494,6 @@ function updateOptions(preferences) {
     if (order.currency) {
       setOption('currency', order.currency);
     }
-  }
-
-  // set orderid as it is required while creating payments
-  if (preferences.invoice) {
-    setOption('order_id', preferences.invoice.order_id);
   }
 }
 

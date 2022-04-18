@@ -13,7 +13,6 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Util imports
-  import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
   import { getPrefilledName, hasFeature } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
@@ -31,6 +30,7 @@
   } from 'ui/labels/upi';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let selected = false;
@@ -46,7 +46,7 @@
 
   const PATTERN_WITH_HANDLE = '.+@.+';
 
-  const session = getSession();
+  const themeMeta = getThemeMeta();
 
   // Computed
   export let pattern;
@@ -168,7 +168,7 @@
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
   <i slot="icon" class="top">
-    <Icon icon={session.themeMeta.icons.upi} />
+    <Icon icon={themeMeta.icons.upi} />
   </i>
 
   <div slot="body">
@@ -271,27 +271,9 @@
   </div>
 </SlottedRadioOption>
 
-<style>
-  .ref-pspName {
-    color: #424242;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    line-height: 40px;
-    z-index: 1;
-  }
-
+<style lang="scss">
   .should-save-vpa-container {
     margin-top: 12px;
-
-    #should-save-vpa-upi span.checkbox,
-    #should-save-vpa-upi_otm span.checkbox {
-      display: inline-block;
-    }
-  }
-
-  .legend {
-    padding: 12px 0 8px 12px;
   }
 
   [slot='icon'].top {
@@ -310,9 +292,5 @@
 
   .downtime-upi {
     margin-top: 8px;
-  }
-  .downtime-upi-icon {
-    position: absolute;
-    right: 20px;
   }
 </style>

@@ -41,6 +41,7 @@ import { views } from 'one_click_checkout/routing/constants';
 
 import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 export const historyExists = () => get(history).length;
 
@@ -85,14 +86,13 @@ export function handleEditContact(logoutFlow = false) {
 }
 
 export function getIcons() {
-  const session = getSession();
-  return session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  return themeMeta.icons;
 }
 
 export function getTheme() {
-  const session = getSession();
-
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 }
 
 /**
