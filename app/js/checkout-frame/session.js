@@ -888,7 +888,7 @@ Session.prototype = {
       this.mainModal = new discreet.MainModal({
         target: document.body,
         props: {
-          embedded: this.embedded,
+          escape: RazorpayHelper.getOption('modal.escape') && !this.embedded,
           onClose: function () {
             session.closeModal();
           },

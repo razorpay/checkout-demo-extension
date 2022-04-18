@@ -1,5 +1,5 @@
 <script lang="ts">
-  import _$ from 'lib/$';
+  import { hasClass } from 'utils/DOM';
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
@@ -20,12 +20,12 @@
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
 
   export let onClose: any = returnAsIs;
-  export let embedded = false;
+  export let escape = true;
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
       // Element wants to handle "Escape" by itself
-      if (_$(e.target).hasClass('no-escape')) {
+      if (hasClass(e.target, 'no-escape')) {
         return;
       }
       if (onClose) {
@@ -36,7 +36,7 @@
 
   onMount(() => {
     window.addEventListener('resize', bringInputIntoView);
-    if (getOption('modal.escape') && !embedded) {
+    if (escape) {
       window.addEventListener('keyup', handleKeyInput);
     }
   });

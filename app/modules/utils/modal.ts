@@ -44,15 +44,11 @@ export function Modal() {
         this.options.animation ? 300 : 0
       );
 
-      if (typeof this.options.onhide === 'function') {
-        this.options.onhide();
-      }
+      this.options.onhide();
     },
 
     hidden: function () {
-      if (typeof this.options.onhidden === 'function') {
-        this.options.onhidden();
-      }
+      this.options.onhidden();
     },
   };
 }
