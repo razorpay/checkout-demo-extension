@@ -36,6 +36,7 @@ import {
 } from 'one_click_checkout/loader/i18n/labels';
 
 const addressCache = {};
+const addressPromiseCache = {};
 let serviceabilityCache = {};
 let availableStateList = {};
 
@@ -55,47 +56,45 @@ export function getCityState(pincode, country) {
   Events.TrackMetric(AddressEvents.CITY_STATE_START);
   Events.TrackMetric(AddressEvents.CITY_STATE_START_V2);
 
-  return new Promise((resolve, reject) => {
-    if (!cachedAddress) {
-      fetch({
-        url: makeAuthUrl(`locations/country/${country}/pincode/${pincode}`),
-        callback: (response) => {
-          // If request was successful, save response in cache
+  if (cachedAddress) {
+    hideLoaderView();
+    return Promise.resolve(cachedAddress);
+  }
 
-          Events.TrackMetric(AddressEvents.CITY_STATE_END, {
-            time: cityStateApiTimer(),
-          });
+  if (addressPromiseCache[pincode]) return addressPromiseCache[pincode];
 
+  addressPromiseCache[pincode] = new Promise((resolve, reject) => {
+    fetch({
+      url: makeAuthUrl(`locations/country/${country}/pincode/${pincode}`),
+      callback: (response) => {
+        // If request was successful, save response in cache
+
+        Events.TrackMetric(AddressEvents.CITY_STATE_END, {
+          time: cityStateApiTimer(),
+        });
+
+        Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
+          response_time: cityStateApiTimer(),
+          city: response?.city,
+          state: response?.state,
+        });
+
+        hideLoaderView();
+        if (response.error) {
           Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
-            response_time: cityStateApiTimer(),
-            city: response?.city,
-            state: response?.state,
+            error_code: response.error,
           });
-
-          hideLoaderView();
-          if (response.error) {
-            Events.TrackMetric(AddressEvents.CITY_STATE_END_V2, {
-              error_code: response.error,
-            });
-            reject(response.error);
-            return;
-          }
-          addressCache[pincode] = response;
-          resolve(response);
-        },
-      });
-    } else {
-      hideLoaderView();
-      resolve(cachedAddress);
-    }
-    Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
-      is_prefilled: SOURCE.PREFILLED,
-    });
-
-    Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
-      is_prefilled: SOURCE.PREFILLED,
+          reject(response.error);
+          return;
+        }
+        delete addressPromiseCache[pincode];
+        addressCache[pincode] = response;
+        resolve(response);
+      },
     });
   });
+
+  return addressPromiseCache[pincode];
 }
 
 /**
