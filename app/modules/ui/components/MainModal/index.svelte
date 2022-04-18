@@ -29,7 +29,7 @@
         return;
       }
       if (onClose) {
-        onClose();
+        preCloseCheck(onClose);
       }
     }
   }
@@ -46,14 +46,20 @@
     window.removeEventListener('keyup', handleKeyInput);
   });
 
-  function handleBackdropClick() {
+  function preCloseCheck(next: () => void) {
     const $overlayStack = get(overlayStack);
     if ($overlayStack.length > 0) {
       const last: any = $overlayStack[$overlayStack.length - 1];
       last.back({
         from: 'overlay',
       });
-    } else if (getOption('modal.backdropclose')) {
+    } else {
+      next();
+    }
+  }
+
+  function handleBackdropClick() {
+    if (getOption('modal.backdropclose')) {
       onClose();
     }
   }
@@ -72,7 +78,7 @@
   class:noimage={!getOption('image')}
   class:noanim
 >
-  <div id="backdrop" on:click={handleBackdropClick} />
+  <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="tnc-wrap" />
   <div id="modal" class="mchild">
     <div id="modal-inner">
