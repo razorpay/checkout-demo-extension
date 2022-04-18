@@ -103,7 +103,7 @@
   let disabled = true;
   let validationText;
 
-  function trackContactFilled() {
+  function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
     Analytics.track('contact:fill', {
       type: AnalyticsTypes.BEHAV,
@@ -112,17 +112,27 @@
         value: $contact,
       },
     });
-    if (isSummaryScreen && valid) {
-      Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
-        country_code: $country,
-        contact_number: $phone,
-      });
-    }
     Events.TrackBehav(ContactDetailsEvents.CONTACT_INPUT);
+    if (e.type === 'blur' && isOneCCEnabled) {
+      onContactBlur();
+    }
     validationText = getValidationText();
   }
 
-  function trackEmailFilled() {
+  function onContactBlur() {
+    Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
+      country_code: $country,
+      contact_number: $phone,
+    });
+  }
+
+  function onEmailBlur() {
+    Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
+      email_id: $email,
+    });
+  }
+
+  function trackEmailFilled(e) {
     const valid = EMAIL_REGEX.test($email);
     Analytics.track('email:fill', {
       type: AnalyticsTypes.BEHAV,
@@ -131,12 +141,10 @@
         value: $email,
       },
     });
-    Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
-    if (isSummaryScreen) {
-      Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
-        email_id: $email,
-      });
+    if (e.type === 'blur' && isOneCCEnabled) {
+      onEmailBlur();
     }
+    Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
   }
 
   $: {

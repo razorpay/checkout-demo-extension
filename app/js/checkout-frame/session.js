@@ -5856,7 +5856,7 @@ Session.prototype = {
             allowSkip: false,
           });
           that.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-          this.setOneCCTabLogo(walletObj.logo);
+          that.setOneCCTabLogo(walletObj.logo);
           if (wallet === 'freecharge') {
             that.otpView.updateScreen({
               maxlength: 4,

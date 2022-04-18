@@ -29,6 +29,7 @@
     appliedCoupon,
     isCouponApplied,
     couponInputSource,
+    availableCoupons,
   } from 'one_click_checkout/coupons/store';
   import {
     isBillingSameAsShipping,
@@ -137,17 +138,32 @@
       'is_RTB_live_on_merchant',
       getTrustedBadgeHighlights($RTB)
     );
-    Analytics.setMeta('is_cod_enabled', getCODEnabled());
     Analytics.setMeta('is_force_cod_enabled', isCodForced());
     Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
     Analytics.setMeta('is_coupons_enabled', showCoupons);
     Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
     Analytics.setMeta('summary_screen_default_language', $locale);
+    Analytics.setMeta('is_cod_enabled', getCODEnabled());
 
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
-      is_CTA_enabled: ctaDisabled,
+      is_CTA_enabled: !ctaDisabled,
       prefill_contact_number: getPrefilledContact(),
       prefill_email: getPrefilledEmail(),
+      count_coupons_available: $availableCoupons.length,
+      pre_selected_saved_address_id: $selectedAddressId,
+    });
+  }
+
+  function checkAddressServiceability() {
+    return new Promise((resolve, reject) => {
+      if (
+        $savedAddresses?.length &&
+        $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+      ) {
+        loadAddressesWithServiceability().then(resolve).catch(reject);
+        return;
+      }
+      resolve();
     });
   }
 
@@ -156,19 +172,18 @@
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
-      if ($checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED) {
-        loadAddressesWithServiceability().finally(() => {
-          summaryLoadedEvent();
-          Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
-            pre_selected_saved_address_id: $selectedAddressId,
-          });
-          Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
-            checked_billing_address_same_as_delivery_address:
-              $isBillingSameAsShipping,
-          });
-        });
-      }
     }
+    const addressPromise = checkAddressServiceability();
+    const couponsPromise = fetchCoupons();
+    addressPromise.then(() => {
+      Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
+        pre_selected_saved_address_id: $selectedAddressId,
+      });
+      Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
+        checked_billing_address_same_as_delivery_address:
+          $isBillingSameAsShipping,
+      });
+    });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -177,13 +192,10 @@
       },
     });
     hideAmountInTopBar();
-    fetchCoupons();
     if (prefilledCoupon) {
       applyCouponCode(prefilledCoupon);
     }
-    if (!isUserLoggedIn()) {
-      summaryLoadedEvent();
-    }
+    Promise.all([addressPromise, couponsPromise]).finally(summaryLoadedEvent);
   });
 
   onDestroy(() => {

@@ -3,6 +3,7 @@ import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
 import { preventEvent } from 'utils/doc';
+import { truncateString } from 'utils/strings';
 
 const alphanumericRaw = function (value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -240,6 +241,19 @@ Formatter.rules = {
       }
 
       return /^\+[0-9]{1,6}$/.test(value);
+    },
+  },
+
+  state: {
+    raw: function (value) {
+      if (this.oldValue !== value) {
+        return value;
+      }
+      return this.oldValue || value;
+    },
+    pretty: function (value) {
+      this.oldValue = value;
+      return truncateString(value, 12);
     },
   },
 };

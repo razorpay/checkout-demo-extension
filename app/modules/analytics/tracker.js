@@ -1,5 +1,8 @@
 import { getExperimentsFromStorage } from 'experiments';
 import { trackAvailabilty } from './availability';
+
+const CHUNK_SIZE = 5;
+
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -124,7 +127,7 @@ const flushEvents = (mode) => {
         output_key: 'user_agent_parsed',
       },
     ],
-    events: EVT_Q.splice(0, EVT_Q.length),
+    events: EVT_Q.splice(0, CHUNK_SIZE),
   };
 
   /**

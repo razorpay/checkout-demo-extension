@@ -288,11 +288,6 @@
     margin-top: 0.2em;
   }
 
-  .icon svg {
-    height: 20px;
-    max-width: 20px;
-  }
-
   .title {
     padding: 14px 14px 0 14px;
   }

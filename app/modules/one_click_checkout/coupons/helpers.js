@@ -41,7 +41,7 @@ export function nextView() {
 }
 
 export function fetchCoupons() {
-  getCoupons()
+  return getCoupons()
     .then((coupons) => {
       Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, coupons.length);
       availableCoupons.set(coupons);
@@ -92,7 +92,9 @@ export function applyCouponCode(code) {
             coupon_code: input,
           },
         });
-        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED);
+        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
+          is_coupon_valid: true,
+        });
         navigator.navigateTo({ path: views.COUPONS });
         showToast({
           delay: 5000,
@@ -123,6 +125,7 @@ export function applyCouponCode(code) {
           },
         });
         Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
+          is_coupon_valid: false,
           error_reason: error?.error?.reason,
           error_description: error?.error?.description,
         });

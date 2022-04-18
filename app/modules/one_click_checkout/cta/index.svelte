@@ -17,6 +17,9 @@
   import { Events } from 'analytics';
   import CTAEvents from 'one_click_checkout/cta/analytics';
 
+  // util imports
+  import * as _El from 'utils/DOM';
+
   // Props
   export let hidden = false;
   export let disabled = false;
@@ -78,7 +81,7 @@
 <style>
   .one-cc-cta-wrapper {
     width: 70%;
-    min-width: 70%;
+    max-width: 70%;
     margin-left: auto;
     position: relative;
   }

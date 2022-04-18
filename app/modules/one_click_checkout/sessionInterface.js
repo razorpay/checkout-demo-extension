@@ -41,7 +41,10 @@ import {
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
-import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
+import {
+  CLOSE_MODAL_OPTIONS,
+  SCREEN_LIST,
+} from 'one_click_checkout/analytics/constants';
 
 // i18n imports
 import {
@@ -53,6 +56,7 @@ import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
 import { showSummaryModal } from 'one_click_checkout/summary_modal';
+import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
 export const historyExists = () => get(history).length;
 
@@ -84,11 +88,24 @@ export const handleBack = () => {
     get(activeRoute)?.name === views.COUPONS
   ) {
     const locale = getCurrentLocale();
+    Events.TrackBehav(OneCCEvents.CLOSE_MODAL, {
+      screen_name: getCurrentScreen(),
+    });
     Confirm.show({
       heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
       message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
       onPositiveClick: function () {
+        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+          screen_name: getCurrentScreen(),
+          option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
+        });
         session.closeModal();
+      },
+      onNegativeClick: function () {
+        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+          screen_name: getCurrentScreen(),
+          option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
+        });
       },
     });
     return;
