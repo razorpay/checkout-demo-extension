@@ -1819,7 +1819,7 @@ Session.prototype = {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
         onhidden: bind(function () {
-          this.saveAndClose();
+          self.saveAndClose();
           Razorpay.sendMessage({ event: 'hidden' });
         }, this),
       });
