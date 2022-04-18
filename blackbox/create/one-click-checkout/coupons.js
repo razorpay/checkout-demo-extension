@@ -90,6 +90,7 @@ module.exports = function (testFeatures) {
         await handleApplyCouponReq(context, true, discountAmount);
         await handleShippingInfo(context, false, true);
         await handleAvailableCouponReq(context, availableCoupons);
+        await delay(400);
       } else {
         if (couponValid || availableCoupons) {
           await verifyValidCoupon(context, features);
