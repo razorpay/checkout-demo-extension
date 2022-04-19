@@ -6,6 +6,7 @@ import { getDeviceId } from 'fingerprint';
 import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 import { removeTrailingCommas } from 'one_click_checkout/common/utils';
 import { views as addressViews } from 'one_click_checkout/address/constants';
+import { HOME, OFFICE, OTHERS } from './i18n/labels';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -275,4 +276,25 @@ export function hydrateSamePincodeAddresses(addresses, zipcodeHash) {
  */
 export function getLatestServiceableAddress(addresses) {
   return addresses.find((addr) => addr.serviceability);
+}
+
+/**
+ *
+ * @param {string} tag address tag
+ * @returns constant label mapped to i18n string
+ */
+export function getI18nForTag(tag) {
+  switch (tag.toLowerCase()) {
+    case 'home':
+      return HOME;
+
+    case 'office':
+      return OFFICE;
+
+    case 'others':
+      return OTHERS;
+
+    default:
+      return HOME;
+  }
 }
