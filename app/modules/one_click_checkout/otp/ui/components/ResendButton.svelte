@@ -51,9 +51,9 @@
   />
 {:else}
   <div class="resend-container">
-    <span class="resend-label">{$t(RESEND_LABEL)}</span>
+    <span class="resend-label">{$t(RESEND_BTN)}</span>
     <LinkButton {id} on:click={(event) => invokeResend(event, 'resend')}>
-      {$t(RESEND_BTN)}
+      {$t(RESEND_LABEL)}
     </LinkButton>
   </div>
 {/if}
