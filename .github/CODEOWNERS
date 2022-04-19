@@ -8,36 +8,36 @@
 
 
 #
-# Checkout Core Features : "@razorpay/Checkout-CX" team
+# Checkout Core Features : "@razorpay/checkout-cx-1" team
 #
-app/modules/bridge/                                     @razorpay/Checkout-CX
-app/modules/configurability/                            @razorpay/Checkout-CX
-app/modules/trusted-badge/                              @razorpay/Checkout-CX
-app/js/checkout-frame/                                  @razorpay/Checkout-CX
+app/modules/bridge/                                     @razorpay/checkout-cx-1
+app/modules/configurability/                            @razorpay/checkout-cx-1
+app/modules/trusted-badge/                              @razorpay/checkout-cx-1
+app/js/checkout-frame/                                  @razorpay/checkout-cx-1
 
 
 #
-# Checkout One-Click-Checkout (1cc) Features: "@razorpay/Checkout-1cc" team
+# Checkout One-Click-Checkout (1cc) Features: "@razorpay/checkout-1cc" team
 #
-app/modules/one_click_checkout/                         @razorpay/Checkout-1cc
+app/modules/one_click_checkout/                         @razorpay/checkout-1cc
 
 #
 # Checkout Application Build/Deploy
 #
-.github/actions/                                        @razorpay/Checkout-CX
-git-hooks/                                              @razorpay/Checkout-CX
-cdn/                                                    @razorpay/Checkout-CX           @razorpay/Checkout-1cc
-beta-cdn/qa/                                            @razorpay/QA                    @razorpay/Checkout-CX           @razorpay/Checkout-1cc 
-beta-cdn/                                               @razorpay/Checkout-CX           @razorpay/Checkout-1cc 
-dockerconf/                                             @razorpay/Checkout-CX
-Dockerfile                                              @razorpay/Checkout-CX
-Dockerfile.dev                                          @razorpay/Checkout-CX
-gulpfile.js                                             @razorpay/Checkout-CX
-jest.config.js                                          @razorpay/Checkout-CX
-jest.ut.config.js                                       @razorpay/Checkout-CX
-nodemon.json                                            @razorpay/Checkout-CX   
-rollup.config.js                                        @razorpay/Checkout-CX
-rollup.test.js                                          @razorpay/Checkout-CX
-tsconfig.json                                           @razorpay/Checkout-CX
-.babelrc                                                @razorpay/Checkout-CX
-.eslintrc.js                                            @razorpay/Checkout-CX
+.github/actions/                                        @razorpay/checkout-cx-1
+git-hooks/                                              @razorpay/checkout-cx-1
+cdn/                                                    @razorpay/checkout-cx-1           @razorpay/checkout-1cc
+beta-cdn/qa/                                            @razorpay/checkout-cx-1           @razorpay/checkout-1cc 
+beta-cdn/                                               @razorpay/checkout-cx-1           @razorpay/checkout-1cc 
+dockerconf/                                             @razorpay/checkout-cx-1
+Dockerfile                                              @razorpay/checkout-cx-1
+Dockerfile.dev                                          @razorpay/checkout-cx-1
+gulpfile.js                                             @razorpay/checkout-cx-1
+jest.config.js                                          @razorpay/checkout-cx-1
+jest.ut.config.js                                       @razorpay/checkout-cx-1
+nodemon.json                                            @razorpay/checkout-cx-1   
+rollup.config.js                                        @razorpay/checkout-cx-1
+rollup.test.js                                          @razorpay/checkout-cx-1
+tsconfig.json                                           @razorpay/checkout-cx-1
+.babelrc                                                @razorpay/checkout-cx-1
+.eslintrc.js                                            @razorpay/checkout-cx-1
