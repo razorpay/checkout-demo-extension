@@ -82,6 +82,7 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Constant imports
   import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
@@ -121,6 +122,7 @@
   const merchantName = getName();
 
   const session = getSession();
+  const themeMeta = getThemeMeta();
 
   const merchantOrder = getMerchantOrder();
   const merchantSubscription = getSubscription();
@@ -384,8 +386,7 @@
     }
 
     prefillVpaFromIntentInstrument();
-
-    qrIcon = session.themeMeta.icons.qr;
+    qrIcon = themeMeta.icons.qr;
   });
 
   $: {
@@ -832,7 +833,7 @@
                   <i slot="icon">
                     <Icon
                       icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon ||
-                        session.themeMeta.icons.upi}
+                        themeMeta.icons.upi}
                     />
                   </i>
                   <div slot="downtime" class="downtime-saved-vpa">

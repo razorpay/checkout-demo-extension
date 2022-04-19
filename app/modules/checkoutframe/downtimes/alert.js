@@ -1,4 +1,4 @@
-/* global templates, showOverlay, hideEmi, Event */
+/* global showOverlay, hideEmi, Event */
 import Alert from 'ui/elements/Downtime/Alert.svelte';
 import { querySelector } from 'utils/doc';
 export default function downtimeAlertView() {

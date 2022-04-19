@@ -1,4 +1,5 @@
 import { getExperimentsFromStorage } from 'experiments';
+import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
 
 const CHUNK_SIZE = 5;
@@ -190,7 +191,7 @@ export default function Track(r, event, data, immediately) {
     var context = getCommonTrackingData(r);
     context.user_agent = null;
     context.mode = 'live';
-    var order_id = r.get('order_id');
+    var order_id = getOrderId();
     if (order_id) {
       context.order_id = order_id;
     }

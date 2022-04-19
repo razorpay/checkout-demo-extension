@@ -146,6 +146,9 @@
     font-size: 14px;
     font-weight: 600;
     border-radius: 6px;
+
+    color: var(--text-color);
+    background: var(--primary-color);
   }
 
   .one-cc-cta-wrapper.full-width {

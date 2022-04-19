@@ -13,7 +13,7 @@
   import { proxyCountry, proxyPhone } from 'checkoutstore/screens/home';
 
   // Utils imports
-  import { getSession } from 'sessionmanager';
+  import { getThemeMeta } from 'checkoutstore/theme';
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
   import { getBanks, isContactOptional } from 'razorpay';
@@ -63,7 +63,7 @@
   let contactRequired =
     isContactRequiredForInstrument(instrument) && isContactOptional();
 
-  const session = getSession();
+  const themeMeta = getThemeMeta();
   const dispatch = createEventDispatcher();
 
   let title;
@@ -100,7 +100,7 @@
   function getDetailsForPaypalInstrument(instrument, locale) {
     return {
       title: getInstrumentTitle('paypal', null, locale),
-      icon: session.themeMeta.icons.paypal,
+      icon: themeMeta.icons.paypal,
       subtitle: getWalletSubtitle('paypal', locale),
     };
   }
@@ -133,7 +133,7 @@
     let title, icon;
     if (instrument.flow === 'qr') {
       title = getInstrumentTitle('upiqr', null, locale);
-      icon = session.themeMeta.icons['qr'];
+      icon = themeMeta.icons['qr'];
     } else if (instrument.flow === 'intent') {
       const app =
         getUPIIntentApps().all.find(

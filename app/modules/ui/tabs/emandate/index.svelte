@@ -30,8 +30,6 @@
     isEMandateBankEnabled,
   } from 'checkoutstore/methods';
 
-  import { getOption } from 'razorpay';
-
   // i18n
   import { locale, t } from 'svelte-i18n';
   import { getLongBankName } from 'i18n';
@@ -62,6 +60,7 @@
     getPrefillBank,
     getPrefillBankDetails,
   } from 'netbanking/helper';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   const session = getSession();
 
@@ -261,7 +260,8 @@
     });
   }
 
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 </script>
 
 <Tab method="emandate" overrideMethodCheck pad={false}>

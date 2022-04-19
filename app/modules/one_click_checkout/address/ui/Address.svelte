@@ -212,4 +212,16 @@
     font-weight: bold;
     font-size: 14px;
   }
+
+  .saved-addresses-cta {
+    color: var(--highlight-color);
+    font-weight: bold;
+    border: 1px solid #e6e7e8;
+    padding: 10px 12px;
+    width: 100%;
+    margin-bottom: 14px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 </style>

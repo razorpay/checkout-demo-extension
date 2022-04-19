@@ -2,7 +2,8 @@
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import { getThemeColor } from 'checkoutstore/theme';
+
+  import { getThemeColor, getThemeMeta } from 'checkoutstore/theme';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
@@ -12,7 +13,6 @@
     isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
-  import { getSession } from 'sessionmanager';
   import { isOneClickCheckout } from 'razorpay';
   import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
@@ -28,8 +28,8 @@
     OTHER_OPTIONS,
   } from 'ui/labels/cardlessemi';
 
-  const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const sectionMeta = {
     default: { order: 1 },

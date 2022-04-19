@@ -45,9 +45,11 @@
     AVS_INFO_MESSAGE_2,
     AVS_INFO_MESSAGE_3,
   } from 'ui/labels/card';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const providers = getInternationalProviders();
 

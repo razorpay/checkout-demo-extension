@@ -98,6 +98,10 @@
     AVS_INFO_MESSAGE_3,
     CARDS_SAVED_LABEL_ONE_CC,
   } from 'ui/labels/card';
+  import {
+    PAY_NOW_CTA_LABEL,
+    SELECT_EMI_PLAN_LABEL,
+  } from 'one_click_checkout/cta/i18n';
 
   import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
 
@@ -149,10 +153,7 @@
     fetchAVSFlagForCard,
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
-  import {
-    PAY_NOW_CTA_LABEL,
-    SELECT_EMI_PLAN_LABEL,
-  } from 'one_click_checkout/cta/i18n';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   let delayOTPExperiment;
   let cardEle;
@@ -165,7 +166,8 @@
   const isOneCCEnabled = isOneClickCheckout();
 
   const session = getSession();
-  const icons = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
   let isSavedCardsEnabled = shouldRememberCustomer();
 
   $: {

@@ -18,14 +18,17 @@
   } from 'ui/labels/downtime';
 
   import { Events, DowntimeEvents, MetaProperties } from 'analytics';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // helper imports
   import { isOneClickCheckout } from 'razorpay';
 
   let instrument;
+
   const session = getSession();
-  const icons = session.themeMeta.icons;
   const isOneCCEnabled = isOneClickCheckout();
+  const themeMeta = getThemeMeta();
+  const icons = themeMeta.icons;
 
   const handleContinue = () => {
     session.hideOverlayMessage();

@@ -66,7 +66,7 @@
             <div id="modal-close" class="close">×</div>
           {/if}
           {#if getOption('image')}
-            <div id="logo">
+            <div id="logo" class:image-frame={!getOption('theme.image_frame')}>
               <img src={getOption('image')} alt="" />
             </div>
           {/if}
@@ -134,3 +134,13 @@
     </div>
   </div>
 </div>
+
+<style lang="css">
+  #logo.image-frame {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    width: 80px;
+    height: 80px;
+  }
+</style>
