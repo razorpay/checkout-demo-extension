@@ -28,7 +28,7 @@
     intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -399,7 +399,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method: 'qr',
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
 

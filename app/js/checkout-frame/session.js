@@ -1213,7 +1213,7 @@ Session.prototype = {
               : this.homeTab.getCurrentView(),
           },
         },
-        discreet.TrustedBadgeHelper.getTrustedBadgeAnaltyicsPayload()
+        discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
     });
     updateScore('timeToRender');
@@ -6302,9 +6302,7 @@ Session.prototype = {
       customer.customer_id = saved_customer.customer_id;
     }
     // Setting rtb_experiment based on prefs call for logged in users
-    discreet.TrustedBadgeHelper.setTrustedBadgeVariant(
-      preferences.rtb_experiment || {}
-    );
+    discreet.RTBHelper.setRTBVariant(preferences.rtb_experiment || {});
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },

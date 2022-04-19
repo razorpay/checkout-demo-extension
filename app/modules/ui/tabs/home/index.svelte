@@ -9,7 +9,7 @@
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
+  import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import { getAvailableMethods } from 'ui/tabs/home/helpers';
@@ -1167,7 +1167,7 @@
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
-          <TrustedBadge />
+          <RTBBanner />
 
           {#if showUserDetailsStrip || isPartialPayment}
             <div
