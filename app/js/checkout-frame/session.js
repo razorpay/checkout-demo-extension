@@ -1244,10 +1244,6 @@ Session.prototype = {
       this.get('preferences.methods.cod') || false
     );
     Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.IS_THIRDWATCH_INSURED,
-      !this.get('force_cod')
-    );
-    Analytics.setMeta(
       discreet.OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
       this.get('mandatory_login')
     );

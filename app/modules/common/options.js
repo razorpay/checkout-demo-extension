@@ -36,7 +36,6 @@ export const RazorpayDefaults = {
   show_address: true,
   show_coupons: true,
   one_click_checkout: false,
-  force_cod: false,
   mandatory_login: false,
   enable_ga_analytics: false,
   enable_fb_analytics: false,
