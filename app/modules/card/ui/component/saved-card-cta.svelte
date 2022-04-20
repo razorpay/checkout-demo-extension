@@ -2,7 +2,10 @@
   // i18n
   import { t } from 'svelte-i18n';
   import Icon from 'ui/elements/Icon.svelte';
-  import { PAY_WITH_SAVED_CARD, PAY_WITH_SAVED_CARD_SUBTITLE } from 'card/i18n/labels';
+  import {
+    PAY_WITH_SAVED_CARD,
+    PAY_WITH_SAVED_CARD_SUBTITLE,
+  } from 'card/i18n/labels';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   const themeMeta = getThemeMeta();

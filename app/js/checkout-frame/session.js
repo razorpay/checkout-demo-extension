@@ -884,7 +884,16 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       this.setTheme();
-      this.mainModal = new discreet.MainModal({ target: document.body });
+      var session = this;
+      this.mainModal = new discreet.MainModal({
+        target: document.body,
+        props: {
+          escape: RazorpayHelper.getOption('modal.escape') && !this.embedded,
+          onClose: function () {
+            session.closeModal();
+          },
+        },
+      });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
@@ -1805,30 +1814,7 @@ Session.prototype = {
     if (!this.modal) {
       var self = this;
       this.modal = new window.Modal(this.el, {
-        escape: this.get('modal.escape') && !this.embedded,
-        backdropclose: this.get('modal.backdropclose'),
-        handleBackdropClick: function () {
-          // The same logic to close overlay using $overlayStack
-          // is present for backpresses.
-          // Don't forget to update it there too if you change something here.
-          // TODO: DRY
-
-          var $overlayStack = storeGetter(discreet.overlayStackStore);
-
-          if ($overlayStack.length > 0) {
-            var last = $overlayStack[$overlayStack.length - 1];
-
-            last.back({
-              from: 'overlay',
-            });
-
-            // Signal that we don't want the Modal component to handle click on backdrop
-            return false;
-          }
-
-          // Signal that Modal component should hnadle backdrop click
-          return true;
-        },
+        animation: this.mainModal.animation(),
         onhide: function () {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
@@ -6003,11 +5989,9 @@ Session.prototype = {
       });
       this.listeners = [];
       this.bits = [];
-      if (this.modal) {
-        this.modal.destroy();
+      if (this.mainModal) {
+        this.mainModal.$destroy();
       }
-      $(this.el).remove();
-
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
       window.setPaymentID = window.onComplete = null;
