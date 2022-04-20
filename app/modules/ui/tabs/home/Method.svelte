@@ -24,7 +24,7 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
   import {
@@ -109,7 +109,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method,
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
 

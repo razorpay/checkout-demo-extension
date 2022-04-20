@@ -1,4 +1,5 @@
 import 'lib/polyfill/checkoutframe';
+import 'utils/modal';
 import Razorpay from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 import 'checkoutjs/options';

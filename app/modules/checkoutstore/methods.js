@@ -1016,7 +1016,11 @@ export function getAppProviders() {
 }
 
 export function isWalnut369Enabled() {
-  return Boolean(getMerchantMethods()?.cardless_emi?.walnut369);
+  return isCardLessEmiProviderEnabled('walnut369');
+}
+
+export function isCardLessEmiProviderEnabled(code) {
+  return Boolean((getMerchantMethods()?.cardless_emi || {})[code]);
 }
 
 export function getCardlessEMIProviders() {

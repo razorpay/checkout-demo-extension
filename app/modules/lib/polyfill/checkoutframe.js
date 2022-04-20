@@ -198,6 +198,10 @@ if (!Array.prototype.find) {
   });
 }
 
+if (internetExplorer && !Element.prototype.matches) {
+  Element.prototype.matches = Element.prototype.msMatchesSelector;
+}
+
 import './prototypes/native';
 import './prototypes/customelements';
 import './prototypes/nodelist';
