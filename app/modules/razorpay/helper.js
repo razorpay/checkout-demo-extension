@@ -2,7 +2,7 @@
  * {module}/index.js contains the API which is exposed to other modules
  */
 import RazorpayStore from './store';
-import { entityWithAmount } from './constant';
+import { entityWithAmount, PAYMENT_ENTITIES } from './constant';
 import { displayAmount } from 'common/currency';
 import { get } from 'utils/object';
 
@@ -232,6 +232,25 @@ export function isContactEmailHidden() {
  */
 export const getOrderId = () =>
   getPreferences('invoice.order_id') || getOption('order_id');
+
+export const isInvoicePayment = () => !!getPreferences('invoice');
+
+/**
+ * Determines the payment entity used in current checkout
+ * @returns {PAYMENT_ENTITIES|null}
+ */
+export const getPaymentEntity = () => {
+  if (isInvoicePayment()) {
+    return PAYMENT_ENTITIES.INVOICE;
+  }
+  if (isSubscription()) {
+    return PAYMENT_ENTITIES.SUBSCRIPTION;
+  }
+  if (getMerchantOrder()) {
+    return PAYMENT_ENTITIES.ORDER;
+  }
+  return null;
+};
 
 /**
  * prefill related
