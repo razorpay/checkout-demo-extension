@@ -8,7 +8,7 @@ import { getCheckoutBridge, getNewIosBridge } from 'bridge';
 import { getSDKMeta } from 'checkoutstore/native';
 
 // helpers
-import { makeAuthUrl } from 'common/helper';
+import { makeAuthUrl } from 'checkoutstore';
 import { copyToClipboard } from 'common/clipboard';
 import loadScript from 'common/loadScript';
 
@@ -27,7 +27,7 @@ function getPayloadForVirtualAccounts() {
   return payload;
 }
 
-export function createVirtualAccount(session, orderId) {
+export function createVirtualAccount(orderId) {
   return new Promise((resolve) => {
     const data = getPayloadForVirtualAccounts();
 
@@ -35,7 +35,7 @@ export function createVirtualAccount(session, orderId) {
       data,
     });
 
-    let url = makeAuthUrl(session.r, `orders/${orderId}/virtual_accounts`);
+    let url = makeAuthUrl(`orders/${orderId}/virtual_accounts`);
 
     fetch.post({
       url,

@@ -13,7 +13,6 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Util imports
-  import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
   import { getPrefilledName, hasFeature } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
@@ -31,6 +30,7 @@
   } from 'ui/labels/upi';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let selected = false;
@@ -46,7 +46,7 @@
 
   const PATTERN_WITH_HANDLE = '.+@.+';
 
-  const session = getSession();
+  const themeMeta = getThemeMeta();
 
   // Computed
   export let pattern;
@@ -168,7 +168,7 @@
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
   <i slot="icon" class="top">
-    <Icon icon={session.themeMeta.icons.upi} />
+    <Icon icon={themeMeta.icons.upi} />
   </i>
 
   <div slot="body">

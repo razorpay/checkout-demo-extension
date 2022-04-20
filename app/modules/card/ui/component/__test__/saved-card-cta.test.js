@@ -2,16 +2,6 @@ import SavedCardCTA from '../saved-card-cta.svelte';
 
 import { render, fireEvent } from '@testing-library/svelte';
 
-jest.mock('sessionmanager', () => ({
-  getSession: () => ({
-    themeMeta: {
-      icons: {
-        saved_card: '',
-      },
-    },
-  }),
-}));
-
 describe('Saved Card CTA', () => {
   it('should be rendered', async () => {
     const result = render(SavedCardCTA);

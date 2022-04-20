@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { hasClass } from 'utils/DOM';
+  import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
@@ -6,14 +9,64 @@
     isIRCTC,
   } from 'razorpay';
   import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
-  import { getAmount, disableAnimation } from './helper';
+  import { getAmount, disableAnimation, bringInputIntoView } from './helper';
+  import { returnAsIs } from 'lib/utils';
+  import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
-
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
+
+  export let onClose: any = returnAsIs;
+  export let escape = true;
+
+  function handleKeyInput(e: KeyboardEvent) {
+    if ((e.which || e.keyCode) === 27) {
+      // Element wants to handle "Escape" by itself
+      if (hasClass(e.target, 'no-escape')) {
+        return;
+      }
+      if (onClose) {
+        preCloseCheck(onClose);
+      }
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener('resize', bringInputIntoView);
+    if (escape) {
+      window.addEventListener('keyup', handleKeyInput);
+    }
+  });
+
+  onDestroy(() => {
+    window.removeEventListener('resize', bringInputIntoView);
+    window.removeEventListener('keyup', handleKeyInput);
+  });
+
+  function preCloseCheck(next: () => void) {
+    const $overlayStack = get(overlayStack);
+    if ($overlayStack.length > 0) {
+      const last: any = $overlayStack[$overlayStack.length - 1];
+      last.back({
+        from: 'overlay',
+      });
+    } else {
+      next();
+    }
+  }
+
+  function handleBackdropClick() {
+    if (getOption('modal.backdropclose')) {
+      onClose();
+    }
+  }
+
+  export function animation() {
+    return !noanim;
+  }
 </script>
 
 <div
@@ -25,7 +78,7 @@
   class:noimage={!getOption('image')}
   class:noanim
 >
-  <div id="backdrop" />
+  <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="tnc-wrap" />
   <div id="modal" class="mchild">
     <div id="modal-inner">
@@ -60,7 +113,7 @@
             <div id="modal-close" class="close">×</div>
           {/if}
           {#if getOption('image')}
-            <div id="logo">
+            <div id="logo" class:image-frame={!getOption('theme.image_frame')}>
               <img src={getOption('image')} alt="" />
             </div>
           {/if}
@@ -121,3 +174,13 @@
     </div>
   </div>
 </div>
+
+<style lang="css">
+  #logo.image-frame {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    width: 80px;
+    height: 80px;
+  }
+</style>

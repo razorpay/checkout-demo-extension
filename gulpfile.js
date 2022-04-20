@@ -3,14 +3,12 @@
 const fs = require('fs');
 const path = require('path');
 const gulp = require('gulp');
-const dot = require('./scripts/dot/index');
 const stylus = require('gulp-stylus');
 const autoprefixer = require('autoprefixer-stylus');
 const glob = require('glob').sync;
 const uglify = require('uglify-js').minify;
 const usemin = require('gulp-usemin');
 const through = require('through2').obj;
-const runSequence = require('run-sequence');
 const { execSync } = require('child_process');
 
 const rollup = require('rollup');
@@ -29,22 +27,11 @@ function assetPath(path) {
 
 let paths = {
   js: assetPath('js/**/*.js'),
-  templates: assetPath('_templates/**/*.jst'),
   css: assetPath('css/**/*.styl'),
   moduleCss: assetPath('js/**/*.styl'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*'),
 };
-
-gulp.task('compileTemplates', function (cb) {
-  execSync('mkdir -p app/templates');
-  dot.process({
-    path: 'app/_templates',
-    destination: assetPath('templates'),
-    global: 'templates',
-  });
-  cb();
-});
 
 function handleError(err) {
   console.log(err.toString());
@@ -171,24 +158,16 @@ gulp.task('staticAssets', function () {
 
 gulp.task(
   'build',
-  gulp.series(
-    cleanDistDir,
-    'css:prod',
-    'compileTemplates',
-    'compileHTML',
-    'staticAssets',
-    (cb) => {
-      console.log(String(execSync('ls -l app/dist/v1')));
-      cb();
-    }
-  )
+  gulp.series(cleanDistDir, 'css:prod', 'compileHTML', 'staticAssets', (cb) => {
+    console.log(String(execSync('ls -l app/dist/v1')));
+    cb();
+  })
 );
 
 gulp.task('watch', (cb) => {
   cleanDistDir();
   gulp.watch(paths.css, gulp.series('css'));
   gulp.watch(paths.moduleCss, gulp.series('css')); // handle module css
-  gulp.watch(paths.templates, gulp.series('compileTemplates'));
   gulp.watch(paths.js, gulp.series('usemin'));
   gulp.watch(assetPath('*.html'), gulp.series('usemin'));
   rollup.watch(rollupConfig).on('event', (event) => {

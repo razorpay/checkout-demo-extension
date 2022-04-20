@@ -28,7 +28,7 @@
     intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -76,6 +76,7 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let selectedApp = undefined;
@@ -110,6 +111,7 @@
   const merchantName = getName();
 
   const session = getSession();
+  const themeMeta = getThemeMeta();
 
   const merchantOrder = getMerchantOrder();
   const merchantSubscription = getSubscription();
@@ -369,8 +371,7 @@
     }
 
     prefillVpaFromIntentInstrument();
-
-    qrIcon = session.themeMeta.icons.qr;
+    qrIcon = themeMeta.icons.qr;
   });
 
   $: {
@@ -398,7 +399,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method: 'qr',
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
 
@@ -800,7 +801,7 @@
                 <i slot="icon">
                   <Icon
                     icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon ||
-                      session.themeMeta.icons.upi}
+                      themeMeta.icons.upi}
                   />
                 </i>
                 <div slot="downtime" class="downtime-saved-vpa">

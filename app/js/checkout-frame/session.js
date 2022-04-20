@@ -15,7 +15,6 @@
 
 // from init checkout-frame
 /* global SessionManager */
-/* global templates */
 
 var emo = {};
 
@@ -870,12 +869,20 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
-      this.mainModal = new discreet.MainModal({ target: document.body });
+      this.setTheme();
+      var session = this;
+      this.mainModal = new discreet.MainModal({
+        target: document.body,
+        props: {
+          escape: RazorpayHelper.getOption('modal.escape') && !this.embedded,
+          onClose: function () {
+            session.closeModal();
+          },
+        },
+      });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-
-      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },
@@ -1201,7 +1208,7 @@ Session.prototype = {
               : this.homeTab.getCurrentView(),
           },
         },
-        discreet.TrustedBadgeHelper.getTrustedBadgeAnaltyicsPayload()
+        discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
     });
     updateScore('timeToRender');
@@ -1795,30 +1802,7 @@ Session.prototype = {
     if (!this.modal) {
       var self = this;
       this.modal = new window.Modal(this.el, {
-        escape: this.get('modal.escape') && !this.embedded,
-        backdropclose: this.get('modal.backdropclose'),
-        handleBackdropClick: function () {
-          // The same logic to close overlay using $overlayStack
-          // is present for backpresses.
-          // Don't forget to update it there too if you change something here.
-          // TODO: DRY
-
-          var $overlayStack = storeGetter(discreet.overlayStackStore);
-
-          if ($overlayStack.length > 0) {
-            var last = $overlayStack[$overlayStack.length - 1];
-
-            last.back({
-              from: 'overlay',
-            });
-
-            // Signal that we don't want the Modal component to handle click on backdrop
-            return false;
-          }
-
-          // Signal that Modal component should hnadle backdrop click
-          return true;
-        },
+        animation: this.mainModal.animation(),
         onhide: function () {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
@@ -1919,33 +1903,6 @@ Session.prototype = {
     }
   },
 
-  renderCss: function () {
-    var div = document.createElement('div');
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    try {
-      var getter = this.get;
-
-      div.style.color = getter('theme.color');
-
-      if (!div.style.color) {
-        getter()['theme.color'] = '';
-      }
-
-      this.setTheme();
-
-      var rules = templates.theme(getter, this.themeMeta);
-      if (style.styleSheet) {
-        style.styleSheet.cssText = rules;
-      } else {
-        style.appendChild(document.createTextNode(rules));
-      }
-    } catch (e) {
-      // error {e}
-    }
-    return style;
-  },
-
   setTheme: function () {
     // update r.themeMeta based on prefs color
     this.r.postInit();
@@ -1953,8 +1910,6 @@ Session.prototype = {
     // ThemeMeta in razorpay.js contains only
     // color, textColor, highlightColor
     discreet.Theme.setThemeColor(this.r.themeMeta.color);
-
-    this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
   hideErrorMessage: function (confirmedCancel) {
@@ -6026,11 +5981,9 @@ Session.prototype = {
       });
       this.listeners = [];
       this.bits = [];
-      if (this.modal) {
-        this.modal.destroy();
+      if (this.mainModal) {
+        this.mainModal.$destroy();
       }
-      $(this.el).remove();
-
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
       window.setPaymentID = window.onComplete = null;
@@ -6325,9 +6278,7 @@ Session.prototype = {
       customer.customer_id = saved_customer.customer_id;
     }
     // Setting rtb_experiment based on prefs call for logged in users
-    discreet.TrustedBadgeHelper.setTrustedBadgeVariant(
-      preferences.rtb_experiment || {}
-    );
+    discreet.RTBHelper.setRTBVariant(preferences.rtb_experiment || {});
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },

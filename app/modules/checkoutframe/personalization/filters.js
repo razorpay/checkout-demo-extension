@@ -9,6 +9,7 @@ import {
   getWallets,
   getNetbankingBanks,
   isApplicationEnabled,
+  isCardLessEmiProviderEnabled,
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
@@ -126,6 +127,14 @@ const METHOD_FILTERS = {
   app(instrument) {
     return isApplicationEnabled(instrument.provider);
   },
+
+  cardless_emi: (instrument) => {
+    if (!instrument || !instrument.provider) {
+      return false;
+    }
+
+    return isCardLessEmiProviderEnabled(instrument.provider);
+  },
 };
 
 /**
@@ -153,13 +162,11 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
         if (METHOD_FILTERS[method]) {
           return METHOD_FILTERS[method](instrument, { customer });
         }
-
         return true;
       }
 
       return false;
     });
-
     return allowed;
   }
 );
@@ -177,6 +184,9 @@ const SANITY_FILTERS = {
     return true;
   },
   cardless_emi: (instrument) => {
+    if (!isCardLessEmiProviderEnabled(instrument.provider)) {
+      return false;
+    }
     // check for min_amount for cardless_emi
     const provider = getCardlessEMIProvider(instrument.provider);
     const minAmount = provider.min_amount || 0;

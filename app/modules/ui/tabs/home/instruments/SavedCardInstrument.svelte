@@ -34,6 +34,7 @@
   import { selectedCardFromHome } from 'checkoutstore/screens/card';
   import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
+  import { getThemeMeta } from 'checkoutstore/theme';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -46,13 +47,14 @@
   $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
+  const themeMeta = getThemeMeta();
   const isEmiInstrument = instrument.method === 'emi';
 
   function getIcon(card) {
     if (card && card.network && card.network !== 'unknown') {
       return getNetworkIcon(findCodeByNetworkName(card.network));
     } else {
-      return session.themeMeta.icons.card;
+      return themeMeta.icons.card;
     }
   }
 
