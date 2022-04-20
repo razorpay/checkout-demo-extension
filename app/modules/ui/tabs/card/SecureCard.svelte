@@ -10,6 +10,7 @@
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import { showSavedCardTooltip } from 'checkoutstore/screens/card';
   import { isRecurring, isSubscription } from 'razorpay';
+  import { isDesktop } from 'common/useragent';
 
   //i18n
   import {
@@ -34,7 +35,11 @@
     if (e && e.stopPropagation) {
       e.stopPropagation();
     }
-    Razorpay.sendMessage({ event: 'blur' });
+
+    if (!isDesktop()) {
+      Razorpay.sendMessage({ event: 'blur' });
+    }
+
     if (cvvRef) {
       cvvRef.blur();
     }
