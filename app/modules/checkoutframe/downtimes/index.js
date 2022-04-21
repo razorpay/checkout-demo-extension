@@ -61,7 +61,7 @@ function groupDowntimesByMethod(allDowntimes) {
 /**
  * Get downtimes from preferences.
  *
- * @return {Object}
+ * @return {{ upi, netbanking, cards}}
  */
 export function getDowntimes() {
   const hasDowntimes = getPreferences('payment_downtime.items.length');

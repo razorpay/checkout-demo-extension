@@ -1,10 +1,10 @@
 /**
  * In-memory version of window.localStorage
  */
-const BrowserStorage = {
+const BrowserStorage: Partial<Storage> = {
   _storage: {},
 
-  setItem: function (key, value) {
+  setItem: function (key: string, value: any) {
     this._storage[key] = value;
   },
 
@@ -21,27 +21,27 @@ const BrowserStorage = {
  * Determines which storage to use:
  * window.localStorage, or BrowserStorage
  *
- * @returns {localStorage|Object}
+ * @returns {localStorage|Object|Storage}
  */
-function determineStorage() {
+function determineStorage(): Storage {
   // Get current timestamp
-  const now = _.now();
+  const now = Date.now();
 
   try {
     // Put current timestamp in storage and verify if storage is available
-    global.localStorage.setItem('_storage', now);
+    global.localStorage.setItem('_storage', now as any);
     const fromStorage = global.localStorage.getItem('_storage');
     global.localStorage.removeItem('_storage');
 
     // If timestamp from storage doesn't match, use our mocked storage
-    if (now !== parseInt(fromStorage)) {
-      return BrowserStorage;
+    if (now !== parseInt(String(fromStorage))) {
+      return BrowserStorage as Storage;
     } else {
       return global.localStorage;
     }
   } catch (err) {
     // In case something fails, use our mocked storage.
-    return BrowserStorage;
+    return BrowserStorage as Storage;
   }
 }
 

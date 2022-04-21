@@ -10,7 +10,7 @@ async function openSdkCheckoutWithNewHomeScreen(props) {
 }
 
 async function openCheckoutOnMobileWithNewHomeScreen(props) {
-  props = { ...props, emulate: 'Pixel 2' };
+  props = { ...props, emulate: props.emulate || 'Pixel 2' };
   return await openCheckout(props);
 }
 module.exports = {

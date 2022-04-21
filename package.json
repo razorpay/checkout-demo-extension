@@ -121,7 +121,7 @@
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-svelte": "^7.1.0",
     "stylus": "^0.54.7",
-    "svelte": "3.42.5",
+    "svelte": "^3.46.4",
     "svelte-check": "^2.2.10",
     "svelte-i18n": "^3.0.4",
     "svelte-jester": "^2.1.5",

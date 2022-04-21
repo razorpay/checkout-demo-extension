@@ -4,6 +4,7 @@ import loader from 'one_click_checkout/loader/i18n/en';
 import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
+import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
 export default {
   app: {
@@ -1191,6 +1192,8 @@ export default {
     recurring_caw_callout_as_presented:
       'This is a recurring payment and upto {maxAmount} will be charged now. {merchantName} can automatically charge upto {amount} for each payment in the future.',
     redirect_to_app: 'You will be redirected to your UPI app',
+    redirect_to_app_v2:
+      'Choose the app installed on your phone to make the payment directly using the app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
@@ -1203,6 +1206,7 @@ export default {
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
     verifying_vpa_info: 'Verifying your VPA',
+    ...upiLang,
   },
   upi_intent_apps: {
     amazon: 'Amazon Pay UPI',
@@ -1248,7 +1252,7 @@ export default {
     wizely: 'Wizely',
     'yes-bank': 'Yes Bank',
     other_intent_apps: 'UPI Apps',
-    other_intent_upi_apps: 'Other UPI Apps',
+    other_intent_upi_apps: 'Pay with other UPI apps',
   },
   wallets: {
     airtelmoney: 'Airtel Money',

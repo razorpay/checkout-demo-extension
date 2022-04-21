@@ -4,6 +4,7 @@
   import { getSession } from 'sessionmanager';
   import Icon from 'ui/elements/Icon.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
+  import { resetSelectedUPIAppForPay } from 'checkoutstore/screens/upi';
 
   // i18
   import { t, locale } from 'svelte-i18n';
@@ -31,6 +32,7 @@
   };
   const handleBack = () => {
     session.hideOverlayMessage();
+    resetSelectedUPIAppForPay();
   };
   export const handleChange = function (param) {
     instrument = param;

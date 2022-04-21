@@ -45,3 +45,19 @@ if(myExperiment.enabled()) {
 
 ...
 ```
+
+### How to set the traffic %
+
+> If you have to run the experiment for **x%** traffic then evaluator arg must be **(1-x)**
+
+Ex A. 5% experiment will be
+
+```javascript
+const myExperiment = createExperiment('my_experiment', 0.95);
+```
+
+Ex B. 15% experiment will be
+
+```javascript
+const myExperiment = createExperiment('my_experiment', 0.85);
+```

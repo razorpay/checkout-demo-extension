@@ -20,7 +20,10 @@ export function getThemeColor() {
   return theme.color;
 }
 
-export function getColorVariations() {
+export function getColorVariations(fallback = false) {
+  if (fallback && !theme.backgroundColor && !theme.foregroundColor) {
+    return Color.getColorVariations(RAZORPAY_COLOR);
+  }
   return {
     backgroundColor: theme.backgroundColor,
     foregroundColor: theme.foregroundColor,

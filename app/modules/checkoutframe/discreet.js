@@ -4,6 +4,8 @@ import $ from 'lib/$';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
+import { processIntentOnMWeb } from 'upi/helper/payment';
+import { avoidSessionSubmit } from 'upi/helper';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -133,6 +135,11 @@ import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import * as NetbankingHelper from 'netbanking/helper';
 import * as EMIHelper from 'emi/helper';
+
+const upiPaymentHandlers = {
+  processIntentOnMWeb,
+  avoidSessionSubmit,
+};
 
 export default {
   $,
@@ -280,6 +287,7 @@ export default {
   merchantAnalyticsConstant,
 
   SecurityUtils,
+  upiPaymentHandlers,
 
   // Offline Challan
   offlineChallanTab,

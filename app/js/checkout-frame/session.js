@@ -40,6 +40,7 @@ var preferences,
   RazorpayHelper = discreet.RazorpayHelper,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
+  upiPaymentHandlers = discreet.upiPaymentHandlers,
   AnalyticsTypes = discreet.AnalyticsTypes,
   Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
@@ -275,12 +276,14 @@ function hideDowntimeAlert() {
   if (wasShown) {
     hideOverlay(downtimeWrap);
   }
+  // discreet.UpiScreenStore.resetSelectedUPIAppForPay();
   return wasShown;
 }
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
+
   if (
     !hideRecurringCardsOverlay() &&
     !hideDowntimeAlert() &&
@@ -4304,6 +4307,14 @@ Session.prototype = {
       e.preventDefault();
       e.stopPropagation();
     }
+
+    /**
+     * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
+     */
+    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+      return;
+    }
+
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
     var cta = docUtil.querySelector('#footer-cta + span');
@@ -4794,6 +4805,16 @@ Session.prototype = {
   },
 
   submit: function (props) {
+    /**
+     * if upi-payment module has any downtime or has to wait for user to click on Pay button,
+     * it will set the data in respective handlers
+     * `avoidSessionSubmit` will return true in such cases, explaining that
+     * to avoid regular pre-submit and submit flows from sessionjs
+     * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
+     */
+    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+      return;
+    }
     var locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
@@ -5715,7 +5736,7 @@ Session.prototype = {
          * Invoke the flow where upi intent url is opened using deeplink
          */
         if (data.upi_app === null && response.data.intent_url) {
-          that.upiTab.processIntentOnMWeb(response.data.intent_url);
+          upiPaymentHandlers.processIntentOnMWeb(response.data.intent_url);
         }
       });
 
@@ -6235,6 +6256,7 @@ Session.prototype = {
   showOverlay: showOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
+  cancelHandler: cancelHandler,
   getProxyPhone: getProxyPhone,
 };
 

@@ -22,13 +22,15 @@
   import {
     UPI_INTENT_BLOCK_HEADING,
     UPI_REDIRECT_TO_APP,
+    UPI_REDIRECT_TO_APP_V2,
     UPI_RECOMMENDED,
     UPI_SHOW_OTHER_APPS,
   } from 'ui/labels/upi';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
-  import { tryOpeningIntentUrl } from 'upi/helper';
+  import { enableUPITiles, definePlatform } from 'upi/helper';
+  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
@@ -45,11 +47,24 @@
   let downtimeSeverity = false;
   let downtimeInstrument;
 
+  let upiTiles = enableUPITiles();
+  const showIntentListHeaderForIos =
+    upiTiles.status === true && definePlatform('mWebiOS');
+
   let upiDowntimes = getDowntimes().upi;
 
   const session = getSession();
   const themeMeta = getThemeMeta();
   let otherAppsIcon = themeMeta.icons.othermethods;
+
+  // In old UI only 5 apps were displayed upfront, and there was a CTA to show all apps
+  // In the new grid UI we want to show all the apps upfront so explictly setting
+  // showAll to true
+  $: {
+    if (upiTiles.status === true) {
+      showAll = true;
+    }
+  }
 
   $: {
     if (apps.length <= 5 || showAll) {
@@ -74,11 +89,20 @@
     }
   }
 
-  export function onAppSelect({ detail }, index) {
+  function trackIntentAppSelected(app_name, index) {
     Analytics.track(UPI_EVENTS.INTENT_APP_SELECTED, {
-      app_name: detail.app_name,
+      app_name,
       index,
     });
+  }
+
+  function onAppSelectFromV2GridUI({ detail }) {
+    trackIntentAppSelected(detail.app.app_name, detail.index);
+    session.onUpiAppSelect(detail.app.package_name);
+  }
+
+  export function onAppSelect({ detail }, index) {
+    trackIntentAppSelected(detail.app_name, index);
     const packageName = detail.package_name;
     const psp = detail.shortcode;
     const params = {
@@ -95,19 +119,6 @@
     dispatch('select', params);
   }
 
-  export const processIntentOnMWeb = (intentUrl) => {
-    tryOpeningIntentUrl(intentUrl).then((canProceed) => {
-      if (canProceed) {
-        // emit success response and trigger polling
-        session.r.emit('payment.upi.intent_success_response');
-      } else {
-        const metaParam = { upiNoApp: true };
-        // clear the payment and dispatch no upi apps message
-        session.clearRequest(metaParam);
-      }
-    });
-  };
-
   onMount(() => {
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
   });
@@ -117,52 +128,84 @@
 <div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
-    <ListHeader>
-      <i slot="icon">
-        <Icon icon={getMiscIcon('redirect')} />
-      </i>
-      <!-- LABEL: You will be redirected to your UPI app -->
-      <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
-    </ListHeader>
-
-    {#each showableApps as app, i (app.package_name)}
-      <DeprecatedRadioOption
-        data={app}
-        icon={app.app_icon}
-        iconPlaceholder=".placeholder"
-        selected={app.package_name === selected}
-        on:select={(e) => onAppSelect(e, i)}
-        name="upi_app"
-        value={app.package_name}
-        showRadio={!skipCTA}
-        showArrow={skipCTA}
-      >
-        <div class="ref-title" data-name={app.shortcode}>
-          {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
-          {#if i === 0 && showRecommendedUPIApp}
-            <span>
-              <!-- LABEL: Recommended -->
-              <em>({$t(UPI_RECOMMENDED)})</em>
-            </span>
-          {/if}
+    {#if upiTiles.status === false || showIntentListHeaderForIos}
+      <ListHeader>
+        <i slot="icon">
+          <Icon icon={getMiscIcon('redirect')} />
+        </i>
+        <!-- LABEL: You will be redirected to your UPI app -->
+        <div slot="subtitle">
+          {$t(
+            showIntentListHeaderForIos
+              ? UPI_REDIRECT_TO_APP_V2
+              : UPI_REDIRECT_TO_APP
+          )}
         </div>
-        {#if !!downtimeSeverity && app.package_name === selected}
-          <div class="downtime-upi-intent-wrapper">
-            <div class="downtime-upi-intent">
-              <DowntimeCallout
-                showIcon={true}
-                severe={downtimeSeverity}
-                {downtimeInstrument}
-              />
-            </div>
+      </ListHeader>
+    {/if}
+
+    {#if upiTiles.status === true}
+      {#if Array.isArray(showableApps) && showableApps.length > 0}
+        <div class="intent-apps-container uninteractive">
+          <UPIAppStack
+            method="upi"
+            withOtherTile={false}
+            apps={showableApps}
+            variant="row"
+            on:select={onAppSelectFromV2GridUI}
+          />
+        </div>
+      {/if}
+    {:else}
+      {#each showableApps as app, i (app.package_name)}
+        <DeprecatedRadioOption
+          data={app}
+          icon={app.app_icon}
+          iconPlaceholder=".placeholder"
+          selected={app.package_name === selected}
+          on:select={(e) => onAppSelect(e, i)}
+          name="upi_app"
+          value={app.package_name}
+          showRadio={!skipCTA}
+          showArrow={skipCTA}
+        >
+          <div class="ref-title" data-name={app.shortcode}>
+            {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
+            {#if i === 0 && showRecommendedUPIApp}
+              <span>
+                <!-- LABEL: Recommended -->
+                <em>({$t(UPI_RECOMMENDED)})</em>
+              </span>
+            {/if}
           </div>
-        {/if}
-      </DeprecatedRadioOption>
-    {/each}
+          {#if !!downtimeSeverity && app.package_name === selected}
+            <div class="downtime-upi-intent-wrapper">
+              <div class="downtime-upi-intent">
+                <DowntimeCallout
+                  showIcon={true}
+                  severe={downtimeSeverity}
+                  {downtimeInstrument}
+                />
+              </div>
+            </div>
+          {/if}
+        </DeprecatedRadioOption>
+      {/each}
+
+      {#if apps.length > 5 && !showAll}
+        <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
+          <!-- LABEL: Show other UPI apps -->
+          {$t(UPI_SHOW_OTHER_APPS)}
+        </NextOption>
+      {/if}
+    {/if}
+
     {#if payUsingApps}
       <DeprecatedRadioOption
         data={OTHER_INTENT_APPS}
-        icon={OTHER_INTENT_APPS.app_icon}
+        icon={upiTiles?.status === true
+          ? otherAppsIcon
+          : OTHER_INTENT_APPS.app_icon}
         iconPlaceholder=".placeholder"
         name="upi_app"
         value={OTHER_INTENT_APPS.package_name}
@@ -175,13 +218,6 @@
           {getUpiIntentAppName(getOtherAppsLabel(showableApps), $locale)}
         </div>
       </DeprecatedRadioOption>
-    {/if}
-
-    {#if apps.length > 5 && !showAll}
-      <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
-        <!-- LABEL: Show other UPI apps -->
-        {$t(UPI_SHOW_OTHER_APPS)}
-      </NextOption>
     {/if}
   </div>
 </div>
@@ -275,5 +311,10 @@
   }
   .downtime-upi-intent-wrapper {
     margin-bottom: 54px;
+  }
+  .intent-apps-container {
+    background: #fcfcfc;
+    border: 1px solid #e6e7e8;
+    padding: 0px 16px 16px 16px;
   }
 </style>

@@ -32,10 +32,12 @@ import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
 import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
+import { AVAILABLE_METHODS } from 'common/constants';
 
-import { getAllMethods } from 'checkoutframe/paymentmethods';
-
-const availIconNames = getAllMethods().concat([
+/**
+ * Don't use getAllMethods which is functional representation for AVAILABLE_METHODS, as its creating CIRCULAR DEPENDENCY
+ */
+const availIconNames = [...AVAILABLE_METHODS].concat([
   'othermethods',
   'contact',
   'aadhaar',

@@ -1,6 +1,10 @@
 const initThemeMock = () =>
   jest.mock('checkoutstore/theme', () => {
     return {
+      getColorVariations: jest.fn(() => ({
+        foreground: '',
+        backgroundColor: '',
+      })),
       getThemeMeta: () => ({
         icons: {
           card: '',

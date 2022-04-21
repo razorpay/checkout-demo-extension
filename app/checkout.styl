@@ -198,8 +198,8 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .border-list:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
-.border-list > *:focus,
-.border-list > *:focus-within,
+.border-list > *:focus:not(.uninteractive),
+.border-list > *:focus-within:not(.uninteractive),
 .border-list > .selected {
     border-color: var(--highlight-color);
     background-color: var(--hover-state-color);
@@ -214,8 +214,8 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .border-list:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
-.border-list > *:focus + *,
-.border-list > *:focus-within + *,
+.border-list > *:focus:not(.uninteractive) + *,
+.border-list > *:focus-within:not(.uninteractive) + *,
 .border-list > .selected + * {
     border-top-color: var(--highlight-color);
 }

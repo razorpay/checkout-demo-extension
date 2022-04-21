@@ -52,6 +52,10 @@
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import {
+    resetSelectedUPIAppForPay,
+    selectedUPIAppForPay,
+  } from 'checkoutstore/screens/upi';
+  import {
     getName,
     isRecurring,
     getMerchantOrder,
@@ -74,7 +78,12 @@
   } from 'ui/labels/upi';
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
-  import { oneClickUPIIntent } from 'upi/helper';
+  import {
+    oneClickUPIIntent,
+    enableUPITiles,
+    getRecommendedAppsForUPIStack,
+    definePlatform,
+  } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
@@ -95,6 +104,7 @@
   export let intent = false;
   export let pspHandle;
   export let shouldShowQr;
+
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
@@ -107,6 +117,10 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
   let upiIntent;
+
+  let upiTiles = enableUPITiles();
+  const showStaticIntentAppsForIos =
+    upiTiles.status === true && definePlatform('mWebiOS');
 
   const merchantName = getName();
 
@@ -273,7 +287,21 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+  $: {
+    if (showStaticIntentAppsForIos) {
+      intentApps = getRecommendedAppsForUPIStack(false, 3);
+    } else {
+      intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+    }
+  }
+
+  // Deselect everything else on UPI screen when intent app is selected
+  $: {
+    if ($selectedUPIAppForPay?.app) {
+      selectedToken = null;
+      intentAppSelected = null;
+    }
+  }
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
@@ -580,6 +608,12 @@
 
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
+
+    // Note: unselect the new intent UI grid app whenever any other
+    // instrument is selected on upi screen (saved vpa, omnichannel etc)
+    if (upiTiles.status === true) {
+      resetSelectedUPIAppForPay();
+    }
   }
 
   export function getFullVpa() {
@@ -703,10 +737,6 @@
       },
     });
   }
-
-  export const processIntentOnMWeb = (intentUrl) => {
-    upiIntent.processIntentOnMWeb(intentUrl);
-  };
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
@@ -744,7 +774,8 @@
             apps={intentApps || []}
             selected={intentAppSelected}
             skipCTA={oneClickUPIIntentFlow}
-            payUsingApps={availableFlows.intentUrl}
+            payUsingApps={!definePlatform('mWebiOS') &&
+              availableFlows.intentUrl}
             bind:this={upiIntent}
             on:select={(e) => {
               const { downtimeInstrument, downtimeSeverity, packageName } =
@@ -805,7 +836,7 @@
                   />
                 </i>
                 <div slot="downtime" class="downtime-saved-vpa">
-                  {#if !!downtimeSeverity}
+                  {#if !!downtimeSeverity && selectedToken === app.id}
                     <DowntimeCallout
                       showIcon={true}
                       severe={downtimeSeverity}

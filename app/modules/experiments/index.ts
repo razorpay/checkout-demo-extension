@@ -3,16 +3,42 @@ import BrowserStorage from 'browserstorage';
 /** Don't change below */
 const STORAGE_KEY = 'rzp_checkout_exp';
 
+type CreateExperimentOptions = {
+  /**
+   * Argument for evaluator fn
+   */
+  evaluatorArg: number | string;
+
+  /**
+   * Function to override evaluation
+   */
+  overrideFn: Function;
+};
+
+type SingleExperiment = {
+  /**
+   * Name of experiment
+   */
+  name: string;
+  /**
+   * Function to check experiment is enabled or not
+   */
+  enabled: () => boolean;
+  /**
+   * Evaluator function which dev passed during creation of experiment.
+   */
+  evaluator?: Function;
+};
+
 class Experiment {
   /**
    * Sets all experiments in storage.
    * @param {Object} experiments All experiments
    */
-  static setExperimentsInStorage(experiments) {
+  static setExperimentsInStorage(experiments: object) {
     if (experiments && typeof experiments === 'object') {
       try {
-        experiments = JSON.stringify(experiments);
-        BrowserStorage.setItem(STORAGE_KEY, experiments);
+        BrowserStorage.setItem(STORAGE_KEY, JSON.stringify(experiments));
       } catch (err) {
         console.error(err);
         return;
@@ -23,13 +49,13 @@ class Experiment {
   /**
    * Retrieves all experiments from storage.
    *
-   * @returns {Object}
+   * @returns {object}
    */
-  static getExperimentsFromStorage() {
+  static getExperimentsFromStorage(): Common.Object {
     let data;
 
     try {
-      data = JSON.parse(BrowserStorage.getItem(STORAGE_KEY));
+      data = JSON.parse(BrowserStorage.getItem(STORAGE_KEY) as string);
     } catch (err) {
       // JSON parse Error
     }
@@ -42,11 +68,17 @@ class Experiment {
     }
   }
 
+  /**
+   * this parameter is class member
+   */
+  experiments: {
+    [key: string]: SingleExperiment;
+  };
   constructor(experiments = {}) {
     this.experiments = experiments;
   }
 
-  getExperiment = (name) => {
+  getExperiment = (name: string) => {
     if (!name) return null;
     return this.experiments[name];
   };
@@ -58,12 +90,16 @@ class Experiment {
   /**
    * Creates a segment for the given experiment.
    * @param {string} experiment Experiment name
-   * @param {*} evaluatorArg Argument for evaluator fn
-   * @param {Function} overrideFn Function to override evaluation
+   * @param {CreateExperimentOptions['evaluatorArg']} evaluatorArg Argument for evaluator fn
+   * @param {CreateExperimentOptions['overrideFn']} overrideFn Function to override evaluation
    *
    * @returns {*}
    */
-  setSegment(experiment, evaluatorArg, overrideFn) {
+  setSegment(
+    experiment: string,
+    evaluatorArg: CreateExperimentOptions['evaluatorArg'],
+    overrideFn: CreateExperimentOptions['overrideFn']
+  ): any {
     const config = this.getExperiment(experiment);
 
     // Sanity check
@@ -73,7 +109,9 @@ class Experiment {
 
     // Determine what function to use to get the segment
     const evaluator =
-      typeof overrideFn === 'function' ? overrideFn : config.evaluator;
+      typeof overrideFn === 'function'
+        ? overrideFn
+        : (config.evaluator as Function);
 
     // Get segment
     const segment = evaluator(evaluatorArg);
@@ -92,7 +130,7 @@ class Experiment {
    *
    * @returns {*}
    */
-  getSegment(experiment) {
+  getSegment(experiment: string): any {
     const experiments = Experiment.getExperimentsFromStorage();
 
     return experiments[experiment];
@@ -102,12 +140,16 @@ class Experiment {
    * Retrieves segment for an experiment
    * or creates one if it doesn't exist.
    * @param {string} experiment Experiment name
-   * @param {*} [evaluatorArg] Argument for evaluator fn
-   * @param {Function} [overrideFn] Function to override evaluation
+   * @param {CreateExperimentOptions['evaluatorArg']} [evaluatorArg] Argument for evaluator fn
+   * @param {CreateExperimentOptions['overrideFn']} [overrideFn] Function to override evaluation
    *
    * @returns {*}
    */
-  getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
+  getSegmentOrCreate(
+    experiment: string,
+    evaluatorArg: CreateExperimentOptions['evaluatorArg'],
+    overrideFn: CreateExperimentOptions['overrideFn']
+  ): Number {
     const existing = this.getSegment(experiment);
 
     /**
@@ -131,7 +173,7 @@ class Experiment {
     const all = Experiment.getExperimentsFromStorage();
     const current = this.getAllActiveExperimentsName();
 
-    const updatedExp = current.reduce((acc, currentExp) => {
+    const updatedExp = current.reduce((acc: Common.Object, currentExp) => {
       if (typeof all[currentExp] !== 'undefined') {
         acc[currentExp] = all[currentExp];
       }
@@ -141,27 +183,21 @@ class Experiment {
   };
 
   /**
-   * @typedef CreateExperimentOptions
-   * @param {*} evaluatorArg Argument for evaluator fn
-   * @param {Function} overrideFn Function to override evaluation
-   */
-  /**
-   * @typedef SingleExperiment
-   * @param {String} name Name of experiment
-   * @param {Function} enabled Function to check experiment is enabled or not
-   * @param {Function} evaluator evaluator function which dev passed during creation of experiment.
-   */
-  /**
    *
    * @param {String} name
    * @param {Function|number} evaluator returns 0 or 1
    * @param {CreateExperimentOptions} options
    * @returns {SingleExperiment}
    */
-  create = (name, evaluator, options = {}) => {
+  create = (
+    name: string,
+    evaluator: Function,
+    options: CreateExperimentOptions = {} as CreateExperimentOptions
+  ): SingleExperiment => {
     const { evaluatorArg, overrideFn } = options;
 
     function checkEnabled() {
+      // @ts-ignore
       return this.getSegmentOrCreate(name, evaluatorArg, overrideFn) === 1;
     }
     let evaluatorFn = evaluator;
@@ -187,7 +223,7 @@ class Experiment {
     return singleExperiment;
   };
 
-  register(experimentsObject) {
+  register(experimentsObject: Common.Object<SingleExperiment>) {
     this.experiments = { ...this.experiments, ...experimentsObject };
   }
 }
