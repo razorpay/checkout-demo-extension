@@ -223,15 +223,11 @@ function createTestRibbon(parent) {
 }
 
 function fetchNewDesignExp(rzp) {
-  let uuid = BrowserStorage.getItem('v_1_5_experiment_enabled');
-  if (!uuid) {
-    uuid = Track.makeUid();
-  }
+  let uuid = Track.makeUid();
   return new Promise(function (resolve, reject) {
     fetch.post({
       url: 'https://api.razorpay.com/v1/splitz/evaluate',
       callback: function (data) {
-        BrowserStorage.setItem('v_1_5_experiment_enabled', uuid);
         resolve(data);
       },
       data: {
