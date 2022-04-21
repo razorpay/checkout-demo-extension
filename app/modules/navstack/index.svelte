@@ -27,18 +27,18 @@
 </script>
 
 {#each elements as element, i}
-  <Element isOverlay={element.overlay} {backPressed}>
+  <Element isOverlay={element.overlay || false} {backPressed}>
     {#if i === elements.length - 1}
       <svelte:component
         this={element.component}
-        {...element.props}
+        {...element.props || {}}
         bind:this={ref}
         navstack={{
           isOverlay: element.overlay,
         }}
       />
     {:else}
-      <svelte:component this={element.component} {...element.props} />
+      <svelte:component this={element.component} {...element.props || {}} />
     {/if}
   </Element>
 {/each}

@@ -954,7 +954,7 @@ export function getEligiblePlansBasedOnMinAmount(plans) {
 }
 
 // @TODO modifies bajaj cardless emi min_amount
-export function getEMIBanks() {
+export function getEMIBanks(amount) {
   const emiOptions = getMerchantMethods().emi_options;
 
   if (emiOptions |> _Obj.isEmpty) {
@@ -962,7 +962,7 @@ export function getEMIBanks() {
   }
 
   const banks =
-    getEligibleBanksBasedOnMinAmount(getAmount(), emiOptions)
+    getEligibleBanksBasedOnMinAmount(amount || getAmount(), emiOptions)
     |> _Obj.map((plans, bankCode) => {
       return {
         ...getEMIBank(bankCode),

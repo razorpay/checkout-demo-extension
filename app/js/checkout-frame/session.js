@@ -266,15 +266,6 @@ function hideRecurringCardsOverlay() {
   return wasShown;
 }
 
-function hideEmi() {
-  var emic = $('#emi-wrap');
-  var wasShown = emic.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(emic);
-  }
-  return wasShown;
-}
-
 function hideDowntimeAlert() {
   var downtimeWrap = $('#downtime-wrap');
   if (!downtimeWrap || !downtimeWrap[0]) {
@@ -291,7 +282,6 @@ function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
   if (
-    !hideEmi() &&
     !hideRecurringCardsOverlay() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
@@ -1302,11 +1292,6 @@ Session.prototype = {
   },
 
   setEMI: function () {
-    if (!this.emi && MethodStore.isMethodEnabled('emi')) {
-      $(this.el).addClass('emi');
-      this.emi = new discreet.emiView();
-    }
-
     if (!this.emiPlansView) {
       this.emiPlansView = new discreet.emiPlansView();
     }
@@ -3336,21 +3321,6 @@ Session.prototype = {
     }, params);
   },
 
-  /**
-   * Displays the modal for all EMI plans
-   * @param {string} tab the tab from which the modal was invoked
-   */
-  showAllEmiPlans: function (tab) {
-    Analytics.track('emi:plans:view:all', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        from: tab,
-      },
-    });
-
-    showOverlay($('#emi-wrap'));
-  },
-
   showEmiPlansForNewCard: function () {
     var self = this;
     var amount = self.get('amount');
@@ -3453,7 +3423,7 @@ Session.prototype = {
         },
 
         viewAll: function () {
-          self.showAllEmiPlans(prevTab);
+          discreet.EMIHelper.viewAllEMIPlans(prevTab);
         },
       },
 
@@ -3580,7 +3550,7 @@ Session.prototype = {
         },
 
         viewAll: function () {
-          self.showAllEmiPlans(prevTab);
+          discreet.EMIHelper.viewAllEMIPlans(prevTab);
         },
       },
 

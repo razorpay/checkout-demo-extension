@@ -13,11 +13,14 @@
   import { returnAsIs } from 'lib/utils';
   import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
+  import { isOverlayActive } from 'navstack';
+  import { getView } from 'checkoutframe/components';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
+  let mobileDevice = isMobile();
 
   export let onClose: any = returnAsIs;
   export let escape = true;
@@ -34,15 +37,20 @@
     }
   }
 
+  function handleResize() {
+    mobileDevice = isMobile();
+    bringInputIntoView();
+  }
+
   onMount(() => {
-    window.addEventListener('resize', bringInputIntoView);
+    window.addEventListener('resize', handleResize);
     if (escape) {
       window.addEventListener('keyup', handleKeyInput);
     }
   });
 
   onDestroy(() => {
-    window.removeEventListener('resize', bringInputIntoView);
+    window.removeEventListener('resize', handleResize);
     window.removeEventListener('keyup', handleKeyInput);
   });
 
@@ -53,6 +61,8 @@
       last.back({
         from: 'overlay',
       });
+    } else if (isOverlayActive()) {
+      getView('navStack').backPressed();
     } else {
       next();
     }
@@ -72,7 +82,7 @@
 <div
   id="container"
   class="mfix"
-  class:mobile={isMobile()}
+  class:mobile={mobileDevice}
   class:test={!isLiveMode}
   class:notopbar={getOption('theme.hide_topbar')}
   class:noimage={!getOption('image')}
@@ -86,7 +96,6 @@
       <div id="overlay" />
       <div id="nocost-overlay" class="showable" />
       <div id="confirmation-dialog" class="showable" />
-      <div id="emi-wrap" class="overlay showable mfix" />
       <div id="recurring-cards-wrap" class="overlay showable mfix" />
       <div id="fee-wrap" class="overlay showable mfix" />
       <div id="one-cc-summary" />
