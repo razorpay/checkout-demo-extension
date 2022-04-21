@@ -26,6 +26,12 @@
   let merchantName = getOption('name');
 
   export let onCompletionHandler;
+
+  export function preventBack() {
+    finishCheckout();
+    return false;
+  }
+
   let interval;
   const covidPageLink =
     'https://razorpay.com/links/covid19?ref=checkout_covid_donations#hs_cos_wrapper_widget_1585571452797';
@@ -65,41 +71,39 @@
   }
 </script>
 
-<covid-wrap>
-  <div id="covid-wrap">
-    <div id="covid-wrap-success-text">
-      <div class="tick-icon">
-        <i slot="icon">
-          <Icon icon={icons.tick_filled_donate} />
-        </i>
-      </div>
-      <div>{$t(COVID_DONATIONS_PAYMENT_SUCCESS)}</div>
+<div id="covid-wrap">
+  <div id="covid-wrap-success-text">
+    <div class="tick-icon">
+      <i>
+        <Icon icon={icons.tick_filled_donate} />
+      </i>
     </div>
-    <div class="button-wrapper">
-      <div class="donate-icon">
-        <i slot="icon">
-          <Icon icon={icons.donate_heart} />
-        </i>
-      </div>
-      <div class="header">{$t(COVID_DONATIONS_HEADER)}</div>
-      <div on:click={donateCtaHandle} class="donate-button">
-        {$t(COVID_DONATIONS_CTA_TEXT)}
-      </div>
-      <div class="donate-subtext">
-        {$t(COVID_DONATIONS_SUB_TEXT)}
-      </div>
+    <div>{$t(COVID_DONATIONS_PAYMENT_SUCCESS)}</div>
+  </div>
+  <div class="button-wrapper">
+    <div class="donate-icon">
+      <i>
+        <Icon icon={icons.donate_heart} />
+      </i>
     </div>
-    <div class="redirection-text">
-      <FormattedText
-        text={formatTemplateWithLocale(
-          COVID_DONATIONS_REDIRECTION_TEXT,
-          { secondsRemaining, merchantName },
-          $locale
-        )}
-      />
+    <div class="header">{$t(COVID_DONATIONS_HEADER)}</div>
+    <div on:click={donateCtaHandle} class="donate-button">
+      {$t(COVID_DONATIONS_CTA_TEXT)}
+    </div>
+    <div class="donate-subtext">
+      {$t(COVID_DONATIONS_SUB_TEXT)}
     </div>
   </div>
-</covid-wrap>
+  <div class="redirection-text">
+    <FormattedText
+      text={formatTemplateWithLocale(
+        COVID_DONATIONS_REDIRECTION_TEXT,
+        { secondsRemaining, merchantName },
+        $locale
+      )}
+    />
+  </div>
+</div>
 
 <style>
   .tick-icon {
@@ -143,18 +147,10 @@
   }
   #covid-wrap {
     border-radius: 0 0 3px 3px;
-    background: #fff;
-    bottom: -55px;
-    position: absolute;
-    width: 100%;
-    -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     height: 275px;
-    -webkit-transition: 0.2s;
-    -o-transition: 0.2s;
     transition: 0.2s;
     padding-top: 20px;
-    z-index: 100;
   }
   #covid-wrap-success-text {
     display: flex;

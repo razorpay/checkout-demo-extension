@@ -710,11 +710,10 @@ function successHandler(response) {
   }
   hideOverlayMessage();
   if (this.preferences.show_donation) {
-    new CovidDonationView.render(completeCheckoutFlow.bind(this));
+    CovidDonationView.render(completeCheckoutFlow.bind(this));
   } else {
     completeCheckoutFlow.call(this);
   }
-  showOverlay(this.getCovidDonationDialog());
 }
 
 function cancel_upi(session) {
@@ -3939,10 +3938,6 @@ Session.prototype = {
 
   getDowntimeAlertDialog: function () {
     return $('#downtime-wrap');
-  },
-
-  getCovidDonationDialog: function () {
-    return $('#covid-wrap');
   },
 
   setSvelteOverlay: function () {

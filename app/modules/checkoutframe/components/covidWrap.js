@@ -1,11 +1,10 @@
-/* global showOverlay, hideEmi, Event */
 import CovidDonation from 'ui/components/covid-donations/index.svelte';
-import { querySelector } from 'utils/doc';
+import { pushOverlay } from 'navstack';
+
 // Rendering the covid donation bottom sheet
 export function render(cb) {
-  const wrap = querySelector('#modal-inner');
-  return new CovidDonation({
-    target: wrap,
+  pushOverlay({
+    component: CovidDonation,
     props: {
       onCompletionHandler: cb,
     },
