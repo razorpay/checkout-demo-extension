@@ -94,7 +94,6 @@
     <div id="modal-inner">
       <div id="one-cc-loader" />
       <div id="overlay" />
-      <div id="nocost-overlay" class="showable" />
       <div id="confirmation-dialog" class="showable" />
       <div id="recurring-cards-wrap" class="overlay showable mfix" />
       <div id="fee-wrap" class="overlay showable mfix" />

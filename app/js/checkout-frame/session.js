@@ -1901,15 +1901,6 @@ Session.prototype = {
       this.setAmount(this.get('amount'));
     }
 
-    if (this.nocostModal) {
-      var modal = this.nocostModal;
-      hideOverlay($('#nocost-overlay'));
-      setTimeout(function () {
-        modal.$destroy();
-        modal = null;
-      }, 200);
-      return;
-    }
     var self = this;
     if (this.r._payment) {
       if (
@@ -5974,17 +5965,6 @@ Session.prototype = {
         data: this.dismissReason,
       });
     }
-  },
-
-  showNoCostExplainer: function (plan) {
-    this.nocostModal = new discreet.NoCostExplainer({
-      target: docUtil.getElementById('nocost-overlay'),
-      props: {
-        plan: plan,
-        formatter: this.formatAmountWithCurrency.bind(this),
-      },
-    });
-    showOverlay($('#nocost-overlay'));
   },
 
   setOffers: function () {

@@ -3,12 +3,14 @@
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
+  import { pushOverlay } from 'navstack';
 
   // Store imports
   import { appliedOffer } from 'checkoutstore/offers';
 
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
+  import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -142,7 +144,13 @@
   $: showEducation = !isBajajEmi;
 
   function explain() {
-    session.showNoCostExplainer(plan);
+    pushOverlay({
+      component: NoCostExplainer,
+      props: {
+        plan: plan,
+        formatter: session.formatAmountWithCurrency.bind(session),
+      },
+    });
   }
 
   let citiBankDetailsExpandedView = false;
