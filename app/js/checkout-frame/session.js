@@ -3,18 +3,11 @@
  */
 
 /* global discreet */
-/* global Razorpay */
-/* global Analytics */
-/* global AnalyticsTypes */
-/* global P13n */
 
 // The following are globals from app/js/lib/util
 // These have to be removed while refactoring
 
-/* global Wallet */
-
 // from init checkout-frame
-/* global SessionManager */
 
 var emo = {};
 
@@ -22,15 +15,20 @@ var ua = navigator.userAgent;
 
 var preferences,
   $ = discreet.$,
+  Razorpay = window.Razorpay,
+  fetch = discreet.fetch,
   WebPaymentsApi = discreet.WebPaymentsApi,
+  Constants = discreet.Constants,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
   Promise = discreet.Promise,
+  P13n = discreet.P13n,
+  SessionManager = discreet.SessionManager,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
   tab_titles = Constants.TAB_TITLES,
-  freqWallets = Wallet.wallets,
+  freqWallets = discreet.Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
   isMobile = discreet.UserAgent.isMobile,
@@ -42,6 +40,8 @@ var preferences,
   RazorpayHelper = discreet.RazorpayHelper,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
+  AnalyticsTypes = discreet.AnalyticsTypes,
+  Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
   _Arr = discreet._Arr,
   _ = discreet._,

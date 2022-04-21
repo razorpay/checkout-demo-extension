@@ -3,7 +3,7 @@ import { checkValidFlow } from './utils';
 import FLOWS from 'config/FLOWS';
 import { iOS, android } from 'common/useragent';
 import { getPaymentEntity } from 'razorpay';
-import errorService from 'error-service';
+import * as errorService from 'error-service';
 /**
  * popupIframeCheck check for given method is required to open in iframe inside
  * popup. If required it will do necessary steps to load the page

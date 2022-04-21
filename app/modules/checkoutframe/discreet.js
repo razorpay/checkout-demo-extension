@@ -1,14 +1,9 @@
 import 'entry/checkout-frame';
-import RazorpayConfig from 'common/RazorpayConfig';
 
 import $ from 'lib/$';
-import Analytics, { Track } from 'analytics';
+import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import ErrorService from 'error-service';
 import * as UPIUtils from 'common/upi';
-import * as GPay from 'gpay';
-import * as Color from 'lib/color';
-import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -43,12 +38,10 @@ import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
 import * as PayLater from 'common/paylater';
-import * as Token from 'common/token';
 import * as Apps from 'common/apps';
 import * as SessionManager from 'sessionmanager';
 import updateScore from 'analytics/checkoutScore';
 import { trackUpiIntentInstrumentPaymentAttempted } from 'analytics/highlightUpiIntentAnalytics';
-import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
@@ -144,24 +137,18 @@ import * as NetbankingHelper from 'netbanking/helper';
 
 export default {
   $,
-  RazorpayConfig,
   updateScore,
   fetch,
-  Track,
   Analytics,
   AnalyticsTypes,
   UPIUtils,
   UTILS,
-  GPay,
-  Color,
-  _PaymentMethodIcons,
   Confirm,
   FeeLabel,
   Currency,
   OtpService,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
-  ErrorService,
   Formatter,
   Form,
 
@@ -178,9 +165,7 @@ export default {
   Wallet,
   CardlessEmi,
   PayLater,
-  Token,
   SessionManager,
-  Checkout,
   Bridge,
   stopListeningForBackPresses,
   P13n,
