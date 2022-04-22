@@ -99,7 +99,6 @@
     "husky": "^6.0.0",
     "istanbul": "^0.4.5",
     "jest": "^27.3.1",
-    "jest-canvas-mock": "^2.3.1",
     "jest-circus": "^27.3.1",
     "jsdom": "^18.1.1",
     "jsdom-global": "^3.0.2",
