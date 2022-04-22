@@ -4,4 +4,6 @@ const createAccountTabTest = require('../../../create/one-click-checkout/account
 createAccountTabTest({
   amount: 200 * 100,
   logout: true,
+  loggedIn: true,
+  anon: false,
 });

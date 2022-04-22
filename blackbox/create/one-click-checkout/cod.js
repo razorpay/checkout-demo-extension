@@ -46,7 +46,7 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout COD test', ({ preferences, title, options }) => {
-    test(title, async () => {
+    test.skip(title, async () => {
       preferences.methods.cod = true;
 
       const context = await openCheckoutWithNewHomeScreen({

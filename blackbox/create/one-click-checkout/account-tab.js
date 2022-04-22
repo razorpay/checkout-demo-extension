@@ -29,6 +29,7 @@ module.exports = function (testFeatures) {
 
   describe.each(
     getTestData(title, {
+      ...features,
       options,
       preferences,
     })
@@ -43,12 +44,6 @@ module.exports = function (testFeatures) {
         });
 
         await handleAvailableCouponReq(context);
-
-        if (logout || logoutAll) {
-          await login(context);
-          await goBack(context);
-          await handleAvailableCouponReq(context);
-        }
 
         const screenEle = await context.page.waitForSelector('.screen-comp');
         await scrollToEnd(context, screenEle);

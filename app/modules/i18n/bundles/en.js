@@ -1186,8 +1186,7 @@ export default {
     invalid_vpa_default_message:
       'Invalid VPA, please try again with correct VPA',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
-    new_vpa_subtitle_upi_otm:
-      'Pay using <strong>Amazon Pay<strong>, <strong>PhonePe<strong>, <strong>PayTM<strong> or <strong>BHIM<strong>',
+    new_vpa_subtitle_upi_otm: 'Phonepe, GooglePay, PayTM & BHIM',
 
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',

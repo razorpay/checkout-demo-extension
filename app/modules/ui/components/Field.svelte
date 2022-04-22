@@ -24,6 +24,7 @@
   export let type = 'text';
   export let name;
   export let value = null;
+  export let displayValue = null;
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
@@ -451,7 +452,7 @@
       </i>
     {/if}
     {#if leftImage}
-      <img class="left-img" src={leftImage} />
+      <img alt="left-img" class="left-img" src={leftImage} />
     {/if}
     <input
       class="input main"
@@ -461,7 +462,7 @@
       type={inputType}
       {name}
       {inputmode}
-      {value}
+      value={displayValue || value}
       {required}
       {autocomplete}
       x-autocompletetype={xautocompletetype}
@@ -508,7 +509,7 @@
       />
     {/if}
     {#if label}
-      <label class={labelClasses}>{label}</label>
+      <label for={identifier} class={labelClasses}>{label}</label>
     {/if}
     {#if extraLabel}
       <div class={`${extraLabelClass} input-extralabel`}>
