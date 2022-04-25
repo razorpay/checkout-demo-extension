@@ -19,11 +19,11 @@ const highlightUPIIntentOnDesktop = createExperiment(
 
 /**
  * Experiment: UPI NR L0 L1 Improvements
- * Temporary 0.50 rollout, argument must be 1-0.5
+ * Temporary full rollout, argument must be 0
  */
 export const upiNrL0L1Improvements = createExperiment(
-  'upi_nr_l0_l1_improvements_50',
-  0.5
+  'upi_nr_l0_l1_improvements_100',
+  0
 );
 
 export { highlightUPIIntentOnDesktop, oneClickUPIIntent };
