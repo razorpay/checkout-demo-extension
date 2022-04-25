@@ -32,12 +32,12 @@ RUN git init
 
 RUN if [[ -n $TRAFFIC_ENV ]]; then \
     cd /checkout_build \
-    && yarn install \
+    && npm install \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     else \
     cd /checkout_build \
-    && yarn install \
+    && npm install \
     && NODE_ENV=production npm test \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     fi
