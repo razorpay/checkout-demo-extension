@@ -31,6 +31,7 @@
 
   // Form Validation for email - specifically for 1cc
   let validationText;
+  export let showValidations = false;
   $: validationText = !EMAIL_VALIDATOR.test(value) ? $t(EMAIL_HELP_TEXT) : null;
 </script>
 
@@ -49,6 +50,7 @@
     on:blur
     helpText={$t(EMAIL_HELP_TEXT)}
     {validationText}
+    {showValidations}
   />
   <!-- LABEL: Please enter a valid email. Example: you@example.com -->
 </div>
