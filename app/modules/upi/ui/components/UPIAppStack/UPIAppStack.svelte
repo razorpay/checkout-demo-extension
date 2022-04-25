@@ -120,7 +120,7 @@
             </AppTile>
           {/each}
           {#if variant === 'subText' && row === 0}
-            <span class="full-width">& more</span>
+            <span class="full-width">& More</span>
           {/if}
         </div>
         <div class="flex">

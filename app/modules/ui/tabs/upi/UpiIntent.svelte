@@ -231,7 +231,7 @@
   #upi-apps {
     :global(.radio-option),
     :global(.next-option) {
-      padding: 18px 40px 18px 72px;
+      padding: 18px 40px 18px 48px;
       box-sizing: border-box;
     }
 
