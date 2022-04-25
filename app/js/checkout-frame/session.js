@@ -78,7 +78,6 @@ var preferences,
   updateScore = discreet.updateScore,
   trackUpiIntentInstrumentPaymentAttempted =
     discreet.trackUpiIntentInstrumentPaymentAttempted,
-  CovidDonationView = discreet.CovidDonations,
   Header = discreet.Header,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
@@ -709,11 +708,7 @@ function successHandler(response) {
     this.hide();
   }
   hideOverlayMessage();
-  if (this.preferences.show_donation) {
-    CovidDonationView.render(completeCheckoutFlow.bind(this));
-  } else {
-    completeCheckoutFlow.call(this);
-  }
+  completeCheckoutFlow.call(this);
 }
 
 function cancel_upi(session) {

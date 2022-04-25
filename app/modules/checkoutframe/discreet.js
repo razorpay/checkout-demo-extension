@@ -112,7 +112,6 @@ import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 import * as UTILS from 'lib/utils.js';
 
 import OneClickCheckoutHomeTab from 'one_click_checkout/ui/Home.svelte';
-import * as CovidDonations from 'checkoutframe/components/covidWrap';
 import * as Header from 'checkoutframe/components/header';
 import * as ChargesHelper from 'one_click_checkout/charges/helpers';
 import * as ChargesStore from 'one_click_checkout/charges/store';
@@ -259,7 +258,6 @@ export default {
   rewardsStore,
   CRED,
   downtimeUtils,
-  CovidDonations,
   Apps,
   Header,
 

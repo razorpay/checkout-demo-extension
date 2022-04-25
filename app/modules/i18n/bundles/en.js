@@ -1304,15 +1304,6 @@ export default {
     highlight3:
       'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>',
   },
-  covid_donations: {
-    payment_success: 'Your payment was successful!',
-    header: 'Help Organizations Fight COVID-19',
-    cta_text: 'Donate Now',
-    sub_text:
-      'Help people in need of oxygen cylinders or food by sharing a small contribution towards organisations like Hemkunt Foundation and others.',
-    redirection_text:
-      'Redirecting to {merchantName} in {secondsRemaining} seconds',
-  },
   address,
   coupons,
   loader,
