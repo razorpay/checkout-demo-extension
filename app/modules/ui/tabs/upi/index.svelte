@@ -155,7 +155,7 @@
 
   /**
    * bankselection is disabled for UPI recurring
-   * https://jira.corp.razorpay.com/browse/CE-4110
+   * https://razorpay.atlassian.net/browse/CE-4110
    */
   let requiresBankSelection = false;
   let upiFlowStep = steps.upi;
