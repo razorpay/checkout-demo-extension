@@ -111,7 +111,7 @@ module.exports = function (testFeatures) {
           return allIdExist === true ? true : allIdExist;
         }, L0AppIds);
         if (typeof allAppsExist === 'string') {
-          throw new Error(`Missing UPI App Tile ${allSelector}`);
+          throw new Error(`Missing UPI App Tile ${allAppsExist}`);
         }
         // select first app
         const firstApp = await context.page.waitForSelector(
