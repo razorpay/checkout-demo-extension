@@ -31,7 +31,6 @@
 
 // from init checkout-frame
 /* global SessionManager */
-/* global templates */
 
 var ua = navigator.userAgent;
 
@@ -135,6 +134,7 @@ var PayLaterStore = {
 };
 
 var METHODS = discreet.CommonConstants.METHODS;
+var V1_5_EXPERIMENT_ENABLED = discreet.Constants.V1_5_EXPERIMENT_ENABLED;
 
 /**
  * Store for what tab and screen
@@ -777,12 +777,17 @@ function cancel_upi(session) {
 
 function Session(message) {
   var options = message.options;
+  var v_1_5_experiment_enabled =
+    message.options[V1_5_EXPERIMENT_ENABLED] || false;
   var self = this;
 
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+
+  this.set(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
+  Analytics.setMeta(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
 
   each(message, function (key, val) {
     if (key !== 'options') {
@@ -913,12 +918,11 @@ Session.prototype = {
   getEl: function () {
     var r = this.r;
     if (!this.el) {
+      this.setTheme();
       this.mainModal = new discreet.MainModal({ target: document.body });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
-
-      document.body.appendChild(this.renderCss());
     }
     return this.el;
   },
@@ -1181,6 +1185,7 @@ Session.prototype = {
       this.fillData();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
+      discreet.fonts.loadInterFont();
       this.switchTab('home-1cc');
     }
     this.setEMI();
@@ -1976,37 +1981,6 @@ Session.prototype = {
     }
   },
 
-  renderCss: function () {
-    var div = document.createElement('div');
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    try {
-      var getter = this.get;
-
-      div.style.color = getter('theme.color');
-
-      if (!div.style.color) {
-        getter()['theme.color'] = '';
-      }
-
-      this.setTheme();
-
-      var rules = templates.theme(
-        getter,
-        this.themeMeta,
-        discreet.UrlUtils.getCdnUrl
-      );
-      if (style.styleSheet) {
-        style.styleSheet.cssText = rules;
-      } else {
-        style.appendChild(document.createTextNode(rules));
-      }
-    } catch (e) {
-      roll('renderCss', e);
-    }
-    return style;
-  },
-
   setTheme: function () {
     // update r.themeMeta based on prefs color
     this.r.postInit();
@@ -2014,8 +1988,6 @@ Session.prototype = {
     // ThemeMeta in razorpay.js contains only
     // color, textColor, highlightColor
     discreet.Theme.setThemeColor(this.r.themeMeta.color);
-
-    this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
   hideErrorMessage: function (confirmedCancel) {

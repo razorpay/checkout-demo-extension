@@ -24,6 +24,7 @@
   export let hidden = false;
   export let disabled = false;
   export let showAmount = true;
+  export let handleDisable = false;
   export let onViewDetailsClick = function () {
     Events.TrackBehav(CTAEvents.VIEW_DETAILS_CLICKED, {
       screen_name: getCurrentScreen(),
@@ -67,7 +68,7 @@
     {/if}
     <div class="one-cc-cta-wrapper" class:full-width={!showAmount}>
       <button
-        {disabled}
+        disabled={handleDisable ? false : disabled}
         class:disabled
         id="one-cc-cta"
         on:click|preventDefault={(e) => dispatch('click', e)}
@@ -146,6 +147,9 @@
     font-size: 14px;
     font-weight: 600;
     border-radius: 6px;
+
+    color: var(--text-color);
+    background: var(--primary-color);
   }
 
   .one-cc-cta-wrapper.full-width {

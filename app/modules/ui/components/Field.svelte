@@ -85,7 +85,7 @@
     right: 'auto',
   };
 
-  let showValidations = false;
+  export let showValidations = false;
 
   const singleCharacterWidth = 7;
   /**

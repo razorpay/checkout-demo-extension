@@ -15,6 +15,7 @@ import {
   redirectTo,
   submitForm,
 } from 'utils/doc';
+import { V1_5_EXPERIMENT_ENABLED } from 'common/constants';
 
 const { screen, scrollTo } = global;
 
@@ -121,7 +122,7 @@ function makeCheckoutUrl(rzp) {
 
   var url = RazorpayConfig.frame;
 
-  if (rzp?.get('v_1_5_experiment_enabled')) {
+  if (rzp?.get(V1_5_EXPERIMENT_ENABLED)) {
     url = getNewDesignUrl();
   }
 

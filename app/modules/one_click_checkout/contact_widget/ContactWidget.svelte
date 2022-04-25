@@ -23,14 +23,17 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { findCountryCode } from 'common/countrycodes';
+  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 
   // Constant Imports
   import { views } from 'one_click_checkout/routing/constants';
 
   let showUserDetailsStrip;
-  let showEditUserDetails = !$isContactPresent && !$email;
+  let showEditUserDetails =
+    !CONTACT_REGEX.test($contact) || !EMAIL_REGEX.test($email);
   let phoneCode = '';
   let phoneNum = '';
+  export let showValidations = false;
 
   $: {
     showUserDetailsStrip =
@@ -68,7 +71,7 @@
     </div>
     {#if showEditUserDetails}
       <div>
-        <PaymentDetails />
+        <PaymentDetails {showValidations} />
       </div>
     {:else}
       <div class="contact-info">

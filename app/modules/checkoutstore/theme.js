@@ -1,6 +1,7 @@
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import { COLORS } from 'common/constants';
+import { setRootCSSVariable } from 'utils/CSSVar';
 
 const {
   RAZORPAY_COLOR,
@@ -48,4 +49,14 @@ export function setThemeColor(color) {
   theme.secondaryHighlightColor = theme.hoverStateColor;
   theme.icons = _PaymentMethodIcons.getIcons(colorVariations);
   theme.highlightBorderColor = Color.transparentify(theme.color, 40);
+
+  setRootCSSVariable({
+    'primary-color': color,
+    'text-color': theme.textColor,
+    'highlight-color': theme.highlightColor,
+    'hover-state-color': theme.hoverStateColor,
+    'background-color': theme.backgroundColor,
+    'secondary-highlight-color': theme.secondaryHighlightColor,
+    'active-state-color': theme.activeStateColor,
+  });
 }

@@ -75,6 +75,20 @@
 </div>
 
 <style>
+  .coupon-remove-text {
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: auto;
+    cursor: pointer;
+  }
+  #coupons-available-container {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
   .coupons-available-text {
     margin-left: 8px;
     font-weight: 600;
@@ -91,6 +105,14 @@
     padding-top: 2px;
   }
   .apply {
+    cursor: pointer;
+  }
+
+  .coupon-remove-next {
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: auto;
     cursor: pointer;
   }
 </style>

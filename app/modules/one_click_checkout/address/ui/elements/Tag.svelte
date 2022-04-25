@@ -1,7 +1,13 @@
 <script>
+  // svelte imports
   import { createEventDispatcher } from 'svelte';
 
+  // ui imports
   import TagIcon from 'one_click_checkout/address/ui/components/TagIcon.svelte';
+
+  // util / helper imports
+  import { t } from 'svelte-i18n';
+  import { getI18nForTag } from 'one_click_checkout/address/helpersExtra';
 
   const dispatch = createEventDispatcher();
 
@@ -15,7 +21,7 @@
   on:click={() => dispatch('select', { label })}
 >
   <TagIcon {label} {selected} />
-  <span class="inner-text">{label}</span>
+  <span class="inner-text">{$t(getI18nForTag(label))}</span>
 </div>
 
 <style>

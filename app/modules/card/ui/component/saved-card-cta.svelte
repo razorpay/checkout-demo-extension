@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { getSession } from 'sessionmanager';
-
   // i18n
   import { t } from 'svelte-i18n';
   import Icon from 'ui/elements/Icon.svelte';
@@ -8,9 +6,10 @@
     PAY_WITH_SAVED_CARD,
     PAY_WITH_SAVED_CARD_SUBTITLE,
   } from 'card/i18n/labels';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
-  const session = getSession();
-  const icons: { [x: string]: any } = session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  const icons: { [x: string]: any } = themeMeta.icons;
 
   export let showSubTitle = true;
 </script>

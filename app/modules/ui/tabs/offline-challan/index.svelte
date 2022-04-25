@@ -5,7 +5,7 @@
   // Store imports
   import { showFeeLabel } from 'checkoutstore';
 
-  import { getAmount, getOption } from 'razorpay';
+  import { getAmount, getOption, getOrderId } from 'razorpay';
   import { Events, OfflineChallanEvents } from 'analytics';
 
   // Utils imports
@@ -58,12 +58,12 @@
 
   let copied = false;
   const session = getSession();
-  const order_id = getOption('order_id');
+  const order_id = getOrderId();
   const amount = getAmount();
 
   const fetchVA = () => {
     loading = true;
-    createVirtualAccount(session, order_id)
+    createVirtualAccount(order_id)
       .then((response) => {
         if (response.error) {
           error = response.error.description;

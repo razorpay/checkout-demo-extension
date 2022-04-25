@@ -1,5 +1,4 @@
-import { makeAuthUrl } from 'common/helper';
-import { getSession } from 'sessionmanager';
+import { makeAuthUrl } from 'checkoutstore';
 
 const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',
@@ -11,9 +10,7 @@ const _headers = {
  * @return {Promise<Object>}
  */
 export function fetchFundAccounts(contactId) {
-  const { r } = getSession();
-
-  let url = makeAuthUrl(r, `contacts/${contactId}/public`);
+  let url = makeAuthUrl(`contacts/${contactId}/public`);
 
   return new Promise((resolve, reject) =>
     fetch({
@@ -35,9 +32,7 @@ export function fetchFundAccounts(contactId) {
  * @return {Promise<Object>}
  */
 export function createFundAccount(fundAccount) {
-  const { r } = getSession();
-
-  let url = makeAuthUrl(r, 'fund_accounts/public');
+  let url = makeAuthUrl('fund_accounts/public');
 
   return new Promise((resolve, reject) =>
     fetch({

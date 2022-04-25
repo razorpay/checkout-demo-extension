@@ -145,7 +145,7 @@ import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import * as NetbankingHelper from 'netbanking/helper';
 
-import * as UrlUtils from 'common/urls';
+import * as fonts from 'checkoutframe/fonts';
 
 export default {
   $,
@@ -308,7 +308,7 @@ export default {
   // Offline Challan
   offlineChallanTab,
   AccountTabStore,
-
-  UrlUtils,
   NetbankingHelper,
+
+  fonts,
 };

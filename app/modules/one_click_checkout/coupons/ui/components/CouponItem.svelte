@@ -182,4 +182,14 @@
   .apply-button {
     font-weight: 600;
   }
+
+  .coupon-item-code {
+    padding: 4px 8px;
+    background-color: var(--secondary-highlight-color);
+    color: var(--highlight-color);
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 20px;
+    border: 1px dashed var(--highlight-color);
+  }
 </style>

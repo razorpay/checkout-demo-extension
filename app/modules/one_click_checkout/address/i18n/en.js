@@ -51,5 +51,8 @@ export default {
   add_landmark: 'Add Landmark',
   optional: '(Optional)',
   address_tags_heading: 'Save address as',
+  home: 'Home',
+  office: 'Office',
+  others: 'Others',
   ...billingAddressLabels,
 };
