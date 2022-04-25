@@ -8,6 +8,7 @@
   export let id;
   export let defaultStyles = true;
   export let attributes = {};
+  export let withRow = false;
 
   /**
    * since the Stack component already uses display: flex
@@ -32,15 +33,30 @@
   {...attributes}
   on:click
 >
-  <Stack horizontal>
-    <slot name="icon" />
-    <div class:grow={flexGrow}>
-      <slot name="title" />
-      <slot name="subtitle" />
-      <slot name="error" />
-    </div>
-    <slot name="extra" />
-  </Stack>
+  {#if !withRow}
+    <Stack horizontal>
+      <slot name="icon" />
+      <div class:grow={flexGrow}>
+        <slot name="title" />
+        <slot name="subtitle" />
+        <slot name="error" />
+      </div>
+      <slot name="extra" />
+    </Stack>
+  {:else}
+    <Stack vertical>
+      <Stack horizontal>
+        <slot name="icon" />
+        <div class:grow={flexGrow}>
+          <slot name="title" />
+          <slot name="subtitle" />
+          <slot name="error" />
+        </div>
+        <slot name="extra" />
+      </Stack>
+      <slot name="row" />
+    </Stack>
+  {/if}
   <slot name="banner" />
 </button>
 

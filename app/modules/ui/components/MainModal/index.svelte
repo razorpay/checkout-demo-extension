@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { hasClass } from 'utils/DOM';
+  import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
@@ -6,34 +9,91 @@
     isIRCTC,
   } from 'razorpay';
   import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
-  import { getAmount, disableAnimation } from './helper';
+  import { getAmount, disableAnimation, bringInputIntoView } from './helper';
+  import { returnAsIs } from 'lib/utils';
+  import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
+  import { isOverlayActive } from 'navstack';
+  import { getView } from 'checkoutframe/components';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
-
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
   const isOneClickCheckoutEnabled = isOneClickCheckout();
+  let mobileDevice = isMobile();
+  export let onClose: any = returnAsIs;
+  export let escape = true;
+
+  function handleKeyInput(e: KeyboardEvent) {
+    if ((e.which || e.keyCode) === 27) {
+      // Element wants to handle "Escape" by itself
+      if (hasClass(e.target, 'no-escape')) {
+        return;
+      }
+      if (onClose) {
+        preCloseCheck(onClose);
+      }
+    }
+  }
+
+  function handleResize() {
+    mobileDevice = isMobile();
+    bringInputIntoView();
+  }
+
+  onMount(() => {
+    window.addEventListener('resize', handleResize);
+    if (escape) {
+      window.addEventListener('keyup', handleKeyInput);
+    }
+  });
+
+  onDestroy(() => {
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('keyup', handleKeyInput);
+  });
+
+  function preCloseCheck(next: () => void) {
+    const $overlayStack = get(overlayStack);
+    if ($overlayStack.length > 0) {
+      const last: any = $overlayStack[$overlayStack.length - 1];
+      last.back({
+        from: 'overlay',
+      });
+    } else if (isOverlayActive()) {
+      getView('navStack').backPressed();
+    } else {
+      next();
+    }
+  }
+
+  function handleBackdropClick() {
+    if (getOption('modal.backdropclose')) {
+      onClose();
+    }
+  }
+
+  export function animation() {
+    return !noanim;
+  }
 </script>
 
 <div
   id="container"
   class="mfix"
-  class:mobile={isMobile()}
+  class:mobile={mobileDevice}
   class:test={!isLiveMode}
   class:notopbar={getOption('theme.hide_topbar')}
   class:noimage={!getOption('image')}
   class:noanim
 >
-  <div id="backdrop" />
+  <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="tnc-wrap" />
   <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
     <div id="modal-inner">
       <div id="overlay" />
-      <div id="nocost-overlay" class="showable" />
       <div id="confirmation-dialog" class="showable" />
-      <div id="emi-wrap" class="overlay showable mfix" />
       <div id="recurring-cards-wrap" class="overlay showable mfix" />
       <div id="fee-wrap" class="overlay showable mfix" />
       <div id="one-cc-summary" />

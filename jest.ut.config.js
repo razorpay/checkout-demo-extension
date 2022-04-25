@@ -5,11 +5,7 @@ module.exports = {
     '^.+\\.(ts)$': 'ts-jest',
   },
   moduleFileExtensions: ['js', 'svelte', 'ts'],
-  roots: [
-    '<rootDir>/app/modules',
-    '<rootDir>/app/js/checkout-frame',
-    '<rootDir>/app/js/lib',
-  ],
+  roots: ['<rootDir>/app/modules', '<rootDir>/app/js/checkout-frame'],
   modulePaths: ['<rootDir>/app/modules'],
   moduleDirectories: ['node_modules', 'app/modules'],
   setupFilesAfterEnv: [
@@ -28,7 +24,6 @@ function collectCoverageFrom() {
     return [
       '<rootDir>/app/modules/**/*.*',
       '<rootDir>/app/js/checkout-frame/**/*.*',
-      '<rootDir>/app/js/lib/**/*.*',
     ];
   }
 

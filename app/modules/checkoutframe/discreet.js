@@ -1,27 +1,22 @@
 import 'entry/checkout-frame';
-import RazorpayConfig from 'common/RazorpayConfig';
 
 import $ from 'lib/$';
-import Analytics, { Track } from 'analytics';
+import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import ErrorService from 'error-service';
 import * as UPIUtils from 'common/upi';
-import * as GPay from 'gpay';
-import * as Color from 'lib/color';
-import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
+import { processIntentOnMWeb } from 'upi/helper/payment';
+import { avoidSessionSubmit } from 'upi/helper';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
 import MainModal from 'ui/components/MainModal/index.svelte';
-import emiView from 'checkoutframe/emi';
 import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
-import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
@@ -43,12 +38,10 @@ import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
 import * as PayLater from 'common/paylater';
-import * as Token from 'common/token';
 import * as Apps from 'common/apps';
 import * as SessionManager from 'sessionmanager';
 import updateScore from 'analytics/checkoutScore';
 import { trackUpiIntentInstrumentPaymentAttempted } from 'analytics/highlightUpiIntentAnalytics';
-import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import { initIframe } from 'checkoutframe/iframe';
@@ -120,7 +113,6 @@ import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 import * as UTILS from 'lib/utils.js';
 
 import OneClickCheckoutHomeTab from 'one_click_checkout/ui/Home.svelte';
-import * as CovidDonations from 'checkoutframe/components/covidWrap';
 import * as Header from 'checkoutframe/components/header';
 import * as ChargesHelper from 'one_click_checkout/charges/helpers';
 import * as ChargesStore from 'one_click_checkout/charges/store';
@@ -132,8 +124,8 @@ import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
-import * as TrustedBadgeHelper from 'trusted-badge/helper';
 import * as AccountTabStore from 'one_click_checkout/account_modal/store';
+import * as RTBHelper from 'rtb/helper';
 
 import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
@@ -144,29 +136,29 @@ import * as _El from 'utils/DOM';
 
 import * as docUtil from 'utils/doc';
 import * as NetbankingHelper from 'netbanking/helper';
+import * as EMIHelper from 'emi/helper';
+
+const upiPaymentHandlers = {
+  processIntentOnMWeb,
+  avoidSessionSubmit,
+};
 
 import * as fonts from 'checkoutframe/fonts';
 
 export default {
   $,
-  RazorpayConfig,
   updateScore,
   fetch,
-  Track,
   Analytics,
   AnalyticsTypes,
   UPIUtils,
   UTILS,
-  GPay,
-  Color,
-  _PaymentMethodIcons,
   Confirm,
   FeeLabel,
   Currency,
   OtpService,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
-  ErrorService,
   Formatter,
   Form,
 
@@ -183,9 +175,7 @@ export default {
   Wallet,
   CardlessEmi,
   PayLater,
-  Token,
   SessionManager,
-  Checkout,
   Bridge,
   stopListeningForBackPresses,
   P13n,
@@ -210,14 +200,13 @@ export default {
   OffersStore,
   Cta,
   dynamicFeeObject,
-  TrustedBadgeHelper,
+  RTBHelper,
 
   Customer,
   getCustomer,
   sanitizeTokens,
 
   MainModal,
-  emiView,
   CardlessEmiView,
   emiScreenView,
   emiPlansView,
@@ -228,7 +217,6 @@ export default {
   AuthOverlay,
   UserConfirmationOverlay,
   OffersView,
-  NoCostExplainer,
 
   otpView,
   languageSelectionView,
@@ -275,7 +263,6 @@ export default {
   rewardsStore,
   CRED,
   downtimeUtils,
-  CovidDonations,
   Apps,
   Header,
 
@@ -305,10 +292,13 @@ export default {
 
   SecurityUtils,
   CommonConstants,
+  upiPaymentHandlers,
+
   // Offline Challan
   offlineChallanTab,
   AccountTabStore,
   NetbankingHelper,
 
   fonts,
+  EMIHelper,
 };

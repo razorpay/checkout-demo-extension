@@ -3,7 +3,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtimeLow, downtimeHigh, offers, showDonation } = features;
+  const { downtimeLow, downtimeHigh, offers } = features;
 
   preferences.features = { google_pay_omnichannel: true };
 
@@ -62,10 +62,6 @@ function makePreferences(features, preferences) {
         display_text: 'UPI Offer Display Text',
       },
     ];
-  }
-
-  if (showDonation) {
-    preferences.show_donation = true;
   }
 
   return preferences;

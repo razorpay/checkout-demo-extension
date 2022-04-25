@@ -8,8 +8,8 @@
   import { headerVisible } from 'one_click_checkout/header/store';
 
   // Imports for RTB
-  import { RTB } from 'checkoutstore/rtb';
-  import { getTrustedBadgeHighlights } from 'trusted-badge/helper';
+  import { RTBExperiment } from 'rtb/store';
+  import { isRTBEnabled as RTBEnabled } from 'rtb/helper';
 
   // session imports
   import { handleModalClose } from 'one_click_checkout/header/sessionInterface';
@@ -23,7 +23,7 @@
   // Other Imports
   import { views } from 'one_click_checkout/routing/constants';
 
-  const isRTBEnabled = getTrustedBadgeHighlights($RTB);
+  const isRTBEnabled = RTBEnabled($RTBExperiment);
   const merchantName = truncateString(getMerchantName(), 20);
   const closeIcon = close();
 

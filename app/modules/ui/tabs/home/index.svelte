@@ -10,7 +10,8 @@
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import TrustedBadge from 'trusted-badge/ui/component/TrustedBadge.svelte';
+  import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
+  import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import {
     getAvailableMethods,
@@ -1189,7 +1190,7 @@
         >
           <!-- We dont want it to show in 1cc flow-->
           {#if !isOneCCEnabled}
-            <TrustedBadge />
+            <RTBBanner />
           {/if}
 
           {#if showUserDetailsStrip || isPartialPayment}

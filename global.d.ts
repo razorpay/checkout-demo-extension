@@ -1,4 +1,9 @@
 declare const __BUILD_NUMBER__: string;
 declare const _Obj: { [key: string]: (...args: any) => any };
+
 declare const _: any;
-declare const global: Window & { Razorpay: any; Event: any; Element: any };
+declare const global: Window & {
+  Razorpay: any;
+  Event: any;
+  Element: any;
+};

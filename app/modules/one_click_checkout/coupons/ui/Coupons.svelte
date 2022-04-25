@@ -41,7 +41,7 @@
     isCodForced,
     isLoginMandatory,
   } from 'one_click_checkout/store';
-  import { RTB } from 'checkoutstore/rtb';
+  import { RTBExperiment } from 'rtb/store';
 
   // i18n imports
   import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
@@ -77,7 +77,7 @@
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isElementUnscrollable } from 'one_click_checkout/helper';
-  import { getTrustedBadgeHighlights } from 'trusted-badge/helper';
+  import { isRTBEnabled } from 'rtb/helper';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -134,10 +134,7 @@
   }
 
   function summaryLoadedEvent() {
-    Analytics.setMeta(
-      'is_RTB_live_on_merchant',
-      getTrustedBadgeHighlights($RTB)
-    );
+    Analytics.setMeta('is_RTB_live_on_merchant', isRTBEnabled($RTBExperiment));
     Analytics.setMeta('is_force_cod_enabled', isCodForced());
     Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
     Analytics.setMeta('is_coupons_enabled', showCoupons);

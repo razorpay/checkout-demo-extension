@@ -4,12 +4,12 @@
   import Icon from 'ui/elements/Icon.svelte';
   //i18n Imports
   import {
-    TRUSTED_BADGE_HEADER,
-    TRUSTED_BADGE_HIGHLIGHT1,
-    TRUSTED_BADGE_HIGHLIGHT2,
-    TRUSTED_BADGE_HIGHLIGHT3,
-    TRUSTED_BADGE_CONTENT,
-  } from 'trusted-badge/i18n/labels';
+    RTB_HEADER,
+    RTB_HIGHLIGHT1,
+    RTB_HIGHLIGHT2,
+    RTB_HIGHLIGHT3,
+    RTB_CONTENT,
+  } from 'rtb/i18n/labels';
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
 
@@ -26,11 +26,7 @@
   const { circle_check, rtb_close } = getIcons();
   const merchantName = getMerchantName();
   let visible = false;
-  let listItems = [
-    TRUSTED_BADGE_HIGHLIGHT1,
-    TRUSTED_BADGE_HIGHLIGHT2,
-    TRUSTED_BADGE_HIGHLIGHT3,
-  ];
+  let listItems = [RTB_HIGHLIGHT1, RTB_HIGHLIGHT2, RTB_HIGHLIGHT3];
 
   export function show() {
     visible = true;
@@ -61,7 +57,7 @@
       </div>
       <div class="rtb-header-section">
         <div class="rtb-header-text">{merchantName}</div>
-        <div class="rtb-title">{$t(TRUSTED_BADGE_HEADER)}</div>
+        <div class="rtb-title">{$t(RTB_HEADER)}</div>
         <hr align="left" class="rtb-separator" />
       </div>
       <div class="rtb-close" on:click={hide}>
@@ -70,11 +66,7 @@
     </div>
     <div class="rtb-content">
       <div class="rtb-summary">
-        {formatTemplateWithLocale(
-          TRUSTED_BADGE_CONTENT,
-          { merchantName },
-          $locale
-        )}
+        {formatTemplateWithLocale(RTB_CONTENT, { merchantName }, $locale)}
       </div>
       {#each listItems as listItem}
         <div class="rtb-list">

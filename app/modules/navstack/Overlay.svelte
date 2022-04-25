@@ -9,7 +9,6 @@
 
   function moveToPortal(node: HTMLDivElement) {
     const overlayParent = document.querySelector('#overlay') as HTMLDivElement;
-
     const backHandling = !overlayParent.children.length;
     // add back handler only once
     if (backHandling) {
@@ -29,7 +28,6 @@
         if (backHandling) {
           window.removeEventListener('click', hide);
         }
-        // @ts-ignore
         _El.detach(node);
       },
     };

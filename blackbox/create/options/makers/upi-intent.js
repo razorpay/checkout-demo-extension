@@ -78,6 +78,8 @@ function makePreferences(features, preferences) {
     ];
   }
 
+  preferences.feature_overrides = {};
+
   return preferences;
 }
 

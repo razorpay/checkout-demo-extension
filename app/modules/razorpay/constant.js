@@ -5,4 +5,18 @@ export const IRCTC_KEYS = [
   'rzp_live_alEMh9FVT4XpwM',
 ];
 
-export const entityWithAmount = ['order', 'invoice', 'subscription'];
+/**
+ * Payment Entity Types
+ * @enum {string}
+ */
+export const PAYMENT_ENTITIES = {
+  ORDER: 'order',
+  SUBSCRIPTION: 'subscription',
+  INVOICE: 'invoice',
+};
+
+export const entityWithAmount = [
+  PAYMENT_ENTITIES.ORDER,
+  PAYMENT_ENTITIES.INVOICE,
+  PAYMENT_ENTITIES.SUBSCRIPTION,
+];

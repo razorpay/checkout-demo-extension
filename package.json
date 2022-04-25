@@ -38,7 +38,6 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "start": "NODE_ENV=dev gulp watch",
     "dev-start": "API_SERVER=localhost nodemon server & npm start",
     "func-start": "API_SERVER=https://api-2.func.razorpay.in nodemon server & npm start",
@@ -77,14 +76,13 @@
     "@testing-library/jest-dom": "^5.15.1",
     "@testing-library/svelte": "^3.0.3",
     "@tsconfig/svelte": "^2.0.1",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.3.1",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
     "autoprefixer-stylus": "^1.0.0",
     "babel-eslint": "^10.0.2",
     "babel-jest": "^27.3.1",
     "body-parser": "^1.19.0",
-    "chalk": "^2.4.1",
     "cors": "^2.8.5",
     "css-vars-ponyfill": "^2.4.7",
     "eslint": "^7.32.0",
@@ -97,9 +95,7 @@
     "gulp-usemin": "^0.3.29",
     "http-proxy-middleware": "^2.0.1",
     "husky": "^6.0.0",
-    "istanbul": "^0.4.5",
     "jest": "^27.3.1",
-    "jest-canvas-mock": "^2.3.1",
     "jest-circus": "^27.3.1",
     "jsdom": "^18.1.1",
     "jsdom-global": "^3.0.2",
@@ -115,13 +111,12 @@
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-includepaths": "^0.2.3",
     "rollup-plugin-inject": "^3.0.1",
-    "rollup-plugin-istanbul": "^3.0.0",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-svelte": "^7.1.0",
     "stylus": "^0.54.7",
-    "svelte": "3.42.5",
+    "svelte": "^3.46.4",
     "svelte-check": "^2.2.10",
     "svelte-i18n": "^3.0.4",
     "svelte-jester": "^2.1.5",
@@ -137,13 +132,6 @@
   "bin": {
     "lintFix": "./cfu/scripts/lintFix.js",
     "lintOutput": "./cfu/scripts/lintOutput.js"
-  },
-  "resolutions": {
-    "trim-newlines": "^4.0.2",
-    "handlebars": "^4.7.7",
-    "diff": ">=3.5.0",
-    "path-parse": ">=1.0.7",
-    "glob-parent": "5.1.2"
   },
   "dependencies": {
     "node-sass": "^7.0.1"

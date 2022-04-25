@@ -21,12 +21,6 @@ export const shouldShowCoupons = () =>
 
 /**
  * @returns boolean
- * Checks for force_cod option
- */
-export const isCodForced = () => getOption('force_cod');
-
-/**
- * @returns boolean
  * Checks for mandatory_login option
  */
 export const isLoginMandatory = () => {

@@ -3,7 +3,7 @@ import * as _Arr from '../../../cfu/src/fe/implicit/_Arr.js';
 import * as _Obj from '../../../cfu/src/fe/implicit/_Obj.js';
 
 import initI18n from './init-i18n';
-import 'jest-canvas-mock';
+import mockCanvas from './__mocks__/mock-canvas';
 import initThemeMock from './__mocks__/theme.js';
 
 global.matchMedia = jest.fn(() => ({ matches: false }));
@@ -16,9 +16,11 @@ global.matchMedia = jest.fn(() => ({ matches: false }));
 global._ = _;
 global._Arr = _Arr;
 global._Obj = _Obj;
+global.__BUILD_NUMBER__ = '123456789';
 
 global.beforeEach(() => {
   initI18n();
 });
 
 initThemeMock();
+mockCanvas();
