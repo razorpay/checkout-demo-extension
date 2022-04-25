@@ -222,7 +222,7 @@ export function returnAsIs(_: any) {
  * @param {object}   A key-value pair object
  * @returns {array}  An array with keys which have truthy values
  */
-export function filterTruthyKeys(o) {
+export function filterTruthyKeys(o: any) {
   return Object.keys(o).filter((key) => !!o[key]);
 }
 
