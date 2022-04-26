@@ -3,15 +3,12 @@
   import { onMount } from 'svelte';
 
   // Imports Related to RTB
-  import { RTB } from 'checkoutstore/rtb';
+  import { RTBExperiment } from 'rtb/store';
   import { showRTBModal } from 'one_click_checkout/rtb_modal';
-  import {
-    getTrustedBadgeHighlights,
-    getTrustedBadgeAnaltyicsPayload,
-  } from 'trusted-badge/helper';
+  import { isRTBEnabled, getRTBAnalyticsPayload } from 'rtb/helper';
 
   //i18n
-  import { TRUSTED_BADGE_HEADER } from 'trusted-badge/i18n/labels';
+  import { RTB_HEADER } from 'rtb/i18n/labels';
   import { t } from 'svelte-i18n';
 
   // Imports releated to icons
@@ -32,11 +29,11 @@
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
-  $: trustedBadgeHighlights = getTrustedBadgeHighlights($RTB);
+  $: trustedBadgeHighlights = isRTBEnabled($RTBExperiment);
   onMount(() => {
     if (sendAnalytics) {
       Events.TrackRender(rtbEvents.RTB_RENDER, {
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       });
     }
   });
@@ -55,7 +52,7 @@
       <div class="rtb-icon-wrapper">
         <TrustedBadgeIcon />
       </div>
-      <div class="rtb-text">{$t(TRUSTED_BADGE_HEADER)}</div>
+      <div class="rtb-text">{$t(RTB_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
     </div>
   {:else}

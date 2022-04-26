@@ -50,6 +50,7 @@ import {
   isMobile,
   android,
   AndroidWebView,
+  iOS,
 } from 'common/useragent';
 
 import {
@@ -536,7 +537,7 @@ const UPI_METHODS = {
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     getUPIIntentApps().all.length,
   intentUrl: () =>
-    // available only on android mobile web (no-sdk, no-fb-insta)
+    // available only on android+ios mobile web (no-sdk, no-fb-insta)
     !isRecurring() &&
     !isPayout() &&
     !global.CheckoutBridge &&
@@ -545,7 +546,8 @@ const UPI_METHODS = {
     getMerchantMethods().upi_intent &&
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     intentEnabledInOption() &&
-    android,
+    getSDKMeta()?.platform === 'web' &&
+    (android || iOS),
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -954,7 +956,7 @@ export function getEligiblePlansBasedOnMinAmount(plans) {
 }
 
 // @TODO modifies bajaj cardless emi min_amount
-export function getEMIBanks() {
+export function getEMIBanks(amount) {
   const emiOptions = getMerchantMethods().emi_options;
 
   if (emiOptions |> _Obj.isEmpty) {
@@ -962,7 +964,7 @@ export function getEMIBanks() {
   }
 
   const banks =
-    getEligibleBanksBasedOnMinAmount(getAmount(), emiOptions)
+    getEligibleBanksBasedOnMinAmount(amount || getAmount(), emiOptions)
     |> _Obj.map((plans, bankCode) => {
       return {
         ...getEMIBank(bankCode),
@@ -1016,7 +1018,11 @@ export function getAppProviders() {
 }
 
 export function isWalnut369Enabled() {
-  return Boolean(getMerchantMethods()?.cardless_emi?.walnut369);
+  return isCardLessEmiProviderEnabled('walnut369');
+}
+
+export function isCardLessEmiProviderEnabled(code) {
+  return Boolean((getMerchantMethods()?.cardless_emi || {})[code]);
 }
 
 export function getCardlessEMIProviders() {

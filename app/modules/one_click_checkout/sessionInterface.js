@@ -20,7 +20,7 @@ import {
   newUserAddress,
   showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
-import { isEditContactFlow, isCodForced } from 'one_click_checkout/store';
+import { isEditContactFlow } from 'one_click_checkout/store';
 import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
@@ -204,14 +204,9 @@ export function redirectToPaymentMethods(
         session.oneClickCheckoutRedirection(showSnackbar);
         navigator.navigateTo({ path: views.METHODS });
 
-        if (isCodForced()) {
-          showCodLoader.set(false);
-        }
-
         thirdWatchCodServiceability(address)
           .then((res) => {
             session.homeTab.codActions();
-            if (isCodForced()) return;
 
             if (addressType === 'saved') {
               const newAddresses = get(savedAddresses).map((item) => {

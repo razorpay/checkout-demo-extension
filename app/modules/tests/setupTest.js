@@ -16,6 +16,7 @@ global.matchMedia = jest.fn(() => ({ matches: false }));
 global._ = _;
 global._Arr = _Arr;
 global._Obj = _Obj;
+global.__BUILD_NUMBER__ = '123456789';
 
 global.beforeEach(() => {
   initI18n();

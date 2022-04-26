@@ -36,6 +36,7 @@ import {
 } from 'common/webPaymentsApi';
 
 import { isStandardCheckout } from 'common/helper';
+import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
 
@@ -307,7 +308,14 @@ function fetchPrefs(session) {
           event: 'flush',
           data: preferences.mode,
         });
-        setSessionPreferences(session, preferences);
+        setSessionPreferences(session, {
+          /**
+           * TODO: move this feature_overrides to pref-response
+           */
+          // this must be first so that test can remove this and run as required
+          feature_overrides,
+          ...preferences,
+        });
         fetchRewards(session);
       }
     }

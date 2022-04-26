@@ -46,6 +46,7 @@ module.exports = function (testFeatures) {
     personalised,
     discountAmount,
     isSaveAddress,
+    skip,
   } = features;
 
   describe.each(
@@ -54,7 +55,10 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
-    // skipping tests because some are failing randomly
+    if (skip) {
+      test.skip(title, () => {});
+      return;
+    }
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,

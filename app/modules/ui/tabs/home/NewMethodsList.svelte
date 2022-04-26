@@ -15,9 +15,9 @@
   import { getSession } from 'sessionmanager';
   import { getInstrumentMeta } from 'ui/tabs/home/instruments';
   import { getAnimationOptions } from 'svelte-utils';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
   import { toggleHeader } from 'one_click_checkout/header/helper';
 
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
   // Store
   import {
     selectedInstrument,
@@ -60,7 +60,7 @@
         instrument,
         index,
         instrumentMeta: getInstrumentMeta(instrument),
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
   }

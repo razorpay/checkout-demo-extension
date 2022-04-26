@@ -3,48 +3,33 @@
  */
 
 /* global discreet */
-/* global Razorpay */
-/* global Analytics */
-/* global AnalyticsTypes */
-/* global gel */
-/* global P13n */
 
 // The following are globals from app/js/lib/util
 // These have to be removed while refactoring
 
-/* global Wallet */
-/* global each */
-/* global abortAjax */
-/* global bind */
-/* global isString */
-/* global clone */
-/* global preventDefault */
-/* global qs */
-/* global invoke */
-/* global noop */
-/* global isNonNullObject */
-/* global $$ */
-/* global emo */
-/* global doc */
-/* global now */
-/* global roll */
-
 // from init checkout-frame
 /* global SessionManager */
+
+var emo = {};
 
 var ua = navigator.userAgent;
 
 var preferences,
   $ = discreet.$,
+  Razorpay = window.Razorpay,
+  fetch = discreet.fetch,
   WebPaymentsApi = discreet.WebPaymentsApi,
+  Constants = discreet.Constants,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
   Promise = discreet.Promise,
+  P13n = discreet.P13n,
+  SessionManager = discreet.SessionManager,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
   tab_titles = Constants.TAB_TITLES,
-  freqWallets = Wallet.wallets,
+  freqWallets = discreet.Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
   isMobile = discreet.UserAgent.isMobile,
@@ -56,6 +41,9 @@ var preferences,
   RazorpayHelper = discreet.RazorpayHelper,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
+  upiPaymentHandlers = discreet.upiPaymentHandlers,
+  AnalyticsTypes = discreet.AnalyticsTypes,
+  Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
   _Arr = discreet._Arr,
   _ = discreet._,
@@ -91,7 +79,6 @@ var preferences,
   updateScore = discreet.updateScore,
   trackUpiIntentInstrumentPaymentAttempted =
     discreet.trackUpiIntentInstrumentPaymentAttempted,
-  CovidDonationView = discreet.CovidDonations,
   Header = discreet.Header,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
@@ -159,7 +146,7 @@ function doesContactHaveValidCharacters(contact) {
 }
 
 function fillData(container, returnObj) {
-  each($(container).find('input[name],select[name]'), function (i, el) {
+  UTILS.each($(container).find('input[name],select[name]'), function (i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
       return;
     }
@@ -285,15 +272,6 @@ function hideRecurringCardsOverlay() {
   return wasShown;
 }
 
-function hideEmi() {
-  var emic = $('#emi-wrap');
-  var wasShown = emic.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(emic);
-  }
-  return wasShown;
-}
-
 function hideDowntimeAlert() {
   var downtimeWrap = $('#downtime-wrap');
   if (!downtimeWrap || !downtimeWrap[0]) {
@@ -303,14 +281,15 @@ function hideDowntimeAlert() {
   if (wasShown) {
     hideOverlay(downtimeWrap);
   }
+  // discreet.UpiScreenStore.resetSelectedUPIAppForPay();
   return wasShown;
 }
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
+
   if (
-    !hideEmi() &&
     !hideRecurringCardsOverlay() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
@@ -323,9 +302,9 @@ function hideOverlayMessage() {
 
     if (
       $('#confirmation-dialog').hasClass('animate') ||
-      gel('options-wrap').children.length
+      docUtil.getElementById('options-wrap').children.length
     ) {
-      makeHidden(gel('error-message'));
+      makeHidden(docUtil.getElementById('error-message'));
     } else {
       hideOverlay($('#error-message'));
     }
@@ -334,7 +313,7 @@ function hideOverlayMessage() {
 
 // this === Session
 function errorHandler(response) {
-  if (isString(response)) {
+  if (_.isString(response)) {
     try {
       response = JSON.parse(response);
     } catch (e) {
@@ -352,7 +331,7 @@ function errorHandler(response) {
    * for which one more level of parsing is required.
    * For web and other cases, error is an object
    */
-  if (isString(error)) {
+  if (_.isString(error)) {
     try {
       error = JSON.parse(error);
     } catch (e) {
@@ -558,7 +537,7 @@ function askOTP(
     paymentData = {
       timestamp: Date.now(),
     };
-    if (isNonNullObject(origText) && !origText.error) {
+    if (_.isNonNullObject(origText) && !origText.error) {
       if (thisSession.headless) {
         paymentData.goToBank = origText.redirect;
       }
@@ -590,7 +569,7 @@ function askOTP(
       };
     }
   }
-  if (isNonNullObject(textView)) {
+  if (_.isNonNullObject(textView)) {
     textView = textView.error && textView.error.description;
   }
 
@@ -634,7 +613,7 @@ function askOTP(
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
         textView = 'otp_sent_no_phone';
-        if (isNonNullObject(origText)) {
+        if (_.isNonNullObject(origText)) {
           if (origText.metadata) {
             var metadata = origText.metadata;
             thisSession.headlessMetadata = metadata;
@@ -649,7 +628,7 @@ function askOTP(
             }
 
             if (bankLogo) {
-              qs('#tab-title').innerHTML =
+              docUtil.querySelector('#tab-title').innerHTML =
                 '<img class="native-otp-bank" src="' +
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
@@ -696,7 +675,7 @@ function askOTP(
 
           if (!thisSession.get('timeout')) {
             thisSession.timer = discreet.showTimer(
-              now() + 3 * 60 * 1000,
+              Date.now() + 3 * 60 * 1000,
               function () {
                 thisSession.hideTimer();
                 thisSession.back(true);
@@ -760,12 +739,7 @@ function successHandler(response) {
     this.hide();
   }
   hideOverlayMessage();
-  if (this.preferences.show_donation) {
-    new CovidDonationView.render(completeCheckoutFlow.bind(this));
-  } else {
-    completeCheckoutFlow.call(this);
-  }
-  showOverlay(this.getCovidDonationDialog());
+  completeCheckoutFlow.call(this);
 }
 
 function cancel_upi(session) {
@@ -789,14 +763,14 @@ function Session(message) {
   this.set(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
   Analytics.setMeta(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
 
-  each(message, function (key, val) {
+  UTILS.each(message, function (key, val) {
     if (key !== 'options') {
       self[key] = val;
     }
   });
 
   if (this.embedded) {
-    $(doc).addClass('embedded');
+    $(docUtil.documentElement).addClass('embedded');
   }
 
   this.states = Constants.STATES;
@@ -919,7 +893,16 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       this.setTheme();
-      this.mainModal = new discreet.MainModal({ target: document.body });
+      var session = this;
+      this.mainModal = new discreet.MainModal({
+        target: document.body,
+        props: {
+          escape: RazorpayHelper.getOption('modal.escape') && !this.embedded,
+          onClose: function () {
+            session.closeModal();
+          },
+        },
+      });
 
       this.el = docUtil.querySelector('#container');
       this.body = $('#body');
@@ -952,7 +935,7 @@ Session.prototype = {
       var valid = true;
       var fields = ['contact', 'email'];
 
-      each(fields, function (optionKey, option) {
+      UTILS.each(fields, function (optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
           errorHandler.call(SessionManager.getSession(), {
@@ -1067,7 +1050,7 @@ Session.prototype = {
          */
         if (
           isActivityRecreated &&
-          now() - pendingPaymentTimestamp <=
+          Date.now() - pendingPaymentTimestamp <=
             Constants.MINUTES_TO_WAIT_FOR_PENDING_PAYMENT * 60000
         ) {
           pollUrl = StorageBridge.getString(Constants.UPI_POLL_URL);
@@ -1092,10 +1075,10 @@ Session.prototype = {
           url: pollUrl,
           callback: function (response) {
             if (response.razorpay_payment_id) {
-              invoke(successHandler, self, response);
+              self.successHandler(response);
             } else {
               var errorObj = response.error;
-              if (!isNonNullObject(errorObj) && !errorObj.description) {
+              if (!_.isNonNullObject(errorObj) && !errorObj.description) {
                 response = discreet.error('Payment failed');
               }
 
@@ -1130,7 +1113,7 @@ Session.prototype = {
   },
 
   setParamsInStorage: function (params) {
-    each(params, function (key, val) {
+    UTILS.each(params, function (key, val) {
       try {
         StorageBridge.setString(key, val);
       } catch (e) {}
@@ -1249,7 +1232,7 @@ Session.prototype = {
               : this.homeTab.getCurrentView(),
           },
         },
-        discreet.TrustedBadgeHelper.getTrustedBadgeAnaltyicsPayload()
+        discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
     });
     updateScore('timeToRender');
@@ -1271,10 +1254,6 @@ Session.prototype = {
       this.get('preferences.methods.cod') || false
     );
     Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.IS_THIRDWATCH_INSURED,
-      !this.get('force_cod')
-    );
-    Analytics.setMeta(
       discreet.OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
       this.get('mandatory_login')
     );
@@ -1286,13 +1265,13 @@ Session.prototype = {
 
   setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
-      target: gel('form-fields'),
+      target: docUtil.getElementById('form-fields'),
     });
   },
 
   setOneClickCheckoutHome: function () {
     this.oneClickCheckoutHome = new discreet.OneClickCheckoutHomeTab({
-      target: gel('form-fields'),
+      target: docUtil.getElementById('form-fields'),
     });
   },
 
@@ -1331,7 +1310,9 @@ Session.prototype = {
     this.setSvelteOverlay();
     this.setFeeLabel();
     // make bottom the last element
-    gel('form-fields').appendChild(gel('bottom'));
+    docUtil
+      .getElementById('form-fields')
+      .appendChild(docUtil.getElementById('bottom'));
   },
 
   // this does not apply if options.timeout was passed
@@ -1345,11 +1326,6 @@ Session.prototype = {
   },
 
   setEMI: function () {
-    if (!this.emi && MethodStore.isMethodEnabled('emi')) {
-      $(this.el).addClass('emi');
-      this.emi = new discreet.emiView();
-    }
-
     if (!this.emiPlansView) {
       this.emiPlansView = new discreet.emiPlansView();
     }
@@ -1555,7 +1531,7 @@ Session.prototype = {
       branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
-        back: bind(function (confirmedCancel) {
+        back: function (confirmedCancel) {
           var payment = self.r._payment;
 
           if (confirmedCancel !== true && payment) {
@@ -1571,7 +1547,7 @@ Session.prototype = {
           }
 
           return true;
-        }, this),
+        },
 
         select: function (value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
@@ -1825,28 +1801,28 @@ Session.prototype = {
   setOtpScreen: function () {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
-        target: gel('form-fields'),
+        target: docUtil.getElementById('form-fields'),
 
         props: {
           addShowableClass: true,
           on: {
-            closeAndDismiss: bind(this.closeAndDismiss, this),
-            chooseMethod: bind(function () {
+            closeAndDismiss: this.closeAndDismiss.bind(this),
+            chooseMethod: function () {
               this.switchTab();
-            }, this),
-            addFunds: bind(this.addFunds, this),
-            resend: bind(this.resendOTP, this),
-            retry: bind(this.back, this),
-            secondary: bind(this.secAction, this),
-            retryWithPaypal: bind(this.retryWithPaypal, this),
-            cancelRetryWithPaypal: bind(function () {
+            }.bind(this),
+            addFunds: this.addFunds.bind(this),
+            resend: this.resendOTP.bind(this),
+            retry: this.back.bind(this),
+            secondary: this.secAction.bind(this),
+            retryWithPaypal: this.retryWithPaypal.bind(this),
+            cancelRetryWithPaypal: function () {
               this.back();
               Analytics.track('paypal_retry:cancel_click', {
                 data: {
                   currentScreen: this.screen,
                 },
               });
-            }, this),
+            }.bind(this),
           },
         },
       });
@@ -1857,37 +1833,14 @@ Session.prototype = {
     if (!this.modal) {
       var self = this;
       this.modal = new window.Modal(this.el, {
-        escape: this.get('modal.escape') && !this.embedded,
-        backdropclose: this.get('modal.backdropclose'),
-        handleBackdropClick: function () {
-          // The same logic to close overlay using $overlayStack
-          // is present for backpresses.
-          // Don't forget to update it there too if you change something here.
-          // TODO: DRY
-
-          var $overlayStack = storeGetter(discreet.overlayStackStore);
-
-          if ($overlayStack.length > 0) {
-            var last = $overlayStack[$overlayStack.length - 1];
-
-            last.back({
-              from: 'overlay',
-            });
-
-            // Signal that we don't want the Modal component to handle click on backdrop
-            return false;
-          }
-
-          // Signal that Modal component should hnadle backdrop click
-          return true;
-        },
+        animation: this.mainModal.animation(),
         onhide: function () {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
-        onhidden: bind(function () {
+        onhidden: function () {
           this.saveAndClose();
           Razorpay.sendMessage({ event: 'hidden' });
-        }, this),
+        }.bind(this),
       });
     }
   },
@@ -1998,15 +1951,6 @@ Session.prototype = {
       this.setAmount(this.get('amount'));
     }
 
-    if (this.nocostModal) {
-      var modal = this.nocostModal;
-      hideOverlay($('#nocost-overlay'));
-      setTimeout(function () {
-        modal.$destroy();
-        modal = null;
-      }, 200);
-      return;
-    }
     var self = this;
     if (this.r._payment) {
       if (
@@ -2086,8 +2030,8 @@ Session.prototype = {
   on: function (event, selector, delegateClass, listener, useCapture) {
     var listeners = this.listeners;
     if (!listener || listener === true) {
-      each(
-        $$(selector),
+      UTILS.each(
+        docUtil.querySelectorAll(selector),
         function (i, element) {
           listeners.push($(element).on(event, delegateClass, listener, this));
         },
@@ -2108,7 +2052,9 @@ Session.prototype = {
 
               if ($(target).hasClass(delegateClass)) {
                 e.delegateTarget = target;
-                invoke(listener, self, e);
+                if (_.isFunction(listener)) {
+                  listener.call(self, e);
+                }
                 break;
               }
               target = target.parentNode;
@@ -2240,7 +2186,7 @@ Session.prototype = {
     }
   },
 
-  addFunds: function (event) {
+  addFunds: function () {
     Analytics.track('wallet:balance:add', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2553,7 +2499,7 @@ Session.prototype = {
     }
 
     var value = el.value;
-    var required = isString(el.getAttribute('required'));
+    var required = _.isString(el.getAttribute('required'));
     var pattern = el.getAttribute('pattern');
     var $parent = $(el.parentNode);
 
@@ -2579,9 +2525,12 @@ Session.prototype = {
 
   refresh: function () {
     var self = this;
-    each($$('.input:not(.no-refresh)'), function (i, el) {
-      self.input(el);
-    });
+    UTILS.each(
+      docUtil.querySelectorAll('.input:not(.no-refresh)'),
+      function (i, el) {
+        self.input(el);
+      }
+    );
   },
 
   setFormatting: function () {
@@ -2590,7 +2539,7 @@ Session.prototype = {
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
     delegator.otp = delegator
-      .add('number', gel('otp'))
+      .add('number', docUtil.getElementById('otp'))
       .on('change', function () {
         self.input(this.el);
       });
@@ -2641,10 +2590,10 @@ Session.prototype = {
 
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
-        target: qs('#form-fields'),
+        target: docUtil.querySelector('#form-fields'),
         props: {
           paymentData: this.getFormData(),
-          onSuccess: bind(successHandler, this),
+          onSuccess: successHandler.bind(this),
         },
       });
     } else if (this.currentScreen) {
@@ -2703,9 +2652,10 @@ Session.prototype = {
      *
      * Temp check, will be fixed when old homescreen is removed.
      */
+    var invalidInput = docUtil.querySelector(screenEl + ' .invalid input');
     if (screen === '') {
-      if (this.homeTab && this.homeTab.onDetailsScreen()) {
-        invoke('focus', qs(screenEl + ' .invalid input'));
+      if (this.homeTab && this.homeTab.onDetailsScreen() && invalidInput) {
+        invalidInput.focus();
       }
     } else if (
       !(
@@ -2720,9 +2670,10 @@ Session.prototype = {
           appliedOffer &&
           appliedOffer.issuer === 'cred' &&
           this.tab === appliedOffer.payment_method
-        )
+        ) &&
+        invalidInput
       ) {
-        invoke('focus', qs(screenEl + ' .invalid input'));
+        invalidInput.focus();
       }
     }
 
@@ -3466,21 +3417,6 @@ Session.prototype = {
     }, params);
   },
 
-  /**
-   * Displays the modal for all EMI plans
-   * @param {string} tab the tab from which the modal was invoked
-   */
-  showAllEmiPlans: function (tab) {
-    Analytics.track('emi:plans:view:all', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        from: tab,
-      },
-    });
-
-    showOverlay($('#emi-wrap'));
-  },
-
   showEmiPlansForNewCard: function () {
     var self = this;
     var amount = self.get('amount');
@@ -3530,13 +3466,13 @@ Session.prototype = {
       },
       contactRequiredForEMI: contactRequiredForEMI,
       on: {
-        back: bind(function () {
+        back: function () {
           self.switchTab(prevTab);
           self.setScreen(prevScreen);
           self.svelteCardTab.showAddCardView();
 
           return true;
-        }),
+        },
 
         payWithoutEmi: function () {
           Analytics.track('emi:pay_without', {
@@ -3583,7 +3519,7 @@ Session.prototype = {
         },
 
         viewAll: function () {
-          self.showAllEmiPlans(prevTab);
+          discreet.EMIHelper.viewAllEMIPlans(prevTab);
         },
       },
 
@@ -3710,7 +3646,7 @@ Session.prototype = {
         },
 
         viewAll: function () {
-          self.showAllEmiPlans(prevTab);
+          discreet.EMIHelper.viewAllEMIPlans(prevTab);
         },
       },
 
@@ -3844,7 +3780,7 @@ Session.prototype = {
         },
       });
 
-      each(invalids, function (i, field) {
+      UTILS.each(invalids, function (i, field) {
         $(field).addClass('mature');
       });
       return true;
@@ -3892,7 +3828,7 @@ Session.prototype = {
       }
 
       // Delete all the auth_type-* keys
-      each(data, function (key, val) {
+      UTILS.each(data, function (key, val) {
         if (key.indexOf('auth_type-') === 0) {
           delete data[key];
         }
@@ -3923,7 +3859,7 @@ Session.prototype = {
           upiData = this.upiTab.getPayload();
         }
 
-        each(upiData, function (key, value) {
+        UTILS.each(upiData, function (key, value) {
           data[key] = value;
         });
       }
@@ -4063,14 +3999,12 @@ Session.prototype = {
     });
 
     if (!action) {
-      invoke(
+      setTimeout(
         function () {
           if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
             Cta.showVerify();
           }
-        },
-        this,
-        null,
+        }.bind(this),
         200
       );
     }
@@ -4107,10 +4041,6 @@ Session.prototype = {
 
   getDowntimeAlertDialog: function () {
     return $('#downtime-wrap');
-  },
-
-  getCovidDonationDialog: function () {
-    return $('#covid-wrap');
   },
 
   setSvelteOverlay: function () {
@@ -4385,7 +4315,7 @@ Session.prototype = {
       }
       this.getCurrentCustomer().submitOTP(
         submitPayload,
-        bind(callback, this),
+        callback.bind(this),
         queryParams
       );
     } else {
@@ -4400,10 +4330,6 @@ Session.prototype = {
 
   clearRequest: function (extra) {
     this.hideTimer();
-    var powerotp = gel('powerotp');
-    if (powerotp) {
-      powerotp.value = '';
-    }
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
@@ -4426,7 +4352,7 @@ Session.prototype = {
     params[Constants.PENDING_PAYMENT_TS] = '0';
     this.setParamsInStorage(params);
 
-    abortAjax(this.ajax);
+    UTILS.abortAjax(this.ajax);
 
     clearTimeout(this.requestTimeout);
     this.requestTimeout = null;
@@ -4509,7 +4435,19 @@ Session.prototype = {
     if (this.tab === 'home-1cc') {
       return;
     }
-    preventDefault(e);
+
+    if (e instanceof Event) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    /**
+     * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
+     */
+    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+      return;
+    }
+
     // let <CTA> handle click, if present
     // used for keyboard submit in payout screen
     var cta = docUtil.querySelector('#footer-cta + span');
@@ -5000,6 +4938,16 @@ Session.prototype = {
   },
 
   submit: function (props) {
+    /**
+     * if upi-payment module has any downtime or has to wait for user to click on Pay button,
+     * it will set the data in respective handlers
+     * `avoidSessionSubmit` will return true in such cases, explaining that
+     * to avoid regular pre-submit and submit flows from sessionjs
+     * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
+     */
+    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+      return;
+    }
     var locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
@@ -5812,9 +5760,9 @@ Session.prototype = {
 
     var payment = this.r.createPayment(data, request);
     payment
-      .on('payment.success', bind(successHandler, this))
-      .on('payment.error', bind(errorHandler, this))
-      .on('payment.cancel', bind(cancelHandler, this));
+      .on('payment.success', successHandler.bind(this))
+      .on('payment.error', errorHandler.bind(this))
+      .on('payment.cancel', cancelHandler.bind(this));
 
     if (data.method === 'wallet' && isDynamicWalletFlow) {
       /**
@@ -5891,7 +5839,7 @@ Session.prototype = {
       });
       this.r.on(
         'payment.wallet.topup',
-        bind(function () {
+        function () {
           Analytics.track('wallet:balance:insufficient', {
             data: {
               wallet: this.payload && this.payload.wallet,
@@ -5916,7 +5864,7 @@ Session.prototype = {
             addFunds: true,
           });
           this.otpView.setTextView('wallet_insufficient_balance');
-        }, this)
+        }.bind(this)
       );
     } else if (data.method === 'upi') {
       sub_link.html(I18n.format('misc.cancel_action'));
@@ -5934,7 +5882,7 @@ Session.prototype = {
       this.r.on('payment.upi.coproto_response', function (response) {
         var params = {};
         params[Constants.UPI_POLL_URL] = response.request.url;
-        params[Constants.PENDING_PAYMENT_TS] = now() + '';
+        params[Constants.PENDING_PAYMENT_TS] = Date.now() + '';
         that.setParamsInStorage(params);
 
         /**
@@ -5942,7 +5890,7 @@ Session.prototype = {
          * Invoke the flow where upi intent url is opened using deeplink
          */
         if (data.upi_app === null && response.data.intent_url) {
-          that.upiTab.processIntentOnMWeb(response.data.intent_url);
+          upiPaymentHandlers.processIntentOnMWeb(response.data.intent_url);
         }
       });
 
@@ -6041,7 +5989,7 @@ Session.prototype = {
       }
       if (RazorpayHelper.isRecurring()) {
         var recurringValue = this.get('recurring');
-        data.recurring = isString(recurringValue) ? recurringValue : 1;
+        data.recurring = _.isString(recurringValue) ? recurringValue : 1;
       }
     }
 
@@ -6147,7 +6095,7 @@ Session.prototype = {
 
       var cancelReason = this.getCancelReason();
 
-      abortAjax(this.ajax);
+      UTILS.abortAjax(this.ajax);
       this.clearRequest(cancelReason);
       this.isOpen = false;
 
@@ -6165,11 +6113,9 @@ Session.prototype = {
       });
       this.listeners = [];
       this.bits = [];
-      if (this.modal) {
-        this.modal.destroy();
+      if (this.mainModal) {
+        this.mainModal.$destroy();
       }
-      $(this.el).remove();
-
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
       window.setPaymentID = window.onComplete = null;
@@ -6194,17 +6140,6 @@ Session.prototype = {
         data: this.dismissReason,
       });
     }
-  },
-
-  showNoCostExplainer: function (plan) {
-    this.nocostModal = new discreet.NoCostExplainer({
-      target: gel('nocost-overlay'),
-      props: {
-        plan: plan,
-        formatter: this.formatAmountWithCurrency.bind(this),
-      },
-    });
-    showOverlay($('#nocost-overlay'));
   },
 
   setOffers: function () {
@@ -6253,7 +6188,7 @@ Session.prototype = {
       };
       var session = this;
       this.offers = new discreet.OffersView({
-        target: gel('bottom'),
+        target: docUtil.getElementById('bottom'),
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function (offer, shouldNavigate) {
@@ -6486,9 +6421,7 @@ Session.prototype = {
       customer.customer_id = saved_customer.customer_id;
     }
     // Setting rtb_experiment based on prefs call for logged in users
-    discreet.TrustedBadgeHelper.setTrustedBadgeVariant(
-      preferences.rtb_experiment || {}
-    );
+    discreet.RTBHelper.setRTBVariant(preferences.rtb_experiment || {});
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },
@@ -6509,6 +6442,7 @@ Session.prototype = {
   showOverlay: showOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
+  cancelHandler: cancelHandler,
   getProxyPhone: getProxyPhone,
 };
 

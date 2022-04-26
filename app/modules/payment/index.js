@@ -36,7 +36,7 @@ import updateScore from 'analytics/checkoutScore';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 import { shouldRedirectZestMoney } from 'common/emi';
-import { popupIframeCheck } from './helper';
+import { assertPaymentSuccessMetadata, popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import { getOption, getOrderId } from 'razorpay';
@@ -510,6 +510,9 @@ Payment.prototype = {
 
     if (data.razorpay_payment_id) {
       this.clear();
+      try {
+        assertPaymentSuccessMetadata(data);
+      } catch (e) {}
       // Track
       Analytics.track('oncomplete', {
         r: this.r,

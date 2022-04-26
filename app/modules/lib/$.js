@@ -1,7 +1,8 @@
-import { escapeHtml, scrollIntoView } from 'lib/utils';
+import { each, escapeHtml, scrollIntoView } from 'lib/utils';
+import { isNonNullObject } from 'utils/object';
 
 var $ = function (el) {
-  if (isString(el)) {
+  if (_.isString(el)) {
     return $(document.querySelector(el));
   }
   if (!(this instanceof $)) {
@@ -18,10 +19,10 @@ $.prototype = {
     }
 
     var ref;
-    if (isString(callback)) {
+    if (_.isString(callback)) {
       callback = thisArg[callback];
     }
-    if (!isFunction(callback)) {
+    if (!_.isFunction(callback)) {
       return;
     }
     ref = function (e) {
@@ -35,9 +36,9 @@ $.prototype = {
       el.addEventListener(evt, ref, !!capture);
     });
 
-    return bind(function () {
+    return function () {
       this.off(event, ref, capture);
-    }, this);
+    }.bind(this);
   },
 
   off: function (event, callback, capture) {
@@ -187,10 +188,10 @@ $.prototype = {
   },
 
   height: function (height) {
-    if (isNumber(height)) {
+    if (_.isNumber(height)) {
       height = height.toFixed(2) + 'px';
     }
-    if (isString(height)) {
+    if (_.isString(height)) {
       return this.css('height', height);
     }
     if (this[0]) {
@@ -203,7 +204,7 @@ $.prototype = {
   },
 
   toggle: function (flag) {
-    invoke(flag ? 'show' : 'hide', this);
+    flag ? this.show() : this.hide();
   },
 
   show: function () {
@@ -285,7 +286,7 @@ $.prototype = {
       return;
     }
 
-    if (isFunction($el.click)) {
+    if (_.isFunction($el.click)) {
       return $el.click();
     }
 

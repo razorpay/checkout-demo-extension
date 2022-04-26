@@ -198,8 +198,8 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .border-list:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
-.border-list > *:focus,
-.border-list > *:focus-within,
+.border-list > *:focus:not(.uninteractive),
+.border-list > *:focus-within:not(.uninteractive),
 .border-list > .selected {
     border-color: var(--highlight-color);
     background-color: var(--hover-state-color);
@@ -214,18 +214,14 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .border-list:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
-.border-list > *:focus + *,
-.border-list > *:focus-within + *,
+.border-list > *:focus:not(.uninteractive) + *,
+.border-list > *:focus-within:not(.uninteractive) + *,
 .border-list > .selected + * {
     border-top-color: var(--highlight-color);
 }
 
-.trusted-badge-wrapper {
+.rtb-banner {
     background: var(--active-state-color);
-}
-
-.trusted-badge-header-section.active {
-    border-bottom: 2px solid var(--active-state-color);
 }
 
 .arrow {
@@ -306,3 +302,13 @@ label.sv-checkbox > .stack > input:focus::before {
 #content.one-cc .confirm-container {
   border-top: 2px solid var(--background-color);
 }
+
+.loading-indicator {
+    border-radius: 50%;
+    width: 33px;
+    height: 33px;
+    border: 1px solid;
+    border-color: var(--highlight-color) transparent var(--highlight-color) var(--highlight-color) !important;
+    animation: 1s linear 0s infinite normal none running rotate;
+}
+

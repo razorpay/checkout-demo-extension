@@ -31,3 +31,11 @@ export function popStack(count = 1) {
 export function replaceStack(stackElement: NavStack.StackElement) {
   updater(1, stackElement);
 }
+
+export function isOverlayActive(): boolean {
+  const navStack = get(stack);
+  if (navStack.length > 0) {
+    return Boolean(navStack[navStack.length - 1].overlay);
+  }
+  return false;
+}

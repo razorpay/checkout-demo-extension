@@ -1,19 +1,12 @@
 function makeOptions(features, options) {
-  const {
-    showCoupons,
-    showAddress,
-    mandatoryLogin,
-    forceCOD,
-    orderId,
-    callbackUrl,
-  } = features;
+  const { showCoupons, showAddress, mandatoryLogin, orderId, callbackUrl } =
+    features;
 
   options = {
     one_click_checkout: true,
     show_address: showAddress,
     show_coupons: showCoupons,
     mandatory_login: mandatoryLogin,
-    force_cod: forceCOD,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
 

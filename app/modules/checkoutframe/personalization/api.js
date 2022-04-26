@@ -4,7 +4,7 @@ import { getUPIIntentApps } from 'checkoutstore/native';
 import { getCustomerCountryISOCode } from 'checkoutstore/screens/home';
 
 import { getAmount } from 'razorpay';
-import { setTrustedBadgeVariant } from 'trusted-badge/helper';
+import { setRTBVariant } from 'rtb/helper';
 
 import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';
@@ -121,7 +121,7 @@ function getInstrumentsFromApi(customer) {
         }
 
         const data = response.preferred_methods || {};
-        setTrustedBadgeVariant(response.rtb_experiment || {});
+        setRTBVariant(response.rtb_experiment || {});
         trackP13nMeta(data);
         // default instruments may be provided based on the merchant and amount details
 

@@ -115,11 +115,6 @@ async function respondToUPIPaymentStatus(context) {
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
   let timeout = 2000;
-  if (context.preferences.show_donation) {
-    timeout += 10000;
-    let selector = '#covid-wrap';
-    await context.page.waitForSelector(selector);
-  }
   await context.page.waitFor('#modal-inner', {
     timeout,
     hidden: true,

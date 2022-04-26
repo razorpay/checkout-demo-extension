@@ -68,6 +68,7 @@ function makePreferences(overrides) {
     features: {
       save_vpa: true,
     },
+    feature_overrides: {},
     methods: {
       emi: true,
       emi_subvention: 'customer',

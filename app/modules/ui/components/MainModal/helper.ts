@@ -2,6 +2,7 @@ import { displayCurrencies } from 'common/currency';
 import { isIRCTC, getOption } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { AndroidWebView } from 'common/useragent';
+import { scrollIntoView } from 'lib/utils';
 
 export function getAmount(): string {
   const amount = getOption('amount');
@@ -28,4 +29,19 @@ export function getAmount(): string {
 export function disableAnimation(): boolean {
   const irctcWebview = AndroidWebView && isIRCTC();
   return irctcWebview || !getOption('modal.animation');
+}
+
+export function bringInputIntoView() {
+  var el = document.activeElement;
+  if (el.tagName === 'INPUT') {
+    /**
+     * When device is rotated or the keyboard is shown,
+     * if an input element was focused on,
+     * it might get hidden behind the keyboard.
+     * Let's bring it into view.
+     */
+    setTimeout(function () {
+      scrollIntoView(el);
+    });
+  }
 }
