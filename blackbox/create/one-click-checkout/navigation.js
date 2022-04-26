@@ -10,10 +10,8 @@ const {
   goBack,
   closeModal,
   proceedOneCC,
-  login,
+  mockPaymentSteps,
   handleUpdateOrderReq,
-  handleThirdWatchReq,
-  handleFeeSummary,
 } = require('../../actions/one-click-checkout/common.js');
 const {
   confirmModalClose,
@@ -24,13 +22,8 @@ const {
 } = require('../../actions/one-click-checkout/navigation');
 const { delay } = require('../../util.js');
 const {
-  selectPaymentMethod,
-} = require('../../tests/homescreen/homeActions.js');
-const {
-  selectBank,
-  handleMockSuccessDialog,
-} = require('../../actions/shared-actions.js');
-const { passRequestNetbanking } = require('../../actions/common.js');
+  fillUserAddress,
+} = require('../../actions/one-click-checkout/address.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -42,6 +35,7 @@ module.exports = function (testFeatures) {
 
   describe.each(
     getTestData(title, {
+      ...features,
       options,
       preferences,
     })
@@ -63,25 +57,19 @@ module.exports = function (testFeatures) {
         return;
       }
 
-      await login(context);
-      await assertAddressTab(context);
-      await goBack(context);
       await assertSummaryTab(context);
-      await handleAvailableCouponReq(context);
       await proceedOneCC(context);
 
+      await assertAddressTab(context);
+      await fillUserAddress(context, {
+        isSaveAddress: false,
+        serviceable: true,
+      });
+      await proceedOneCC(context);
       await handleUpdateOrderReq(context, options.order_id);
-      await handleThirdWatchReq(context);
-      await delay(200);
-      await handleFeeSummary(context, features);
+
       await assertPaymentsTab(context);
-
-      await selectPaymentMethod(context, 'netbanking');
-      await selectBank(context, 'SBIN');
-      await proceedOneCC(context);
-
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
+      await mockPaymentSteps(context, options, features, false);
     });
   });
 };

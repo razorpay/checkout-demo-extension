@@ -282,8 +282,15 @@ async function login(context) {
   await handleShippingInfo(context);
 }
 
-async function mockPaymentSteps(context, options, features) {
-  await handleUpdateOrderReq(context, options.order_id);
+async function mockPaymentSteps(
+  context,
+  options,
+  features,
+  updateOrder = true
+) {
+  if (updateOrder) {
+    await handleUpdateOrderReq(context, options.order_id);
+  }
   await handleThirdWatchReq(context);
   await delay(200);
   await handleFeeSummary(context, features);
