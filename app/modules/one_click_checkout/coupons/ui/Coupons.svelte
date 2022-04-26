@@ -78,6 +78,7 @@
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isElementUnscrollable } from 'one_click_checkout/helper';
   import { getTrustedBadgeHighlights } from 'trusted-badge/helper';
+  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -90,6 +91,7 @@
   let couponEle;
   let scrollable = false;
   let orderWidget;
+  let showValidations = false;
 
   $: ctaDisabled =
     (!$contact && !isContactHidden()) ||
@@ -97,6 +99,11 @@
     ($savedAddresses.length && !$selectedAddress.serviceability);
 
   function onSubmit() {
+    if (!CONTACT_REGEX.test($contact) || !EMAIL_REGEX.test($email)) {
+      showValidations = true;
+      return;
+    }
+
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
     Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
     Events.TrackBehav(CouponEvents.SUMMARY_CONTINUE_CTA_CLICKED, {
@@ -225,7 +232,7 @@
     class:coupon-scrollable={scrollable}
   >
     <div class="widget-wrapper contact-wrapper">
-      <ContactWidget />
+      <ContactWidget {showValidations} />
     </div>
     <div class="separator" />
 
@@ -257,7 +264,12 @@
       <OrderWidget />
     </div>
     <div class="separator" />
-    <CTA on:click={onSubmit} {onViewDetailsClick} disabled={ctaDisabled} />
+    <CTA
+      on:click={onSubmit}
+      {onViewDetailsClick}
+      disabled={ctaDisabled}
+      handleDisable
+    />
   </div>
 </Screen>
 

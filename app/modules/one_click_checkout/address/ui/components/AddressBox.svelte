@@ -17,6 +17,7 @@
 
   // utils imports
   import { findCountryCode } from 'common/countrycodes';
+  import { getI18nForTag } from 'one_click_checkout/address/helpersExtra';
 
   export let address;
   export let isSelected = false;
@@ -72,7 +73,7 @@
           {address.name}
         </span>
         {#if address.tag}
-          <div class="address-tag">{address.tag}</div>
+          <div class="address-tag">{$t(getI18nForTag(address.tag))}</div>
         {/if}
       </div>
     </div>

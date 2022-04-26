@@ -5,7 +5,7 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { RESEND_BTN } from 'ui/labels/otp';
+  import { RESEND_LABEL } from 'ui/labels/otp';
 
   // store imports
   import { resendTimeout } from 'checkoutstore/screens/otp';
@@ -72,7 +72,7 @@
     {disabled}
     on:click={(event) => invokeResend(event, 'resend')}
   >
-    {$t(RESEND_BTN)}
+    {$t(RESEND_LABEL)}
     {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
   </LinkButton>
 {/if}

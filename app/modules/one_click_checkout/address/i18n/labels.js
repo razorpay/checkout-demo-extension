@@ -53,3 +53,6 @@ export const ADD_LANDMARK = 'address.add_landmark';
 export const OPTIONAL = 'address.optional';
 export const SAVE_ADDRESS_CONSENT_TOOLTIP = 'address.save_consent_tooltip';
 export const ADDRESS_TAGS_HEADING = 'address.address_tags_heading';
+export const HOME = 'address.home';
+export const OFFICE = 'address.office';
+export const OTHERS = 'address.others';

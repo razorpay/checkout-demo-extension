@@ -1,11 +1,12 @@
 import Razorpay from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
-import { Events, Track, MiscEvents } from 'analytics/index';
+import Analytics, { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import BrowserStorage from 'browserstorage';
 import * as _El from 'utils/DOM';
 import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
+import { V1_5_EXPERIMENT_ENABLED } from 'common/constants';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -223,7 +224,7 @@ function createTestRibbon(parent) {
 }
 
 function fetchNewDesignExp(rzp) {
-  let uuid = BrowserStorage.getItem('v_1_5_experiment_enabled');
+  let uuid = BrowserStorage.getItem(V1_5_EXPERIMENT_ENABLED);
   if (!uuid) {
     uuid = Track.makeUid();
   }
@@ -231,7 +232,7 @@ function fetchNewDesignExp(rzp) {
     fetch.post({
       url: 'https://api.razorpay.com/v1/splitz/evaluate',
       callback: function (data) {
-        BrowserStorage.setItem('v_1_5_experiment_enabled', uuid);
+        BrowserStorage.setItem(V1_5_EXPERIMENT_ENABLED, uuid);
         resolve(data);
       },
       data: {
@@ -255,10 +256,10 @@ function getPreloadedFrame(rzp) {
   }
 
   if (rzp && rzp.get('one_click_checkout')) {
-    rzp.set('v_1_5_experiment_enabled', false);
+    rzp.set(V1_5_EXPERIMENT_ENABLED, false);
     preloadedFramePromise = fetchNewDesignExp(rzp).then((data) => {
       if (data?.response?.variant?.name === 'enable_1_5') {
-        rzp.set('v_1_5_experiment_enabled', true);
+        rzp.set(V1_5_EXPERIMENT_ENABLED, true);
       }
       const currentFrames = document.getElementsByClassName(
         'razorpay-checkout-frame'
@@ -321,9 +322,11 @@ RazorProto.onNew = function (event, callback) {
 
 function intialInstrumentation(that, checkoutFrame) {
   var frame = (that.checkoutFrame = checkoutFrame);
-  Track(that, 'open', {
-    v_1_5_experiment_enabled: that.get('v_1_5_experiment_enabled') || false,
-  });
+  Analytics.setMeta(
+    V1_5_EXPERIMENT_ENABLED,
+    that.get(V1_5_EXPERIMENT_ENABLED) || false
+  );
+  Analytics.track('open');
 
   if (!frame.el.contentWindow) {
     frame.close();

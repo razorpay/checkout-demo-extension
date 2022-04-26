@@ -1,0 +1,51 @@
+const initThemeMock = () =>
+  jest.mock('checkoutstore/theme', () => {
+    return {
+      getThemeMeta: () => ({
+        icons: {
+          card: '',
+          upi: '',
+          netbanking: '',
+          wallet: '',
+          upi_otm: '',
+          gpay: '',
+          emi: '',
+          cardless_emi: '',
+          qr: '',
+          paylater: '',
+          paypal: '',
+          bank_transfer: '',
+          offline_challan: '',
+          nach: '',
+          app: '',
+          emandate: '',
+          cod: '',
+          international: '',
+          othermethods: '',
+          contact: '',
+          aadhaar: '',
+          edit: '',
+          present: '',
+          trusted_badge: '',
+          tick_filled_donate: '',
+          warning: '',
+          refund: '',
+          donate_heart: '',
+          question: '',
+          message: '',
+          lock: '',
+          user_protect: '',
+          tick_flag: '',
+          new_window: '',
+          close: '',
+          offers: '',
+          arrow_next: '',
+          saved_card: '',
+          rzp_logo: '',
+          edit_phone: '',
+        },
+      }),
+    };
+  });
+
+export default initThemeMock;

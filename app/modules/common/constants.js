@@ -118,3 +118,5 @@ export const COLORS = {
 export const INDIA_COUNTRY_ISO_CODE = 'IN';
 
 export const US_COUNTRY_ISO_CODE = 'US';
+
+export const V1_5_EXPERIMENT_ENABLED = 'v_1_5_experiment_enabled';

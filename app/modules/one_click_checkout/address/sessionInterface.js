@@ -20,7 +20,7 @@ import {
   formatApiAddress,
   getLatestServiceableAddress,
 } from 'one_click_checkout/address/helpersExtra';
-import { getSession } from 'sessionmanager';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 // analytics import
 import { Events } from 'analytics';
@@ -63,8 +63,8 @@ function formatAddresses(addresses) {
  * Returns session theme
  */
 export const getTheme = () => {
-  const session = getSession();
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 };
 
 export { showSavedAddressCta };

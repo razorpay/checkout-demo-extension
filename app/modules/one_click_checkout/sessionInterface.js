@@ -57,6 +57,7 @@ import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 import { isOneClickCheckout } from 'razorpay';
 import { showSummaryModal } from 'one_click_checkout/summary_modal';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+import { getThemeMeta } from 'checkoutstore/theme';
 
 export const historyExists = () => get(history).length;
 
@@ -143,14 +144,13 @@ export function handleEditContact(logoutFlow = false) {
 }
 
 export function getIcons() {
-  const session = getSession();
-  return session.themeMeta.icons;
+  const themeMeta = getThemeMeta();
+  return themeMeta.icons;
 }
 
 export function getTheme() {
-  const session = getSession();
-
-  return session.themeMeta;
+  const themeMeta = getThemeMeta();
+  return themeMeta;
 }
 
 /**

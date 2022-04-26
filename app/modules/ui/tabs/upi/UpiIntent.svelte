@@ -30,6 +30,7 @@
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
   import { tryOpeningIntentUrl } from 'upi/helper';
   import { Events } from 'analytics';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
   export let apps;
@@ -48,7 +49,8 @@
   let upiDowntimes = getDowntimes().upi;
 
   const session = getSession();
-  let otherAppsIcon = session.themeMeta.icons.othermethods;
+  const themeMeta = getThemeMeta();
+  let otherAppsIcon = themeMeta.icons.othermethods;
 
   $: {
     if (apps.length <= 5 || showAll) {

@@ -106,12 +106,8 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
 /**
  * Method called when OTP verification is successful
  */
-export function successHandler(data) {
-  if (!data.addresses?.length) {
-    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.ADD_ADDRESS });
-  } else {
-    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
-  }
+export function successHandler() {
+  navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.COUPONS });
 }
 
 /**

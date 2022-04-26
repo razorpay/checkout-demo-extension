@@ -37,6 +37,7 @@
   export let isOptional;
   export let inAddress = false;
   export let validationText;
+  export let showValidations = false;
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 
@@ -193,6 +194,7 @@
       ? 'contact-validation-error'
       : ''}
     {validationText}
+    {showValidations}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

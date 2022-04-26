@@ -2,7 +2,6 @@
 /app/dist
 /app/js/generated
 /app/modules/generated
-/app/templates
 /app/index.html
 /coverage
 /app/mocks

@@ -75,7 +75,7 @@ module.exports = function (testFeatures) {
         await proceedOneCC(context);
         await handleVerifyOTPReq(context);
         await handleShippingInfo(context);
-        await goBack(context);
+
         await handleAvailableCouponReq(context);
         await scrollToEnd(context, '.screen-comp');
         await delay(800);
