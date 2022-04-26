@@ -223,6 +223,7 @@
 
 <Screen pad={false}>
   <div
+    data-test-id="summary-screen"
     class="coupon-container"
     bind:this={couponEle}
     class:coupon-scrollable={scrollable}

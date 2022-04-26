@@ -88,7 +88,7 @@
       </button>
     {/if}
     {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$activeRoute?.topbarTitle}
-      <div class="breadcrumb">
+      <div data-test-id="breadcrumb-nav" class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
           <span
             class="breadcrumb-text"
