@@ -48,10 +48,12 @@ import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
 import solid_down_arrow from 'one_click_checkout/address/icons/solid_down_arrow';
+import { AVAILABLE_METHODS } from 'common/constants';
 
-import { getAllMethods } from 'checkoutframe/paymentmethods';
-
-const availIconNames = getAllMethods().concat([
+/**
+ * Don't use getAllMethods which is functional representation for AVAILABLE_METHODS, as its creating CIRCULAR DEPENDENCY
+ */
+const availIconNames = [...AVAILABLE_METHODS].concat([
   'othermethods',
   'contact',
   'aadhaar',

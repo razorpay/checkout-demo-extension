@@ -76,7 +76,7 @@
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
   import { isCardValidForOffer } from 'checkoutstore/offers';
-  import { querySelector } from 'utils/doc';
+  import { viewAllEMIPlans } from 'emi/helper';
 
   const dispatch = createEventDispatcher();
 
@@ -215,15 +215,6 @@
       default:
         return;
     }
-  }
-
-  function showEmiPlans() {
-    // TODO: Update showOverlay once session.js is refactored.
-    showOverlay({ 0: querySelector('#emi-wrap') });
-
-    Analytics.track('emi:plans:view:all', {
-      type: AnalyticsTypes.BEHAV,
-    });
   }
 
   function setDebitPinRadiosVisibility(visible) {
@@ -529,7 +520,7 @@
     <span class="card-title">{$t(ADD_NEW_CARD)} </span>
     <span class="emi-plans-label">
       {#if tab === 'emi'}
-        <div id="view-emi-plans" on:click={showEmiPlans}>
+        <div id="view-emi-plans" on:click={viewAllEMIPlans}>
           <!-- LABEL: View all EMI Plans -->
           {$t(VIEW_ALL_EMI_PLANS)}
         </div>

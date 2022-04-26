@@ -24,8 +24,8 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
   import { isOneClickCheckout } from 'razorpay';
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
   import {
@@ -34,6 +34,11 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { enableUPITiles } from 'upi/helper';
+  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
+
+  import { PAY_WITH_INSTALLED_OR_OTHERS } from 'upi/i18n/labels';
+  import { captureFeature } from 'upi/events';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
@@ -45,6 +50,7 @@
   export let error = '';
   export let disabled = false;
   export let errorLabel = '';
+  let uninteractive = false;
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -53,12 +59,18 @@
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
   let _icon = getIconForDisplay();
+  let upiTiles = enableUPITiles();
 
   let _subtitle;
   $: {
     _subtitle = getSubtitleForDisplay($locale);
     if (method === 'cod' && disabled) {
       _subtitle = '';
+    }
+    uninteractive =
+      method === 'upi' && upiTiles?.status && upiTiles?.variant === 'row';
+    if (upiTiles.status) {
+      captureFeature('enableUPITiles', upiTiles);
     }
   }
 
@@ -79,6 +91,8 @@
           )}
         </div>
       `;
+    } else if (method === 'upi' && upiTiles.variant === 'row') {
+      return formatMessageWithLocale(PAY_WITH_INSTALLED_OR_OTHERS, locale);
     } else {
       return getMethodDescription(method, locale);
     }
@@ -111,7 +125,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method,
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
 
@@ -122,6 +136,12 @@
     dispatch('select');
   }
 
+  function onClick() {
+    if (uninteractive) {
+      return;
+    }
+    select();
+  }
   // disabled for phase 1 of Walnut369
   // let showWalnutBanner = false;
   // $: showWalnutBanner = instrument.showWalnutBanner;
@@ -135,12 +155,13 @@
 <SlottedOption
   className={`new-method has-tooltip ${
     $selectedInstrumentId === instrument.id && 'selected'
-  }`}
+  } ${uninteractive ? 'uninteractive' : ''}`}
   defaultStyles={false}
-  on:click={select}
+  on:click={onClick}
   attributes={{ method }}
   flexGrow={codLoading}
   {disabled}
+  withRow={method === 'upi' && upiTiles?.status}
 >
   <i slot="icon">
     {#if method === 'cod'}
@@ -153,7 +174,12 @@
     {_title}
   </div>
   <div slot="subtitle" class:subtitle-one-cc={isOneCC}>
-    {@html _subtitle}
+    {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'subText'}
+      <!-- This component is built with "early return" concept and returns html upon conditions met -->
+      <UPIAppStack onOtherClick={select} {method} />
+    {:else}
+      {@html _subtitle}
+    {/if}
   </div>
   <div slot="error">
     {#if disabled}
@@ -174,6 +200,12 @@
   <div slot="extra">
     {#if codLoading}
       <div class="spinner cod-loader" />
+    {/if}
+  </div>
+  <div slot="row">
+    {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'row'}
+      <!-- This component has earli return and renders on demand -->
+      <UPIAppStack onOtherClick={select} {method} />
     {/if}
   </div>
 </SlottedOption>

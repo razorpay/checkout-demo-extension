@@ -33,7 +33,7 @@
     intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-  import { getTrustedBadgeAnaltyicsPayload } from 'trusted-badge/helper';
+  import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -58,6 +58,10 @@
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import {
+    resetSelectedUPIAppForPay,
+    selectedUPIAppForPay,
+  } from 'checkoutstore/screens/upi';
+  import {
     getName,
     isRecurring,
     getMerchantOrder,
@@ -80,7 +84,12 @@
   } from 'ui/labels/upi';
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
-  import { oneClickUPIIntent } from 'upi/helper';
+  import {
+    oneClickUPIIntent,
+    enableUPITiles,
+    getRecommendedAppsForUPIStack,
+    definePlatform,
+  } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
@@ -105,6 +114,7 @@
   export let intent = false;
   export let pspHandle;
   export let shouldShowQr;
+
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
@@ -118,6 +128,10 @@
   let otmStartDate = new Date();
   let upiIntent;
   let renderCtaOneCC = false;
+
+  let upiTiles = enableUPITiles();
+  const showStaticIntentAppsForIos =
+    upiTiles.status === true && definePlatform('mWebiOS');
 
   const merchantName = getName();
 
@@ -154,7 +168,7 @@
 
   /**
    * bankselection is disabled for UPI recurring
-   * https://jira.corp.razorpay.com/browse/CE-4110
+   * https://razorpay.atlassian.net/browse/CE-4110
    */
   let requiresBankSelection = false;
   let upiFlowStep = steps.upi;
@@ -286,7 +300,21 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+  $: {
+    if (showStaticIntentAppsForIos) {
+      intentApps = getRecommendedAppsForUPIStack(false, 3);
+    } else {
+      intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+    }
+  }
+
+  // Deselect everything else on UPI screen when intent app is selected
+  $: {
+    if ($selectedUPIAppForPay?.app) {
+      selectedToken = null;
+      intentAppSelected = null;
+    }
+  }
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
@@ -415,7 +443,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method: 'qr',
-        ...getTrustedBadgeAnaltyicsPayload(),
+        ...getRTBAnalyticsPayload(),
       },
     });
 
@@ -609,6 +637,12 @@
 
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
+
+    // Note: unselect the new intent UI grid app whenever any other
+    // instrument is selected on upi screen (saved vpa, omnichannel etc)
+    if (upiTiles.status === true) {
+      resetSelectedUPIAppForPay();
+    }
   }
 
   export function getFullVpa() {
@@ -732,10 +766,6 @@
       },
     });
   }
-
-  export const processIntentOnMWeb = (intentUrl) => {
-    upiIntent.processIntentOnMWeb(intentUrl);
-  };
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
@@ -776,7 +806,8 @@
               apps={intentApps || []}
               selected={intentAppSelected}
               skipCTA={oneClickUPIIntentFlow}
-              payUsingApps={availableFlows.intentUrl}
+              payUsingApps={!definePlatform('mWebiOS') &&
+                availableFlows.intentUrl}
               bind:this={upiIntent}
               on:select={(e) => {
                 const { downtimeInstrument, downtimeSeverity, packageName } =
@@ -837,7 +868,7 @@
                     />
                   </i>
                   <div slot="downtime" class="downtime-saved-vpa">
-                    {#if !!downtimeSeverity}
+                    {#if !!downtimeSeverity && selectedToken === app.id}
                       <DowntimeCallout
                         showIcon={true}
                         severe={downtimeSeverity}
@@ -859,7 +890,6 @@
                 bind:value={vpaEntered}
                 bind:rememberVpa
                 bind:this={vpaField}
-                bind:helpTextToDisplay
               />
             </div>
           {/if}

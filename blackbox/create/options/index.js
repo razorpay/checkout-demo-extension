@@ -111,6 +111,8 @@ function makeTestPreferences(
     };
   }
 
+  preferences.feature_overrides = {};
+
   return preferences;
 }
 

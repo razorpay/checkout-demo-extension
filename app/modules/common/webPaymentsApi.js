@@ -4,7 +4,7 @@ import {
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
   CRED_PACKAGE_NAME,
-} from 'common/upi';
+} from 'upi/constants';
 
 import { getSession } from 'sessionmanager';
 
@@ -17,12 +17,13 @@ export const appsThatSupportWebPayments = [
 const webPaymentsApps = {};
 
 appsThatSupportWebPayments.forEach((app) => {
-  webPaymentsApps[app] = false;
+  webPaymentsApps[app.package_name] = false;
 });
 
 /**
  * Tells if Web Payments are available for the app passed
- * @param app
+ * @param {string} app package name of the application and sometimes the
+ * Note: this method has to be tested in "https" route and local dev results in false all-time
  *
  * @returns {boolean}
  */
@@ -34,6 +35,11 @@ export function isWebPaymentsApiAvailable(app) {
   return webPaymentsApps[app];
 }
 
+/**
+ *
+ * @param {string} app package name of the application
+ * @returns
+ */
 export const checkWebPaymentsForApp = (app) => {
   const session = getSession();
   /* disable Web payments API for SDK as we have native intent there */

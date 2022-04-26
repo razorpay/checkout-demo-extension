@@ -2,6 +2,8 @@ import { submitForm } from 'common/form';
 import { checkValidFlow } from './utils';
 import FLOWS from 'config/FLOWS';
 import { iOS, android } from 'common/useragent';
+import { getPaymentEntity } from 'razorpay';
+import * as errorService from 'error-service';
 /**
  * popupIframeCheck check for given method is required to open in iframe inside
  * popup. If required it will do necessary steps to load the page
@@ -90,4 +92,56 @@ export function popupIframeCheck(context, request) {
     return true;
   }
   return false;
+}
+
+/**
+ * In this function, we're checking if the necessary metadata is being passed to the merchant
+ * on payment success in addition to razorpay_payment_id.
+ *
+ * This is required to for merchants to correlate the payment with corresponding order/invoice/subscription etc
+ */
+
+export function assertPaymentSuccessMetadata(data) {
+  try {
+    if (!data || !data.razorpay_payment_id) {
+      // Ideally this case should not get triggered but have added it here just in case.
+      return;
+    }
+
+    const paymentEntity = getPaymentEntity();
+
+    if (!paymentEntity) {
+      // In this case, usually there is no other metadata sent except for
+      // razorpay_payment_id and hence needs no further validation.
+      return;
+    }
+
+    const expectedEntities = [
+      'razorpay_signature',
+      `razorpay_${paymentEntity}_id`,
+    ];
+
+    expectedEntities.forEach((entity) => {
+      // Raise an error if an expected entity is not present
+      if (!data[entity]) {
+        errorService.capture(new Error(`ValidationError: Missing ${entity}`), {
+          severity: errorService.SEVERITY_LEVELS.S2, // TODO: Change it to S0 after monitoring for a few days
+          analytics: {
+            event: 'validation:failed',
+            data: {
+              validationFailure: {
+                flow: 'payment_success',
+                field: entity,
+                value: data[entity], // This will (should?) always be an empty value
+                data,
+              },
+            },
+          },
+        });
+      }
+    });
+  } catch (e) {
+    // Adding this try/catch block to ensure any potential errors here
+    // do not cause any cascading failures as this is in the critical payment oncomplete flow
+  }
 }

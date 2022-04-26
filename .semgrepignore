@@ -1,7 +1,6 @@
 /blackbox/
 /scripts/
 /app/js/checkout-frame/session.js
-/app/js/lib/
 /app/modules/analytics/base-analytics.js
 /app/modules/common/form.js
 /app/modules/common/upi_helpers.js

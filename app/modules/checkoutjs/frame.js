@@ -189,6 +189,7 @@ function appendLoader($parent, parent) {
   }
 }
 
+var isMarkupSet = false;
 export default function CheckoutFrame(rzp) {
   doc = document.body;
   head = document.head;
@@ -357,7 +358,11 @@ CheckoutFrame.prototype = {
 
     this.$metas.forEach(_El.appendTo(head));
 
-    merchantMarkup.overflow = docStyle.overflow;
+    // Hack added for 1cc flow ( merchantMarkup was being set twice  )
+    if (!isMarkupSet) {
+      merchantMarkup.overflow = docStyle.overflow;
+      isMarkupSet = true;
+    }
     docStyle.overflow = 'hidden';
 
     if (ua_iPhone) {

@@ -1,4 +1,7 @@
-export type CustomObject<T> = { [key: string]: T };
+export type CustomObject<T> = {
+  [key: string]: T;
+};
+export type EmptyObject = CustomObject<never>;
 export type Razorpay = any;
 export type DownTimeSeverity = 'high' | 'low' | boolean;
 export type BaseFunction = (...args: any) => any;
