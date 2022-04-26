@@ -184,7 +184,11 @@
         </ul>
       {:else}
         {#if isLoggedIn}
-          <p class="account-menu" on:click={handleEdit}>
+          <p
+            data-test-id="edit-contact-account"
+            class="account-menu"
+            on:click={handleEdit}
+          >
             {$t(EDIT_CONTACT_ACTION)}
           </p>
         {/if}

@@ -15,15 +15,12 @@ const {
 } = require('../../actions/one-click-checkout/coupons');
 const {
   handleCustomerStatusReq,
-  handleUpdateOrderReq,
-  handleThirdWatchReq,
-  handleFeeSummary,
   handleCreateOTPReq,
   handleVerifyOTPReq,
   handleTypeOTP,
   proceedOneCC,
+  mockPaymentSteps,
 } = require('../../actions/one-click-checkout/common');
-const { selectPaymentMethod } = require('../../tests/homescreen/actions');
 const {
   fillUserAddress,
   handleShippingInfo,
@@ -32,11 +29,6 @@ const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
 const { delay } = require('../../util');
-const {
-  selectBank,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-} = require('../../actions/common');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -113,15 +105,7 @@ module.exports = function (testFeatures) {
         await fillUserAddress(context, { isSaveAddress, serviceable });
       }
       await proceedOneCC(context);
-      await handleUpdateOrderReq(context, options.order_id);
-      await handleThirdWatchReq(context);
-      await delay(200);
-      await handleFeeSummary(context, features);
-      await selectPaymentMethod(context, 'netbanking');
-      await selectBank(context, 'SBIN');
-      await proceedOneCC(context);
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
+      await mockPaymentSteps(context, options, features);
     });
   });
 };

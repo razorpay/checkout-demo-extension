@@ -86,6 +86,7 @@
   export let tpv;
   export let newCta;
   export let onSubmit;
+  export let showValidations = false;
 
   const order = getMerchantOrder();
   const accountName = getPrefillBankDetails('name');
@@ -199,6 +200,7 @@
 </script>
 
 <div
+  data-test-id="payment-details-block"
   class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
@@ -221,13 +223,18 @@
           on:blur={trackContactFilled}
           on:input={trackContactFilled}
           on:countrySelect={handleCountrySelect}
+          {showValidations}
           {validationText}
         />
       </div>
     {/if}
     {#if !isEmailHidden()}
       <div class="email-field">
-        <EmailField bind:value={$email} on:blur={trackEmailFilled} />
+        <EmailField
+          bind:value={$email}
+          on:blur={trackEmailFilled}
+          {showValidations}
+        />
       </div>
     {/if}
   </div>

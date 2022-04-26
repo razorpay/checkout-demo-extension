@@ -10,7 +10,22 @@ async function openVernacularFromAccountTab(context) {
   await vernacularCta.click();
 }
 
+async function logoutFromAccountTab(context, logoutAll) {
+  const logoutCta = await getDataAttrSelector(
+    context,
+    logoutAll ? 'account-logoutall-cta' : 'account-logout-cta'
+  );
+  await logoutCta.click();
+}
+
+async function openContactFromAccountTab(context) {
+  const contactCta = await getDataAttrSelector(context, 'edit-contact-account');
+  await contactCta.click();
+}
+
 module.exports = {
   openAccounTab,
   openVernacularFromAccountTab,
+  logoutFromAccountTab,
+  openContactFromAccountTab,
 };

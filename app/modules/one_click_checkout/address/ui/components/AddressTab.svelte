@@ -28,6 +28,7 @@
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
+  import { showLoader } from 'one_click_checkout/loader/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -226,7 +227,7 @@
 
   $: {
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
-      disabled = !isFormComplete;
+      disabled = !isFormComplete || $showLoader;
     } else if (
       addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
       currentView === addressViews.SAVED_ADDRESSES

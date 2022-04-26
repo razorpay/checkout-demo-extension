@@ -190,6 +190,8 @@
   let methodEle;
   let scrollable;
   let preferredMethods;
+  let homeMethodEle;
+  let oneCCResizeObserver;
 
   // TPV
   const tpv = getTPV();
@@ -803,6 +805,19 @@
     }
     // TODO: 120px as hack for payment methods to make the screen scrollable
     scrollable = isElementUnscrollable(methodEle?.parentNode, 120);
+
+    if (isOneCCEnabled) {
+      // Recalculate the screen size whenever homeMethodEle resize happened
+      setTimeout(() => {
+        if (homeMethodEle && window?.ResizeObserver) {
+          oneCCResizeObserver = new window.ResizeObserver(() => {
+            scrollable = isElementUnscrollable(methodEle?.parentNode);
+          });
+          oneCCResizeObserver.observe(homeMethodEle);
+        }
+      });
+    }
+
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
       hideCta();
@@ -1063,6 +1078,9 @@
   }
 
   export function onHide() {
+    if (isOneCCEnabled && oneCCResizeObserver) {
+      oneCCResizeObserver.unobserve(homeMethodEle);
+    }
     renderCtaOneCC = false;
   }
 
@@ -1238,6 +1256,7 @@
 
           <div
             class="home-methods"
+            bind:this={homeMethodEle}
             in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
           >
             <NewMethodsList
