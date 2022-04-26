@@ -23,6 +23,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'Equitas Small Finance Bank'} | ${false} | ${true}  | ${false}
       ${'HSBC'}                       | ${true}  | ${false} | ${false}
       ${'Indian Overseas Bank'}       | ${true}  | ${true}  | ${false}
+      ${'Jupiter'}                    | ${false} | ${true}  | ${false}
       ${'Karur Vysya Bank'}           | ${true}  | ${true}  | ${false}
       ${'Niyo Global Cards'}          | ${true}  | ${false} | ${false}
       ${'OneCard'}                    | ${true}  | ${false} | ${false}
@@ -59,6 +60,7 @@ describe('RecurringCardsOverlay.svelte', () => {
       ${'Equitas Small Finance Bank'} | ${[]}                     | ${['Visa', 'MasterCard']} | ${[]}
       ${'HSBC'}                       | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
       ${'Indian Overseas Bank'}       | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
+      ${'Jupiter'}                    | ${[]}                     | ${['Visa']}               | ${[]}
       ${'Karur Vysya Bank'}           | ${['Visa']}               | ${['Visa', 'MasterCard']} | ${[]}
       ${'Niyo Global Cards'}          | ${['Visa', 'MasterCard']} | ${[]}                     | ${[]}
       ${'OneCard'}                    | ${['Visa']}               | ${[]}                     | ${[]}
