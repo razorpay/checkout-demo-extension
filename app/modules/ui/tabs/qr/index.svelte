@@ -15,9 +15,10 @@
     isCustomerFeeBearer,
     getOptionalObject,
     isOneClickCheckout,
+    getCurrency,
   } from 'razorpay';
   import { amount } from 'one_click_checkout/charges/store';
-  import { formatAmountWithCurrency } from 'one_click_checkout/summary_modal/sessionInterface';
+  import { formatAmountWithSymbol } from 'common/currency';
   import { showSummaryModal } from 'one_click_checkout/summary_modal';
 
   import { getSession } from 'sessionmanager';
@@ -46,6 +47,7 @@
   export let onSuccess;
 
   const session = getSession();
+  const currency = getCurrency();
 
   onMount(() => {
     init();
@@ -163,7 +165,9 @@
       {/if}
       {#if isOneClickCheckout()}
         <div class="active-bg-color qr-one-cc-cta">
-          <span class="price-label">{formatAmountWithCurrency($amount)}</span>
+          <span class="price-label"
+            >{formatAmountWithSymbol($amount, currency, false)}</span
+          >
           <button
             class="cta-view-details"
             on:click={() => showSummaryModal(false)}
@@ -263,7 +267,7 @@
   }
 
   :global(#content.one-cc #form-qr) {
-    padding-top: 12px;
+    padding-top: 26px;
   }
 
   :global(#content.one-cc) .message {

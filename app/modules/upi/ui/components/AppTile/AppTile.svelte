@@ -95,4 +95,12 @@
     align-items: center;
     flex: 1 1 0;
   }
+
+  :global(.one-cc) .circle-icon {
+    display: flex;
+  }
+
+  :global(.one-cc) .app-title {
+    padding: 4px 0px;
+  }
 </style>
