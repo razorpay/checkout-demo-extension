@@ -180,6 +180,7 @@
             {@html getOtpScreenTitle($textView, $templateData, $locale)}
             {#if otpClasses.includes($textView)}
               <span
+                data-test-id="edit-contact-otp"
                 class="edit-contact-btn"
                 on:click={() => handleEditContact()}
               >

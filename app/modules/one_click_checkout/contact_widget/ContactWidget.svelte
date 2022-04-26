@@ -60,7 +60,11 @@
         <span class="contact-text">{$t(CONTACT_LABEL)}</span>
       </div>
       {#if !showEditUserDetails}
-        <div class="contact-edit theme" on:click={editContact}>
+        <div
+          data-test-id="edit-contact"
+          class="contact-edit theme"
+          on:click={editContact}
+        >
           {$t(CHANGE_ACTION)}
         </div>
       {/if}

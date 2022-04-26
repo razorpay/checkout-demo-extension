@@ -1,4 +1,9 @@
+const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
 const { delay } = require('../../util');
+const { passRequestNetbanking } = require('../common');
+const { fillUserDetails } = require('../home-page-actions');
+const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
+const { handleShippingInfo } = require('./address');
 
 function getVerifyOTPResponse(inValidOTP) {
   const successResp = {
@@ -218,10 +223,20 @@ function getDataAttrSelector(context, selectorValue) {
   return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
 }
 
-function scrollToEnd(context, node = window) {
-  return context.page.evaluate((_node) => {
-    _node.scrollBy(0, _node.scrollHeight);
-  }, node);
+function scrollToEnd(context, selectorOrElem) {
+  if (typeof selectorOrElem === 'string') {
+    return page.$eval(selectorOrElem, (_node) =>
+      _node.scrollBy(0, _node.scrollHeight)
+    );
+  }
+
+  try {
+    return context.page.evaluate((_node) => {
+      _node.scrollBy(0, _node.scrollHeight);
+    }, selectorOrElem || window);
+  } catch (err) {
+    return undefined;
+  }
 }
 
 function formatTextToNumber(str) {
@@ -231,6 +246,57 @@ function formatTextToNumber(str) {
 async function proceedOneCC(context) {
   const cta = await context.page.waitForSelector('#one-cc-cta');
   await cta.click();
+}
+
+async function goBack(context) {
+  const backBtn = await context.page.waitForSelector('.back');
+  await backBtn.click();
+}
+
+async function handleLogoutReq(context, logoutAll) {
+  const req = await context.expectRequest();
+  expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
+  expect(req.method).toBe('DELETE');
+  expect(req.url).toContain('apps/logout');
+  await context.respondJSON([]);
+}
+
+async function handleResetReq(context, orderId) {
+  await context.getRequest(`/v1/orders/1cc/${orderId}/reset`);
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('orders/1cc');
+  await context.respondJSON([]);
+}
+
+async function login(context) {
+  await fillUserDetails(context, '9952395555');
+  await delay(200);
+  await proceedOneCC(context);
+  await handleCustomerStatusReq(context, true);
+  await handleCreateOTPReq(context);
+  await handleTypeOTP(context);
+  await delay(200);
+  await proceedOneCC(context);
+  await handleVerifyOTPReq(context);
+  await handleShippingInfo(context);
+}
+
+async function mockPaymentSteps(context, options, features) {
+  await handleUpdateOrderReq(context, options.order_id);
+  await handleThirdWatchReq(context);
+  await delay(200);
+  await handleFeeSummary(context, features);
+  await selectPaymentMethod(context, 'netbanking');
+  await selectBank(context, 'SBIN');
+  await proceedOneCC(context);
+  await passRequestNetbanking(context);
+  await handleMockSuccessDialog(context);
+}
+
+async function closeModal(context) {
+  const crossCTA = await context.page.waitForSelector('.modal-close');
+  await crossCTA.click();
 }
 
 module.exports = {
@@ -247,4 +313,10 @@ module.exports = {
   scrollToEnd,
   formatTextToNumber,
   proceedOneCC,
+  goBack,
+  handleLogoutReq,
+  handleResetReq,
+  login,
+  mockPaymentSteps,
+  closeModal,
 };
