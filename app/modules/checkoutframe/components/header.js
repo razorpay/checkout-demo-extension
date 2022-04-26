@@ -1,6 +1,7 @@
 import { getSession } from 'sessionmanager';
 import { isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
 import { querySelector } from 'utils/doc';
+import { formatAmountWithCurrency } from 'helper/currency';
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
  *
@@ -57,10 +58,10 @@ export function updateAmountFontSize() {
   let originalAmount = session.get('amount');
 
   let discountString = offer?.amount
-    ? session.formatAmountWithCurrency(offer.amount)
+    ? formatAmountWithCurrency(offer.amount)
     : '';
   let originalAmountString = originalAmount
-    ? session.formatAmountWithCurrency(originalAmount)
+    ? formatAmountWithCurrency(originalAmount)
     : '';
 
   if (!discountString && !originalAmountString) {

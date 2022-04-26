@@ -39,6 +39,7 @@
   import { PAY_WITH_INSTALLED_OR_OTHERS } from 'upi/i18n/labels';
   import { captureFeature } from 'upi/events';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { formatAmountWithCurrency } from 'helper/currency';
 
   // Props
   export let method = null; // Name of the method
@@ -84,7 +85,7 @@
         <div class="highlight-text">
           ${formatTemplateWithLocale(
             COD_CHARGES_DESCRIPTION,
-            { charge: session.formatAmountWithCurrency($codChargeAmount) },
+            { charge: formatAmountWithCurrency($codChargeAmount) },
             locale
           )}
         </div>

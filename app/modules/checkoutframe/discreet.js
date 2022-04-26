@@ -11,6 +11,7 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
+import * as CurrencyHelper from 'helper/currency';
 import MainModal from 'ui/components/MainModal/index.svelte';
 import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
@@ -291,4 +292,5 @@ export default {
   offlineChallanTab,
   NetbankingHelper,
   EMIHelper,
+  CurrencyHelper,
 };

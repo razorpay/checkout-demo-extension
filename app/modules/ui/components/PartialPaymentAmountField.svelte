@@ -21,6 +21,8 @@
   // Utils
   import { getSession } from 'sessionmanager';
   import { getCurrencyConfig } from 'common/currency';
+  import { formatAmountWithCurrency } from 'helper/currency';
+  import { getOption } from 'razorpay';
 
   // Props
   export let maxAmount = null;
@@ -60,7 +62,7 @@
     }
   }
 
-  const currencyConfig = getCurrencyConfig(session.get('currency'));
+  const currencyConfig = getCurrencyConfig(getOption('currency'));
 
   // If min amount is absent, set it from currency
   if (!minAmount) {
@@ -100,13 +102,13 @@
   $: {
     if (!value) {
       helpTextLabel = PARTIAL_AMOUNT_HELP_INVALID;
-      helpTextAmount = session.formatAmountWithCurrency(maxAmount);
+      helpTextAmount = formatAmountWithCurrency(maxAmount);
     } else if (valueInMinor < minAmount) {
       helpTextLabel = PARTIAL_AMOUNT_HELP_LOWER;
-      helpTextAmount = session.formatAmountWithCurrency(minAmount);
+      helpTextAmount = formatAmountWithCurrency(minAmount);
     } else if (valueInMinor > maxAmount) {
       helpTextLabel = PARTIAL_AMOUNT_HELP_HIGHER;
-      helpTextAmount = session.formatAmountWithCurrency(maxAmount);
+      helpTextAmount = formatAmountWithCurrency(maxAmount);
     }
   }
 </script>
@@ -143,7 +145,7 @@
       checked={valueInMinor === minAmount}
     >
       {minAmountLabel}
-      {session.formatAmountWithCurrency(minAmount)}
+      {formatAmountWithCurrency(minAmount)}
     </Checkbox>
   </div>
   <div class="subtitle subtitle--help">{partialDescription}</div>

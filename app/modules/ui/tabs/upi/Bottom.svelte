@@ -3,14 +3,13 @@
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import Callout from 'ui/elements/Callout.svelte';
 
-  import { getSession } from 'sessionmanager';
-
   import { _ as t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
 
   import { UPI_OTM_CALLOUT } from 'ui/labels/upi';
 
   import { getAmount, getName } from 'razorpay';
+  import { formatAmountWithCurrency } from 'helper/currency';
 
   export let isOtm = false;
   export let isUpiRecurringCAW = false;
@@ -22,7 +21,6 @@
   export let maxRecurringAmount = 0;
   export let recurringFrequency = 0;
 
-  const session = getSession();
   const merchantName = getName();
 
   let toShortFormat = function (date, delimter = ' ') {
@@ -54,7 +52,7 @@
     <Callout classes={['downtime-callout']} showIcon={true}>
       <FormattedText
         text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
-          amount: session.formatAmountWithCurrency(getAmount()),
+          amount: formatAmountWithCurrency(getAmount()),
           nameString: merchantName ? 'by ' + merchantName : '',
           startDate: toShortFormat(otmStartDate),
           endDate: toShortFormat(otmEndDate),
@@ -72,9 +70,9 @@
       {formatTemplateWithLocale(
         recurring_callout,
         {
-          maxAmount: session.formatAmountWithCurrency(getAmount()),
+          maxAmount: formatAmountWithCurrency(getAmount()),
           merchantName: !merchantName ? '' : merchantName,
-          amount: session.formatAmountWithCurrency(maxRecurringAmount),
+          amount: formatAmountWithCurrency(maxRecurringAmount),
           recurringFrequency,
           endDate: toShortFormat(new Date(endDate * 1000)),
         },

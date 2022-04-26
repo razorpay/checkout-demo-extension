@@ -166,6 +166,10 @@
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
   import { querySelector } from 'utils/doc';
   import { getPrefillBank } from 'netbanking/helper';
+  import {
+    formatAmountWithCurrency,
+    formatAmountWithCurrencyInMinor,
+  } from 'helper/currency';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -762,7 +766,7 @@
       oneMethod: singleMethod,
     });
     if (showSnackbar) {
-      const charge = session.formatAmountWithCurrency($shippingCharge);
+      const charge = formatAmountWithCurrency($shippingCharge);
       const text = [];
       if ($didSaveAddress) {
         text.push($t(SAVED_ADDRESS_LABEL));
@@ -1002,7 +1006,7 @@
   }
 
   function showSnackbar(isCodApplied) {
-    const charge = session.formatAmountWithCurrency($codChargeAmount);
+    const charge = formatAmountWithCurrency($codChargeAmount);
     const template = isCodApplied
       ? 'methods.descriptions.cod_charge_applied'
       : 'methods.descriptions.cod_charge_removed';
@@ -1091,11 +1095,9 @@
   let formattedPartialAmount;
   $: {
     if ($partialPaymentOption === 'full') {
-      formattedPartialAmount = session.formatAmountWithCurrency(
-        session.get('amount')
-      );
+      formattedPartialAmount = formatAmountWithCurrency(session.get('amount'));
     } else {
-      formattedPartialAmount = session.formatAmountWithCurrencyInMinor(
+      formattedPartialAmount = formatAmountWithCurrencyInMinor(
         $partialPaymentAmount
       );
     }

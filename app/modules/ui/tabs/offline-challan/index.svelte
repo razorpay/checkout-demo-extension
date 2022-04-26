@@ -47,6 +47,7 @@
     loadJsPdf,
     copyDetailsToClipboard,
   } from 'ui/tabs/offline-challan/helper';
+  import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
 
   // Props
   export let loading = true;
@@ -84,11 +85,11 @@
             receiver: receivers[0],
             amount:
               response.amount_expected &&
-              session.formatAmountWithCurrency(response.amount_expected),
+              formatAmountWithCurrency(response.amount_expected),
             closeBy: response.close_by && timeConverter(response.close_by),
             amountExpected:
               response.amount_expected &&
-              session.formatAmount(response.amount_expected),
+              formatAmount(response.amount_expected),
             customerAdditionalInfo: response.order?.customer_additional_info,
           };
 

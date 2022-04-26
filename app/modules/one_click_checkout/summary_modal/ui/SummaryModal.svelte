@@ -26,10 +26,8 @@
     isCouponApplied,
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'checkoutstore/offers';
-  import {
-    formatAmountWithCurrency,
-    createCodPayment,
-  } from 'one_click_checkout/summary_modal/sessionInterface';
+  import { createCodPayment } from 'one_click_checkout/summary_modal/sessionInterface';
+  import { formatAmountWithCurrency } from 'helper/currency';
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
   import { truncateString } from 'utils/strings';
