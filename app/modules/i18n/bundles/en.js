@@ -1315,7 +1315,7 @@ export default {
     super_cards: 'Super Cards',
     yes: 'Yes',
   },
-  trusted_badge: rtb,
+  rtb,
   downtime_alert: {
     highlight1: 'There is a high chance this payment might fail',
     card_highlight2:

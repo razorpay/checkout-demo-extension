@@ -42,6 +42,7 @@
     ICICI_BANK_EMI,
     ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
   } from 'ui/labels/emi';
+  import { formatAmountWithCurrency } from 'helper/currency';
 
   // Props
   export let amount;
@@ -83,10 +84,8 @@
 
   $: {
     processingFee =
-      plan.processing_fee &&
-      session.formatAmountWithCurrency(plan.processing_fee);
-    stampDuty =
-      plan.stamp_duty && session.formatAmountWithCurrency(plan.stamp_duty);
+      plan.processing_fee && formatAmountWithCurrency(plan.processing_fee);
+    stampDuty = plan.stamp_duty && formatAmountWithCurrency(plan.stamp_duty);
     processingFeeDisclaimer = plan.processing_fee_disclaimer;
   }
 
@@ -125,7 +124,7 @@
   $: {
     noCostEmi = plan.subvention === 'merchant' || zestMoneyForcedEmiOffer;
     if (noCostEmi && plan.merchant_payback) {
-      interestChargedByBank = session.formatAmountWithCurrency(
+      interestChargedByBank = formatAmountWithCurrency(
         amount / (1 - plan.merchant_payback / 100) - amount
       );
     }
@@ -134,9 +133,9 @@
   $: isCardEmi = !provider;
   $: showInterest =
     !isCardEmi || !['zestmoney', 'earlysalary'].includes(provider);
-  $: formattedAmount = session.formatAmountWithCurrency(amountAfterDiscount);
-  $: formattedAmountPerMonth = session.formatAmountWithCurrency(amountPerMonth);
-  $: formattedFinalAmount = session.formatAmountWithCurrency(
+  $: formattedAmount = formatAmountWithCurrency(amountAfterDiscount);
+  $: formattedAmountPerMonth = formatAmountWithCurrency(amountPerMonth);
+  $: formattedFinalAmount = formatAmountWithCurrency(
     plan.duration * amountPerMonth
   );
 
@@ -148,7 +147,7 @@
       component: NoCostExplainer,
       props: {
         plan: plan,
-        formatter: session.formatAmountWithCurrency.bind(session),
+        formatter: formatAmountWithCurrency,
       },
     });
   }

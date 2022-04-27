@@ -1,19 +1,7 @@
-/**
- * The following are globals are defined here to avoid es-lint errors
- */
-
 /* global discreet */
 
-// The following are globals from app/js/lib/util
-// These have to be removed while refactoring
-
-// from init checkout-frame
-/* global SessionManager */
-
 var emo = {};
-
 var ua = navigator.userAgent;
-
 var preferences,
   $ = discreet.$,
   Razorpay = window.Razorpay,
@@ -794,39 +782,6 @@ Session.prototype = {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
 
-  formatAmount: function (amount) {
-    var displayCurrency = this.r.get('display_currency');
-    var currency = this.r.get('currency');
-
-    return discreet.Currency.formatAmount(amount, displayCurrency || currency);
-  },
-
-  formatAmountWithCurrencyInMinor: function (amount) {
-    var currency = this.get('currency');
-    var config = discreet.Currency.getCurrencyConfig(currency);
-    var multiplier = Math.pow(10, config.decimals);
-
-    var value = parseInt((amount * multiplier).toFixed(config.decimals));
-
-    return this.formatAmountWithCurrency(value);
-  },
-
-  formatAmountWithCurrency: function (amount) {
-    var amountFigure = this.formatAmount(amount);
-    var displayCurrency = this.r.get('display_currency');
-    var displayAmount = this.r.get('display_amount');
-    var currency = this.r.get('currency');
-
-    if (displayCurrency && displayAmount) {
-      // TODO: handle display_amount case as in modal.jst
-
-      amount = discreet.currencies[displayCurrency] + ' ' + displayAmount;
-    } else {
-      amount = discreet.currencies[currency] + ' ' + amountFigure;
-    }
-
-    return amount;
-  },
   setFeeLabel: function () {
     if (
       RazorpayHelper.isCustomerFeeBearer() ||
@@ -850,7 +805,7 @@ Session.prototype = {
       $('#amount .original-amount').hide();
     } else {
       $('#amount .original-amount').rawHtml(
-        this.formatAmountWithCurrency(amount)
+        discreet.CurrencyHelper.formatAmountWithCurrency(amount)
       );
       if ($('#amount .original-amount')[0]) {
         $('#amount .original-amount')[0].removeAttribute('style');
@@ -862,7 +817,9 @@ Session.prototype = {
     if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
-    $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
+    $('#amount .discount').rawHtml(
+      discreet.CurrencyHelper.formatAmountWithCurrency(amount)
+    );
     //$('#amount .original-amount').hide();
     Header.updateAmountFontSize();
   },

@@ -147,6 +147,9 @@ export const supportedNetworksAndProviders = {
     debit: ['VISA', 'MC'],
     credit: ['VISA'],
   },
+  JUPITER: {
+    debit: ['VISA'],
+  },
   KVBL: {
     credit: ['VISA'],
     debit: ['VISA', 'MC'],

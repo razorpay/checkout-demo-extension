@@ -35,10 +35,8 @@
   import { appliedOffer } from 'checkoutstore/offers';
 
   // session imports
-  import {
-    formatAmountWithCurrency,
-    createCodPayment,
-  } from 'one_click_checkout/summary_modal/sessionInterface';
+  import { createCodPayment } from 'one_click_checkout/summary_modal/sessionInterface';
+  import { formatAmountWithCurrency } from 'helper/currency';
 
   // analytics imports
   import { Events } from 'analytics';

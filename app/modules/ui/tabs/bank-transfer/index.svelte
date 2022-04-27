@@ -61,6 +61,7 @@
     VIRTUAL_ACCOUNT_SUCCESS,
     BANK_TRANSFER_PDF_INIT_FAILURE,
   } from './events';
+  import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
 
   // adding 3rd party script for printing, adding here to not increase unnecessary bundle size
   function addScript(url, content) {
@@ -150,11 +151,10 @@
         receiver: receivers[0],
         amount:
           response.amount_expected &&
-          session.formatAmountWithCurrency(response.amount_expected),
+          formatAmountWithCurrency(response.amount_expected),
         close_by: response.close_by && timeConverter(response.close_by),
         amount_expected:
-          response.amount_expected &&
-          session.formatAmount(response.amount_expected),
+          response.amount_expected && formatAmount(response.amount_expected),
       };
 
       loading = false;

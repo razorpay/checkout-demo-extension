@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
   import { _ as t } from 'svelte-i18n';
@@ -11,8 +11,6 @@
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
-  import Card from 'ui/elements/Card.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
 
   import {
@@ -37,8 +35,6 @@
   const session = getSession();
 
   // Computed
-  const amount = session.formatAmountWithCurrency(session.get('amount'));
-
   const onSelection = () => {
     const customer = session.getCurrentCustomer() || {};
 

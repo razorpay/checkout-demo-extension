@@ -27,6 +27,8 @@
     SELECT_BANK_LABEL,
     TOTAL_LABEL,
   } from './label.18n';
+  import { formatAmountWithCurrency } from 'helper/currency';
+  import { getAmount } from 'razorpay';
 
   const session = getSession();
   let banks: EMIPlanView.EMIPlanData;
@@ -59,7 +61,7 @@
       if (selectedBank && session.isOfferApplicableOnIssuer(selectedBank)) {
         amount = session.getDiscountedAmount();
       } else {
-        amount = session.get('amount');
+        amount = getAmount();
       }
     }
   }
@@ -98,8 +100,8 @@
           return {
             duration: duration,
             rate: plan.interest,
-            monthly: session.formatAmountWithCurrency(installment),
-            total: session.formatAmountWithCurrency(total),
+            monthly: formatAmountWithCurrency(installment),
+            total: formatAmountWithCurrency(total),
           };
         }
       );

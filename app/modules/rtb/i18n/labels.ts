@@ -1,8 +1,8 @@
 /**
- * All label value should be prefix by `trusted_badge`
+ * All label value should be prefix by `rtb`
  */
-export const RTB_HEADER = 'trusted_badge.header';
-export const RTB_HIGHLIGHT1 = 'trusted_badge.highlight1';
-export const RTB_HIGHLIGHT2 = 'trusted_badge.highlight2';
-export const RTB_HIGHLIGHT3 = 'trusted_badge.highlight3';
-export const RTB_CONTENT = 'trusted_badge.content';
+export const RTB_HEADER = 'rtb.header';
+export const RTB_HIGHLIGHT1 = 'rtb.highlight1';
+export const RTB_HIGHLIGHT2 = 'rtb.highlight2';
+export const RTB_HIGHLIGHT3 = 'rtb.highlight3';
+export const RTB_CONTENT = 'rtb.content';

@@ -178,6 +178,10 @@
   import { headerVisible } from 'one_click_checkout/header/store';
   import { querySelector } from 'utils/doc';
   import { getPrefillBank } from 'netbanking/helper';
+  import {
+    formatAmountWithCurrency,
+    formatAmountWithCurrencyInMinor,
+  } from 'helper/currency';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -1027,7 +1031,7 @@
   }
 
   function showSnackbar(isCodApplied) {
-    const charge = session.formatAmountWithCurrency($codChargeAmount);
+    const charge = formatAmountWithCurrency($codChargeAmount);
     const template = isCodApplied
       ? 'methods.descriptions.cod_charge_applied'
       : 'methods.descriptions.cod_charge_removed';
@@ -1119,11 +1123,9 @@
   let formattedPartialAmount;
   $: {
     if ($partialPaymentOption === 'full') {
-      formattedPartialAmount = session.formatAmountWithCurrency(
-        session.get('amount')
-      );
+      formattedPartialAmount = formatAmountWithCurrency(session.get('amount'));
     } else {
-      formattedPartialAmount = session.formatAmountWithCurrencyInMinor(
+      formattedPartialAmount = formatAmountWithCurrencyInMinor(
         $partialPaymentAmount
       );
     }

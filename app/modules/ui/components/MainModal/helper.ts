@@ -1,8 +1,8 @@
 import { displayCurrencies } from 'common/currency';
 import { isIRCTC, getOption } from 'razorpay';
-import { getSession } from 'sessionmanager';
 import { AndroidWebView } from 'common/useragent';
 import { scrollIntoView } from 'lib/utils';
+import { formatAmountWithCurrency } from 'helper/currency';
 
 export function getAmount(): string {
   const amount = getOption('amount');
@@ -14,7 +14,7 @@ export function getAmount(): string {
   if (display_amount && display_currency) {
     return displayCurrencies[display_currency] + display_amount;
   } else {
-    return getSession().formatAmountWithCurrency(amount);
+    return formatAmountWithCurrency(amount);
   }
 }
 
