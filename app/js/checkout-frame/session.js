@@ -4255,7 +4255,6 @@ Session.prototype = {
       e.preventDefault();
       e.stopPropagation();
     }
-
     /**
      * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
      */

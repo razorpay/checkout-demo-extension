@@ -97,7 +97,6 @@
       <div id="confirmation-dialog" class="showable" />
       <div id="recurring-cards-wrap" class="overlay showable mfix" />
       <div id="fee-wrap" class="overlay showable mfix" />
-      <div id="one-cc-summary" />
       <div id="options-wrap" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
