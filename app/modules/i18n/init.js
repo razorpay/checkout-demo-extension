@@ -209,41 +209,6 @@ function updateRetryBtnText() {
   }
 }
 
-function setupMissingMessageInterception() {
-  function proxy(context, method, callback) {
-    return function (...args) {
-      // Maybe think of a better name because this is not really a callback
-      if (callback(args)) {
-        method.apply(context, args);
-      }
-    };
-  }
-
-  // Create a proxy because we want to intercept the behaviour of console.warn
-  // We do this because we want to track missing i18n translations, however, the library does not provide us a callback.
-  // Hence, this, coupled with warnOnMissingMessages
-  window.console.warn = proxy(window.console, window.console.warn, (args) => {
-    const targetString = args[0];
-    const isFromSveltei18n = targetString.includes('[svelte-i18n]');
-    if (isFromSveltei18n) {
-      const pattern = /".*?"/g;
-      const data = targetString.match(pattern);
-      if (data && data[0]) {
-        Analytics.track('i18n:translation_missing', {
-          data: {
-            string: data[0],
-            callout: targetString,
-          },
-        });
-      }
-    }
-
-    const allowDefaultBehaviour = !isFromSveltei18n;
-
-    return allowDefaultBehaviour;
-  });
-}
-
 export function init() {
   // Add bundled messages
   addDefaultMessages();
@@ -261,8 +226,6 @@ export function init() {
     initialLocale,
     warnOnMissingMessages: true,
   });
-
-  setupMissingMessageInterception();
 
   Analytics.setMeta('locale.initial', initialLocale);
   Analytics.setMeta('locale.current', initialLocale);
