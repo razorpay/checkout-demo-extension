@@ -25,6 +25,7 @@ export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 
 export const Instagram = check(/Instagram/);
 export const samsungBrowser = check(/SamsungBrowser/);
+export let isBrave = false;
 
 /**
  * Facebook User-Agents:
@@ -106,6 +107,10 @@ export const isBraveBrowser = () => {
       res(false);
     }
   });
+};
+
+export const setBraveBrowser = (res = false) => {
+  isBrave = res;
 };
 
 // Some stock android browsers that pause the checkout tab

@@ -7,7 +7,7 @@ import { isUPIFlowEnabled } from 'checkoutstore/methods';
 import { getSDKMeta, getUPIIntentApps } from 'checkoutstore/native';
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { getPreferences, isCustomerFeeBearer, isRecurring } from 'razorpay';
-import { android, iOS, isDesktop, Safari } from 'common/useragent';
+import { android, iOS, isBrave, isDesktop } from 'common/useragent';
 import { OTHER_INTENT_APPS, UPI_APPS } from 'upi/constants';
 import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
 import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
@@ -114,7 +114,7 @@ export function enableUPITiles(): EnableUPITilesReturnType {
     config: { apps: [] },
     variant: 'subText',
   };
-  if (isRecurring() || !upiNrL0L1Improvements.enabled()) {
+  if (isRecurring() || !upiNrL0L1Improvements.enabled() || (isBrave && iOS)) {
     return response;
   } else {
     const { name, config = {} } =

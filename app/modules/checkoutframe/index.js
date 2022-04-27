@@ -28,7 +28,6 @@ import { cookieDisabled, isIframe, ownerWindow } from 'common/constants';
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { reward } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
-import { isBraveBrowser } from 'common/useragent';
 
 import {
   appsThatSupportWebPayments,
@@ -39,6 +38,7 @@ import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
+import { setBraveBrowser } from 'common/useragent';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -151,9 +151,15 @@ const setAnalyticsMeta = (message) => {
   /**
    * Browser related meta properties
    */
-  isBraveBrowser().then((result) => {
-    Events.setMeta(MetaProperties.BRAVE_BROWSER, result);
-  });
+  /**
+   * in iframe isBraveBrowser doesn't work as expected to make sure we detect brave browser
+   * we are moving check of isBraveBrowser to checkout.js and pass isBrave flag
+   * via meta property using postmessage
+   */
+  if (message.metadata) {
+    setBraveBrowser(message.metadata.isBrave);
+    Events.setMeta(MetaProperties.BRAVE_BROWSER, message.metadata.isBrave);
+  }
 };
 
 /**
