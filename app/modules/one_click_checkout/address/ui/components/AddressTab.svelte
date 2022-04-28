@@ -29,6 +29,7 @@
   } from 'one_click_checkout/address/shipping_address/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { showLoader } from 'one_click_checkout/loader/store';
+  import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -60,7 +61,6 @@
 
   let addressWrapperEle;
   let scrollable = false;
-
   let addresses;
   $: {
     if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
@@ -125,6 +125,14 @@
     });
   }
 
+  const getSelectedAddrIndex = () =>
+    addresses?.findIndex(
+      (addr) =>
+        (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+          addr?.id === $selectedShippingAddressId) ||
+        addr?.id === $selectedBillingAddressId
+    );
+
   export function onSubmit() {
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       const elementId = Resource[addressType].formId;
@@ -172,17 +180,28 @@
       };
     }
     Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, analyticsData);
-    Events.TrackBehav(AddressEvents.ADDRESS_SUBMIT_CLICKED_V2, {
-      meta: {
-        is_user_opted_to_save_address: !!$shouldSaveAddress,
-      },
-      '1cc_category_of_saved_address': $selectedAddress?.tag,
-    });
 
     if (currentView === addressViews.SAVED_ADDRESSES) {
+      const selectedAddrIndex = getSelectedAddrIndex();
+      Events.TrackBehav(AddressEvents.SAVED_ADDRESS_CONTINUE_CLICKED, {
+        count_saved_addresses: addresses?.length,
+        address_id:
+          addressType === ADDRESS_TYPES.SHIPPING_ADDRESS
+            ? $selectedShippingAddressId
+            : $selectedBillingAddressId,
+        address_position_index: selectedAddrIndex,
+        top_shown_address: !selectedAddrIndex,
+      });
       merchantAnalytics({
         event: `saved_address_${ACTIONS.CTA_CLICKED}`,
         category: CATEGORIES.ADDRESS,
+      });
+    } else {
+      Events.TrackBehav(AddressEvents.ADDRESS_SUBMIT_CLICKED_V2, {
+        meta: {
+          is_user_opted_to_save_address: !!$shouldSaveAddress,
+        },
+        '1cc_category_of_saved_address': $selectedAddress?.tag,
       });
     }
     onSubmitCallback(addressCompleted);

@@ -68,6 +68,8 @@ const address = {
   TOP_SHOWN_SHIPPING_ADDRESS: '1cc_used_top_shown_shipping_address',
   SAVED_BILLING_ADDRESS_LOADED: '1cc_saved_billing_address_screen_loaded',
   SAVED_BILLING_ADDRESS_SELECTED: '1cc_saved_billing_address_selected',
+  SAVED_ADDRESS_CONTINUE_CLICKED:
+    '1cc_saved_address_screen_continue_CTA_clicked',
   TOP_SHOWN_BILLING_ADDRESS: '1cc_used_top_shown_billing_address',
 };
 

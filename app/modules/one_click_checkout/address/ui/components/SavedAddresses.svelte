@@ -52,7 +52,7 @@
 
   const { add_square } = getIcons();
 
-  function dispatchServiceability(id, index) {
+  function dispatchSelect(id, index) {
     dispatch('select', {
       addressId: id,
       addressIndex: index,
@@ -78,10 +78,10 @@
       });
     }
     selectedAddressId.set(id);
+    dispatchSelect(id, index);
     if (!checkServiceability) return;
 
     postAddressSelection(id, index);
-    dispatchServiceability(id, index);
   }
 
   onMount(() => {
@@ -97,7 +97,7 @@
     ) {
       selectedAddressId.set(addresses[0].id);
     }
-    dispatchServiceability();
+    dispatchSelect();
     if ($activeRoute?.name === views.SAVED_BILLING_ADDRESS) {
       Events.TrackBehav(AddressEvents.SAVED_BILLING_ADDRESS_SELECTED, {
         address_id: $selectedBillingAddressId,
