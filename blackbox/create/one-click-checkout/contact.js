@@ -40,7 +40,7 @@ module.exports = function (testFeatures) {
     testFeatures
   );
 
-  const { editFromHome, editFromAccount, editFromOTP } = features;
+  const { editFromHome, editFromAccount, editFromOTP, skip } = features;
 
   describe.each(
     getTestData(title, {
@@ -48,6 +48,10 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout Contact test', ({ preferences, title, options }) => {
+    if (skip) {
+      test.skip(title, () => {});
+      return;
+    }
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
