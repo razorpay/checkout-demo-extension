@@ -288,7 +288,7 @@ describe('Test getStatesWithCountryCode', () => {
       await getStatesWithCountryCode(razorpayInstance, 'CA')
     ).toStrictEqual(response);
     expect(mockFetch).toHaveBeenCalledWith({
-      url: expect.stringMatching('/v1/states/CA'),
+      url: expect.stringMatching('/v1/states/ca'),
       callback,
     });
   });

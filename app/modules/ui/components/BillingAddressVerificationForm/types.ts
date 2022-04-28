@@ -11,7 +11,7 @@ export enum FORM_FIELDS {
   city = 'city',
   postal_code = 'postal_code',
   country = 'country',
-  _country = '_country', // to store country ISO code
+  countryCode = 'countryCode', // to store country ISO code
   state = 'state',
 }
 

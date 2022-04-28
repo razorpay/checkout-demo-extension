@@ -64,6 +64,11 @@ const {
   selectConsentCollectorForTokenization,
 } = require('../actions/card-actions');
 
+const {
+  expectStatesAPI,
+  expectCountriesAPI,
+} = require('../actions/avs-countries-states');
+
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'saved-cards',
@@ -205,8 +210,11 @@ module.exports = function (testFeatures) {
             if (!avsPrefillFromSavedCard) {
               // skip filling of data
               await fillAVSForm(context);
+              await expectCountriesAPI(context);
             } else {
               // assert data from saved card
+              await expectCountriesAPI(context);
+              await expectStatesAPI(context);
               await assertAVSFormData(context);
             }
             // verify footer amount with currency
@@ -225,14 +233,16 @@ module.exports = function (testFeatures) {
         await submit(context);
 
         /**
-         * if AVS feature flag is enabled with DCC flag
+         * if AVS feature flag is enabled without DCC flag
          */
         if (!dcc && avs && !domesticSavedCard) {
+          await expectCountriesAPI(context);
           if (!avsPrefillFromSavedCard) {
             // skip filling of data
             await fillAVSForm(context);
           } else {
             // assert data from saved card
+            await expectStatesAPI(context);
             await assertAVSFormData(context);
           }
           await submit(context);

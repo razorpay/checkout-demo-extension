@@ -5,6 +5,8 @@
  */
 import { FORM_FIELDS, FORM_TYPE } from './types';
 
+export const EVENT_NAMESPACE = 'billingAddressVerificationForm';
+
 export const SPACIAL_CHAR_REGEX =
   /^[\s`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]*$/;
 

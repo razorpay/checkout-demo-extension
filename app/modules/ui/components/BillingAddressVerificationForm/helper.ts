@@ -150,11 +150,16 @@ export const combineFormValues = (
   preFilledValue: { [x: string]: unknown }
 ) => {
   const clonedValue = { ...preFilledValue };
-  Object.keys(clonedValue).forEach((key) => {
-    if (value[key] !== undefined) {
-      clonedValue[key] = value[key];
+  if (value) {
+    Object.keys(clonedValue).forEach((key) => {
+      if (value[key] !== undefined) {
+        clonedValue[key] = value[key];
+      }
+    });
+    if (value.countryCode) {
+      clonedValue.countryCode = value.countryCode;
     }
-  });
+  }
   return clonedValue;
 };
 
@@ -242,7 +247,7 @@ export const getStatesWithCountryCode = (
       return cache[countryCode];
     }
 
-    let url = makeAuthUrl(rzpInstance, `states/${countryCode}`);
+    let url = makeAuthUrl(rzpInstance, `states/${countryCode.toLowerCase()}`);
 
     const requestPayload = {
       '_[source]': Track.props.library,

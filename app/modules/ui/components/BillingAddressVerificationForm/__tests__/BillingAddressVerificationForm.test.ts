@@ -1,4 +1,5 @@
 import { render } from '@testing-library/svelte';
+import Analytics from 'analytics';
 
 // component
 import BillingAddressVerificationForm from '../BillingAddressVerificationForm.svelte';
@@ -24,6 +25,9 @@ jest.mock('sessionmanager', () => {
 });
 
 describe('Test BillingAddressVerificationForm', () => {
+  beforeAll(() => {
+    Analytics.setR(razorpayInstance);
+  });
   it('should render without breaking', () => {
     const { component } = render(BillingAddressVerificationForm);
     expect(component).toBeTruthy();

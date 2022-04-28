@@ -6,6 +6,9 @@
   import { getPrefillBillingAddress } from 'razorpay';
   import { getSession } from 'sessionmanager';
 
+  // analytics
+  import { Events, MetaProperties } from 'analytics';
+
   // components
   import Field from 'ui/components/Field.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
@@ -27,8 +30,9 @@
   } from './types';
 
   // constants
+  import RazorpayConfig from 'common/RazorpayConfig';
   import { AVS_FORM_INPUT_REQUIRED } from 'ui/labels/avs-form';
-  import { FORM_FIELDS_TYPE_MAPPING } from './constants';
+  import { FORM_FIELDS_TYPE_MAPPING, EVENT_NAMESPACE } from './constants';
 
   // helpers
   import {
@@ -60,6 +64,11 @@
   const preFilledValues = getPrefillBillingAddress(
     formType === FORM_TYPE.N_AVS
   );
+  const countryFlagsUrl = `${RazorpayConfig.cdn}country-flags/`;
+  const metaPropertyName =
+    formType === FORM_TYPE.AVS
+      ? MetaProperties.AVS_FORM_DATA
+      : MetaProperties.NVS_FORM_DATA;
 
   // reactive states
   $: formValues = combineFormValues(value, preFilledValues);
@@ -135,7 +144,7 @@
     const data = event.detail;
     handleOnInput(data.type, data.label);
     if (data.type === FORM_FIELDS.country) {
-      handleOnInput(FORM_FIELDS._country, data.key);
+      handleOnInput(FORM_FIELDS.countryCode, data.key);
       handleOnInput(FORM_FIELDS.state, '');
       handleFetchStates(data.key);
     }
@@ -166,6 +175,7 @@
     if (isValid) {
       dispatch('submit', { ...formValues });
     }
+    Events.Track(`${EVENT_NAMESPACE}:${formType}:submit`);
   };
 
   /**
@@ -183,7 +193,7 @@
       );
       formValues = {
         ...formValues,
-        [FORM_FIELDS._country]: formValues[FORM_FIELDS.country],
+        [FORM_FIELDS.countryCode]: formValues[FORM_FIELDS.country],
         [FORM_FIELDS.country]: country?.label || '',
       };
       if (country) {
@@ -220,10 +230,13 @@
     if (footerCta) {
       footerCta.addEventListener('click', checkFormErrors);
     }
+    Events.setMeta(metaPropertyName, formValues);
+    Events.Track(`${EVENT_NAMESPACE}:${formType}:loaded`);
     return () => {
       if (footerCta) {
         footerCta.removeEventListener('click', checkFormErrors);
       }
+      Events.removeMeta(metaPropertyName);
     };
   });
 </script>
@@ -249,15 +262,14 @@
             id={`billing-address-verification-${subField.id}`}
             name={`billing-address-verification-${subField.id}`}
             label={formValues[subField.id] ? subField.placeholder : ''}
+            labelClasses={formValues[subField.id] ? 'input-label' : ''}
             icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(subField.id)
               ? ''
               : false}
             value={formValues[subField.id]}
             leftImage={subField.id === FORM_FIELDS.country &&
-            formValues[subField.id]
-              ? `https://cdn.razorpay.com/country-flags/${
-                  formValues[subField.id]
-                }.svg`
+            formValues[FORM_FIELDS.countryCode]
+              ? `${countryFlagsUrl}${formValues[FORM_FIELDS.countryCode]}.svg`
               : ''}
             helpText={formErrors[subField.id]
               ? $t(AVS_FORM_INPUT_REQUIRED)
@@ -285,6 +297,7 @@
           id={`billing-address-verification-${field.id}`}
           name={`billing-address-verification-${field.id}`}
           label={formValues[field.id] ? field.placeholder : ''}
+          labelClasses={formValues[field.id] ? 'input-label' : ''}
           helpText={formErrors[field.id] ? $t(AVS_FORM_INPUT_REQUIRED) : ''}
           on:click={() => handleSearchFieldClick(field)}
           on:focus={() => handleSearchFieldClick(field)}
@@ -321,11 +334,11 @@
   }
 
   .billing-address-form__field > :global(div:nth-child(odd)) {
-    margin-right: 18px;
+    margin-right: 12px;
   }
 
   .billing-address-form__field > :global(div:nth-child(even)) {
-    margin-left: 18px;
+    margin-left: 12px;
   }
 
   .billing-address-form__field > :global(div:last-child) {
@@ -336,7 +349,8 @@
     display: flex;
   }
 
-  .billing-address-form :global(.filled:not(.input-radio) label) {
+  .billing-address-form :global(.filled:not(.input-radio) label),
+  .billing-address-form :global(.input-label) {
     transform: scale(0.86) translateY(-30px);
   }
 
