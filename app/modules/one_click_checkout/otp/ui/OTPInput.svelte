@@ -9,12 +9,14 @@
     isWalletPayment,
   } from 'one_click_checkout/otp/sessionInterface';
   import { Safari } from 'common/useragent';
+  import { afterUpdate } from 'svelte';
 
   export let hidden;
   export let isError;
   export let onBlur;
 
   let otpContainer;
+  let focused = false;
   let autoCompleteMethod = 'new-otp'; // random string for browser to ignore autocomplete
 
   if (Safari) {
@@ -49,14 +51,27 @@
    * @param index {number} index of input which fired the event
    */
   function onOtpDigitInput(e, index) {
+    // If user is trying to override the existing value
+    if (e?.target?.value && e?.data) {
+      $digits[index] = e.data;
+    }
+
+    // If user is pasting from keyboard suggestion
+    if (e?.data?.length > 1) {
+      const input = e.data.split('');
+      for (const [i, digit] of input.entries()) {
+        $digits[i] = digit;
+      }
+      otpContainer.children[input.length - 1].focus();
+    } else if (e.target.value && index < $digits.length - 1) {
+      otpContainer.children[index + 1].focus();
+    }
+
     const otp = $digits.join('');
     if (otp.length === $digits.length) {
       disableCTA.set(false);
     } else {
       disableCTA.set(true);
-    }
-    if (e.target.value && index < $digits.length - 1) {
-      otpContainer.children[index + 1].focus();
     }
   }
 
@@ -105,9 +120,15 @@
     onOtpDigitInput(e, nextActiveInput);
     otpContainer.children[nextActiveInput].focus();
   }
+
+  afterUpdate(() => {
+    if (otpContainer && !focused && otpContainer.children.length) {
+      otpContainer.children[0].focus();
+      focused = true;
+    }
+  });
 </script>
 
-<!-- TODO: Figure out autofill. -->
 <div class="otp-container" bind:this={otpContainer} class:hidden id="otp-input">
   {#each $digits as _, i}
     <input
@@ -118,7 +139,6 @@
       pattern="[0-9]"
       class="otp-input theme-border"
       class:otp-input-small={$digits.length > 6}
-      maxlength="1"
       bind:value={$digits[i]}
       on:focus={() => trackInput(i)}
       on:input={(e) => onOtpDigitInput(e, i)}
