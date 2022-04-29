@@ -1,5 +1,6 @@
 <script>
   // UI imports
+  import { onMount } from 'svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { getSession } from 'sessionmanager';
   import Icon from 'ui/elements/Icon.svelte';
@@ -20,22 +21,22 @@
 
   import { Events, DowntimeEvents, MetaProperties } from 'analytics';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { popStack } from 'navstack';
 
-  let instrument;
+  export let instrument;
   const session = getSession();
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
 
   const handleContinue = () => {
-    session.hideOverlayMessage();
+    popStack();
     session.submit();
   };
   const handleBack = () => {
-    session.hideOverlayMessage();
+    popStack();
     resetSelectedUPIAppForPay();
   };
-  export const handleChange = function (param) {
-    instrument = param;
+  onMount(() => {
     Events.setMeta(MetaProperties.DOWNTIME_ALERTSHOWN, true);
     Events.TrackRender(DowntimeEvents.DOWNTIME_ALERTSHOW, {
       instrument,
@@ -44,7 +45,7 @@
     if ($selectedInstrument?.method === 'netbanking') {
       instrument = getLongBankName(instrument, $locale);
     }
-  };
+  });
 </script>
 
 <div id="downtime-wrap">
@@ -145,18 +146,9 @@
   }
   #downtime-wrap {
     border-radius: 0 0 3px 3px;
-    background: #fff;
-    bottom: -55px;
-    position: absolute;
-    width: 100%;
-    display: none;
-    -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     height: 250px;
-    -webkit-transition: 0.2s;
-    -o-transition: 0.2s;
     transition: 0.2s;
     padding-top: 20px;
-    z-index: 100;
   }
 </style>

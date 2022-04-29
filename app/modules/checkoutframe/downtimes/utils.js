@@ -1,5 +1,5 @@
-import downtimeAlertView from 'checkoutframe/downtimes/alert';
-let downtimeAlertModal;
+import { pushOverlay } from 'navstack';
+import Alert from 'ui/elements/Downtime/Alert.svelte';
 export const checkForDowntime = function (payload) {
   const downtimeSeverity = payload.downtimeSeverity;
   const downtimeInstrument = payload.downtimeInstrument;
@@ -11,8 +11,10 @@ export const checkForDowntime = function (payload) {
 };
 
 export const showDowntimeAlert = function (downtimeInstrument) {
-  if (!downtimeAlertModal) {
-    downtimeAlertModal = new downtimeAlertView();
-  }
-  downtimeAlertModal.view.handleChange(downtimeInstrument);
+  pushOverlay({
+    component: Alert,
+    props: {
+      instrument: downtimeInstrument,
+    },
+  });
 };

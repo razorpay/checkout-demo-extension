@@ -3889,10 +3889,6 @@ Session.prototype = {
     });
   },
 
-  getDowntimeAlertDialog: function () {
-    return $('#downtime-wrap');
-  },
-
   setSvelteOverlay: function () {
     this.svelteOverlay = new discreet.Overlay({
       target: docUtil.querySelector('#modal-inner'),
@@ -4702,7 +4698,6 @@ Session.prototype = {
       this.submit();
     } else {
       discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
-      showOverlay(this.getDowntimeAlertDialog());
     }
   },
 
