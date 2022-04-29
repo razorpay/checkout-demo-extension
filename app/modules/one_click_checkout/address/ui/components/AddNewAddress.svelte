@@ -423,12 +423,12 @@
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
-                Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+                Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
                   is_prefilled: SOURCE.PREFILLED,
                   meta: { city: res[value].city },
                 });
 
-                Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+                Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
                   is_prefilled: SOURCE.PREFILLED,
                   meta: { state: res[value].state },
                 });
@@ -477,11 +477,11 @@
       !isCityStateAutopopulateDisabled
     ) {
       getCityState(value, $selectedCountryISO).then((response) => {
-        Events.TrackMetric(AddressEvents.INPUT_ENTERED_city_V2, {
+        Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
           is_prefilled: SOURCE.PREFILLED,
         });
 
-        Events.TrackMetric(AddressEvents.INPUT_ENTERED_state_V2, {
+        Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
           is_prefilled: SOURCE.PREFILLED,
         });
         onUpdate('city', toTitleCase(response.city) || '');
