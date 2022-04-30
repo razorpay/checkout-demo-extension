@@ -20,5 +20,6 @@ export function attachEvent(target, ...args) {
 export function removeTrailingCommas(str) {
   if (str && typeof str === 'string')
     return str.trim().replace(/(^,)|(,$)/g, '');
-  else '';
+
+  return '';
 }

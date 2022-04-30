@@ -76,8 +76,8 @@ export const formatApiAddress = (payload, type = 'shipping_address') => {
 
   return {
     ...formatAddress(payload, type),
-    formattedLine1: removeTrailingCommas(`${line1 ?? ''}`),
-    formattedLine2: removeTrailingCommas(`${line2 ?? ''}`),
+    formattedLine1: removeTrailingCommas(line1 ?? ''),
+    formattedLine2: removeTrailingCommas(line2 ?? ''),
     formattedLine3: `${city}, ${state}, ${getCountryName(
       countryISO
     )}, ${zipcode}`,
