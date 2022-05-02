@@ -21,6 +21,7 @@
     COUNTRY_HELP_TEXT,
     PHONE_NUMBER,
     MOBILE_NUMBER,
+    MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
 
   import { t } from 'svelte-i18n';
@@ -82,12 +83,10 @@
     });
   }
 
-  const contactLabel = isOneClickCheckoutEnabled
-    ? MOBILE_NUMBER
-    : CONTACT_LABEL_REQUIRED;
-
-  // LABEL: Phone with Country Code (Optional) / Phone with Country Code
-  const label = isOptional ? CONTACT_LABEL_OPTIONAL : contactLabel;
+  let label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
+  if (isOneClickCheckoutEnabled) {
+    label = isOptional ? MOBILE_NUMBER : MOBILE_NUMBER_OPTIONAL;
+  }
 
   function closeSearch() {
     searchModalOpen = false;
