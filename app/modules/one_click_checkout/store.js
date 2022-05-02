@@ -45,8 +45,5 @@ export function getContactPayload() {
   return payload;
 }
 
-export const shouldShowNewDesign = () =>
-  isOneClickCheckout() && getPreferences('1cc_experiment');
-
 export const isAutopopulateDisabled = () =>
   getPreferences('1cc_city_autopopulate_disable');

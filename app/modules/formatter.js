@@ -243,19 +243,6 @@ Formatter.rules = {
       return /^\+[0-9]{1,6}$/.test(value);
     },
   },
-
-  state: {
-    raw: function (value) {
-      if (this.oldValue !== value) {
-        return value;
-      }
-      return this.oldValue || value;
-    },
-    pretty: function (value) {
-      this.oldValue = value;
-      return truncateString(value, 12);
-    },
-  },
 };
 
 let formatterProto = (Formatter.prototype = new Eventer());

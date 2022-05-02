@@ -102,17 +102,16 @@
   let showCardUnsupported = false;
   let lastIin = '';
 
-  let elemClasses = '';
-  let inputFieldClasses = '';
-  let labelClasses = '';
-  let labelUpperClasses = '';
+  let oneCCFieldProps = {};
 
   $: {
     if (isOneClickCheckoutEnabled) {
-      elemClasses = 'add-card-fields-one-cc-wrapper';
-      inputFieldClasses = 'add-card-fields-one-cc';
-      labelClasses = 'add-card-fields-label-one-cc';
-      labelUpperClasses = 'add-card-fields-label-upper-one-cc';
+      oneCCFieldProps = {
+        elemClasses: 'add-card-fields-one-cc-wrapper',
+        inputFieldClasses: 'add-card-fields-one-cc',
+        labelClasses: 'add-card-fields-label-one-cc',
+        labelUpperClasses: 'add-card-fields-label-upper-one-cc',
+      };
     }
   }
 
@@ -544,10 +543,7 @@
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled}
-        {elemClasses}
-        {inputFieldClasses}
-        {labelClasses}
-        {labelUpperClasses}
+        {...oneCCFieldProps}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -560,10 +556,7 @@
           on:focus
           on:blur={trackExpiryFilled}
           on:filled={(_) => handleFilled('expiryField')}
-          {elemClasses}
-          {inputFieldClasses}
-          {labelClasses}
-          {labelUpperClasses}
+          {...oneCCFieldProps}
         />
       </div>
     {/if}
@@ -578,10 +571,7 @@
         bind:this={nameField}
         on:focus
         on:blur={trackNameFilled}
-        {elemClasses}
-        {inputFieldClasses}
-        {labelClasses}
-        {labelUpperClasses}
+        {...oneCCFieldProps}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -593,10 +583,7 @@
           bind:this={cvvField}
           on:focus
           on:blur={trackCvvFilled}
-          {elemClasses}
-          {inputFieldClasses}
-          {labelClasses}
-          {labelUpperClasses}
+          {...oneCCFieldProps}
         />
       </div>
     {/if}

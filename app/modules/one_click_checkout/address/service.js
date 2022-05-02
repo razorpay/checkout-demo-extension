@@ -5,7 +5,6 @@ import { get } from 'svelte/store';
 import { makeAuthUrl } from 'checkoutstore';
 import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { getContactPayload } from 'one_click_checkout/store';
-import { didSaveAddress } from 'one_click_checkout/address/store';
 
 // analytics import
 import { Events } from 'analytics';
@@ -139,7 +138,6 @@ export function putCustomerAddress({ shipping_address, billing_address }) {
           hideLoaderView();
           return;
         }
-        didSaveAddress.set(true);
         hideLoaderView();
         resolve(response);
       },
@@ -187,7 +185,6 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
           hideLoaderView();
           return;
         }
-        didSaveAddress.set(true);
         hideLoaderView();
         resolve(response);
       },

@@ -73,9 +73,6 @@ export function showDetailsOverlay() {
     props: {
       onClose: function () {
         session.hideErrorMessage();
-        if (get(activeRoute)?.name === views.COUPONS_LIST) {
-          hideCta();
-        }
       },
     },
   });

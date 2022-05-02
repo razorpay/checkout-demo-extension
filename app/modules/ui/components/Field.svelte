@@ -344,7 +344,7 @@
       type={inputType}
       {name}
       {inputmode}
-      {value}
+      value={displayValue || value}
       {required}
       {autocomplete}
       x-autocompletetype={xautocompletetype}
@@ -462,7 +462,7 @@
       type={inputType}
       {name}
       {inputmode}
-      value={displayValue || value}
+      {value}
       {required}
       {autocomplete}
       x-autocompletetype={xautocompletetype}

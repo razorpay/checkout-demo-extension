@@ -3,7 +3,6 @@
   import { onMount } from 'svelte';
 
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import { shouldShowNewDesign } from 'one_click_checkout/store';
   import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
   import { isOneClickCheckout } from 'razorpay';
 

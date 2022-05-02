@@ -109,7 +109,8 @@
       onChange(id, { val: countryName, extra: countryISO });
     }}
     on:blur
-    value={truncateString(countryName, 12)}
+    value={countryName}
+    displayValue={truncateString(countryName, 12)}
     elemClasses="address-elem"
     labelClasses="address-label"
     {validationText}

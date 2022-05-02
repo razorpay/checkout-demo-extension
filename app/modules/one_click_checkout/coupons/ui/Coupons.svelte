@@ -18,7 +18,7 @@
     isEmailHidden,
     getPrefilledContact,
     getPrefilledEmail,
-    getCODEnabled,
+    isCodEnabled,
   } from 'razorpay';
   import {
     checkServiceabilityStatus,
@@ -76,7 +76,7 @@
   import { hideToast } from 'one_click_checkout/Toast';
   import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-  import { isElementUnscrollable } from 'one_click_checkout/helper';
+  import { isUnscrollable } from 'one_click_checkout/helper';
   import { isRTBEnabled } from 'rtb/helper';
   import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 
@@ -147,7 +147,7 @@
     Analytics.setMeta('is_coupons_enabled', showCoupons);
     Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
     Analytics.setMeta('summary_screen_default_language', $locale);
-    Analytics.setMeta('is_cod_enabled', getCODEnabled());
+    Analytics.setMeta('is_cod_enabled', isCodEnabled());
 
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
@@ -172,7 +172,7 @@
   }
 
   onMount(() => {
-    scrollable = isElementUnscrollable(couponEle?.parentNode);
+    scrollable = isUnscrollable(couponEle?.parentNode);
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);

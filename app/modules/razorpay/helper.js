@@ -349,7 +349,7 @@ export const getCustomerCart = () => getOption('customer_cart');
 
 export const getMerchantName = () => getOption('name');
 
-export const getCODEnabled = () =>
+export const isCodEnabled = () =>
   getPreferences('preferences.methods.cod') || false;
 
 /** misc */

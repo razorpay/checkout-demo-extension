@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import OfferItemMagicCheckout from 'ui/components/offers/OfferItemMagicCheckout.svelte';
+  import OfferItemMagicCheckout from 'one_click_checkout/offers/item.svelte';
   // util imports
   import { appliedOffer } from 'checkoutstore/offers';
   import { isOneClickCheckout } from 'razorpay';

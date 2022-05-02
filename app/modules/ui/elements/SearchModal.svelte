@@ -359,7 +359,8 @@
                 <div class="list results">
                   {#each results as item, index (IDs.resultItem(item))}
                     <div
-                      class="list-item list-item-1cc"
+                      class="list-item"
+                      class:list-item-1cc={isOneClickCheckoutEnabled}
                       class:focused={index === focusedIndex}
                       id={IDs.resultItem(item)}
                       role="option"

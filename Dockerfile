@@ -27,8 +27,8 @@ WORKDIR /checkout_build
 
 SHELL ["/bin/bash", "-c"]
 
-# because of post install script
-RUN git init
+# because of post install script 
+RUN git init 
 
 RUN if [[ -n $TRAFFIC_ENV ]]; then \
     cd /checkout_build \
@@ -120,7 +120,7 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     --exclude "*" \
     --include "*.js" \
     --include "*.css"; \
-    fi
+    fi 
 
 FROM c.rzp.io/razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH

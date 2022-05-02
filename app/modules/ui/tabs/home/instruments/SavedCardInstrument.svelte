@@ -155,6 +155,21 @@
       });
     }
   }
+
+  let additionalCvvProps = {
+    placeholder: 'CVV',
+    label: '',
+  };
+  if (isOneClickCheckoutEnabled) {
+    additionalCvvProps = {
+      placeholder: '',
+      label: 'CVV',
+      labelClasses: 'cvv-one-cc-label-prefered-block',
+      elemClasses: 'cvv-one-cc-wrapper-prefered-block',
+      inputFieldClasses: 'cvv-one-cc-prefered-block',
+      labelUpperClasses: 'cvv-one-cc-label-upper-prefered-block',
+    };
+  }
 </script>
 
 <svelte:component
@@ -188,22 +203,13 @@
       <Field
         type="cvv"
         name="cvv"
-        placeholder={isOneClickCheckoutEnabled ? '' : 'CVV'}
-        label={isOneClickCheckoutEnabled ? 'CVV' : ''}
         maxlength={cvvLength}
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }}
         bind:this={cvvRef}
         handleBlur={true}
-        labelClasses={isOneClickCheckoutEnabled &&
-          'cvv-one-cc-label-prefered-block'}
-        elemClasses={isOneClickCheckoutEnabled &&
-          'cvv-one-cc-wrapper-prefered-block'}
-        inputFieldClasses={isOneClickCheckoutEnabled &&
-          'cvv-one-cc-prefered-block'}
-        labelUpperClasses={isOneClickCheckoutEnabled &&
-          'cvv-one-cc-label-upper-prefered-block'}
+        {...additionalCvvProps}
       />
     {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>

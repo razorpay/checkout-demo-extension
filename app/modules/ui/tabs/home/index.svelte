@@ -17,7 +17,7 @@
     getAvailableMethods,
     getSectionsDisplayed,
   } from 'ui/tabs/home/helpers';
-  import { isElementUnscrollable } from 'one_click_checkout/helper';
+  import { isUnscrollable } from 'one_click_checkout/helper';
   import {
     showToast,
     TOAST_THEME,
@@ -533,7 +533,7 @@
             'api'
           ).then(({ identified, instruments: instrumentsFromApi }) => {
             // Recalculate the screen size after Preferred Payment Methods loaded due to layout shift happens
-            scrollable = isElementUnscrollable(methodEle?.parentNode);
+            scrollable = isUnscrollable(methodEle?.parentNode);
             userIdentified = identified;
 
             if (instrumentsFromApi.length) {
@@ -808,14 +808,14 @@
       showHome = true;
     }
     // TODO: 120px as hack for payment methods to make the screen scrollable
-    scrollable = isElementUnscrollable(methodEle?.parentNode, 120);
+    scrollable = isUnscrollable(methodEle?.parentNode, 120);
 
     if (isOneCCEnabled) {
       // Recalculate the screen size whenever homeMethodEle resize happened
       setTimeout(() => {
         if (homeMethodEle && window?.ResizeObserver) {
           oneCCResizeObserver = new window.ResizeObserver(() => {
-            scrollable = isElementUnscrollable(methodEle?.parentNode);
+            scrollable = isUnscrollable(methodEle?.parentNode);
           });
           oneCCResizeObserver.observe(homeMethodEle);
         }
