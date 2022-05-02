@@ -109,7 +109,6 @@ var PayLaterStore = {
 };
 
 var METHODS = discreet.CommonConstants.METHODS;
-var V1_5_EXPERIMENT_ENABLED = discreet.Constants.V1_5_EXPERIMENT_ENABLED;
 
 /**
  * Store for what tab and screen
@@ -739,17 +738,12 @@ function cancel_upi(session) {
 
 function Session(message) {
   var options = message.options;
-  var v_1_5_experiment_enabled =
-    message.options[V1_5_EXPERIMENT_ENABLED] || false;
   var self = this;
 
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
-
-  this.set(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
-  Analytics.setMeta(V1_5_EXPERIMENT_ENABLED, v_1_5_experiment_enabled);
 
   UTILS.each(message, function (key, val) {
     if (key !== 'options') {
