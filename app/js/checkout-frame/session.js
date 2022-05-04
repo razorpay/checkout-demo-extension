@@ -2905,7 +2905,7 @@ Session.prototype = {
         this.confirmClose().then(function (close) {
           if (close) {
             self.back(true);
-            this.setOneCCTabLogo('');
+            self.setOneCCTabLogo('');
           }
         });
         return;
