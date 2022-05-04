@@ -19,6 +19,7 @@ jest.mock('razorpay', () => ({
   isOfferForced: () => false,
   getPreferences: () => {},
   isRecurring: () => false,
+  getMerchantKey: () => '',
 }));
 
 jest.mock('checkoutstore/cta', () => ({
