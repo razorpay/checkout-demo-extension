@@ -85,7 +85,7 @@
 
   let label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
   if (isOneClickCheckoutEnabled) {
-    label = isOptional ? MOBILE_NUMBER : MOBILE_NUMBER_OPTIONAL;
+    label = isOptional ? MOBILE_NUMBER_OPTIONAL : MOBILE_NUMBER;
   }
 
   function closeSearch() {

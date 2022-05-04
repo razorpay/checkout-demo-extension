@@ -4,12 +4,12 @@ const querystring = require('querystring');
 const { sendSiftJS } = require('./siftjs');
 
 const AVS_DATA = {
-  'avs-line1': '21A Vincent Square',
-  'avs-line2': '',
-  'avs-postal_code': 'SW1P 2NA',
-  'avs-city': 'London',
-  'avs-state': 'Greater London',
-  'avs-country': 'GB',
+  line1: '21A Vincent Square',
+  line2: '',
+  postal_code: 'SW1P 2NA',
+  city: 'London',
+  state: 'Greater London',
+  country: 'GB',
 };
 
 async function handleCardValidation(context, { urlShouldContain } = {}) {
@@ -33,7 +33,8 @@ async function fillAVSForm(context) {
   await context.page.evaluate((data) => {
     const keys = Object.keys(data);
     keys.forEach((id) => {
-      document.getElementById(id).value = data[id];
+      document.getElementById(`billing-address-verification-${id}`).value =
+        data[id];
     });
   }, AVS_DATA);
 }
@@ -44,17 +45,19 @@ async function assertAVSFormData(context) {
     const keys = Object.keys(data);
     let returnObj = {};
     keys.forEach((id) => {
-      returnObj[id] = document.getElementById(id).value;
+      returnObj[id] = document.getElementById(
+        `billing-address-verification-${id}`
+      ).value;
     });
     return returnObj;
   }, AVS_DATA);
 
   Object.keys(InputData).forEach((id) => {
-    if (id === 'avs-country') {
+    if (id.includes('country')) {
       expect(InputData[id]).toEqual('United Kingdom');
-      return;
+    } else {
+      expect(InputData[id]).toEqual(AVS_DATA[id]);
     }
-    expect(InputData[id]).toEqual(AVS_DATA[id]);
   });
 }
 
@@ -262,12 +265,12 @@ async function respondSavedCards(
           },
           billing_address: avsPrefillFromSavedCard
             ? {
-                line1: AVS_DATA['avs-line1'],
-                line2: AVS_DATA['avs-line2'],
-                state: AVS_DATA['avs-state'],
-                country: AVS_DATA['avs-country'],
-                city: AVS_DATA['avs-city'],
-                postal_code: AVS_DATA['avs-postal_code'],
+                line1: AVS_DATA['line1'],
+                line2: AVS_DATA['line2'],
+                state: AVS_DATA['state'],
+                country: AVS_DATA['country'],
+                city: AVS_DATA['city'],
+                postal_code: AVS_DATA['postal_code'],
               }
             : null,
           recurring: false,
@@ -386,10 +389,10 @@ async function expectDCCParametersInRequest(
   if (isAVS) {
     check = {
       ...check,
-      'billing_address[line1]': AVS_DATA['avs-line1'],
-      'billing_address[country]': AVS_DATA['avs-country'],
-      'billing_address[city]': AVS_DATA['avs-city'],
-      'billing_address[postal_code]': AVS_DATA['avs-postal_code'],
+      'billing_address[line1]': AVS_DATA['line1'],
+      'billing_address[country]': AVS_DATA['country'],
+      'billing_address[city]': AVS_DATA['city'],
+      'billing_address[postal_code]': AVS_DATA['postal_code'],
     };
   }
   expect(body).toMatchObject(check);
@@ -399,10 +402,10 @@ async function expectAVSParametersInRequest(context) {
   const request = await context.expectRequest();
   const body = querystring.parse(request.body);
   let check = {
-    'billing_address[line1]': AVS_DATA['avs-line1'],
-    'billing_address[country]': AVS_DATA['avs-country'],
-    'billing_address[city]': AVS_DATA['avs-city'],
-    'billing_address[postal_code]': AVS_DATA['avs-postal_code'],
+    'billing_address[line1]': AVS_DATA['line1'],
+    'billing_address[country]': AVS_DATA['country'],
+    'billing_address[city]': AVS_DATA['city'],
+    'billing_address[postal_code]': AVS_DATA['postal_code'],
   };
   expect(body).toMatchObject(check);
 }

@@ -5,6 +5,7 @@ import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
+import { isBraveBrowser } from 'common/useragent';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -222,6 +223,15 @@ function createTestRibbon(parent) {
 }
 
 var preloadedFrame;
+var isBrave = false;
+/**
+ * in iframe isBraveBrowser doesn't work as expected to make sure we detect brave browser
+ * we are moving check of isBraveBrowser to checkout.js and pass isBrave flag
+ * via meta property using postmessage
+ */
+isBraveBrowser().then((r) => {
+  isBrave = r;
+});
 function getPreloadedFrame(rzp) {
   if (preloadedFrame) {
     preloadedFrame.openRzp(rzp);
@@ -257,26 +267,11 @@ RazorProto.onNew = function (event, callback) {
   }
 };
 
-function intialInstrumentation(that, checkoutFrame) {
-  var frame = (that.checkoutFrame = checkoutFrame);
-  Analytics.track('open');
-
-  if (!frame.el.contentWindow) {
-    frame.close();
-    frame.afterClose();
-    global.alert(
-      'This browser is not supported.\nPlease try payment in another browser.'
-    );
-  }
-
-  if (currentScript.src.slice(-7) === '-new.js') {
-    Track(that, 'oldscript', location.href);
-  }
-}
-
 RazorProto.open = needBody(function () {
   if (!this.metadata) {
-    this.metadata = {};
+    this.metadata = {
+      isBrave,
+    };
   }
   this.metadata.openedAt = Date.now();
 

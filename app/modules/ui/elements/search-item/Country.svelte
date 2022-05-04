@@ -1,14 +1,15 @@
 <script>
+  // constants
+  import RazorpayConfig from 'common/RazorpayConfig';
+
   export let item;
+  const countryFlagsUrl = `${RazorpayConfig.cdn}country-flags/`;
 </script>
 
 <div class="list-data">
   {#if item.type === 'country'}
     <span>
-      <img
-        alt={item.label}
-        src={`https://cdn.razorpay.com/country-flags/${item._key}.svg`}
-      />
+      <img alt={item.label} src={`${countryFlagsUrl}${item.key}.svg`} />
     </span>
   {/if}
   <span>{item.label}</span>

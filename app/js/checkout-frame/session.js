@@ -3990,10 +3990,6 @@ Session.prototype = {
     });
   },
 
-  getDowntimeAlertDialog: function () {
-    return $('#downtime-wrap');
-  },
-
   setSvelteOverlay: function () {
     this.svelteOverlay = new discreet.Overlay({
       target: docUtil.querySelector('#modal-inner'),
@@ -4391,7 +4387,6 @@ Session.prototype = {
       e.preventDefault();
       e.stopPropagation();
     }
-
     /**
      * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
      */
@@ -4839,7 +4834,6 @@ Session.prototype = {
       this.submit();
     } else {
       discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
-      showOverlay(this.getDowntimeAlertDialog());
     }
   },
 
@@ -5478,10 +5472,10 @@ Session.prototype = {
       AVSData = discreet.storeGetter(CardScreenStore.AVSBillingAddress) || {};
       // AVS will submit only on AVS screen
       if (this.svelteCardTab.isOnAVSScreen() && AVSData && AVSData.line1) {
-        if (AVSData._country) {
+        if (AVSData.countryCode) {
           // onretry we already updated the payload
-          AVSData.country = AVSData._country;
-          delete AVSData._country;
+          AVSData.country = AVSData.countryCode;
+          delete AVSData.countryCode;
         }
         data.billing_address = {
           city: AVSData.city,

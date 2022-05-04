@@ -36,6 +36,7 @@
     authType,
     currentCvv,
     AVSDccPayload,
+    AVSBillingAddress,
     currentAuthType,
     selectedCardFromHome,
     defaultDCCCurrency,
@@ -135,13 +136,11 @@
 
   // Transitions
   import { fade } from 'svelte/transition';
-  import AvsForm from './AVSForm.svelte';
+  import { BillingAddressVerificationForm } from 'ui/components/BillingAddressVerificationForm';
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
   import Icon from 'ui/elements/Icon.svelte';
   import Info from 'ui/elements/Info.svelte';
-
-  // Constant imports
-  import { Views, cardWithRecurringSupport } from './constant';
+  import { Views, cardWithRecurringSupport, AVS_COUNTRIES } from './constant';
 
   let showAVSInfo = false;
 
@@ -151,6 +150,8 @@
     delayLoginOTPExperiment,
     getIntSelectedCardTokenId,
     fetchAVSFlagForCard,
+    updateAVSFormDataForCardView,
+    setAVSBillingAddressData,
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
   import { getThemeMeta } from 'checkoutstore/theme';
@@ -625,6 +626,29 @@
   }
 
   let directlyOpenAVS = false;
+
+  $: {
+    updateAVSFormDataForCardView({
+      lastView,
+      direct: directlyOpenAVS,
+      selectedCard: $selectedCard,
+      selectedCardFromHome: $selectedCardFromHome,
+    });
+  }
+
+  function handleAVSFormInput(evt: CustomEvent<{}>) {
+    setAVSBillingAddressData(evt.detail);
+  }
+
+  /**
+   * Filter AVS countries to show in AVS form
+   * @param countries
+   */
+  function filterCountries(
+    countries: { key: string; label: string; type: string }[]
+  ) {
+    return countries.filter((country) => AVS_COUNTRIES.includes(country.key));
+  }
 
   export function showAVSView(direct = false) {
     if (currentView === Views.SAVED_CARDS) {
@@ -1126,7 +1150,12 @@
               }}><Icon icon={icons.question} /></span
             >
           </div>
-          <AvsForm direct={directlyOpenAVS} {lastView} />
+          <BillingAddressVerificationForm
+            {filterCountries}
+            value={$AVSBillingAddress}
+            on:input={handleAVSFormInput}
+            on:blur={handleAVSFormInput}
+          />
           <Info
             bind:show={showAVSInfo}
             title={$t(AVS_INFO_TITLE)}

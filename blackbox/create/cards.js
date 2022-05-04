@@ -65,6 +65,10 @@ const {
 const { delay } = require('../util.js');
 
 const { respondToPaymentFailure } = require('../actions/card-actions');
+const {
+  expectStatesAPI,
+  expectCountriesAPI,
+} = require('../actions/avs-countries-states');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -181,8 +185,11 @@ module.exports = function (testFeatures) {
           await submit(context);
           if (!AVSPrefillData) {
             await fillAVSForm(context);
+            await expectCountriesAPI(context);
           } else {
             // assert data from prefill options
+            await expectCountriesAPI(context);
+            await expectStatesAPI(context);
             await assertAVSFormData(context);
           }
           // verify footer amount with currency
@@ -243,11 +250,13 @@ module.exports = function (testFeatures) {
        * if AVS feature flag is enabled with DCC flag
        */
       if (!dcc && avs && internationalCard) {
+        await expectCountriesAPI(context);
         if (!AVSPrefillData) {
           // skip filling of data
           await fillAVSForm(context);
         } else {
           // assert data from saved card
+          await expectStatesAPI(context);
           await assertAVSFormData(context);
         }
         await submit(context);

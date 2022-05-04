@@ -26,7 +26,7 @@
   }
 </script>
 
-{#each elements as element, i}
+{#each elements as element, i (element.component)}
   <Element isOverlay={element.overlay || false} {backPressed}>
     {#if i === elements.length - 1}
       <svelte:component

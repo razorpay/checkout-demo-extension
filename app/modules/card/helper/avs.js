@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import { Views } from 'ui/tabs/card/constant';
 import { getCurrencies } from './dcc';
 import { AVSBillingAddress, AVSScreenMap } from 'checkoutstore/screens/card';
@@ -73,9 +74,39 @@ export const resetAVSBillingAddressData = () => {
   AVSBillingAddress.set(null);
 };
 
+export const setAVSBillingAddressData = (data) => {
+  AVSBillingAddress.set(data);
+};
+
 export const updateAVSScreenMap = (key, value) => {
   AVSScreenMap.update((prevValue) => ({
     ...prevValue,
     [key]: value,
   }));
+};
+
+export const updateAVSFormDataForCardView = ({
+  lastView,
+  direct,
+  selectedCard,
+  selectedCardFromHome,
+}) => {
+  if (lastView !== Views.ADD_CARD) {
+    let billingAddress = null;
+    if (direct && selectedCardFromHome?.billing_address) {
+      // directly come from home screen
+      billingAddress = { ...selectedCardFromHome.billing_address };
+    } else if (!direct && selectedCard?.billing_address) {
+      // from card screen
+      billingAddress = { ...selectedCard.billing_address };
+    }
+    setAVSBillingAddressData(billingAddress);
+  } else if (get(AVSBillingAddress)) {
+    /**
+     * If user comes from ADD_CARD screen then:
+     * if AVSBillingAddress store has previously stored card and
+     * user is trying to add new card then previous billing address should not be shown
+     * */
+    setAVSBillingAddressData(null);
+  }
 };

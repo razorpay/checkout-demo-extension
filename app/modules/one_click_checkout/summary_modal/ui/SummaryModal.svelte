@@ -1,6 +1,8 @@
 <script>
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI imports
-  import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
@@ -34,23 +36,22 @@
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'checkoutstore/offers';
 
-  // session imports
-  import { createCodPayment } from 'one_click_checkout/summary_modal/sessionInterface';
-  import { formatAmountWithCurrency } from 'helper/currency';
-
   // analytics imports
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
 
   // utils imports
   import { truncateString } from 'utils/strings';
+  import { getSession } from 'sessionmanager';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { formatAmountWithCurrency } from 'helper/currency';
+  import { popStack } from 'navstack';
 
-  let visible = false;
-  let ctaVisible = false;
+  export let ctaVisible = false;
+
   let offerAmount;
 
-  // Sets visible variable to true and makes backdrop and modal visible
-  export function show() {
+  onMount(() => {
     Events.Track(events.ORDER_SUMMARY_LOAD, {
       ctaVisible,
     });
@@ -59,130 +60,146 @@
     } else {
       Events.TrackRender(events.ORDER_SUMMARY_LOAD_V2);
     }
-    visible = true;
+  });
+
+  export function preventBack() {
+    Events.Track(events.ORDER_SUMMARY_HIDDEN);
+    return false;
   }
 
-  // Sets visible variable to false and makes backdrop and modal visible
-  export function hide() {
-    if (ctaVisible) {
-      Events.TrackRender(events.CONFIRM_ORDER_SUMMARY_HIDDEN);
-    } else {
-      Events.TrackBehav(events.ORDER_SUMMARY_HIDDEN_V2);
-    }
+  function onClose() {
     Events.Track(events.ORDER_SUMMARY_HIDDEN);
-    visible = false;
+    popStack();
   }
+
   $: {
     if ($appliedOffer) {
       offerAmount = $appliedOffer.original_amount - $appliedOffer.amount;
     }
   }
 
-  // Toggles CTA visibility
-  export function toggleCta(visible) {
-    ctaVisible = visible;
-  }
-
   function onConfirm() {
-    Events.TrackRender(events.ORDER_SUMMARY_LOAD_V2);
     Events.Track(events.ORDER_SUMMARY_CTA_CLICK);
     Events.TrackBehav(events.ORDER_SUMMARY_CTA_CLICK_V2);
-    createCodPayment();
+
+    getSession().submit();
+    selectedInstrumentId.set(null);
   }
 </script>
 
-<Backdrop {visible} on:click={hide}>
-  <div data-test-id="summary-modal" class="summary-modal">
-    <div class="summary-table-wrapper">
-      <div class="summary-heading-container">
-        <p class="summary-heading">
-          {$t(MODAL_TITLE)}
-        </p>
-        <div class="summary-close" on:click={hide}>
-          <Icon icon={close()} />
+<div data-test-id="summary-modal" class="summary-modal">
+  <div class="summary-table-wrapper">
+    <div class="summary-heading-container">
+      <p class="summary-heading">
+        {$t(MODAL_TITLE)}
+      </p>
+      <div class="summary-close" on:click={onClose}>
+        <Icon icon={close()} />
+      </div>
+    </div>
+    <hr class="summary-separator" />
+    <div class="summary-table">
+      <div class="summary-row">
+        <div>{$t(AMOUNT_LABEL)}</div>
+        <div data-test-id="cart-amount">
+          {formatAmountWithCurrency($cartAmount)}
         </div>
       </div>
-      <hr class="summary-separator" />
-      <div class="summary-table">
+      {#if $isCouponApplied}
         <div class="summary-row">
-          <div>{$t(AMOUNT_LABEL)}</div>
-          <div data-test-id="cart-amount">
-            {formatAmountWithCurrency($cartAmount)}
+          <div data-test-id="applied-coupon-label">
+            {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
+          </div>
+          <div data-test-id="discount-amount" class="text-green">
+            -{formatAmountWithCurrency($cartDiscount)}
           </div>
         </div>
-        {#if $isCouponApplied}
-          <div class="summary-row">
-            <div data-test-id="applied-coupon-label">
-              {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
-            </div>
-            <div data-test-id="discount-amount" class="text-green">
-              -{formatAmountWithCurrency($cartDiscount)}
-            </div>
+      {/if}
+      {#if $isShippingAddedToAmount}
+        <div class="summary-row" class:text-green={!$shippingCharge}>
+          <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
+          <div data-test-id="shipping-amount">
+            {$shippingCharge
+              ? formatAmountWithCurrency($shippingCharge)
+              : $t(FREE_LABEL)}
           </div>
-        {/if}
-        {#if $isShippingAddedToAmount}
-          <div class="summary-row" class:text-green={!$shippingCharge}>
-            <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
-            <div data-test-id="shipping-amount">
-              {$shippingCharge
-                ? formatAmountWithCurrency($shippingCharge)
-                : $t(FREE_LABEL)}
-            </div>
+        </div>
+      {/if}
+      {#if $isCodAddedToAmount && $codChargeAmount}
+        <div class="summary-row">
+          <div>{$t(COD_CHARGES_LABEL)}</div>
+          <div data-test-id="cod-amount">
+            {formatAmountWithCurrency($codChargeAmount)}
           </div>
-        {/if}
-        {#if $isCodAddedToAmount && $codChargeAmount}
-          <div class="summary-row">
-            <div>{$t(COD_CHARGES_LABEL)}</div>
-            <div data-test-id="cod-amount">
-              {formatAmountWithCurrency($codChargeAmount)}
-            </div>
+        </div>
+      {/if}
+      {#if $appliedOffer?.amount}
+        <div class="summary-row">
+          <div>
+            {$t(OFFER_LABEL, {
+              values: {
+                offer_name: `(${truncateString(
+                  $appliedOffer.display_text,
+                  20
+                )})`,
+              },
+            })}
           </div>
-        {/if}
-        {#if $appliedOffer?.amount}
-          <div class="summary-row">
-            <div>
-              {$t(OFFER_LABEL, {
-                values: {
-                  offer_name: `(${truncateString(
-                    $appliedOffer.display_text,
-                    20
-                  )})`,
-                },
-              })}
-            </div>
-            <div data-test-id="offer-amount" class="text-green">
-              -{formatAmountWithCurrency(offerAmount)}
-            </div>
+          <div data-test-id="offer-amount" class="text-green">
+            -{formatAmountWithCurrency(offerAmount)}
           </div>
-        {/if}
-        <hr class="total-separator" />
-        <div class="summary-row total-charges-text">
-          <div>{$t(TOTAL_CHARGES_LABEL)}</div>
-          <div data-test-id="total-amount">
-            {formatAmountWithCurrency($amount)}
-          </div>
+        </div>
+      {/if}
+      <hr class="total-separator" />
+      <div class="summary-row total-charges-text">
+        <div>{$t(TOTAL_CHARGES_LABEL)}</div>
+        <div data-test-id="total-amount">
+          {formatAmountWithCurrency($amount)}
         </div>
       </div>
     </div>
-    {#if ctaVisible}
+  </div>
+  {#if ctaVisible}
+    <div class="cta-container">
       <div class="cta-wrapper">
         <button class="summary-modal-cta" on:click={onConfirm}>
           {$t(CTA_LABEL)}
         </button>
       </div>
-    {/if}
-  </div>
-</Backdrop>
+    </div>
+  {/if}
+</div>
 
 <style>
   .summary-modal {
     box-sizing: border-box;
-    position: absolute;
     background: white;
     text-align: start;
+    /* current change */
     bottom: 0;
     width: 100%;
     padding-top: 16px;
+    /* incoming change
+    padding: 24px; */
+  }
+
+  .summary-modal-cta:hover::after {
+    left: 0;
+    top: 0;
+    opacity: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    content: '';
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(0, 0, 0, 0.1)
+    );
+  }
+
+  .summary-modal-cta::after {
+    opacity: 0;
   }
 
   .summary-table-wrapper {
@@ -251,24 +268,23 @@
     border-bottom: none;
     margin: 16px 0px;
   }
-
-  .summary-modal-cta::after {
-    left: 0;
-    top: 0;
-    opacity: 1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    content: '';
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(0, 0, 0, 0.1)
-    );
+  .cta-container {
+    padding: 24px 16px;
+    box-shadow: 0px -4px 4px rgba(166, 158, 158, 0.08);
   }
 
   .cta-wrapper {
-    padding: 24px 16px;
-    box-shadow: 0px -4px 4px rgba(166, 158, 158, 0.08);
+    position: relative;
+  }
+  .summary-modal-cta {
+    width: 100%;
+    padding: 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    font-family: 'Inter', 'lato', ubuntu, helvetica, sans-serif !important;
+
+    color: var(--text-color);
+    background: var(--primary-color);
   }
 </style>

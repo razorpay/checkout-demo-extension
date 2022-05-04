@@ -78,9 +78,6 @@ beforeAll(() => {
 describe('handleFeeBearer tests', () => {
   test('should properly load the fee-bearer modal', async () => {
     const callback = (data: any) => {};
-    const feeWrap = document.createElement('div');
-    feeWrap.setAttribute('id', 'fee-wrap');
-    document.body.appendChild(feeWrap);
     handleFeeBearer(argumentData as Partial<UPI.UPIPaymentPayload>, callback);
     document.querySelector('.fee-bearer')?.dispatchEvent(new Event('continue'));
     document.dispatchEvent(new Event('error'));

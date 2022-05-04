@@ -42,6 +42,7 @@ jest.mock('razorpay', () => ({
 jest.mock('common/useragent', () => ({
   android: true,
   iOS: true,
+  isBrave: false,
   isDesktop: jest.fn(),
 }));
 

@@ -196,7 +196,7 @@ async function handleFeeSummary(context, features) {
   if (isSelectCOD) {
     await context.page.click('.summary-modal-cta');
   } else {
-    await context.page.click('.backdrop');
+    await context.page.click('.summary-close');
   }
 }
 
