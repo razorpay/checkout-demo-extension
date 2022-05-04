@@ -284,20 +284,16 @@ function getPreloadedFrame(rzp) {
         resolve(preloadedFrame);
       });
     }
-  } else {
-    if (preloadedFramePromise) {
-      preloadedFramePromise.then(() => {
-        if (rzp) {
-          preloadedFrame.openRzp(rzp);
-        }
-      });
-      return preloadedFrame;
-    }
-    preloadedFramePromise = new Promise(function (resolve, reject) {
-      setFrame();
-      resolve(preloadedFrame);
-    });
   }
+
+  if (!preloadedFrame) {
+    setFrame();
+  }
+
+  if (rzp && !rzp.get('one_click_checkout') && preloadedFrame) {
+    preloadedFrame.openRzp(rzp);
+  }
+
   return preloadedFrame;
 }
 
