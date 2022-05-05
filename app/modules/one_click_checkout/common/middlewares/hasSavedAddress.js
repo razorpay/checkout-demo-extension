@@ -18,10 +18,11 @@ import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import {
   RESEND_OTP_INTERVAL,
   OTP_TEMPLATES,
+  otpReasons,
 } from 'one_click_checkout/otp/constants';
 
 const hasSavedAddresses =
-  (redirect, check_status = true, reason) =>
+  (redirect, check_status = true) =>
   (route, history, navigator) => {
     const customer = getCustomerDetails();
     const labels = route.otpLabels;
@@ -52,7 +53,8 @@ const hasSavedAddresses =
       history.config[views.OTP].props = {
         ...history.config[views.OTP].props,
         ...props,
-        otpReason: OTP_TEMPLATES.access_address,
+        otpReason: otpReasons.access_address,
+        smsTemplate: OTP_TEMPLATES.access_address,
       };
       history.config[views.OTP].otpParams = {
         loading: {
@@ -76,7 +78,7 @@ const hasSavedAddresses =
           if (customer.saved_address && !customer.logged) {
             Events.TrackRender(otpEvents.OTP_LOAD, {
               is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
-              otp_reason: reason,
+              otp_reason: otpReasons.access_address,
             });
 
             createOTP(

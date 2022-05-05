@@ -7,20 +7,22 @@ export const otpClasses = [
 
 export const otpReasons = {
   mandatory_login: 'mandatory_login',
-  saving_address: 'saving_address',
+  saving_address: 'save_address',
   access_address: 'access_address',
-  coupons_edit_contact: 'coupons_edit_contact',
+  verify_coupon: 'verify_coupon',
   access_card: 'access_card',
   save_card: 'save_card',
+  edit_contact: 'edit_contact',
 };
 
 export const OTP_TEMPLATES = {
   mandatory_login: 'mandatory_login',
-  saving_address: 'save_address',
+  save_address: 'save_address',
   access_address: 'access_address',
-  coupons_edit_contact: 'verify_coupon',
+  verify_coupon: 'verify_coupon',
   access_card: 'access_card',
   save_card: 'save_card',
+  edit_contact: 'access_address',
 };
 
 export const RESEND_OTP_INTERVAL = 30 * 1000;

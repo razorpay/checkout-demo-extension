@@ -71,7 +71,7 @@ export const handleDetailsNext = (prevContact) => {
         function () {
           if (customer.saved_address && !customer.logged) {
             toggleHeader(true);
-            askForOTP(otpReasons.coupons_edit_contact);
+            askForOTP(otpReasons.edit_contact);
           } else {
             isEditContactFlow.set(false);
             navigator.navigateTo({ path: views.COUPONS });

@@ -50,7 +50,7 @@
     }
     onClose();
     if (!isUserLoggedIn() && $isIndianCustomer) {
-      askForOTP(otpReasons.coupons_edit_contact);
+      askForOTP(otpReasons.verify_coupon);
     }
     // couponsCta.hide();
   }
