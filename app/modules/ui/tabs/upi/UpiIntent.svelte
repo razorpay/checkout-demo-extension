@@ -29,7 +29,8 @@
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
-  import { enableUPITiles, definePlatform } from 'upi/helper';
+  import { definePlatform } from 'upi/helper';
+  import { enableUPITiles } from 'upi/features';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
   import { getThemeMeta } from 'checkoutstore/theme';
 

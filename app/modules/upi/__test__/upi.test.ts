@@ -1,10 +1,10 @@
 import {
   definePlatform,
-  enableUPITiles,
   avoidSessionSubmit,
   getGridArray,
   definePlatformReturnMethodIdentifier,
 } from '../helper/upi';
+import { enableUPITiles } from 'upi/features';
 import { getSDKMeta } from 'checkoutstore/native';
 import { isDesktop } from 'common/useragent';
 import {

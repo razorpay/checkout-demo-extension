@@ -33,7 +33,7 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
-  import { enableUPITiles } from 'upi/helper';
+  import { enableUPITiles } from 'upi/features';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
   import { PAY_WITH_INSTALLED_OR_OTHERS } from 'upi/i18n/labels';
