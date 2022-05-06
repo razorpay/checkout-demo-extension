@@ -78,12 +78,12 @@
   } from 'ui/labels/upi';
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
+  import { definePlatform } from 'upi/helper';
   import {
     oneClickUPIIntent,
     enableUPITiles,
     getRecommendedAppsForUPIStack,
-    definePlatform,
-  } from 'upi/helper';
+  } from 'upi/features';
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
