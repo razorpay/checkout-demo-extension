@@ -108,11 +108,11 @@ export const getSortedApps = (allApps) => {
   // Filter out apps which are installed, but the user isn't registered on them.
   // The check is only performed if verify_registration is true for the app.
   // See UPI_APPS.whitelist.
-  if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
+  if (global.CheckoutBridge && global.CheckoutBridge.isUserRegisteredOnUPI) {
     usableApps = usableApps.filter((app) => {
       // Only check for user registration if app is installed.
       if (app.verify_registration && isAppInstalled(app.package_name)) {
-        return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
+        return global.CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
       }
       return true;
     });

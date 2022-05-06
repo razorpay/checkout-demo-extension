@@ -1,6 +1,4 @@
 <script lang="ts">
-  /* global showOverlay, gel, Event */
-
   // UI Imports
   import NumberField from 'ui/elements/fields/card/NumberField.svelte';
   import ExpiryField from 'ui/elements/fields/card/ExpiryField.svelte';

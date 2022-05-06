@@ -1,5 +1,3 @@
-/* global confirm */
-
 import { Track } from 'analytics';
 import Bridge from './bridge';
 import * as _El from 'utils/DOM';

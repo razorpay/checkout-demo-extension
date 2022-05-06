@@ -280,7 +280,6 @@ function fetchPrefs(session) {
     return;
   }
   session.isOpen = true;
-
   performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(

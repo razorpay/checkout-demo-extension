@@ -180,7 +180,7 @@ $.prototype = {
     if (this[0]) {
       return this[0].getBoundingClientRect();
     }
-    return emo;
+    return {};
   },
 
   offht: function () {

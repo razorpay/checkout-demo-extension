@@ -117,7 +117,7 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
   // Web Payments api are treated as intent and each available web payment app is added as a valid intent app
   // Since wallets cannot be used through intent on browsers,
   // do not turn wallets to intent if native intent is not available
-  if (!(CheckoutBridge && CheckoutBridge.callNativeIntent)) {
+  if (!(global.CheckoutBridge && global.CheckoutBridge.callNativeIntent)) {
     return false;
   }
 

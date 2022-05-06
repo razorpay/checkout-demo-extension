@@ -77,12 +77,12 @@ export function getCardApps(sdkMeta, externalSDKs, uriData) {
 
     // Check if app requires user registration
     if (app.verify_registration) {
-      if (CheckoutBridge && CheckoutBridge.isUserRegistered) {
+      if (global.CheckoutBridge && global.CheckoutBridge.isUserRegistered) {
         const check = {
           method: 'card',
           code: app.code,
         };
-        if (!CheckoutBridge.isUserRegistered(JSON.stringify(check))) {
+        if (!global.CheckoutBridge.isUserRegistered(JSON.stringify(check))) {
           // Filter out this app as user is not registered.
           return false;
         }

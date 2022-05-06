@@ -20,13 +20,13 @@ function getCartInfo() {
 export function merchantAnalytics(params) {
   if (isOneClickCheckout()) {
     if (isGoogleAnalyticsEnabled()) {
-      Razorpay.sendMessage({
+      global.Razorpay.sendMessage({
         event: 'gaevent',
         data: params,
       });
     }
     if (isFacebookAnalyticsEnabled()) {
-      Razorpay.sendMessage({
+      global.Razorpay.sendMessage({
         event: 'fbaevent',
         data: params,
       });
@@ -42,7 +42,7 @@ export function merchantFBStandardAnalytics(data) {
     Object.keys(getCustomerCart())?.length
   ) {
     data.params = getCartInfo();
-    Razorpay.sendMessage({
+    global.Razorpay.sendMessage({
       event: 'fbaevent',
       data,
     });

@@ -1,4 +1,5 @@
 import { querySelector } from 'utils/doc';
+import { ownerWindow } from 'common/constants';
 import * as UserAgent from 'common/useragent';
 import { compareSemver } from 'lib/utils';
 import * as _El from 'utils/DOM';
@@ -114,7 +115,7 @@ function autoScrollHeaderIfLandscape() {
 
   if (isLandscape) {
     if (UserAgent.iOS) {
-      setTimeout(() => global.ownerWindow.scroll(0, 100));
+      setTimeout(() => ownerWindow.scroll(0, 100));
     }
     if (UserAgent.android) {
       setTimeout(() => global.scroll(0, 100));

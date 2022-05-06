@@ -13,7 +13,6 @@
 app/modules/bridge/                                     @razorpay/checkout-cx-1
 app/modules/configurability/                            @razorpay/checkout-cx-1
 app/modules/rtb/                                        @razorpay/checkout-cx-1
-app/js/checkout-frame/                                  @razorpay/checkout-cx-1
 
 #
 # Checkout One-Click-Checkout (1cc) Features: "@razorpay/checkout-1cc" team
