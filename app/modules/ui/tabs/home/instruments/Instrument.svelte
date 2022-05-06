@@ -14,8 +14,8 @@
   import SavedCardInstrument from './SavedCardInstrument.svelte';
   import SkeletonInstrument from './SkeletonInstrument.svelte';
   import UpiAppMethodInstrument from './UpiAppMethodInstrument.svelte';
-  import { oneClickUPIIntent } from 'upi/helper';
   import { getSectionCategoryForBlock } from '../helpers';
+  import { oneClickUPIIntent } from 'upi/features';
 
   // Props
   export let instrument;

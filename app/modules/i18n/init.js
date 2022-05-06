@@ -234,7 +234,7 @@ export function init() {
   initSvelteI18n({
     fallbackLocale: 'en',
     initialLocale,
-    warnOnMissingMessages: true,
+    warnOnMissingMessages: false,
   });
 
   Analytics.setMeta('locale.initial', initialLocale);

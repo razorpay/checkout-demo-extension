@@ -147,6 +147,15 @@
           </div>
           <div id="language-dropdown" />
         </div>
+        {#if isIRCTC()}
+          <div
+            class="recurring-message"
+            style="right: 0;left: 0;border-radius:0 0 3px 3px"
+          >
+            <span>&#x2139;</span>
+            *Payment charges and taxes as applicable.
+          </div>
+        {/if}
         <div id="body" class="sub">
           <div id="topbar-wrap" />
           <div id="messages" />
@@ -160,15 +169,6 @@
             <div id="root" />
             <div id="form-fields">
               <div id="body-overlay" />
-              {#if isIRCTC()}
-                <div
-                  class="recurring-message"
-                  style="right: 0;left: 0;border-radius:0 0 3px 3px"
-                >
-                  <span>&#x2139;</span>
-                  *Payment charges and taxes as applicable.
-                </div>
-              {/if}
 
               {#if isMethodEnabled('emi') && emiBanks.BAJAJ}
                 <div class="tab-content showable screen" id="form-emi" />

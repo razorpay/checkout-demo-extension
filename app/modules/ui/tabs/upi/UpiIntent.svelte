@@ -16,6 +16,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
   import { getMiscIcon } from 'checkoutframe/icons';
 
@@ -30,9 +31,9 @@
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
   import { Events } from 'analytics';
-  import { enableUPITiles, definePlatform } from 'upi/helper';
-  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
+  import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { definePlatform } from 'upi/helper';
 
   // Props
   export let apps;

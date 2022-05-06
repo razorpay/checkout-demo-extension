@@ -175,12 +175,9 @@
     box-sizing: border-box;
     background: white;
     text-align: start;
-    /* current change */
     bottom: 0;
     width: 100%;
     padding-top: 16px;
-    /* incoming change
-    padding: 24px; */
   }
 
   .summary-modal-cta:hover::after {

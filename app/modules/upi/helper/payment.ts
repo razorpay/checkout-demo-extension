@@ -15,7 +15,8 @@ import {
 } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { GOOGLE_PAY_PACKAGE_NAME, UPI_TAB_CALLBACK_NAME } from 'upi/constants';
-import { enableUPITiles, resetCallbackOnUPIAppForPay } from './upi';
+import { resetCallbackOnUPIAppForPay } from './upi';
+import { enableUPITiles } from '../features';
 import { reward } from 'checkoutstore/rewards';
 import { getNewIosBridge } from 'bridge';
 import { handleFeeBearer } from './fee-bearer';

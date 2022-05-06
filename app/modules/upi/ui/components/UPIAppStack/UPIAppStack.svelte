@@ -1,17 +1,15 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import {
-    getRecommendedAppsForUPIStack,
     getDowntimeForUPIApp,
     initiateNecessaryFlow,
     getGridArray,
   } from 'upi/helper';
+  import { getRecommendedAppsForUPIStack } from 'upi/features';
   import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import {
-    definePlatformReturnMethodIdentifier,
-    enableUPITiles,
-  } from 'upi/helper';
+  import { definePlatformReturnMethodIdentifier } from 'upi/helper';
+  import { enableUPITiles } from 'upi/features';
   import { handleUPIPayments } from 'upi/helper/payment';
   import { AppTile } from '../AppTile';
   import {

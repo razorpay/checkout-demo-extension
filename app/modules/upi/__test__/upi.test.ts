@@ -1,10 +1,10 @@
 import {
   definePlatform,
-  enableUPITiles,
   avoidSessionSubmit,
   getGridArray,
   definePlatformReturnMethodIdentifier,
 } from '../helper/upi';
+import { enableUPITiles } from 'upi/features';
 import { getSDKMeta } from 'checkoutstore/native';
 import { isDesktop } from 'common/useragent';
 import {
@@ -42,7 +42,7 @@ jest.mock('razorpay', () => ({
 }));
 jest.mock('common/useragent', () => ({
   android: true,
-  iOS: true,
+  iOS: false,
   isBrave: false,
   isDesktop: jest.fn(),
 }));
@@ -63,9 +63,14 @@ describe('definePlatform: Utility test', () => {
       platform: 'web',
     });
 
+    /**
+     * Above we are mocking modules and user agents.
+     * please check if tests failing
+     */
+
     expect(definePlatform('mWebAndroid')).toBeTruthy();
 
-    expect(definePlatform('mWebiOS')).toBeTruthy();
+    expect(definePlatform('mWebiOS')).toBeFalsy();
   });
   test('definePlatform;default', () => {
     (isDesktop as jest.Mock).mockReturnValue(true);
