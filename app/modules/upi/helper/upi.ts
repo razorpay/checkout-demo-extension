@@ -8,7 +8,7 @@ import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import { get, Writable } from 'svelte/store';
 import { showDowntimeAlert } from 'checkoutframe/downtimes/utils';
 import { getSession } from 'sessionmanager';
-import { captureFeature, storePlatformForTracker } from 'upi/events/trackers';
+import { storePlatformForTracker } from 'upi/events/trackers';
 
 /**
  * Priority Order is very important

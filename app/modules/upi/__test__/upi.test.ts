@@ -38,11 +38,10 @@ jest.mock('razorpay', () => ({
   getMerchantMethods: jest.fn(),
   getAmount: jest.fn(),
   getMerchantOrder: jest.fn(),
-  getMerchantKey: jest.fn(() => 'rzp_live_ILgsfZCZoFIKMb'),
 }));
 jest.mock('common/useragent', () => ({
   android: true,
-  iOS: true,
+  iOS: false,
   isBrave: false,
   isDesktop: jest.fn(),
 }));
@@ -63,9 +62,14 @@ describe('definePlatform: Utility test', () => {
       platform: 'web',
     });
 
+    /**
+     * Above we are mocking modules and user agents.
+     * please check if tests failing
+     */
+
     expect(definePlatform('mWebAndroid')).toBeTruthy();
 
-    expect(definePlatform('mWebiOS')).toBeTruthy();
+    expect(definePlatform('mWebiOS')).toBeFalsy();
   });
   test('definePlatform;default', () => {
     (isDesktop as jest.Mock).mockReturnValue(true);
