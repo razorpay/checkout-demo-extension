@@ -6,12 +6,7 @@ import {
 import { isUPIFlowEnabled } from 'checkoutstore/methods';
 import { getSDKMeta, getUPIIntentApps } from 'checkoutstore/native';
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
-import {
-  getMerchantKey,
-  getPreferences,
-  isCustomerFeeBearer,
-  isRecurring,
-} from 'razorpay';
+import { getPreferences, isCustomerFeeBearer, isRecurring } from 'razorpay';
 import { android, iOS, isBrave, isDesktop } from 'common/useragent';
 import { OTHER_INTENT_APPS, UPI_APPS } from 'upi/constants';
 import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
@@ -19,7 +14,7 @@ import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import { get, Writable } from 'svelte/store';
 import { showDowntimeAlert } from 'checkoutframe/downtimes/utils';
 import { getSession } from 'sessionmanager';
-import { captureFeature, storePlatformForTracker } from 'upi/events/trackers';
+import { storePlatformForTracker } from 'upi/events/trackers';
 
 export function oneClickUPIIntent() {
   /**
@@ -113,8 +108,6 @@ type EnableUPITilesReturnType = {
   config: { apps: UPI.AppConfiguration[] };
 };
 
-const ninetyPercent = Math.random() < 0.9;
-
 export function enableUPITiles(): EnableUPITilesReturnType {
   let response: EnableUPITilesReturnType = {
     status: false,
@@ -122,21 +115,12 @@ export function enableUPITiles(): EnableUPITilesReturnType {
     variant: 'subText',
   };
 
-  if (isRecurring() || !upiNrL0L1Improvements.enabled() || (isBrave && iOS)) {
-    return response;
-  } else if (
-    definePlatform('mWebiOS') &&
-    getMerchantKey() !== 'rzp_live_ILgsfZCZoFIKMb' &&
-    ninetyPercent
+  if (
+    isRecurring() ||
+    !upiNrL0L1Improvements.enabled() ||
+    (isBrave && iOS) ||
+    definePlatform('mWebiOS')
   ) {
-    /**
-     * TODO
-     * This is temporary and has to be removed
-     * Enable only 10% traffic on iOS mweb
-     * Not on demo merchant
-     * Hence we do reverse
-     */
-    captureFeature('tenPercentMWebiOS', false);
     return response;
   } else {
     const { name, config = {} } =
