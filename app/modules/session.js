@@ -69,9 +69,7 @@ var preferences,
   merchantAnalytics = discreet.merchantAnalytics,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
   TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
-  AccountTabStore = discreet.AccountTabStore,
-  SecurityUtils = discreet.SecurityUtils;
-merchantAnalyticsConstant = discreet.merchantAnalyticsConstant;
+  merchantAnalyticsConstant = discreet.merchantAnalyticsConstant;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 const ua_iPhone = /iPhone/.test(ua);

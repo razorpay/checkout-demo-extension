@@ -120,10 +120,8 @@ import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
-import * as AccountTabStore from 'one_click_checkout/account_modal/store';
 import * as RTBHelper from 'rtb/helper';
 
-import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
 import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
@@ -283,13 +281,11 @@ export default {
   merchantAnalyticsConstant,
   TopbarMagicCheckoutStore,
 
-  SecurityUtils,
   CommonConstants,
   upiPaymentHandlers,
 
   // Offline Challan
   offlineChallanTab,
-  AccountTabStore,
   NetbankingHelper,
 
   fonts,
