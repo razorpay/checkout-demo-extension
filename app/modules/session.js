@@ -1,4 +1,5 @@
-/* global discreet */
+import discreet from 'checkoutframe/discreet';
+import { formatAmountWithCurrency } from 'helper/currency';
 
 var emo = {};
 var ua = navigator.userAgent;
@@ -12,14 +13,8 @@ var preferences,
   StorageBridge = window.StorageBridge,
   Promise = discreet.Promise,
   P13n = discreet.P13n,
-  SessionManager = discreet.SessionManager,
   Bridge = discreet.Bridge,
-  isIframe = window !== parent,
-  ownerWindow = isIframe ? parent : opener,
-  tab_titles = Constants.TAB_TITLES,
   freqWallets = discreet.Wallet.wallets,
-  contactPattern = Constants.CONTACT_REGEX,
-  emailPattern = Constants.EMAIL_REGEX,
   isMobile = discreet.UserAgent.isMobile,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
@@ -33,7 +28,6 @@ var preferences,
   AnalyticsTypes = discreet.AnalyticsTypes,
   Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
-  _Arr = discreet._Arr,
   _ = discreet._,
   _Obj = discreet._Obj,
   docUtil = discreet.docUtil,
@@ -70,7 +64,6 @@ var preferences,
   Header = discreet.Header,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
-  dynamicFeeObject = discreet.dynamicFeeObject,
   views = discreet.views,
   CardViews = discreet.CardViews,
   merchantAnalytics = discreet.merchantAnalytics,
@@ -78,20 +71,20 @@ var preferences,
   TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
   AccountTabStore = discreet.AccountTabStore,
   SecurityUtils = discreet.SecurityUtils;
+merchantAnalyticsConstant = discreet.merchantAnalyticsConstant;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
-var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
-var ua_iPhone = /iPhone/.test(ua);
+const ua_iPhone = /iPhone/.test(ua);
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
-var shownClass = 'drishy';
+const shownClass = 'drishy';
 
 /**
  * Temp stores for Cardless EMI & PayLater.
  * Will move to Svelte Store upon migration.
  */
-var CardlessEmiStore = {
+const CardlessEmiStore = {
   plans: {},
   duration: {},
   loanUrls: {},
@@ -100,7 +93,7 @@ var CardlessEmiStore = {
   urls: {},
 };
 
-var PayLaterStore = {
+const PayLaterStore = {
   plans: {},
   duration: {},
   loanUrls: {},
@@ -114,7 +107,7 @@ var METHODS = discreet.CommonConstants.METHODS;
  * Store for what tab and screen
  * should be shown when back is pressed.
  */
-var BackStore = null;
+let BackStore = null;
 
 /**
  * A valid contact can only contain
@@ -273,7 +266,7 @@ function hideDowntimeAlert() {
 }
 
 function hideOverlayMessage() {
-  var session = SessionManager.getSession();
+  var session = this;
   session.preventErrorDismissal = false;
 
   if (
@@ -425,7 +418,7 @@ function errorHandler(response) {
           }
           updateScore('clickOnSubmitWithoutDetails');
           Form.shake();
-          return hideOverlayMessage();
+          return this.hideOverlayMessage();
         }
       }
     }
@@ -515,7 +508,7 @@ function askOTP(
 ) {
   var origText = textView; // ಠ_ಠ
   var qpmap = _.getQueryParams();
-  var thisSession = SessionManager.getSession();
+  var thisSession = this;
   var session = thisSession;
   var paymentId = _Obj.getSafely(session, 'r._payment.payment_id');
   var paymentData = OtpService.getPaymentData(paymentId);
@@ -725,7 +718,7 @@ function successHandler(response) {
     Razorpay.sendMessage({ event: 'complete', data: response });
     this.hide();
   }
-  hideOverlayMessage();
+  this.hideOverlayMessage();
   completeCheckoutFlow.call(this);
 }
 
@@ -740,7 +733,7 @@ function Session(message) {
   var options = message.options;
   var self = this;
 
-  this.r = Razorpay(options);
+  this.r = window.Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
@@ -798,9 +791,7 @@ Session.prototype = {
     if (fee) {
       $('#amount .original-amount').hide();
     } else {
-      $('#amount .original-amount').rawHtml(
-        discreet.CurrencyHelper.formatAmountWithCurrency(amount)
-      );
+      $('#amount .original-amount').rawHtml(formatAmountWithCurrency(amount));
       if ($('#amount .original-amount')[0]) {
         $('#amount .original-amount')[0].removeAttribute('style');
       }
@@ -811,9 +802,7 @@ Session.prototype = {
     if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
-    $('#amount .discount').rawHtml(
-      discreet.CurrencyHelper.formatAmountWithCurrency(amount)
-    );
+    $('#amount .discount').rawHtml(formatAmountWithCurrency(amount));
     //$('#amount .original-amount').hide();
     Header.updateAmountFontSize();
   },
@@ -889,7 +878,7 @@ Session.prototype = {
       UTILS.each(fields, function (optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
-          errorHandler.call(SessionManager.getSession(), {
+          errorHandler.call(self, {
             error: {
               field: option,
             },
@@ -1561,7 +1550,7 @@ Session.prototype = {
       }
 
       var locale = I18n.getCurrentLocale();
-      askOTP(self.otpView, otpMessageView, true, {
+      self.askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getCardlessEmiProviderName(providerCode, locale),
       });
@@ -1691,7 +1680,7 @@ Session.prototype = {
         otpMessageView = 'otp_resent_successful';
       }
 
-      askOTP(self.otpView, otpMessageView, true, {
+      self.askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
       });
@@ -1786,7 +1775,10 @@ Session.prototype = {
       this.modal = new window.Modal(this.el, {
         animation: this.mainModal.animation(),
         onhide: function () {
-          Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
+          Razorpay.sendMessage({
+            event: 'dismiss',
+            data: self.dismissReason,
+          });
         },
         onhidden: function () {
           this.saveAndClose();
@@ -1921,7 +1913,7 @@ Session.prototype = {
       }
 
       $('#overlay-close').hide();
-      hideOverlayMessage();
+      self.hideOverlayMessage();
     };
 
     if (this.r._payment || this.isResumedPayment) {
@@ -2085,7 +2077,7 @@ Session.prototype = {
       this.getCurrentCustomer().createOTP(
         function (message) {
           // TODO: check how message is being consumed. Possible bug.
-          askOTP(
+          self.askOTP(
             self.otpView,
             message,
             true,
@@ -3353,7 +3345,7 @@ Session.prototype = {
        * 2. If customer doesn't have saved cards, show cards screen.
        */
       if (customer.saved && !customer.logged) {
-        askOTP(
+        self.askOTP(
           self.otpView,
           undefined,
           true,
@@ -3866,7 +3858,7 @@ Session.prototype = {
       }
 
       $('#modal-inner').removeClass('shake');
-      hideOverlayMessage();
+      self.hideOverlayMessage();
       this.modal.hide();
       discreet.stopListeningForBackPresses();
     }
@@ -4107,7 +4099,7 @@ Session.prototype = {
           if (!isRedirect) {
             this.submit();
           }
-          callback = function (msg) {
+          callback = (msg) => {
             if (this.getCurrentCustomer().logged) {
               // OTP verification successful
               OtpService.resetCount('razorpay');
@@ -4123,8 +4115,7 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-
-              askOTP(
+              this.askOTP(
                 this.otpView,
                 msg,
                 true,
@@ -4147,7 +4138,7 @@ Session.prototype = {
             Analytics.track('saved_cards:access:otp:submit');
           }
 
-          callback = function (msg) {
+          callback = (msg) => {
             if (self.getCurrentCustomer().logged) {
               // OTP verification successful
               OtpService.resetCount('razorpay');
@@ -4164,7 +4155,7 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-              askOTP(
+              this.askOTP(
                 this.otpView,
                 msg,
                 true,
@@ -4220,10 +4211,10 @@ Session.prototype = {
       }
 
       if (this.tab === 'upi') {
-        callback = function (msg, data) {
+        callback = (msg) => {
           if (msg) {
             Analytics.track('behav:otp:incorrect');
-            askOTP(this.otpView, msg, true);
+            this.askOTP(this.otpView, msg, true);
             this.updateCustomerInStore();
           } else {
             discreet.upiTab.render();
@@ -4278,7 +4269,7 @@ Session.prototype = {
   clearRequest: function (extra) {
     this.hideTimer();
     if (this.r._payment) {
-      hideOverlayMessage();
+      this.hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
     }
 
@@ -5336,7 +5327,7 @@ Session.prototype = {
         OtpService.markOtpSent('razorpay');
 
         if (!emi_duration) {
-          hideOverlayMessage();
+          session.hideOverlayMessage();
           return session.showCardlessEmiPlans();
         }
       });
@@ -5388,7 +5379,7 @@ Session.prototype = {
         this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
           phone: getPhone(),
         });
-        askOTP(
+        this.askOTP(
           this.otpView,
           undefined,
           true,
@@ -5614,11 +5605,11 @@ Session.prototype = {
         Analytics.track('native_otp:attempt');
         session.tabs.card.onHide();
         this.setScreen('otp', params);
-        this.r.on('payment.otp.required', function (data) {
+        this.r.on('payment.otp.required', (data) => {
           session.otpView.updateScreen({
             showCtaOneCC: true,
           });
-          askOTP(that.otpView, data);
+          this.askOTP(that.otpView, data);
         });
         this.r.on('payment.3ds.required', function () {
           that.svelteOverlay.$set({
@@ -5715,7 +5706,7 @@ Session.prototype = {
        */
       this.r.on('payment.createPayment.responseType', function (type) {
         if (type === 'otp') {
-          hideOverlayMessage();
+          that.hideOverlayMessage();
           that.otpView.updateScreen({
             skipTextLabel: 'resend_otp',
             allowSkip: false,
@@ -5774,8 +5765,8 @@ Session.prototype = {
     }
 
     if (data.method === 'wallet' && (this.powerwallet || isDynamicWalletFlow)) {
-      this.r.on('payment.otp.required', function (message) {
-        askOTP(that.otpView, message, false, { phone: getPhone() });
+      this.r.on('payment.otp.required', (message) => {
+        this.askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
           showCtaOneCC: true,
           ctaOneCCDisabled: false,
@@ -6389,10 +6380,7 @@ Session.prototype = {
   successHandler: successHandler,
   cancelHandler: cancelHandler,
   getProxyPhone: getProxyPhone,
+  askOTP: askOTP,
 };
 
-/*
- * Call initIframe() after the session class is defined.
- */
-
-discreet.initIframe();
+export default Session;

@@ -1,4 +1,3 @@
-/* global Set */
 import Config, { FLOWS } from 'config';
 import { get } from 'svelte/store';
 

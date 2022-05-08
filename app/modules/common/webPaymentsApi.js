@@ -4,9 +4,8 @@ import {
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
   CRED_PACKAGE_NAME,
-} from 'upi/constants';
-
-import { getSession } from 'sessionmanager';
+} from 'common/upi';
+import RazorpayStore from 'razorpay';
 
 export const appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
@@ -41,13 +40,14 @@ export function isWebPaymentsApiAvailable(app) {
  * @returns
  */
 export const checkWebPaymentsForApp = (app) => {
-  const session = getSession();
   /* disable Web payments API for SDK as we have native intent there */
   if (Bridge.checkout.exists()) {
     return Promise.resolve(false);
   }
 
-  return session.r.checkPaymentAdapter(app).then(() => {
+  const razorpayInstance = RazorpayStore.get();
+
+  return razorpayInstance.checkPaymentAdapter(app).then(() => {
     webPaymentsApps[app] = true;
   });
 };

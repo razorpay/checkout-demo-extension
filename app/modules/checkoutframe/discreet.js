@@ -1,5 +1,3 @@
-import 'entry/checkout-frame';
-
 import $ from 'lib/$';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
@@ -11,7 +9,6 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import * as CardHelper from 'card/helper';
-import * as CurrencyHelper from 'helper/currency';
 import MainModal from 'ui/components/MainModal/index.svelte';
 import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
@@ -40,7 +37,6 @@ import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
 import * as PayLater from 'common/paylater';
 import * as Apps from 'common/apps';
-import * as SessionManager from 'sessionmanager';
 import updateScore from 'analytics/checkoutScore';
 import { trackUpiIntentInstrumentPaymentAttempted } from 'analytics/highlightUpiIntentAnalytics';
 import * as Offers from 'checkoutframe/offers';
@@ -120,7 +116,6 @@ import * as ChargesStore from 'one_click_checkout/charges/store';
 
 import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
-import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
@@ -130,7 +125,6 @@ import * as RTBHelper from 'rtb/helper';
 
 import * as SecurityUtils from 'utils/security';
 import * as CommonConstants from 'checkoutframe/constants';
-
 import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 import * as _El from 'utils/DOM';
@@ -176,7 +170,6 @@ export default {
   Wallet,
   CardlessEmi,
   PayLater,
-  SessionManager,
   Bridge,
   stopListeningForBackPresses,
   P13n,
@@ -200,7 +193,6 @@ export default {
   NativeStore,
   OffersStore,
   Cta,
-  dynamicFeeObject,
   RTBHelper,
 
   Customer,
@@ -302,5 +294,4 @@ export default {
 
   fonts,
   EMIHelper,
-  CurrencyHelper,
 };

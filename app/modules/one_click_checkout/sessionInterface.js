@@ -59,6 +59,8 @@ import { showSummaryModal } from 'one_click_checkout/summary_modal';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 import { getThemeMeta } from 'checkoutstore/theme';
 
+import * as Confirm from 'checkoutframe/components/confirm';
+
 export const historyExists = () => get(history).length;
 
 /**

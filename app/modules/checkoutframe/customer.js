@@ -20,8 +20,8 @@ import { format } from 'i18n';
 
 import { delayLoginOTPExperiment } from 'card/helper';
 import { timer } from 'utils/timer';
-
-/* global getPhone */
+import { get } from 'svelte/store';
+import { contact } from 'checkoutstore/screens/home';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -229,7 +229,7 @@ Customer.prototype = {
     let user = this;
 
     // TODO: fix this
-    data.contact = this.contact || getCustomer(getPhone()).contact;
+    data.contact = this.contact || getCustomer(get(contact)).contact;
     let url = 'otp/verify';
 
     if (queryParams) {

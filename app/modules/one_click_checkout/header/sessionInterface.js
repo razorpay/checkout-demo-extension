@@ -1,4 +1,5 @@
 import { getSession } from 'sessionmanager';
+import * as Confirm from 'checkoutframe/components/confirm';
 
 // i18n imports
 import {

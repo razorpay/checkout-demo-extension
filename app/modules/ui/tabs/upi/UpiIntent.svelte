@@ -31,9 +31,9 @@
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
   import { Events } from 'analytics';
+  import { definePlatform } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
-  import { definePlatform } from 'upi/helper';
 
   // Props
   export let apps;
