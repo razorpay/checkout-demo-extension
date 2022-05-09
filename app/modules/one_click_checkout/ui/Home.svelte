@@ -14,6 +14,7 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
+  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constants import
   import routes from 'one_click_checkout/routing/routes';
@@ -23,13 +24,14 @@
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
   import { destroyHeader } from 'one_click_checkout/header';
   import { destroyTopbar } from 'one_click_checkout/topbar';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
   // svelte imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
-  import { Events } from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -63,6 +65,9 @@
 
   onMount(() => {
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
+    Analytics.setMeta('initial_loggedIn', isUserLoggedIn());
+    Analytics.setMeta('initial_hasSavedAddress', !!$savedAddresses?.length);
+
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,
