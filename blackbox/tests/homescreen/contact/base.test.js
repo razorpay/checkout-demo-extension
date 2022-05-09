@@ -7,4 +7,5 @@ const createContactTest = require('../../../create/one-click-checkout/contact');
 createContactTest({
   amount: 200 * 100,
   editFromHome: true,
+  skip: true,
 });
