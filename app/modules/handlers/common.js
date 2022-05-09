@@ -20,7 +20,7 @@ function addSubtextToActionArea(subText, parent) {
 
   const newSubText = document.createElement('div');
   newSubText.style = `white-space: normal;padding: 0px 20px 10px 20px;line-height: 22px;font-size:12px`;
-  newSubText.innerHTML = subText;
+  newSubText.textContent = subText;
   // use the text converted to lowercase with space replaced by `-` as id
   newSubText.setAttribute('id', subTextId);
   parent.appendChild(newSubText);
@@ -57,7 +57,7 @@ function updateButton(
     'id',
     `fd-${label.toLocaleLowerCase().replace(/ /g, '-')}`
   );
-  newButton.innerHTML = label;
+  newButton.textContent = label;
 
   parent.appendChild(newButton);
 }

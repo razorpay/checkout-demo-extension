@@ -165,7 +165,7 @@ function getValue(obj, prop) {
 
   let i = -1;
   while (obj && ++i < len) {
-    obj = obj[segs[i]];
+    obj = _Obj.getOwnProp(obj, segs[i]);
   }
 
   return obj;
