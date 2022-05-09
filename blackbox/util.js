@@ -262,7 +262,8 @@ const util = (module.exports = {
         url.startsWith(lumerjackVajraURL) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes('html2pdf.bundle.js') ||
-        url.includes('locations/autosuggest');
+        url.includes('locations/autosuggest') ||
+        url.includes('fonts.googleapis.com');
       if (ignoredUrl || (pattern && !pattern.test(url))) {
         return true;
       }
