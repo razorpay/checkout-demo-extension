@@ -1,4 +1,4 @@
-import { definePlatform } from './upi';
+import { definePlatform } from '../upi';
 import {
   tryOpeningIntentUrlOniOSMWeb,
   upiPopUpForiOSMWeb,

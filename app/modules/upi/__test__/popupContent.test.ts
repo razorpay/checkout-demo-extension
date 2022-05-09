@@ -1,4 +1,4 @@
-import popupContent from 'upi/helper/popupContent';
+import popupContent from 'upi/helper/intent/popupContent';
 
 describe('Popup Content for the iOS Safari deeplink', () => {
   it('should have the passed in the callBackName for events', async () => {
