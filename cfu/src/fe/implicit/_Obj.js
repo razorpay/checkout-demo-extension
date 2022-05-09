@@ -209,7 +209,7 @@ export const unflatten = (o) => {
           _r[k] = {};
         }
 
-        _r = _r[k];
+        _r = getOwnProp(_r, k);
       } else {
         _r[k] = val;
       }

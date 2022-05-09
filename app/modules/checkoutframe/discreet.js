@@ -2,7 +2,7 @@ import $ from 'lib/$';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import { processIntentOnMWeb } from 'upi/helper/payment';
+import { processIntentOnMWeb } from 'upi/payment';
 import { avoidSessionSubmit } from 'upi/helper';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';

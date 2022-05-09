@@ -4766,6 +4766,9 @@ Session.prototype = {
         !isOnNVSForm &&
         discreet.isInternationalInPreferredInstrument(selectedInstrument)
       ) {
+        discreet.InternationalStores.updateSelectedProvider(
+          selectedInstrument.providers[0]
+        );
         NVSRequired = NVSEntities[selectedInstrument.providers[0]];
         this.switchTab('international', {
           directlyToNVS: NVSRequired,
@@ -5500,10 +5503,10 @@ Session.prototype = {
          */
 
         if (NVSRequired && NVSFormData) {
-          if (NVSFormData._country) {
+          if (NVSFormData.countryCode) {
             // onretry we already updated the payload
-            NVSFormData.country = NVSFormData._country;
-            delete NVSFormData._country;
+            NVSFormData.country = NVSFormData.countryCode;
+            delete NVSFormData.countryCode;
           }
           data.billing_address = NVSFormData;
           Analytics.track('card:nvsformdata', {

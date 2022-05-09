@@ -1,10 +1,10 @@
-import { tryOpeningIntentUrl } from '../helper/intentResolver';
-import { tryOpeningIntentUrlOniOSMWeb } from '../helper/upiOniOSMWeb';
+import { tryOpeningIntentUrl } from '../helper/intent/resolver';
+import { tryOpeningIntentUrlOniOSMWeb } from '../helper/intent/upiOniOSMWeb';
 jest.mock('checkoutstore', () => ({
   getMerchantKey: () => '',
 }));
 
-jest.mock('../helper/upiOniOSMWeb', () => ({
+jest.mock('../helper/intent/upiOniOSMWeb', () => ({
   tryOpeningIntentUrlOniOSMWeb: jest.fn(),
   upiPopUpForiOSMWeb: {
     instance: null,

@@ -10,7 +10,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { definePlatformReturnMethodIdentifier } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
-  import { handleUPIPayments } from 'upi/helper/payment';
+  import { handleUPIPayments } from 'upi/payment';
   import { AppTile } from '../AppTile';
   import {
     storeActionForTracker,
@@ -56,7 +56,9 @@
       if (app && app.shortcode === OTHER_INTENT_APPS.shortcode) {
         trackOtherSelection(variant);
       }
-      onOtherClick();
+      if (onOtherClick) {
+        onOtherClick();
+      }
     } else {
       const appForPay: UPI.UpiAppForPay = {
         app,
