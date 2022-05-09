@@ -1,4 +1,5 @@
-const { delay } = require('../../util');
+const { delay, assertVisible } = require('../../util');
+const { getDataAttrSelector, formatTextToNumber } = require('./common');
 
 function getCouponResponse(isValidCoupon, discountAmount, personalised) {
   if (personalised) {
@@ -30,16 +31,21 @@ function getCouponResponse(isValidCoupon, discountAmount, personalised) {
 }
 
 async function applyCoupon(context, code = 'WELCOME10') {
-  await context.page.waitForSelector('#coupon-input');
+  await context.page.waitForSelector('.coupon-input-container');
   await context.page.type('#coupon-input', code);
   await context.page.click('.coupon-apply-btn');
 }
 
-async function applyAvailableCoupon(context) {
-  await context.page.waitForSelector('.coupons-available-container');
-  await context.page.click('.coupons-available-container');
-  await context.page.waitForSelector('.available-coupons-container');
-  await context.page.click('button.theme-highlight');
+async function applyAvailableCoupon(context, couponCode) {
+  const applyCta = await getDataAttrSelector(context, `coupon-${couponCode}`);
+  await applyCta.click();
+}
+
+async function handleCouponView(context) {
+  const goToCouponsCta = await context.page.waitForSelector(
+    '#coupons-available-container'
+  );
+  await goToCouponsCta.click();
 }
 
 async function handleApplyCouponReq(
@@ -59,23 +65,30 @@ async function handleApplyCouponReq(
 }
 
 async function getOrderSummary(context, isValidCoupon) {
-  const orderInfo = await context.page.$eval(
-    '.coupon-order-summary',
+  const orderSummaryEle = await getDataAttrSelector(context, 'order-summary');
+
+  const orderInfo = await context.page.evaluate(
     (element, isValidCoupon) => {
-      const priceEle = element.getElementsByClassName('row')[0];
-      const price = priceEle.getElementsByTagName('p')[1].innerText;
+      const cartAmount = element.querySelector(
+        '[data-test-id=cart-amount]'
+      ).innerText;
       if (isValidCoupon) {
-        const couponEle = element.getElementsByClassName('row')[1];
-        const discountPrice = couponEle.getElementsByTagName('p')[1].innerText;
-        const totalEle = element.getElementsByClassName('row')[2];
-        const total = totalEle.getElementsByTagName('p')[1].innerText;
-        return { price, discountPrice, total };
+        const totalAmount = element.querySelector(
+          '[data-test-id=total-amount]'
+        ).innerText;
+        const discountAmount = element.querySelector(
+          '[data-test-id=discount-amount]'
+        ).innerText;
+        return {
+          cartAmount,
+          discountAmount,
+          totalAmount,
+        };
       } else {
-        const totalEle = element.getElementsByClassName('row')[1];
-        const total = totalEle.getElementsByTagName('p')[1].innerText;
-        return { price, total };
+        return { cartAmount };
       }
     },
+    orderSummaryEle,
     isValidCoupon
   );
 
@@ -85,34 +98,35 @@ async function getOrderSummary(context, isValidCoupon) {
 async function verifyValidCoupon(context, features) {
   const { amount, discountAmount, availableCoupons, couponCode } = features;
   if (availableCoupons) {
-    applyAvailableCoupon(context);
+    applyAvailableCoupon(context, couponCode);
   } else {
     applyCoupon(context, couponCode);
   }
   await delay(200);
   handleApplyCouponReq(context, true, discountAmount);
-  await context.page.waitForSelector('#success-message');
-  expect(
-    await context.page.$eval('#success-message', (el) => el.innerText)
-  ).toEqual('Coupon applied');
-  const { price, discountPrice, total } = await getOrderSummary(context, true);
-  expect(price).toEqual(`₹ ${amount / 100}`);
-  expect(discountPrice).toEqual(`₹ ${discountAmount / 100}`);
+  const {
+    cartAmount,
+    discountAmount: _discountAmount,
+    totalAmount,
+  } = await getOrderSummary(context, true);
+  expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+  expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
   const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
-  expect(total).toEqual(`₹ ${calcTotalAmount}`);
+  expect(formatTextToNumber(totalAmount)).toEqual(calcTotalAmount);
 }
 
 async function verifyInValidCoupon(context, amount) {
   applyCoupon(context);
   await delay(200);
   handleApplyCouponReq(context);
-  await context.page.waitForSelector('#error-feedback');
-  expect(
-    await context.page.$eval('#error-feedback', (el) => el.innerText)
-  ).toEqual('Coupon code is not valid');
-  const { price, total } = await getOrderSummary(context);
-  expect(price).toEqual(`₹ ${amount / 100}`);
-  expect(total).toEqual(`₹ ${amount / 100}`);
+  await context.page.waitForSelector('[data-test-id=error-feedback]');
+  await assertVisible('[data-test-id=error-feedback]');
+  await delay(400);
+  await context.page.waitForSelector('.back');
+  await context.page.click('.back');
+  await delay(200);
+  const { cartAmount } = await getOrderSummary(context);
+  expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
 }
 
 async function handleAvailableCouponReq(context, availableCoupons = []) {
@@ -123,6 +137,7 @@ async function handleAvailableCouponReq(context, availableCoupons = []) {
 }
 
 async function handleRemoveCouponReq(context) {
+  await context.getRequest('coupon/remove');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('coupon/remove');
@@ -130,17 +145,17 @@ async function handleRemoveCouponReq(context) {
 }
 
 async function removeCoupon(context) {
-  await context.page.waitForSelector('.coupon-input-group');
-  await context.page.click('.close-button');
+  await context.page.waitForSelector('.coupon-remove-text');
+  await context.page.click('.coupon-remove-text');
 }
 
 async function handleRemoveCoupon(context, amount) {
+  await delay(600);
   removeCoupon(context);
-  await delay(200);
   handleRemoveCouponReq(context);
-  const { price, total } = await getOrderSummary(context);
-  expect(price).toEqual(`₹ ${amount / 100}`);
-  expect(total).toEqual(`₹ ${amount / 100}`);
+  await delay(200);
+  const { cartAmount } = await getOrderSummary(context);
+  expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
 }
 
 async function handleFillUserDetails(context, contact, email) {
@@ -158,4 +173,5 @@ module.exports = {
   applyCoupon,
   handleApplyCouponReq,
   handleFillUserDetails,
+  handleCouponView,
 };

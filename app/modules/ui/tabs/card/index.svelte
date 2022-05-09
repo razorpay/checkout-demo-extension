@@ -17,6 +17,7 @@
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   // Store
   import {
@@ -41,6 +42,7 @@
     defaultDCCCurrency,
     cardCountry,
     showSavedCardTooltip,
+    cardScreenScrollable,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -58,6 +60,7 @@
     isRecurring,
     getCardFeatures,
     isDynamicFeeBearer,
+    isOneClickCheckout,
     isPartialPayment,
     hasFeature,
     isInternational,
@@ -94,7 +97,12 @@
     AVS_INFO_MESSAGE_1,
     AVS_INFO_MESSAGE_2,
     AVS_INFO_MESSAGE_3,
+    CARDS_SAVED_LABEL_ONE_CC,
   } from 'ui/labels/card';
+  import {
+    PAY_NOW_CTA_LABEL,
+    SELECT_EMI_PLAN_LABEL,
+  } from 'one_click_checkout/cta/i18n';
 
   import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
 
@@ -121,10 +129,10 @@
     injectSiftScript,
     injectCyberSourceScript,
   } from 'common/card';
-
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
+  import { isUnscrollable } from 'one_click_checkout/helper';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -149,13 +157,14 @@
   import { getThemeMeta } from 'checkoutstore/theme';
 
   let delayOTPExperiment;
-
+  let cardEle;
   $: {
     delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
   }
 
   const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
+  const isOneCCEnabled = isOneClickCheckout();
 
   const session = getSession();
   const themeMeta = getThemeMeta();
@@ -190,6 +199,7 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+  let renderCtaOneCC = false;
 
   $: showTnC = shouldShowTnc($defaultDCCCurrency, $cardCountry);
 
@@ -958,16 +968,27 @@
     Events.TrackBehav(eventName, eventData);
   }
 
+  function isScreenScrollable() {
+    $cardScreenScrollable = isUnscrollable(cardEle?.parentNode);
+  }
+
   export function onShown() {
     //#region cards-tokenization
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
+    setTimeout(isScreenScrollable, 0);
+    renderCtaOneCC = true;
     $selectedCard = null;
     //#endregion
     tab = session.tab;
     onCardInput();
   }
+
+  export function onHide() {
+    renderCtaOneCC = false;
+  }
+
   function isDowntime(instrument, value) {
     const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
     if (currentDowntime) {
@@ -987,9 +1008,6 @@
   }
 
   export function setTabVisible(status = true) {
-    if (currentView === Views.SAVED_CARDS && status) {
-      Analytics.track(SAVED_CARD_EVENTS.SCREEN_LOAD);
-    }
     tabVisible = status;
   }
 
@@ -1000,11 +1018,28 @@
   function toggleAppListOnSavedCard() {
     appsListExpandedOnSavedCard = !appsListExpandedOnSavedCard;
   }
+
+  $: {
+    if (tabVisible) {
+      if (currentView === Views.ADD_CARD) {
+        Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
+      } else if (
+        currentView === Views.SAVED_CARDS &&
+        isSavedCardsEnabled &&
+        savedCards.length
+      ) {
+        Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
+      }
+    }
+  }
 </script>
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div>
+    <div
+      bind:this={cardEle}
+      class:screen-one-cc={isOneCCEnabled && $cardScreenScrollable}
+    >
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta && !delayOTPExperiment}
@@ -1068,6 +1103,8 @@
             {downtimeInstrument}
             {delayOTPExperiment}
             {isCardSupportedForRecurring}
+            {cardEle}
+            {isScreenScrollable}
           />
           {#if showEmiCta}
             <EmiActions
@@ -1134,7 +1171,13 @@
           {/if}
 
           <!-- LABEL: Your saved cards -->
-          <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
+          <h3 class:saved-card-header={isOneCCEnabled} class="pad">
+            {$t(
+              isOneCCEnabled
+                ? CARDS_SAVED_LABEL_ONE_CC
+                : CARDS_SAVED_ON_RZP_LABEL
+            )}
+          </h3>
           <div id="saved-cards-container">
             <SavedCards
               {tab}
@@ -1217,6 +1260,13 @@
         </Callout>
       {/if}
     </Bottom>
+    {#if renderCtaOneCC}
+      <CTAOneCC on:click={() => session.preSubmit()}>
+        {session.emiPlansForNewCard
+          ? $t(SELECT_EMI_PLAN_LABEL)
+          : $t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 
@@ -1270,6 +1320,17 @@
   }
 
   .apps-heading-container {
+    margin-top: 26px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
+  }
+
+  .saved-card-header {
+    font-weight: 400;
+    font-size: 14px;
+    color: #263a4a;
+    text-transform: none;
     margin-top: 26px;
   }
 </style>

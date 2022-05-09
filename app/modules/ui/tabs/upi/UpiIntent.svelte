@@ -16,6 +16,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
   import { getMiscIcon } from 'checkoutframe/icons';
 
@@ -29,9 +30,9 @@
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
+  import { Events } from 'analytics';
   import { definePlatform } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
-  import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
@@ -122,6 +123,7 @@
 
   onMount(() => {
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
+    Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
   });
 </script>
 

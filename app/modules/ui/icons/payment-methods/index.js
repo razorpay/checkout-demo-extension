@@ -29,9 +29,25 @@ import internationalIcon from './international';
 import close from 'one_click_checkout/coupons/icons/close';
 import offers from 'one_click_checkout/coupons/icons/offers';
 import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
+import circle_arrow_next from 'one_click_checkout/coupons/icons/circle_arrow_next';
+import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
+import order from 'one_click_checkout/coupons/icons/order';
 import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
+import location from 'one_click_checkout/address/icons/location';
+import addSquare from 'one_click_checkout/address/icons/add_square';
+import kebabMenu from 'one_click_checkout/address/icons/kebab_menu';
 import savedCard from 'card/icons/saved-card';
 import edit_phone from 'ui/icons/payment-methods/edit_phone';
+import info from 'ui/icons/payment-methods/info';
+import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
+import double_arrow from 'one_click_checkout/topbar/icons/double_arrow';
+import rzp_brand_logo from 'one_click_checkout/account_modal/icons/rzp_brand_logo';
+import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
+import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+import edit_paper from 'ui/icons/payment-methods/edit_paper';
+import user from 'one_click_checkout/contact_widget/icons/user';
+import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
+import solid_down_arrow from 'one_click_checkout/address/icons/solid_down_arrow';
 import { AVAILABLE_METHODS } from 'common/constants';
 
 /**
@@ -60,6 +76,23 @@ const availIconNames = [...AVAILABLE_METHODS].concat([
   'saved_card',
   'rzp_logo',
   'edit_phone',
+  'info',
+  'back_arrow',
+  'double_arrow',
+  'rzp_brand_logo',
+  'circle_check',
+  'rtb_close',
+  'circle_arrow_next',
+  'arrow_down',
+  'order',
+  'edit_paper',
+  'location',
+  'add_square',
+  'kebab_menu',
+  'info',
+  'user',
+  'caret_circle_right',
+  'solid_down_arrow',
 ]);
 
 function getIconFn(iconName) {
@@ -115,11 +148,13 @@ function getIconFn(iconName) {
 
     case 'present':
       return present;
+
     case 'trusted_badge':
       return trustedBadge;
 
     case 'tick_filled_donate':
       return tickFilledDonate;
+
     case 'warning':
       return warning;
 
@@ -156,18 +191,71 @@ function getIconFn(iconName) {
     case 'arrow_next':
       return arrow_next;
 
+    case 'circle_arrow_next':
+      return circle_arrow_next;
+
+    case 'order':
+      return order;
+
+    case 'arrow_down':
+      return arrow_down;
+
     case 'saved_card':
       return savedCard;
+
     case 'rzp_logo':
       return rzpLogo;
+
     case 'edit_phone':
       return edit_phone;
+
+    case 'info':
+      return info;
 
     case 'international':
       return internationalIcon;
 
+    case 'back_arrow':
+      return back_arrow;
+
+    case 'double_arrow':
+      return double_arrow;
+
+    case 'rzp_brand_logo':
+      return rzp_brand_logo;
+
+    case 'circle_check':
+      return circle_check;
+
+    case 'rtb_close':
+      return rtb_close;
+
+    case 'edit_paper':
+      return edit_paper;
+
+    case 'location':
+      return location;
+
+    case 'add_square':
+      return addSquare;
+
+    case 'kebab_menu':
+      return kebabMenu;
+
+    case 'info':
+      return info;
+
+    case 'user':
+      return user;
+
+    case 'caret_circle_right':
+      return caret_circle_right;
+
     case 'offline_challan':
       return offlineChallan;
+
+    case 'solid_down_arrow':
+      return solid_down_arrow;
   }
 }
 

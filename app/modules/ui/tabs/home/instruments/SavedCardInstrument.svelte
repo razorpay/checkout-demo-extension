@@ -1,6 +1,5 @@
 <script>
   // UI imports
-  import { onMount, tick, createEventDispatcher } from 'svelte';
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
@@ -38,6 +37,10 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
+
+  // Other Imports
+  import { isOneClickCheckout } from 'razorpay';
+
   let downtimeSeverity;
   let downtimeInstrument = '';
   let cvvRef;
@@ -49,6 +52,8 @@
   const session = getSession();
   const themeMeta = getThemeMeta();
   const isEmiInstrument = instrument.method === 'emi';
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   function getIcon(card) {
     if (card && card.network && card.network !== 'unknown') {
@@ -150,6 +155,21 @@
       });
     }
   }
+
+  let additionalCvvProps = {
+    placeholder: 'CVV',
+    label: '',
+  };
+  if (isOneClickCheckoutEnabled) {
+    additionalCvvProps = {
+      placeholder: '',
+      label: 'CVV',
+      labelClasses: 'cvv-one-cc-label-prefered-block',
+      elemClasses: 'cvv-one-cc-wrapper-prefered-block',
+      inputFieldClasses: 'cvv-one-cc-prefered-block',
+      labelUpperClasses: 'cvv-one-cc-label-upper-prefered-block',
+    };
+  }
 </script>
 
 <svelte:component
@@ -183,13 +203,13 @@
       <Field
         type="cvv"
         name="cvv"
-        placeholder="CVV"
         maxlength={cvvLength}
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }}
         bind:this={cvvRef}
         handleBlur={true}
+        {...additionalCvvProps}
       />
     {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>

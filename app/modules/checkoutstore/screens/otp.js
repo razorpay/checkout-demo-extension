@@ -21,3 +21,9 @@ export const errorMessage = writable('');
 export const digits = writable([]);
 export const disableCTA = writable(false);
 export const ctaLabel = writable('');
+export const tabLogo = writable('');
+export const renderCtaOneCC = writable(true);
+export const isRazorpayOTP = writable(false);
+
+export const showCtaOneCC = writable(false);
+export const ctaOneCCDisabled = writable(false);

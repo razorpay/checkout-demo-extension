@@ -15,11 +15,12 @@
   //Util imports
   import { getSession } from 'sessionmanager';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getAmount } from 'razorpay';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, getAmount, isOneClickCheckout } from 'razorpay';
 
   const session = getSession();
   const DYNAMIC_FEE_BEARER_VIEW_TIME = 6000;
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
 
   let label;
   let showFeeDetails = false;
@@ -82,7 +83,13 @@
           <div class="dynamic-fee-breakup-block">
             <div class="dynamic-fee-breakup">
               <span>Amount</span>
-              <span>{formatAmountWithSymbol(getAmount(), getCurrency())}</span>
+              <span
+                >{formatAmountWithSymbol(
+                  getAmount(),
+                  getCurrency(),
+                  spaceAmoutWithSymbol
+                )}</span
+              >
             </div>
             <div class="dynamic-fee-breakup">
               <span
@@ -93,7 +100,8 @@
               <span
                 >{formatAmountWithSymbol(
                   $dynamicFeeObject['convenience_fee'],
-                  getCurrency()
+                  getCurrency(),
+                  spaceAmoutWithSymbol
                 )}</span
               >
             </div>

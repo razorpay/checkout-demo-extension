@@ -268,6 +268,24 @@ function post(opts) {
 }
 
 /**
+ * Sends put request with the given options.
+ * @param {Object} opts
+ *
+ * @returns {Object}
+ */
+function put(opts) {
+  opts.method = 'put';
+  if (!opts.headers) {
+    opts.headers = {};
+  }
+  if (!opts.headers['Content-type']) {
+    opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
+  }
+
+  return fetch(opts);
+}
+
+/**
  * Sends patch request with the given options.
  * @param {Object} opts
  *
@@ -365,6 +383,7 @@ function jsonp(options) {
 
 fetch.post = post;
 fetch.patch = patch;
+fetch.put = put;
 fetch.setSessionId = setSessionId;
 fetch.setTrackId = setTrackId;
 fetch.setKeylessHeader = setKeylessHeader;

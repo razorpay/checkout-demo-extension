@@ -57,6 +57,7 @@ export const contact = derived([country, phone], ([$country, $phone]) => {
   }
 });
 
+export const prevContact = writable({});
 export const proxyCountry = writable('');
 export const proxyPhone = writable('');
 export const proxyContact = derived(

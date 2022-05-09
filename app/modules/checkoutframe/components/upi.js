@@ -4,6 +4,8 @@ import Analytics from 'analytics';
 
 import { getSession } from 'sessionmanager';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'upi/constants';
+import { METHODS } from 'checkoutframe/constants';
+
 import {
   isWebPaymentsApiAvailable,
   checkWebPaymentsForApp,
@@ -52,12 +54,17 @@ export function checkForPossibleWebPaymentsForUpi() {
 }
 
 export function render(props = {}) {
+  const session = getSession();
   const upiTab = new UpiTab({
     target: querySelector('#form-fields'),
     props,
   });
   setView(UPI_KEY, upiTab);
-  getSession()[UPI_KEY] = upiTab;
+  session[UPI_KEY] = upiTab;
+  session.tabs = {
+    ...getSession().tabs,
+    [METHODS.UPI]: upiTab,
+  };
   upiTab.onShown();
   return upiTab;
 }

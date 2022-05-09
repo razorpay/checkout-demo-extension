@@ -16,7 +16,7 @@
   let icon;
   let foregroundColor = defaultForegroundColor;
   $: foregroundColor = selected
-    ? getTheme().foregroundColor
+    ? getTheme().highlightColor
     : defaultForegroundColor;
   $: icon = iconMap[label](foregroundColor, backgroundColor);
 </script>

@@ -1,6 +1,8 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  import { isOneClickCheckout } from 'razorpay';
+
   // i18n
   import { t } from 'svelte-i18n';
   import { NAME_LABEL, NAME_HELP } from 'ui/labels/card';
@@ -11,14 +13,23 @@
   export let name;
   export let readonly = false;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   const NAME_PATTERN = "^[a-zA-Z. 0-9'-]{1,100}$";
+
+  let helpTextToDisplay;
 
   function handleInput(event) {
     value = event.target.value;
   }
 
   export function isValid() {
-    return value !== '';
+    const result = Boolean(value !== '');
+    helpTextToDisplay = result ? undefined : $t(NAME_HELP);
+    return result;
   }
 </script>
 
@@ -40,4 +51,9 @@
   handleFocus
   handleInput
   {readonly}
+  {elemClasses}
+  {inputFieldClasses}
+  {labelClasses}
+  {labelUpperClasses}
+  validationText={isOneClickCheckout() && helpTextToDisplay}
 />

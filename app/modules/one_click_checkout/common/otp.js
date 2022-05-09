@@ -8,7 +8,7 @@ import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
-import otpEvents from 'ui/tabs/otp/analytics';
+import otpEvents from 'one_click_checkout/otp/analytics';
 import { Events } from 'analytics';
 import {
   mergeObjOnKey,
@@ -16,6 +16,7 @@ import {
 } from 'one_click_checkout/common/utils';
 import { INVALID_OTP_LABEL } from 'ui/labels/otp';
 import {
+  otpReasons,
   OTP_TEMPLATES,
   RESEND_OTP_INTERVAL,
 } from 'one_click_checkout/otp/constants';
@@ -25,6 +26,7 @@ import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
+import { submitAttemptIndex } from 'one_click_checkout/otp/store';
 
 let customer;
 
@@ -39,7 +41,8 @@ export const askForOTP = (otp_reason) => {
   routesConfig[views.OTP].props = {
     ...routesConfig[views.OTP].props,
     ...navigator.currentActiveRoute.otpProps,
-    otpReason: OTP_TEMPLATES[otp_reason],
+    otpReason: otpReasons[otp_reason],
+    smsTemplate: OTP_TEMPLATES[otp_reason],
   };
 
   routesConfig[views.OTP].otpParams = {
@@ -70,8 +73,8 @@ export const askForOTP = (otp_reason) => {
   });
 
   updateOTPStore(otpParams.loading);
-  Events.Track(otpEvents.OTP_LOAD, {
-    otp_skip_visible: get(OtpScreenStore.allowSkip),
+  Events.TrackRender(otpEvents.OTP_LOAD, {
+    is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
     otp_reason,
   });
   createOTP(() => {
@@ -105,6 +108,7 @@ const postSubmit = (msg, data) => {
     if (data && data.addresses) {
       setSavedAddresses(data.addresses);
     }
+    updateOTPStore({ renderCtaOneCC: false });
     screensHistory.config.otp.props.successHandler(data);
   }
 };
@@ -145,7 +149,11 @@ export const submitOTP = () => {
 
   updateOTPStore(verifying);
   customer.submitOTP(submitPayload, postSubmit);
-  Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK, { otpReason });
+  submitAttemptIndex.set(get(submitAttemptIndex) + 1);
+  Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK, {
+    otp_reason: otpReason,
+    submit_attempt_index: get(submitAttemptIndex),
+  });
 };
 
 /**
@@ -154,7 +162,7 @@ export const submitOTP = () => {
 export const handleBack = () => {
   const routesConfig = screensHistory.config;
   const { otpReason } = routesConfig[views.OTP].props;
-  Events.TrackBehav(otpEvents.OTP_BACK_CLICK, { otpReason });
+  Events.TrackBehav(otpEvents.OTP_BACK_CLICK, { otp_reason: otpReason });
   updateOTPStore({
     mode: '',
     resendTimeout: null,

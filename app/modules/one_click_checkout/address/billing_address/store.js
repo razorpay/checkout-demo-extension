@@ -1,11 +1,11 @@
 // Svelte store for address
 import { writable, derived } from 'svelte/store';
-import { INITIAL_ADDRESS } from 'one_click_checkout/address/constants';
+import { INITIAL_BILLING_ADDRESS } from 'one_click_checkout/address/constants';
 import { savedAddresses } from 'one_click_checkout/address/store';
 
 export const selectedAddressId = writable('');
 
-export const newUserAddress = writable(INITIAL_ADDRESS);
+export const newUserAddress = writable(INITIAL_BILLING_ADDRESS);
 
 export const addressCompleted = writable(false);
 
@@ -27,11 +27,9 @@ export const selectedAddress = derived(
 
 export const shouldSaveAddress = writable(null);
 
-export const resetNewBillingAddress = () => newUserAddress.set(INITIAL_ADDRESS);
-
 export const updateNewBillingAddress = (address) => newUserAddress.set(address);
 
 export function resetAddress() {
   selectedAddressId.set(null);
-  newUserAddress.set(INITIAL_ADDRESS);
+  newUserAddress.set(INITIAL_BILLING_ADDRESS);
 }

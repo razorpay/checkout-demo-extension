@@ -9,11 +9,15 @@
     isWalletPayment,
   } from 'one_click_checkout/otp/sessionInterface';
   import { Safari } from 'common/useragent';
+  import { afterUpdate } from 'svelte';
 
   export let hidden;
+  export let isError;
+  export let onBlur;
 
   let otpContainer;
-  let autoCompleteMethod = 'off';
+  let focused = false;
+  let autoCompleteMethod = 'new-otp'; // random string for browser to ignore autocomplete
 
   if (Safari) {
     autoCompleteMethod = 'one-time-code';
@@ -47,14 +51,27 @@
    * @param index {number} index of input which fired the event
    */
   function onOtpDigitInput(e, index) {
+    // If user is trying to override the existing value
+    if (e?.target?.value && e?.data) {
+      $digits[index] = e.data;
+    }
+
+    // If user is pasting from keyboard suggestion
+    if (e?.data?.length > 1) {
+      const input = e.data.split('');
+      for (const [i, digit] of input.entries()) {
+        $digits[i] = digit;
+      }
+      otpContainer.children[input.length - 1].focus();
+    } else if (e.target.value && index < $digits.length - 1) {
+      otpContainer.children[index + 1].focus();
+    }
+
     const otp = $digits.join('');
     if (otp.length === $digits.length) {
       disableCTA.set(false);
     } else {
       disableCTA.set(true);
-    }
-    if (e.target.value && index < $digits.length - 1) {
-      otpContainer.children[index + 1].focus();
     }
   }
 
@@ -103,9 +120,15 @@
     onOtpDigitInput(e, nextActiveInput);
     otpContainer.children[nextActiveInput].focus();
   }
+
+  afterUpdate(() => {
+    if (otpContainer && !focused && otpContainer.children.length) {
+      otpContainer.children[0].focus();
+      focused = true;
+    }
+  });
 </script>
 
-<!-- TODO: Figure out autofill. -->
 <div class="otp-container" bind:this={otpContainer} class:hidden id="otp-input">
   {#each $digits as _, i}
     <input
@@ -114,15 +137,16 @@
       name="otp"
       type="tel"
       pattern="[0-9]"
-      class="otp-input"
+      class="otp-input theme-border"
       class:otp-input-small={$digits.length > 6}
-      maxlength="1"
       bind:value={$digits[i]}
       on:focus={() => trackInput(i)}
       on:input={(e) => onOtpDigitInput(e, i)}
       on:keydown={(e) => onOtpDigitKeyDown(e, i)}
-      autocomplete={i === 0 && autoCompleteMethod}
+      autocomplete={autoCompleteMethod}
       on:paste={otpPaste}
+      class:otp-error={isError}
+      on:blur={onBlur}
     />
   {/each}
 </div>
@@ -134,18 +158,24 @@
   }
 
   .otp-input {
-    width: 28px;
-    font-size: 18px;
-    line-height: 24px;
-    padding: 11px 4px;
-    margin: 0px 8px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+    width: 44px;
+    font-size: 16px;
+    padding: 14px 4px;
+    margin: 0px 5px;
+    border: 1px solid;
+    box-shadow: 0px 4px 4px rgba(166, 158, 158, 0.08);
+    border-radius: 5px;
+    box-sizing: border-box;
     text-align: center;
+  }
+
+  #otp-input .otp-error {
+    border-color: #b21528;
   }
 
   .otp-input-small {
     width: 18px;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 21px;
     padding: 8px 4px;
   }

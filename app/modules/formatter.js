@@ -3,6 +3,7 @@ import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
 import { preventEvent } from 'utils/doc';
+import { truncateString } from 'utils/strings';
 
 const alphanumericRaw = function (value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');

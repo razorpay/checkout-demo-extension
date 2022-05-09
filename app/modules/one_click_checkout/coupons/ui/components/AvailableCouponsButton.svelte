@@ -1,46 +1,118 @@
 <script>
-  import { availableCoupons } from 'one_click_checkout/coupons/store';
-
-  import { AVAILABLE_COUPONS_LABEL } from 'one_click_checkout/coupons/i18n/labels';
-  import { t } from 'svelte-i18n';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
-  import { showAvailableCoupons } from 'one_click_checkout/coupons/sessionInterface';
+  // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
+
+  // store imports
+  import {
+    appliedCoupon,
+    availableCoupons,
+  } from 'one_click_checkout/coupons/store';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import {
+    HAVE_COUPON_LABEL,
+    REMOVE_LABEL,
+    AVAILABLE_LABEL,
+    APPLIED_LABEL,
+  } from 'one_click_checkout/coupons/i18n/labels';
+
+  // analytics imports
+  import { Events } from 'analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+
+  // constant imports
+  import { views } from 'one_click_checkout/routing/constants';
+
+  // utils imports
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
   export let applyCoupon;
   export let removeCoupon;
 
-  const { offers, arrow_next } = getIcons();
+  const { offers, circle_arrow_next } = getIcons();
+  const showAvailableCoupons = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_COUPON_CLICKED);
+    navigator.navigateTo({ path: views.COUPONS_LIST });
+  };
+  const handleRemoveCoupon = () => {
+    Events.TrackBehav(CouponEvents.SUMMARY_COUPON_REMOVE_CLICKED);
+    removeCoupon();
+  };
 </script>
 
-{#if $availableCoupons.length}
-  <button
-    id="coupons-available-container"
-    class="coupons-available-container"
-    on:click|preventDefault={() => {
-      showAvailableCoupons({
-        onApply: applyCoupon,
-        onRemove: removeCoupon,
-      });
-    }}
-  >
-    <Icon icon={offers} />
+<div
+  id="coupons-available-container"
+  class:apply={!$appliedCoupon}
+  on:click|preventDefault={!$appliedCoupon && showAvailableCoupons}
+>
+  <Icon icon={offers} />
+  {#if $appliedCoupon}
     <div class="coupons-available-text">
-      {`${$availableCoupons.length} ${$t(AVAILABLE_COUPONS_LABEL)}`}
+      ‘{$appliedCoupon}’ {$t(APPLIED_LABEL)}
+    </div>
+    <span
+      class="coupon-remove-text"
+      on:click|preventDefault={handleRemoveCoupon}
+    >
+      {$t(REMOVE_LABEL)}
+    </span>
+  {:else}
+    <div class="coupons-available-text">
+      {$t(HAVE_COUPON_LABEL)}
+      {#if $availableCoupons.length}
+        <span class="coupons-available-count">
+          ({$availableCoupons.length}
+          {$t(AVAILABLE_LABEL)})
+        </span>
+      {/if}
     </div>
     <span class="coupon-arrow-next">
-      <Icon icon={arrow_next} />
+      <Icon icon={circle_arrow_next} />
     </span>
-  </button>
-{/if}
+  {/if}
+</div>
 
 <style>
+  .coupon-remove-text {
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: auto;
+    cursor: pointer;
+  }
+  #coupons-available-container {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
   .coupons-available-text {
     margin-left: 8px;
     font-weight: 600;
   }
 
+  .coupons-available-count {
+    padding-left: 2px;
+    font-weight: 300;
+    color: rgba(51, 51, 51, 0.6);
+  }
   .coupon-arrow-next {
     margin-left: auto;
+    cursor: pointer;
+    padding-top: 2px;
+  }
+  .apply {
+    cursor: pointer;
+  }
+
+  .coupon-remove-next {
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: auto;
+    cursor: pointer;
   }
 </style>

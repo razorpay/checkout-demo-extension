@@ -1,13 +1,14 @@
 // session imports
 import { getSession } from 'sessionmanager';
+
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+
 // store imports
 import { get } from 'svelte/store';
-import { isOneClickCheckout } from 'razorpay';
-import { history } from 'one_click_checkout/routing/store';
+import { history, activeRoute } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,
   isBillingSameAsShipping,
@@ -19,25 +20,46 @@ import {
   newUserAddress,
   showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
-import { isEditContactFlow, isLogoutFlow } from 'one_click_checkout/store';
+import { isEditContactFlow } from 'one_click_checkout/store';
 import {
   selectedAddress as selectedBillingAddress,
   selectedCountryISO as selectedBillingCountryISO,
 } from 'one_click_checkout/address/billing_address/store';
+import { tabTitle } from 'one_click_checkout/topbar/store';
+import { couponListTimer } from 'one_click_checkout/coupons/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import CouponEvents from 'one_click_checkout/coupons/analytics';
+import OneCCEvents from 'one_click_checkout/analytics';
 // service imports
 import {
   updateOrder,
   thirdWatchCodServiceability,
 } from 'one_click_checkout/address/service';
+
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
-
-import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
+import {
+  CLOSE_MODAL_OPTIONS,
+  SCREEN_LIST,
+} from 'one_click_checkout/analytics/constants';
+
+// i18n imports
+import {
+  CONFIRM_CANCEL_HEADING,
+  CONFIRM_CANCEL_MESSAGE,
+} from 'one_click_checkout/misc/i18n/label';
+import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
+
+// utils imports
+import { isOneClickCheckout } from 'razorpay';
+import { showSummaryModal } from 'one_click_checkout/summary_modal';
+import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 import { getThemeMeta } from 'checkoutstore/theme';
+
+import * as Confirm from 'checkoutframe/components/confirm';
 
 export const historyExists = () => get(history).length;
 
@@ -46,12 +68,55 @@ export const historyExists = () => get(history).length;
  */
 export const handleBack = () => {
   const session = getSession();
+  let handleBack = get(activeRoute)?.props?.handleBack;
+
+  if (handleBack) {
+    handleBack();
+  }
+  tabTitle.set('');
   const currHistory = get(history);
-  if (currHistory.length === 1) {
-    session.closeModal();
+  if (get(activeRoute)?.name === views.COUPONS_LIST) {
+    Events.TrackBehav(CouponEvents.COUPON_BACK_BUTTON_CLICKED, {
+      time: get(couponListTimer)(),
+    });
+  }
+  const tab = session.tab;
+  const currentScreen =
+    tab === 'home-1cc' ? get(activeRoute).name : tab || 'methods';
+  Events.TrackBehav(OneCCEvents.BACK_BUTTON_CLICKED, {
+    screen_name: SCREEN_LIST[currentScreen],
+  });
+  if (
+    (!get(activeRoute)?.isBackEnabled && currHistory.length === 1) ||
+    get(activeRoute)?.name === views.COUPONS
+  ) {
+    const locale = getCurrentLocale();
+    Events.TrackBehav(OneCCEvents.CLOSE_MODAL, {
+      screen_name: getCurrentScreen(),
+    });
+    Confirm.show({
+      heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
+      message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
+      onPositiveClick: function () {
+        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+          screen_name: getCurrentScreen(),
+          option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
+        });
+        session.closeModal();
+      },
+      onNegativeClick: function () {
+        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+          screen_name: getCurrentScreen(),
+          option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
+        });
+      },
+    });
     return;
   }
   navigator.navigateBack();
+  if (navigator.currentActiveRoute.name === views.METHODS) {
+    redirectToMethods();
+  }
 };
 
 export function getLandingView() {
@@ -73,7 +138,6 @@ export function handleEditContact(logoutFlow = false) {
   const params = { path: views.DETAILS };
   if (logoutFlow) {
     resetOrder(true);
-    isLogoutFlow.set(true);
     params.initialize = true;
   } else {
     isEditContactFlow.set(true);
@@ -184,7 +248,8 @@ export function redirectToPaymentMethods(
         }
       });
   } else {
-    session.oneClickCheckoutRedirection(showSnackbar);
+    session.oneClickCheckoutRedirection();
+    navigator.navigateTo({ path: views.METHODS });
   }
 }
 

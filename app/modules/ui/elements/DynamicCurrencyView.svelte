@@ -47,7 +47,7 @@
   import { getAmount } from 'razorpay';
   import { getCurrencies } from 'card/helper/dcc';
 
-  import { getCurrency, isPartialPayment } from 'razorpay';
+  import { getCurrency, isPartialPayment, isOneClickCheckout } from 'razorpay';
 
   import { getIin } from 'common/card';
 
@@ -79,6 +79,8 @@
     POLI_PROVIDER: 'poli',
     AVS: 'avs-card',
   };
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
 
   let prop = null;
   let entity = null;
@@ -502,7 +504,11 @@
             {$t(PAY_IN)}
             {selectedCurrency}
             {explicitUI
-              ? `(${formatAmountWithSymbol(dccAmount, selectedCurrency)})`
+              ? `(${formatAmountWithSymbol(
+                  dccAmount,
+                  selectedCurrency,
+                  spaceAmoutWithSymbol
+                )})`
               : ''}
           </div>
         {/if}
@@ -545,7 +551,8 @@
               <span class="small-text">
                 ({formatAmountWithSymbol(
                   currencies[originalCurrency].amount,
-                  originalCurrency
+                  originalCurrency,
+                  spaceAmoutWithSymbol
                 )})
               </span>
             {/if}

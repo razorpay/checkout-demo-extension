@@ -1,5 +1,5 @@
 <script>
-  import { getOption, getOrgDetails } from 'razorpay';
+  import { getOption, getOrgDetails, isOneClickCheckout } from 'razorpay';
   import { onMount } from 'svelte';
   import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';
 
@@ -32,7 +32,11 @@
   }
 </script>
 
-<i id="powered-by" class:branded={customLogo && fontLoaded}>
+<i
+  id="powered-by"
+  class:branded={customLogo && fontLoaded}
+  class:powered-one-cc={isOneClickCheckout()}
+>
   {#if customLogo && fontLoaded}
     {$t(PARTNERSHIP_LABEL)}
     <br />

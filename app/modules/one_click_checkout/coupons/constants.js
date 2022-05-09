@@ -1,4 +1,5 @@
 export const ERROR_USER_NOT_LOGGED_IN = 'LOGIN_REQUIRED';
+export const LOADING_STATUS = 'loading';
 export const OTP_LABELS = {
   loading: {
     headingText: 'none',

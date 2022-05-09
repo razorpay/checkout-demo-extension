@@ -67,6 +67,8 @@ var preferences,
   views = discreet.views,
   CardViews = discreet.CardViews,
   merchantAnalytics = discreet.merchantAnalytics,
+  merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
+  TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -96,6 +98,8 @@ const PayLaterStore = {
   ott: {},
   lenderBranding: {},
 };
+
+var METHODS = discreet.CommonConstants.METHODS;
 
 /**
  * Store for what tab and screen
@@ -491,7 +495,15 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
+function askOTP(
+  view,
+  textView,
+  shouldLimitResend,
+  templateData,
+  headingText,
+  errorMessage,
+  isRazorpayOTP
+) {
   var origText = textView; // ಠ_ಠ
   var qpmap = _.getQueryParams();
   var thisSession = this;
@@ -545,6 +557,8 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
     digits: new Array(storeGetter(discreet.OTPScreenStore.maxlength)),
     otp: '',
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
+    errorMessage: errorMessage,
+    isRazorpayOTP: !!isRazorpayOTP,
   };
 
   if (RazorpayHelper.isASubscription()) {
@@ -567,6 +581,10 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
   }
 
   $('#body').addClass('sub');
+
+  var isOneCC = RazorpayHelper.isOneClickCheckout();
+
+  var isOneCCOtpScreen = isOneCC && isRazorpayOTP && thisSession.tab === 'card';
 
   if (!textView) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
@@ -592,6 +610,7 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
                 '<img class="native-otp-bank" src="' +
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
+              thisSession.setOneCCTabLogo(bankLogo);
             }
 
             view.updateScreen({
@@ -651,18 +670,28 @@ function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
         }
       } else {
         if (thisSession.payload) {
-          textView = 'otp_sent_save_card';
+          textView = isOneCC
+            ? 'otp_sent_save_card_one_cc'
+            : 'otp_sent_save_card';
         } else {
-          textView = 'otp_sent_access_card';
+          textView = isOneCC
+            ? 'otp_sent_access_card_one_cc'
+            : 'otp_sent_access_card';
         }
       }
     } else {
-      textView = 'otp_sent_generic';
+      textView = isOneCC ? 'otp_sent_generic_one_cc' : 'otp_sent_generic';
+    }
+  } else if (isOneCCOtpScreen) {
+    if (thisSession.payload) {
+      textView = 'otp_sent_save_card_one_cc';
+    } else {
+      textView = 'otp_sent_access_card_one_cc';
     }
   }
 
   view.updateScreen({
-    headingText: headingText,
+    headingText: headingText || isOneCCOtpScreen ? 'default_login' : '',
   });
   view.setTextView(textView, templateData);
 }
@@ -1077,6 +1106,7 @@ Session.prototype = {
       this.fillData();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
+      discreet.fonts.loadInterFont();
       this.switchTab('home-1cc');
     }
     this.setEMI();
@@ -1129,16 +1159,22 @@ Session.prototype = {
       });
     }
 
+    let first_screen;
+
+    if (RazorpayHelper.isPayout()) {
+      first_screen = 'payout_instruments_screen';
+    } else if (RazorpayHelper.isOneClickCheckout()) {
+      first_screen = discreet.OneClickCheckoutInterface.getLandingView();
+    } else {
+      first_screen = this.homeTab.getCurrentView();
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: _Obj.extend(
         {
           embedded: this.embedded,
-          meta: {
-            first_screen: RazorpayHelper.isOneClickCheckout()
-              ? discreet.OneClickCheckoutInterface.getLandingView()
-              : this.homeTab.getCurrentView(),
-          },
+          meta: { first_screen },
         },
         discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
@@ -1367,6 +1403,16 @@ Session.prototype = {
       var providerCode = event.detail.code;
       self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
+
+    this.tabs[METHODS.PAYLATER] = this.payLaterView;
+  },
+
+  setOneCCTabLogo: function (logo) {
+    if (RazorpayHelper.isOneClickCheckout()) {
+      this.otpView.updateScreen({
+        tabLogo: logo,
+      });
+    }
   },
 
   setEmiScreen: function () {
@@ -1399,7 +1445,6 @@ Session.prototype = {
       'image',
       CardlessEmi.getImageUrl(providerCode)
     );
-
     if (!plans) {
       this.fetchCardlessEmiPlans();
       return;
@@ -1486,8 +1531,12 @@ Session.prototype = {
 
     var topbarImages = CardlessEmi.getImageUrl(providerCode);
     this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.setOneCCTabLogo(topbarImages);
 
     var locale = I18n.getCurrentLocale();
+    this.otpView.updateScreen({
+      showCtaOneCC: false,
+    });
     this.commenceOTP('cardlessemi_sending', 'cardless_emi_enter', {
       phone: getPhone(),
       provider: I18n.getCardlessEmiProviderName(providerCode, locale),
@@ -1511,6 +1560,8 @@ Session.prototype = {
       });
       self.otpView.updateScreen({
         allowSkip: false,
+        showCtaOneCC: true,
+        ctaOneCCDisabled: false,
       });
     };
 
@@ -1584,6 +1635,7 @@ Session.prototype = {
 
     var topbarImages = PayLater.getImageUrl(providerCode);
     this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.setOneCCTabLogo(topbarImages);
 
     var params = {
       provider: payLaterProviderObj.name,
@@ -1996,6 +2048,9 @@ Session.prototype = {
     });
 
     if (this.headless) {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
       this.commenceOTP('resending_otp');
       this.hideTimer();
 
@@ -2016,6 +2071,9 @@ Session.prototype = {
     } else if (this.tab === 'paylater') {
       this.askPayLaterOtp('resend');
     } else if (isWallet) {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
@@ -2023,7 +2081,15 @@ Session.prototype = {
       this.getCurrentCustomer().createOTP(
         function (message) {
           // TODO: check how message is being consumed. Possible bug.
-          self.askOTP(self.otpView, message, true, { phone: getPhone() });
+          self.askOTP(
+            self.otpView,
+            message,
+            true,
+            { phone: getPhone() },
+            undefined,
+            undefined,
+            true
+          );
           self.updateCustomerInStore();
         },
         null,
@@ -2429,6 +2495,13 @@ Session.prototype = {
   setScreen: function (screen, params) {
     var extraProps = params && params.extraProps;
 
+    // Remove CTA for all cases, if moving away from otp screen
+    if (screen !== 'otp' && this.screen === 'otp') {
+      this.otpView.updateScreen({
+        showCtaOneCC: false,
+      });
+    }
+
     if (screen) {
       var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
@@ -2569,6 +2642,11 @@ Session.prototype = {
       this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
+    } else {
+      var instance = this.getCurrentTabInstance(screen);
+      if (instance && instance.onShown) {
+        instance.onShown();
+      }
     }
 
     return;
@@ -2785,6 +2863,10 @@ Session.prototype = {
     var thisTab = this.tab;
     var self = this;
 
+    if (RazorpayHelper.isOneClickCheckout()) {
+      TopbarMagicCheckoutStore.tabTitle.set('');
+      CardScreenStore.cardScreenScrollable.set(false);
+    }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
     });
@@ -2792,7 +2874,10 @@ Session.prototype = {
     var isNVSFormHomeScreenView = discreet.storeGetter(
       discreet.InternationalStores.isNVSFormHomeScreenView
     );
-
+    if (thisTab === 'home-1cc' || this.screen === 'home-1cc') {
+      discreet.OneClickCheckoutInterface.handleBack();
+      return;
+    }
     if (
       this.screen === 'otp' &&
       thisTab !== 'card' &&
@@ -2816,6 +2901,7 @@ Session.prototype = {
         this.confirmClose().then(function (close) {
           if (close) {
             self.back(true);
+            self.setOneCCTabLogo('');
           }
         });
         return;
@@ -2878,7 +2964,6 @@ Session.prototype = {
       discreet.offlineChallanTab.destroy();
     } else if (!this.tab) {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
-        discreet.ChargesHelper.removeShippingCharges();
         discreet.ChargesHelper.removeCodCharges();
         discreet.OneClickCheckoutInterface.handleBack();
         this.switchTab('home-1cc');
@@ -2916,9 +3001,11 @@ Session.prototype = {
       tab === 'wallet' && this.screen === 'otp' && this.r._payment;
     var cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
+
     if (walletOtpPage || cardlessEmiOtpPage) {
       self.confirmClose().then(function (close) {
         if (close) {
+          discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
             '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
           });
@@ -2939,9 +3026,9 @@ Session.prototype = {
     this.topBar.show();
   },
 
-  oneClickCheckoutRedirection: function (showSnackbar) {
+  oneClickCheckoutRedirection: function () {
     this.switchTab('');
-    this.homeTab.addressNext(showSnackbar);
+    this.homeTab.addressNext();
     this.homeTab.next(views.METHODS);
   },
 
@@ -3037,6 +3124,14 @@ Session.prototype = {
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
+    // Executes actions to be done when moving away from a screen
+    if (this.tab !== tab) {
+      var instance = this.getCurrentTabInstance();
+      if (instance && instance.onHide) {
+        instance.onHide();
+      }
+    }
+
     if (tab === '') {
       this.homeTab.onShown();
     }
@@ -3081,7 +3176,7 @@ Session.prototype = {
         offer &&
         discreet.Offers.getOfferMethodForTab(tab) !== offer.payment_method
       ) {
-        this.offers.clearOffer();
+        this.offers.clearOffer(false);
       }
     } else {
       this.payload = null;
@@ -3201,7 +3296,9 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: 'skip_saved_cards',
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+        ? 'skip_saved_cards_one_cc'
+        : 'skip_saved_cards',
     });
 
     /**
@@ -3228,7 +3325,9 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: 'skip_saved_cards',
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+        ? 'skip_saved_cards_one_cc'
+        : 'skip_saved_cards',
     });
 
     self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
@@ -3250,7 +3349,15 @@ Session.prototype = {
        * 2. If customer doesn't have saved cards, show cards screen.
        */
       if (customer.saved && !customer.logged) {
-        self.askOTP(self.otpView, undefined, true, { phone: getPhone() });
+        self.askOTP(
+          self.otpView,
+          undefined,
+          true,
+          { phone: getPhone() },
+          undefined,
+          undefined,
+          true
+        );
       } else {
         self.setScreen('card');
       }
@@ -3967,10 +4074,18 @@ Session.prototype = {
       storeGetter(discreet.OTPScreenStore.otp) ||
       storeGetter(discreet.OTPScreenStore.digits).join('');
 
-    if (otp.length > 0) {
+    if (
+      otp.length > 0 &&
+      (!RazorpayHelper.isOneClickCheckout() ||
+        !storeGetter(discreet.OTPScreenStore.isRazorpayOTP) ||
+        otp.length === storeGetter(discreet.OTPScreenStore.digits).length)
+    ) {
       this.commenceOTP('verifying_otp');
 
       if (isWallet || this.headless) {
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
         return this.r.submitOTP(otp);
       }
 
@@ -4004,7 +4119,15 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-              this.askOTP(this.otpView, msg, true);
+              this.askOTP(
+                this.otpView,
+                msg,
+                true,
+                { phone: getPhone() },
+                undefined,
+                msg,
+                true
+              );
               this.updateCustomerInStore();
             }
           };
@@ -4036,7 +4159,15 @@ Session.prototype = {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
               });
-              this.askOTP(this.otpView, msg, true);
+              this.askOTP(
+                this.otpView,
+                msg,
+                true,
+                { phone: getPhone() },
+                undefined,
+                msg,
+                true
+              );
               self.updateCustomerInStore();
             }
           };
@@ -4059,6 +4190,9 @@ Session.prototype = {
 
         callback = function (msg, data) {
           if (msg) {
+            this.otpView.updateScreen({
+              showCtaOneCC: true,
+            });
             this.fetchCardlessEmiPlans({
               incorrect: true,
             });
@@ -4071,10 +4205,13 @@ Session.prototype = {
             CardlessEmiStore.ott[providerCode] = data.ott;
             CardlessEmiStore.lenderBranding[providerCode] =
               data.lender_branding_url;
-
             this.showCardlessEmiPlans();
           }
         };
+
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
       }
 
       if (this.tab === 'upi') {
@@ -4237,6 +4374,10 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function (e, payload) {
+    if (this.tab === 'home-1cc') {
+      return;
+    }
+
     if (e instanceof Event) {
       e.preventDefault();
       e.stopPropagation();
@@ -5118,7 +5259,9 @@ Session.prototype = {
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       if (appliedOffer.type !== 'read_only') {
         data.offer_id = appliedOffer.id;
-        this.r.display_amount = appliedOffer.amount;
+        this.r.display_amount = RazorpayHelper.isOneClickCheckout()
+          ? this.get('amount')
+          : appliedOffer.amount;
         updateScore('affordability_offers');
         Analytics.track('offers:applied_with_payment', {
           data: appliedOffer,
@@ -5235,13 +5378,23 @@ Session.prototype = {
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         this.otpView.updateScreen({
-          skipTextLabel: 'skip_saving_card',
+          skipTextLabel: RazorpayHelper.isOneClickCheckout()
+            ? 'skip_saving_card_one_cc'
+            : 'skip_saving_card',
         });
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
           phone: getPhone(),
         });
-        this.askOTP(this.otpView, undefined, true, { phone: getPhone() });
+        this.askOTP(
+          this.otpView,
+          undefined,
+          true,
+          { phone: getPhone() },
+          undefined,
+          undefined,
+          true
+        );
         var otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
         this.getCurrentCustomer().createOTP(
           function () {
@@ -5448,6 +5601,7 @@ Session.prototype = {
       }
 
       if (shouldUseNativeOTP) {
+        var session = this;
         var params = {
           extraProps: {
             reason: 'native_otp_enter',
@@ -5456,8 +5610,12 @@ Session.prototype = {
 
         this.headless = true;
         Analytics.track('native_otp:attempt');
+        session.tabs.card.onHide();
         this.setScreen('otp', params);
         this.r.on('payment.otp.required', (data) => {
+          session.otpView.updateScreen({
+            showCtaOneCC: true,
+          });
           this.askOTP(that.otpView, data);
         });
         this.r.on('payment.3ds.required', function () {
@@ -5505,6 +5663,7 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
+      this.setOneCCTabLogo(walletObj.logo);
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
@@ -5560,6 +5719,7 @@ Session.prototype = {
             allowSkip: false,
           });
           that.topBar.setTitleOverride('otp', 'image', walletObj.logo);
+          that.setOneCCTabLogo(walletObj.logo);
           if (wallet === 'freecharge') {
             that.otpView.updateScreen({
               maxlength: 4,
@@ -5615,6 +5775,8 @@ Session.prototype = {
       this.r.on('payment.otp.required', (message) => {
         this.askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
+          showCtaOneCC: true,
+          ctaOneCCDisabled: false,
           allowSkip: false,
         });
       });
@@ -5980,12 +6142,34 @@ Session.prototype = {
             session.handleDiscount();
           },
           onShown: function () {
+            if (session.screen === 'otp') {
+              session.otpView.updateScreen({
+                showCtaOneCC: false,
+              });
+            } else {
+              var instance = session.getCurrentTabInstance();
+              if (instance && instance.onHide) {
+                instance.onHide();
+              }
+            }
             Analytics.track(
               'offers:list_view:screen:' + (session.screen || 'home'),
               {
                 data: session.getAppliedOffer(),
               }
             );
+          },
+          onHide: function () {
+            if (session.screen === 'otp') {
+              session.otpView.updateScreen({
+                showCtaOneCC: true,
+              });
+            } else {
+              var instance = session.getCurrentTabInstance();
+              if (instance && instance.onShown) {
+                instance.onShown();
+              }
+            }
           },
         },
       });
@@ -6184,6 +6368,16 @@ Session.prototype = {
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
   },
+
+  getCurrentTabInstance: function (override_tab) {
+    var tab = override_tab || this.tab;
+    if (tab === '') {
+      return this.homeTab;
+    }
+    return this.tabs[tab];
+  },
+
+  tabs: {},
 
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,

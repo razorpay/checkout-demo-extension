@@ -13,6 +13,7 @@
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
+  import { isOneClickCheckout } from 'razorpay';
   import { popStack } from 'navstack';
 
   // i18n
@@ -37,6 +38,8 @@
   export let onContinue;
   export let navstack;
 
+  // Remove the space between Amount and symbol on Magic Checkout Flow
+  const spaceAmoutWithSymbol = !isOneClickCheckout();
   const entries = _Obj.entries;
 
   const isOverlay = navstack?.isOverlay;
@@ -140,7 +143,11 @@
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
-              {formatAmountWithSymbol(amount * 100, 'INR')}
+              {formatAmountWithSymbol(
+                amount * 100,
+                'INR',
+                spaceAmoutWithSymbol
+              )}
             </div>
           </div>
         {/if}

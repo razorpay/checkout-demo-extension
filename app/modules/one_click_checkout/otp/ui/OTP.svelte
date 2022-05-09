@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { get } from 'svelte/store';
+
   // Store imports
   import {
     action,
@@ -17,13 +20,16 @@
     accessTime,
     errorMessage,
     disableCTA,
-    ctaLabel,
+    renderCtaOneCC,
   } from 'checkoutstore/screens/otp';
   import { isOneClickCheckout } from 'razorpay';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
+  import { resendAttemptIndex } from 'one_click_checkout/otp/store';
+
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+
   // i18n
   import { t, locale } from 'svelte-i18n';
   import {
@@ -46,30 +52,31 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
-  import ResendButton from 'ui/elements/ResendButton.svelte';
+  import ResendButton from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import OTPInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
-  import {
-    stopResendCountdown,
-    getTheme,
-  } from 'one_click_checkout/otp/sessionInterface';
+  import CTA from 'one_click_checkout/cta/index.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
-  import otpEvents from 'ui/tabs/otp/analytics';
+  // analytics
+  import otpEvents from 'one_click_checkout/otp/analytics';
   import { Events } from 'analytics';
+
+  // helpers
   import { screensHistory } from 'one_click_checkout/routing/History';
   import { views } from 'one_click_checkout/routing/constants';
+  import { getThemeColor } from 'checkoutstore/theme';
+  import { getIcons } from 'ui/icons/payment-methods';
+  import { stopResendCountdown } from 'one_click_checkout/otp/sessionInterface';
+  import { handleEditContact } from 'one_click_checkout/sessionInterface';
 
-  const { edit_phone } = getTheme().icons;
+  const { edit_paper } = getIcons({ backgroundColor: getThemeColor() });
 
   const { otpReason } = screensHistory.config[views.OTP].props;
 
   // Props
   export let on = {};
   export let addShowableClass;
-  export let newCta;
   export let onSubmit;
   export let skipOTPHandle;
   export let resendOTPHandle;
@@ -82,6 +89,8 @@
   $: otpPromptVisible = !$action && !$loading;
   $: compact = $mode === 'HDFC_DC' || ($ipAddress && $accessTime);
   $: showInput = !($action || $loading);
+  $: newCta = $renderCtaOneCC && newCta;
+
   export function invoke(type, event) {
     const method = on[type];
     if (type === 'secondary') {
@@ -98,6 +107,34 @@
     $accessTime = '';
     errorMessage.set('');
   }
+
+  function onSkip(event) {
+    Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otp_reason: otpReason });
+    if (skipOTPHandle) {
+      skipOTPHandle();
+    } else {
+      invoke('secondary', event);
+    }
+  }
+
+  function onResend(event) {
+    resendAttemptIndex.set(get(resendAttemptIndex) + 1);
+    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, {
+      otp_reason: otpReason,
+      resend_attempt_index: $resendAttemptIndex,
+    });
+    if (resendOTPHandle) {
+      resendOTPHandle();
+    } else {
+      invoke('resend', event);
+    }
+  }
+
+  const handleOnBlur = () => {
+    Events.TrackBehav(otpEvents.OTP_ENTERED, {
+      otp_reason: otpReason,
+    });
+  };
 </script>
 
 <!-- // TODO: showable logic -->
@@ -108,6 +145,7 @@
   class:showable={addShowableClass}
   class:tab-mg-1cc={isOneClickCheckout()}
   class:resetMargin={!addShowableClass}
+  class:tab-content-one-cc={isOneClickCheckout()}
 >
   <!-- <div id="form-otp" class="tab-content screen" class:loading={$loading}> -->
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
@@ -122,15 +160,12 @@
           $cardNumber}
       />
     {/if}
-    <div
-      class="otp-controls"
-      class:margin-none={otpClasses.includes($textView)}
-    >
-      <div id="otp-prompt" class:text-start={otpClasses.includes($textView)}>
+    <div class="otp-controls">
+      <div id="otp-prompt">
         {#if $headingText}
-          <div class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+          <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
             {getOtpScreenHeading($headingText, $templateData, $locale)}
-          </div>
+          </p>
         {/if}
         <!-- Align text to start only if in address context -->
         {#if $loading}
@@ -145,10 +180,11 @@
             {@html getOtpScreenTitle($textView, $templateData, $locale)}
             {#if otpClasses.includes($textView)}
               <span
+                data-test-id="edit-contact-otp"
                 class="edit-contact-btn"
                 on:click={() => handleEditContact()}
               >
-                <Icon icon={edit_phone} />
+                <Icon icon={edit_paper} />
               </span>
             {/if}
           </div>
@@ -208,8 +244,11 @@
             </div>
           {/if}
         {/if}
-
-        <OTPInput hidden={!showInput} />
+        <OTPInput
+          hidden={!showInput}
+          isError={$errorMessage}
+          onBlur={handleOnBlur}
+        />
       </div>
 
       <div class="error-message" class:hidden={!showInput}>
@@ -217,45 +256,27 @@
       </div>
 
       <div id="otp-sec-outer" class:compact>
-        {#if showInput}
-          {#if $allowResend}
-            <!-- LABEL: Resend OTP -->
-            <ResendButton
-              id="otp-resend"
-              on:resend={(event) => {
-                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK, { otpReason });
-                if (resendOTPHandle) {
-                  resendOTPHandle();
-                } else {
-                  invoke('resend', event);
-                }
-              }}
-            />
+        <div class="otp-action-container">
+          {#if showInput}
+            {#if $allowResend}
+              <!-- LABEL: Resend OTP -->
+              <ResendButton id="otp-resend" on:resend={onResend} />
+            {/if}
+            {#if $allowSkip}
+              <LinkButton id="otp-sec" on:click={onSkip}>
+                {$t(`otp.skip_text.${$skipTextLabel}`)}
+              </LinkButton>
+            {:else if $allowBack}
+              <!-- LABEL: Go Back -->
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => invoke('secondary', event)}
+              >
+                {$t(BACK_LABEL)}
+              </LinkButton>
+            {/if}
           {/if}
-          {#if $allowSkip}
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => {
-                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK, { otpReason });
-                if (skipOTPHandle) {
-                  skipOTPHandle();
-                } else {
-                  invoke('secondary', event);
-                }
-              }}
-            >
-              {$t(`otp.skip_text.${$skipTextLabel}`)}
-            </LinkButton>
-          {:else if $allowBack}
-            <!-- LABEL: Go Back -->
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => invoke('secondary', event)}
-            >
-              {$t(BACK_LABEL)}
-            </LinkButton>
-          {/if}
-        {/if}
+        </div>
       </div>
     </div>
     {#if otpPromptVisible && $mode}
@@ -274,17 +295,16 @@
       </span>
     {/if}
   </div>
-  {#if newCta}
-    <CTA disabled={$disableCTA} on:click={onSubmit}>{$t($ctaLabel)}</CTA>
+  {#if !$loading}
+    <CTA disabled={$disableCTA} on:click={onSubmit} showAmount={false} />
   {/if}
 </div>
 
 <style>
   .otp-title {
-    /* margin: 0 40px; */
-    line-height: 164%;
-    color: rgba(0, 0, 0, 0.74);
-    font-weight: normal;
+    color: #263a4a;
+    text-align: center;
+    padding: 0px 20px;
   }
   .otp-screen-contents {
     display: flex;
@@ -293,12 +313,11 @@
   }
   .otp-controls {
     flex-grow: 1;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 0px 16px 0px;
   }
   /* If otp controls is the first thing in the screen, then push it down by 40px */
   .otp-screen-contents .otp-controls:first-child {
-    margin-top: 40px;
+    margin-top: 34px;
   }
   :global(.otp-screen-contents .card-box:first-child) {
     margin-bottom: 12px;
@@ -318,29 +337,22 @@
     padding-bottom: 24px;
   }
   .error-message {
-    color: #eb001b;
-    text-align: start !important;
+    color: #d64052;
     margin: 12px 0px;
     font-size: 12px;
   }
-  .text-start {
-    text-align: start !important;
-  }
-  .margin-none {
-    margin-top: 0px !important;
-  }
   .otp-heading {
-    margin: 24px 0 15px;
-    font-size: 13px;
-    font-weight: normal;
-    line-height: 16px;
-    color: #33333399;
-    text-transform: uppercase;
+    margin: 34px 0 22px;
+    text-align: center;
+    color: #263a4a;
+    text-transform: capitalize;
+    font-weight: 600;
   }
 
-  .heading-1cc {
-    margin-top: 0 !important;
+  #form-otp .heading-1cc {
+    margin-top: 0px;
   }
+
   .tab-mg-1cc {
     margin-top: 20px;
   }
@@ -359,7 +371,28 @@
     text-transform: initial;
   }
   .edit-contact-btn {
-    margin-left: 4px;
+    margin-left: 2px;
+    position: relative;
+    top: 1px;
     cursor: pointer;
+  }
+
+  .otp-action-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .tab-content-one-cc {
+    margin-top: 0px;
+  }
+  #otp-prompt {
+    margin-bottom: 24px;
+  }
+
+  :global(.tab-content-one-cc .otp-title .theme) {
+    font-weight: 600;
   }
 </style>

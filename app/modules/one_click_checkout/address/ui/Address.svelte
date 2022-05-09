@@ -3,6 +3,11 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
+  import {
+    showToast,
+    TOAST_SCREEN,
+    TOAST_THEME,
+  } from 'one_click_checkout/Toast';
   import AddressTab from 'one_click_checkout/address/ui/components/AddressTab.svelte';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
 
@@ -13,25 +18,35 @@
     showSavedAddressCta,
   } from 'one_click_checkout/address/shipping_address/store';
   import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
-  import { isIndianCustomer } from 'checkoutstore';
   import { contact } from 'checkoutstore/screens/home';
+  import { shippingCharge } from 'one_click_checkout/charges/store';
+
   // interface imports
-  import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
+  import {
+    getIcons,
+    redirectToPaymentMethods,
+  } from 'one_click_checkout/sessionInterface';
 
   // helpers imports
-  import { saveNewAddress } from 'one_click_checkout/address/helpers';
+  import { saveAddress } from 'one_click_checkout/address/helpers';
   import { getCustomer } from 'checkoutframe/customer';
   import { askForOTP } from 'one_click_checkout/common/otp';
+  import { addTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
 
   // i18n imports
   import { t } from 'svelte-i18n';
-  import { SAVED_ADDRESS_CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
+  import { formatTemplateWithLocale } from 'i18n';
+  import {
+    SAVED_ADDRESS_CTA_LABEL,
+    SHIPPING_CHARGES_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
+  import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
   // Analytics imports
   import Analytics, { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import {
+    ADDRESS_FORM_VIEWS,
     ADDRESS_TYPES,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
@@ -41,20 +56,20 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { formatAmountWithSymbol } from 'common/currency';
+  import { getCurrency } from 'razorpay';
 
   // props
   export let currentView;
 
   let address;
 
-  const { arrow_next } = getTheme().icons;
+  const { caret_circle_right } = getIcons();
 
   let customer = getCustomer($contact, null, true);
 
-  $: isViewAddAddress = routeMap[currentView] === addressViews.ADD_ADDRESS;
-
   function onSubmit(addressCompleted) {
-    if (currentView === views.ADD_ADDRESS) {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       addressCompleted.set(true);
     }
 
@@ -76,7 +91,7 @@
       return;
     }
     if (customer.logged) {
-      saveNewAddress().then((res) => {
+      saveAddress().then((res) => {
         $newUserAddress.id = res.shipping_address?.id;
         redirectToPaymentMethods();
       });
@@ -88,12 +103,13 @@
   const routeMap = {
     [views.ADD_ADDRESS]: addressViews.ADD_ADDRESS,
     [views.SAVED_ADDRESSES]: addressViews.SAVED_ADDRESSES,
+    [views.EDIT_ADDRESS]: addressViews.EDIT_ADDRESS,
   };
 
   function onSavedAddressClick() {
     Events.Track(AddressEvents.ACCESS_SAVED_ADDRESS);
 
-    address.currentView.setCurrentView(addressViews.SAVED_ADDRESSES);
+    address.setCurrentView(addressViews.SAVED_ADDRESSES);
     navigator.navigateTo({
       path: Resource[ADDRESS_TYPES.SHIPPING_ADDRESS].routes[
         addressViews.SAVED_ADDRESSES
@@ -102,6 +118,7 @@
   }
 
   onMount(() => {
+    addTabInBreadcrumbs(ADDRESS_LABEL);
     Analytics.setMeta(
       MetaProperties.ADDRESS_SCREEN_TYPE,
       ADDRESS_TYPES.SHIPPING_ADDRESS
@@ -124,6 +141,18 @@
       });
     }
   }
+
+  $: {
+    if ($shippingCharge) {
+      showToast({
+        screen: TOAST_SCREEN.ONE_CC,
+        theme: TOAST_THEME.INFO,
+        message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
+          charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
+        }),
+      });
+    }
+  }
 </script>
 
 <AddressTab
@@ -133,22 +162,16 @@
   currentView={routeMap[currentView]}
 >
   <div slot="header">
-    {#if $showSavedAddressCta && isViewAddAddress}
+    {#if $showSavedAddressCta && routeMap[currentView] === addressViews.ADD_ADDRESS}
       <button
         class="saved-addresses-cta"
         on:click|preventDefault={onSavedAddressClick}
       >
-        {$t(SAVED_ADDRESS_CTA_LABEL)}
-        <Icon icon={arrow_next} />
+        <span class="saved-addresses-cta__text">
+          {$t(SAVED_ADDRESS_CTA_LABEL)}
+        </span>
+        <Icon icon={caret_circle_right} />
       </button>
-    {/if}
-  </div>
-  <div slot="inner-footer">
-    {#if isViewAddAddress}
-      <SameBillingAndShipping
-        shouldSaveAddress={true}
-        on:toggle={trackSameBillingAndShippingCheckbox}
-      />
     {/if}
   </div>
   <div slot="footer">
@@ -163,7 +186,42 @@
 </AddressTab>
 
 <style>
+  * {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+  }
+
   div[slot='inner-footer'] {
     margin-top: 16px;
+  }
+
+  .saved-addresses-cta {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 12px 16px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .saved-addresses-cta__text {
+    color: var(--background-color);
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .saved-addresses-cta {
+    color: var(--highlight-color);
+    font-weight: bold;
+    border: 1px solid #e6e7e8;
+    padding: 10px 12px;
+    width: 100%;
+    margin-bottom: 14px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>

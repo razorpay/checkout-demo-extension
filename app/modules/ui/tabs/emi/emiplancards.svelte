@@ -1,4 +1,6 @@
 <script>
+  import { isOneClickCheckout } from 'razorpay';
+
   import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';
   export let plans;
   export let bank;
@@ -18,7 +20,7 @@
   }
 </script>
 
-<h3>{title}</h3>
+<h3 class:one-cc={isOneClickCheckout()}>{title}</h3>
 <div class="emi-plans-list expandable-card-list">
   {#each plans as plan, index (plan.duration)}
     <EmiPlanCard
@@ -31,3 +33,16 @@
     />
   {/each}
 </div>
+
+<style>
+  .one-cc {
+    font-weight: 600;
+    color: #263a4a;
+    text-transform: none;
+    margin-left: 12px;
+  }
+
+  :global(#content.one-cc) .emi-plans-list {
+    margin: 0px;
+  }
+</style>

@@ -1,4 +1,5 @@
 const { setState, delay } = require('../../util');
+const { getDataAttrSelector } = require('./common');
 
 async function handleStateReq(context, country = 'in') {
   const req = await context.expectRequest();
@@ -49,11 +50,12 @@ function getShippingInfoResponse({
   serviceable = true,
   codFee = 0,
   shippingFee = 0,
+  zipcode = '560001',
 }) {
   const resp = {
     addresses: [
       {
-        zipcode: '560001',
+        zipcode,
         country: 'in',
         city: 'Bengaluru',
         state: 'KARNATAKA',
@@ -95,7 +97,7 @@ function getCustomerAddressResponse() {
   return resp;
 }
 
-async function handleShippingInfo(context, options) {
+async function handleShippingInfo(context, options = {}) {
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('merchant/shipping_info');
@@ -130,7 +132,9 @@ async function fillUserAddress(
     showSavedAddress = false,
     serviceable,
     codFee,
+    zipcode = '560001',
     diffBillShipAddr,
+    addLandmark = false,
   }
 ) {
   await context.page.waitForSelector('.address-new');
@@ -138,9 +142,14 @@ async function fillUserAddress(
     await handleStateReq(context);
   }
   await context.page.type('#name', 'Test');
-  await context.page.type('#zipcode', '560001');
+  await context.page.type('#zipcode', zipcode);
   if (!showSavedAddress && !diffBillShipAddr) {
-    await handleShippingInfo(context, { isCODEligible, serviceable, codFee });
+    await handleShippingInfo(context, {
+      isCODEligible,
+      serviceable,
+      codFee,
+      zipcode,
+    });
   }
   if (diffBillShipAddr) {
     await handlePincodes(context);
@@ -148,7 +157,12 @@ async function fillUserAddress(
   }
   await context.page.type('#line1', 'SJR Cyber Laskar');
   await context.page.type('#line2', 'Hosur Road');
-  await context.page.type('#landmark', 'Adugodi');
+  if (addLandmark) {
+    const landmarkCta = await getDataAttrSelector('toggle-landmark-cta');
+    await landmarkCta.click();
+    await delay(200);
+    await context.page.type('#landmark', 'Adugodi');
+  }
   if (!isSaveAddress) {
     await delay(200);
     await context.page.waitForSelector('#address-consent-checkbox');
@@ -157,8 +171,8 @@ async function fillUserAddress(
 }
 
 async function handleAddAddress(context) {
-  await context.page.waitForSelector('.address-add-icon');
-  await context.page.click('.address-add-icon');
+  await context.page.waitForSelector('#address-add');
+  await context.page.click('#address-add');
 }
 
 async function handleCustomerAddressReq(context) {

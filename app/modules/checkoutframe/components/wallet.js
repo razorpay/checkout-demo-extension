@@ -2,10 +2,13 @@ import { setView, destroyView } from './index';
 import { getSession } from 'sessionmanager';
 
 import WalletTab from 'ui/tabs/wallets/index.svelte';
+import { METHODS } from 'checkoutframe/constants';
 import { querySelector } from 'utils/doc';
+
 const WALLET_KEY = 'walletTab';
 
 export function render(props = {}) {
+  const session = getSession();
   const walletTab = new WalletTab({
     target: querySelector('#form-fields'),
     props,
@@ -23,7 +26,11 @@ export function render(props = {}) {
       .appendChild(document.getElementById('bottom'));
   }
   setView(WALLET_KEY, walletTab);
-  getSession()[WALLET_KEY] = walletTab;
+  session[WALLET_KEY] = walletTab;
+  session.tabs = {
+    ...session.tabs,
+    [METHODS.WALLET]: walletTab,
+  };
   walletTab.onShown();
 
   return walletTab;

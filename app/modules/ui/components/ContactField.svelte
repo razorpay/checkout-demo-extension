@@ -17,12 +17,16 @@
   import {
     CONTACT_LABEL_REQUIRED,
     CONTACT_LABEL_OPTIONAL,
-    CONTACT_HELP_TEXT,
     COUNTRY_LABEL,
     COUNTRY_HELP_TEXT,
+    PHONE_NUMBER,
+    MOBILE_NUMBER,
+    MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
 
   import { t } from 'svelte-i18n';
+
+  import { isOneClickCheckout } from 'razorpay';
 
   // Refs
   let countryField;
@@ -34,6 +38,9 @@
   export let isOptional;
   export let inAddress = false;
   export let validationText;
+  export let showValidations = false;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   const dispatch = createEventDispatcher();
 
@@ -76,8 +83,10 @@
     });
   }
 
-  // LABEL: Phone with Country Code (Optional) / Phone with Country Code
-  const label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
+  let label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
+  if (isOneClickCheckoutEnabled) {
+    label = isOptional ? MOBILE_NUMBER_OPTIONAL : MOBILE_NUMBER;
+  }
 
   function closeSearch() {
     searchModalOpen = false;
@@ -134,13 +143,19 @@
     icon=""
     modifyIconPosition={!!validationText}
     formatter={{ type: 'country_code' }}
-    label={$t(COUNTRY_LABEL)}
+    label={isOneClickCheckoutEnabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
     on:blur
     value={country}
     helpText={$t(COUNTRY_HELP_TEXT)}
     elemClasses={inAddress ? 'address-elem' : ''}
-    labelClasses={inAddress ? 'address-label' : ''}
+    labelClasses={`${inAddress && 'address-label'} ${
+      isOneClickCheckoutEnabled && 'hidden'
+    }`}
+    inputFieldClasses={isOneClickCheckoutEnabled
+      ? 'country-code-one-click-checkout'
+      : ''}
+    showDropDownIcon={true}
   />
   <!-- LABEL: Please enter a valid country code -->
 
@@ -161,12 +176,24 @@
     label={$t(label)}
     icon=""
     modifyIconPosition={!!validationText}
-    on:input={(e) => (phone = e.target.value)}
+    on:input={(e) => {
+      phone = e.target.value;
+      dispatch('input', e);
+    }}
     on:blur
     value={phone}
     elemClasses={inAddress ? 'address-elem' : ''}
-    labelClasses={inAddress ? 'address-label' : ''}
+    labelClasses={`${inAddress && 'address-label'} ${
+      isOneClickCheckoutEnabled && 'contact-label'
+    }`}
+    inputFieldClasses={isOneClickCheckoutEnabled
+      ? 'phone-field-one-click-checkout'
+      : ''}
+    errorValidationClasses={isOneClickCheckoutEnabled
+      ? 'contact-validation-error'
+      : ''}
     {validationText}
+    {showValidations}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

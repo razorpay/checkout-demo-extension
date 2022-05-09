@@ -12,6 +12,7 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import { isOneClickCheckout } from 'razorpay';
   import * as _El from 'utils/DOM';
 
   // Store imports
@@ -67,6 +68,8 @@
   let containerRef;
   let inputRef;
   let resultsContainerRef;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   function getResults(query, items) {
     if (query) {
@@ -311,9 +314,17 @@
         out:fade={getAnimationOptions({ duration: 200 })}
       >
         <Stack vertical>
-          <form on:submit|preventDefault={submitHandler} class="search-field">
+          <form
+            on:submit|preventDefault={submitHandler}
+            class="search-field"
+            class:search-field-1cc={isOneClickCheckoutEnabled}
+          >
             <div class="icon">
-              <Icon icon={getMiscIcon('search')} />
+              <Icon
+                icon={isOneClickCheckoutEnabled
+                  ? getMiscIcon('search_one_cc')
+                  : getMiscIcon('search')}
+              />
             </div>
             <input
               class="no-escape"
@@ -340,6 +351,7 @@
             aria-label={$t('misc.search_results_label')}
             role="listbox"
             bind:this={resultsContainerRef}
+            class:search-dropdown-1cc={isOneClickCheckoutEnabled}
           >
             {#if query}
               {#if results.length}
@@ -348,6 +360,7 @@
                   {#each results as item, index (IDs.resultItem(item))}
                     <div
                       class="list-item"
+                      class:list-item-1cc={isOneClickCheckoutEnabled}
                       class:focused={index === focusedIndex}
                       id={IDs.resultItem(item)}
                       role="option"
@@ -370,16 +383,24 @@
               {/if}
             {/if}
             {#if all}
-              <div class="list-header">
-                <div class="text">{all}</div>
-                <div class="divider" />
-              </div>
+              {#if isOneClickCheckoutEnabled}
+                <div class="list-header list-header-1cc">
+                  <div class="divider" />
+                  <div class="text">{all}</div>
+                </div>
+              {:else}
+                <div class="list-header">
+                  <div class="text">{all}</div>
+                  <div class="divider" />
+                </div>
+              {/if}
             {/if}
             <div class="list">
               {#each items as item, index (IDs.allItem(item))}
                 <div
                   class="list-item"
                   class:focused={index + results.length === focusedIndex}
+                  class:list-item-1cc={isOneClickCheckoutEnabled}
                   id={IDs.allItem(item)}
                   role="option"
                   aria-selected={index + results.length === focusedIndex}
@@ -449,7 +470,6 @@
     line-height: 13px;
     margin-top: 16px;
     margin-bottom: 4px;
-
     color: rgba(117, 117, 117, 0.58);
   }
 
@@ -543,5 +563,47 @@
     text-align: center;
     padding: 20px 24px;
     color: #888;
+  }
+
+  .list-item-1cc {
+    border-bottom: none;
+    color: #263a4a;
+  }
+
+  .list-header-1cc {
+    flex-direction: column;
+    margin-top: 0px;
+  }
+
+  .list-header-1cc .text {
+    width: 100%;
+    padding: 16px 16px 0px 16px;
+    box-sizing: border-box;
+    margin: 0px;
+    font-size: 14px;
+    line-height: 16px;
+    color: #757575;
+  }
+
+  .list-header-1cc .divider {
+    width: 100%;
+  }
+
+  .search-field-1cc {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    align-self: stretch;
+    margin: 20px 16px;
+  }
+
+  .search-field-1cc .icon :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  .search-field-1cc .icon {
+    margin-right: -6px;
   }
 </style>

@@ -14,10 +14,12 @@
   import SavedCardInstrument from './SavedCardInstrument.svelte';
   import SkeletonInstrument from './SkeletonInstrument.svelte';
   import UpiAppMethodInstrument from './UpiAppMethodInstrument.svelte';
+  import { getSectionCategoryForBlock } from '../helpers';
   import { oneClickUPIIntent } from 'upi/features';
 
   // Props
   export let instrument;
+  export let block;
 
   const isInstrumentLoading = instrument._loading;
   const dispatch = createEventDispatcher();
@@ -32,6 +34,7 @@
 
   function dispatchSelect() {
     instrument.skipCTAClick = skipCTAClick;
+    instrument.section = getSectionCategoryForBlock(block);
     dispatch('selectInstrument', instrument);
   }
 </script>

@@ -3,7 +3,12 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { SERVICEABLE_LABEL } from 'one_click_checkout/address/i18n/labels';
+  import {
+    SERVICEABLE_LABEL,
+    ADD_LANDMARK,
+    OPTIONAL,
+    UNSERVICEABLE_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
 
   import { country, phone } from 'checkoutstore/screens/home';
 
@@ -13,11 +18,12 @@
   import AutoCompleteInput from 'one_click_checkout/address/ui/components/AutoCompleteInput.svelte';
   import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
   import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
+
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   // constant imports
-  import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
+  import { ADDRESS_TYPES, SOURCE } from 'one_click_checkout/address/constants';
 
   export let INPUT_FORM;
   export let formData;
@@ -43,6 +49,42 @@
 
   const onBlur = (id) => {
     dispatch('blur', { id });
+
+    if (id === 'landmark' && !formData[id]) {
+      showLandmark = false;
+    }
+
+    // Analytics Event
+
+    const fieldError = errors[id];
+    const fieldData = formData[id];
+
+    if (!fieldError) {
+      let data = {};
+
+      if ('city' === id) {
+        data = {
+          meta: { [id]: fieldData },
+          is_prefilled: formData?.zipcode
+            ? SOURCE.OVERIDDEN
+            : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+        };
+      }
+      if (id === 'country_name') {
+        data = {
+          country: fieldData,
+          is_prefilled: SOURCE.OVERIDDEN,
+        };
+      }
+
+      if (id === 'zipcode') {
+        data = {
+          pincode: fieldData,
+        };
+      }
+
+      Events.TrackBehav(AddressEvents[`INPUT_ENTERED_${id}_V2`], data);
+    }
   };
 
   onMount(() => {
@@ -61,7 +103,17 @@
         country_code: countryCode,
       });
     }
+
+    Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
+      is_prefilled: SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+    });
   });
+
+  let showLandmark = false;
+
+  const handleLandmarkToggle = () => {
+    showLandmark = true;
+  };
 </script>
 
 <form {id}>
@@ -111,15 +163,18 @@
               placeholder={subInput.placeholder}
               loader={subInput.loader}
               validationText={errors[subInput.id] ? errors[subInput.id] : ''}
-              labelClasses="address-label"
+              labelClasses="address-label {!subInput?.hideStatusText &&
+                subInput.unserviceableText === UNSERVICEABLE_LABEL &&
+                'pincode-unserviceable-label'}"
               elemClasses={'address-elem'}
               handleInput
               autocomplete={subInput.autofillToken ?? 'off'}
-              extraLabel={subInput.unserviceableText}
-              extraLabelClass={subInput.unserviceableText === SERVICEABLE_LABEL
-                ? 'successText'
-                : 'failureText'}
+              showServicableIcon={!subInput?.hideStatusText &&
+                subInput.unserviceableText === SERVICEABLE_LABEL}
               disabled={subInput.disabled}
+              inputFieldClasses={!subInput?.hideStatusText &&
+                subInput.unserviceableText === UNSERVICEABLE_LABEL &&
+                'pincode-unserviceable-wrapper'}
             />
           {/if}
         {/each}
@@ -140,21 +195,50 @@
           required={input.required}
           validationText={errors[input.id] ? errors[input.id] : ''}
           on:blur={() => onBlur(input.id)}
-          on:input={(e) => handleInput(input.id, e.target.textContent)}
+          on:input={({ detail: e }) =>
+            handleInput(input.id, e.target.textContent)}
         />
       {:else if input.autocomplete}
-        <AutoCompleteInput
-          id={input.id}
-          label={input.label}
-          required={input.required}
-          value={formData[input.id]}
-          suggestionsResource={input.suggestionsResource}
-          validationText={errors[input.id] ? errors[input.id] : ''}
-          on:blur={() => onBlur(input.id)}
-          on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
-          on:select={input.onSelect}
-          handleValidation={onBlur}
-        />
+        {#if input.id === 'landmark'}
+          {#if showLandmark}
+            <AutoCompleteInput
+              id={input.id}
+              label={input.label}
+              required={input.required}
+              value={formData[input.id]}
+              suggestionsResource={input.suggestionsResource}
+              validationText={errors[input.id] ? errors[input.id] : ''}
+              on:blur={() => onBlur(input.id)}
+              on:input={({ detail: e }) =>
+                handleInput(input.id, e.target.textContent)}
+              on:select={input.onSelect}
+              autofocus={true}
+              handleValidation={onBlur}
+            />
+          {:else}
+            <span
+              on:click={() => handleLandmarkToggle()}
+              data-test-id="toggle-landmark-cta"
+              class="show-landmark-label"
+            >
+              + {$t(ADD_LANDMARK)}
+              <span class="optional"> {$t(OPTIONAL)} </span>
+            </span>
+          {/if}
+        {:else}
+          <AutoCompleteInput
+            id={input.id}
+            label={input.label}
+            required={input.required}
+            value={formData[input.id]}
+            suggestionsResource={input.suggestionsResource}
+            validationText={errors[input.id] ? errors[input.id] : ''}
+            on:blur={() => onBlur(input.id)}
+            on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
+            on:select={input.onSelect}
+            handleValidation={onBlur}
+          />
+        {/if}
       {:else}
         <Field
           id={input.id}
@@ -193,11 +277,11 @@
   }
 
   .form-input > :global(div:nth-child(odd)) {
-    margin-right: 18px;
+    margin-right: 12px;
   }
 
   .form-input > :global(div:nth-child(even)) {
-    margin-left: 18px;
+    margin-left: 12px;
   }
 
   .form-input > :global(div:last-child) {
@@ -206,6 +290,7 @@
 
   .form-input {
     display: flex;
+    margin-bottom: 6px;
   }
 
   form :global(.filled:not(.input-radio) label) {
@@ -215,5 +300,16 @@
   form :global(.elem > i) {
     transform: rotate(-90deg) scale(0.5);
     top: 50%;
+  }
+
+  .show-landmark-label {
+    margin: 8px 0px;
+    color: var(--highlight-color);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .show-landmark-label .optional {
+    color: #79747e;
   }
 </style>

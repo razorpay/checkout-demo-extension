@@ -20,8 +20,8 @@
   const cta = getStore();
   const noanim = disableAnimation();
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
   let mobileDevice = isMobile();
-
   export let onClose: any = returnAsIs;
   export let escape = true;
 
@@ -90,12 +90,13 @@
 >
   <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="tnc-wrap" />
-  <div id="modal" class="mchild">
+  <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
     <div id="modal-inner">
-      <div id="one-cc-loader" />
       <div id="overlay" />
       <div id="confirmation-dialog" class="showable" />
       <div id="recurring-cards-wrap" class="overlay showable mfix" />
+      <div id="one-cc-account" />
+      <div id="one-cc-rtb" />
       <div id="options-wrap" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
@@ -113,8 +114,12 @@
         <button id="fd-hide" class="btn">Retry</button>
         <div id="cancel_upi" />
       </div>
-      <div id="content" class:one-cc={isOneClickCheckout()}>
-        <div id="header">
+      <div id="content" class:one-cc={isOneClickCheckoutEnabled}>
+        <div id="header-1cc">
+          <div id="header-1cc-wrap" />
+          <div id="topbar-onecc-wrap" />
+        </div>
+        <div id="header" class:hidden={isOneClickCheckoutEnabled}>
           {#if getOption('theme.close_button')}
             <div id="modal-close" class="close">×</div>
           {/if}
@@ -170,9 +175,16 @@
               {/if}
             </div>
             <div id="bottom" />
-            <div id="footer" role="button" class="button">
+            <div
+              id="footer"
+              role="button"
+              class="button"
+              class:hidden={isOneClickCheckoutEnabled}
+            >
               <span id="footer-cta">{cta}</span>
             </div>
+            <div id="one-cc-loader" />
+            <div id="one-cc-footer" />
             <button type="submit" />
           </form>
         </div>

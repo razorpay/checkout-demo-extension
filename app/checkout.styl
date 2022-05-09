@@ -261,42 +261,32 @@ label.sv-checkbox > .stack > input:focus::before {
     border-left-color: var(--highlight-color);
 }
 
-.coupons-available-container {
-    background-color: var(--secondary-highlight-color);
-    color: var(--highlight-color);
-    border: 1px solid var(--secondary-highlight-color);
-    display: flex;
-    align-items: center;
-    padding: 10px 12px;
-    width: 100%;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.coupon-item-code {
-    padding: 4px 8px;
-    background-color: var(--secondary-highlight-color);
-    color: var(--highlight-color);
-    font-weight: 800;
-    font-size: 14px;
-    line-height: 20px;
-    border: 1px dashed var(--highlight-color);
-}
-
 .highlight-text {
     color: var(--highlight-color);
 }
 
-.saved-addresses-cta {
-    color: var(--highlight-color);
-    font-weight: bold;
-    border: 1px solid #e6e7e8;
-    padding: 10px 12px;
-    width: 100%;
-    margin-bottom: 14px;
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
+.search-dropdown-1cc .list-item:hover, .language-container .list-item:hover {
+    background-color: var(--active-state-color) !important;
+}
+
+.active-bg-color {
+  background-color: var(--active-state-color);
+}
+
+.theme-bg-color {
+  background-color: var(--background-color);
+}
+
+.theme-border-color {
+  border-color: var(--background-color);
+}
+
+.elem-one-click-checkout{
+  --error-validation-color: #B21528;
+}
+
+#content.one-cc .confirm-container {
+  border-top: 2px solid var(--background-color);
 }
 
 .loading-indicator {
@@ -308,12 +298,3 @@ label.sv-checkbox > .stack > input:focus::before {
     animation: 1s linear 0s infinite normal none running rotate;
 }
 
-.summary-modal-cta {
-    box-sizing: border-box;
-    background: var(--primary-color);
-    color: var(--text-color);
-    font-weight: bold;
-    padding: 15px 0;
-    width: 100%;
-    text-align: center;
-}

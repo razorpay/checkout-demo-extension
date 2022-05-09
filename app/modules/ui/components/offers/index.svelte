@@ -2,10 +2,12 @@
   import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, isOneClickCheckout } from 'razorpay';
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
+  import { EVENTS as ONE_CC_EVENTS } from 'analytics/offers/events';
+
   import * as _El from 'utils/DOM';
   import {
     getOffersForTab,
@@ -38,6 +40,7 @@
     APPLY_OFFER_CTA,
   } from 'ui/labels/offers';
 
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
   import {
@@ -54,6 +57,7 @@
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
   export let onShown;
+  export let onHide;
 
   let listActive;
   let otherActive;
@@ -64,6 +68,9 @@
   let discount;
   let previousApplied = {};
   let currentTab;
+  let renderCtaOneCC = false;
+
+  const isOneCCEnabled = isOneClickCheckout();
 
   $: {
     _El.keepClass(querySelector('#header'), 'offer-fade', listActive);
@@ -174,12 +181,28 @@
       selected = $appliedOffer;
     }
 
+    if (isOneCCEnabled) {
+      const headerMagicCheckout = document.querySelector('#header-1cc');
+      headerMagicCheckout.classList.add('offers-fade');
+
+      renderCtaOneCC = true;
+    }
     onShown();
   }
 
-  function hideList() {
+  function hideList(shouldMountCta) {
+    renderCtaOneCC = false;
     listActive = false;
     selected = null;
+
+    // onHide basically mounts the active screen's cta..don't do it in edge cases. (When going back from home screen)
+    if (shouldMountCta) {
+      onHide();
+    }
+    if (isOneCCEnabled) {
+      const headerMagicCheckout = document.querySelector('#header-1cc');
+      headerMagicCheckout.classList.remove('offers-fade');
+    }
   }
 
   export function isListShown() {
@@ -187,10 +210,10 @@
   }
 
   export function onSubmit() {
-    applyOffer(selected);
+    applyOffer(selected, true);
   }
 
-  function applyOffer(offer) {
+  function applyOffer(offer, shouldMountCta) {
     Events.TrackBehav(OfferEvents.APPLY, { offer });
     if (offer && offer.id === CRED_EXPERIMENTAL_OFFER_ID) {
       Events.TrackBehav(CredEvents.EXPERIMENT_OFFER_SELECTED);
@@ -200,14 +223,14 @@
       previousApplied[offer.payment_method] = offer;
     }
     // you hide offers view first, to initiate CTA unmount lifecycle
-    hideList();
+    hideList(shouldMountCta);
     // let other view updation take place after offers hide
     // to maintain CTA lifo stack
     tick().then(() => setAppliedOffer(offer, true));
   }
 
-  export function clearOffer() {
-    applyOffer(null);
+  export function clearOffer(shouldMountCta = true) {
+    applyOffer(null, shouldMountCta);
     selected = null;
   }
 
@@ -219,8 +242,24 @@
   }
 
   function selectOffer(offer) {
+    Events.TrackBehav(ONE_CC_EVENTS.OFFERS_CLICKED, {
+      offer: {
+        id: offer.id,
+        type: offer.type,
+        method: offer.payment_method,
+      },
+    });
     selected = offer;
   }
+
+  function onCloseClick() {
+    Events.TrackBehav(ONE_CC_EVENTS.OFFERS_DISMISSED);
+    hideList(true);
+  }
+
+  const ctaRef = document.getElementById('one-cc-footer');
+
+  $: error ? (ctaRef.style.display = 'none') : (ctaRef.style.display = 'block');
 </script>
 
 {#if $showOffers}
@@ -229,6 +268,7 @@
     id="offers-container"
     hidden={applicableOffers.length + otherOffers.length === 0}
     class:has-error={error}
+    class:offers-container-one-cc={isOneCCEnabled}
   >
     <header
       on:click={showList}
@@ -276,7 +316,7 @@
       </span>
     </header>
     {#if error}
-      <div class="error-container">
+      <div class="error-container" class:one-cc={isOneCCEnabled}>
         <div class="error-desc">
           <!-- LABEL: The offer is not applicable on {error}. -->
           <b>
@@ -301,18 +341,24 @@
     {#if listActive}
       <main
         class="list"
-        transition:fly={getAnimationOptions({ y: 40, duration: 200 })}
+        class:main-one-cc={isOneCCEnabled}
+        transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
-        <header class="close-offerlist" on:click={hideList}>
+        <header class="close-offerlist" on:click={onCloseClick}>
           <!-- LABEL: Select an offer -->
           {$t(SELECT_OFFER_HEADER)}
           <!-- LABEL: Hide -->
           <span>{$t(HIDE_ACTION)}</span>
         </header>
-        <div class="offerlist-container">
+        <div
+          class="offerlist-container"
+          class:offerlist-one-cc={isOneCCEnabled}
+        >
           {#if applicableOffers.length}
             <!-- LABEL: Available Offers -->
-            <legend>{$t(AVAILABLE_OFFERS_HEADER)}</legend>
+            <legend class:one-cc-label={isOneCCEnabled}
+              >{$t(AVAILABLE_OFFERS_HEADER)}</legend
+            >
             <OfferItemList
               {selected}
               offers={applicableOffers}
@@ -320,7 +366,7 @@
               {selectOffer}
             />
           {:else}
-            <legend>
+            <legend class:one-cc-label={isOneCCEnabled}>
               <!-- LABEL: No offers available for this method. Please look at other offers
               available below -->
               <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
@@ -330,7 +376,9 @@
             {#if otherActive || !applicableOffers.length}
               {#if otherActive}
                 <!-- LABEL: Other Offers -->
-                <legend>{$t(OTHER_OFFERS_HEADER)}</legend>
+                <legend class:one-cc-label={isOneCCEnabled}
+                  >{$t(OTHER_OFFERS_HEADER)}</legend
+                >
               {/if}
               <OfferItemList
                 {selected}
@@ -339,7 +387,7 @@
                 {selectOffer}
               />
             {:else}
-              <legend>
+              <legend class:one-cc-label={isOneCCEnabled}>
                 <!-- LABEL: + OTHER OFFERS -->
                 <span
                   class="theme-highlight"
@@ -362,7 +410,15 @@
       </main>
     {/if}
   </div>
-  {#if error}
+  {#if renderCtaOneCC}
+    <CTAOneCC
+      disabled={error || !selected}
+      on:click={onSubmit}
+      showAmount={false}
+    >
+      {$t(APPLY_OFFER_CTA)}
+    </CTAOneCC>
+  {:else if error}
     <CTA show={false} />
   {:else if listActive}
     <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA
@@ -430,10 +486,23 @@
     display: flex;
     flex-direction: column;
   }
+  main.main-one-cc {
+    height: calc(100% - 104px);
+    top: inherit;
+  }
   .offerlist-container {
     overflow: auto;
     flex: 1;
     padding-bottom: 14px;
+  }
+  .offerlist-one-cc {
+    background-color: #fff;
+    padding-bottom: 130px;
+  }
+  .one-cc-label {
+    padding: 20px 16px 16px;
+    text-transform: capitalize;
+    font-size: 14px;
   }
   .close-offerlist {
     line-height: 44px;
@@ -463,6 +532,10 @@
     right: 0;
     left: 0;
   }
+
+  .one-cc.error-container {
+    bottom: 0px;
+  }
   .error-desc {
     padding: 16px 24px;
     border-bottom: 1px solid #ddd;
@@ -489,5 +562,9 @@
   }
   legend span {
     cursor: pointer;
+  }
+
+  .offers-container-one-cc {
+    z-index: 2;
   }
 </style>

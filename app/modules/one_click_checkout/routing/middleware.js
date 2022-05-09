@@ -6,7 +6,7 @@ import { views } from 'one_click_checkout/routing/constants';
 const config = {
   [views.SAVED_ADDRESSES]: [
     isDetailsPrefilled,
-    hasSavedAddresses(views.ADD_ADDRESS, true, 'access_saved_address'),
+    hasSavedAddresses(views.ADD_ADDRESS, true),
   ],
   [views.SAVED_BILLING_ADDRESS]: [
     hasSavedAddresses(views.ADD_BILLING_ADDRESS, false),

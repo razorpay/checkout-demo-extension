@@ -3,6 +3,10 @@ import { get as storeGetter } from 'svelte/store';
 import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
 import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
 import { getDeviceId } from 'fingerprint';
+import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
+import { removeTrailingCommas } from 'one_click_checkout/common/utils';
+import { views as addressViews } from 'one_click_checkout/address/constants';
+import { HOME, OFFICE, OTHERS } from './i18n/labels';
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -22,12 +26,13 @@ export const formatAddress = (
     tag,
     contact = '',
     country,
+    type,
   },
-  type = 'shipping_address'
+  address_type = 'shipping_address'
 ) => {
-  const countryName =
+  const countryISO =
     country ||
-    (type === 'shipping_address'
+    (address_type === 'shipping_address'
       ? storeGetter(selectedShippingCountryISO)
       : storeGetter(selectedBillingCountryISO));
 
@@ -44,13 +49,94 @@ export const formatAddress = (
     type,
     line1,
     line2,
-    zipcode: zipcode || countryName,
+    zipcode: zipcode || countryISO,
     city,
     state,
     tag,
     landmark,
-    country: countryName,
+    country: countryISO,
     contact: contactNumber,
+  };
+};
+
+/**
+ *
+ * @param {Object} address Address object which is to be formatted
+ * @param {string} type Address type (shipping_address/billing_address)
+ * @returns Object
+ * format the address received from api
+ */
+export const formatApiAddress = (payload, type = 'shipping_address') => {
+  const { country, line1, line2, city, state, zipcode } = payload;
+  const countryISO =
+    country ||
+    (type === 'shipping_address'
+      ? storeGetter(selectedShippingCountryISO)
+      : storeGetter(selectedBillingCountryISO));
+
+  return {
+    ...formatAddress(payload, type),
+    formattedLine1: removeTrailingCommas(line1 ?? ''),
+    formattedLine2: removeTrailingCommas(line2 ?? ''),
+    formattedLine3: `${city}, ${state}, ${getCountryName(
+      countryISO
+    )}, ${zipcode}`,
+  };
+};
+
+/**
+ *
+ * @param {String} countryISO country ISO code
+ * @returns String
+ * returns the country name from COUNTRY POSTAL CODE LIST
+ */
+const getCountryName = (countryISO) => {
+  const rows = Object.entries(COUNTRY_POSTALS_MAP);
+  for (const [iso, countryInfo] of rows) {
+    if (countryISO && countryISO.toUpperCase() === iso) {
+      return countryInfo.name;
+    }
+  }
+};
+
+/**
+ *
+ * @param {Object} address Address object which is to be formatted
+ * @returns Object
+ * format the savedAddress to send it to the edit Address form
+ */
+export const formatAddressToFormData = (
+  { country: countryPostalCode, contact, ...address },
+  formView = addressViews.EDIT_ADDRESS
+) => {
+  let countryName = '';
+  let countryCode = '';
+  if (countryPostalCode) {
+    countryName = COUNTRY_POSTALS_MAP[countryPostalCode.toUpperCase()].name;
+    countryCode = `+${COUNTRY_TO_CODE_MAP[countryPostalCode.toUpperCase()]}`;
+  }
+
+  let phoneNum = contact?.substring(countryCode.length) || '';
+
+  const { id, name, zipcode, city, state, line1, line2, landmark, tag, type } =
+    address;
+  return {
+    id,
+    name,
+    zipcode,
+    city,
+    state,
+    line1,
+    line2,
+    landmark,
+    tag,
+    contact: {
+      countryCode,
+      phoneNum,
+    },
+    country_name: countryName,
+    formView,
+    type,
   };
 };
 
@@ -60,10 +146,10 @@ export const formatAddress = (
  * @returns Object
  * Format the address and create Payload for saving the address
  */
-export const getCustomerAddressApiPayload = ({
-  shipping_address,
-  billing_address,
-}) => {
+export const getCustomerAddressApiPayload = (
+  { shipping_address, billing_address },
+  isUpdate
+) => {
   const storedContact = storeGetter(contact);
   const storedEmail = storeGetter(email);
   const payload = {
@@ -72,13 +158,15 @@ export const getCustomerAddressApiPayload = ({
   };
 
   if (shipping_address) {
-    payload['shipping_address'] = { ...formatAddress(shipping_address) };
+    payload.shipping_address = { ...formatAddress(shipping_address) };
+    if (isUpdate) payload.shipping_address.id = shipping_address.id;
   }
 
   if (billing_address) {
-    payload['billing_address'] = {
+    payload.billing_address = {
       ...formatAddress(billing_address, 'billing_address'),
     };
+    if (isUpdate) payload.billing_address.id = billing_address.id;
   }
 
   return payload;
@@ -151,3 +239,62 @@ export const getDevicePayload = () => {
   const deviceId = getDeviceId();
   return deviceId ? { id: deviceId } : null;
 };
+
+/**
+ *
+ * @param {Array<Addresses>} addresses
+ * @param {Object} zipecodeHash
+ * @returns Array of addresses with zipcode data
+ * This method adds serviceability data to all the addresses from zipcodeHash
+ *
+ */
+export function hydrateSamePincodeAddresses(addresses, zipcodeHash) {
+  return addresses.map((item) => {
+    if (
+      item.zipcode === item.country &&
+      zipcodeHash[item.zipcode]?.hasOwnProperty('city') &&
+      zipcodeHash[item.zipcode]?.hasOwnProperty('state')
+    ) {
+      delete zipcodeHash[item.zipcode].city;
+      delete zipcodeHash[item.zipcode].state;
+    }
+
+    return {
+      ...item,
+      ...zipcodeHash[item.zipcode],
+      city: zipcodeHash[item.zipcode].city || item.city,
+      state: zipcodeHash[item.zipcode].state || item.state,
+    };
+  });
+}
+
+/**
+ *
+ * @param {Array<Addresses>} addresses
+ * @returns Returns the last updated serviceable address
+ *
+ */
+export function getLatestServiceableAddress(addresses) {
+  return addresses.find((addr) => addr.serviceability);
+}
+
+/**
+ *
+ * @param {string} tag address tag
+ * @returns constant label mapped to i18n string
+ */
+export function getI18nForTag(tag) {
+  switch (tag.toLowerCase()) {
+    case 'home':
+      return HOME;
+
+    case 'office':
+      return OFFICE;
+
+    case 'others':
+      return OTHERS;
+
+    default:
+      return HOME;
+  }
+}

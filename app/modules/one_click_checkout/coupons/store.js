@@ -64,3 +64,5 @@ export function resetChargesCoupons() {
   resetCharges();
   removeCouponInStore();
 }
+
+export const couponListTimer = writable('');

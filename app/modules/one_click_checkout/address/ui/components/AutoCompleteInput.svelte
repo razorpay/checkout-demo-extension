@@ -14,6 +14,7 @@
   export let required;
   export let validationText;
   export let suggestionsResource;
+  export let autofocus;
 
   export let handleValidation;
 
@@ -28,7 +29,7 @@
     debouncedFetch();
   }
 
-  function onInput(e) {
+  function onInput({ detail: e }) {
     dispatch('input', e);
     if (e.target.textContent.length > 3) {
       fetchSuggestions();
@@ -61,4 +62,5 @@
   on:blur
   {suggestions}
   on:suggestion-select={onSuggestionSelect}
+  {autofocus}
 />

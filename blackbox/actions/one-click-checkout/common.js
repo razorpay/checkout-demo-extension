@@ -1,4 +1,9 @@
+const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
 const { delay } = require('../../util');
+const { passRequestNetbanking } = require('../common');
+const { fillUserDetails } = require('../home-page-actions');
+const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
+const { handleShippingInfo } = require('./address');
 
 function getVerifyOTPResponse(inValidOTP) {
   const successResp = {
@@ -43,6 +48,7 @@ function getVerifyOTPResponse(inValidOTP) {
 }
 
 async function handleCustomerStatusReq(context, saved_address = false) {
+  await context.getRequest('customers/status');
   const req = await context.expectRequest();
   expect(req.method).toBe('GET');
   expect(req.url).toContain('customers/status');
@@ -68,6 +74,7 @@ async function handleCreateOTPReq(context) {
 }
 
 async function handleVerifyOTPReq(context, inValidOTP = false) {
+  await context.getRequest('otp/verify');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/verify');
@@ -84,40 +91,45 @@ async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
 }
 
 async function getSummaryInfo(context, isValidCoupon, codFee) {
-  const orderInfo = await context.page.$eval(
-    '.summary-modal',
+  const summaryModalEle = await getDataAttrSelector(context, 'summary-modal');
+  const orderInfo = await context.page.evaluate(
     (element, isValidCoupon, codFee) => {
-      const priceEle = element.getElementsByClassName('summary-row')[0];
-      const price = priceEle.getElementsByTagName('div')[1].innerText;
+      const cartAmount = element.querySelector(
+        '[data-test-id=cart-amount]'
+      ).innerText;
+      const shippingAmount = element.querySelector(
+        '[data-test-id=shipping-amount]'
+      ).innerText;
+      const totalAmount = element.querySelector(
+        '[data-test-id=total-amount]'
+      ).innerText;
+
       if (isValidCoupon) {
-        const couponEle = element.getElementsByClassName('summary-row')[1];
-        const couponText = couponEle.getElementsByTagName('div')[0].innerText;
-        const discountPrice =
-          couponEle.getElementsByTagName('div')[1].innerText;
-        const shippingEle = element.getElementsByClassName('summary-row')[2];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, discountPrice, total, couponText, shippingAmount };
+        const discountAmount = element.querySelector(
+          '[data-test-id=discount-amount]'
+        ).innerText;
+        const couponText = element.querySelector(
+          '[data-test-id=applied-coupon-label]'
+        ).innerText;
+
+        return {
+          cartAmount,
+          discountAmount,
+          totalAmount,
+          couponText,
+          shippingAmount,
+        };
       } else if (codFee) {
-        const shippingEle = element.getElementsByClassName('summary-row')[1];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const codEle = element.getElementsByClassName('summary-row')[2];
-        const codAmount = codEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[3];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, codAmount, total, shippingAmount };
+        const codAmount = element.querySelector(
+          '[data-test-id=cod-amount]'
+        ).innerText;
+
+        return { cartAmount, codAmount, totalAmount, shippingAmount };
       } else {
-        const shippingEle = element.getElementsByClassName('summary-row')[1];
-        const shippingAmount =
-          shippingEle.getElementsByTagName('div')[1].innerText;
-        const totalEle = element.getElementsByClassName('summary-row')[2];
-        const total = totalEle.getElementsByTagName('div')[1].innerText;
-        return { price, total, shippingAmount };
+        return { cartAmount, totalAmount, shippingAmount };
       }
     },
+    summaryModalEle,
     isValidCoupon,
     codFee
   );
@@ -136,46 +148,55 @@ async function handleFeeSummary(context, features) {
   } = features;
   await delay(200);
   if (!isSelectCOD) {
-    await context.page.waitForSelector('.fee');
-    await context.page.click('.fee');
+    const viewDetailsCta = await getDataAttrSelector(
+      context,
+      'cta-view-details'
+    );
+    viewDetailsCta.click();
   }
   await context.page.waitForSelector('.summary-modal');
   const { shippingFee, codFee } = context.state;
   if (couponValid && !removeCoupon) {
-    const { price, discountPrice, total, couponText, shippingAmount } =
-      await getSummaryInfo(context, couponValid);
+    const {
+      cartAmount,
+      discountAmount: _discountAmount,
+      totalAmount,
+      couponText,
+      shippingAmount,
+    } = await getSummaryInfo(context, couponValid);
     if (!shippingFee) {
       expect('FREE').toEqual(shippingAmount);
     }
-    expect(price).toEqual(`₹ ${amount / 100}`);
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
     expect(`Coupon (${couponCode})`).toEqual(couponText);
-    expect(discountPrice).toEqual(`-₹ ${discountAmount / 100}`);
+    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
     const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
-    expect(total).toEqual(`₹ ${calcTotalAmount}`);
+    expect(formatTextToNumber(totalAmount)).toEqual(calcTotalAmount);
   } else if (isSelectCOD) {
-    const { price, total, shippingAmount, codAmount } = await getSummaryInfo(
-      context,
-      false,
-      codFee
+    const { cartAmount, totalAmount, shippingAmount, codAmount } =
+      await getSummaryInfo(context, false, codFee);
+    if (!shippingFee) {
+      expect('FREE').toEqual(shippingAmount);
+    }
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+    expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
+    expect(formatTextToNumber(totalAmount)).toEqual(
+      amount / 100 + codFee / 100
+    );
+  } else {
+    const { cartAmount, totalAmount, shippingAmount } = await getSummaryInfo(
+      context
     );
     if (!shippingFee) {
       expect('FREE').toEqual(shippingAmount);
     }
-    expect(price).toEqual(`₹ ${amount / 100}`);
-    expect(codAmount).toEqual(`₹ ${codFee / 100}`);
-    expect(total).toEqual(`₹ ${amount / 100 + codFee / 100}`);
-  } else {
-    const { price, total, shippingAmount } = await getSummaryInfo(context);
-    if (!shippingFee) {
-      expect('FREE').toEqual(shippingAmount);
-    }
-    expect(price).toEqual(`₹ ${amount / 100}`);
-    expect(total).toEqual(`₹ ${amount / 100}`);
+    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+    expect(formatTextToNumber(totalAmount)).toEqual(amount / 100);
   }
   if (isSelectCOD) {
     await context.page.click('.summary-modal-cta');
   } else {
-    await context.page.click('.backdrop');
+    await context.page.click('.summary-close');
   }
 }
 
@@ -198,6 +219,93 @@ async function checkInvalidOTP(context) {
   ).toEqual('Entered OTP was incorrect. Re-enter to proceed.');
 }
 
+function getDataAttrSelector(context, selectorValue) {
+  return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
+}
+
+function scrollToEnd(context, selectorOrElem) {
+  if (typeof selectorOrElem === 'string') {
+    return page.$eval(selectorOrElem, (_node) =>
+      _node.scrollBy(0, _node.scrollHeight)
+    );
+  }
+
+  try {
+    return context.page.evaluate((_node) => {
+      _node.scrollBy(0, _node.scrollHeight);
+    }, selectorOrElem || window);
+  } catch (err) {
+    return undefined;
+  }
+}
+
+function formatTextToNumber(str) {
+  return str ? +`${str}`.replace(/\D/g, '') : null;
+}
+
+async function proceedOneCC(context) {
+  const cta = await context.page.waitForSelector('#one-cc-cta');
+  await cta.click();
+}
+
+async function goBack(context) {
+  const backBtn = await context.page.waitForSelector('.back');
+  await backBtn.click();
+}
+
+async function handleLogoutReq(context, logoutAll) {
+  const req = await context.expectRequest();
+  expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
+  expect(req.method).toBe('DELETE');
+  expect(req.url).toContain('apps/logout');
+  await context.respondJSON([]);
+}
+
+async function handleResetReq(context, orderId) {
+  await context.getRequest(`/v1/orders/1cc/${orderId}/reset`);
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('orders/1cc');
+  await context.respondJSON([]);
+}
+
+async function login(context) {
+  await fillUserDetails(context, '9952395555');
+  await delay(200);
+  await proceedOneCC(context);
+  await handleCustomerStatusReq(context, true);
+  await handleCreateOTPReq(context);
+  await handleTypeOTP(context);
+  await delay(200);
+  await proceedOneCC(context);
+  await handleVerifyOTPReq(context);
+  await handleShippingInfo(context);
+}
+
+async function mockPaymentSteps(
+  context,
+  options,
+  features,
+  updateOrder = true
+) {
+  if (updateOrder) {
+    await handleUpdateOrderReq(context, options.order_id);
+  }
+  await handleThirdWatchReq(context);
+  await delay(200);
+  await handleFeeSummary(context, features);
+  await selectPaymentMethod(context, 'netbanking');
+  await selectBank(context, 'SBIN');
+  await proceedOneCC(context);
+  await passRequestNetbanking(context);
+  await handleMockSuccessDialog(context);
+}
+
+async function closeModal(context) {
+  const crossCTA = await context.page.waitForSelector('.modal-close');
+  await crossCTA.click();
+}
+
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -208,4 +316,14 @@ module.exports = {
   handleVerifyOTPReq,
   handleSkipOTP,
   checkInvalidOTP,
+  getDataAttrSelector,
+  scrollToEnd,
+  formatTextToNumber,
+  proceedOneCC,
+  goBack,
+  handleLogoutReq,
+  handleResetReq,
+  login,
+  mockPaymentSteps,
+  closeModal,
 };

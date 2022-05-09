@@ -16,18 +16,29 @@
     resendTimeout,
     ipAddress,
     accessTime,
+    tabLogo,
+    headingText,
+    errorMessage,
+    isRazorpayOTP,
+    showCtaOneCC,
+    ctaOneCCDisabled,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { showFeeLabel } from 'checkoutstore/index.js';
-  import { isRecurring } from 'razorpay';
+  import { isRecurring, isOneClickCheckout } from 'razorpay';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { getOtpScreenTitle, getOtpScreenMiscText } from 'i18n';
+  import {
+    getOtpScreenTitle,
+    getOtpScreenMiscText,
+    getOtpScreenHeading,
+  } from 'i18n';
 
   import {
     ADD_FUNDS_LABEL,
@@ -52,13 +63,17 @@
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
   import ResendButton from 'ui/elements/ResendButton.svelte';
+  import ResendButtonOneCC from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
-  import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 
   import { Safari } from 'common/useragent';
+  import { VERIFY_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let on = {};
@@ -74,6 +89,8 @@
   let otpPromptVisible;
   let compact;
   let allowSkipButton = $allowSkip;
+  let otpEle;
+  let showAccountTab;
   const session = getSession();
   // As of Jan 2021, Safari is the only browser that supports one-time-code
   let autoCompleteMethod = 'off';
@@ -106,7 +123,9 @@
     // For recurring payments Skip Saving card is not an option
     // Since we already took mandatory consent on privios screen(Save Checkbox)
     // we are not allowing Skip saving option on OTP Screen
-    const isSaveYourCardOTPScreen = $skipTextLabel === 'skip_saving_card';
+    const isSaveYourCardOTPScreen =
+      $skipTextLabel === 'skip_saving_card' ||
+      $skipTextLabel === 'skip_saving_card_one_cc';
     allowSkipButton = isRecurring() ? !isSaveYourCardOTPScreen : $allowSkip;
   }
 
@@ -119,6 +138,12 @@
       input && input.focus();
     }
   }
+
+  let isRazorpayOTPAndOneCC;
+  $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isOneClickCheckout();
+  let isNativeOTPAndOneCC;
+  $: isNativeOTPAndOneCC = !$isRazorpayOTP && isOneClickCheckout();
+  let isOneCC = isOneClickCheckout();
 
   export function invoke(type, event) {
     const method = on[type];
@@ -150,6 +175,16 @@
     $resendTimeout = null;
     $ipAddress = '';
     $accessTime = '';
+    $showCtaOneCC = false;
+  }
+
+  function onResend(event) {
+    Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
+    invoke('resend', event);
+  }
+
+  function onScroll() {
+    showAccountTab = isShowAccountTab(otpEle);
   }
 </script>
 
@@ -158,10 +193,17 @@
   class="tab-content screen"
   class:loading={$loading}
   class:showable={addShowableClass}
+  class:tab-content-one-cc={isOneCC}
+  on:scroll={onScroll}
+  bind:this={otpEle}
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
-  <div class="otp-screen-contents">
+  <div
+    class="otp-screen-contents"
+    class:heading-1cc={isOneCC}
+    class:otp-wrapper-1cc={isOneCC}
+  >
     {#if otpPromptVisible && $mode === 'HDFC_DC'}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
@@ -174,16 +216,29 @@
 
     <div
       class="otp-controls"
+      class:otp-controls-one-cc={isOneCC}
       class:recurring-alignment={isRecurring() ? !allowSkipButton : false}
     >
-      <div id="otp-prompt">
+      <div id="otp-prompt" class:otp-header={isOneCC}>
         {#if $loading}
           <AsyncLoading>
             {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
         {:else}
+          {#if isOneCC && $headingText}
+            <p class="otp-heading" class:heading-1cc={isOneCC}>
+              {getOtpScreenHeading('default_login', $templateData, $locale)}
+            </p>
+          {/if}
+          {#if $tabLogo && isOneCC}
+            <img class="title-logo" alt="Logo" src={$tabLogo} />
+          {/if}
           <div class="otp-title">
-            {getOtpScreenTitle($textView, $templateData, $locale)}
+            {#if isRazorpayOTPAndOneCC}
+              {@html getOtpScreenTitle($textView, $templateData, $locale)}
+            {:else}
+              {getOtpScreenTitle($textView, $templateData, $locale)}
+            {/if}
           </div>
         {/if}
       </div>
@@ -251,63 +306,86 @@
           {/if}
         {/if}
 
-        <div
-          id="otp-elem"
-          style="width: {inputWidth};"
-          class:compact
-          class:hidden={!showInput}
-        >
-          <!-- LABEL: Please enter the OTP -->
-          <div class="help">{$t(OTP_FIELD_HELP)}</div>
-          <input
-            bind:this={input}
-            on:blur={trackInput}
-            type="tel"
-            class="input"
-            name="otp"
-            id="otp"
-            bind:value={$otp}
-            pattern="[0-9]"
-            maxlength={$maxlength || 6}
-            autocomplete={autoCompleteMethod}
-            required
-          />
-        </div>
+        <!-- LABEL: Please enter the OTP -->
+
+        {#if isRazorpayOTPAndOneCC}
+          <OtpInput hidden={!showInput} isError={$errorMessage} />
+        {:else}
+          <div
+            id="otp-elem"
+            style="width: {isOneCC ? '100%' : inputWidth};"
+            class:compact
+            class={isOneCC ? 'theme-border-color' : 'border-bottom-grey'}
+            class:hidden={!showInput}
+          >
+            <div class="help">{$t(OTP_FIELD_HELP)}</div>
+            <input
+              bind:this={input}
+              on:blur={trackInput}
+              type="tel"
+              class="input"
+              name="otp"
+              id="otp"
+              bind:value={$otp}
+              pattern="[0-9]"
+              maxlength={$maxlength || 6}
+              autocomplete={autoCompleteMethod}
+              required
+            />
+          </div>
+        {/if}
       </div>
 
+      {#if isOneCC && $errorMessage}
+        <div class="error-message" class:hidden={!showInput}>
+          {$t($errorMessage)}
+        </div>
+      {/if}
+
       <div id="otp-sec-outer" class:compact>
-        {#if showInput}
-          {#if $allowResend}
-            <!-- LABEL: Resend OTP -->
-            <ResendButton
-              id="otp-resend"
-              resendTimeout={$resendTimeout}
-              on:resend={(event) => {
-                Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
-                invoke('resend', event);
-              }}
-            />
+        <div
+          class="otp-action-container"
+          class:action-container-center={isRazorpayOTPAndOneCC}
+          class:action-native-otp={isNativeOTPAndOneCC}
+        >
+          {#if showInput}
+            {#if $allowResend}
+              <!-- LABEL: Resend OTP -->
+              {#if isRazorpayOTPAndOneCC}
+                <ResendButtonOneCC
+                  id="otp-resend"
+                  resendTimeout={$resendTimeout}
+                  on:resend={onResend}
+                />
+              {:else}
+                <ResendButton
+                  id="otp-resend"
+                  resendTimeout={$resendTimeout}
+                  on:resend={onResend}
+                />
+              {/if}
+            {/if}
+            {#if allowSkipButton}
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => invoke('secondary', event)}
+              >
+                {$t(`otp.skip_text.${$skipTextLabel}`)}
+              </LinkButton>
+            {:else if $allowBack}
+              <!-- LABEL: Go Back -->
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => {
+                  Events.TrackBehav(otpEvents.OTP_SKIP_CLICK);
+                  invoke('secondary', event);
+                }}
+              >
+                {$t(BACK_LABEL)}
+              </LinkButton>
+            {/if}
           {/if}
-          {#if allowSkipButton}
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => invoke('secondary', event)}
-            >
-              {$t(`otp.skip_text.${$skipTextLabel}`)}
-            </LinkButton>
-          {:else if $allowBack}
-            <!-- LABEL: Go Back -->
-            <LinkButton
-              id="otp-sec"
-              on:click={(event) => {
-                Events.TrackBehav(otpEvents.OTP_SKIP_CLICK);
-                invoke('secondary', event);
-              }}
-            >
-              {$t(BACK_LABEL)}
-            </LinkButton>
-          {/if}
-        {/if}
+        </div>
       </div>
     </div>
     {#if otpPromptVisible && $mode}
@@ -326,6 +404,16 @@
       </span>
     {/if}
   </div>
+  {#if $showCtaOneCC}
+    <CTAOneCC
+      showAmount={false}
+      disabled={$ctaOneCCDisabled}
+      on:click={() => session.preSubmit()}
+    >
+      {$t(VERIFY_LABEL)}
+    </CTAOneCC>
+  {/if}
+  <AccountTab {showAccountTab} />
 </div>
 
 <style>
@@ -351,9 +439,18 @@
     padding-left: 24px;
     padding-right: 24px;
   }
+
+  .otp-controls-one-cc {
+    padding: 0px 16px;
+  }
+
   /* If otp controls is the first thing in the screen, then push it down by 40px */
   .otp-screen-contents .otp-controls:first-child {
     margin-top: 40px;
+  }
+
+  .otp-screen-contents .otp-controls-one-cc:first-child {
+    margin-top: 34px;
   }
 
   :global(.otp-screen-contents .card-box:first-child) {
@@ -386,5 +483,64 @@
 
   .text-initial {
     text-transform: initial;
+  }
+  .otp-action-container {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+  }
+
+  .action-container-center {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .action-native-otp :global(.one-cc-btn) {
+    font-size: 14px;
+  }
+
+  .tab-content-one-cc {
+    margin-top: 0px;
+  }
+
+  .otp-heading {
+    margin-bottom: 26px;
+    text-align: center;
+    color: #263a4a;
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+
+  #form-otp .heading-1cc {
+    margin-top: 0px;
+  }
+
+  .error-message {
+    color: #d64052;
+    margin: 12px 0px;
+    font-size: 12px;
+  }
+
+  #otp-prompt.otp-header {
+    margin-bottom: 24px;
+  }
+
+  .border-bottom-grey {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .tab-content-one-cc #otp-elem {
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .otp-wrapper-1cc {
+    min-height: 110%;
+  }
+  .title-logo {
+    height: 18px;
+    margin-bottom: 18px;
   }
 </style>

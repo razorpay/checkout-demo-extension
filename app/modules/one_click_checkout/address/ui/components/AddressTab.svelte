@@ -1,17 +1,22 @@
 <script>
   // svelte imports
   import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
+
   // UI imports
-  import CTA from 'ui/elements/CTA.svelte';
+  import CTA from 'one_click_checkout/cta/index.svelte';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+
   // i18n imports
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-  import { CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+
   // store imports
   import {
     savedAddresses,
@@ -19,30 +24,54 @@
   } from 'one_click_checkout/address/store';
   import {
     selectedAddress,
+    selectedAddressId as selectedShippingAddressId,
     selectedCountryISO as selectedShippingCountryISO,
   } from 'one_click_checkout/address/shipping_address/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
+  import { showLoader } from 'one_click_checkout/loader/store';
+  import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
+
   // helpers imports
+  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
+  import { isUnscrollable } from 'one_click_checkout/helper';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
+
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
   import {
     views as addressViews,
     ADDRESS_TYPES,
+    ADDRESS_FORM_VIEWS,
   } from 'one_click_checkout/address/constants';
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import { views } from 'one_click_checkout/routing/constants';
 
   export let error;
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
 
-  let showCta = true;
+  let addressWrapperEle;
+  let scrollable = false;
+  let addresses;
+  $: {
+    if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
+      addresses = $savedAddresses;
+    } else {
+      addresses = $savedAddresses.filter(
+        (_addr) => _addr.id !== $selectedShippingAddressId
+      );
+    }
+  }
+
   let disabled;
   let {
     title,
@@ -54,15 +83,29 @@
       selectedCountryISO,
     },
   } = Resource[addressType];
-
   let isFormComplete = false;
+  let showAccountTab;
+  const { location } = getIcons();
 
   export function handleAddAddressClick() {
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
-    selectedAddressId.set('');
+    Resource[addressType].store.resetAddress();
     currentView = addressViews.ADD_ADDRESS;
     navigator.navigateTo({
       path: Resource[addressType].routes[addressViews.ADD_ADDRESS],
+    });
+  }
+
+  function handleEditAddressClick({ detail: _address }) {
+    selectedAddressId.set(_address.id);
+    if (_address.country) selectedShippingCountryISO.set(_address.country);
+    newUserAddress.update((addr) => ({
+      ...addr,
+      ...formatAddressToFormData(_address),
+    }));
+    currentView = addressViews.EDIT_ADDRESS;
+    navigator.navigateTo({
+      path: Resource[addressType].routes[addressViews.EDIT_ADDRESS],
     });
   }
 
@@ -71,24 +114,28 @@
   }
 
   export function handleAddressSelection({
-    detail: { isAddressServiceable, addressId, addressIndex, is_cod_available },
+    detail: { addressId, addressIndex },
   }) {
+    const { serviceability, cod } = $selectedAddress;
     Events.Track(AddressEvents.SAVED_ADDRESS_SELECTED, {
-      serviceable: isAddressServiceable,
+      serviceable: serviceability,
       address_id: addressId,
       address_index: addressIndex,
-      is_cod_available,
+      is_cod_available: cod,
     });
-    showCta = true;
-    if (Resource[addressType].checkServiceability) {
-      showCta = isAddressServiceable;
-    }
   }
 
-  export function onSubmit() {
-    if (currentView === addressViews.ADD_ADDRESS) {
-      const elementId = Resource[addressType].formId;
+  const getSelectedAddrIndex = () =>
+    addresses?.findIndex(
+      (addr) =>
+        (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+          addr?.id === $selectedShippingAddressId) ||
+        addr?.id === $selectedBillingAddressId
+    );
 
+  export function onSubmit() {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
+      const elementId = Resource[addressType].formId;
       const inpError = validateInput(elementId);
       if (inpError) {
         error = inpError;
@@ -133,10 +180,28 @@
       };
     }
     Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, analyticsData);
+
     if (currentView === addressViews.SAVED_ADDRESSES) {
+      const selectedAddrIndex = getSelectedAddrIndex();
+      Events.TrackBehav(AddressEvents.SAVED_ADDRESS_CONTINUE_CLICKED, {
+        count_saved_addresses: addresses?.length,
+        address_id:
+          addressType === ADDRESS_TYPES.SHIPPING_ADDRESS
+            ? $selectedShippingAddressId
+            : $selectedBillingAddressId,
+        address_position_index: selectedAddrIndex,
+        top_shown_address: !selectedAddrIndex,
+      });
       merchantAnalytics({
         event: `saved_address_${ACTIONS.CTA_CLICKED}`,
         category: CATEGORIES.ADDRESS,
+      });
+    } else {
+      Events.TrackBehav(AddressEvents.ADDRESS_SUBMIT_CLICKED_V2, {
+        meta: {
+          is_user_opted_to_save_address: !!$shouldSaveAddress,
+        },
+        '1cc_category_of_saved_address': $selectedAddress?.tag,
       });
     }
     onSubmitCallback(addressCompleted);
@@ -171,87 +236,144 @@
     }
   }
 
-  $: disabled =
-    currentView === addressViews.ADD_ADDRESS ? !isFormComplete : !showCta;
+  function onScroll() {
+    showAccountTab = isShowAccountTab(addressWrapperEle);
+  }
+
+  onMount(() => {
+    scrollable = isUnscrollable(addressWrapperEle);
+  });
+
+  $: {
+    if (ADDRESS_FORM_VIEWS.includes(currentView)) {
+      disabled = !isFormComplete || $showLoader;
+    } else if (
+      addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+      currentView === addressViews.SAVED_ADDRESSES
+    ) {
+      disabled = !$selectedAddress.serviceability;
+    } else {
+      disabled = false;
+    }
+  }
 </script>
 
 <div class="address-tab">
-  <slot name="header" />
   <div
     class="address-wrapper"
     class:shipping-address-wrapper={addressType ===
       ADDRESS_TYPES.SHIPPING_ADDRESS &&
-      currentView === addressViews.ADD_ADDRESS}
+      ADDRESS_FORM_VIEWS.includes(currentView)}
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
+    bind:this={addressWrapperEle}
+    on:scroll={onScroll}
   >
-    <slot name="inner-header" />
-    <div class="address-shipping-label">
-      {$t(title)}
+    <div class="address-section" class:address-scrollable={scrollable}>
+      <slot name="header" />
+      <slot name="inner-header" />
+      <div class="label-container">
+        <Icon icon={location} />
+        <p class="label-text">{$t(title)}</p>
+      </div>
+      {#if currentView === addressViews.SAVED_ADDRESSES}
+        <SavedAddresses
+          {selectedAddressId}
+          {addresses}
+          on:select={handleAddressSelection}
+          on:editClick={handleEditAddressClick}
+          onAddAddressClick={handleAddAddressClick}
+          checkServiceability={Resource[addressType].checkServiceability}
+          {addressType}
+          {addressWrapperEle}
+        />
+      {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
+        <AddNewAddress
+          on:formCompletion={onFormCompletion}
+          id={Resource[addressType].formId}
+          checkServiceability={Resource[addressType].checkServiceability}
+          formData={newUserAddress}
+          {error}
+          {shouldSaveAddress}
+          {addressType}
+          {selectedCountryISO}
+          {currentView}
+          {addressWrapperEle}
+        />
+      {/if}
+      <slot name="inner-footer" />
     </div>
-    {#if currentView === addressViews.SAVED_ADDRESSES}
-      <SavedAddresses
-        {selectedAddressId}
-        addresses={savedAddresses}
-        on:selectedAddressUpdate={handleAddressSelection}
-        onAddAddressClick={handleAddAddressClick}
-        checkServiceability={Resource[addressType].checkServiceability}
-        {addressType}
-      />
-    {:else if currentView === addressViews.ADD_ADDRESS}
-      <AddNewAddress
-        on:formCompletion={onFormCompletion}
-        id={Resource[addressType].formId}
-        checkServiceability={Resource[addressType].checkServiceability}
-        formData={newUserAddress}
-        {error}
-        {shouldSaveAddress}
-        {addressType}
-        {selectedCountryISO}
-      />
+    <AccountTab {showAccountTab} />
+    {#if $activeRoute?.name === views.SAVED_ADDRESSES}
+      <hr class="separator" />
     {/if}
-    <slot name="inner-footer" />
   </div>
   <slot name="footer" />
-  <CTA on:click={onSubmit} {disabled}>
-    {$t(CTA_LABEL)}
-  </CTA>
+  <CTA on:click={onSubmit} {disabled} />
 </div>
 
 <style>
+  * {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+  }
+
   .address-wrapper {
-    padding: 18px 24px 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: 26px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
-    height: calc(100% - 47px - 55px);
+    height: calc(100% - 55px);
   }
 
   .address-tab {
     height: inherit;
   }
 
-  .address-shipping-label {
-    font-weight: normal;
-    color: rgba(51, 51, 51, 0.6);
-    font-size: 13px;
-    padding-bottom: 6px;
-    text-transform: uppercase;
+  .label-container {
+    display: flex;
+    align-items: center;
   }
+
+  .label-text {
+    color: #263a4a;
+    font-size: 14px;
+    text-transform: capitalize;
+    margin-left: 8px;
+    font-weight: 600;
+  }
+
   .billing-address-wrapper {
-    padding: 8px 24px 12px;
+    padding: 8px 0px 12px;
     /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
     height: calc(
-      100% - 47px - 55px + 20px + 16px
+      100% - 55px + 20px
     ); /* 16 is because of the reduced vertical padding */
   }
+
   .shipping-address-wrapper {
-    height: calc(
-      100% - 47px - 55px + 20px + 10px
-    ); /* add 10 for the reduced padding-bottom */
+    height: calc(100% - 55px + 20px);
     padding-bottom: 8px;
   }
+
   :global(.address-label) {
     font-size: 14px;
+  }
+
+  .address-section {
+    /* TODO: to replace left/right padding with variable */
+    padding: 0px 16px 16px;
+  }
+
+  .address-scrollable {
+    min-height: 120%;
+  }
+
+  .separator {
+    border-top: 1px solid #e0e0e0;
+    margin-bottom: 12px;
   }
 </style>

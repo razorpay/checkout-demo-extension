@@ -4,6 +4,13 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
+  import { isOneClickCheckout } from 'razorpay';
+
+  // Icon Imports
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  const { circle_check, solid_down_arrow } = getIcons();
+
   import * as _El from 'utils/DOM';
   // Actions
   import {
@@ -17,6 +24,7 @@
   export let type = 'text';
   export let name;
   export let value = null;
+  export let displayValue = null;
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
@@ -53,6 +61,12 @@
   export let dir;
   export let disabled = false;
   export let modifyIconPosition = false;
+  export let inputFieldClasses = '';
+  export let errorValidationClasses = '';
+  export let labelUpperClasses = '';
+  export let showServicableIcon = false;
+  export let showDropDownIcon = false;
+  export let isInvalid = false;
 
   /**
    * To show prediction as dropdown
@@ -70,6 +84,8 @@
     left: 'auto',
     right: 'auto',
   };
+
+  export let showValidations = false;
 
   const singleCharacterWidth = 7;
   /**
@@ -105,6 +121,8 @@
   let formatterObj = null;
 
   const session = getSession();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   export function getCaretPosition() {
     return formatterObj.caretPosition;
@@ -188,6 +206,12 @@
     readonlyValue = e.target.value;
     value = readonlyValue;
     getPrediction();
+    if (isOneClickCheckoutEnabled) {
+      const { parentNode } = e.target || {};
+      if (parentNode?.classList?.contains('filled')) {
+        parentNode.classList.remove('filled');
+      }
+    }
   }
 
   function handleInputFocus(event) {
@@ -197,6 +221,7 @@
 
   function handleInputBlur(event) {
     focused = false;
+    showValidations = true;
     setTimeout(() => {
       // prevent dropdown selection destroy before click
       dropDownSuggestion = [];
@@ -292,118 +317,243 @@
   }
 </script>
 
-<div
-  bind:this={wrap}
-  class={`elem ${elemClasses}`}
-  class:readonly
-  class:with-prediction={isPredictionEnable}
->
-  {#if icon}
-    <i class:icon-invalid={modifyIconPosition}>
-      {@html icon}
-    </i>
-  {/if}
-  {#if leftImage}
-    <img alt="left-img" class="left-img" src={leftImage} />
-  {/if}
-  <input
-    class="input main"
-    class:with-left-img={leftImage}
-    bind:this={input}
-    id={identifier}
-    type={inputType}
-    {name}
-    {inputmode}
-    {value}
-    {required}
-    {autocomplete}
-    x-autocompletetype={xautocompletetype}
-    placeholder={placeholderToShow}
-    {pattern}
-    {readonly}
-    {min}
-    {max}
-    {tabindex}
-    {autocapitalize}
-    {autocorrect}
-    {spellcheck}
-    {dir}
-    {disabled}
-    use:formatterAction={formatter}
-    use:focusAction={handleFocus}
-    use:blurAction={handleBlur}
-    use:inputAction={handleInput}
-    on:focus={handleInputFocus}
-    on:blur={handleInputBlur}
-    on:input={handleInputEvent}
-    on:focus
-    on:blur
-    on:input
-    on:autocomplete
-    on:paste
-    on:click
-    on:keydown={onKeyDown}
-    on:keydown
-    on:scroll={(e) => {
-      mainInputScrollLeft = e.target.scrollLeft;
-    }}
-    class:no-refresh={!refresh}
-    class:no-focus={handleFocus}
-    class:no-blur={handleBlur}
-    class:no-validate={handleInput}
-    class:cvv-input={type === 'cvv'}
-  />
-  {#if isPredictionEnable}
+<!-- To Do: Refatoring Fields.js for 1cc post demo-->
+{#if isOneClickCheckoutEnabled}
+  <div
+    bind:this={wrap}
+    class={`elem elem-one-click-checkout ${elemClasses}`}
+    class:readonly
+    class:with-prediction={isPredictionEnable}
+  >
+    {#if showServicableIcon}
+      <span class="servicibility-icon-wrapper"
+        ><Icon icon={circle_check} /></span
+      >
+    {/if}
+    {#if showDropDownIcon}
+      <span class="drop-down-icon-wrapper"
+        ><Icon icon={solid_down_arrow} /></span
+      >
+    {/if}
     <input
-      bind:this={suggestionInputRef}
-      bind:value={predictedValue}
-      class="input prediction-input"
+      class={`input-one-click-checkout ${inputFieldClasses} main`}
+      class:error-field-one-click-checkout={(validationText || isInvalid) &&
+        showValidations}
+      bind:this={input}
+      id={identifier}
+      type={inputType}
+      {name}
+      {inputmode}
+      value={displayValue || value}
+      {required}
+      {autocomplete}
+      x-autocompletetype={xautocompletetype}
+      placeholder={placeholderToShow}
+      {pattern}
+      {readonly}
+      {min}
+      {max}
+      {tabindex}
+      {autocapitalize}
+      {autocorrect}
+      {spellcheck}
+      {dir}
+      {disabled}
+      use:formatterAction={formatter}
+      use:focusAction={handleFocus}
+      use:blurAction={handleBlur}
+      use:inputAction={handleInput}
+      on:focus={handleInputFocus}
+      on:blur={handleInputBlur}
+      on:input={handleInputEvent}
+      on:focus
+      on:blur
+      on:input
+      on:autocomplete
+      on:paste
+      on:click
+      on:keydown={onKeyDown}
+      on:keydown
+      on:scroll={(e) => {
+        mainInputScrollLeft = e.target.scrollLeft;
+      }}
+      class:no-refresh={!refresh}
+      class:no-focus={handleFocus}
+      class:no-blur={handleBlur}
+      class:no-validate={handleInput}
+      class:cvv-input={type === 'cvv'}
     />
-  {/if}
-  {#if label}<label for={identifier} class={labelClasses}>{label}</label>{/if}
-  {#if extraLabel}
-    <div class={`${extraLabelClass} input-extralabel`}>
-      {$t(extraLabel)}
-    </div>
-  {/if}
-  {#if loader}
-    <div class="spinner input-loader" />
-  {/if}
-  {#if helpText}
-    <div class="help">{helpText}</div>
-  {/if}
-  {#if downtimeSeverity}
-    <div class="downtime-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
-  {/if}
-  {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
-    <ul
-      style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
-      bind:this={dropdownRef}
-      class="suggestion-dropdown"
-    >
-      {#each dropDownSuggestion as suggestion, index (suggestion)}
-        <li
-          class:hover={dropdownArrowIndex === index}
-          tabindex={index}
-          on:click={() => {
-            if (typeof dropDownSelection === 'function') {
-              const updatedValue = dropDownSelection(suggestion);
-              if (typeof updatedValue === 'string') {
-                value = updatedValue;
-                readonlyValue = updatedValue;
+    {#if label}
+      <label
+        class={`${labelClasses} label-one-click-checkout ${
+          !focused && value ? `${labelUpperClasses}` : ''
+        }`}
+        class:label-upper={focused || value}
+        class:error-label-one-click-checkout={(validationText || isInvalid) &&
+          showValidations}>{label}</label
+      >
+    {/if}
+    {#if extraLabel}
+      <div class={`${extraLabelClass} input-extralabel`}>
+        {$t(extraLabel)}
+      </div>
+    {/if}
+    {#if loader}
+      <div class="spinner input-loader" />
+    {/if}
+    {#if downtimeSeverity}
+      <div class="downtime-icon">
+        <DowntimeIcon severe={downtimeSeverity} />
+      </div>
+    {/if}
+    {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
+      <ul
+        style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
+        bind:this={dropdownRef}
+        class="suggestion-dropdown"
+      >
+        {#each dropDownSuggestion as suggestion, index (suggestion)}
+          <li
+            class:hover={dropdownArrowIndex === index}
+            tabindex={index}
+            on:click={() => {
+              if (typeof dropDownSelection === 'function') {
+                const updatedValue = dropDownSelection(suggestion);
+                if (typeof updatedValue === 'string') {
+                  value = updatedValue;
+                  readonlyValue = updatedValue;
+                }
               }
-            }
-          }}
-        >
-          {suggestion}
-        </li>
-      {/each}
-    </ul>
-  {/if}
-  {#if validationText !== ''}
-    <div class="input-validation-error">{validationText}</div>
-  {/if}
-</div>
+            }}
+          >
+            {suggestion}
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    {#if validationText && showValidations}
+      <div
+        class={`input-validation-error validation-error-one-click-checkout ${errorValidationClasses}`}
+      >
+        {validationText}
+      </div>
+    {/if}
+  </div>
+{:else}
+  <div
+    bind:this={wrap}
+    class={`elem ${elemClasses}`}
+    class:readonly
+    class:with-prediction={isPredictionEnable}
+  >
+    {#if icon}
+      <i class:icon-invalid={modifyIconPosition}>
+        {@html icon}
+      </i>
+    {/if}
+    {#if leftImage}
+      <img alt="left-img" class="left-img" src={leftImage} />
+    {/if}
+    <input
+      class="input main"
+      class:with-left-img={leftImage}
+      bind:this={input}
+      id={identifier}
+      type={inputType}
+      {name}
+      {inputmode}
+      {value}
+      {required}
+      {autocomplete}
+      x-autocompletetype={xautocompletetype}
+      placeholder={placeholderToShow}
+      {pattern}
+      {readonly}
+      {min}
+      {max}
+      {tabindex}
+      {autocapitalize}
+      {autocorrect}
+      {spellcheck}
+      {dir}
+      {disabled}
+      use:formatterAction={formatter}
+      use:focusAction={handleFocus}
+      use:blurAction={handleBlur}
+      use:inputAction={handleInput}
+      on:focus={handleInputFocus}
+      on:blur={handleInputBlur}
+      on:input={handleInputEvent}
+      on:focus
+      on:blur
+      on:input
+      on:autocomplete
+      on:paste
+      on:click
+      on:keydown={onKeyDown}
+      on:keydown
+      on:scroll={(e) => {
+        mainInputScrollLeft = e.target.scrollLeft;
+      }}
+      class:no-refresh={!refresh}
+      class:no-focus={handleFocus}
+      class:no-blur={handleBlur}
+      class:no-validate={handleInput}
+      class:cvv-input={type === 'cvv'}
+    />
+    {#if isPredictionEnable}
+      <input
+        bind:this={suggestionInputRef}
+        bind:value={predictedValue}
+        class="input prediction-input"
+      />
+    {/if}
+    {#if label}
+      <label for={identifier} class={labelClasses}>{label}</label>
+    {/if}
+    {#if extraLabel}
+      <div class={`${extraLabelClass} input-extralabel`}>
+        {$t(extraLabel)}
+      </div>
+    {/if}
+    {#if loader}
+      <div class="spinner input-loader" />
+    {/if}
+    {#if helpText}
+      <div class="help">{helpText}</div>
+    {/if}
+    {#if downtimeSeverity}
+      <div class="downtime-icon">
+        <DowntimeIcon severe={downtimeSeverity} />
+      </div>
+    {/if}
+    {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
+      <ul
+        style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
+        bind:this={dropdownRef}
+        class="suggestion-dropdown"
+      >
+        {#each dropDownSuggestion as suggestion, index (suggestion)}
+          <li
+            class:hover={dropdownArrowIndex === index}
+            tabindex={index}
+            on:click={() => {
+              if (typeof dropDownSelection === 'function') {
+                const updatedValue = dropDownSelection(suggestion);
+                if (typeof updatedValue === 'string') {
+                  value = updatedValue;
+                  readonlyValue = updatedValue;
+                }
+              }
+            }}
+          >
+            {suggestion}
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+{/if}
 
 <style>
   div:not(.help) {
@@ -418,7 +568,7 @@
     border-bottom: 0px;
   }
   .input-validation-error {
-    color: #f46060;
+    color: var(--error-validation-color);
     margin-top: 4px;
     font-size: 12px;
   }
@@ -440,11 +590,15 @@
     right: 0;
     top: 33px;
   }
+
+  .cvv-input {
+    font-family: 'rzpcvv' !important;
+  }
   .successText {
     color: #079f0d;
   }
   .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .with-prediction {
     .prediction-input {
@@ -514,5 +668,236 @@
 
   .icon-invalid {
     top: 12%;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .visible {
+    display: block;
+  }
+
+  .input-one-click-checkout {
+    font-size: 14px;
+    position: relative;
+    border: 1px solid #e0e0e0;
+    margin-top: 8px;
+    padding: 15px 16px;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .elem-one-click-checkout::after {
+    border-bottom: none !important;
+  }
+  .country-code-one-click-checkout {
+    border-right: none;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .input-one-click-checkout.phone-field-one-click-checkout {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-left: -8%;
+    padding-right: 10%;
+    width: calc(100% + 8%);
+  }
+
+  .label-one-click-checkout {
+    color: #8d8d8d;
+    position: absolute;
+    top: 24px;
+    left: 15px;
+    cursor: inherit;
+    transition: all ease-in 0.2s;
+  }
+
+  .input-one-click-checkout:focus + .label-one-click-checkout,
+  .label-upper {
+    top: 0px;
+    background-color: transparent;
+    font-size: 12px;
+    padding: 0px 4px;
+    left: 9px;
+    color: var(--highlight-color);
+    transition: all ease-out 0.2s;
+    background-color: #fff;
+  }
+
+  .label-upper {
+    color: #8d8d8d;
+  }
+
+  .label-upper.error-label-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .input-one-click-checkout:focus
+    + .label-one-click-checkout.error-label-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .label-one-click-checkout.label-upper.contact-label {
+    left: -40%;
+  }
+
+  .label-one-click-checkout.contact-label {
+    left: -2%;
+  }
+
+  .input-one-click-checkout:focus + .label-one-click-checkout.contact-label {
+    left: -40%;
+  }
+
+  .input-one-click-checkout:focus {
+    border-color: var(--highlight-color);
+  }
+
+  .error-field-one-click-checkout,
+  .pincode-unserviceable-wrapper {
+    border-color: var(--error-validation-color);
+  }
+
+  .error-field-one-click-checkout .label-one-click-checkout,
+  .pincode-unserviceable-label {
+    color: var(--error-validation-color);
+  }
+
+  .error-field-one-click-checkout:focus {
+    border-color: var(--error-validation-color);
+  }
+
+  .validation-error-one-click-checkout {
+    color: var(--error-validation-color);
+  }
+
+  .contact-validation-error {
+    position: relative;
+    left: -8%;
+  }
+
+  /* For the CVV Input field for 1cc */
+
+  .cvv-one-cc {
+    padding: 6px 8px;
+    background: #fff;
+    font-family: rzpcvv !important;
+  }
+
+  .cvv-one-cc-wrapper {
+    width: 56px;
+  }
+
+  .cvv-one-cc-label {
+    top: 18px;
+    left: 12px;
+    line-height: 12px;
+  }
+
+  .input-one-click-checkout:focus + .cvv-one-cc-label {
+    top: 20px;
+    left: 6px;
+  }
+
+  .cvv-one-cc-label-upper {
+    padding: 0px 2px;
+    font-size: 10px;
+    line-height: 12px;
+    left: 6px;
+    top: 2px;
+    background-color: #fff;
+  }
+
+  /* For the Prefered Block CVV Input field for 1cc */
+  .cvv-one-cc-wrapper-prefered-block {
+    width: 48px;
+  }
+
+  .cvv-one-cc-prefered-block {
+    padding: 4px;
+    margin: 0px;
+    background-color: #fff;
+    font-family: rzpcvv !important;
+  }
+
+  .cvv-one-cc-label-prefered-block {
+    top: 6px;
+    left: 6px;
+    font-size: 12px;
+  }
+  .input-one-click-checkout:focus + .cvv-one-cc-label-prefered-block,
+  .cvv-one-cc-label-upper-prefered-block {
+    background-color: #fff;
+    padding: 0px 2px;
+    font-size: 10px;
+    left: 6px;
+    top: -6px;
+  }
+
+  /* For the Input field on Add new card and Emi Page for 1cc */
+
+  .add-card-fields-one-cc-wrapper {
+    width: 100%;
+    margin: 10px 0px;
+    font-size: 12px;
+  }
+
+  .add-card-fields-one-cc {
+    padding: 15px 12px;
+    box-sizing: border-box;
+    margin-top: 0px;
+  }
+
+  .add-card-fields-label-one-cc {
+    top: 18px;
+    line-height: 14px;
+    font-size: 12px;
+  }
+  .input-one-click-checkout:focus + .add-card-fields-label-one-cc {
+    top: 12px;
+    background: #fff;
+    padding: 0px 4px;
+    left: 8px;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  .add-card-fields-label-upper-one-cc {
+    background-color: #fff;
+    top: -6px;
+    padding: 0px 4px;
+    left: 8px;
+    font-size: 12px;
+    line-height: 14px;
+  }
+
+  /* For UPI Page 1cc */
+  .upi-vpa-field-one-cc {
+    background-color: #fff !important;
+    height: 42px;
+  }
+
+  .upi-vpa-labal-one-cc {
+    top: 20px;
+  }
+
+  .upi-vpa-label-upper-one-cc {
+    top: 0px;
+  }
+
+  /* For the Icons needed for 1cc */
+  .servicibility-icon-wrapper {
+    position: absolute;
+    right: 14px;
+    top: 24px;
+    z-index: 1;
+  }
+
+  .drop-down-icon-wrapper {
+    position: absolute;
+    right: 14px;
+    top: 22px;
   }
 </style>

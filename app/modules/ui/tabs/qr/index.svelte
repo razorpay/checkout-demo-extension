@@ -14,7 +14,12 @@
     getMerchantOrder,
     isCustomerFeeBearer,
     getOptionalObject,
+    isOneClickCheckout,
+    getCurrency,
   } from 'razorpay';
+  import { amount } from 'one_click_checkout/charges/store';
+  import { formatAmountWithSymbol } from 'common/currency';
+  import { showSummaryModal } from 'one_click_checkout/summary_modal';
 
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -28,6 +33,7 @@
     PAYMENT_CHECKING_STATUS,
     QR_RETRY,
     QR_SCAN_ON_PHONE,
+    VIEW_AMOUNT_DETAILS,
   } from 'ui/labels/qr';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
@@ -41,6 +47,7 @@
   export let onSuccess;
 
   const session = getSession();
+  const currency = getCurrency();
 
   onMount(() => {
     init();
@@ -156,6 +163,18 @@
           <img alt="QR" src={qrImage} on:load={qrLoaded} />
         </div>
       {/if}
+      {#if isOneClickCheckout()}
+        <div class="active-bg-color qr-one-cc-cta">
+          <span class="price-label"
+            >{formatAmountWithSymbol($amount, currency, false)}</span
+          >
+          <button
+            class="cta-view-details"
+            on:click={() => showSummaryModal(false)}
+            >{$t(VIEW_AMOUNT_DETAILS)}</button
+          >
+        </div>
+      {/if}
     {/if}
   {:else if view === 'error'}
     <div class="error mchild">
@@ -222,5 +241,36 @@
   .btn {
     display: inline-block;
     margin-top: 20px;
+  }
+
+  .qr-one-cc-cta {
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  .price-label {
+    color: #263a4a;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .cta-view-details {
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 400;
+    color: #8d97a1;
+  }
+
+  :global(#content.one-cc #form-qr) {
+    padding-top: 26px;
+  }
+
+  :global(#content.one-cc) .message {
+    padding-bottom: 50px;
   }
 </style>

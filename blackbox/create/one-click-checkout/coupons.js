@@ -11,17 +11,16 @@ const {
   applyCoupon,
   handleApplyCouponReq,
   handleFillUserDetails,
+  handleCouponView,
 } = require('../../actions/one-click-checkout/coupons');
 const {
   handleCustomerStatusReq,
-  handleUpdateOrderReq,
-  handleThirdWatchReq,
-  handleFeeSummary,
   handleCreateOTPReq,
   handleVerifyOTPReq,
   handleTypeOTP,
+  proceedOneCC,
+  mockPaymentSteps,
 } = require('../../actions/one-click-checkout/common');
-const { selectPaymentMethod } = require('../../tests/homescreen/actions');
 const {
   fillUserAddress,
   handleShippingInfo,
@@ -29,14 +28,7 @@ const {
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
-const { proceed } = require('../../tests/homescreen/sharedActions');
 const { delay } = require('../../util');
-const {
-  selectBank,
-  submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-} = require('../../actions/common');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -54,6 +46,7 @@ module.exports = function (testFeatures) {
     personalised,
     discountAmount,
     isSaveAddress,
+    skip,
   } = features;
 
   describe.each(
@@ -62,8 +55,11 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
-    // skipping tests because some are failing randomly
-    test.skip(title, async () => {
+    if (skip) {
+      test.skip(title, () => {});
+      return;
+    }
+    test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -71,10 +67,9 @@ module.exports = function (testFeatures) {
       });
 
       await handleAvailableCouponReq(context, availableCoupons);
-
+      await handleCouponView(context);
       if (personalised) {
         await applyCoupon(context, couponCode);
-        await delay(200);
         await handleApplyCouponReq(
           context,
           false,
@@ -84,13 +79,14 @@ module.exports = function (testFeatures) {
         await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
         await handleCreateOTPReq(context);
         await handleTypeOTP(context);
-        await proceed(context);
+        await delay(200);
+        await proceedOneCC(context);
         await handleVerifyOTPReq(context);
         await handleAvailableCouponReq(context, availableCoupons);
         await handleApplyCouponReq(context, true, discountAmount);
-        await handleAvailableCouponReq(context, availableCoupons);
-        await context.page.click('#footer');
         await handleShippingInfo(context, false, true);
+        await handleAvailableCouponReq(context, availableCoupons);
+        await delay(400);
       } else {
         if (couponValid || availableCoupons) {
           await verifyValidCoupon(context, features);
@@ -102,22 +98,14 @@ module.exports = function (testFeatures) {
           await handleRemoveCoupon(context, amount);
         }
 
-        await proceed(context);
         await fillUserDetails(context);
-        await proceed(context);
+        await delay(200);
+        await proceedOneCC(context);
         await handleCustomerStatusReq(context);
         await fillUserAddress(context, { isSaveAddress, serviceable });
       }
-      await proceed(context);
-      await handleUpdateOrderReq(context, options.order_id);
-      await handleThirdWatchReq(context);
-      await delay(200);
-      await handleFeeSummary(context, features);
-      await selectPaymentMethod(context, 'netbanking');
-      await selectBank(context, 'SBIN');
-      await submit(context, false);
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
+      await proceedOneCC(context);
+      await mockPaymentSteps(context, options, features);
     });
   });
 };

@@ -21,6 +21,9 @@ export const INPUT_ERROR_LABEL = 'address.input_error_label';
 export const HOUSE_ERROR_LABEL = 'address.house_error_label';
 export const AREA_ERROR_LABEL = 'address.area_error_label';
 export const ADD_ADDRESS_LABEL = 'address.add_address_label';
+export const SAVED_ADDRESS_PHONE_LABEL = 'address.saved_address_phone_label';
+export const SAVED_ADDRESS_LANDMARK_LABEL =
+  'address.saved_address_landmark_label';
 export const NON_SERVICEABLE_LABEL = 'address.non_serviceable_label';
 export const COD_DISABLED_LABEL = 'cod.disabled_label';
 export const COD_CHARGES_DESCRIPTION = 'methods.descriptions.cod_charge';
@@ -43,3 +46,13 @@ export const REQUIRED_LABEL = 'address.required_label';
 export const INDIA_CONTACT_ERROR_LABEL = 'address.indian_contact_error_label';
 export const CONTACT_ERROR_LABEL = 'address.contact_error_label';
 export const PINCODE_ERROR_LABEL = 'address.pincode_error_message';
+export const EDIT_ADDRESS_LABEL = 'address.edit_address_label';
+export const PINCODE_NON_SERVICEABLE_LABEL =
+  'address.pincode_non_serviceable_label';
+export const ADD_LANDMARK = 'address.add_landmark';
+export const OPTIONAL = 'address.optional';
+export const SAVE_ADDRESS_CONSENT_TOOLTIP = 'address.save_consent_tooltip';
+export const ADDRESS_TAGS_HEADING = 'address.address_tags_heading';
+export const HOME = 'address.home';
+export const OFFICE = 'address.office';
+export const OTHERS = 'address.others';

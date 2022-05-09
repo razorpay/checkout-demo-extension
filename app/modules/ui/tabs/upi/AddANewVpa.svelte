@@ -14,7 +14,7 @@
 
   // Util imports
   import { shouldRememberCustomer } from 'checkoutstore';
-  import { getPrefilledName, hasFeature } from 'razorpay';
+  import { getPrefilledName, hasFeature, isOneClickCheckout } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
@@ -40,6 +40,7 @@
   export let recurring = false;
   export let value = '';
   export let rememberVpa = true;
+  export let helpTextToDisplay;
 
   // Refs
   export let vpaField = null;
@@ -47,6 +48,8 @@
   const PATTERN_WITH_HANDLE = '.+@.+';
 
   const themeMeta = getThemeMeta();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Computed
   export let pattern;
@@ -92,7 +95,9 @@
 
   function handleVpaInput() {
     checkAndAddDowntime();
-    if (isVpaValid(vpa) || !pspHandle) {
+    const isValidVPA = isVpaValid(vpa);
+    helpTextToDisplay = isValidVPA ? undefined : $t(UPI_COLLECT_NEW_VPA_HELP);
+    if (isValidVPA || !pspHandle) {
       value = vpa;
     } else {
       value = `${vpa}@${pspHandle}`;
@@ -138,6 +143,20 @@
   $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
+
+  let label;
+  let placeholder;
+
+  $: {
+    // LABEL: VPA
+    if (isOneClickCheckoutEnabled) {
+      label = $t(UPI_COLLECT_ENTER_ID);
+      placeholder = null;
+    } else {
+      label = null;
+      placeholder = $t(UPI_COLLECT_ENTER_ID);
+    }
+  }
 </script>
 
 <!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
@@ -151,7 +170,11 @@
   on:click={focusAfterTimeout}
   {selected}
 >
-  <div id={'new-vpa-field-' + paymentMethod} slot="title">
+  <div
+    id={'new-vpa-field-' + paymentMethod}
+    slot="title"
+    class:title-vpa-upi-one-cc={isOneClickCheckoutEnabled}
+  >
     <!-- LABEL: UPI ID -->
     <!-- LABEL: Add UPI ID -->
     {logged && canSaveVpa
@@ -162,6 +185,8 @@
   <div
     slot="subtitle"
     class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}
+    class:subtitle-vpa-upi-one-cc={isOneClickCheckoutEnabled &&
+      paymentMethod === 'upi'}
   >
     {#if paymentMethod === 'upi_otm' || recurring}
       <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
@@ -239,7 +264,14 @@
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
           on:blur
-          placeholder={$t(UPI_COLLECT_ENTER_ID)}
+          {placeholder}
+          {label}
+          inputFieldClasses={isOneClickCheckoutEnabled &&
+            'upi-vpa-field-one-cc'}
+          validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+          labelClasses={isOneClickCheckoutEnabled && 'upi-vpa-labal-one-cc'}
+          labelUpperClasses={isOneClickCheckoutEnabled &&
+            'upi-vpa-label-upper-one-cc'}
         />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
@@ -292,5 +324,20 @@
 
   .downtime-upi {
     margin-top: 8px;
+  }
+
+  /* 1CC Input Classes*/
+
+  .subtitle-vpa-upi-one-cc {
+    font-size: 12px;
+    line-height: 16px;
+    color: #8d97a1;
+    margin-top: 2px;
+    margin-bottom: 10px;
+  }
+
+  .title-vpa-upi-one-cc {
+    color: #263a4a;
+    font-weight: 400;
   }
 </style>

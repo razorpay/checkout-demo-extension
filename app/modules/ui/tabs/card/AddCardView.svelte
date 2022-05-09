@@ -40,6 +40,7 @@
     isStrictlyRecurring,
     getRecurringMethods,
     isRecurring,
+    isOneClickCheckout,
     isDynamicFeeBearer,
   } from 'razorpay';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
@@ -87,18 +88,38 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
+  export let isScreenScrollable;
+
   const isSavedCardsEnabled = shouldRememberCustomer();
 
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
+
   let showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
+
   let cvvLength = 3;
   let showCardUnsupported = false;
   let lastIin = '';
 
+  let oneCCFieldProps = {};
+
+  $: {
+    if (isOneClickCheckoutEnabled) {
+      oneCCFieldProps = {
+        elemClasses: 'add-card-fields-one-cc-wrapper',
+        inputFieldClasses: 'add-card-fields-one-cc',
+        labelClasses: 'add-card-fields-label-one-cc',
+        labelUpperClasses: 'add-card-fields-label-upper-one-cc',
+      };
+    }
+  }
+
   let cardNumberHelpText;
-  $: cardNumberHelpText =
-    showCardUnsupported && $cardNumber.length > 6
-      ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-      : undefined;
+  $: {
+    cardNumberHelpText =
+      showCardUnsupported && $cardNumber.length > 6
+        ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+        : undefined;
+  }
 
   export let faded = false;
 
@@ -122,6 +143,7 @@
   }
 
   onMount(() => {
+    isScreenScrollable();
     Events.TrackBehav(CardEvents.ADD_NEW_CARD, {
       PayWithSavedCard: delayOTPExperiment,
     });
@@ -492,7 +514,7 @@
 
 <div class="pad" id="add-card-container" class:faded>
   <div class="page-header">
-    <span class="card-title">{$t(ADD_NEW_CARD)}</span>
+    <span class="card-title">{$t(ADD_NEW_CARD)} </span>
     <span class="emi-plans-label">
       {#if tab === 'emi'}
         <div id="view-emi-plans" on:click={viewAllEMIPlans}>
@@ -519,6 +541,7 @@
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled}
+        {...oneCCFieldProps}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -531,6 +554,7 @@
           on:focus
           on:blur={trackExpiryFilled}
           on:filled={(_) => handleFilled('expiryField')}
+          {...oneCCFieldProps}
         />
       </div>
     {/if}
@@ -545,6 +569,7 @@
         bind:this={nameField}
         on:focus
         on:blur={trackNameFilled}
+        {...oneCCFieldProps}
       />
     </div>
     {#if !$hideExpiryCvvFields}
@@ -556,6 +581,7 @@
           bind:this={cvvField}
           on:focus
           on:blur={trackCvvFilled}
+          {...oneCCFieldProps}
         />
       </div>
     {/if}
@@ -581,7 +607,10 @@
     </div>
   </div>
   {#if $showNoCvvCheckbox}
-    <div class="row maestro-card-block">
+    <div
+      class="row maestro-card-block"
+      class:maestro-card-block-one-cc={isOneClickCheckoutEnabled}
+    >
       <label id="nocvv-check" for="nocvv">
         <input
           type="checkbox"
@@ -664,6 +693,10 @@
     margin-top: 15px;
   }
 
+  .maestro-card-block-one-cc {
+    margin-top: 24px;
+  }
+
   .maestro-card-block label {
     font-size: 14px;
     line-height: 14px;
@@ -671,5 +704,10 @@
   }
   .maestro-card-block-label-text {
     margin-left: 5px;
+  }
+
+  :global(#content.one-cc) .card-title {
+    font-weight: 600;
+    color: #263a4a;
   }
 </style>

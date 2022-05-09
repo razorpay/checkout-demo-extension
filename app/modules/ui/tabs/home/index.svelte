@@ -3,6 +3,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import { updateActionAreaContentAndCTA } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
@@ -12,7 +13,16 @@
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
   import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
-  import { getAvailableMethods } from 'ui/tabs/home/helpers';
+  import {
+    getAvailableMethods,
+    getSectionsDisplayed,
+  } from 'ui/tabs/home/helpers';
+  import { isUnscrollable } from 'one_click_checkout/helper';
+  import {
+    showToast,
+    TOAST_THEME,
+    TOAST_SCREEN,
+  } from 'one_click_checkout/Toast';
   import * as _El from 'utils/DOM';
 
   import { HOME_VIEWS } from './constants';
@@ -35,7 +45,9 @@
     setContact,
     setEmail,
     upiIntentInstrumentsForAnalytics,
+    blocks,
   } from 'checkoutstore/screens/home';
+  import { activeRoute } from 'one_click_checkout/routing/store';
 
   import { customer } from 'checkoutstore/customer';
   import {
@@ -65,10 +77,6 @@
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     TPV_METHODS_NOT_AVAILABLE,
   } from 'ui/labels/home';
-  import {
-    SHIPPING_CHARGES_LABEL,
-    SAVED_ADDRESS_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
   import { t, locale } from 'svelte-i18n';
 
   // Utils imports
@@ -99,10 +107,8 @@
     isMethodEnabled,
   } from 'checkoutstore/methods';
 
-  import { didSaveAddress } from 'one_click_checkout/address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
   import { codReason } from 'one_click_checkout/address/shipping_address/store';
-
   import {
     getInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
@@ -116,7 +122,7 @@
     showNext,
   } from 'checkoutstore/cta';
 
-  import {
+  import Analytics, {
     P13NEvents,
     OrderEvents,
     Events,
@@ -124,6 +130,7 @@
     MetaProperties,
     MiscEvents,
   } from 'analytics';
+  import MetaPropertiesOneCC from 'one_click_checkout/analytics/metaProperties';
   import { intentVpaPrefill } from 'checkoutstore/screens/upi';
 
   import updateScore from 'analytics/checkoutScore';
@@ -164,6 +171,11 @@
     CATEGORIES,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
+  import {
+    PAY_NOW_CTA_LABEL,
+    PLACE_ORDER_CTA_LABEL,
+  } from 'one_click_checkout/cta/i18n';
+  import { headerVisible } from 'one_click_checkout/header/store';
   import { querySelector } from 'utils/doc';
   import { getPrefillBank } from 'netbanking/helper';
   import {
@@ -175,7 +187,15 @@
   const session = getSession();
   const singleMethod = getSingleMethod();
 
+  let selectedMethod = '';
   let showHome = false;
+  let renderCtaOneCC = false;
+  let ctaOneCCDisabled = true;
+  let methodEle;
+  let scrollable;
+  let preferredMethods;
+  let homeMethodEle;
+  let oneCCResizeObserver;
 
   // TPV
   const tpv = getTPV();
@@ -192,6 +212,7 @@
   const prefilledBank = getPrefillBank();
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
+  const isOneCCEnabled = isOneClickCheckout();
 
   let expSourceSet = false;
 
@@ -511,6 +532,8 @@
             },
             'api'
           ).then(({ identified, instruments: instrumentsFromApi }) => {
+            // Recalculate the screen size after Preferred Payment Methods loaded due to layout shift happens
+            scrollable = isUnscrollable(methodEle?.parentNode);
             userIdentified = identified;
 
             if (instrumentsFromApi.length) {
@@ -616,13 +639,10 @@
       sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
       // Get the methods for which a preferred instrument was shown
-      const preferredMethods = setPreferredInstruments.reduce(
-        (acc, instrument) => {
-          acc[`_${instrument.method}`] = true;
-          return acc;
-        },
-        {}
-      );
+      preferredMethods = setPreferredInstruments.reduce((acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      }, {});
 
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
@@ -735,13 +755,21 @@
   }
 
   export function codActions() {
-    if (isOneClickCheckout() && getMerchantOffers()?.length) {
+    Analytics.setMeta(MetaPropertiesOneCC.IS_COD_ENABLED, $isCodAvailable);
+    if (isOneCCEnabled && getMerchantOffers()?.length) {
       showMethodOffers.set(true);
     }
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
+    });
+    Events.TrackRender(HOME_EVENTS.HOME_LOADED_V2, {
+      is_cod_enabled: $isCodAvailable,
+      cod_unavailable_reason: $codReason,
+      available_methods: getAvailableMethods(),
+      sections: getSectionsDisplayed($blocks),
+      p13n_instruments: Object.keys(preferredMethods),
     });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
@@ -755,49 +783,45 @@
     });
     if (isMethodEnabled('cod')) {
       Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
+      Events.TrackRender(COD_EVENTS.COD_SHOWN_V2, {
+        is_cod_enabled: $isCodAvailable,
+      });
     }
   }
 
-  export function addressNext(showSnackbar) {
+  export function addressNext() {
     $isShippingAddedToAmount = true;
     showHome = true;
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
     });
-    if (showSnackbar) {
-      const charge = formatAmountWithCurrency($shippingCharge);
-      const text = [];
-      if ($didSaveAddress) {
-        text.push($t(SAVED_ADDRESS_LABEL));
-      }
-      if ($shippingCharge) {
-        text.push(
-          formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, { charge }, $locale)
-        );
-      }
-      if (text.length) {
-        const snackBar = new Snackbar({
-          target: document.getElementById('form'),
-          props: {
-            align: 'bottom',
-            shown: true,
-            timer: 2000,
-            text: text,
-            class: 'snackbar-cod',
-          },
-        });
-      }
-    }
     setTimeout(() => {
       hideCta();
     });
   }
 
   export function onShown() {
-    if (!isOneClickCheckout()) {
+    $headerVisible = true;
+    renderCtaOneCC = true;
+    if (!isOneCCEnabled) {
       showHome = true;
     }
+    // TODO: 120px as hack for payment methods to make the screen scrollable
+    scrollable = isUnscrollable(methodEle?.parentNode, 120);
+
+    if (isOneCCEnabled) {
+      // Recalculate the screen size whenever homeMethodEle resize happened
+      setTimeout(() => {
+        if (homeMethodEle && window?.ResizeObserver) {
+          oneCCResizeObserver = new window.ResizeObserver(() => {
+            scrollable = isUnscrollable(methodEle?.parentNode);
+          });
+          oneCCResizeObserver.observe(homeMethodEle);
+        }
+      });
+    }
+
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
       hideCta();
@@ -913,7 +937,7 @@
   }
 
   view = determineLandingView();
-  if (!isOneClickCheckout()) {
+  if (!isOneCCEnabled) {
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
@@ -1003,6 +1027,7 @@
   function deselectInstrument() {
     $selectedInstrumentId = null;
     dccView = 'home-screen';
+    ctaOneCCDisabled = true;
   }
 
   function showSnackbar(isCodApplied) {
@@ -1011,19 +1036,15 @@
       ? 'methods.descriptions.cod_charge_applied'
       : 'methods.descriptions.cod_charge_removed';
 
-    const snackBar = new Snackbar({
-      target: document.getElementById('form'),
-      props: {
-        align: 'bottom',
-        shown: true,
-        timer: 2000,
-        text: formatTemplateWithLocale(template, { charge }, $locale),
-        class: 'snackbar-cod',
-      },
+    showToast({
+      message: formatTemplateWithLocale(template, { charge }),
+      theme: TOAST_THEME.INFO,
+      screen: TOAST_SCREEN.COMMON,
     });
   }
 
   export function selectMethod(method) {
+    selectedMethod = method;
     Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
       method,
     });
@@ -1058,6 +1079,13 @@
       // other code to run and perform validations.
       session.switchTab(method);
     });
+  }
+
+  export function onHide() {
+    if (isOneCCEnabled && oneCCResizeObserver) {
+      oneCCResizeObserver.unobserve(homeMethodEle);
+    }
+    renderCtaOneCC = false;
   }
 
   function showCODCharges(method) {
@@ -1108,13 +1136,21 @@
     showUserDetailsStrip =
       ($isContactPresent || $email) &&
       !isContactEmailHidden() &&
-      !isOneClickCheckout();
+      !isOneCCEnabled;
   }
 
   export function onSelectInstrument(event) {
+    ctaOneCCDisabled = false;
     const instrument = event.detail;
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
       instrument,
+    });
+    Events.TrackBehav(HOME_EVENTS.PAYMENT_INSTRUMENT_SELECTED_V2, {
+      instrument,
+    });
+    Events.TrackBehav(HOME_EVENTS.PAYMENT_METHOD_SELECTED_V2, {
+      method: instrument.method,
+      section: instrument.section,
     });
     updateScore('instrumentSelected');
 
@@ -1158,24 +1194,30 @@
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
   <Screen pad={false}>
-    <div class="screen-main">
+    <div
+      class="screen-main"
+      class:screen-one-cc={scrollable && isOneCCEnabled}
+      bind:this={methodEle}
+    >
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}
       {#if view === HOME_VIEWS.METHODS}
         <div
           class="solidbg"
-          class:topbar-mg={isOneClickCheckout()}
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
-          <RTBBanner />
+          <!-- We dont want it to show in 1cc flow-->
+          {#if !isOneCCEnabled}
+            <RTBBanner />
+          {/if}
 
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container"
-              class:details-container-1cc={isOneClickCheckout()}
+              class:details-container-1cc={isOneCCEnabled}
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}
             >
               {#if showUserDetailsStrip}
@@ -1216,6 +1258,7 @@
 
           <div
             class="home-methods"
+            bind:this={homeMethodEle}
             in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
           >
             <NewMethodsList
@@ -1250,6 +1293,16 @@
         <SecuredMessage />
       {/if}
     </Bottom>
+    {#if renderCtaOneCC}
+      <CTAOneCC
+        disabled={ctaOneCCDisabled}
+        on:click={() => session.preSubmit()}
+      >
+        {selectedMethod === 'cod'
+          ? $t(PLACE_ORDER_CTA_LABEL)
+          : $t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 
@@ -1306,7 +1359,15 @@
     background: white;
     order: -1;
   }
-  .topbar-mg {
-    margin-top: 47px;
+
+  :global(#content.one-cc) .home-methods {
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 26px;
+    margin-top: 26px;
+  }
+
+  .screen-one-cc {
+    min-height: 120%;
   }
 </style>

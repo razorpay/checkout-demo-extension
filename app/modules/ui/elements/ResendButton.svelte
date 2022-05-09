@@ -7,11 +7,12 @@
   import { t } from 'svelte-i18n';
   import { RESEND_LABEL } from 'ui/labels/otp';
 
-  // Utils imports
-  import { formatToMMSS } from 'utils/date';
-
+  // store imports
   import { resendTimeout } from 'checkoutstore/screens/otp';
+
+  // utils imports
   import { isOneClickCheckout } from 'razorpay';
+  import { formatToMMSS } from 'utils/date';
 
   const dispatch = createEventDispatcher();
 
@@ -27,8 +28,6 @@
   $: secondsLeftText = secondsLeft > 0 ? `(${secondsLeft})` : '';
 
   let disabled = false;
-  secondsLeft > 0;
-
   $: disabled = secondsLeft > 0 && isOneClickCheckout();
 
   function invokeResend(event) {

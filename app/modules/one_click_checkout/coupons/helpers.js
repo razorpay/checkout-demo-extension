@@ -23,6 +23,13 @@ import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
+import { showToast, TOAST_THEME, TOAST_SCREEN } from 'one_click_checkout/Toast';
+import { COUPON_TOAST_MESSAGE } from 'one_click_checkout/coupons/i18n/labels';
+import { getCurrency } from 'razorpay';
+import { formatAmountWithSymbol } from 'common/currency';
+import { formatTemplateWithLocale } from 'i18n';
+import { locale } from 'svelte-i18n';
+import { cartDiscount } from 'one_click_checkout/charges/store';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -34,7 +41,7 @@ export function nextView() {
 }
 
 export function fetchCoupons() {
-  getCoupons()
+  return getCoupons()
     .then((coupons) => {
       Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, coupons.length);
       availableCoupons.set(coupons);
@@ -47,6 +54,9 @@ export function fetchCoupons() {
     .finally(() => {
       Events.TrackRender(CouponEvents.COUPONS_SCREEN, {
         coupons_count: get(availableCoupons).length,
+      });
+      Events.TrackRender(CouponEvents.SUMMARY_COUPONS_COUNT, {
+        count_coupons_available: get(availableCoupons)?.length,
       });
     });
 }
@@ -65,6 +75,8 @@ export function applyCouponCode(code) {
   if (input) {
     applyCoupon(input, source, {
       onValid: () => {
+        Analytics.setMeta('is_coupon_valid', true);
+        Analytics.setMeta('coupon_code', input);
         merchantAnalytics({
           event: ACTIONS.COUPONS_APPLIED_SUCCESS,
           category: CATEGORIES.COUPONS,
@@ -80,8 +92,30 @@ export function applyCouponCode(code) {
             coupon_code: input,
           },
         });
+        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
+          is_coupon_valid: true,
+        });
+        navigator.navigateTo({ path: views.COUPONS });
+        showToast({
+          delay: 5000,
+          message: formatTemplateWithLocale(
+            COUPON_TOAST_MESSAGE,
+            {
+              amount: formatAmountWithSymbol(
+                get(cartDiscount),
+                getCurrency(),
+                false
+              ),
+            },
+            get(locale)
+          ),
+          theme: TOAST_THEME.SUCCESS,
+          screen: TOAST_SCREEN.ONE_CC,
+        });
       },
       onInvalid: (error) => {
+        Analytics.setMeta('is_coupon_valid', false);
+        Analytics.setMeta('coupon_code', input);
         merchantAnalytics({
           event: ACTIONS.COUPONS_APPLIED_FAILED,
           category: CATEGORIES.COUPONS,
@@ -89,6 +123,11 @@ export function applyCouponCode(code) {
             page_title: CATEGORIES.COUPONS,
             coupon_code: input,
           },
+        });
+        Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
+          is_coupon_valid: false,
+          error_reason: error?.error?.reason,
+          error_description: error?.error?.description,
         });
         if (error.failure_code === ERROR_USER_NOT_LOGGED_IN) {
           showDetailsOverlay(true);
@@ -107,4 +146,8 @@ export function successHandler() {
 
 export function skipCouponOTP() {
   navigator.replace(views.COUPONS);
+}
+
+export function skipCouponListOTP() {
+  navigator.replace(views.COUPONS_LIST);
 }

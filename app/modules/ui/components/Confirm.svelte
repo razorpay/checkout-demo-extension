@@ -150,4 +150,32 @@
     letter-spacing: 1px;
     line-height: 40px;
   }
+
+  :global(.one-cc) .confirm-container {
+    padding: 20px 16px;
+  }
+
+  :global(.one-cc) .confirm-heading {
+    letter-spacing: normal;
+    text-transform: none;
+    color: #263a4a;
+    font-weight: 600;
+    border-bottom: 1px solid #e1e5ea;
+    padding: 0 0 12px 0;
+  }
+
+  :global(.one-cc) .confirm-message {
+    color: #8d97a1;
+  }
+
+  :global(.one-cc) .confirm-buttons {
+    margin-top: 16px;
+  }
+
+  :global(.one-cc) .text-btn {
+    letter-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    font-weight: 600;
+  }
 </style>

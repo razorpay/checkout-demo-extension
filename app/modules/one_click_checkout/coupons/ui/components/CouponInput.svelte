@@ -1,4 +1,16 @@
 <script>
+  // UI Imports
+  import Icon from 'ui/elements/Icon.svelte';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import {
+    COUPON_APPLIED_LABEL,
+    APPLY_LABEL,
+    COUPON_INPUT_PLACEHOLDER,
+  } from 'one_click_checkout/coupons/i18n/labels';
+
+  // store imports
   import {
     error,
     couponInputValue,
@@ -7,16 +19,7 @@
     couponAppliedIndex,
   } from 'one_click_checkout/coupons/store';
 
-  import {
-    COUPON_INPUT_PLACEHOLDER,
-    COUPON_APPLIED_LABEL,
-    APPLY_LABEL,
-  } from 'one_click_checkout/coupons/i18n/labels';
-  import { t } from 'svelte-i18n';
-
-  import Icon from 'ui/elements/Icon.svelte';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
-
+  // Analytics Imports
   import { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import {
@@ -25,12 +28,21 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 
-  const { close, tick_filled_donate } = getIcons();
+  // utils imports
+  import { getIcons } from 'one_click_checkout/sessionInterface';
 
+  // constant imports
+  import { LOADING_STATUS } from 'one_click_checkout/coupons/constants';
+
+  const { close, tick_filled_donate } = getIcons();
+  let couponField;
   function onBlur() {
     if ($couponInputValue) {
       Events.TrackBehav(CouponEvents.INPUT, {
         couponCode: $couponInputValue,
+      });
+      Events.TrackBehav(CouponEvents.CUSTOM_COUPON_ENTERED, {
+        coupon_code: $couponInputValue,
       });
       merchantAnalytics({
         event: ACTIONS.COUPONS_MANUAL_INPUT,
@@ -42,37 +54,56 @@
     }
   }
 
+  function handleClickLabel() {
+    couponField.focus();
+  }
+
+  const handleApplyCoupon = () => {
+    Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {
+      index: $couponAppliedIndex,
+    });
+    if ($couponInputValue) {
+      Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
+        meta: {
+          coupon_code: $couponInputValue,
+          chosen_coupon_available: 0,
+        },
+      });
+    }
+    applyCoupon();
+  };
+
   export let removeCoupon;
   export let applyCoupon;
   export let onCouponInput;
 </script>
 
-<div class="row coupon-input-group" class:invalid={$error}>
+<div class="input-group" class:invalid={$error}>
   <input
+    id="coupon-input"
+    type="text"
+    class="input-area"
+    required
     on:input={onCouponInput}
     bind:value={$couponInputValue}
     on:blur={onBlur}
-    type="text"
-    id="coupon-input"
-    placeholder={$t(COUPON_INPUT_PLACEHOLDER)}
+    bind:this={couponField}
   />
+  <label for="inputField" class="label" on:click={handleClickLabel}
+    >{$t(COUPON_INPUT_PLACEHOLDER)}</label
+  >
   {#if $isCouponApplied || $error}
     <button class="close-button" on:click|preventDefault={removeCoupon}>
       <Icon icon={close} />
     </button>
-  {:else if $couponState === 'loading'}
+  {:else if $couponState === LOADING_STATUS}
     <div class="spinner coupon-spinner" />
   {:else}
     <button
       disabled={!$couponInputValue}
       id="coupon-apply-btn"
-      class={`${$couponInputValue ? 'theme-highlight' : ''} coupon-apply-btn`}
-      on:click|preventDefault={() => {
-        Events.TrackBehav(CouponEvents.COUPON_APPLY_CLICKED, {
-          index: $couponAppliedIndex,
-        });
-        applyCoupon();
-      }}
+      class="theme coupon-apply-btn"
+      on:click|preventDefault={handleApplyCoupon}
     >
       {$t(APPLY_LABEL)}
     </button>
@@ -87,7 +118,7 @@
 {/if}
 
 {#if $error}
-  <div id="error-feedback">{$error}</div>
+  <div data-test-id="error-feedback" id="error-feedback">{$error}</div>
 {/if}
 
 <style>
@@ -116,11 +147,11 @@
 
   #coupon-input {
     padding: 12px;
-    color: #424242;
+    color: #263a4a;
     flex: 1;
     min-width: 0;
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 500;
     caret-color: var(--background-color, #3684d6);
   }
 
@@ -137,9 +168,8 @@
 
   .coupon-apply-btn {
     font-size: 14px;
-    font-weight: 700;
-    line-height: 20px;
-    padding-right: 14px;
+    font-weight: 600;
+    padding-right: 22px;
   }
 
   .invalid {
@@ -147,14 +177,16 @@
   }
 
   #error-feedback {
-    color: #fc6e51;
-    margin-bottom: 20px;
+    color: #b21528;
     font-size: 12px;
     font-weight: 500;
   }
 
   .coupon-spinner {
-    margin-right: 12px;
+    display: inline-block;
+    position: relative;
+    top: 12px;
+    right: 24px;
   }
 
   .color-green {
@@ -222,5 +254,62 @@
 
   input:focus::placeholder {
     opacity: 0.3;
+  }
+
+  .input-group {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+
+  .input-area {
+    outline: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 15px;
+    color: #263a4a;
+    width: 205px;
+  }
+  .label {
+    color: #8d8d8d;
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    background: #fff;
+    cursor: inherit;
+    transition: all ease-in 0.2s;
+  }
+
+  .input-group:focus-within {
+    border: 1px solid var(--highlight-color);
+    color: var(--highlight-color);
+  }
+
+  .input-group.invalid {
+    border: 1px solid #b21528;
+    color: #b21528;
+  }
+
+  .input-group .input-area:focus + .label {
+    top: -8px;
+    padding: 0 3px;
+    font-size: 12px;
+    left: 9px;
+    color: var(--highlight-color);
+    transition: all ease-out 0.2s;
+  }
+
+  .input-group .input-area:valid + .label {
+    top: -8px;
+    padding: 0 3px;
+    font-size: 12px;
+    left: 9px;
+  }
+
+  .input-group.invalid label {
+    color: #b21528;
   }
 </style>

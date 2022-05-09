@@ -38,6 +38,7 @@ jest.mock('razorpay', () => ({
   getMerchantMethods: jest.fn(),
   getAmount: jest.fn(),
   getMerchantOrder: jest.fn(),
+  getMerchantKey: jest.fn(() => 'rzp_live_ILgsfZCZoFIKMb'),
 }));
 jest.mock('common/useragent', () => ({
   android: true,

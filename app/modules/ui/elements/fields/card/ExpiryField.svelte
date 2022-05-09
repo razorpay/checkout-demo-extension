@@ -13,6 +13,11 @@
   export let id;
   export let name;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   let valid = false;
 
   $: {
@@ -45,7 +50,10 @@
     }
   }
 
+  let expirayValidationError;
+
   export function isValid() {
+    expirayValidationError = !valid;
     return valid;
   }
 </script>
@@ -68,4 +76,9 @@
   handleBlur
   handleFocus
   handleInput
+  {elemClasses}
+  {inputFieldClasses}
+  {labelClasses}
+  {labelUpperClasses}
+  isInvalid={expirayValidationError}
 />

@@ -18,6 +18,22 @@
   }
 }
 
+#modal.one-cc {
+  border-radius: 0px;
+  color: #263A4A;
+}
+
+@media (min-width: 992px) {
+  #modal.one-cc {
+   height: 600px;
+  }
+}
+
+.one-cc > #modal-inner {
+  border-radius: 0px;
+  font-family: "Inter", "lato", ubuntu, helvetica, sans-serif !important;
+}
+
 .payment-frame {
   overflow: hidden;
   background: #fff;
@@ -69,10 +85,13 @@
 }
 
 #one-cc-loader {
-  position: absolute;
-  height: 100%;
-  width: 100%
   display: flex;
   align-items: center;
-  justify-content: center;  
+  justify-content: center;
+}
+
+#one-cc-loader.fixed {
+  bottom: 0;
+  position: absolute;
+  width: 100%;
 }

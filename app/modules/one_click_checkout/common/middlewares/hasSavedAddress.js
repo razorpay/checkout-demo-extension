@@ -2,7 +2,7 @@ import {
   getCustomerDetails,
   isUserLoggedIn,
 } from 'one_click_checkout/common/helpers/customer';
-import otpEvents from 'ui/tabs/otp/analytics';
+import otpEvents from 'one_click_checkout/otp/analytics';
 import { Events } from 'analytics';
 import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
@@ -11,16 +11,18 @@ import {
   updateOTPStore,
 } from 'one_click_checkout/common/otpHelpers';
 import { savedAddresses } from 'one_click_checkout/address/store';
+import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { views } from 'one_click_checkout/routing/constants';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import {
   RESEND_OTP_INTERVAL,
   OTP_TEMPLATES,
+  otpReasons,
 } from 'one_click_checkout/otp/constants';
 
 const hasSavedAddresses =
-  (redirect, check_status = true, reason) =>
+  (redirect, check_status = true) =>
   (route, history, navigator) => {
     const customer = getCustomerDetails();
     const labels = route.otpLabels;
@@ -33,9 +35,17 @@ const hasSavedAddresses =
     }
 
     if (loggedIn) {
-      if (get(savedAddresses).length) {
+      let addresses = get(savedAddresses);
+      if (route.name === views.SAVED_BILLING_ADDRESS) {
+        addresses = addresses.filter(
+          (addr) => addr.id !== get(selectedShippingAddressId)
+        );
+      }
+
+      if (addresses.length) {
         return;
       }
+
       return redirect;
     }
 
@@ -43,7 +53,8 @@ const hasSavedAddresses =
       history.config[views.OTP].props = {
         ...history.config[views.OTP].props,
         ...props,
-        otpReason: OTP_TEMPLATES.access_address,
+        otpReason: otpReasons.access_address,
+        smsTemplate: OTP_TEMPLATES.access_address,
       };
       history.config[views.OTP].otpParams = {
         loading: {
@@ -65,9 +76,9 @@ const hasSavedAddresses =
       customer.checkStatus(
         function () {
           if (customer.saved_address && !customer.logged) {
-            Events.Track(otpEvents.OTP_LOAD, {
-              otp_skip_visible: get(OtpScreenStore.allowSkip),
-              otp_reason: reason,
+            Events.TrackRender(otpEvents.OTP_LOAD, {
+              is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
+              otp_reason: otpReasons.access_address,
             });
 
             createOTP(

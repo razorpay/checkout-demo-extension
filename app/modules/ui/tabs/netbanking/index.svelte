@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
@@ -23,6 +23,12 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import { truncateString } from 'utils/strings';
+
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
+  const { solid_down_arrow } = getIcons();
 
   // i18n
   import {
@@ -43,7 +49,7 @@
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
-  import Analytics from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
@@ -62,12 +68,16 @@
 
   // Analytics imports
   import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let banks;
   export let downtimes = getDowntimes();
   export let method;
   export let bankOptions;
+
+  // Other Imports
+  import { isOneClickCheckout } from 'razorpay';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -80,6 +90,8 @@
   let downtimeSeverity = false;
   let selectedBankName;
   let translatedBanksArr;
+
+  let renderCtaOneCC = false;
 
   $: {
     if ($selectedBank) {
@@ -105,6 +117,8 @@
 
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   export function getPayload() {
     return {
@@ -280,6 +294,10 @@
         },
       });
 
+      Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
+        bank_selected: bankCode,
+      });
+
       dispatch('bankSelected', {
         bank: {
           code: bankCode,
@@ -290,7 +308,23 @@
 
   onMount(() => {
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+    Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD_V2);
+    renderCtaOneCC = true;
   });
+
+  onDestroy(() => {
+    renderCtaOneCC = false;
+  });
+
+  export function onShown() {
+    Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+    Events.TrackRender(NETBANKING_EVENTS.SCREEN_LOAD_V2);
+    renderCtaOneCC = true;
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
+  }
 </script>
 
 <!-- TODO: remove override after fixing method check -->
@@ -301,8 +335,12 @@
   hasMessage={!!downtimeSeverity}
 >
   <Screen pad={false}>
-    <div>
-      <div id="netb-banks" class="clear grid count-3">
+    <div class:screen-one-cc={isOneClickCheckoutEnabled}>
+      <div
+        id="netb-banks"
+        class="clear grid count-3"
+        class:netb-banks-one-cc={isOneClickCheckoutEnabled}
+      >
         {#each netbanks as { name, code } (code)}
           <GridItem
             name={getShortBankName(code, $locale)}
@@ -314,10 +352,32 @@
       </div>
 
       <div class="elem-wrap pad">
-        <div id="nb-elem" class="elem select" class:invalid>
-          <i class="select-arrow"></i>
+        <div
+          id="nb-elem"
+          class="elem select"
+          class:invalid
+          class:nb-one-cc-wrapper={isOneClickCheckoutEnabled}
+        >
+          {#if !isOneClickCheckoutEnabled}
+            <i class="select-arrow"></i>
+          {/if}
+
           <!-- LABEL: Please select a bank -->
-          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
+          <div class="help">
+            {$t(NETBANKING_SELECT_HELP)}
+          </div>
+          {#if $selectedBank && isOneClickCheckoutEnabled}
+            <span class="nb-select-bank-text"
+              >{$t(NETBANKING_SELECT_LABEL)}</span
+            >
+          {/if}
+
+          {#if isOneClickCheckoutEnabled}
+            <span class="drop-down-icon-wrapper">
+              <Icon icon={solid_down_arrow} />
+            </span>
+          {/if}
+
           <button
             aria-label={`${
               $selectedBank
@@ -325,6 +385,7 @@
                 : $t(NETBANKING_SELECT_LABEL)
             }`}
             class="input dropdown-like dropdown-bank"
+            class:nb-one-cc-button={isOneClickCheckoutEnabled}
             type="button"
             id="bank-select"
             bind:this={bankSelect}
@@ -332,7 +393,9 @@
             on:keypress={handleEnterOnButton}
           >
             {#if $selectedBank}
-              <div>{selectedBankName}</div>
+              <div>
+                {truncateString(selectedBankName, 28)}
+              </div>
               {#if !!downtimeSeverity}
                 <div>
                   <DowntimeIcon severe={downtimeSeverity} />
@@ -424,6 +487,14 @@
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />
     {/if}
+    {#if renderCtaOneCC}
+      <CTAOneCC
+        disabled={!$selectedBank}
+        on:click={() => getSession().preSubmit()}
+      >
+        {$t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
+    {/if}
   </Screen>
 </Tab>
 
@@ -461,5 +532,56 @@
   .downtime-wrapper {
     width: 86%;
     margin: auto;
+  }
+
+  .nb-one-cc-wrapper {
+    border: 1px solid rgba(38, 50, 56, 0.3);
+    margin-top: 20px;
+    border-radius: 4px;
+    padding: 0px 12px;
+    height: 48px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+  }
+
+  .nb-one-cc-button {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 100%;
+    display: flex;
+    margin-top: 2px !important;
+  }
+
+  .nb-one-cc-arrow {
+    position: absolute;
+    font-size: 20px;
+    bottom: 20px;
+    right: 10px;
+    color: #8f8f8f;
+  }
+
+  .nb-one-cc-wrapper::after {
+    border-bottom: none !important;
+  }
+
+  .nb-select-bank-text {
+    position: absolute;
+    top: -10px;
+    background: white;
+    padding: 0px 2px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
+  }
+
+  .netb-banks-one-cc {
+    margin-top: 26px;
+    border-top: 1px solid #ebedf0;
+  }
+
+  .drop-down-icon-wrapper {
+    position: absolute;
+    right: 14px;
+    top: 14px;
   }
 </style>

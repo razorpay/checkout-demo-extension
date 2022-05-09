@@ -1,11 +1,22 @@
 <script>
   // svelte imports
   import { t } from 'svelte-i18n';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+
   // UI imports
   import AddressFormBuilder from 'one_click_checkout/address/ui/components/AddressFormBuilder.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import TagSelector from 'one_click_checkout/address/ui/components/TagSelector.svelte';
+  import {
+    showToast,
+    hideToast,
+    TOAST_THEME,
+    TOAST_SCREEN,
+  } from 'one_click_checkout/Toast';
+  import Icon from 'ui/elements/Icon.svelte';
+  import info from 'ui/icons/payment-methods/info';
+  import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+
   // labels import
   import {
     NAME_LABEL,
@@ -17,25 +28,30 @@
     SAVE_ADDRESS_CONSENT,
     UNSERVICEABLE_LABEL,
     SERVICEABLE_LABEL,
-    SAVE_ADDRESS_CONSENT_TNC,
-    SAVE_ADDRESS_CONSENT_PRIVACY,
-    SAVE_ADDRESS_CONSENT_AND,
+    PINCODE_NON_SERVICEABLE_LABEL,
     INTERNATIONAL_STATE_LABEL,
     INTERNATIONAL_PINCODE_LABEL,
     STATE_LABEL,
     REQUIRED_LABEL,
+    SAVE_ADDRESS_CONSENT_TNC,
+    SAVE_ADDRESS_CONSENT_PRIVACY,
+    SAVE_ADDRESS_CONSENT_AND,
+    SAVE_ADDRESS_CONSENT_TOOLTIP,
+    ADDRESS_TAGS_HEADING,
   } from 'one_click_checkout/address/i18n/labels';
+
   // const import
   import {
-    TNC_LINK,
-    PRIVACY_LINK,
     ADDRESS_TYPES,
+    SOURCE,
+    views as addressViews,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+
   // store import
   import {
     getCityState,
@@ -45,12 +61,22 @@
   import {
     codChargeAmount,
     shippingCharge,
+    isShippingAddedToAmount,
+    resetCharges,
+    amount,
+    cartAmount,
+    cartDiscount,
   } from 'one_click_checkout/charges/store';
   import { country as countryCode } from 'checkoutstore/screens/home';
+  import { isAutopopulateDisabled } from 'one_click_checkout/store';
+  import { activeRoute } from 'one_click_checkout/routing/store';
+
   // analytics imports
   import { Events } from 'analytics';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+
+  // other imports
   import { isIndianCustomer } from 'checkoutstore';
   import { savedAddresses } from 'one_click_checkout/address/store';
   import {
@@ -64,10 +90,15 @@
     PHONE_REGEX_INDIA,
     INDIA_COUNTRY_ISO_CODE,
   } from 'common/constants';
+  import { views } from 'one_click_checkout/routing/constants';
 
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
+  import {
+    hideLoaderView,
+    showLoaderView,
+  } from 'one_click_checkout/loader/helper';
 
-  import { isAutopopulateDisabled } from 'one_click_checkout/store';
+  import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
 
   // props
   export let formData;
@@ -76,9 +107,11 @@
   export let shouldSaveAddress;
   export let addressType;
   export let selectedCountryISO;
+  export let currentView;
+  export let addressWrapperEle;
 
   let errors = {};
-  let selectedTag = $formData.tag || 'Home';
+  let selectedTag = $formData.tag;
   let called = false;
   let pinIndex = 2;
   let pinSubIndex = 1;
@@ -88,9 +121,20 @@
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
+  let lastUpdateState = '';
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
+
+  const pincode_error_toast = {
+    message: $t(PINCODE_NON_SERVICEABLE_LABEL),
+    theme: TOAST_THEME.ERROR,
+    screen: TOAST_SCREEN.ONE_CC,
+  };
+
+  const showPincodeToast = (pincode) => {
+    if (pincode) showToast(pincode_error_toast);
+  };
 
   let INPUT_FORM = [
     {
@@ -117,6 +161,7 @@
         unserviceableText: '',
         autofillToken: 'postal-code',
         disabled: false,
+        hideStatusText: false,
       },
     ],
     [
@@ -232,10 +277,17 @@
         index: e?.detail?.index,
         field: id,
       });
+
+      Events.TrackBehav(AddressEvents.SUGGESTION_SELECTED_V2);
     };
   }
 
   function handleCountrySelect(name, iso) {
+    if (!$formData?.zipCode) {
+      Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
+        is_prefilled: SOURCE.PREFILLED,
+      });
+    }
     // show number keypad for pincode if country is India
     if (iso === INDIA_COUNTRY_ISO_CODE) {
       INPUT_FORM[pinIndex][pinSubIndex].type = 'tel';
@@ -243,6 +295,12 @@
       INPUT_FORM[pinIndex][pinSubIndex].type = 'text';
     }
     $selectedCountryISO = iso.toLowerCase();
+    if (!COUNTRY_POSTALS_MAP[iso]?.pattern) {
+      INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = true;
+    } else {
+      INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = false;
+      INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+    }
     pinPattern = new RegExp(COUNTRY_POSTALS_MAP[iso].pattern);
     INPUT_FORM[pinIndex][pinSubIndex].pattern =
       COUNTRY_POSTALS_MAP[iso].pattern;
@@ -269,12 +327,15 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+
+              showPincodeToast($formData.zipcode);
             }
             $formData.cod = res[$selectedCountryISO]?.cod;
           })
           .catch(() => {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
+            showPincodeToast($formData.zipcode);
           });
       }
     } else {
@@ -304,6 +365,14 @@
   };
 
   export function onUpdate(key, value, extra) {
+    /**
+     * onUpdate gets fired twice for every input change.
+     * therefore, returning if last state was same.
+     */
+    if (lastUpdateState === JSON.stringify({ key, value, extra })) {
+      return;
+    }
+    lastUpdateState = JSON.stringify({ key, value, extra });
     // Track whenever suggestion is cleared
     if (
       ['landmark', 'line2'].includes(key) &&
@@ -311,6 +380,8 @@
       !value
     ) {
       Events.Track(AddressEvents.SUGGESTION_CLEARED, { field: key });
+
+      Events.TrackBehav(AddressEvents.SUGGESTION_CLEARED_V2);
     }
     // If invalid field, then re-validate the input and update error messages
     if (errors[key]) {
@@ -324,18 +395,15 @@
     }
     // checks if pincode has been filled and autofills city, state for the same
     if (key === 'zipcode' && checkServiceability) {
+      hideToast();
       if (
         INPUT_FORM[pinIndex][pinSubIndex]?.unserviceableText &&
         !$formData.city
       ) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
       }
-      // Hack to prevent api being called twice, will remove and look for a better solution
-      called = !called;
-      if (!called) {
-        return;
-      }
       if (pinPattern.test(value)) {
+        showLoaderView();
         const payload = [
           {
             zipcode: value,
@@ -350,16 +418,27 @@
             if (res && res[value]?.serviceability) {
               codChargeAmount.set(res[value].cod_fee);
               shippingCharge.set(res[value].shipping_fee);
+              isShippingAddedToAmount.set(true);
               stateCode = res[value].state_code;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
+                Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { city: res[value].city },
+                });
+
+                Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
+                  is_prefilled: SOURCE.PREFILLED,
+                  meta: { state: res[value].state },
+                });
                 onUpdate('city', toTitleCase(res[value].city) || '');
                 onUpdate('state', toTitleCase(res[value].state) || '');
               }
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+              showPincodeToast($formData.zipcode);
             }
             $formData.cod = res[value]?.cod;
             if (isShippingAddress) {
@@ -381,9 +460,15 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
+            showPincodeToast($formData.zipcode);
+          })
+          .finally(() => {
+            hideLoaderView();
           });
       } else if (INPUT_FORM[pinIndex][pinSubIndex]?.required) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+        codChargeAmount.set(0);
+        resetCharges();
       }
     } else if (
       !checkServiceability &&
@@ -392,6 +477,13 @@
       !isCityStateAutopopulateDisabled
     ) {
       getCityState(value, $selectedCountryISO).then((response) => {
+        Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
+
+        Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
+          is_prefilled: SOURCE.PREFILLED,
+        });
         onUpdate('city', toTitleCase(response.city) || '');
         onUpdate('state', toTitleCase(response.state) || '');
       });
@@ -432,6 +524,15 @@
 
     if (key === 'contact' && pinIndex !== -1) {
       changePincodeStateLabel();
+    }
+
+    if (key === 'state' && value) {
+      Events.TrackBehav(AddressEvents[`INPUT_ENTERED_${key}_V2`], {
+        meta: { [key]: value },
+        is_prefilled: $formData?.zipcode
+          ? SOURCE.OVERIDDEN
+          : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+      });
     }
 
     dispatch('formCompletion', {
@@ -502,11 +603,13 @@
           } else {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
+            showPincodeToast($formData.zipcode);
           }
         })
         .catch(() => {
           INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
             UNSERVICEABLE_LABEL;
+          showPincodeToast($formData.zipcode);
         });
     }
     if (id === 'line1') {
@@ -526,14 +629,60 @@
     }
   };
 
+  function trackSameBillingAndShippingCheckbox({ detail }) {
+    if (detail.checked) {
+      Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_CHECKED, {
+        address_screen: ADDRESS_TYPES.SHIPPING_ADDRESS,
+      });
+    } else {
+      Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_UNCHECKED, {
+        address_screen: ADDRESS_TYPES.SHIPPING_ADDRESS,
+      });
+    }
+  }
+
+  /* Helpers for - tooltip.
+  Not created a dedicated component for it - because its just used at one place and
+  its abstraction is a little tricky! With interest of time - I am adding it just here
+  if needed in future - we will abstract it. */
+  $: showTooltip = false;
+
+  function handleShowTooltip() {
+    showTooltip = true;
+  }
+
+  function handleHideTooltip() {
+    showTooltip = false;
+  }
+
   onMount(() => {
+    const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
+    const address_type = isShippingAddress ? 'shipping' : 'billing';
+
+    screenScrollTop(addressWrapperEle);
+    if (isShippingAddress && !$formData.zipcode && !$formData.city) {
+      $isShippingAddedToAmount = false;
+    }
+
+    // case when user comes back to add shipping address with last prefilled data
+    if (isShippingAddress && $shippingCharge && $formData?.zipcode) {
+      amount.set($cartAmount - $cartDiscount + $shippingCharge);
+    }
+
     if ($shouldSaveAddress === null) {
       $shouldSaveAddress = $isIndianCustomer;
     }
+
+    // Anaytics Events
     Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {
       meta: { saved_address_count: $savedAddresses?.length },
       type: addressType,
     });
+
+    Events.TrackRender(AddressEvents.NEW_ADDRESS_SCREEN_LOADED_V2, {
+      address_type,
+    });
+
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,
@@ -543,6 +692,10 @@
       '#addressForm > div:nth-child(1) > div > #name'
     );
     el.focus();
+  });
+
+  onDestroy(() => {
+    hideToast();
   });
 </script>
 
@@ -558,26 +711,59 @@
       {addressType}
       on:blur={onInputFieldBlur}
     />
-    {#if $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
+
+    {#if $activeRoute?.name !== views.ADD_BILLING_ADDRESS}
+      <SameBillingAndShipping
+        shouldSaveAddress={true}
+        on:toggle={trackSameBillingAndShippingCheckbox}
+      />
+    {/if}
+
+    {#if currentView === addressViews.ADD_ADDRESS && $isIndianCustomer && $formData?.contact?.countryCode === INDIA_COUNTRY_CODE && $selectedCountryISO?.toUpperCase() === INDIA_COUNTRY_ISO_CODE}
       <div class="address-save-consent">
         <Checkbox
           on:change={handleSaveConsentChange}
           checked={$shouldSaveAddress}
           id="address-consent-checkbox"
         />
-        <span>
-          {$t(SAVE_ADDRESS_CONSENT)}
-          <a href={TNC_LINK} class="address-consent-links" target="_blank">
-            {$t(SAVE_ADDRESS_CONSENT_TNC)}
-          </a>
-          {$t(SAVE_ADDRESS_CONSENT_AND)}
-          <a href={PRIVACY_LINK} class="address-consent-links" target="_blank">
-            {$t(SAVE_ADDRESS_CONSENT_PRIVACY)}
-          </a>
-        </span>
+        <div class="save-address-wrapper">
+          {$t(SAVE_ADDRESS_CONSENT)} &nbsp;
+          <div class="icon-wrapper" on:click={handleShowTooltip}>
+            <Icon icon={info('#263A4A')} />
+          </div>
+        </div>
+      </div>
+      <div
+        class="elem-wrap-save-address-tc"
+        use:clickOutside
+        on:click_outside={handleHideTooltip}
+      >
+        {#if showTooltip}
+          <div class="save-address-tooltip">
+            {$t(SAVE_ADDRESS_CONSENT_TOOLTIP)}
+            <a
+              class="tc-text"
+              href="https://razorpay.com/terms/"
+              target="_blank"
+            >
+              {$t(SAVE_ADDRESS_CONSENT_TNC)}
+            </a>
+            {$t(SAVE_ADDRESS_CONSENT_AND)}
+            <a
+              class="tc-text"
+              href="https://razorpay.com/privacy/"
+              target="_blank"
+            >
+              {$t(SAVE_ADDRESS_CONSENT_PRIVACY)}
+            </a>
+          </div>
+        {/if}
       </div>
     {/if}
     {#if $isIndianCustomer && $shouldSaveAddress}
+      {#if currentView === addressViews.EDIT_ADDRESS}
+        <p class="tags-heading">{$t(ADDRESS_TAGS_HEADING)}</p>
+      {/if}
       <TagSelector on:select={(e) => updateTag(e.detail.label)} {selectedTag} />
     {/if}
   </div>
@@ -585,6 +771,7 @@
 
 <style>
   .address-new {
+    margin-top: 16px;
     margin-bottom: -14px;
   }
   .address-save-consent {
@@ -594,5 +781,67 @@
   }
   .address-consent-links {
     color: #551a8b;
+  }
+
+  .save-address-wrapper {
+    height: fit-content;
+    display: flex;
+    align-items: center;
+  }
+
+  .icon-wrapper {
+    cursor: pointer;
+    margin-top: 2px;
+  }
+
+  .elem-wrap-save-address-tc {
+    margin-top: 5px;
+    position: relative;
+  }
+
+  .save-address-tooltip {
+    transition: 0.25s ease-in transform, 0.16s ease-in opacity;
+    transform: translateY(-10px);
+    color: #fff;
+    position: absolute;
+    line-height: 17px;
+    padding: 12px;
+    font-size: 12px;
+    background: #2d313a;
+    box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
+    z-index: 3;
+    border-radius: 2px;
+    bottom: -62px;
+    letter-spacing: 0.125px;
+  }
+  .save-address-tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent #2d313a;
+    bottom: 100%;
+    left: 122px;
+    margin: 0 0 -1px -10px;
+  }
+
+  .tc-text {
+    cursor: pointer;
+    color: #3684d6;
+    text-decoration: underline;
+  }
+
+  .tags-heading {
+    font-weight: 400;
+    font-size: 14px;
+    margin: 8px 0px 6px;
+  }
+
+  @media (max-width: 340px) {
+    .save-address-tooltip {
+      bottom: -80px;
+    }
   }
 </style>

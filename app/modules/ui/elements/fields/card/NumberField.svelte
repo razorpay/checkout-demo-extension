@@ -20,6 +20,7 @@
   // Utils
   import { getIcon } from 'icons/network';
   import { formatMessageWithLocale } from 'i18n';
+  import { isOneClickCheckout } from 'razorpay';
   import { isIndianCustomer } from 'checkoutstore';
   import { isSIHubEnabledMerchant } from 'ui/tabs/card/utils';
 
@@ -32,10 +33,17 @@
   export let validCardForOffer = true;
   export let isCardSupportedForRecurring;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   // State
   let valid = false;
 
   const dispatch = createEventDispatcher();
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 
   // Refs
   let field = null;
@@ -45,8 +53,10 @@
   }
 
   let helpTextToDisplay;
-  $: helpTextToDisplay =
-    (value && helpText) || (!valid ? getHelpText($locale) : undefined);
+  $: {
+    helpTextToDisplay =
+      (value && helpText) || (!valid ? getHelpText($locale) : undefined);
+  }
 
   function getHelpText(locale) {
     if (
@@ -111,7 +121,7 @@
 
 <div class="field-container">
   {#if type}
-    <div class="icon">
+    <div class="icon" class:icon-1cc={isOneClickCheckoutEnabled}>
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
@@ -119,6 +129,7 @@
     {id}
     formatter={{ type: 'card' }}
     helpText={helpTextToDisplay}
+    validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
     name="card[number]"
     required={true}
     {value}
@@ -134,6 +145,10 @@
     on:autocomplete
     on:input={handleInput}
     on:input
+    {elemClasses}
+    {inputFieldClasses}
+    {labelClasses}
+    {labelUpperClasses}
   />
 </div>
 
@@ -146,6 +161,14 @@
     position: absolute;
     right: 4px;
     top: 30px;
+    bottom: 0;
+    width: 24px;
+  }
+
+  .icon-1cc {
+    position: absolute;
+    right: 6%;
+    top: 25%;
     bottom: 0;
     width: 24px;
   }

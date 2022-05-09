@@ -25,6 +25,8 @@
   import { Events } from 'analytics';
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
+  import { isOneClickCheckout } from 'razorpay';
+  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   //UI Imports
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -37,6 +39,7 @@
     FORM_TYPE,
   } from 'ui/components/BillingAddressVerificationForm';
   import Info from 'ui/elements/Info.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // Constants
   import { VIEWS_MAP, NVS_COUNTRY_MAP } from 'ui/tabs/international/constants';
@@ -57,6 +60,7 @@
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
+  const isOneCCEnabled = isOneClickCheckout();
 
   export let directlyToNVS = false;
 
@@ -76,6 +80,8 @@
   let NVSInfo = [];
 
   let tabVisible = false;
+  let internationalEle;
+  let showAccountTab;
 
   const handleProviderSelect = (provider) => {
     directlyToNVS = false;
@@ -237,75 +243,91 @@
   onMount(() => {
     Events.Track(EVENTS.SCREEN_LOAD);
   });
+
+  function onScroll() {
+    showAccountTab = isShowAccountTab(internationalEle);
+  }
 </script>
 
 <Tab method="international" pad={false} overrideMethodCheck>
-  {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
-    <div class="border-list collapsable">
-      {#each filteredProviders as provider, i (provider.code)}
-        <SlottedRadioOption
-          name={provider.code}
-          selected={$selectedInternationalProvider === provider.code}
-          align="top"
-          on:click={() => handleProviderSelect(provider)}
-        >
-          <div
-            class="title-container"
-            slot="title"
-            bind:this={providerRefs[provider.code]}
-            id={`international-radio-${provider.code}`}
+  <div
+    class="international-wrapper"
+    on:scroll={onScroll}
+    bind:this={internationalEle}
+    class:international-one-cc={isOneCCEnabled}
+  >
+    {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
+      <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
+        {#each filteredProviders as provider, i (provider.code)}
+          <SlottedRadioOption
+            name={provider.code}
+            selected={$selectedInternationalProvider === provider.code}
+            align="top"
+            on:click={() => handleProviderSelect(provider)}
           >
-            <span class="title"
-              >{getAppProviderName(provider.code, $locale)}</span
+            <div
+              class="title-container"
+              slot="title"
+              bind:this={providerRefs[provider.code]}
+              id={`international-radio-${provider.code}`}
             >
-            <span class="subtitle"
-              >{getAppProviderSubtext(provider.code, $locale)}</span
-            >
-          </div>
-          <i slot="icon" class="top">
-            <Icon icon={provider.logo} />
-          </i>
-        </SlottedRadioOption>
-      {/each}
-    </div>
-  {:else if currentView === VIEWS_MAP.NVS_FORM}
-    <div id="nvsContainer">
-      {#if selectedProvider}
-        <div class="nvs-provider-info">
-          <Icon icon={selectedProvider.logo} />
-          <span class="provider-name">
-            {getAppProviderName(selectedProvider.code, $locale)}
-          </span>
-        </div>
-      {/if}
-      <div class="nvs-title">
-        {$t(AVS_HEADING)}
-        <span
-          on:click={() => {
-            showNVSInfo = true;
-          }}><Icon icon={icons.question} /></span
-        >
+              <span class="title"
+                >{getAppProviderName(provider.code, $locale)}</span
+              >
+              <span class="subtitle"
+                >{getAppProviderSubtext(provider.code, $locale)}</span
+              >
+            </div>
+            <i slot="icon" class="top">
+              <Icon icon={provider.logo} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
       </div>
-      <BillingAddressVerificationForm
-        {filterCountries}
-        formType={FORM_TYPE.N_AVS}
-        value={$NVSFormData}
-        on:input={handleAVSFormInput}
-        on:blur={handleAVSFormInput}
-      />
-      <Info bind:show={showNVSInfo} title={$t(AVS_INFO_TITLE)} data={NVSInfo} />
-    </div>
-  {/if}
-  <Bottom tab="international">
-    {#if $selectedInternationalProvider}
-      <DynamicCurrencyView
-        {tabVisible}
-        view={$selectedInternationalProvider}
-        isAVS={currentView === VIEWS_MAP.NVS_FORM}
-      />
+    {:else if currentView === VIEWS_MAP.NVS_FORM}
+      <div id="nvsContainer" class:screen-one-cc={isOneCCEnabled}>
+        {#if selectedProvider}
+          <div class="nvs-provider-info">
+            <Icon icon={selectedProvider.logo} />
+            <span class="provider-name">
+              {getAppProviderName(selectedProvider.code, $locale)}
+            </span>
+          </div>
+        {/if}
+        <div class="nvs-title">
+          {$t(AVS_HEADING)}
+          <span
+            on:click={() => {
+              showNVSInfo = true;
+            }}><Icon icon={icons.question} /></span
+          >
+        </div>
+        <BillingAddressVerificationForm
+          {filterCountries}
+          formType={FORM_TYPE.N_AVS}
+          value={$NVSFormData}
+          on:input={handleAVSFormInput}
+          on:blur={handleAVSFormInput}
+        />
+        <Info
+          bind:show={showNVSInfo}
+          title={$t(AVS_INFO_TITLE)}
+          data={NVSInfo}
+        />
+        <AccountTab {showAccountTab} />
+      </div>
     {/if}
-  </Bottom>
-</Tab>
+    <Bottom tab="international">
+      {#if $selectedInternationalProvider}
+        <DynamicCurrencyView
+          {tabVisible}
+          view={$selectedInternationalProvider}
+          isAVS={currentView === VIEWS_MAP.NVS_FORM}
+        />
+      {/if}
+    </Bottom>
+  </div></Tab
+>
 
 <style lang="css">
   .border-list {
@@ -356,5 +378,17 @@
     margin-left: 12px;
     font-size: 13px;
     color: #707070;
+  }
+
+  .international-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .international-one-cc {
+    overflow: auto;
+  }
+  .screen-one-cc {
+    min-height: 110%;
   }
 </style>

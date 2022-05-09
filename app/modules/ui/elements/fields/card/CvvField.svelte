@@ -5,6 +5,7 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { CVV_LABEL, CVV_HELP } from 'ui/labels/card';
+  import { isOneClickCheckout } from 'razorpay';
 
   export let ref = null;
 
@@ -18,10 +19,19 @@
   export let showPlaceholder = false; // Turns label into placeholder
   export let showHelp = true;
 
+  export let elemClasses;
+  export let inputFieldClasses;
+  export let labelClasses;
+  export let labelUpperClasses;
+
   let cvvPattern = '[0-9]{3}';
   let helpText = formatTemplateWithLocale(CVV_HELP, { length }, $locale);
   let placeholder;
   let label;
+  let isInvalid;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const CVV_REGEX = new RegExp(cvvPattern);
 
   $: {
     if (showHelp) {
@@ -55,9 +65,16 @@
     ref.blur();
   }
 
+  let helpTextToDisplay;
+
   export function isValid() {
-    return new RegExp(cvvPattern).test(value);
+    const result = CVV_REGEX.test(value);
+    helpTextToDisplay = result ? undefined : helpText;
+    return result;
   }
+
+  // Option Specific to 1cc
+  $: isInvalid = !CVV_REGEX.test(value);
 </script>
 
 <!-- TODO: make helpText support an image as well -->
@@ -82,6 +99,12 @@
   handleBlur
   handleFocus
   handleInput
+  {elemClasses}
+  {inputFieldClasses}
+  {labelClasses}
+  {labelUpperClasses}
+  validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+  {isInvalid}
 />
 
 <style lang="scss">

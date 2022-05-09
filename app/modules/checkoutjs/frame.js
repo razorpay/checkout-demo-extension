@@ -105,14 +105,6 @@ function sanitizeImage(options) {
   }
 }
 
-function getNewDesignUrl() {
-  let url = `${RazorpayConfig.api}test/checkout.html?branch=1cc/v1_5_beta`;
-  if (location.hostname === 'localhost') {
-    url = '/checkout.html?branch=1cc/v1_5_beta';
-  }
-  return url;
-}
-
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
   // const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
@@ -120,10 +112,6 @@ function makeCheckoutUrl(rzp) {
   //   : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;
-
-  if (rzp?.get('v_1_5_experiment_enabled')) {
-    url = getNewDesignUrl();
-  }
 
   // const useCanary = _.random() < CANARY_PERCENTAGE;
 
@@ -188,7 +176,6 @@ function appendLoader($parent, parent) {
   }
 }
 
-var isMarkupSet = false;
 export default function CheckoutFrame(rzp) {
   doc = document.body;
   head = document.head;
@@ -357,11 +344,7 @@ CheckoutFrame.prototype = {
 
     this.$metas.forEach(_El.appendTo(head));
 
-    // Hack added for 1cc flow ( merchantMarkup was being set twice  )
-    if (!isMarkupSet) {
-      merchantMarkup.overflow = docStyle.overflow;
-      isMarkupSet = true;
-    }
+    merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
 
     if (ua_iPhone) {

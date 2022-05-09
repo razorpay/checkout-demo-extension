@@ -6,7 +6,12 @@
   // Util imports
   import { getSession } from 'sessionmanager';
   import { shouldRememberCustomer } from 'checkoutstore';
-  import { isPayout, getPrefilledVPA, hasFeature } from 'razorpay';
+  import {
+    isPayout,
+    getPrefilledVPA,
+    hasFeature,
+    isOneClickCheckout,
+  } from 'razorpay';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -18,7 +23,7 @@
     getUPIAppDataFromHandle,
     isOtherIntentApp,
   } from 'common/upi';
-  import Analytics from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCta } from 'checkoutstore/cta';
@@ -45,6 +50,7 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   import updateScore from 'analytics/checkoutScore';
 
@@ -87,6 +93,10 @@
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
+  // Constant imports
+  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { filterTruthyKeys } from 'lib/utils';
+
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
@@ -117,6 +127,7 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
   let upiIntent;
+  let renderCtaOneCC = false;
 
   let upiTiles = enableUPITiles();
   const showStaticIntentAppsForIos =
@@ -135,6 +146,8 @@
   const upiDowntimes = getDowntimes().upi;
   let downtimeSeverity;
   let downtimeInstrument;
+
+  let helpTextToDisplay;
 
   const banksThatSupportRecurring = [
     {
@@ -322,6 +335,8 @@
     ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
+    if (selectedToken) return;
+
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
     const hasTokens = tokens && tokens.length;
 
@@ -423,6 +438,7 @@
   }
 
   export function selectQrMethod() {
+    Events.TrackBehav(UPI_EVENTS.QR_SELECTED);
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -439,12 +455,25 @@
   }
 
   export function onShown() {
+    Events.TrackRender(UPI_EVENTS.SCREEN_LOAD_V2, {
+      sections: filterTruthyKeys({
+        intent,
+        collect: shouldShowCollect,
+        omnichannel: shouldShowOmnichannel,
+        qr: shouldShowQr,
+      }),
+    });
+    renderCtaOneCC = true;
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
     if (requiresBankSelection) {
       upiFlowStep = steps.preUpiPspBankSelection;
     }
+  }
+
+  export function onHide() {
+    renderCtaOneCC = false;
   }
 
   export function updateStep() {
@@ -740,178 +769,190 @@
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
-  <Screen>
-    {#if upiFlowStep === steps.preUpiPspBankSelection}
-      <BankSelection bind:value={selectedBankForRecurring} />
-    {:else if upiFlowStep === steps.upi}
-      {#if selectedBankForRecurring}
-        <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
-        <div class="border-list">
-          <SlottedOption className="upi-selected-bank" id="user-details">
-            <i slot="icon">
-              <Icon
-                icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`}
-              />
-            </i>
-            <div slot="title"><span>{selectedBankForRecurring.name}</span></div>
-            <div
-              slot="extra"
-              on:click={() => {
-                upiFlowStep = steps.preUpiPspBankSelection;
+  <Screen pad={!isOneClickCheckout()}>
+    <div class="upi-container" class:screen-one-cc={isOneClickCheckout()}>
+      {#if upiFlowStep === steps.preUpiPspBankSelection}
+        <BankSelection bind:value={selectedBankForRecurring} />
+      {:else if upiFlowStep === steps.upi}
+        {#if selectedBankForRecurring}
+          <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
+          <div class="border-list">
+            <SlottedOption className="upi-selected-bank" id="user-details">
+              <i slot="icon">
+                <Icon
+                  icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`}
+                />
+              </i>
+              <div slot="title">
+                <span>{selectedBankForRecurring.name}</span>
+              </div>
+              <div
+                slot="extra"
+                on:click={() => {
+                  upiFlowStep = steps.preUpiPspBankSelection;
+                }}
+              >
+                <!-- LABEL: Edit -->
+                <span>Change Bank</span>
+                <span class="downward-arrow">&#xe604;</span>
+              </div>
+            </SlottedOption>
+          </div>
+        {/if}
+
+        <div>
+          {#if intent}
+            <UpiIntent
+              apps={intentApps || []}
+              selected={intentAppSelected}
+              skipCTA={oneClickUPIIntentFlow}
+              payUsingApps={!definePlatform('mWebiOS') &&
+                availableFlows.intentUrl}
+              bind:this={upiIntent}
+              on:select={(e) => {
+                const { downtimeInstrument, downtimeSeverity, packageName } =
+                  e.detail;
+                onUpiAppSelection({
+                  detail: {
+                    id: 'intent',
+                    app: packageName,
+                    severity: downtimeSeverity,
+                    instrument: downtimeInstrument,
+                  },
+                });
+                if (oneClickUPIIntentFlow) {
+                  session.preSubmit();
+                }
               }}
-            >
-              <!-- LABEL: Edit -->
-              <span>Change Bank</span>
-              <span class="downward-arrow">&#xe604;</span>
+              {showRecommendedUPIApp}
+            />
+          {/if}
+
+          {#if shouldShowCollect}
+            <!-- LABEL: Pay using UPI ID -->
+            <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
+            <div class="border-list" id="upi-collect-list">
+              {#if intent}
+                <ListHeader>
+                  <i slot="icon">
+                    <Icon icon={getMiscIcon('receive')} />
+                  </i>
+                  <!-- LABEL: You will receive a payment request on your UPI app -->
+                  <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
+                </ListHeader>
+              {/if}
+
+              {#each tokens as app, i (app.id)}
+                <SlottedRadioOption
+                  name="payment_type"
+                  ellipsis
+                  selected={selectedToken === app.id}
+                  on:click={() => {
+                    const { downtimeSeverity, downtimeInstrument } = app;
+                    onUpiAppSelection({
+                      detail: {
+                        id: app.id,
+                        severity: downtimeSeverity,
+                        instrument: downtimeInstrument,
+                      },
+                    });
+                  }}
+                >
+                  <div slot="title">
+                    {app.vpa.username + '@' + app.vpa.handle}
+                  </div>
+                  <i slot="icon">
+                    <Icon
+                      icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon ||
+                        themeMeta.icons.upi}
+                    />
+                  </i>
+                  <div slot="downtime" class="downtime-saved-vpa">
+                    {#if !!downtimeSeverity && selectedToken === app.id}
+                      <DowntimeCallout
+                        showIcon={true}
+                        severe={downtimeSeverity}
+                        {downtimeInstrument}
+                      />
+                    {/if}
+                  </div>
+                </SlottedRadioOption>
+              {/each}
+              <AddANewVpa
+                recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
+                paymentMethod={method}
+                on:click={() => {
+                  onUpiAppSelection({ detail: { id: 'new' } });
+                }}
+                customer={$customer}
+                on:blur={trackVpaEntry}
+                selected={selectedToken === 'new'}
+                bind:value={vpaEntered}
+                bind:rememberVpa
+                bind:this={vpaField}
+              />
             </div>
-          </SlottedOption>
+          {/if}
+
+          {#if shouldShowOmnichannel}
+            <GooglePayOmnichannel
+              error={retryOmnichannel}
+              focusOnCreate={true}
+              {isFirst}
+              retry={retryOmnichannel}
+              selected={selectedToken === 'gpay-omni'}
+              on:blur={trackOmnichannelEntry}
+              on:select={() => {
+                onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+              }}
+              bind:value={omnichannelPhone}
+            />
+          {/if}
+
+          {#if shouldShowQr}
+            <!-- LABEL: Pay using QR Code -->
+            <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
+            <div class="options" id="showQr">
+              <NextOption
+                icon={qrIcon}
+                tabindex="0"
+                attributes={{
+                  role: 'button',
+                  'aria-label':
+                    'Show QR Code - Scan the QR code using your UPI app',
+                }}
+                on:select={selectQrMethod}
+              >
+                <!-- LABEL: Show QR Code -->
+                <div>{$t(SHOW_QR_CODE)}</div>
+                <!-- LABEL: Scan the QR code using your UPI app -->
+                <div class="desc">{$t(SCAN_QR_CODE)}</div>
+              </NextOption>
+            </div>
+          {/if}
         </div>
       {/if}
 
-      <div>
-        {#if intent}
-          <UpiIntent
-            apps={intentApps || []}
-            selected={intentAppSelected}
-            skipCTA={oneClickUPIIntentFlow}
-            payUsingApps={!definePlatform('mWebiOS') &&
-              availableFlows.intentUrl}
-            bind:this={upiIntent}
-            on:select={(e) => {
-              const { downtimeInstrument, downtimeSeverity, packageName } =
-                e.detail;
-              onUpiAppSelection({
-                detail: {
-                  id: 'intent',
-                  app: packageName,
-                  severity: downtimeSeverity,
-                  instrument: downtimeInstrument,
-                },
-              });
-              if (oneClickUPIIntentFlow) {
-                session.preSubmit();
-              }
-            }}
-            {showRecommendedUPIApp}
-          />
-        {/if}
-
-        {#if shouldShowCollect}
-          <!-- LABEL: Pay using UPI ID -->
-          <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
-          <div class="border-list" id="upi-collect-list">
-            {#if intent}
-              <ListHeader>
-                <i slot="icon">
-                  <Icon icon={getMiscIcon('receive')} />
-                </i>
-                <!-- LABEL: You will receive a payment request on your UPI app -->
-                <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
-              </ListHeader>
-            {/if}
-
-            {#each tokens as app, i (app.id)}
-              <SlottedRadioOption
-                name="payment_type"
-                ellipsis
-                selected={selectedToken === app.id}
-                on:click={() => {
-                  const { downtimeSeverity, downtimeInstrument } = app;
-                  onUpiAppSelection({
-                    detail: {
-                      id: app.id,
-                      severity: downtimeSeverity,
-                      instrument: downtimeInstrument,
-                    },
-                  });
-                }}
-              >
-                <div slot="title">
-                  {app.vpa.username + '@' + app.vpa.handle}
-                </div>
-                <i slot="icon">
-                  <Icon
-                    icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon ||
-                      themeMeta.icons.upi}
-                  />
-                </i>
-                <div slot="downtime" class="downtime-saved-vpa">
-                  {#if !!downtimeSeverity && selectedToken === app.id}
-                    <DowntimeCallout
-                      showIcon={true}
-                      severe={downtimeSeverity}
-                      {downtimeInstrument}
-                    />
-                  {/if}
-                </div>
-              </SlottedRadioOption>
-            {/each}
-            <AddANewVpa
-              recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
-              paymentMethod={method}
-              on:click={() => {
-                onUpiAppSelection({ detail: { id: 'new' } });
-              }}
-              customer={$customer}
-              on:blur={trackVpaEntry}
-              selected={selectedToken === 'new'}
-              bind:value={vpaEntered}
-              bind:rememberVpa
-              bind:this={vpaField}
-            />
-          </div>
-        {/if}
-
-        {#if shouldShowOmnichannel}
-          <GooglePayOmnichannel
-            error={retryOmnichannel}
-            focusOnCreate={true}
-            {isFirst}
-            retry={retryOmnichannel}
-            selected={selectedToken === 'gpay-omni'}
-            on:blur={trackOmnichannelEntry}
-            on:select={() => {
-              onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-            }}
-            bind:value={omnichannelPhone}
-          />
-        {/if}
-
-        {#if shouldShowQr}
-          <!-- LABEL: Pay using QR Code -->
-          <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
-          <div class="options" id="showQr">
-            <NextOption
-              icon={qrIcon}
-              tabindex="0"
-              attributes={{
-                role: 'button',
-                'aria-label':
-                  'Show QR Code - Scan the QR code using your UPI app',
-              }}
-              on:select={selectQrMethod}
-            >
-              <!-- LABEL: Show QR Code -->
-              <div>{$t(SHOW_QR_CODE)}</div>
-              <!-- LABEL: Scan the QR code using your UPI app -->
-              <div class="desc">{$t(SCAN_QR_CODE)}</div>
-            </NextOption>
-          </div>
-        {/if}
-      </div>
+      <UpiBottom
+        {isOtm}
+        {isUpiRecurringCAW}
+        {isUpiRecurringSubscription}
+        {otmStartDate}
+        {otmEndDate}
+        {recurring_callout}
+        {endDate}
+        {maxRecurringAmount}
+        {recurringFrequency}
+      />
+    </div>
+    {#if renderCtaOneCC}
+      <CTAOneCC
+        disabled={Boolean(helpTextToDisplay) && selectedToken === 'new'}
+        on:click={() => session.preSubmit()}
+      >
+        {$t(PAY_NOW_CTA_LABEL)}
+      </CTAOneCC>
     {/if}
-
-    <UpiBottom
-      {isOtm}
-      {isUpiRecurringCAW}
-      {isUpiRecurringSubscription}
-      {otmStartDate}
-      {otmEndDate}
-      {recurring_callout}
-      {endDate}
-      {maxRecurringAmount}
-      {recurringFrequency}
-    />
   </Screen>
 </Tab>
 
@@ -962,5 +1003,16 @@
   }
   .downtime-saved-vpa {
     margin-top: 4px;
+  }
+
+  .upi-container {
+    padding: 0px 12px 12px;
+  }
+  .screen-one-cc {
+    min-height: 120%;
+  }
+
+  :global(#content.one-cc) .upi-container {
+    padding: 0px 16px 12px;
   }
 </style>

@@ -3,7 +3,10 @@
   import Field from 'ui/components/Field.svelte';
 
   // Utils
-  import { EMAIL_PATTERN } from 'common/constants';
+  import {
+    EMAIL_PATTERN,
+    EMAIL_REGEX as EMAIL_VALIDATOR,
+  } from 'common/constants';
 
   // i18n
   import {
@@ -25,6 +28,11 @@
 
   // LABEL: Email (Optional) / Email
   const label = isOptional ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
+
+  // Form Validation for email - specifically for 1cc
+  let validationText;
+  export let showValidations = false;
+  $: validationText = !EMAIL_VALIDATOR.test(value) ? $t(EMAIL_HELP_TEXT) : null;
 </script>
 
 <div>
@@ -41,6 +49,8 @@
     on:input={(e) => (value = e.target.value)}
     on:blur
     helpText={$t(EMAIL_HELP_TEXT)}
+    {validationText}
+    {showValidations}
   />
   <!-- LABEL: Please enter a valid email. Example: you@example.com -->
 </div>

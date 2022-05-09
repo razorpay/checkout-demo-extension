@@ -7,6 +7,9 @@ export const EMAIL_LABEL_REQUIRED = 'home.email_label_required';
 export const EMAIL_LABEL_OPTIONAL = 'home.email_label_optional';
 export const EMAIL_HELP_TEXT = 'home.email_help_text';
 export const MANDATORY_LOGIN_CALLOUT = 'home.mandatory_login_callout';
+export const PHONE_NUMBER = 'home.phone_number';
+export const MOBILE_NUMBER = 'home.contact_label_mobile';
+export const MOBILE_NUMBER_OPTIONAL = 'home.contact_label_mobile_optional';
 
 export const PARTIAL_PAYMENT_TITLE = 'home.partial_payment_title';
 export const MIN_AMOUNT_LABEL = 'home.min_amount_label';

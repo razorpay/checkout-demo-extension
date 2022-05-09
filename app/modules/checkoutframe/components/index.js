@@ -2,11 +2,12 @@
 import PoweredBy from 'ui/components/PoweredBy.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
-import NavigationStack, { isStackPopulated } from 'navstack';
-
-import { isPayout } from 'razorpay';
+import { showTopbar } from 'one_click_checkout/topbar';
+import { showHeader } from 'one_click_checkout/header';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
+import { isOneClickCheckout, isPayout } from 'razorpay';
+import NavigationStack, { isStackPopulated } from 'navstack';
 import { querySelector } from 'utils/doc';
 
 let componentsMap = {};
@@ -30,6 +31,12 @@ export function render() {
 
   const session = getSession();
   session.topBar = topbar;
+
+  if (isOneClickCheckout()) {
+    showHeader();
+    showTopbar();
+  }
+
   if (isPayout()) {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {

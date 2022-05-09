@@ -1,4 +1,7 @@
 <script>
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI imports
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import Address from 'ui/elements/address.svelte';
@@ -6,7 +9,8 @@
   import TpvBank from 'ui/elements/TpvBank.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
+  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Store
   import {
@@ -19,7 +23,9 @@
     state,
     multiTpvOption,
     countryISOCode,
+    prevContact,
   } from 'checkoutstore/screens/home';
+  import { activeRoute } from 'one_click_checkout/routing/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -31,32 +37,48 @@
     isContactHidden,
     isPartialPayment,
     getMerchantOrder,
-    getOption,
     isContactEmailOptional,
     isContactOptional,
     isOneClickCheckout,
   } from 'razorpay';
-
+  import { toggleHeader } from 'one_click_checkout/header/helper';
+  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { getAnimationOptions } from 'svelte-utils';
+  import { screensHistory } from 'one_click_checkout/routing/History';
 
+  // analytics imports
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { ContactDetailsEvents } from 'analytics/home/events';
-  import { CONTACT_REGEX, EMAIL_REGEX, STATES } from 'common/constants';
-  import { onMount } from 'svelte';
-  import { screensHistory } from 'one_click_checkout/routing/History';
-
-  import { t } from 'svelte-i18n';
-  import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
-  import { CtaViews as CTA_LABELS } from 'ui/labels/cta';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
+  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import {
+    INDIA_CONTACT_ERROR_LABEL,
+    CONTACT_ERROR_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
+  import { getPrefillBankDetails } from 'netbanking/helper';
+
+  // Constants imports
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
-  import { getPrefillBankDetails } from 'netbanking/helper';
+  import { views } from 'one_click_checkout/routing/constants';
+  import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
+  import {
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    STATES,
+    INDIA_COUNTRY_CODE,
+    PHONE_REGEX_INDIA,
+  } from 'common/constants';
 
   const entries = _Obj.entries;
 
@@ -64,15 +86,25 @@
   export let tpv;
   export let newCta;
   export let onSubmit;
+  export let showValidations = false;
 
   const order = getMerchantOrder();
   const accountName = getPrefillBankDetails('name');
   const icons = getThemeMeta().icons;
-
+  const { user } = getIcons();
+  const isOneCCEnabled = isOneClickCheckout();
+  const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
+  const isSummaryScreen = $activeRoute?.name === views.COUPONS;
   const userContact = $contact;
+  $prevContact = {
+    country: $country,
+    phone: $phone,
+    email: $email,
+  };
   let disabled = true;
+  let validationText;
 
-  function trackContactFilled() {
+  function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
     Analytics.track('contact:fill', {
       type: AnalyticsTypes.BEHAV,
@@ -82,9 +114,26 @@
       },
     });
     Events.TrackBehav(ContactDetailsEvents.CONTACT_INPUT);
+    if (e.type === 'blur' && isOneCCEnabled) {
+      onContactBlur();
+    }
+    validationText = getValidationText();
   }
 
-  function trackEmailFilled() {
+  function onContactBlur() {
+    Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
+      country_code: $country,
+      contact_number: $phone,
+    });
+  }
+
+  function onEmailBlur() {
+    Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
+      email_id: $email,
+    });
+  }
+
+  function trackEmailFilled(e) {
     const valid = EMAIL_REGEX.test($email);
     Analytics.track('email:fill', {
       type: AnalyticsTypes.BEHAV,
@@ -93,11 +142,18 @@
         value: $email,
       },
     });
+    if (e.type === 'blur' && isOneCCEnabled) {
+      onEmailBlur();
+    }
     Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
   }
 
   $: {
     disabled = !(CONTACT_REGEX.test($contact) && EMAIL_REGEX.test($email));
+
+    if ($country === INDIA_COUNTRY_CODE) {
+      disabled = !PHONE_REGEX_INDIA.test($phone);
+    }
   }
 
   onMount(() => {
@@ -111,6 +167,9 @@
     Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
       previousScreen: screensHistory.previousRoute(),
     });
+    if (isOneCCEnabled && isEditDetailScreen) {
+      toggleHeader(false);
+    }
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();
@@ -127,13 +186,34 @@
     const { country } = countryInfo.detail;
     $countryISOCode = country;
   }
+
+  // Phone Validation for 1CC
+  function getValidationText() {
+    if ($country === INDIA_COUNTRY_CODE) {
+      return !PHONE_REGEX_INDIA.test($phone)
+        ? $t(INDIA_CONTACT_ERROR_LABEL)
+        : null;
+    } else {
+      return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
+    }
+  }
 </script>
 
-<div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
+<div
+  data-test-id="payment-details-block"
+  class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
+  in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
+>
   {#if isLoginMandatory()}
     <div class="details-callout">{$t(MANDATORY_LOGIN_CALLOUT)}</div>
   {/if}
-  <div class="details-block" class:pd-1cc={isOneClickCheckout()}>
+  {#if isOneCCEnabled && isEditDetailScreen}
+    <div class="contact-title">
+      <Icon icon={user} />
+      <span class="contact-text">{$t(CONTACT_LABEL)}</span>
+    </div>
+  {/if}
+  <div class="details-block" class:p-1cc={isOneCCEnabled}>
     {#if !isContactHidden()}
       <div class="contact-field">
         <ContactField
@@ -141,13 +221,20 @@
           bind:phone={$phone}
           isOptional={isContactOptional()}
           on:blur={trackContactFilled}
+          on:input={trackContactFilled}
           on:countrySelect={handleCountrySelect}
+          {showValidations}
+          {validationText}
         />
       </div>
     {/if}
     {#if !isEmailHidden()}
       <div class="email-field">
-        <EmailField bind:value={$email} on:blur={trackEmailFilled} />
+        <EmailField
+          bind:value={$email}
+          on:blur={trackEmailFilled}
+          {showValidations}
+        />
       </div>
     {/if}
   </div>
@@ -185,13 +272,16 @@
     {/if}
   {/if}
   {#if newCta}
-    <CTA on:click={onSubmitClick} {disabled}
-      >{$t(`cta.${CTA_LABELS.PROCEED}`)}</CTA
-    >
+    <CTAOneCC on:click={onSubmitClick} {disabled} showAmount={false}>
+      {$t(CTA_LABEL)}
+    </CTAOneCC>
   {/if}
 </div>
 
 <style>
+  .details-wrapper {
+    padding: 28px 16px;
+  }
   .details-block {
     padding: 0 24px;
   }
@@ -210,7 +300,19 @@
     font-weight: 700;
   }
 
-  .pd-1cc {
-    padding-top: 8px;
+  .p-1cc {
+    padding: 8px 0px 8px;
+  }
+
+  .contact-title {
+    display: flex;
+    align-items: center;
+    padding-bottom: 6px;
+  }
+
+  .contact-text {
+    padding-left: 10px;
+    font-weight: 600;
+    font-size: 14px;
   }
 </style>

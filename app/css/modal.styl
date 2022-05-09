@@ -469,6 +469,15 @@ i {
   }
 }
 
+ @keyframes loader {
+  0% {
+    left: 0px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
 .loading .spin {
   display: block;
 }
@@ -595,6 +604,10 @@ i {
       opacity: 1;
     }
 
+    #powered-by.powered-one-cc  {
+      opacity: 0;
+    }
+
     #modal {
       opacity: 1;
       transform: none;
@@ -675,6 +688,20 @@ i {
   font-family: $font;
 }
 
+.offers-fade {
+  pointer-events: none;
+  &::after {
+    content: '';
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    position: absolute;
+    background: rgba(7, 38, 84, 0.4);
+    z-index: 2;
+    height: 104px;
+  }
+}
 #content {
   text-align: left;
   white-space: normal;
@@ -704,6 +731,7 @@ i {
       }
     }
 }
+
 #content.one-cc {
   #logo {
     width: 40px;
@@ -728,8 +756,54 @@ i {
   }
 
   #body {
-    height: 403px;
-    flex-basis: 403px;
+    min-height: 440px;
+    height: 440px;
+    flex-basis: 440px;
+  }
+
+  #body.sub {
+    margin-bottom: 0;
+  }
+
+  #form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #form-fields {
+    z-index: inherit;
+    position: inherit;
+  }
+
+  #modal, #timeout, button, input, textarea, select {
+    font-family: "Inter", "lato", ubuntu, helvetica, sans-serif;
+    font-feature-settings: 'liga' 0;
+  }
+
+  .pad {
+    padding: 0 16px;
+  }
+
+  h3.title, .legend {
+    text-transform: capitalize;
+    color: #263A4A;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 1;
+  }
+
+  .text-btn {
+    font-weight: 600;
+  }
+
+  input[type=checkbox]::before{
+    border-radius: 2px;
+  }
+}
+
+@media (min-width: 992px) {
+  #content.one-cc {
+   height: 100%;
   }
 }
 
@@ -1137,10 +1211,6 @@ $outline = #ddd;
   bottom: 0;
 }
 
-#form-cardless_emi {
-  padding-bottom: 16px;
-}
-
 .offers-container {
   order: 1;
   border-top: 1px solid #ebedf0;
@@ -1538,4 +1608,34 @@ div.callout span{
       transform: none;
     }
   }
+}
+
+#secure-card-know-more-wrap {
+  white-space: initial;
+  z-index: 100;
+  width: 100%;
+  position: absolute;
+  top: initial;
+  left: 0;
+  bottom: -55px;
+  transform: translateY(18px);
+}
+
+.hide-topbar {
+  display: none;
+}
+
+#footer.hidden {
+  display: none;
+}
+
+#one-cc-footer {
+  background: white;
+  z-index: 3;
+  color: black;
+  width: 100%;
+}
+
+#one-cc-footer:hover {
+  cursor: pointer;
 }

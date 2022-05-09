@@ -5,7 +5,7 @@ import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import { isOneClickCheckout } from 'razorpay/helper';
 
 export function getDefaultOtpTemplate() {
-  let template = screensHistory.config[views.OTP].props.otpReason;
+  let template = screensHistory.config[views.OTP].props.smsTemplate;
 
   const session = getSession();
   if (session.tab !== 'home-1cc' && isOneClickCheckout()) {

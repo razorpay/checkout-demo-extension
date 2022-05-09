@@ -18,6 +18,8 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
+  import { truncateString } from 'utils/strings';
+
   export let onChange;
   export let extraLabel;
   export let extraLabelClass;
@@ -108,10 +110,12 @@
     }}
     on:blur
     value={countryName}
+    displayValue={truncateString(countryName, 12)}
     elemClasses="address-elem"
     labelClasses="address-label"
     {validationText}
     modifyIconPosition={!!validationText}
+    showDropDownIcon={true}
   />
   {#if showExtraLabel && extraLabel}
     <div class={`${extraLabelClass} extralabel`}>
@@ -136,7 +140,7 @@
     color: #079f0d;
   }
   .field-wrapper .failureText {
-    color: #ff5f00;
+    color: var(--error-validation-color);
   }
   .field-wrapper .extralabel {
     position: absolute;

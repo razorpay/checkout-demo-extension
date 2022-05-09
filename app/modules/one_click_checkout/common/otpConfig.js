@@ -5,6 +5,7 @@ import {
 } from 'one_click_checkout/common/otp';
 import OTP from 'one_click_checkout/otp/ui/OTP.svelte';
 import { views } from 'one_click_checkout/routing/constants';
+import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
 const otp = {
   name: views.OTP,
@@ -17,5 +18,6 @@ const otp = {
     handleBack,
   },
   isBackEnabled: true,
+  breadcrumHighlight: ADDRESS_LABEL,
 };
 export default otp;

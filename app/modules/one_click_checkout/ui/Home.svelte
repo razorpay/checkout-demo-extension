@@ -1,26 +1,37 @@
 <script>
+  // svelte imports
+  import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
+
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
-  import TopBar from 'ui/components/Topbar.svelte';
   import Loader from 'one_click_checkout/loader/Loader.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Router from 'one_click_checkout/routing/component/Router.svelte';
+
   // Store imports
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
+  import { savedAddresses } from 'one_click_checkout/address/store';
+
   // Constants import
   import routes from 'one_click_checkout/routing/routes';
   import { views } from 'one_click_checkout/routing/constants';
+
   // Helpers import
-  import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+  import { destroyHeader } from 'one_click_checkout/header';
+  import { destroyTopbar } from 'one_click_checkout/topbar';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+
   // svelte imports
-  import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
+
+  // analytics imports
+  import Analytics, { Events } from 'analytics';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
@@ -29,6 +40,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { querySelector } from 'utils/doc';
 
   let topbar;
@@ -39,10 +51,12 @@
   setEmail(getPrefilledEmail());
 
   let theme = getTheme();
+
   let styles = {
     'highlight-color': theme.highlightColor,
     'sec-highlight-color': theme.secondaryHighlightColor,
     'background-color': theme.backgroundColor,
+    'error-validation-color': '#B21528',
   };
 
   $: cssVarStyles = Object.entries(styles)
@@ -50,6 +64,10 @@
     .join(';');
 
   onMount(() => {
+    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
+    Analytics.setMeta('initial_loggedIn', isUserLoggedIn());
+    Analytics.setMeta('initial_hasSavedAddress', !!$savedAddresses?.length);
+
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,
@@ -60,7 +78,11 @@
     new Loader({
       target: querySelector('#one-cc-loader'),
     });
-    const view = determineLandingView();
+    const checkoutTopbar = document.querySelector('#topbar-wrap');
+    if (checkoutTopbar) {
+      checkoutTopbar.classList.add('hide-topbar');
+    }
+    const view = views.COUPONS;
     navigator.navigateTo({ path: view });
     contact.subscribe(updateTopBar);
   });
@@ -114,6 +136,8 @@
 
   onDestroy(() => {
     resetRouting();
+    destroyHeader();
+    destroyTopbar();
   });
 </script>
 
@@ -124,7 +148,6 @@
   pad={false}
   resetMargin="true"
 >
-  <TopBar bind:this={topbar} on:back={onBack} isFixed={true} />
   <div style={cssVarStyles} class="container">
     <Router {routes} />
   </div>
@@ -143,5 +166,6 @@
 
   .container {
     height: inherit;
+    overflow: auto;
   }
 </style>

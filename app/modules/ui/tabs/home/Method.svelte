@@ -24,6 +24,7 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
+  import { isOneClickCheckout } from 'razorpay';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
@@ -54,6 +55,7 @@
 
   const session = getSession();
   const dispatch = createEventDispatcher();
+  const isOneCC = isOneClickCheckout();
 
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
@@ -169,8 +171,10 @@
       <Icon icon={_icon} />
     {/if}
   </i>
-  <div slot="title" class:cod-error={disabled}>{_title}</div>
-  <div slot="subtitle">
+  <div slot="title" class:cod-error={disabled} class:title-one-cc={isOneCC}>
+    {_title}
+  </div>
+  <div slot="subtitle" class:subtitle-one-cc={isOneCC}>
     {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'subText'}
       <!-- This component is built with "early return" concept and returns html upon conditions met -->
       <UPIAppStack onOtherClick={select} {method} />
@@ -250,8 +254,10 @@
 
   .error {
     margin-top: 4px;
-    color: #ee1a32 !important;
+    color: #8d97a1cc !important;
     overflow: visible;
+    font-size: 12px;
+    line-height: 16px;
   }
   .error-container {
     display: flex;
@@ -262,12 +268,24 @@
   }
 
   .cod-error {
-    color: #858585 !important;
+    color: #263a4a99 !important;
   }
 
   .cod-loader {
     opacity: 1;
     height: 16px;
     width: 16px;
+  }
+
+  div[slot='title'].title-one-cc {
+    font-weight: 400;
+    color: #263a4a;
+    font-size: 14px;
+  }
+
+  div[slot='subtitle'].subtitle-one-cc {
+    font-weight: 400;
+    font-size: 12px;
+    color: #8d97a1;
   }
 </style>

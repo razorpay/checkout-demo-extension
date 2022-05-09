@@ -10,7 +10,11 @@ import Analytics, {
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
-import RazorpayStore, { getRecurringMethods, isRecurring } from 'razorpay';
+import RazorpayStore, {
+  getRecurringMethods,
+  isOneClickCheckout,
+  isRecurring,
+} from 'razorpay';
 
 import { format } from 'i18n';
 
@@ -142,6 +146,7 @@ Customer.prototype = {
 
     const getDuration = timer();
     Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_START);
+    Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_API_INITIATED);
 
     fetch({
       url: url,
@@ -154,7 +159,19 @@ Customer.prototype = {
           MetaProperties.HAS_SAVED_CARDS_STATUS_CHECK,
           hasSavedCards
         );
-
+        const eventProperties = {
+          response_time: getDuration(),
+          api_response: data,
+          has_saved_cards: hasSavedCards,
+          has_saved_addresses: !!data.saved_address,
+        };
+        if (data?.error) {
+          eventProperties['error_reason'] = data?.error;
+        }
+        Events.TrackMetric(
+          MiscEvents.CUSTOMER_STATUS_API_COMPLETED,
+          eventProperties
+        );
         Events.setMeta(
           MetaProperties.HAS_SAVED_ADDRESSES,
           !!data.saved_address
@@ -246,7 +263,13 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            callback(format('otp.title.incorrect_otp_retry'));
+            var errorMsg = '';
+            if (isOneClickCheckout()) {
+              errorMsg = 'otp.title.incorrect_otp_retry_one_cc';
+            } else {
+              errorMsg = 'otp.title.incorrect_otp_retry';
+            }
+            callback(errorMsg);
           }
         } else {
           callback(undefined, data);

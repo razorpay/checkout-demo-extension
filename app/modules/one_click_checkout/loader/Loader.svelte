@@ -2,38 +2,70 @@
   import { t } from 'svelte-i18n';
   import { fly, fade } from 'svelte/transition';
   import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
-  import Icon from 'ui/elements/Icon.svelte';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
+  import { getTheme } from 'one_click_checkout/address/sessionInterface';
+  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
+  import { onMount } from 'svelte';
+  import { isMobile } from 'common/useragent';
 
-  const { rzp_logo } = getIcons();
+  const theme = getTheme();
+  let resizeBackdrop = false;
+  let isKeyboardOpen = false;
+  let layoutHeight;
+
+  $: {
+    if ($showLoader) {
+      resizeBackdrop = !!document.getElementById('one-cc-cta');
+    }
+  }
+
+  onMount(() => {
+    layoutHeight = window.innerHeight;
+    window.onresize = function () {
+      // Assumption: On a mobile device, window height will change only when keyboard is shown/hidden
+      if (window.innerHeight < layoutHeight && isMobile()) {
+        isKeyboardOpen = true;
+      } else {
+        isKeyboardOpen = false;
+      }
+    };
+  });
 </script>
 
 {#if $showLoader}
   <div
     class="loader-backdrop"
+    class:resize-backdrop={resizeBackdrop && !isKeyboardOpen}
     in:fade={{ duration: 250 }}
     out:fade={{ duration: 250 }}
   />
-  <div class="card" transition:fly={{ duration: 250, y: 50 }}>
-    <div class="content">
-      <div class="activity-container">
-        <div class="loading-indicator" />
-        <div class="icon-container">
-          <Icon icon={rzp_logo} />
-        </div>
+  <div
+    class="card"
+    class:card-absolute={isKeyboardOpen}
+    transition:fly|local={{ duration: 250, y: 50 }}
+  >
+    <div class="wrapper">
+      <div class="bar" />
+      <div class="content">
+        <span class="label">{$t($loaderLabel) || $t(LOADING_LABEL)}...</span>
       </div>
-      <span class="label">{$t($loaderLabel)}</span>
-      <span class="rpay"><em>Razorpay</em></span>
     </div>
   </div>
 {/if}
 
 <style>
+  .card.card-absolute {
+    bottom: 0;
+    position: absolute;
+  }
+  .loader-backdrop.resize-backdrop {
+    height: calc(100% - 96px);
+  }
+
   .loader-backdrop {
     width: 100%;
     height: 100%;
-    opacity: 0.2;
     position: absolute;
+    opacity: 0.2;
     background-color: black;
     top: 0;
     right: 0;
@@ -41,38 +73,58 @@
   }
   .card {
     z-index: 10001;
-    width: 252px;
-    height: 144px;
-    background-color: white;
-    color: black;
-    border-radius: 6px;
+    width: 100%;
+    height: 36px;
+    color: #757575;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: 500;
+    box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.08);
+    background-color: #fef5e5;
   }
+
   .content {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 12px;
     font-size: 12px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
-  .rpay {
-    font-size: 11px;
-    margin-top: 3px;
-    font-weight: 900;
-  }
   .label {
     cursor: default;
   }
-  .activity-container {
-    position: relative;
+
+  .wrapper {
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
-  .icon-container {
-    position: absolute;
-    top: 1px;
-    left: 1px;
+  .bar {
+    width: 50px;
+    height: 5px;
+    top: 0px;
+    position: relative;
+    animation-name: loader;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    background-color: #b88c45;
+  }
+
+  @keyframes loader {
+    0% {
+      left: 0px;
+    }
+    100% {
+      left: calc(100% - 50px);
+    }
   }
 </style>

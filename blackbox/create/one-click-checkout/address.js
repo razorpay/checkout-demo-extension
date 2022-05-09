@@ -61,7 +61,7 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout Address test', ({ preferences, title, options }) => {
-    test(title, async () => {
+    test.skip(title, async () => {
       preferences.methods.cod = true;
       const context = await openCheckoutWithNewHomeScreen({
         page,
@@ -142,7 +142,6 @@ module.exports = function (testFeatures) {
         await proceed(context);
       }
       if (isSaveAddress && skipOTP) {
-        await delay(200);
         await handleVerifyOTPReq(context);
         await handleCustomerAddressReq(context);
       }

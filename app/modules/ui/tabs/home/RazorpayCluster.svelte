@@ -18,7 +18,7 @@
   import { SINGLE_BLOCK_TITLE } from 'ui/labels/methods';
 
   // helpers
-  import { setDynamicFees } from './helpers';
+  import { getSectionCategoryForBlock, setDynamicFees } from './helpers';
 
   // Props
   export let block;
@@ -68,6 +68,7 @@
         {instrument}
         on:select={() => {
           setDynamicFees(instrument, 'rzpCluster');
+          instrument.section = getSectionCategoryForBlock(block);
           dispatch('selectInstrument', instrument);
         }}
       />

@@ -1,6 +1,6 @@
 import Razorpay from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
-import { Events, Track, MiscEvents } from 'analytics/index';
+import Analytics, { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
@@ -222,25 +222,6 @@ function createTestRibbon(parent) {
   );
 }
 
-function fetchNewDesignExp(rzp) {
-  let uuid = Track.makeUid();
-  return new Promise(function (resolve, reject) {
-    fetch.post({
-      url: 'https://api.razorpay.com/v1/splitz/evaluate',
-      callback: function (data) {
-        resolve(data);
-      },
-      data: {
-        id: uuid,
-        experiment_id: 'JARUK3l9b4GF7f',
-        request_data: JSON.stringify({
-          merchant_key_id: rzp.get('key') || '',
-        }),
-      },
-    });
-  });
-}
-
 var preloadedFrame;
 var isBrave = false;
 /**
@@ -251,47 +232,13 @@ var isBrave = false;
 isBraveBrowser().then((r) => {
   isBrave = r;
 });
-var preloadedFramePromise;
 function getPreloadedFrame(rzp) {
-  function setFrame() {
+  if (preloadedFrame) {
+    preloadedFrame.openRzp(rzp);
+  } else {
     preloadedFrame = new CheckoutFrame(rzp);
     global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
-    _El.append(frameContainer, preloadedFrame.el);
-  }
-
-  if (rzp && rzp.get('one_click_checkout')) {
-    rzp.set('v_1_5_experiment_enabled', false);
-    preloadedFramePromise = fetchNewDesignExp(rzp).then((data) => {
-      if (data?.response?.variant?.name === 'enable_1_5') {
-        rzp.set('v_1_5_experiment_enabled', true);
-      }
-      const currentFrames = document.getElementsByClassName(
-        'razorpay-checkout-frame'
-      );
-      while (currentFrames.length) {
-        currentFrames[0].remove();
-      }
-      setFrame();
-      intialInstrumentation(rzp, preloadedFrame);
-      return preloadedFrame;
-    });
-
-    if (preloadedFrame && preloadedFrame.openRzp) {
-      preloadedFrame.openRzp(rzp);
-    } else {
-      preloadedFramePromise = new Promise(function (resolve, reject) {
-        setFrame();
-        resolve(preloadedFrame);
-      });
-    }
-  }
-
-  if (!preloadedFrame) {
-    setFrame();
-  }
-
-  if (rzp && !rzp.get('one_click_checkout') && preloadedFrame) {
-    preloadedFrame.openRzp(rzp);
+    frameContainer |> _El.append(preloadedFrame.el);
   }
 
   return preloadedFrame;
@@ -320,11 +267,16 @@ RazorProto.onNew = function (event, callback) {
   }
 };
 
-function intialInstrumentation(that, checkoutFrame) {
-  var frame = (that.checkoutFrame = checkoutFrame);
-  Track(that, 'open', {
-    v_1_5_experiment_enabled: that.get('v_1_5_experiment_enabled') || false,
-  });
+RazorProto.open = needBody(function () {
+  if (!this.metadata) {
+    this.metadata = {
+      isBrave,
+    };
+  }
+  this.metadata.openedAt = Date.now();
+
+  var frame = (this.checkoutFrame = getPreloadedFrame(this));
+  Track(this, 'open');
 
   if (!frame.el.contentWindow) {
     frame.close();
@@ -335,22 +287,7 @@ function intialInstrumentation(that, checkoutFrame) {
   }
 
   if (currentScript.src.slice(-7) === '-new.js') {
-    Track(that, 'oldscript', location.href);
-  }
-}
-
-RazorProto.open = needBody(function () {
-  if (!this.metadata) {
-    this.metadata = {
-      isBrave,
-    };
-  }
-  this.metadata.openedAt = Date.now();
-  var checkoutFrame = getPreloadedFrame(this);
-  var that = this;
-
-  if (checkoutFrame && !that?.get('one_click_checkout')) {
-    intialInstrumentation(that, checkoutFrame);
+    Track(this, 'oldscript', location.href);
   }
 
   return this;

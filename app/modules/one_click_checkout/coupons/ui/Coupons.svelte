@@ -1,80 +1,119 @@
 <script>
+  // svelte imports
+  import { onMount, onDestroy } from 'svelte';
+
   // UI Imports
-  import CTA from 'ui/elements/CTA.svelte';
-  import AvailableCouponsButton from './components/AvailableCouponsButton.svelte';
-  import CouponInput from './components/CouponInput.svelte';
-  import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
+  import AvailableCouponsButton from 'one_click_checkout/coupons/ui/components/AvailableCouponsButton.svelte';
+  import ContactWidget from 'one_click_checkout/contact_widget/ContactWidget.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
+  import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
+  import CTA from 'one_click_checkout/cta/index.svelte';
 
   // store imports
-  import { getCurrency, getPrefilledCouponCode } from 'razorpay';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-
+  import { contact, email } from 'checkoutstore/screens/home';
+  import {
+    getPrefilledCouponCode,
+    isContactHidden,
+    isEmailHidden,
+    getPrefilledContact,
+    getPrefilledEmail,
+    isCodEnabled,
+  } from 'razorpay';
+  import {
+    checkServiceabilityStatus,
+    selectedAddress,
+    selectedAddressId,
+  } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
     isCouponApplied,
-    couponInputValue,
-    error,
     couponInputSource,
+    availableCoupons,
   } from 'one_click_checkout/coupons/store';
-
-  // svelte imports
-  import { onMount } from 'svelte';
+  import {
+    isBillingSameAsShipping,
+    savedAddresses,
+  } from 'one_click_checkout/address/store';
+  import { isIndianCustomer } from 'checkoutstore';
+  import {
+    shouldShowCoupons,
+    isCodForced,
+    isLoginMandatory,
+  } from 'one_click_checkout/store';
+  import { RTBExperiment } from 'rtb/store';
 
   // i18n imports
-  import { t } from 'svelte-i18n';
-  import {
-    SUMMARY_LABEL,
-    TOTAL_LABEL,
-    HAVE_COUPON_LABEL,
-    CONTINUE_LABEL,
-  } from 'one_click_checkout/coupons/i18n/labels';
-  import {
-    COUPON_DISCOUNT_LABEL,
-    AMOUNT_LABEL,
-  } from 'one_click_checkout/summary_modal/i18n/labels';
+  import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
+  import { locale } from 'svelte-i18n';
 
-  import { formatAmountWithSymbol } from 'common/currency';
-
-  // Coupons imports
+  // session imports
   import {
-    showDetailsOverlay,
     removeCouponCode,
     showAmountInTopBar,
     hideAmountInTopBar,
   } from 'one_click_checkout/coupons/sessionInterface';
-  import Razorpay from 'common/Razorpay';
+  import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
+  import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
+
+  // analytics imports
   import Analytics, { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
-
-  import {
-    cartAmount,
-    cartDiscount,
-    amount,
-  } from 'one_click_checkout/charges/store';
-
-  import {
-    fetchCoupons,
-    applyCouponCode,
-  } from 'one_click_checkout/coupons/helpers';
-
-  import { removeCouponInStore } from 'one_click_checkout/coupons/store';
-
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
-  import { views } from 'one_click_checkout/routing/constants';
-  import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
 
-  let showCta = true;
-  const currency = getCurrency();
+  // utils imports
+  import {
+    fetchCoupons,
+    applyCouponCode,
+  } from 'one_click_checkout/coupons/helpers';
+  import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
+  import { hideToast } from 'one_click_checkout/Toast';
+  import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { isUnscrollable } from 'one_click_checkout/helper';
+  import { isRTBEnabled } from 'rtb/helper';
+  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
+
+  // constant imports
+  import { views } from 'one_click_checkout/routing/constants';
+  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+
   const prefilledCoupon = getPrefilledCouponCode();
+  const showCoupons = shouldShowCoupons();
+
+  let ctaDisabled = false;
+  let couponEle;
+  let scrollable = false;
+  let orderWidget;
+  let showValidations = false;
+
+  $: ctaDisabled =
+    (!$contact && !isContactHidden()) ||
+    (!$email && !isEmailHidden()) ||
+    ($savedAddresses.length && !$selectedAddress.serviceability);
 
   function onSubmit() {
+    if (!CONTACT_REGEX.test($contact) || !EMAIL_REGEX.test($email)) {
+      showValidations = true;
+      return;
+    }
+
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
     Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
+    Events.TrackBehav(CouponEvents.SUMMARY_CONTINUE_CTA_CLICKED, {
+      coupon_code_applied: $appliedCoupon,
+      address_id: $selectedAddressId,
+      address_country: $selectedAddress?.country,
+      meta: {
+        is_saved_address: !!$savedAddresses?.length,
+      },
+    });
     Events.Track(CouponEvents.COUPONS_SUBMIT, {
       input_source: $couponInputSource,
     });
@@ -88,36 +127,67 @@
         page_title: CATEGORIES.COUPONS,
       },
     });
-    if (!$isCouponApplied) {
-      removeCouponInStore();
+
+    if (!isUserLoggedIn() && $isIndianCustomer) {
+      navigator.navigateTo({ path: views.SAVED_ADDRESSES });
+    } else if (!$savedAddresses.length) {
+      navigator.navigateTo({ path: views.ADD_ADDRESS });
+    } else {
+      if (!$isBillingSameAsShipping) {
+        navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
+      } else redirectToPaymentMethods();
     }
-    navigator.navigateTo({ path: views.SAVED_ADDRESSES });
     showAmountInTopBar();
   }
 
-  function onCouponInput() {
-    if ($error) {
-      $error = '';
-    }
+  function summaryLoadedEvent() {
+    Analytics.setMeta('is_RTB_live_on_merchant', isRTBEnabled($RTBExperiment));
+    Analytics.setMeta('is_force_cod_enabled', isCodForced());
+    Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
+    Analytics.setMeta('is_coupons_enabled', showCoupons);
+    Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
+    Analytics.setMeta('summary_screen_default_language', $locale);
+    Analytics.setMeta('is_cod_enabled', isCodEnabled());
 
-    if ($isCouponApplied) {
-      $isCouponApplied = false;
-      $appliedCoupon = '';
-      $amount = $cartAmount;
-    }
+    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
+      is_CTA_enabled: !ctaDisabled,
+      prefill_contact_number: getPrefilledContact(),
+      prefill_email: getPrefilledEmail(),
+      count_coupons_available: $availableCoupons.length,
+      pre_selected_saved_address_id: $selectedAddressId,
+    });
   }
 
-  function onEdit() {
-    Razorpay.sendMessage({
-      event: 'event',
-      data: {
-        event: 'user_details.edit',
-      },
+  function checkAddressServiceability() {
+    return new Promise((resolve, reject) => {
+      if (
+        $savedAddresses?.length &&
+        $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+      ) {
+        loadAddressesWithServiceability().then(resolve).catch(reject);
+        return;
+      }
+      resolve();
     });
-    showDetailsOverlay();
   }
 
   onMount(() => {
+    scrollable = isUnscrollable(couponEle?.parentNode);
+    toggleHeader(true);
+    if ($savedAddresses?.length) {
+      removeTabInBreadcrumbs(ADDRESS_LABEL);
+    }
+    const addressPromise = checkAddressServiceability();
+    const couponsPromise = fetchCoupons();
+    addressPromise.then(() => {
+      Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
+        pre_selected_saved_address_id: $selectedAddressId,
+      });
+      Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
+        checked_billing_address_same_as_delivery_address:
+          $isBillingSameAsShipping,
+      });
+    });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -126,117 +196,99 @@
       },
     });
     hideAmountInTopBar();
-    fetchCoupons();
     if (prefilledCoupon) {
       applyCouponCode(prefilledCoupon);
     }
+    Promise.all([addressPromise, couponsPromise]).finally(summaryLoadedEvent);
   });
+
+  onDestroy(() => {
+    hideToast();
+  });
+
+  function onViewDetailsClick() {
+    if (orderWidget) {
+      orderWidget.scrollIntoView();
+    }
+  }
+
+  function onAddressHeaderClick() {
+    let view = views.SAVED_ADDRESSES;
+    if ($savedAddresses.length <= 1) {
+      view = views.ADD_ADDRESS;
+    }
+    navigator.navigateTo({ path: view });
+  }
 </script>
 
 <Screen pad={false}>
-  <div class="coupon-container">
-    <UserDetailsStrip {onEdit} />
-    <p class="have-coupon-label">{$t(HAVE_COUPON_LABEL)}</p>
-
-    <CouponInput
-      {onCouponInput}
-      applyCoupon={() => applyCouponCode()}
-      removeCoupon={removeCouponCode}
-    />
-
-    <AvailableCouponsButton
-      applyCoupon={(code) => applyCouponCode(code)}
-      removeCoupon={removeCouponCode}
-    />
-
-    <p class="coupon-order-summary-label">{$t(SUMMARY_LABEL)}</p>
-
-    <div class="coupon-order-summary">
-      <div class="row justify-between">
-        <p>{$t(AMOUNT_LABEL)}</p>
-        <p>
-          {formatAmountWithSymbol($cartAmount, currency)}
-        </p>
-      </div>
-      {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
-        <div class="row justify-between">
-          <p>
-            {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
-          </p>
-          <p class="color-green">
-            {formatAmountWithSymbol($cartDiscount, currency)}
-          </p>
-        </div>
-      {/if}
-      <hr />
-      <div class="row justify-between">
-        <p><b>{$t(TOTAL_LABEL)}</b></p>
-        <p><b>{formatAmountWithSymbol($amount, currency)}</b></p>
-      </div>
+  <div
+    data-test-id="summary-screen"
+    class="coupon-container"
+    bind:this={couponEle}
+    class:coupon-scrollable={scrollable}
+  >
+    <div class="widget-wrapper contact-wrapper">
+      <ContactWidget {showValidations} />
     </div>
-    {#if showCta}
-      <CTA on:click={onSubmit}>{$t(CONTINUE_LABEL)}</CTA>
+    <div class="separator" />
+
+    {#if $savedAddresses.length}
+      <div class="widget-wrapper">
+        <AddressWidget
+          loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+          address={$selectedAddress}
+          on:headerCtaClick={onAddressHeaderClick}
+        />
+      </div>
+      <div class="separator" />
     {/if}
+
+    {#if showCoupons}
+      <div class="widget-wrapper">
+        <AvailableCouponsButton
+          applyCoupon={(code) => applyCouponCode(code)}
+          removeCoupon={removeCouponCode}
+        />
+      </div>
+      <div class="separator" />
+    {/if}
+    <div
+      class="widget-wrapper order-summary-wrapper"
+      id="order-widget"
+      bind:this={orderWidget}
+    >
+      <OrderWidget />
+    </div>
+    <div class="separator" />
+    <CTA
+      on:click={onSubmit}
+      {onViewDetailsClick}
+      disabled={ctaDisabled}
+      handleDisable
+    />
   </div>
 </Screen>
 
 <style>
-  .coupon-order-summary-label {
-    font-style: normal;
-    font-weight: normal;
-    font-size: 13px;
-    line-height: 16px;
-    margin-top: 20px;
-    text-transform: uppercase;
-    color: rgba(51, 51, 51, 0.6);
-  }
-  .coupon-container {
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-top: 20px;
+  .separator {
+    height: 10px;
+    background-color: #f8fafd;
   }
 
-  .coupon-order-summary {
-    margin-top: 14px;
-    margin-bottom: 14px;
-    padding: 12px 14px;
-    background: #f7f7f7;
-    font-size: 14px;
-  }
-  .row {
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #424242;
+  .widget-wrapper {
+    padding: 20px 16px;
   }
 
-  p {
-    margin-block-start: 0;
-    margin-block-end: 0;
+  .contact-wrapper {
+    padding-top: 26px;
   }
 
-  .color-green {
-    color: #079f0d;
+  .order-summary-wrapper {
+    padding-bottom: 26px;
   }
 
-  hr {
-    opacity: 0.1;
-    border: 1px solid #000000;
-  }
-
-  .have-coupon-label {
-    font-style: normal;
-    font-weight: normal;
-    font-size: 13px;
-    line-height: 16px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    color: rgba(51, 51, 51, 0.6);
-  }
-
-  b {
-    color: #000000;
-    line-height: 17px;
+  .coupon-scrollable {
+    min-height: 110%;
   }
 </style>

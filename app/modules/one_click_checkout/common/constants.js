@@ -14,7 +14,7 @@ export const OTP_PARAMS = {
   },
   sent: {
     addFunds: false,
-    loading: true,
+    loading: false,
     showInput: true,
     // skipTextLabel,
     // allowSkip,

@@ -1,9 +1,15 @@
 import address from 'one_click_checkout/address/i18n/en';
 import coupons from 'one_click_checkout/coupons/i18n/en';
+import account from 'one_click_checkout/account_modal/i18n/en';
+import contact from 'one_click_checkout/contact_widget/i18n/en';
+import miscOneCC from 'one_click_checkout/misc/i18n/en';
 import loader from 'one_click_checkout/loader/i18n/en';
 import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
+import ctaOneCC from 'one_click_checkout/cta/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
+import topbar from 'one_click_checkout/topbar/i18n/en';
+
 import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
 export default {
@@ -224,6 +230,7 @@ export default {
     card_number_label: 'Card Number',
     cards_saved_on_apps_label: 'Pay with card on other apps',
     cards_saved_on_rzp_label: 'YOUR SAVED CARDS',
+    cards_saved_label_one_cc: 'All cards supported',
     checking_cred_eligibility: 'Checking you eligibility status on CRED',
     cvv_help: "It's a {length} digit code printed on the back of your card.",
     cvv_label: 'CVV',
@@ -759,8 +766,10 @@ export default {
     bank_details_heading: 'Bank Details',
     config_block_default_title: 'Available Payment Methods',
     contact_help_text: 'Please enter a valid contact number',
-    contact_label_optional: 'Phone (Optional)',
-    contact_label_required: 'Phone',
+    contact_label_optional: 'Phone Number (Optional)',
+    contact_label_required: 'Phone Number',
+    contact_label_mobile_optional: 'Mobile Number (Optional)',
+    contact_label_mobile: 'Mobile Number',
     country_help_text: 'Please enter a valid country code',
     country_label: 'Country',
     country_search_all: 'All countries',
@@ -790,6 +799,7 @@ export default {
     partial_payment_title: 'Select a payment type',
     pincode_help: 'Enter 6 digit pincode',
     pincode_label: 'PIN Code',
+    phone_number: 'Phone Number',
     preferred_block_title: 'Preferred Payment Methods',
     secured_by_message: 'This payment is secured by Razorpay.',
     single_block_title: 'Pay via {method}',
@@ -995,6 +1005,7 @@ export default {
     back_label: 'Go Back',
     otp_field_help: 'Please enter the OTP',
     resend_label: 'Resend OTP',
+    resend_btn: 'Didn’t get the code?',
     retry_label: 'Retry',
     cancel_label: 'Cancel',
     pay_with_paypal: 'Pay With PayPal',
@@ -1004,35 +1015,44 @@ export default {
       resend_otp: 'Resend OTP',
       skip_saved_cards: 'Skip Saved Cards',
       skip_saving_card: 'Skip saving card',
+      skip_saved_cards_one_cc: 'Skip OTP',
+      skip_saving_card_one_cc: 'Skip OTP',
       skip_saved_address: 'Skip',
     },
     heading: {
       mandate_login: 'Verify Mobile Number',
-      access_saved_addresses: 'Save Address',
+      access_saved_addresses: 'Verify Mobile Number',
+      default_login: 'Verify Mobile Number',
     },
     title: {
       access_saved_addresses:
-        'To use your saved addresses, enter the OTP sent to <strong>{phone}</strong>',
+        'To use your saved addresses, enter the OTP sent to <strong class="theme">{phone}</strong>',
       address:
-        'To use this address for future orders, enter the OTP sent to <strong>{phone}</strong>',
+        'To use this address for future orders, enter the OTP sent to <strong class="theme">{phone}</strong>',
       cardlessemi_plans:
         'Enter the OTP sent on {phone} to get EMI plans for {provider}',
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
+      incorrect_otp_retry_one_cc: 'Incorrect OTP. Try Again',
       loading: 'Loading...',
       mandate_login:
-        'A text message with an OTP has been sent to <strong>{phone}</strong>',
+        'A text message with an OTP has been sent to <strong class="theme">{phone}</strong>',
       otp_proceed_with_upi_subscription:
         'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',
       otp_resent_successful: 'OTP has been resent successfully.',
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
+      otp_sent_access_card_one_cc:
+        'To use your saved card, enter the OTP sent to <strong class="theme">{phone}</strong>',
       otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_generic_one_cc: 'Enter OTP to complete payment',
       otp_sent_phone: 'Enter OTP sent on {phone} to complete the payment',
       otp_sent_no_phone: 'Enter OTP to complete payment',
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
+      otp_sent_save_card_one_cc:
+        'To save your card, enter the OTP sent to <strong class="theme">{phone}</strong>',
       otp_sent_save_card_recurring:
         'Enter OTP sent to {phone} to save your card for future payments',
       paylater_continue:
@@ -1108,6 +1128,7 @@ export default {
     retry: 'Retry',
     scan_on_phone:
       'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
+    view_amount_details: 'View Details',
   },
   tab_titles: {
     bank_transfer: 'Bank Transfer',
@@ -1160,7 +1181,7 @@ export default {
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:
       "Please accept the request from Razorpay's VPA on your UPI app",
-    intent_block_heading: 'PAY USING APPS',
+    intent_block_heading: 'Pay Using Apps',
     intent_no_apps_error:
       'No UPI App on this device. Select other UPI option to proceed.',
     intent_select_app: 'Select UPI App in your device',
@@ -1306,9 +1327,12 @@ export default {
   },
   address,
   coupons,
+  contact,
   loader,
+  account,
   details_modal,
   summary_modal,
+  topbar,
   cod: {
     disabled_label: 'Not available',
   },
@@ -1316,4 +1340,6 @@ export default {
     nvs_first_name: 'First Name*',
     nvs_last_name: 'Last Name*',
   },
+  cta_one_cc: ctaOneCC,
+  misc_one_cc: miscOneCC,
 };

@@ -42,6 +42,17 @@ jobs:
             echo "Cache Invalidated, STAGE_CDN_BUCKET: $STAGE_CDN_BUCKET, DIR_PATH_IN_REPO: $DIR_PATH_IN_REPO, PARENT_DIR_IN_CDN: $PARENT_DIR_IN_CDN"
           fi
 
+      - name: Deploy cdn folder to BetaCDN Environment
+        env:
+          STAGE_CDN_BUCKET: rzp-1018-nonprod-betacdn
+          DIR_PATH_IN_REPO: cdn
+        run: |
+          if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
+              echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
+              echo "pushing repo/$DIR_PATH_IN_REPO content to $STAGE_CDN_BUCKET location and invalidating cache"
+              aws s3 cp $DIR_PATH_IN_REPO s3://$STAGE_CDN_BUCKET/ --recursive  
+          fi
+
       - name: Mark Deployment Success on GitHub
         if: ${{ success() }}
         run: |

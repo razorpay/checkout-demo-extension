@@ -6,14 +6,10 @@
 
   import { t } from 'svelte-i18n';
   import {
-    CANCEL_REASON_TITLE,
-    CANCEL_REASON_COLLECT_NOT_RECEIVED,
-    CANCEL_REASON_FAILED_IN_APP,
-    CANCEL_REASON_MONEY_DEDUCTED,
-    CANCEL_REASON_OTHER,
     CANCEL_REASON_BACK_ACTION,
     CANCEL_REASON_SUBMIT_ACTION,
   } from 'ui/labels/upi';
+  import { isOneClickCheckout } from 'razorpay';
 
   export let title = '';
   export let method = '';
@@ -30,9 +26,15 @@
   };
 
   const prefixGenerator = (text) => `${method}-${text}`;
+
+  const isOneClickCheckoutEnabled = isOneClickCheckout();
 </script>
 
-<div id={'cancel_' + method} class="cancel_modal">
+<div
+  id={'cancel_' + method}
+  class="cancel_modal"
+  class:modal_one_cc={isOneClickCheckoutEnabled}
+>
   <p>{$t(title)}</p>
 
   {#each reasons as reason, i (reason.value)}
@@ -59,6 +61,7 @@
     <!-- LABEL: Submit -->
     <button
       class="btn"
+      class:btn-one-cc={isOneClickCheckoutEnabled}
       on:click={() => {
         Analytics.track(method + ':cancel_reason_submit', {
           type: AnalyticsTypes.BEHAV,
@@ -116,5 +119,22 @@
       letter-spacing: 0.5px;
       font-weight: bold;
     }
+  }
+
+  /*  1CC Specific classes */
+  .btn-one-cc {
+    border-radius: 4px;
+    font-family: inherit;
+    text-transform: capitalize;
+  }
+
+  .modal_one_cc > p {
+    font-weight: 600;
+  }
+
+  .modal_one_cc > label {
+    color: #8d97a1;
+    font-size: 14px;
+    line-height: 20px;
   }
 </style>

@@ -9,7 +9,10 @@ import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 // Helper imports
 import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-import { postCustomerAddress } from 'one_click_checkout/address/service';
+import {
+  postCustomerAddress,
+  putCustomerAddress,
+} from 'one_click_checkout/address/service';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 // Constants imports
@@ -26,6 +29,9 @@ import {
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
+import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+import { views as addressViews } from 'one_click_checkout/address/constants';
+import { updateAddressesInStore } from './sessionInterface';
 
 /**
  * Checks for the address form if there are any errors and returns the obj
@@ -84,6 +90,9 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
       } else if (formInput.id === 'landmark') {
         return LANDMARK_ERROR_LABEL;
       } else if (formInput.id === 'zipcode') {
+        if (!COUNTRY_POSTALS_MAP[selectedCountryIso]?.pattern) {
+          return;
+        }
         return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE
           ? PINCODE_ERROR_LABEL
           : ZIPCODE_ERROR_LABEL;
@@ -97,12 +106,8 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
 /**
  * Method called when OTP verification is successful
  */
-export function successHandler(data) {
-  if (!data.addresses?.length) {
-    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.ADD_ADDRESS });
-  } else {
-    navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
-  }
+export function successHandler() {
+  navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.COUPONS });
 }
 
 /**
@@ -111,7 +116,7 @@ export function successHandler(data) {
  */
 export function addressSaveOTPSuccessHandler(service) {
   // Save address
-  saveNewAddress(service).then((res) => {
+  saveAddress(service).then((res) => {
     get(newUserAddress).id = res.shipping_address?.id;
     redirectToPaymentMethods();
   });
@@ -135,15 +140,48 @@ export const skipOTPHandle = () => {
  * Method called when an address has to be saved.
  * @returns {Promise} promise which is completed when address save is successful
  */
-export const saveNewAddress = () => {
+export const saveAddress = () => {
   let payload = getSaveAddressPayload();
   const loggedIn = isUserLoggedIn();
   if (loggedIn && Object.keys(payload).length > 0) {
-    return new Promise((resolve) => {
-      postCustomerAddress(payload).then((res) => {
-        resolve(res);
+    const { shipping_address, billing_address } = payload;
+
+    /**
+     * send a single request if both forms share common type (add/edit)
+     * or if only one billing/shipping address needs to be created/updated
+     */
+    if (
+      shipping_address?.formView === billing_address?.formView ||
+      !shipping_address ||
+      !billing_address
+    ) {
+      if (
+        shipping_address?.formView === addressViews.EDIT_ADDRESS ||
+        billing_address?.formView === addressViews.EDIT_ADDRESS
+      )
+        return putCustomerAddress(payload).then((res) => {
+          updateAddressesInStore(Object.values(res));
+          return res;
+        });
+      return postCustomerAddress(payload).then((res) => {
+        updateAddressesInStore(Object.values(res));
+        return res;
       });
-    });
+    } else {
+      let postPayload = { shipping_address };
+      let putPayload = { billing_address };
+      if (payload.shipping_address?.formView === addressViews.EDIT_ADDRESS) {
+        postPayload = { billing_address };
+        putPayload = { shipping_address };
+      }
+      return Promise.all([
+        postCustomerAddress(postPayload),
+        putCustomerAddress(putPayload),
+      ]).then((response) => {
+        response.forEach((res) => updateAddressesInStore(Object.values(res)));
+        return response;
+      });
+    }
   }
   return Promise.resolve(false);
 };

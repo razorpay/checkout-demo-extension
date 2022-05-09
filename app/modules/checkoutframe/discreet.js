@@ -66,6 +66,7 @@ import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
 import { reward as rewardsStore } from 'checkoutstore/rewards';
 import * as address from 'one_click_checkout/address/sessionInterface';
+import * as TopbarMagicCheckoutStore from 'one_click_checkout/topbar/store';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -121,6 +122,7 @@ import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as RTBHelper from 'rtb/helper';
 
+import * as CommonConstants from 'checkoutframe/constants';
 import * as WalletHelper from 'wallet/helper';
 import * as offlineChallanTab from 'checkoutframe/components/offlineChallan';
 import * as _El from 'utils/DOM';
@@ -133,6 +135,8 @@ const upiPaymentHandlers = {
   processIntentOnMWeb,
   avoidSessionSubmit,
 };
+
+import * as fonts from 'checkoutframe/fonts';
 
 export default {
   $,
@@ -275,11 +279,15 @@ export default {
   isInternationalInPreferredInstrument,
   merchantAnalytics,
   merchantAnalyticsConstant,
+  TopbarMagicCheckoutStore,
 
+  CommonConstants,
   upiPaymentHandlers,
 
   // Offline Challan
   offlineChallanTab,
   NetbankingHelper,
+
+  fonts,
   EMIHelper,
 };
