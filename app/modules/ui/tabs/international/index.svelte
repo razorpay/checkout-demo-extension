@@ -9,6 +9,8 @@
     selectedInternationalProvider,
     updateSelectedProvider,
     setIsNVSFormHomeScreenView,
+    NVSFormData,
+    setNVSFormData,
   } from 'checkoutstore/screens/international';
   import { AVSDccPayload } from 'checkoutstore/screens/card';
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
@@ -32,12 +34,15 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import NVSForm from 'ui/tabs/international/NVSForm.svelte';
+  import {
+    BillingAddressVerificationForm,
+    FORM_TYPE,
+  } from 'ui/components/BillingAddressVerificationForm';
   import Info from 'ui/elements/Info.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // Constants
-  import { VIEWS_MAP } from 'ui/tabs/international/constants';
+  import { VIEWS_MAP, NVS_COUNTRY_MAP } from 'ui/tabs/international/constants';
   import {
     AVS_HEADING,
     AVS_INFO_TITLE,
@@ -81,6 +86,9 @@
   const handleProviderSelect = (provider) => {
     directlyToNVS = false;
     onProviderSelection(provider.code);
+    if ($NVSFormData) {
+      setNVSFormData(null);
+    }
   };
 
   export const onProviderSelection = (providerCode) => {
@@ -161,6 +169,15 @@
     ];
   }
 
+  function filterCountries(countries) {
+    const countryCodeMap = NVS_COUNTRY_MAP[$selectedInternationalProvider];
+    return countries.filter((country) => countryCodeMap.includes(country.key));
+  }
+
+  function handleAVSFormInput(evt) {
+    setNVSFormData(evt.detail);
+  }
+
   export function onShown() {
     if ($selectedInternationalProvider) {
       tabVisible = true;
@@ -185,6 +202,11 @@
     directlyToNVS = direct;
     setView(VIEWS_MAP.NVS_FORM);
 
+    if ($NVSFormData) {
+      setNVSFormData(null);
+    }
+
+    Events.Track(EVENTS.NVS_SHOW);
     Events.Track(EVENTS.DIRECT_NVS, {
       directlyToNVS,
     });
@@ -280,26 +302,32 @@
             }}><Icon icon={icons.question} /></span
           >
         </div>
-        <NVSForm />
+        <BillingAddressVerificationForm
+          {filterCountries}
+          formType={FORM_TYPE.N_AVS}
+          value={$NVSFormData}
+          on:input={handleAVSFormInput}
+          on:blur={handleAVSFormInput}
+        />
         <Info
           bind:show={showNVSInfo}
           title={$t(AVS_INFO_TITLE)}
           data={NVSInfo}
         />
+        <AccountTab {showAccountTab} />
       </div>
     {/if}
-    <AccountTab {showAccountTab} />
-  </div>
-  <Bottom tab="international">
-    {#if $selectedInternationalProvider}
-      <DynamicCurrencyView
-        {tabVisible}
-        view={$selectedInternationalProvider}
-        isAVS={currentView === VIEWS_MAP.NVS_FORM}
-      />
-    {/if}
-  </Bottom>
-</Tab>
+    <Bottom tab="international">
+      {#if $selectedInternationalProvider}
+        <DynamicCurrencyView
+          {tabVisible}
+          view={$selectedInternationalProvider}
+          isAVS={currentView === VIEWS_MAP.NVS_FORM}
+        />
+      {/if}
+    </Bottom>
+  </div></Tab
+>
 
 <style lang="css">
   .border-list {
@@ -322,6 +350,7 @@
   #nvsContainer {
     position: relative;
     line-height: 46px;
+    padding-bottom: 20px;
   }
 
   .nvs-provider-info {

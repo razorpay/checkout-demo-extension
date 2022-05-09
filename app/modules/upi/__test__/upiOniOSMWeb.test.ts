@@ -2,7 +2,7 @@ import {
   tryOpeningIntentUrlOniOSMWeb,
   upiPopUpForiOSMWeb,
   upiPopupEvents,
-} from '../helper/upiOniOSMWeb';
+} from '../helper/intent/upiOniOSMWeb';
 import {
   APP_DETECTED_FURTHER_STEPS_TIMEOUT,
   APP_DETECTION_OR_MANUAL_CANCEL_TIMEOUT,
