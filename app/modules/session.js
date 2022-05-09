@@ -1159,16 +1159,22 @@ Session.prototype = {
       });
     }
 
+    let first_screen;
+
+    if (RazorpayHelper.isPayout()) {
+      first_screen = 'payout_instruments_screen';
+    } else if (RazorpayHelper.isOneClickCheckout()) {
+      first_screen = discreet.OneClickCheckoutInterface.getLandingView();
+    } else {
+      first_screen = this.homeTab.getCurrentView();
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: _Obj.extend(
         {
           embedded: this.embedded,
-          meta: {
-            first_screen: RazorpayHelper.isOneClickCheckout()
-              ? discreet.OneClickCheckoutInterface.getLandingView()
-              : this.homeTab.getCurrentView(),
-          },
+          meta: { first_screen },
         },
         discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
