@@ -16,7 +16,6 @@ import {
 } from 'one_click_checkout/common/utils';
 import { INVALID_OTP_LABEL } from 'ui/labels/otp';
 import {
-  otpReasons,
   OTP_TEMPLATES,
   RESEND_OTP_INTERVAL,
 } from 'one_click_checkout/otp/constants';
@@ -41,7 +40,7 @@ export const askForOTP = (otp_reason) => {
   routesConfig[views.OTP].props = {
     ...routesConfig[views.OTP].props,
     ...navigator.currentActiveRoute.otpProps,
-    otpReason: otpReasons[otp_reason],
+    otpReason: otp_reason,
     smsTemplate: OTP_TEMPLATES[otp_reason],
   };
 
