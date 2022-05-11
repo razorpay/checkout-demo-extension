@@ -11,15 +11,14 @@ const {
   handleUpdateOrderReq,
   handleThirdWatchReq,
   handleFeeSummary,
+  proceedOneCC,
 } = require('../../actions/one-click-checkout/common');
 const { selectPaymentMethod } = require('../../tests/homescreen/actions');
 const { fillUserAddress } = require('../../actions/one-click-checkout/address');
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
-const { proceed } = require('../../tests/homescreen/sharedActions');
 const { delay } = require('../../util');
-const { submit, expectRedirectWithCallback } = require('../../actions/common');
 const {
   handleCODPayment,
   checkDisabledCOD,
@@ -46,7 +45,7 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout COD test', ({ preferences, title, options }) => {
-    test.skip(title, async () => {
+    test(title, async () => {
       preferences.methods.cod = true;
 
       const context = await openCheckoutWithNewHomeScreen({
@@ -56,9 +55,9 @@ module.exports = function (testFeatures) {
       });
 
       await handleAvailableCouponReq(context);
-      await proceed(context);
       await fillUserDetails(context);
-      await proceed(context);
+      await proceedOneCC(context);
+
       await handleCustomerStatusReq(context);
 
       await fillUserAddress(context, {
@@ -67,7 +66,7 @@ module.exports = function (testFeatures) {
         serviceable,
         codFee,
       });
-      await proceed(context);
+      await proceedOneCC(context);
       await handleUpdateOrderReq(context, options.order_id);
       await handleThirdWatchReq(context, isThirdWatchEligible);
       await delay(200);
@@ -75,7 +74,7 @@ module.exports = function (testFeatures) {
         features.isSelectCOD = true;
         await delay(200);
         await selectPaymentMethod(context, 'cod');
-        await submit(context, false);
+        await proceedOneCC(context, false);
         await handleFeeSummary(context, features);
         await handleCODPayment(context);
       } else {
