@@ -2,7 +2,7 @@ const { makePreferences, makePreferencesLogged } = require('./preferences');
 const { makeOptions } = require('./options');
 const { openCheckout } = require('./checkout');
 
-const getDataUpdatedForKeyless = d => {
+const getDataUpdatedForKeyless = (d) => {
   let options = {
     ...{
       amount: 200,
@@ -33,11 +33,12 @@ const getTestData = (
     loggedIn = false,
     anon = true,
     keyless = true,
+    addresses = [],
   } = {}
 ) => {
   keyless = false;
   let tests = [];
-  const preferencesLoggedIn = makePreferencesLogged(preferences);
+  const preferencesLoggedIn = makePreferencesLogged(preferences, addresses);
   preferences = makePreferences(preferences);
   options = makeOptions(options);
   if (loggedIn) {

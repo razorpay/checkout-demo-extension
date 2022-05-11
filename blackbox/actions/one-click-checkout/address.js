@@ -1,5 +1,9 @@
-const { setState, delay } = require('../../util');
-const { getDataAttrSelector } = require('./common');
+const { delay, assertVisible } = require('../../util');
+const {
+  getDataAttrSelector,
+  handleShippingInfo,
+  proceedOneCC,
+} = require('./common');
 
 async function handleStateReq(context, country = 'in') {
   const req = await context.expectRequest();
@@ -45,32 +49,6 @@ async function handleStateReq(context, country = 'in') {
   ]);
 }
 
-function getShippingInfoResponse({
-  isCODEligible,
-  serviceable = true,
-  codFee = 0,
-  shippingFee = 0,
-  zipcode = '560001',
-}) {
-  const resp = {
-    addresses: [
-      {
-        zipcode,
-        country: 'in',
-        city: 'Bengaluru',
-        state: 'KARNATAKA',
-        state_code: 'KA',
-        cod: isCODEligible,
-        cod_fee: codFee,
-        shipping_fee: shippingFee,
-        serviceable,
-      },
-    ],
-  };
-
-  return resp;
-}
-
 function getCustomerAddressResponse() {
   const resp = {
     shipping_address: {
@@ -97,22 +75,6 @@ function getCustomerAddressResponse() {
   return resp;
 }
 
-async function handleShippingInfo(context, options = {}) {
-  const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
-  expect(req.url).toContain('merchant/shipping_info');
-  const resp = getShippingInfoResponse(options);
-  const { shipping_fee, cod_fee } = resp.addresses[0];
-  const state = {
-    shippingFee: shipping_fee,
-  };
-  if (cod_fee) {
-    state.codFee = cod_fee;
-  }
-  setState(context, state);
-  await context.respondJSON(resp);
-}
-
 async function handlePincodes(context) {
   const req = await context.expectRequest();
   expect(req.method).toBe('GET');
@@ -127,52 +89,73 @@ async function handlePincodes(context) {
 async function fillUserAddress(
   context,
   {
-    isSaveAddress = true,
+    saveAddress = true,
     isCODEligible = false,
-    showSavedAddress = false,
     serviceable,
     codFee,
     zipcode = '560001',
-    diffBillShipAddr,
+    isBillingAddress,
     addLandmark = false,
   }
 ) {
   await context.page.waitForSelector('.address-new');
-  if (!diffBillShipAddr) {
+  if (!isBillingAddress) {
     await handleStateReq(context);
   }
   await context.page.type('#name', 'Test');
   await context.page.type('#zipcode', zipcode);
-  if (!showSavedAddress && !diffBillShipAddr) {
+  if (!isBillingAddress) {
     await handleShippingInfo(context, {
       isCODEligible,
       serviceable,
       codFee,
       zipcode,
     });
-  }
-  if (diffBillShipAddr) {
+  } else {
     await handlePincodes(context);
     await delay(400);
   }
   await context.page.type('#line1', 'SJR Cyber Laskar');
   await context.page.type('#line2', 'Hosur Road');
   if (addLandmark) {
-    const landmarkCta = await getDataAttrSelector('toggle-landmark-cta');
+    await context.page.waitForSelector('[data-test-id=toggle-landmark-cta]');
+    const landmarkCta = await getDataAttrSelector(
+      context,
+      'toggle-landmark-cta'
+    );
+    await delay(200);
     await landmarkCta.click();
     await delay(200);
     await context.page.type('#landmark', 'Adugodi');
   }
-  if (!isSaveAddress) {
+  if (!saveAddress) {
     await delay(200);
     await context.page.waitForSelector('#address-consent-checkbox');
     await context.page.click('#address-consent-checkbox');
   }
 }
 
-async function handleAddAddress(context) {
-  await context.page.waitForSelector('#address-add');
-  await context.page.click('#address-add');
+/**
+ * takes user to add address form and fills the form
+ */
+async function handleAddAddress(context, options = {}, addresses = []) {
+  const minAddresses = options.isBillingAddress ? 2 : 1;
+  if (addresses.length >= minAddresses) {
+    await context.page.waitForSelector('#address-add');
+    await context.page.click('#address-add');
+  }
+  await fillUserAddress(context, options);
+}
+
+/**
+ * clicks on add/change on Address widget in L0 screen
+ */
+async function handleManageAddress(context) {
+  const manageAddrCTA = await getDataAttrSelector(
+    context,
+    'manage-address-cta'
+  );
+  await manageAddrCTA.click();
 }
 
 async function handleCustomerAddressReq(context) {
@@ -184,23 +167,85 @@ async function handleCustomerAddressReq(context) {
   await delay(200);
 }
 
-async function handleCheckUnserviceable(context) {
-  await context.page.waitForSelector('.failureText');
+async function handleEditAddressReq(context) {
+  await context.getRequest(`/v1/customers/addresses`);
+  const req = await context.expectRequest();
+  expect(req.method).toBe('PUT');
+  expect(req.url).toContain('customers/addresses');
+  await context.respondJSON(getCustomerAddressResponse());
+  await delay(200);
+}
+
+async function handleCheckUnserviceable(context, addAddress) {
+  if (addAddress) {
+    await assertVisible('[data-test-id=toast-error]');
+  } else {
+    await assertVisible('[data-test-id=address-box-unserviceability]');
+  }
   expect(
-    await context.page.$eval('.failureText', (el) => el.innerText)
-  ).toEqual('Unserviceable');
+    await context.page.$eval('#one-cc-cta', (el) =>
+      el.classList.contains('disabled')
+    )
+  ).toBe(true);
 }
 
 async function unCheckBillAddress(context) {
   await context.page.waitForSelector('#same-address-checkbox');
-  await context.page.click('#same-address-checkbox');
+  await context.page.$eval('#same-address-checkbox', (ele) => ele.click());
+}
+
+/**
+ * @param {object} context
+ * @param {boolean} isBillingAddress
+ * clicks edit cta from address box and edits the title of address
+ */
+async function handleEditAddress(context, isBillingAddress) {
+  const editCTA = await getDataAttrSelector(context, 'edit-cta');
+  await editCTA.click();
+  const editMenuCTA = await getDataAttrSelector(context, 'edit-menu-cta');
+  await editMenuCTA.click();
+  await context.page.waitForSelector('.address-new');
+  if (isBillingAddress) {
+    await handlePincodes(context);
+  } else {
+    await handleStateReq(context);
+  }
+  await delay(200);
+  await context.page.type('#name', 'Testing Edit');
+}
+
+/**
+ * @param {object} context
+ * @param {boolean} isAdd if its for add address form
+ * @param {array} addresses user saved addresses
+ * to take user to add or edit billing address form
+ */
+async function handleBillingAddress(context, isAdd, addresses) {
+  await unCheckBillAddress(context);
+  await proceedOneCC(context);
+
+  if (isAdd) {
+    await handleAddAddress(
+      context,
+      {
+        saveAddress: true,
+        isBillingAddress: true,
+      },
+      addresses
+    );
+  } else {
+    await handleEditAddress(context, true);
+  }
 }
 
 module.exports = {
   fillUserAddress,
-  handleShippingInfo,
   handleAddAddress,
   handleCustomerAddressReq,
   handleCheckUnserviceable,
   unCheckBillAddress,
+  handleManageAddress,
+  handleEditAddress,
+  handleEditAddressReq,
+  handleBillingAddress,
 };

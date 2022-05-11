@@ -94,7 +94,10 @@
       </div>
       <!-- address.serviceability will be null for unknown serviceability -->
       {#if !isServiceable}
-        <div class="address-serviceability-error">
+        <div
+          data-test-id="address-box-unserviceability"
+          class="address-serviceability-error"
+        >
           {$t(NON_SERVICEABLE_LABEL)}
         </div>
       {/if}

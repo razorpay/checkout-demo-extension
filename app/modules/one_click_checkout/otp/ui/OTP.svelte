@@ -251,7 +251,11 @@
         />
       </div>
 
-      <div class="error-message" class:hidden={!showInput}>
+      <div
+        data-test-id="otp-error-msg"
+        class="error-message"
+        class:hidden={!showInput}
+      >
         {$t($errorMessage)}
       </div>
 

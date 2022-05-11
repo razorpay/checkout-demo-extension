@@ -7,6 +7,6 @@ createCouponsTest({
   discountAmount: 100 * 100,
   removeCoupon: true,
   serviceable: true,
-  isSaveAddress: false,
+  saveAddress: false,
   couponCode: 'WELCOME10',
 });

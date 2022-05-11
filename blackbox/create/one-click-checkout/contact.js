@@ -24,10 +24,10 @@ const {
   scrollToEnd,
   handleLogoutReq,
   mockPaymentSteps,
+  handleShippingInfo,
 } = require('../../actions/one-click-checkout/common.js');
 const {
   fillUserAddress,
-  handleShippingInfo,
 } = require('../../actions/one-click-checkout/address.js');
 const {
   openAccounTab,
@@ -104,7 +104,7 @@ module.exports = function (testFeatures) {
       await proceedOneCC(context);
       await handleCustomerStatusReq(context);
       await fillUserAddress(context, {
-        isSaveAddress: false,
+        saveAddress: false,
         zipcode: '560002',
         serviceable: true,
       });

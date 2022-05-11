@@ -1,12 +1,11 @@
 const createAddressTest = require('../../../create/one-click-checkout/address');
 const addresses = require('../../../data/one-click-checkout/addresses.json');
 
-// Test case: Skip the Initial OTP and save address on Address screen.
+// Test case: Block loggedin user if default address is unserviceable
 createAddressTest({
-  skip: true, // skipping for now as this is failing many times on github actions
   amount: 200 * 100,
-  saveAddress: true,
-  serviceable: true,
-  skipAccessOTP: true,
+  loggedIn: true,
+  anon: false,
+  serviceable: false,
   addresses,
 });

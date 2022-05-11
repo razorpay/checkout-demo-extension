@@ -4,7 +4,7 @@ const createAddressTest = require('../../../create/one-click-checkout/address');
 // the Billing address same as shipping address on Billing Address screen.
 createAddressTest({
   amount: 200 * 100,
-  isSaveAddress: false,
+  saveAddress: false,
   serviceable: true,
   sameBillShipAddr: true,
 });

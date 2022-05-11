@@ -32,7 +32,7 @@ module.exports = function (testFeatures) {
   );
 
   const {
-    isSaveAddress,
+    saveAddress,
     isCODEligible,
     serviceable,
     codFee,
@@ -62,7 +62,7 @@ module.exports = function (testFeatures) {
       await handleCustomerStatusReq(context);
 
       await fillUserAddress(context, {
-        isSaveAddress,
+        saveAddress,
         isCODEligible,
         serviceable,
         codFee,

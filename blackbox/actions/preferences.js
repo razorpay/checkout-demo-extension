@@ -89,7 +89,7 @@ module.exports = {
   makePreferences,
   preferencesParams,
 
-  makePreferencesLogged(overrides) {
+  makePreferencesLogged(overrides, addresses = []) {
     const token = randomId();
     return {
       ...makePreferences(overrides),
@@ -120,6 +120,7 @@ module.exports = {
       customer: {
         email: randomEmail(),
         contact: randomContact(),
+        addresses,
         tokens: {
           count: 2,
           entity: 'collection',

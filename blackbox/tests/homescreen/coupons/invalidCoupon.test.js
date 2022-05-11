@@ -6,5 +6,5 @@ createCouponsTest({
   couponValid: false,
   discountAmount: 100 * 100,
   serviceable: true,
-  isSaveAddress: false,
+  saveAddress: false,
 });

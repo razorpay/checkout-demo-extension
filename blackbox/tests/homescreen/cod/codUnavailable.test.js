@@ -5,6 +5,6 @@ createCODTest({
   isCODEligible: false,
   serviceable: true,
   codFee: 50 * 100,
-  isSaveAddress: false,
+  saveAddress: false,
   isThirdWatchEligible: true,
 });

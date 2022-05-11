@@ -52,7 +52,11 @@
         <Icon icon={location} />
         <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
       </div>
-      <button on:click={handleChangeAddress} class="label-cta theme">
+      <button
+        data-test-id="manage-address-cta"
+        on:click={handleChangeAddress}
+        class="label-cta theme"
+      >
         {$t(ADDRESS_CTA_LABEL)}
       </button>
     </div>

@@ -1,36 +1,37 @@
 const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
-const { delay } = require('../../util');
+const { delay, assertVisible, setState } = require('../../util');
 const { passRequestNetbanking } = require('../common');
 const { fillUserDetails } = require('../home-page-actions');
 const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
-const { handleShippingInfo } = require('./address');
 
-function getVerifyOTPResponse(inValidOTP) {
+function getVerifyOTPResponse(inValidOTP, addresses = []) {
   const successResp = {
     success: 1,
     session_id: 'IU7w1z3PBZnA6O',
-    addresses: [
-      {
-        id: 'ISXW2w9b7WcgMA',
-        entity_id: 'IPmBz5KJ03rXr3',
-        entity_type: 'customer',
-        line1: 'Gandhi nagar',
-        line2: 'MG Road',
-        city: 'Bengaluru',
-        zipcode: '560001',
-        state: 'Karnataka',
-        country: 'in',
-        type: 'shipping_address',
-        primary: true,
-        deleted_at: null,
-        created_at: 1638433514,
-        updated_at: 1638433514,
-        tag: '',
-        landmark: 'test land',
-        name: 'Razorpay',
-        contact: '+919952398433',
-      },
-    ],
+    addresses: addresses.length
+      ? addresses
+      : [
+          {
+            id: 'ISXW2w9b7WcgMA',
+            entity_id: 'IPmBz5KJ03rXr3',
+            entity_type: 'customer',
+            line1: 'Gandhi nagar',
+            line2: 'MG Road',
+            city: 'Bengaluru',
+            zipcode: '560001',
+            state: 'Karnataka',
+            country: 'in',
+            type: 'shipping_address',
+            primary: true,
+            deleted_at: null,
+            created_at: 1638433514,
+            updated_at: 1638433514,
+            tag: '',
+            landmark: 'test land',
+            name: 'Razorpay',
+            contact: '+919952398433',
+          },
+        ],
   };
 
   const failureResp = {
@@ -73,12 +74,14 @@ async function handleCreateOTPReq(context) {
   await context.respondJSON({ success: false });
 }
 
-async function handleVerifyOTPReq(context, inValidOTP = false) {
+async function handleVerifyOTPReq(context, inValidOTP = false, options = {}) {
   await context.getRequest('otp/verify');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/verify');
-  await context.respondJSON(getVerifyOTPResponse(inValidOTP));
+  await context.respondJSON(
+    getVerifyOTPResponse(inValidOTP, options.addresses)
+  );
 }
 
 async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
@@ -213,10 +216,10 @@ async function handleSkipOTP(context) {
 }
 
 async function checkInvalidOTP(context) {
-  await context.page.waitForSelector('.error-message');
-  expect(
-    await context.page.$eval('.error-message', (el) => el.innerText)
-  ).toEqual('Entered OTP was incorrect. Re-enter to proceed.');
+  await assertVisible('[data-test-id=otp-error-msg]');
+  expect(await context.page.$eval('#one-cc-cta', (el) => el.disabled)).toBe(
+    true
+  );
 }
 
 function getDataAttrSelector(context, selectorValue) {
@@ -269,7 +272,7 @@ async function handleResetReq(context, orderId) {
   await context.respondJSON([]);
 }
 
-async function login(context) {
+async function login(context, options = {}) {
   await fillUserDetails(context, '9952395555');
   await delay(200);
   await proceedOneCC(context);
@@ -278,8 +281,8 @@ async function login(context) {
   await handleTypeOTP(context);
   await delay(200);
   await proceedOneCC(context);
-  await handleVerifyOTPReq(context);
-  await handleShippingInfo(context);
+  await handleVerifyOTPReq(context, false, options);
+  await handleShippingInfo(context, options);
 }
 
 async function mockPaymentSteps(
@@ -306,6 +309,48 @@ async function closeModal(context) {
   await crossCTA.click();
 }
 
+function getShippingInfoResponse({
+  isCODEligible,
+  serviceable = true,
+  codFee = 0,
+  shippingFee = 0,
+  zipcode = '560001',
+}) {
+  const resp = {
+    addresses: [
+      {
+        zipcode,
+        country: 'in',
+        city: 'Bengaluru',
+        state: 'KARNATAKA',
+        state_code: 'KA',
+        cod: isCODEligible,
+        cod_fee: codFee,
+        shipping_fee: shippingFee,
+        serviceable,
+      },
+    ],
+  };
+
+  return resp;
+}
+async function handleShippingInfo(context, options = {}) {
+  await context.getRequest(`/v1/merchant/shipping_info`);
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('merchant/shipping_info');
+  const resp = getShippingInfoResponse(options);
+  const { shipping_fee, cod_fee } = resp.addresses[0];
+  const state = {
+    shippingFee: shipping_fee,
+  };
+  if (cod_fee) {
+    state.codFee = cod_fee;
+  }
+  setState(context, state);
+  await context.respondJSON(resp);
+}
+
 module.exports = {
   handleCustomerStatusReq,
   handleUpdateOrderReq,
@@ -326,4 +371,5 @@ module.exports = {
   login,
   mockPaymentSteps,
   closeModal,
+  handleShippingInfo,
 };

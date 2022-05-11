@@ -1,0 +1,41 @@
+[
+  {
+    "id": "ISXW2w9b7WcgMA",
+    "entity_id": "IPmBz5KJ03rXr3",
+    "entity_type": "customer",
+    "line1": "Gandhi nagar",
+    "line2": "MG Road",
+    "city": "Bengaluru",
+    "zipcode": "560001",
+    "state": "Karnataka",
+    "country": "in",
+    "type": "shipping_address",
+    "primary": true,
+    "deleted_at": null,
+    "created_at": 1638433514,
+    "updated_at": 1638433514,
+    "tag": "",
+    "landmark": "test land",
+    "name": "Razorpay",
+    "contact": "+919952398433"
+  },
+  {
+    "id": "JCxhRdbhHL4Qrw",
+    "entity_id": "IwIzc0fNtv5TvB",
+    "entity_type": "customer",
+    "line1": "72 Sam's Grande 5th floor, 6th Cross Road, Teacher's Colony",
+    "line2": "test test",
+    "city": "Bengaluru",
+    "zipcode": "560001",
+    "state": "Karnataka",
+    "country": "in",
+    "type": "shipping_address",
+    "primary": true,
+    "deleted_at": null,
+    "created_at": 1648569368,
+    "updated_at": 1648569368,
+    "contact": "+919952398433",
+    "tag": "Home",
+    "name": "Bangalore Home"
+  }
+]

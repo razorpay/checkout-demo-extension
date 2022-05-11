@@ -20,11 +20,9 @@ const {
   handleTypeOTP,
   proceedOneCC,
   mockPaymentSteps,
-} = require('../../actions/one-click-checkout/common');
-const {
-  fillUserAddress,
   handleShippingInfo,
-} = require('../../actions/one-click-checkout/address');
+} = require('../../actions/one-click-checkout/common');
+const { fillUserAddress } = require('../../actions/one-click-checkout/address');
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
@@ -45,7 +43,7 @@ module.exports = function (testFeatures) {
     couponCode,
     personalised,
     discountAmount,
-    isSaveAddress,
+    saveAddress,
     skip,
   } = features;
 
@@ -102,7 +100,7 @@ module.exports = function (testFeatures) {
         await delay(200);
         await proceedOneCC(context);
         await handleCustomerStatusReq(context);
-        await fillUserAddress(context, { isSaveAddress, serviceable });
+        await fillUserAddress(context, { saveAddress, serviceable });
       }
       await proceedOneCC(context);
       await mockPaymentSteps(context, options, features);

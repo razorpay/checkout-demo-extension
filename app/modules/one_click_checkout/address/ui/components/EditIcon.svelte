@@ -19,11 +19,12 @@
 </script>
 
 <DropdownMenu triggerElement={dropdownTrigger} on:click>
-  <button bind:this={dropdownTrigger}>
+  <button data-test-id="edit-cta" bind:this={dropdownTrigger}>
     <Icon icon={kebab_menu} />
   </button>
   <div slot="dropdown_menu">
     <button
+      data-test-id="edit-menu-cta"
       class="dropdown-item"
       type="button"
       on:click={() => dispatch('editClick')}

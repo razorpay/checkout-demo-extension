@@ -28,5 +28,5 @@ createCouponsTest({
   couponCode: 'WELCOME10',
   showCoupons: true,
   serviceable: true,
-  isSaveAddress: false,
+  saveAddress: false,
 });

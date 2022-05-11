@@ -62,7 +62,7 @@ module.exports = function (testFeatures) {
 
       await assertAddressTab(context);
       await fillUserAddress(context, {
-        isSaveAddress: false,
+        saveAddress: false,
         serviceable: true,
       });
       await proceedOneCC(context);
