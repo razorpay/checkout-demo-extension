@@ -781,10 +781,6 @@
     margin-top: 4px;
     font-size: 13px;
   }
-  .address-consent-links {
-    color: #551a8b;
-  }
-
   .save-address-wrapper {
     height: fit-content;
     display: flex;

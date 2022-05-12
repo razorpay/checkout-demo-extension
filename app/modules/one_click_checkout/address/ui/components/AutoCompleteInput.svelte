@@ -11,7 +11,6 @@
   export let id;
   export let value;
   export let label;
-  export let required;
   export let validationText;
   export let suggestionsResource;
   export let autofocus;
@@ -56,7 +55,6 @@
   {id}
   {label}
   {value}
-  {required}
   {validationText}
   on:input={onInput}
   on:blur

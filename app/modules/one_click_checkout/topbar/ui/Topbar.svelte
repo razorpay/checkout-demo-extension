@@ -147,9 +147,6 @@
   .text-bold {
     font-weight: 600;
   }
-  .title-logo {
-    height: 16px;
-  }
 
   .breadcrumb-icon {
     padding: 2px 8px 0px;

@@ -248,10 +248,7 @@
 
     {#if showCoupons}
       <div class="widget-wrapper">
-        <AvailableCouponsButton
-          applyCoupon={(code) => applyCouponCode(code)}
-          removeCoupon={removeCouponCode}
-        />
+        <AvailableCouponsButton removeCoupon={removeCouponCode} />
       </div>
       <div class="separator" />
     {/if}

@@ -163,11 +163,6 @@
     color: #8d97a1;
   }
 
-  b {
-    color: #000000;
-    line-height: 17px;
-  }
-
   .split {
     border: 1px dashed #8d97a1;
     border-bottom: none;

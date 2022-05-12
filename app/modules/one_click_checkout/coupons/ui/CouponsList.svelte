@@ -70,31 +70,6 @@
 </Screen>
 
 <style>
-  .row {
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #263a4a;
-  }
-
-  p {
-    margin-block-start: 0;
-    margin-block-end: 0;
-  }
-
-  .color-green {
-    color: #079f0d;
-  }
-
-  hr {
-    opacity: 0.1;
-    border: 1px solid #000000;
-  }
-  b {
-    color: #000000;
-    line-height: 18px;
-  }
   .separator {
     height: 10px;
     background-color: #f8fafd;

@@ -136,15 +136,6 @@
     width: 42px;
   }
 
-  .coupon-input-group {
-    border: 1px solid #e6e7e8;
-    border-radius: 2px;
-  }
-
-  .coupon-input-group:focus-within {
-    border: 1px solid var(--background-color, #3684d6);
-  }
-
   #coupon-input {
     padding: 12px;
     color: #263a4a;

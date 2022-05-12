@@ -102,7 +102,6 @@
   export let preferIntent = true;
   export let retryOmnichannel = false;
   export let isFirst = true;
-  export let vpa = '';
   export let qrIcon;
   export let method = 'upi';
 

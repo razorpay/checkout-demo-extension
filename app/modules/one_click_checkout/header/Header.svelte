@@ -133,10 +133,6 @@
     width: 100%;
   }
 
-  .language-container {
-    padding-left: 10px;
-  }
-
   .header-wrapper {
     display: flex;
     flex-direction: column;

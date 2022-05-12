@@ -12,7 +12,6 @@
   export let id;
   export let label = '';
   export let value = '';
-  export let required = false;
   export let suggestions = [];
   export let validationText = '';
   export let autofocus;
@@ -151,21 +150,6 @@
   .wrapper {
     position: relative;
     margin-bottom: 12px;
-  }
-
-  .label-top {
-    position: absolute;
-    top: 28px;
-    left: 8px;
-    bottom: auto;
-    transform: translateY(-30px);
-    padding: 0px 4px;
-    background-color: #fff;
-    z-index: 1;
-  }
-
-  .label-top-focused {
-    color: var(--highlight-color);
   }
 
   .suggestion-dropdown {

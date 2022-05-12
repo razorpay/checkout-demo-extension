@@ -192,7 +192,6 @@
           id={input.id}
           value={formData[input.id]}
           label={input.label}
-          required={input.required}
           validationText={errors[input.id] ? errors[input.id] : ''}
           on:blur={() => onBlur(input.id)}
           on:input={({ detail: e }) =>
@@ -204,7 +203,6 @@
             <AutoCompleteInput
               id={input.id}
               label={input.label}
-              required={input.required}
               value={formData[input.id]}
               suggestionsResource={input.suggestionsResource}
               validationText={errors[input.id] ? errors[input.id] : ''}
@@ -229,7 +227,6 @@
           <AutoCompleteInput
             id={input.id}
             label={input.label}
-            required={input.required}
             value={formData[input.id]}
             suggestionsResource={input.suggestionsResource}
             validationText={errors[input.id] ? errors[input.id] : ''}

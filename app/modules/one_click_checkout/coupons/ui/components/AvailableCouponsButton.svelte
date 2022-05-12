@@ -28,7 +28,6 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
-  export let applyCoupon;
   export let removeCoupon;
 
   const { offers, circle_arrow_next } = getIcons();
@@ -105,14 +104,6 @@
     padding-top: 2px;
   }
   .apply {
-    cursor: pointer;
-  }
-
-  .coupon-remove-next {
-    color: var(--primary-color);
-    font-size: 12px;
-    font-weight: 600;
-    margin-left: auto;
     cursor: pointer;
   }
 </style>

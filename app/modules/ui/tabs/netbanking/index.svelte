@@ -551,14 +551,6 @@
     margin-top: 2px !important;
   }
 
-  .nb-one-cc-arrow {
-    position: absolute;
-    font-size: 20px;
-    bottom: 20px;
-    right: 10px;
-    color: #8f8f8f;
-  }
-
   .nb-one-cc-wrapper::after {
     border-bottom: none !important;
   }

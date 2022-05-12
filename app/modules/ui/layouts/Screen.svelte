@@ -9,7 +9,6 @@
   // Props
   export let pad = true;
   export let threshold = 16;
-  export let scrollable;
   export let removeAccountTab;
   // Refs
   let contentRef;

@@ -304,7 +304,6 @@
           {addressWrapperEle}
         />
       {/if}
-      <slot name="inner-footer" />
     </div>
     <AccountTab {showAccountTab} />
     {#if $activeRoute?.name === views.SAVED_ADDRESSES}

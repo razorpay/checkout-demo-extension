@@ -157,10 +157,6 @@
     min-width: 100%;
   }
 
-  .flex-1 {
-    flex: 1;
-  }
-
   .flex-column {
     display: flex;
     flex-direction: column;

@@ -16,7 +16,6 @@
   import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
 
   export let coupon;
-  export let selected;
 
   const dispatch = createEventDispatcher();
 
@@ -92,12 +91,6 @@
   .up-arrow {
     transform: rotate(180deg);
   }
-  .remove-button {
-    color: #eb001b;
-    font-weight: bold;
-    font-size: 14px;
-    line-height: 20px;
-  }
 
   .coupon-item-description {
     font-style: normal;
@@ -134,24 +127,9 @@
     justify-content: space-between;
   }
 
-  .success-message {
-    margin: 8px 0;
-  }
-
-  .success-message p {
-    margin-left: 8px;
-  }
-
   p {
     margin-block-start: 0;
     margin-block-end: 0;
-  }
-
-  .text-green {
-    color: #079f0d;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
   }
 
   ul {
@@ -171,10 +149,6 @@
     color: #8d97a1;
   }
 
-  .show-details {
-    padding-left: 0;
-    font-weight: 500;
-  }
   .terms-section {
     font-style: normal;
   }

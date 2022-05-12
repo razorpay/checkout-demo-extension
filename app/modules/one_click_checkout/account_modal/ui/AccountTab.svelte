@@ -101,9 +101,4 @@
     transform: rotate(90deg);
     margin-top: 2px;
   }
-  .tab-bottom {
-    position: absolute;
-    bottom: 0px;
-    width: 87%;
-  }
 </style>

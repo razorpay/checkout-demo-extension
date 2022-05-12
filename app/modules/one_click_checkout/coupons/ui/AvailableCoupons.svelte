@@ -6,7 +6,6 @@
   // store imports
   import {
     availableCoupons,
-    appliedCoupon,
     couponState,
   } from 'one_click_checkout/coupons/store';
 
@@ -32,7 +31,6 @@
   // constant imports
   import { LOADING_STATUS } from 'one_click_checkout/coupons/constants';
 
-  export let onClose;
   export let applyCoupon;
   export let removeCoupon;
 
@@ -79,7 +77,6 @@
     <div class="coupons-list">
       {#each $availableCoupons as coupon, index}
         <CouponItem
-          selected={coupon.code === $appliedCoupon}
           {coupon}
           on:apply={() => handleCouponCode(coupon.code, index)}
           on:remove={removeCoupon}
@@ -118,11 +115,6 @@
 
   .justify-between {
     justify-content: space-between;
-  }
-
-  p {
-    margin-block-start: 0;
-    margin-block-end: 0;
   }
 
   .coupon-inactive {
