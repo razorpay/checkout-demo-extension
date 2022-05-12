@@ -2,6 +2,8 @@
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
+  import CartItemList from 'one_click_checkout/cart/ui/CartItemList.svelte';
+  import CartCta from 'one_click_checkout/coupons/ui/components/CartCta.svelte';
 
   // store imports
   import { getCurrency } from 'razorpay';
@@ -19,6 +21,11 @@
     shippingCharge,
     isShippingAddedToAmount,
   } from 'one_click_checkout/charges/store';
+  import {
+    areAllCartItemsShown,
+    cartItems,
+    enableCart,
+  } from 'one_click_checkout/cart/store';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -41,11 +48,34 @@
 
   // constant imports
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import {
+    CART_EXPERIMENTS,
+    DEFAULT_CART_ITEMS_COUNT,
+  } from 'one_click_checkout/cart/constants';
+  import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
+  import { views } from 'one_click_checkout/routing/constants';
+  import { getCartExperiment } from 'one_click_checkout/store';
 
   const currency = getCurrency();
   const { order } = getIcons();
   const spaceAmoutWithSymbol = false;
   let showTotal;
+  const cartExperiment = getCartExperiment();
+
+  let cartItemsToShow = [];
+  $: {
+    if ($areAllCartItemsShown) {
+      cartItemsToShow = $cartItems;
+    } else {
+      cartItemsToShow = $cartItems.slice(
+        0,
+        cartExperiment === CART_EXPERIMENTS.VARIANT_A
+          ? 0
+          : DEFAULT_CART_ITEMS_COUNT
+      );
+    }
+  }
+
   $: {
     showTotal = $isShippingAddedToAmount || $isCouponApplied;
     if ($savedAddresses?.length && $shippingCharge) {
@@ -56,12 +86,37 @@
   }
 </script>
 
-<div class="order-summary-label">
-  <span class="order-icon"><Icon icon={order} /></span>
-  {$t(SUMMARY_LABEL)}
+<div class="header">
+  <div class="order-summary-label">
+    <span class="order-icon"><Icon icon={order} /></span>
+    {$t(SUMMARY_LABEL)}
+  </div>
+  {#if $enableCart}
+    <CartCta
+      screenName={SCREEN_LIST[views.COUPONS]}
+      variant={CART_EXPERIMENTS.VARIANT_A}
+      on:toggleItems
+    />
+  {/if}
 </div>
 
 <div data-test-id="order-summary" class="order-summary">
+  {#if $enableCart}
+    <CartItemList
+      items={cartItemsToShow}
+      screenName={SCREEN_LIST[views.COUPONS]}
+    />
+    {#if $cartItems.length > DEFAULT_CART_ITEMS_COUNT}
+      <CartCta
+        screenName={SCREEN_LIST[views.COUPONS]}
+        variant={CART_EXPERIMENTS.VARIANT_B}
+        on:toggleItems
+      />
+    {/if}
+    {#if cartItemsToShow.length}
+      <hr class="split" />
+    {/if}
+  {/if}
   <div
     class="row justify-between"
     class:color-gray={showTotal}
@@ -122,6 +177,16 @@
 </div>
 
 <style>
+  * {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .order-summary-label {
     font-style: normal;
     font-weight: 600;
@@ -138,7 +203,7 @@
   }
 
   .order-summary {
-    padding: 12px 0px 0px;
+    padding: 16px 0px 0px;
     font-size: 14px;
   }
 
@@ -150,11 +215,6 @@
     color: #263a4a;
   }
 
-  p {
-    margin-block-start: 0;
-    margin-block-end: 0;
-  }
-
   .color-green {
     color: #079f0d;
   }
@@ -164,7 +224,7 @@
   }
 
   .split {
-    border: 1px dashed #8d97a1;
+    border: 1px dashed #e1e5ea;
     border-bottom: none;
     margin: 16px 0px;
   }
@@ -174,5 +234,9 @@
 
   .price-label {
     margin: 0px;
+  }
+
+  .order-summary :global(.btn-theme-B) {
+    margin-top: 14px;
   }
 </style>

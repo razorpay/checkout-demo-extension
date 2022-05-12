@@ -6,11 +6,12 @@ import SummaryModal from 'one_click_checkout/summary_modal/ui/SummaryModal.svelt
  * @param {boolean} withCta Flag which indicates if confirm CTA should be shown or not
  * @returns
  */
-export function showSummaryModal(ctaVisible) {
+export function showSummaryModal({ withCta, withCart = true }) {
   pushOverlay({
     component: SummaryModal,
     props: {
-      ctaVisible,
+      ctaVisible: withCta,
+      cartVisible: withCart,
     },
   });
 }

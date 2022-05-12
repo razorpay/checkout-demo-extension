@@ -47,3 +47,5 @@ export function getContactPayload() {
 
 export const isAutopopulateDisabled = () =>
   getPreferences('1cc_city_autopopulate_disable');
+
+export const getCartExperiment = () => getPreferences('1cc_cart_items_exp');

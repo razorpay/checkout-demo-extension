@@ -13,7 +13,11 @@
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
-  import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
+  import {
+    getMerchantOrder,
+    getPrefilledContact,
+    getPrefilledEmail,
+  } from 'razorpay';
   import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constants import
@@ -26,9 +30,10 @@
   import { destroyTopbar } from 'one_click_checkout/topbar';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
-  // svelte imports
+  // session imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { redirectToMethods } from 'one_click_checkout/sessionInterface';
+  import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
 
   // analytics imports
   import Analytics, { Events } from 'analytics';
@@ -64,6 +69,8 @@
     .join(';');
 
   onMount(() => {
+    setLineItems(getMerchantOrder().line_items || []);
+
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
     Analytics.setMeta('initial_loggedIn', isUserLoggedIn());
     Analytics.setMeta('initial_hasSavedAddress', !!$savedAddresses?.length);

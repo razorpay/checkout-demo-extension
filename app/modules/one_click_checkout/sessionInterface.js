@@ -273,5 +273,5 @@ export function redirectToMethods() {
 }
 
 export function showOrderSummary() {
-  showSummaryModal(true);
+  showSummaryModal({ withCta: true, withCart: false });
 }

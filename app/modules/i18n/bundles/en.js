@@ -9,6 +9,7 @@ import ctaOneCC from 'one_click_checkout/cta/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import topbar from 'one_click_checkout/topbar/i18n/en';
+import cart from 'one_click_checkout/cart/i18n/en';
 
 import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
@@ -1342,4 +1343,5 @@ export default {
   },
   cta_one_cc: ctaOneCC,
   misc_one_cc: miscOneCC,
+  cart,
 };

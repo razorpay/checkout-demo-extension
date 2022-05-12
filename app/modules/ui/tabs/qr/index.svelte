@@ -170,7 +170,7 @@
           >
           <button
             class="cta-view-details"
-            on:click={() => showSummaryModal(false)}
+            on:click={() => showSummaryModal({ withCta: false })}
             >{$t(VIEW_AMOUNT_DETAILS)}</button
           >
         </div>

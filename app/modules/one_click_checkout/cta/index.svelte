@@ -29,7 +29,7 @@
     Events.TrackBehav(CTAEvents.VIEW_DETAILS_CLICKED, {
       screen_name: getCurrentScreen(),
     });
-    showSummaryModal(false);
+    showSummaryModal({ withCta: false });
   };
 
   const currency = getCurrency();

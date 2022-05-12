@@ -1,10 +1,11 @@
 <script>
   // svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+  import CartItemList from 'one_click_checkout/cart/ui/CartItemList.svelte';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -35,21 +36,46 @@
     isCouponApplied,
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'checkoutstore/offers';
+  import { cartItems, enableCart } from 'one_click_checkout/cart/store';
 
   // analytics imports
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
 
-  // utils imports
+  // utils / constant imports
   import { truncateString } from 'utils/strings';
+  import { MODAL_MAX_HEIGHT } from 'one_click_checkout/summary_modal/constants';
   import { getSession } from 'sessionmanager';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { formatAmountWithCurrency } from 'helper/currency';
   import { popStack } from 'navstack';
 
   export let ctaVisible = false;
-
+  export let cartVisible = false;
+  let showShadow = false;
   let offerAmount;
+
+  let tableHeight;
+  let backdropHeight;
+
+  afterUpdate(() => {
+    tableHeight = document.getElementById('summary-table').offsetHeight;
+    backdropHeight = document.getElementById('overlay').offsetHeight;
+
+    const cartListEle = document.querySelector('#cart-list');
+
+    if (cartListEle) {
+      const maxHeight =
+        (MODAL_MAX_HEIGHT / 100) * backdropHeight -
+        tableHeight -
+        40 - // header height
+        72 - // margin/paddings
+        10;
+      if (cartListEle.scrollHeight > maxHeight && !showShadow) {
+        showShadow = true;
+      }
+    }
+  });
 
   onMount(() => {
     Events.Track(events.ORDER_SUMMARY_LOAD, {
@@ -87,7 +113,11 @@
   }
 </script>
 
-<div data-test-id="summary-modal" class="summary-modal">
+<div
+  data-test-id="summary-modal"
+  class="summary-modal"
+  style="max-height: {MODAL_MAX_HEIGHT}%;"
+>
   <div class="summary-table-wrapper">
     <div class="summary-heading-container">
       <p class="summary-heading">
@@ -98,7 +128,22 @@
       </div>
     </div>
     <hr class="summary-separator" />
-    <div class="summary-table">
+    {#if $enableCart && cartVisible}
+      <div class:inset-shadow={showShadow}>
+        <CartItemList
+          maxHeight="{(MODAL_MAX_HEIGHT / 100) * backdropHeight -
+            tableHeight -
+            40 - // header height
+            72 - // margin/paddings
+            10}px"
+          items={$cartItems}
+        />
+      </div>
+      {#if !showShadow}
+        <hr class="total-separator mv-16 mh-16" />
+      {/if}
+    {/if}
+    <div id="summary-table" class="summary-table">
       <div class="summary-row">
         <div>{$t(AMOUNT_LABEL)}</div>
         <div data-test-id="cart-amount">
@@ -150,7 +195,7 @@
           </div>
         </div>
       {/if}
-      <hr class="total-separator" />
+      <hr class="total-separator mv-16" />
       <div class="summary-row total-charges-text">
         <div>{$t(TOTAL_CHARGES_LABEL)}</div>
         <div data-test-id="total-amount">
@@ -200,7 +245,7 @@
   }
 
   .summary-table-wrapper {
-    padding: 0px 16px 4px;
+    padding-bottom: 4px;
   }
   :global(.mobile) .summary-modal {
     bottom: 0;
@@ -213,12 +258,13 @@
     line-height: 16px;
     letter-spacing: 0;
     color: #8d97a1;
+    padding: 0px 16px;
   }
 
   .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .text-green {
@@ -235,6 +281,7 @@
     font-size: 14px;
     line-height: 16px;
     color: #363636;
+    margin-bottom: 16px;
   }
 
   .summary-heading-container {
@@ -242,6 +289,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0px 16px;
   }
 
   .summary-heading {
@@ -255,7 +303,7 @@
   }
 
   .summary-separator {
-    margin-bottom: 16px;
+    margin: 0px 16px 16px;
     border: 1px solid #e1e5ea;
     border-bottom: none;
   }
@@ -263,7 +311,16 @@
   .total-separator {
     border: 1px dashed #e1e5ea;
     border-bottom: none;
-    margin: 16px 0px;
+  }
+
+  .mv-16 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .mh-16 {
+    margin-left: 16px;
+    margin-right: 16px;
   }
   .cta-container {
     padding: 24px 16px;
@@ -283,5 +340,19 @@
 
     color: var(--text-color);
     background: var(--primary-color);
+  }
+
+  .summary-table-wrapper :global(.cart-list-container) {
+    padding: 0px 16px;
+  }
+
+  .inset-shadow {
+    box-shadow: inset 0px -4px 8px rgba(107, 108, 109, 0.13);
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e1e5ea;
+  }
+
+  .inset-shadow :global(.cart-list-container) {
+    padding-bottom: 16px;
   }
 </style>

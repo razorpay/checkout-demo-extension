@@ -173,8 +173,12 @@
     });
   }
 
-  onMount(() => {
+  function setScrollable() {
     scrollable = isUnscrollable(couponEle?.parentNode);
+  }
+
+  onMount(() => {
+    setScrollable();
     toggleHeader(true);
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
@@ -257,7 +261,7 @@
       id="order-widget"
       bind:this={orderWidget}
     >
-      <OrderWidget />
+      <OrderWidget on:toggleItems={setScrollable} />
     </div>
     <div class="separator" />
     <CTA

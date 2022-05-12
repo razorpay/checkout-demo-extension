@@ -6,6 +6,7 @@
 </script>
 
 <div
+  id="backdrop-modal"
   class="backdrop"
   class:backdrop-one-cc={isOneClickCheckout()}
   class:visible
