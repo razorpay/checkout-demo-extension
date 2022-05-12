@@ -14,7 +14,7 @@ export function setDynamicFeeObject(instrument, type) {
 }
 export function setMerchantMessage() {
   let msg = getDynamicFeeBearerMerchantMessage();
-  merchantMessage.update((m) => (m = msg));
+  merchantMessage.update(() => msg);
 }
 
 function getConvenienceFee(instrument, type) {

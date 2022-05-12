@@ -4,6 +4,8 @@ import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import getOwnPropertyDescriptor from './prototypes/getownpropertydescriptors';
 
+// keeping till we convert this file to typescript
+// eslint-disable-next-line no-redeclare
 /* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType, CSSStyleDeclaration */
 
 /**
@@ -165,6 +167,7 @@ if (!_.isFunction(Object.getOwnPropertyDescriptors)) {
 
 // https://tc39.github.io/ecma262/#sec-array.prototype.find
 if (!Array.prototype.find) {
+  // eslint-disable-next-line no-extend-native
   Object.defineProperty(Array.prototype, 'find', {
     value: function (predicate) {
       if (this === null) {

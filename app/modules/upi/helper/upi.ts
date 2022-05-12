@@ -41,7 +41,10 @@ export const definePlatform = (platform: UPI.Platform): boolean => {
  * this functions will be called with app package_name,
  * hence bind/create dummy functions to avoid param miss-match
  */
-const actionQualifier: Common.KeyObject<UPI.AppTileAction, Function[]> = {
+const actionQualifier: Common.KeyObject<
+  UPI.AppTileAction,
+  ((...args: any[]) => void)[]
+> = {
   nativeIntent: [
     isUPIFlowEnabled.bind(null, 'intent'),
     (packageName: string) =>
@@ -88,7 +91,7 @@ export function definePlatformReturnMethodIdentifier(): (
 
 export function getDowntimeForUPIApp(
   app: UPI.AppConfiguration,
-  normalize: boolean = false
+  normalize = false
 ) {
   const response: Downtime.Config = {
     downtimeInstrument: app.shortcode,
@@ -139,7 +142,7 @@ export function avoidSessionSubmit() {
 export const initiateNecessaryFlow = (
   data: UPI.UpiAppForPay,
   setData: Writable<UPI.UpiAppForPay>['set'],
-  proceedForAction: Function
+  proceedForAction: (...args: any[]) => void
 ) => {
   const downtimeSevere = data.downtimeConfig && data.downtimeConfig.severe;
   const { app_name, name } = (data.app || {}) as UPI.AppConfiguration;
@@ -178,7 +181,7 @@ export const initiateNecessaryFlow = (
  *
  *
  */
-export const getGridArray = <T>(maxInRow: number = 0, items: T[] = []) => {
+export const getGridArray = <T>(maxInRow = 0, items: T[] = []) => {
   return Array.from(new Array(Math.ceil(items.length / maxInRow))).map((_, i) =>
     items.slice(i * maxInRow, (i + 1) * maxInRow)
   );

@@ -1,5 +1,3 @@
-/* global CheckoutBridge */
-
 import RazorpayConfig from 'common/RazorpayConfig';
 
 const cdnUrl = RazorpayConfig.cdn;

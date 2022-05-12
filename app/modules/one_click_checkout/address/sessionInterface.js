@@ -52,7 +52,9 @@ export const setSavedAddresses = (addresses) => {
 };
 
 function formatAddresses(addresses) {
-  if (!addresses) return [];
+  if (!addresses) {
+    return [];
+  }
   return (addresses = addresses.map((item) => {
     return { ...formatApiAddress(item, item.type), id: item.id };
   }));
@@ -147,7 +149,9 @@ export const updateAddressesInStore = (_addresses) => {
   const _savedAddresses = get(savedAddresses);
 
   _addresses.forEach((addr) => {
-    if (!Object.values(ADDRESS_LONG_TYPES).includes(addr.type)) return;
+    if (!Object.values(ADDRESS_LONG_TYPES).includes(addr.type)) {
+      return;
+    }
 
     const addressIndex = _savedAddresses.findIndex(
       (savedAddr) => savedAddr.id === addr.id

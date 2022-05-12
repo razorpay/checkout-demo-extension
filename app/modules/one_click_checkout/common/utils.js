@@ -18,8 +18,9 @@ export function attachEvent(target, ...args) {
 
 /*-- the regex deletes any leading or trailing commas --*/
 export function removeTrailingCommas(str) {
-  if (str && typeof str === 'string')
+  if (str && typeof str === 'string') {
     return str.trim().replace(/(^,)|(,$)/g, '');
+  }
 
   return '';
 }

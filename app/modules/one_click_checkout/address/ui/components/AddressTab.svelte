@@ -98,7 +98,9 @@
 
   function handleEditAddressClick({ detail: _address }) {
     selectedAddressId.set(_address.id);
-    if (_address.country) selectedShippingCountryISO.set(_address.country);
+    if (_address.country) {
+      selectedShippingCountryISO.set(_address.country);
+    }
     newUserAddress.update((addr) => ({
       ...addr,
       ...formatAddressToFormData(_address),

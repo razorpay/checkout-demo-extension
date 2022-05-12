@@ -108,7 +108,7 @@
    * @returns null
    */
   function toDataUrl(src, callback, outputFormat, logoType) {
-    var img = new window.Image();
+    let img = new window.Image();
     img.crossOrigin = 'anonymous';
     /**
      * Fix CORS related issue for chromium based browser due to cache
@@ -121,9 +121,9 @@
 
     img.onload = function () {
       /*image completely converted to base64string */
-      var canvas = document.createElement('CANVAS');
-      var ctx = canvas.getContext('2d');
-      var dataURL;
+      let canvas = document.createElement('CANVAS');
+      let ctx = canvas.getContext('2d');
+      let dataURL;
       canvas.height = this.height;
       canvas.width = this.width;
       ctx.drawImage(this, 0, 0);
@@ -151,7 +151,7 @@
   const session = getSession();
 
   function stripOffNonUTF8Chars(text) {
-    if (typeof text !== 'string') return text;
+    if (typeof text !== 'string') {return text;}
     return text.replace(/[^ -~]/g, '');
   }
 

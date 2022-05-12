@@ -65,7 +65,6 @@ export const askForOTP = (otp_reason) => {
     ),
   };
   const otpParams = routesConfig[views.OTP].otpParams;
-  const currentScreen = navigator.currentActiveRoute.name;
   navigator.navigateTo({
     path: views.OTP,
     props: routesConfig[views.OTP].props,
@@ -121,8 +120,9 @@ const isValidOtp = (otpStr) => {
   if (
     otpStr.length !== get(OtpScreenStore.maxlength) ||
     !isNumericalString(otpStr)
-  )
+  ) {
     return false;
+  }
   return true;
 };
 

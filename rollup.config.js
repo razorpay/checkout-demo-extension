@@ -1,9 +1,9 @@
-const { stylus, rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
+const { rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
 const livereload = require('rollup-plugin-livereload');
 
 const plugins = getPlugins({
   src: ['app/modules/', 'node_modules/'],
-}).concat(stylus);
+});
 
 if (process.env.NODE_ENV === 'dev') {
   plugins.push(
@@ -40,8 +40,12 @@ function getOptions(module) {
     plugins,
     onwarn: function (warning) {
       // Suppress "this is undefined" warning due to an issue in the
+      // Supress typescript warning because of pipeline operator
       // intl-messageformat module.
-      if (warning.code === 'THIS_IS_UNDEFINED') {
+      if (
+        warning.code === 'THIS_IS_UNDEFINED' ||
+        warning.pluginCode === 'TS1109'
+      ) {
         return;
       }
       if (warning.code === 'CIRCULAR_DEPENDENCY') {

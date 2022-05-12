@@ -5,8 +5,6 @@ import { hideToast } from 'one_click_checkout/Toast';
 import { showBackdrop } from 'checkoutstore/backdrop';
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
-import { hideCta } from 'checkoutstore/cta';
-import { activeRoute } from 'one_click_checkout/routing/store';
 import { showLoaderView } from 'one_click_checkout/loader/helper.js';
 import { showLoader } from 'one_click_checkout/loader/store';
 import { get } from 'svelte/store';
@@ -25,7 +23,6 @@ import {
   validateCoupon,
 } from 'one_click_checkout/coupons/service';
 import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
-import { views } from 'one_click_checkout/routing/constants';
 import { setOption, getPrefilledCouponCode } from 'razorpay';
 
 /**

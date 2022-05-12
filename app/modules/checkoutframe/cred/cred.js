@@ -214,7 +214,7 @@ const updatePreferencesAndSession = (contact) => {
  * the entire logic for the A/B resides in BE. BE either sends us the meta offer or the cred subtext
  * @param {Object} preferences the preferences response
  */
-const setupExperimentForCRED = (preferences) => {
+const setupExperimentForCRED = () => {
   // // The following comments/explanations is intentional, do not remove.
 
   // // The following method triggers a new flow (including validation hence avoid)
@@ -330,16 +330,16 @@ export const checkCREDEligibilityForUpdatedContact = (currentContact) => {
 
   initCREDCache(session);
 
-  const { eligible: _isUserEligible = undefined, offer: userSpecificOffer } =
+  const { eligible: _isUserEligible = undefined } =
     isUserEligible(contact) || {};
 
   if (_isUserEligible === undefined && isMerchantConsentForCREDGiven()) {
     checkCREDEligibility(contact)
-      .then(function (res) {
+      .then(function () {
         // const offerDescription = res?.data?.offer?.description;
         // setCREDEligibility(contact, true, offerDescription);
       })
-      .catch(function (e) {
+      .catch(function () {
         // setCREDEligibility(contact, false);
       })
       .finally(function () {

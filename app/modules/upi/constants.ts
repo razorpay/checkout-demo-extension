@@ -10,12 +10,12 @@ export const OTHER_INTENT_APPS: UPI.AppConfiguration = {
   // app_icon: 'https://cdn.razorpay.com/static/assets/instrument-request/upi.svg',
 };
 
-export const GOOGLE_PAY_PACKAGE_NAME: string =
+export const GOOGLE_PAY_PACKAGE_NAME =
   'com.google.android.apps.nbu.paisa.user';
-export const PHONE_PE_PACKAGE_NAME: string = 'com.phonepe.app';
+export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
 // Not the real package name. We're using this because api returns 'cred' instead of the real package name
 // TODO: get this fixed
-export const CRED_PACKAGE_NAME: string = 'cred';
+export const CRED_PACKAGE_NAME = 'cred';
 
 export const UPI_APPS: {
   preferred: Array<UPI.AppConfiguration>;

@@ -4,8 +4,6 @@ const globals = require('./scripts/rollup-injects');
 const include = require('rollup-plugin-includepaths');
 const babelOptions = require('./scripts/babel-options');
 const babelPlugin = require('rollup-plugin-babel');
-// const babel = require('@babel/core');
-const stylus = require('./scripts/rollup-plugin-stylus');
 const svelte = require('rollup-plugin-svelte');
 const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
@@ -51,13 +49,13 @@ const parseFile = async ({ attributes, filename, content }) => {
   };
 };
 
-const getPlugins = ({ lint = true, src }) => {
+const getPlugins = ({ src }) => {
   if (!Array.isArray(src)) {
     src = [src];
   }
   const paths = src.concat(commonFeDir, 'node_modules');
 
-  if (lint) {
+  if (isProd) {
     eslint.lint(isWatching)(paths);
   }
 
@@ -92,7 +90,9 @@ const getPlugins = ({ lint = true, src }) => {
         preprocess({ defaults: { style: 'scss' } }),
         {
           script: async (svelteFile) => {
-            setTimeout(() => eslint.lint(false)([svelteFile.filename]));
+            if (!isProd) {
+              setTimeout(() => eslint.lint(false)([svelteFile.filename]));
+            }
 
             const { content, dependencies } = await parseFile(svelteFile);
 
@@ -134,7 +134,6 @@ if (isWatching) {
 }
 
 module.exports = {
-  stylus,
   isWatching,
   rollupCommon,
   getPlugins,

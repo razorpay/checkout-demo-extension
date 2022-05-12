@@ -7,9 +7,9 @@ import { captureTrace, trackIntentFailure, TRACES } from 'upi/events';
 
 const processIntentOnMWeb = (intentUrl: string) => {
   const session = getSession();
-  tryOpeningIntentUrl(intentUrl).then((response) => {
+  void tryOpeningIntentUrl(intentUrl).then((response) => {
     captureTrace(TRACES.INTENT_PROMISE_RESOLVED, { promiseResponse: response });
-    let { canProceed, reason } =
+    const { canProceed, reason } =
       typeof response === 'object'
         ? (response as any)
         : { canProceed: response, reason: null };

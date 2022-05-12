@@ -1,6 +1,6 @@
 import Razorpay from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
-import Analytics, { Events, Track, MiscEvents } from 'analytics/index';
+import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
@@ -130,7 +130,7 @@ function initAutomaticCheckout() {
   var key = opts.key;
   if (key && key.length > 0) {
     // passing form action as callback_url
-    var form = currentScript |> _El.parent;
+    // var form = currentScript |> _El.parent;
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
     if (!opts.parent) {

@@ -68,10 +68,6 @@ export function getSortedWallets(wallets) {
   });
 }
 
-const otpLengths = {
-  freecharge: 4,
-};
-
 const powerWallets = ['mobikwik', 'freecharge', 'payumoney'];
 
 export const wallets = _Obj.map(list, (details, code) => ({

@@ -76,30 +76,38 @@ export function appendParamsToUrl(url, params) {
  */
 export function serialize(obj) {
   var str = [];
-  for (var p in obj)
+  for (var p in obj) {
     if (obj.hasOwnProperty(p)) {
       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
     }
+  }
   return str.join('&');
 }
 
 export function flatten(data = {}) {
   var result = {};
-  if (Object.keys(data).length === 0) return '';
+  if (Object.keys(data).length === 0) {
+    return '';
+  }
   function recurse(cur, prop) {
     if (Object(cur) !== cur) {
       result[prop] = cur;
     } else if (Array.isArray(cur)) {
-      for (var i = 0, l = cur.length; i < l; i++)
+      for (var i = 0, l = cur.length; i < l; i++) {
         recurse(cur[i], prop + '[' + i + ']');
-      if (l === 0) result[prop] = [];
+      }
+      if (l === 0) {
+        result[prop] = [];
+      }
     } else {
       var isEmpty = true;
       for (var p in cur) {
         isEmpty = false;
         recurse(cur[p], prop ? prop + '[' + p + ']' : p);
       }
-      if (isEmpty && prop) result[prop] = {};
+      if (isEmpty && prop) {
+        result[prop] = {};
+      }
     }
   }
   recurse(data, '');

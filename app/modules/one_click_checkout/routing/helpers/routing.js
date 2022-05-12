@@ -8,7 +8,9 @@ import {
 } from 'one_click_checkout/routing/store';
 import { views } from 'one_click_checkout/routing/constants';
 
+// eslint-disable-next-line no-restricted-syntax
 export const navigator = {
+  // eslint-disable-next-line no-restricted-syntax
   get currentActiveRoute() {
     return get(activeRoute);
   },
@@ -28,7 +30,7 @@ export const navigator = {
       route.props = { ...route.props, ...props };
     }
     activeRoute.set(route);
-    if (nextView === 'otp') return;
+    if (nextView === 'otp') {return;}
     if (screensHistory.isInitialized && !initialize) {
       screensHistory.push(route);
     } else {

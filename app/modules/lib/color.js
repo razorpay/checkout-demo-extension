@@ -222,7 +222,7 @@ const stringToColor = (string) => {
 };
 
 export const transparentify = (color, alphaPercentage = 0) => {
-  const { red, green, blue, alpha } = getColorProperties(color);
+  const { red, green, blue } = getColorProperties(color);
 
   return getColorString(red, green, blue, alphaPercentage / 100);
 };

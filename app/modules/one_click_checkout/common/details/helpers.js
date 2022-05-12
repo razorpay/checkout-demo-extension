@@ -56,8 +56,9 @@ export const handleDetailsNext = (prevContact) => {
   }
   if (continueNext) {
     // validations
-    if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email)))
+    if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email))) {
       return;
+    }
     let view = views.COUPONS;
     if (isLoginMandatory()) {
       if (!isUserLoggedIn()) {

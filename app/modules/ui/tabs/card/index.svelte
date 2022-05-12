@@ -636,7 +636,7 @@
     });
   }
 
-  function handleAVSFormInput(evt: CustomEvent<{}>) {
+  function handleAVSFormInput(evt: CustomEvent<any>) {
     setAVSBillingAddressData(evt.detail);
   }
 
@@ -817,7 +817,9 @@
 
   function checkCardSupportForRecurring(features) {
     // For non domestic users don't need to check support
-    if (!$isIndianCustomer) return true;
+    if (!$isIndianCustomer) {
+      return true;
+    }
     const { issuer, type } = features;
     const issuerDetail = cardWithRecurringSupport[issuer];
     return Boolean(issuerDetail?.[type]);

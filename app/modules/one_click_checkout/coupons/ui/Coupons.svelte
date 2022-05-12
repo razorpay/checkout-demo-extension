@@ -135,7 +135,9 @@
     } else {
       if (!$isBillingSameAsShipping) {
         navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
-      } else redirectToPaymentMethods();
+      } else {
+        redirectToPaymentMethods();
+      }
     }
     showAmountInTopBar();
   }

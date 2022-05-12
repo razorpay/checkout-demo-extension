@@ -2,11 +2,10 @@ import { getPreferences } from 'razorpay';
 import { get } from 'svelte/store';
 import { Events, MetaProperties } from 'analytics';
 import { contact } from 'checkoutstore/screens/home';
-import * as AnalyticsTypes from 'analytics-types';
 import { RTBExperiment } from 'rtb/store';
 import { RTBExperimentEvents } from 'rtb/events';
 import type { EmptyObject } from 'types';
-import { RTB } from 'rtb/types/rtb';
+import * as RTB from 'rtb/types/rtb';
 
 const RTB_EXPERIMENT_VARIANTS_ALLOWED: RTB.ExperimentVariants[] = [
   RTB.ExperimentVariants.NotApplicable,
@@ -32,7 +31,7 @@ function isRTBExperimentVariantAllowed(rtb: RTB.RTBExperiment): boolean {
 }
 
 export function setRTBVariant(exp: RTB.RTBExperiment) {
-  let rtbExperiment = get(RTBExperiment);
+  const rtbExperiment = get(RTBExperiment);
 
   if (!rtbExperiment?.variant && !!exp?.variant) {
     RTBExperiment.update((val) => ({ ...val, ...exp }));

@@ -1,16 +1,16 @@
 import $ from 'lib/$';
 
 export function Modal() {
-  var timeout: NodeJS.Timeout | null;
+  let timeout: NodeJS.Timeout | null;
 
-  var clearTimeout = function () {
+  const clearTimeOut = function () {
     if (timeout) {
       window.clearTimeout(timeout);
     }
     timeout = null;
   };
 
-  var Modal = ((window as any).Modal = function (
+  const Modal = ((window as any).Modal = function (
     element: HTMLElement,
     options: any
   ) {
@@ -26,7 +26,7 @@ export function Modal() {
       }
       this.isShown = true;
       this.container.reflow().addClass('drishy');
-      clearTimeout();
+      clearTimeOut();
     },
 
     hide: function () {
@@ -35,7 +35,7 @@ export function Modal() {
       }
       this.isShown = false;
       this.container.removeClass('drishy');
-      var self = this;
+      const self = this;
 
       timeout = setTimeout(
         function () {

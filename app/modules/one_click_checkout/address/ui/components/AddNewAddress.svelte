@@ -133,7 +133,9 @@
   };
 
   const showPincodeToast = (pincode) => {
-    if (pincode) showToast(pincode_error_toast);
+    if (pincode) {
+      showToast(pincode_error_toast);
+    }
   };
 
   let INPUT_FORM = [
@@ -238,7 +240,7 @@
 
   const isFormComplete = () => {
     let completed = false;
-    const { countryCode, phoneNum } = $formData?.contact;
+    const { countryCode, phoneNum } = $formData?.contact || {};
     for (let key in $formData) {
       if (
         ['landmark', 'tag', 'cod'].includes(key) ||
@@ -349,7 +351,7 @@
   }
 
   const changePincodeStateLabel = () => {
-    const { countryCode } = $formData?.contact;
+    const { countryCode } = $formData?.contact || {};
     if (
       countryCode !== INDIA_COUNTRY_CODE ||
       $selectedCountryISO?.toUpperCase() !== INDIA_COUNTRY_ISO_CODE

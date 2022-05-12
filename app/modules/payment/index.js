@@ -426,7 +426,7 @@ Payment.prototype = {
 
     formatPayment(this);
 
-    let setCompleteHandler = (_) => {
+    let setCompleteHandler = () => {
       window.onComplete = this.complete.bind(this);
       pollPaymentData(window.onComplete);
     };
@@ -1031,7 +1031,7 @@ razorpayProto.verifyVpa = function (vpa = '', timeout = 0) {
       }, timeout);
     }
 
-    const response = fetch.post({
+    fetch.post({
       url,
       data: {
         entity: 'vpa',
@@ -1112,7 +1112,7 @@ razorpayProto.submitOTP = function (otp) {
   });
 };
 
-razorpayProto.resendOTP = function (callback) {
+razorpayProto.resendOTP = function () {
   var payment = this._payment;
   var url =
     payment.resendOtpUrl ||

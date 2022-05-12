@@ -44,7 +44,9 @@ function updateButton(
 ) {
   if (type === 'replace') {
     const existingButton = document.querySelector(`#${replacerId}`);
-    if (!existingButton) return;
+    if (!existingButton) {
+      return;
+    }
     existingButton?.parentNode?.removeChild(existingButton);
   }
 
@@ -80,7 +82,9 @@ export function updateActionAreaContentAndCTA(
   onClick
 ) {
   const errorMessageContainer = document.querySelector('#error-message');
-  if (!errorMessageContainer) return;
+  if (!errorMessageContainer) {
+    return;
+  }
   // disable the backdrop clicks to leak the flow.
 
   if (avoidBackdropClick) {
@@ -145,7 +149,9 @@ export function hasPaypalOptionInErrorMetadata(errorMetadata) {
  */
 export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
   var errorMessageContainer = document.querySelector('#error-message');
-  if (!errorMessageContainer) return;
+  if (!errorMessageContainer) {
+    return;
+  }
 
   var existingPaypalContainer = document.querySelector('#fd-paypal-container');
 

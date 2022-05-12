@@ -1,4 +1,4 @@
-const path = require('path');
+/* global page */
 const URL = require('url');
 const querystring = require('querystring');
 
@@ -41,14 +41,14 @@ const randomString =
   (set) =>
   (length = 14) =>
     Array.apply(null, { length })
-      .map((_) => randomItem(set))
+      .map(() => randomItem(set))
       .join('');
 
 const randomLengthString =
-  (set) =>
+  () =>
   (min = 3, max = 8) =>
     Array.apply(null, { length: module.exports.randomRange(min, max) })
-      .map((_) => randomItem(chrlow))
+      .map(() => randomItem(chrlow))
       .join('');
 
 const randomItem = (set) => set[randomRange(0, set.length - 1)];
@@ -115,7 +115,7 @@ const unflatten = (o) => {
   return result;
 };
 
-const util = (module.exports = {
+module.exports = {
   unflatten,
   query2obj,
   /**
@@ -246,7 +246,9 @@ const util = (module.exports = {
     };
 
     function getRequestPath(request) {
-      if (!request) return '';
+      if (!request) {
+        return '';
+      }
       const parsedURL = URL.parse(request.url());
       return parsedURL.pathname;
     }
@@ -275,6 +277,7 @@ const util = (module.exports = {
       }
       const urlPath = getRequestPath(interceptedRequest);
 
+      // eslint-disable-next-line jest/no-standalone-expect
       expect(allRequests[urlPath]).toBeFalsy();
       currentRequest = interceptedRequest;
       allRequests[urlPath] = interceptedRequest;
@@ -370,4 +373,4 @@ const util = (module.exports = {
       return '';
     }
   },
-});
+};

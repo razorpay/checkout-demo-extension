@@ -10,7 +10,7 @@ import {
 
 import { getMerchantKey } from 'razorpay';
 
-import { androidBrowser, iOS, android } from 'common/useragent';
+import { androidBrowser } from 'common/useragent';
 import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 
@@ -122,7 +122,7 @@ var responseTypes = {
     });
   },
 
-  first: function (request, fullResponse) {
+  first: function (request) {
     if (request.method === 'redirect') {
       if (this.data.method === 'app' && this.data.provider === 'cred') {
         this.avoidPopup = false;

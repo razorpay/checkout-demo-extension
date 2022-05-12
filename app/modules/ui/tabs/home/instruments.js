@@ -80,7 +80,7 @@ const INSTRUMENT_COMPARATORS = {
   netbanking: (a, b) => a.bank === b.bank,
 };
 
-function genericInstrumentComparator(a, b) {
+function genericInstrumentComparator() {
   return false;
 }
 
@@ -293,20 +293,9 @@ export function setBlocks(
     allBlocks = [preferredBlock].concat(allBlocks);
   }
 
-  // if walnut 369 is highlight in block
-  let walnut369Visible = false;
-  // (not releasing in 1st phase of walnut 369)
-  // const walnut369Enabled = isWalnut369Enabled();
-  // const walnutNCEnabled = hasFeature('walnut369_nc_emi', false);
   // Filter out blocks with no instruments & check for walnut 369 exist in block
   allBlocks = allBlocks.filter((block) => {
     const _instruments = block?.instruments || [];
-    _instruments.forEach((instrument) => {
-      if (instrument?._ungrouped?.[0]?.provider === 'walnut369') {
-        walnut369Visible = true;
-      }
-    });
-    // check for walnut 369
     return _instruments.length > 0;
   });
   // Add an ID to all instruments

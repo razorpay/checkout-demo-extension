@@ -37,7 +37,7 @@ INSTRUMENT_PROPS.emi = INSTRUMENT_PROPS.card;
  *
  * @returns {Object|undefined}
  */
-function getExtractedDetails(payment, customer, extra = {}) {
+function getExtractedDetails(payment, customer) {
   const details = {};
 
   let extractable = INSTRUMENT_PROPS[payment.method];

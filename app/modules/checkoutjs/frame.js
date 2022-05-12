@@ -21,7 +21,6 @@ const { screen, scrollTo } = global;
 const ua_iPhone = iPhone;
 var doc, head, docStyle;
 
-var ch_PageY = 0;
 // there is no "position: fixed" in iphone
 var containerHeight = 460;
 var merchantMarkup = {

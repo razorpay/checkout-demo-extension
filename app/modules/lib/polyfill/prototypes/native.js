@@ -1,5 +1,4 @@
 /* eslint-disable no-extend-native */
-/* global Set */
 
 /**
  * Polyfill for String.prototype.includes
@@ -205,7 +204,7 @@
   if (typeof Object.assign !== 'function') {
     // Must be writable: true, enumerable: false, configurable: true
     Object.defineProperty(Object, 'assign', {
-      value: function assign(target, varArgs) {
+      value: function assign(target) {
         // .length of function is 2
         'use strict';
         if (target === null || target === undefined) {
@@ -263,7 +262,9 @@ if (!global.alert.name) {
         size = this.length;
 
       for (let i = 0; i < size; i++) {
-        if (cb(this[i], i, this)) filtered.push(this[i]);
+        if (cb(this[i], i, this)) {
+          filtered.push(this[i]);
+        }
       }
       return filtered;
     };

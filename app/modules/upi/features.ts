@@ -62,8 +62,8 @@ export function enableUPITiles(): EnableUPITilesReturnType {
  * @returns
  */
 export function getRecommendedAppsForUPIStack(
-  includeOthers: boolean = false,
-  limit: number = 4
+  includeOthers = false,
+  limit = 4
 ): Array<UPI.AppConfiguration> {
   const { config, status } = enableUPITiles();
   if (!status) {

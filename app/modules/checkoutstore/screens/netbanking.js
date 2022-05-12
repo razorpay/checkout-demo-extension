@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import RazorpayStore, { getOption } from 'razorpay';
+import RazorpayStore from 'razorpay';
 import { hiddenInstruments } from './home';
 import { getPrefillBank } from 'netbanking/helper';
 

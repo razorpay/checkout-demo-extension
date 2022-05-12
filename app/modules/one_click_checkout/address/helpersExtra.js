@@ -159,14 +159,18 @@ export const getCustomerAddressApiPayload = (
 
   if (shipping_address) {
     payload.shipping_address = { ...formatAddress(shipping_address) };
-    if (isUpdate) payload.shipping_address.id = shipping_address.id;
+    if (isUpdate) {
+      payload.shipping_address.id = shipping_address.id;
+    }
   }
 
   if (billing_address) {
     payload.billing_address = {
       ...formatAddress(billing_address, 'billing_address'),
     };
-    if (isUpdate) payload.billing_address.id = billing_address.id;
+    if (isUpdate) {
+      payload.billing_address.id = billing_address.id;
+    }
   }
 
   return payload;

@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   // Svelte Imports
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
 
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
@@ -104,7 +104,7 @@
     return !!$selectedWallet;
   }
 
-  const walletReferences = {};
+  const walletReferences: any = {};
 
   export function onWalletSelection(code) {
     Events.TrackBehav(WALLET_EVENTS.WALLET_SELECTED, {

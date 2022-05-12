@@ -15,8 +15,12 @@ import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
 
 function getSplitConfig() {
   const config = [];
-  if (isMethodEnabled('debit_card')) config.push(debitCardConfig);
-  if (isMethodEnabled('credit_card')) config.push(creditCardConfig);
+  if (isMethodEnabled('debit_card')) {
+    config.push(debitCardConfig);
+  }
+  if (isMethodEnabled('credit_card')) {
+    config.push(creditCardConfig);
+  }
   return config;
 }
 
@@ -75,19 +79,12 @@ export function setDynamicFees(instrument, forType) {
       let inst = types.includes(instrument?.method)
         ? 'card'
         : instrument?.method;
-      let type =
-        instrument?.method === 'debit_card'
-          ? 'debit'
-          : instrument?.method === 'credit_card'
-          ? 'credit'
-          : '';
       if (inst !== 'card') {
         return setDynamicFeeObject(inst);
       }
     }
     if (forType === 'newList') {
       let method = instrument?.method;
-      let type = instrument?.types?.[0] || '';
       if (method !== 'card') {
         return setDynamicFeeObject(method);
       }

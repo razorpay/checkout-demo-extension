@@ -11,7 +11,6 @@ import { Events } from 'analytics';
 import AddressEvents from 'one_click_checkout/address/analytics';
 
 // utils import
-import { SOURCE } from 'one_click_checkout/address/constants';
 import { makeUrl } from 'common/helper';
 import { getOrderId } from 'razorpay';
 import { timer } from 'utils/timer';
@@ -60,7 +59,9 @@ export function getCityState(pincode, country) {
     return Promise.resolve(cachedAddress);
   }
 
-  if (addressPromiseCache[pincode]) return addressPromiseCache[pincode];
+  if (addressPromiseCache[pincode]) {
+    return addressPromiseCache[pincode];
+  }
 
   addressPromiseCache[pincode] = new Promise((resolve, reject) => {
     fetch({

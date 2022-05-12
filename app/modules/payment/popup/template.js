@@ -153,10 +153,3 @@ export function writePopup(win, paymentInstance) {
     trackPopup('unload');
   });
 }
-
-const cancelError = JSON.stringify({
-  error: {
-    code: 'BAD_REQUEST_ERROR',
-    description: t('payment_canceled'),
-  },
-});

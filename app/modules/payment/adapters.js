@@ -72,7 +72,7 @@ function phonepePaymentRequestAdapter() {
             reject(CHECK_ERROR);
           }
         })
-        .catch((e) => {
+        .catch(() => {
           reject(CHECK_ERROR);
         });
     } catch (e) {
@@ -122,7 +122,7 @@ export function gpayPaymentRequestAdapter() {
           if (isAvailable) {
             isBrowserAllowedByGpay()
               .then(resolve)
-              .catch((e) => {
+              .catch(() => {
                 reject(CHECK_ERROR);
               });
           } else {

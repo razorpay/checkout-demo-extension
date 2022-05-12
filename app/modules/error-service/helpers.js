@@ -1,5 +1,3 @@
-import { SEVERITY_LEVELS } from './models';
-
 /**
  * @typedef {Object} CustomError
  *

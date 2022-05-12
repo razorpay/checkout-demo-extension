@@ -117,7 +117,7 @@ export const upiPopUpForiOSMWeb: {
     if (this.instance && this.instance.window) {
       if (forceClose) {
         // this over-writing will destroy any system pops present and empty the page
-        this.instance = (this.instance as Window).open('about:blank', '_self');
+        this.instance = this.instance.open('about:blank', '_self');
       }
       const _i = setInterval(() => {
         if (this.instance && this.instance.document) {
@@ -138,7 +138,7 @@ export const upiPopUpForiOSMWeb: {
     if (!this.instance || !this.instance.document) {
       return null;
     }
-    (this.instance as Window).location = url;
+    this.instance.location = url;
     captureTrace(TRACES.IOS_MWEB_TAB_URL_SET);
     return this.instance;
   },

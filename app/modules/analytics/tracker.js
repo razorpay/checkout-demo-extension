@@ -78,7 +78,9 @@ function getCommonTrackingData(r) {
     'referer',
   ]
     |> _Arr.loop((propName) => {
-      if (trackingProps[propName]) props[propName] = trackingProps[propName];
+      if (trackingProps[propName]) {
+        props[propName] = trackingProps[propName];
+      }
     });
 
   return props;
@@ -161,7 +163,7 @@ const flushEvents = (mode) => {
 
 // Keep flushing at regular intervals. 🚽
 const FLUSH_INTERVAL_DURATION = 1000;
-const FLUSH_INTERVAL = setInterval(() => {
+setInterval(() => {
   flushEvents();
 }, FLUSH_INTERVAL_DURATION);
 

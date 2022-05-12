@@ -89,7 +89,7 @@ function wallet(instrument) {
   };
 }
 
-function paypal(instrument) {
+function paypal() {
   return {
     method: 'paypal',
   };

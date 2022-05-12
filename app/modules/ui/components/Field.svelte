@@ -76,8 +76,7 @@
   let isPredictionEnable = typeof prediction === 'function';
   let predictedValue = '';
   let dropDownSuggestion = [];
-  let dropDownSelection = () => {};
-  let dropdownRef = null;
+  let dropDownSelection;
   let dropdownArrowIndex = -1;
   let mainInputScrollLeft = 0;
   let dropDownPosition = {
@@ -409,7 +408,6 @@
     {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
       <ul
         style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
-        bind:this={dropdownRef}
         class="suggestion-dropdown"
       >
         {#each dropDownSuggestion as suggestion, index (suggestion)}
@@ -530,7 +528,6 @@
     {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
       <ul
         style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
-        bind:this={dropdownRef}
         class="suggestion-dropdown"
       >
         {#each dropDownSuggestion as suggestion, index (suggestion)}

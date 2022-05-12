@@ -88,7 +88,9 @@
   });
 
   function updateTopBar() {
-    if (!topbar) return;
+    if (!topbar) {
+      return;
+    }
     if (!isBackEnabled) {
       topbar.hide();
     } else {

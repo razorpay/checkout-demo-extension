@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Svelte imports
   import { onMount, tick } from 'svelte';
   import { _ as t } from 'svelte-i18n';
@@ -223,7 +223,7 @@
   };
 
   const addDaysToDate = function (date, days) {
-    return new Date(date.getTime() + days * 1000 * 24 * 3600);
+    return new Date((date.getTime() as number) + days * 1000 * 24 * 3600);
   };
 
   const { showRecommendedUPIApp } = session;
@@ -335,7 +335,9 @@
     ['upi', 'upi_otm'].includes(session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
-    if (selectedToken) return;
+    if (selectedToken) {
+      return;
+    }
 
     const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
     const hasTokens = tokens && tokens.length;

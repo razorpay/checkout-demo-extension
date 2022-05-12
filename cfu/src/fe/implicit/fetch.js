@@ -47,7 +47,9 @@ function setKeylessHeader(id) {
  * @returns {string}
  */
 function appendQueryParamToUrl(url, paramName, paramValue) {
-  if (!paramName || !paramValue) return url;
+  if (!paramName || !paramValue) {
+    return url;
+  }
 
   return _.appendParamsToUrl(
     url,
@@ -211,9 +213,13 @@ const fetchPrototype = {
       callback(resp);
     };
 
-    if (sessionId) headers[sessionIdHeader] = sessionId;
+    if (sessionId) {
+      headers[sessionIdHeader] = sessionId;
+    }
 
-    if (trackId) headers[trackIdHeader] = trackId;
+    if (trackId) {
+      headers[trackIdHeader] = trackId;
+    }
 
     headers |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
 
@@ -371,7 +377,7 @@ function jsonp(options) {
       |> _Obj.extend({
         src,
         async: true,
-        onerror: (e) => cb(networkError),
+        onerror: () => cb(networkError),
         onload,
         onreadystatechange: onload,
       })

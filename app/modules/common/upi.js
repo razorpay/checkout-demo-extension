@@ -1,5 +1,3 @@
-/* global CheckoutBridge */
-
 import Analytics from 'analytics';
 import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 export * from 'upi/helper/common';

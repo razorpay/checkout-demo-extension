@@ -99,14 +99,14 @@ function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
       }) {
         getSession().setParamsInStorage({
           [UPI_POLL_URL]: response.request.url,
-          [PENDING_PAYMENT_TS]: Date.now() + '',
+          [PENDING_PAYMENT_TS]: Date.now().toString(),
         });
 
         /**
          * When the payment response is for intent mweb using deeplink (without specific app)
          * Invoke the flow where upi intent url is opened using deeplink
          */
-        if (!Boolean(paymentPayload.upi_app) && response.data.intent_url) {
+        if (!paymentPayload.upi_app && response.data.intent_url) {
           handleDeeplinkAction(
             response.data.intent_url,
             config.action,

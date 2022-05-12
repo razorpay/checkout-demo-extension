@@ -10,7 +10,9 @@ import { get } from 'utils/object';
  * Helper methods
  */
 export const getPreferences = (path, defaultValue) => {
-  if (!path) return RazorpayStore.preferences;
+  if (!path) {
+    return RazorpayStore.preferences;
+  }
   return get(RazorpayStore.preferences, path, defaultValue);
 };
 

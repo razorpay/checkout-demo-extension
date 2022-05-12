@@ -57,7 +57,7 @@
   };
 
   function stripOffNonUTF8Chars(text) {
-    if (typeof text !== 'string') return text;
+    if (typeof text !== 'string') {return text;}
     return text.replace(/[^ -~]/g, '');
   }
 

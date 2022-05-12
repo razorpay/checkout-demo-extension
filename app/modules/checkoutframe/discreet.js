@@ -141,7 +141,6 @@ import * as fonts from 'checkoutframe/fonts';
 export default {
   $,
   updateScore,
-  fetch,
   Analytics,
   AnalyticsTypes,
   UPIUtils,
@@ -236,13 +235,8 @@ export default {
   CardHelper,
   BrowserStorage,
 
-  _Arr,
   docUtil,
   _El,
-  _Obj,
-  _,
-  Promise,
-
   NBHandlers,
   CommonHandlers,
 

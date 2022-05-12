@@ -1,11 +1,9 @@
-const fs = require('fs');
 const chokidar = require('chokidar');
 const lintRules = require('./eslintrc');
-const CLIEngine = require('eslint').CLIEngine;
+const CLIEngine = require('eslint').ESLint;
 
 const eslint = new CLIEngine(lintRules);
-const eslintFormatter = eslint.getFormatter('stylish');
-const lintCompat = new CLIEngine(require('./eslintrc-compat'));
+const eslintFormatter = eslint.loadFormatter('stylish');
 
 /**
  * Fixes ESLint issues
@@ -17,23 +15,25 @@ const lintFix = (paths) => {
     fix: true,
   });
 
-  const report = fixer.executeOnFiles(paths);
+  const report = fixer.lintFiles(paths);
 
   CLIEngine.outputFixes(report);
 };
 
-const lintPaths = (paths) => {
+const lintPaths = async (paths) => {
   if (!Array.isArray(paths)) {
     if (!paths.endsWith('.js')) {
       return;
     }
     paths = [paths];
   }
-  lintLog(eslint.executeOnFiles(paths));
+  lintLog(await eslint.lintFiles(paths));
 };
 
-const lintLog = (report) => {
-  const results = eslintFormatter(report.results);
+const lintLog = async (report) => {
+  const formatter = await eslintFormatter;
+  const results = formatter.format(report);
+
   if (results) {
     console.log(results);
   }
@@ -54,11 +54,10 @@ const lint = (isWatching) => (paths) => {
   }
 };
 
-const lintText = (text, id) => lintLog(eslint.executeOnText(text, id));
+const lintText = async (text, id) => lintLog(await eslint.lintText(text, id));
 
 module.exports = {
   lint,
-  lintCompat,
   lintFix,
   lintLog,
   lintText,

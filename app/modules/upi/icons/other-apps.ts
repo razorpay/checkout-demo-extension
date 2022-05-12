@@ -1,7 +1,7 @@
 import { getColorVariations } from 'checkoutstore/theme';
 
 export default (
-  withBorder: boolean = false,
+  withBorder = false,
   colors: {
     foregroundColor: string;
     backgroundColor: string;

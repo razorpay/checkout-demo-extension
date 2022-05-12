@@ -49,8 +49,11 @@ module.exports = function (testFeatures) {
 
       await handleAvailableCouponReq(context);
       if (closeModalOnBack || closeModalOnCross) {
-        if (closeModalOnBack) await goBack(context);
-        else await closeModal(context);
+        if (closeModalOnBack) {
+          await goBack(context);
+        } else {
+          await closeModal(context);
+        }
         await confirmModalClose(context);
         await delay(600);
         await assertModalClose(context);

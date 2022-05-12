@@ -111,8 +111,8 @@
   // Props
   export let classes = [];
   export let visible = false;
-  export let view = null;
-  export let tabVisible = null;
+  export let view = '';
+  export let tabVisible = false;
   export let isAVS = false;
 
   // Computed
@@ -131,7 +131,7 @@
     } else {
       session.dccPayload = Object.assign(session.dccPayload || {}, payload);
     }
-    var offer = session.getAppliedOffer();
+    let offer = session.getAppliedOffer();
     // if offer applied
     if (offer) {
       session.handleDiscount();

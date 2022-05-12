@@ -42,7 +42,7 @@
 
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
-  let abortUploadRequest = () => {};
+  let abortUploadRequest;
   let uploaded = false;
   let uploading = false;
   let error;
@@ -65,7 +65,9 @@
    * Aborts the upload request
    */
   function abortUpload() {
-    abortUploadRequest();
+    if(abortUploadRequest) {
+      abortUploadRequest();
+    }
     reset();
   }
 

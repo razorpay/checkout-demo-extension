@@ -79,7 +79,9 @@ class Experiment {
   }
 
   getExperiment = (name: string) => {
-    if (!name) return null;
+    if (!name) {
+      return null;
+    }
     return this.experiments[name];
   };
 
@@ -149,7 +151,7 @@ class Experiment {
     experiment: string,
     evaluatorArg: CreateExperimentOptions['evaluatorArg'],
     overrideFn: CreateExperimentOptions['overrideFn']
-  ): Number {
+  ): number {
     const existing = this.getSegment(experiment);
 
     /**
@@ -197,6 +199,7 @@ class Experiment {
     const { evaluatorArg, overrideFn } = options;
 
     function checkEnabled() {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return this.getSegmentOrCreate(name, evaluatorArg, overrideFn) === 1;
     }
@@ -231,6 +234,6 @@ class Experiment {
 const experimentModule = new Experiment({});
 const createExperiment = experimentModule.create;
 const clearOldExperiments = experimentModule.clearOldExperiments;
-const getExperimentsFromStorage = Experiment.getExperimentsFromStorage;
+const getExperimentsFromStorage = () => Experiment.getExperimentsFromStorage();
 
 export { createExperiment, getExperimentsFromStorage, clearOldExperiments };

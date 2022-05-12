@@ -147,7 +147,7 @@ function getPrefsJsonp(data, callback) {
   });
 }
 
-var razorpayPayment = (Razorpay.payment = {
+Razorpay.payment = {
   getMethods: function (callback) {
     return getPrefsJsonp(
       {
@@ -203,7 +203,7 @@ var razorpayPayment = (Razorpay.payment = {
       },
     });
   },
-});
+};
 
 function base_configure(overrides) {
   if (!overrides || typeof overrides !== 'object') {

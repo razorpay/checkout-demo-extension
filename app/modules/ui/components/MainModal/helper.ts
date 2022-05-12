@@ -32,8 +32,8 @@ export function disableAnimation(): boolean {
 }
 
 export function bringInputIntoView() {
-  var el = document.activeElement;
-  if (el.tagName === 'INPUT') {
+  const el = document.activeElement as HTMLElement;
+  if (el?.tagName === 'INPUT') {
     /**
      * When device is rotated or the keyboard is shown,
      * if an input element was focused on,

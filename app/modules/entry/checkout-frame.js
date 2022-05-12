@@ -3,7 +3,7 @@ import 'utils/modal';
 import { setSessionConstructor } from 'sessionmanager';
 import { initIframe } from 'checkoutframe/iframe';
 import Session from 'session';
-import Razorpay from 'common/Razorpay';
+import 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 import 'checkoutjs/options';
 import 'payment';

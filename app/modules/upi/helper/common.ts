@@ -9,7 +9,7 @@ import { OTHER_INTENT_APPS, UPI_APPS } from '../constants';
  */
 export const parseUPIIntentResponse = (
   intentResponse: UPI.RawIntentResponse | UPI.IntentResponse,
-  param: string = 'response'
+  param = 'response'
 ): UPI.IntentResponse => {
   const rawResponse = intentResponse[param] as string;
   let response: UPI.IntentResponse = {} as UPI.IntentResponse;

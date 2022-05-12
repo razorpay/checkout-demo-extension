@@ -3,7 +3,9 @@ const isPromise = (p) => _.is(p, Promise);
 
 /** @class */
 function Promise(fn) {
-  if (!isPromise(this)) throw 'new Promise';
+  if (!isPromise(this)) {
+    throw 'new Promise';
+  }
 
   if (typeof fn !== 'function') {
     throw new TypeError('not a function');
@@ -49,7 +51,9 @@ function handle(self, deferred) {
 function resolve(self, newValue) {
   try {
     // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-    if (newValue === self) throw new TypeError('promise resolved by itself');
+    if (newValue === self) {
+      throw new TypeError('promise resolved by itself');
+    }
     if (_.isNonNullObject(newValue) || _.isFunction(newValue)) {
       var then = newValue.then;
       if (isPromise(newValue)) {
@@ -108,18 +112,24 @@ function doResolve(fn, self) {
   try {
     fn(
       function (value) {
-        if (done) return;
+        if (done) {
+          return;
+        }
         done = true;
         resolve(self, value);
       },
       function (reason) {
-        if (done) return;
+        if (done) {
+          return;
+        }
         done = true;
         reject(self, reason);
       }
     );
   } catch (ex) {
-    if (done) return;
+    if (done) {
+      return;
+    }
     done = true;
     reject(self, ex);
   }
@@ -148,10 +158,13 @@ Promise.prototype
 
 Promise.all = function (args) {
   return new Promise(function (resolve, reject) {
-    if (!args || typeof args.length === 'undefined')
+    if (!args || typeof args.length === 'undefined') {
       throw new TypeError('Promise.all accepts an array');
+    }
 
-    if (args.length === 0) return resolve([]);
+    if (args.length === 0) {
+      return resolve([]);
+    }
     var remaining = args.length;
 
     args.forEach(function res(val, i) {

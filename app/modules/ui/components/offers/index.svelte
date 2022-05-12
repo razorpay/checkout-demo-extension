@@ -121,7 +121,7 @@
       });
     }
 
-    var invalidateOffer = false;
+    let invalidateOffer = false;
     // restore previously selected offer for same payment method
     if (previousApplied[tab]) {
       $appliedOffer = previousApplied[tab];

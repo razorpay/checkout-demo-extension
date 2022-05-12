@@ -79,7 +79,9 @@
     }
     selectedAddressId.set(id);
     dispatchSelect(id, index);
-    if (!checkServiceability) return;
+    if (!checkServiceability) {
+      return;
+    }
 
     postAddressSelection(id, index);
   }

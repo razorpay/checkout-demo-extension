@@ -2,9 +2,9 @@ import Analytics from 'analytics';
 import { RTBExperiment } from 'rtb/store';
 import { country, phone } from 'checkoutstore/screens/home';
 import * as razorpay from 'razorpay';
-import { RTB } from 'rtb/types/rtb';
 import { get } from 'svelte/store';
 import { getRTBAnalyticsPayload, isRTBEnabled, setRTBVariant } from '..';
+import * as RTB from 'rtb/types/rtb';
 
 jest.mock('razorpay', () => ({
   getPreferences: jest.fn(),

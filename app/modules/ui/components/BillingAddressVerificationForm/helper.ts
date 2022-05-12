@@ -33,10 +33,6 @@ import {
   FormErrorsType,
 } from './types';
 
-declare const _: {
-  appendParamsToUrl: (url: string, option: unknown) => string;
-};
-
 declare function fetch<ResponseType>(options: {
   url: string;
   callback: (response: ResponseType) => void;
@@ -165,13 +161,13 @@ export const combineFormValues = (
 
 export const validateFormValues = (formValues: FormValuesType) => {
   let isValid = true;
-  let errors: FormErrorsType = {};
+  const errors: FormErrorsType = {};
 
   Object.keys(formValues).forEach((key) => {
-    let value = (formValues[key] as string).trim();
+    const value = (formValues[key] as string).trim();
     if (
       key !== FORM_FIELDS.line2 &&
-      (value === '' || SPACIAL_CHAR_REGEX.test(value as string))
+      (value === '' || SPACIAL_CHAR_REGEX.test(value ))
     ) {
       isValid = false;
       errors[key] = true;

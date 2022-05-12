@@ -242,9 +242,6 @@ function getIconFn(iconName) {
     case 'kebab_menu':
       return kebabMenu;
 
-    case 'info':
-      return info;
-
     case 'user':
       return user;
 

@@ -11,7 +11,7 @@ const transformerByMethod = {
    *
    * @return {Object}
    */
-  card: (token, { amount, emi, recurring }) => {
+  card: (token, { emi, recurring }) => {
     const { card } = token;
     let { flows = [], issuer: bank, network, type } = card;
     let networkCode = Card.findCodeByNetworkName(network);

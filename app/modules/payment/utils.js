@@ -1,5 +1,4 @@
 import Config from 'config/index.js';
-import FLOWS from 'config/FLOWS';
 import RazorpayConfig from 'common/RazorpayConfig';
 
 /**

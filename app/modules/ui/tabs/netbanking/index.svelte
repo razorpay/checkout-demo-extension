@@ -2,7 +2,6 @@
   // Svelte imports
   import { createEventDispatcher, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { onMount } from 'svelte';
 

@@ -8,7 +8,9 @@
       var ownProps = Object.keys(obj),
         i = ownProps.length,
         resArray = new Array(i); // preallocate the Array
-      while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
+      while (i--) {
+        resArray[i] = [ownProps[i], obj[ownProps[i]]];
+      }
 
       return resArray;
     };
@@ -24,7 +26,9 @@
       var ownProps = Object.keys(obj),
         i = ownProps.length,
         resArray = new Array(i); // preallocate the Array
-      while (i--) resArray[i] = obj[ownProps[i]];
+      while (i--) {
+        resArray[i] = obj[ownProps[i]];
+      }
       return resArray;
     };
   }
@@ -38,7 +42,7 @@
   if (typeof Object.assign !== 'function') {
     // Must be writable: true, enumerable: false, configurable: true
     Object.defineProperty(Object, 'assign', {
-      value: function assign(target, varArgs) {
+      value: function assign(target) {
         // .length of function is 2
         'use strict';
         if (target === null || target === undefined) {

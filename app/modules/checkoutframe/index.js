@@ -8,7 +8,7 @@ import Razorpay, {
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
-import RazorpayStore, { getMerchantOrder, setOption } from 'razorpay';
+import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
@@ -250,7 +250,7 @@ export const handleMessage = function (message) {
   try {
     if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = (e) => {};
+      CheckoutBridge.sendExtraAnalyticsData = () => {};
     }
   } catch (e) {}
 };

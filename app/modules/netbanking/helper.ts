@@ -17,7 +17,9 @@ export function getPrefillBankDetails(key: string) {
       getPreferences(`order.bank_account.${dataPoints}`) ||
       getOption(`prefill.bank_account[${dataPoints}]`);
   });
-  if (!key) return returnOptions;
+  if (!key) {
+    return returnOptions;
+  }
   return returnOptions[`prefill.bank_account[${key}]`];
 }
 

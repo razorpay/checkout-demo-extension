@@ -25,9 +25,10 @@ echo "${CYAN} Linting...🔍"
 ./node_modules/.bin/eslint --fix ${fileList[*]}
 if [ $? -ne 0 ]
 then  
-  echo "${YELLOW} Surpassing lint errors please fix ASAP"
+  # echo "${YELLOW} Surpassing lint errors please fix ASAP"
   # enable the following when eslint failure has to stop commiting
-  # echo -e "\nPlease fix the above linting issues before committing.\n"
+  echo -e "\nPlease fix the above linting issues before committing.\n"
+  exit 1
 fi 
 
 

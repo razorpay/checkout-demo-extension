@@ -5,15 +5,16 @@ export const body = document.body;
 export const innerWidth = global.innerWidth;
 export const innerHeight = global.innerHeight;
 export const pageYOffset = global.pageYOffset;
-export const scrollBy = global.scrollBy;
-export const scrollTo = global.scrollTo;
-export const requestAnimationFrame = global.requestAnimationFrame;
+export const scrollBy = window.scrollBy;
+export const scrollTo = window.scrollTo;
+export const requestAnimationFrame = window.requestAnimationFrame;
 export const querySelector = document.querySelector.bind(document);
 export const querySelectorAll = document.querySelectorAll.bind(document);
 export const getElementById = document.getElementById.bind(document);
 export const getComputedStyle = global.getComputedStyle.bind(global);
-export const EventConstructor = global.Event;
-var link;
+export const EventConstructor = window.Event;
+
+let link;
 
 /**
  * Says whether or not the passed argument is an Event
@@ -74,7 +75,7 @@ export function submitForm(
   action: string,
   data: any,
   method: string,
-  target: string = ''
+  target = ''
 ) {
   if (method && method.toLowerCase() === 'get') {
     action = _.appendParamsToUrl(action, data);
@@ -84,7 +85,7 @@ export function submitForm(
       global.location = action;
     }
   } else {
-    let attr: { action: string; method: string; target?: string } = {
+    const attr: { action: string; method: string; target?: string } = {
       action,
       method,
     };
@@ -112,7 +113,7 @@ export function obj2formhtml(
   key?: string
 ) {
   if (_.isNonNullObject(data)) {
-    var str = '';
+    let str = '';
     _Obj.loop(data, function (value: any, name: string) {
       if (key) {
         name = key + '[' + name + ']';
@@ -121,7 +122,7 @@ export function obj2formhtml(
     });
     return str;
   }
-  var input = _El.create('input') as HTMLInputElement;
+  const input = _El.create('input') as HTMLInputElement;
   input.type = 'hidden';
   input.value = data as string;
   input.name = key as string;
@@ -135,7 +136,7 @@ export function obj2formhtml(
  * @returns {Object}
  */
 export function form2obj(form: HTMLFormElement) {
-  let obj: { [x: string]: any } = {};
+  const obj: { [x: string]: any } = {};
   form
     ?.querySelectorAll<HTMLInputElement>('[name]')
     .forEach((el: HTMLInputElement) => {
@@ -179,18 +180,18 @@ export function smoothScrollBy(y: number) {
     clearTimeout(scrollTimeout);
   }
   scrollTimeout = setTimeout(function () {
-    var y0 = pageYOffset;
-    var target = Math.min(y0 + y, _El.offsetHeight(body) - innerHeight);
+    const y0 = pageYOffset;
+    const target = Math.min(y0 + y, _El.offsetHeight(body) - innerHeight);
     y = target - y0;
-    var scrollCount = 0;
-    var oldTimestamp = global.performance.now();
+    let scrollCount = 0;
+    let oldTimestamp = global.performance.now();
 
     function step(newTimestamp: number) {
       scrollCount += (newTimestamp - oldTimestamp) / 300;
       if (scrollCount >= 1) {
         return scrollTo(0, target);
       }
-      var sin = Math.sin((pi * scrollCount) / 2);
+      const sin = Math.sin((pi * scrollCount) / 2);
       scrollTo(0, y0 + Math.round(y * sin));
       oldTimestamp = newTimestamp;
       requestAnimationFrame(step);

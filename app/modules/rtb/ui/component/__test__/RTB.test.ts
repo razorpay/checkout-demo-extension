@@ -1,10 +1,9 @@
 import { RTBExperiment } from 'rtb/store';
 import { fireEvent, render } from '@testing-library/svelte';
-
+import * as RTB from 'rtb/types/rtb';
 import * as razorpay from 'razorpay';
 import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
 import Analytics from 'analytics';
-import { RTB } from 'rtb/types/rtb';
 import RTBOverlay from '../RTBOverlay.svelte';
 import { pushOverlay } from 'navstack';
 

@@ -1,4 +1,4 @@
-export default (foregroundColor = 'white', backgroundColor = '#3A97FC') => {
+export default (foregroundColor, backgroundColor = '#3A97FC') => {
   return `<svg width="12" height="15" viewBox="0 0 12 17" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M10.1299 2H1.68832C1.24056 2 0 2.00006 0 2.00006C0 2.00006 1.30047e-05 3.22464 1.30047e-05 3.66667V17L5.90911 14.5L11.8182 17V3.66667C11.8182 3.22464 11.8182 2 11.8182 2C11.8182 2 10.5777 2 10.1299 2Z" fill="rgba(0,0,0,0.1)"/>
   <path d="M10.1299 2H1.68832C1.24056 2 0 2.00006 0 2.00006C0 2.00006 1.30047e-05 3.22464 1.30047e-05 3.66667V17L5.90911 14.5L11.8182 17V3.66667C11.8182 3.22464 11.8182 2 11.8182 2C11.8182 2 10.5777 2 10.1299 2Z" fill="${backgroundColor}" style="opacity:0.8"/>

@@ -94,13 +94,3 @@ function _translate(options = {}, external) {
 export function translateExternal(options) {
   return _translate(options, true);
 }
-
-/**
- * Translate from internal representation
- * @param {Object} options
- *
- * @returns {Object}
- */
-function translateInternal(options) {
-  return _translate(options, false);
-}

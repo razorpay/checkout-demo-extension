@@ -40,7 +40,7 @@ export function getCustomDisclaimers(): Array<CustomDisclaimersResult> {
  * @description Functions gives us an array of custom feilds configured in options
  * @returns Array
  */
-export function getCustomFields(): Array<{}> {
+export function getCustomFields(): Array<any> {
   return getOption('challan.fields') || [];
 }
 
@@ -58,7 +58,7 @@ export function getCustomExpiry(): number | null {
  * @returns number
  */
 function setPadding(str: string): number {
-  let padding: number = 0;
+  let padding = 0;
   if (str.length <= 110) {
     padding = 4;
   } else if (str.length > 110 && str.length <= 150) {
@@ -77,10 +77,10 @@ function setPadding(str: string): number {
  * @returns {number} timestamp in sec
  */
 export function getTimeStamp(timestamp: number): number {
-  let currentDate: Date = new Date();
-  let minTime: number = currentDate.getTime() + 20 * 60000;
-  let maxTime: number = currentDate.setMonth(currentDate.getMonth() + 6);
-  let time: number = 0;
+  const currentDate: Date = new Date();
+  const minTime: number = currentDate.getTime() + 20 * 60000;
+  const maxTime: number = currentDate.setMonth(currentDate.getMonth() + 6);
+  let time = 0;
   if (timestamp < minTime) {
     time = Math.floor(minTime / 1000);
   } else if (timestamp > maxTime) {

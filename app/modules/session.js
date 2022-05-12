@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-redeclare
+/* global fetch, Promise, _, _Obj */
 import discreet from 'checkoutframe/discreet';
 import { formatAmountWithCurrency } from 'helper/currency';
 
@@ -6,19 +8,16 @@ var ua = navigator.userAgent;
 var preferences,
   $ = discreet.$,
   Razorpay = window.Razorpay,
-  fetch = discreet.fetch,
   WebPaymentsApi = discreet.WebPaymentsApi,
   Constants = discreet.Constants,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
-  Promise = discreet.Promise,
   P13n = discreet.P13n,
   Bridge = discreet.Bridge,
   freqWallets = discreet.Wallet.wallets,
   isMobile = discreet.UserAgent.isMobile,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
-  Constants = discreet.Constants,
   sanitizeTokens = discreet.sanitizeTokens,
   Store = discreet.Store,
   RazorpayHelper = discreet.RazorpayHelper,
@@ -28,8 +27,6 @@ var preferences,
   AnalyticsTypes = discreet.AnalyticsTypes,
   Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
-  _ = discreet._,
-  _Obj = discreet._Obj,
   docUtil = discreet.docUtil,
   _El = discreet._El,
   Hacks = discreet.Hacks,
@@ -68,8 +65,7 @@ var preferences,
   CardViews = discreet.CardViews,
   merchantAnalytics = discreet.merchantAnalytics,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
-  TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore,
-  merchantAnalyticsConstant = discreet.merchantAnalyticsConstant;
+  TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 const ua_iPhone = /iPhone/.test(ua);
@@ -223,10 +219,6 @@ function makeHidden(subject) {
   }
 }
 
-function toggle(subject, showOrHide) {
-  (showOrHide ? makeVisible : makeHidden)(subject);
-}
-
 function showOverlay($with) {
   Backdrop.show();
   if ($with) {
@@ -348,10 +340,6 @@ function errorHandler(response) {
       return;
     }
   }
-
-  // Save payload in a variable, as it's going to get cleared and
-  // we need it for something else.
-  var payload = this.payload;
 
   this.clearRequest();
   updateScore('failedPayment');
@@ -491,7 +479,7 @@ function getEmail() {
   return storeGetter(HomeScreenStore.email);
 }
 
-function elfShowOTP(otp, sender, bank) {
+function elfShowOTP(otp) {
   window.handleOTP(otp);
 }
 
@@ -828,7 +816,6 @@ Session.prototype = {
   },
 
   getEl: function () {
-    var r = this.r;
     if (!this.el) {
       this.setTheme();
       var session = this;
@@ -1062,11 +1049,7 @@ Session.prototype = {
     discreet.Experiments.clearOldExperiments();
   },
 
-  render: function (options) {
-    var that = this;
-
-    options = options || {};
-
+  render: function () {
     if (NativeStore.getUPIIntentApps().filtered.length) {
       /**
        * We need to show "(Recommended)" string alongside the app name
@@ -1416,7 +1399,6 @@ Session.prototype = {
   },
 
   setEmiScreen: function () {
-    var session = this;
     if (!MethodStore.getEMIBanks().BAJAJ) {
       return;
     }
@@ -1524,8 +1506,7 @@ Session.prototype = {
     }
 
     var providerCode = CardlessEmiStore.providerCode;
-    var cardlessEmiProviderObj = CardlessEmi.getProvider(providerCode);
-    var self = this;
+    const self = this;
 
     var incorrectOtp = params.incorrect;
 
@@ -1939,7 +1920,7 @@ Session.prototype = {
       var paymentMethod = this.payload && this.payload.method;
 
       self.confirmClose().then(function (close) {
-        if (paymentMethod == 'netbanking' && close) {
+        if (paymentMethod === 'netbanking' && close) {
           self.r._payment.popup.onClose();
           return;
         }
@@ -2108,7 +2089,7 @@ Session.prototype = {
       this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
     }
-    var payload = this.payload;
+    const payload = this.payload;
     Analytics.track('saved_cards:skip', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2333,7 +2314,7 @@ Session.prototype = {
         this.on(
           'change',
           '#wallets',
-          function (e) {
+          function () {
             if (ua_iPhone) {
               Razorpay.sendMessage({ event: 'blur' });
             }
@@ -2363,14 +2344,9 @@ Session.prototype = {
     }
 
     if (MethodStore.isMethodEnabled('emi')) {
-      this.on(
-        'click',
-        '#form-card',
-        'saved-card-pay-without-emi',
-        function (e) {
-          self.switchTab('card');
-        }
-      );
+      this.on('click', '#form-card', 'saved-card-pay-without-emi', function () {
+        self.switchTab('card');
+      });
     }
 
     var goto_payment = '#error-message .link';
@@ -2483,7 +2459,6 @@ Session.prototype = {
   setFormatting: function () {
     var self = this;
     self.refresh();
-    var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
     delegator.otp = delegator
       .add('number', docUtil.getElementById('otp'))
@@ -3686,7 +3661,7 @@ Session.prototype = {
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
    */
-  proceedAutomaticallyAfterSelectingBank: function (event) {
+  proceedAutomaticallyAfterSelectingBank: function () {
     if (this.checkInvalid()) {
       return;
     }
@@ -3697,7 +3672,7 @@ Session.prototype = {
   checkInvalid: function (parent) {
     if (!parent) {
       parent = this.getActiveForm();
-      var payload = this.payload;
+      const payload = this.payload;
       if (payload && payload.method === 'wallet' && !payload.wallet) {
         return $('#wallets').addClass('invalid');
       } else if (payload && payload.method === 'app') {
@@ -3775,7 +3750,7 @@ Session.prototype = {
       }
 
       // Delete all the auth_type-* keys
-      UTILS.each(data, function (key, val) {
+      UTILS.each(data, function (key) {
         if (key.indexOf('auth_type-') === 0) {
           delete data[key];
         }
@@ -4180,7 +4155,7 @@ Session.prototype = {
       };
 
       if (this.tab === 'cardless_emi' || isCardlessEmi) {
-        var providerCode = CardlessEmiStore.providerCode;
+        const providerCode = CardlessEmiStore.providerCode;
 
         submitPayload = _Obj.extend(submitPayload, {
           provider: providerCode,
@@ -4228,7 +4203,7 @@ Session.prototype = {
       }
 
       if (this.tab === 'paylater') {
-        var providerCode = PayLaterStore.providerCode;
+        const providerCode = PayLaterStore.providerCode;
 
         queryParams = {
           provider: providerCode,
@@ -4310,7 +4285,7 @@ Session.prototype = {
       return;
     }
 
-    _Obj.loop(CardlessEmiStore, function (value, key) {
+    _Obj.loop(CardlessEmiStore, function (value) {
       delete value[provider];
     });
   },
@@ -4510,9 +4485,9 @@ Session.prototype = {
     ) {
       if (screen === 'card') {
         // AVS check
-        var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
-        var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
-        var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+        const isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+        const cardIin = discreet.storeGetter(CardScreenStore.cardIin);
+        const selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
         /**
          * if new card is added then get cardIin
          * else if saved card selected on cards screen then get tokenId
@@ -4786,7 +4761,7 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-    var payload = this.payload;
+    payload = this.payload;
     // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods
     if (
       selectedInstrument &&
@@ -5162,8 +5137,6 @@ Session.prototype = {
         data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
       }
     }
-
-    var session = this;
 
     // For these conditions use google pay card + upi merged flow,
     // so make google pay intent call same as app so that
@@ -5549,7 +5522,7 @@ Session.prototype = {
         if (userEligibleDetails.eligible === undefined) {
           session.showLoadError(I18n.format('card.checking_cred_eligibility'));
           discreet.CRED.checkCREDEligibility(this.payload.contact)
-            .then(function (res) {
+            .then(function () {
               session.hideErrorMessage();
               session.submit();
             })
@@ -5601,7 +5574,6 @@ Session.prototype = {
       }
 
       if (shouldUseNativeOTP) {
-        var session = this;
         var params = {
           extraProps: {
             reason: 'native_otp_enter',
@@ -5812,13 +5784,13 @@ Session.prototype = {
     } else if (data.method === 'upi') {
       sub_link.html(I18n.format('misc.cancel_action'));
 
-      this.r.on('payment.upi.noapp', function (data) {
+      this.r.on('payment.upi.noapp', function () {
         that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
 
         that.body.addClass('upi-noapp');
       });
 
-      this.r.on('payment.upi.selectapp', function (data) {
+      this.r.on('payment.upi.selectapp', function () {
         that.showLoadError(I18n.format('upi.intent_select_app'), false);
       });
 
@@ -5864,9 +5836,7 @@ Session.prototype = {
         sub_link.html(I18n.format('misc.go_to_payment'));
       }
 
-      var locale = I18n.getCurrentLocale();
-
-      this.r.on('payment.app.pending', function (coprotoResponse) {
+      this.r.on('payment.app.pending', function () {
         // Collect flow
         // Message: Please complete the payment on the {app}
         var message = I18n.formatTemplateWithLocale(
@@ -6285,7 +6255,6 @@ Session.prototype = {
       );
     }
 
-    var self = this;
     var customer;
     var saved_customer = preferences.customer;
     if (saved_customer && saved_customer.addresses) {

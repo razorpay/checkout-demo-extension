@@ -158,11 +158,12 @@ export const saveAddress = () => {
       if (
         shipping_address?.formView === addressViews.EDIT_ADDRESS ||
         billing_address?.formView === addressViews.EDIT_ADDRESS
-      )
+      ) {
         return putCustomerAddress(payload).then((res) => {
           updateAddressesInStore(Object.values(res));
           return res;
         });
+      }
       return postCustomerAddress(payload).then((res) => {
         updateAddressesInStore(Object.values(res));
         return res;
@@ -194,7 +195,9 @@ export const saveAddress = () => {
  */
 export const findItem = (array, id) => {
   for (const item of array) {
-    if (item.id === id) return item;
+    if (item.id === id) {
+      return item;
+    }
     if (Array.isArray(item)) {
       const result = findItem(item, id);
       if (result) {

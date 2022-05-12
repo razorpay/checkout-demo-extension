@@ -44,7 +44,9 @@
     "live-start": "API_SERVER=https://api.razorpay.com nodemon server & npm start",
     "start:no-reload": "gulp watch",
     "build": "rollup -c --environment prod && gulp",
-    "lint-fix": "lintFix app/modules",
+    "lint": "eslint app/modules",
+    "lint-fix": "eslint app/modules --fix",
+    "svelte-check": "svelte-check --tsconfig tsconfig.json --threshold error --output human",
     "clean": "./scripts/clean.sh",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
     "jest:custom": "jest blackbox/tests/custom/**/*.test.js",
@@ -64,6 +66,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.14.8",
+    "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@babel/plugin-proposal-pipeline-operator": "^7.14.5",
     "@babel/plugin-transform-modules-commonjs": "^7.14.5",
@@ -85,13 +88,15 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "css-vars-ponyfill": "^2.4.7",
-    "eslint": "^7.32.0",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "^26.1.5",
     "eslint-plugin-svelte3": "^3.2.0",
     "express": "^4.17.1",
     "fast-async": "^7.0.6",
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",
-    "gulp-stylus": "^2.7.0",
+    "gulp-stylus": "^2.7.1",
     "gulp-usemin": "^0.3.29",
     "http-proxy-middleware": "^2.0.1",
     "husky": "^6.0.0",
@@ -126,12 +131,8 @@
     "through2": "^2.0.3",
     "ts-jest": "^27.1.1",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.4",
+    "typescript": "^4.6.4",
     "uglify-js": "^3.13.10"
-  },
-  "bin": {
-    "lintFix": "./cfu/scripts/lintFix.js",
-    "lintOutput": "./cfu/scripts/lintOutput.js"
   },
   "dependencies": {
     "node-sass": "^7.0.1"

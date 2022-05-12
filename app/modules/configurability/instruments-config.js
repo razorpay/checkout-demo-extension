@@ -38,11 +38,11 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
   return payment;
 }
 
-function genericIsValid(instrument) {
+function genericIsValid() {
   return true;
 }
 
-export function genericGroupedToIndividual(grouped, customer) {
+export function genericGroupedToIndividual(grouped) {
   return [grouped];
 }
 

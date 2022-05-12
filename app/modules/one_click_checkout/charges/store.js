@@ -17,7 +17,9 @@ amount.subscribe((amount) => {
   }
 });
 appliedOffer.subscribe((offer) => {
-  if (!isOneClickCheckout()) return;
+  if (!isOneClickCheckout()) {
+    return;
+  }
   let currentAmount = offer ? get(cartAmount) : get(amount);
   if (offer) {
     const shippingCharges = get(shippingCharge) || 0;

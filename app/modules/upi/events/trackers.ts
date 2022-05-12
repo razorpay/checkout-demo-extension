@@ -81,7 +81,7 @@ export const storeActionForTracker = (action: UPI.AppTileAction) => {
 
 export const baseTracker = (
   eventName: string,
-  immediately: boolean = false
+  immediately = false
 ) => {
   Analytics.track(`UPI:${eventName}`, {
     data: upiTrackerPayload,

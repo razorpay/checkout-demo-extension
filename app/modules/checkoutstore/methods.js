@@ -46,7 +46,6 @@ import {
   getOS,
   isMobileByMediaQuery,
   getDevice,
-  isMobile,
   android,
   AndroidWebView,
   iOS,

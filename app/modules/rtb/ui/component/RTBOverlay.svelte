@@ -52,7 +52,7 @@
         <div class="rtb-merchant-certification">
           {$t(RTB_HEADER)}
         </div>
-        <hr align="left" class="rtb-separator" />
+        <hr class="rtb-separator" />
       </div>
     </div>
     <div class="rtb-overlay-header-aside">

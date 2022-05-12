@@ -137,11 +137,11 @@ export function isElementCompletelyVisibleInTab(element: Element) {
  * @return {Integer}
  */
 export function compareSemver(a: string, b: string) {
-  var pa = a.split('.');
-  var pb = b.split('.');
-  for (var i = 0; i < 3; i++) {
-    var na = Number(pa[i]);
-    var nb = Number(pb[i]);
+  const pa = a.split('.');
+  const pb = b.split('.');
+  for (let i = 0; i < 3; i++) {
+    const na = Number(pa[i]);
+    const nb = Number(pb[i]);
     if (na > nb) {
       return 1;
     }
@@ -160,9 +160,9 @@ export function compareSemver(a: string, b: string) {
 
 export function luhnCheck(num: number) {
   let sum = 0;
-  let digits: string[] = String(num).split('').reverse();
+  const digits: string[] = String(num).split('').reverse();
 
-  for (var i = 0; i < digits.length; i++) {
+  for (let i = 0; i < digits.length; i++) {
     let digit: string | number = digits[i];
     digit = parseInt(digit, 10);
     if (i % 2) {
@@ -199,10 +199,10 @@ export function getFormattedDateTime(timestamp: number) {
 export function debounce(cb: (...args: any) => void, delay: number) {
   let timeout: NodeJS.Timeout | number;
   return function (this: any) {
-    const context = this;
+    const self = this;
     const args: any = arguments;
-    clearTimeout(timeout as any);
-    timeout = setTimeout(cb.bind(context, ...args), delay);
+    clearTimeout(timeout as NodeJS.Timeout);
+    timeout = setTimeout(cb.bind(self, ...args), delay);
   };
 }
 
@@ -233,7 +233,7 @@ export function filterTruthyKeys(o: any) {
  * @returns {string} safe html
  */
 export function escapeHtml(str: string) {
-  var escapeDiv = document.createElement('div');
+  const escapeDiv = document.createElement('div');
   escapeDiv.appendChild(document.createTextNode(str));
   return escapeDiv.innerHTML;
 }
@@ -244,7 +244,7 @@ export function each(
   eachFunc: (i: number | string, args: any) => any,
   thisArg?: any
 ) {
-  var i;
+  let i;
   if (arguments.length < 3) {
     thisArg = this;
   }
@@ -259,12 +259,12 @@ export function each(
      */
     if (typeof iteratee.length !== 'undefined') {
       for (i = 0; i < iteratee.length; i++) {
-        eachFunc.call(thisArg, i, (iteratee as anyObject)[i]);
+        eachFunc.call(thisArg, i, iteratee[i]);
       }
     } else {
       for (i in iteratee) {
         if (iteratee.hasOwnProperty(i)) {
-          eachFunc.call(thisArg, i, (iteratee as anyObject)[i]);
+          eachFunc.call(thisArg, i, iteratee[i]);
         }
       }
     }

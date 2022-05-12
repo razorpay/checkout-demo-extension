@@ -1,5 +1,3 @@
-/* global Map */
-
 /**
  * Source: https://github.com/umanghome/fuzzysort
  */
@@ -216,7 +214,7 @@ function fastpriorityqueue() {
         return (r[0] = r[--o]), n(), e;
       }
     }),
-    (e.peek = function (e) {
+    (e.peek = function () {
       if (0 !== o) {
         return r[0];
       }

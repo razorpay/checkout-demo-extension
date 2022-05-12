@@ -1,6 +1,4 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -16,9 +14,8 @@
   export let reasons = [];
 
   export let onBack = null;
-  export let onSubmit = () => {};
+  export let onSubmit;
 
-  const dispatch = createEventDispatcher();
   let selectedReason = null;
 
   const onReasonSelection = (reason) => {
@@ -69,7 +66,9 @@
             selectedReason,
           },
         });
-        onSubmit(selectedReason);
+        if (onSubmit) {
+          onSubmit(selectedReason);
+        }
       }}
     >
       {$t(CANCEL_REASON_SUBMIT_ACTION)}

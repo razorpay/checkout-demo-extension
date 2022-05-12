@@ -41,7 +41,7 @@
   });
 
   function onSubmit() {
-    var invalids = document
+    let invalids = document
       .getElementById('details-container')
       .querySelectorAll('.invalid');
     if (invalids.length) {

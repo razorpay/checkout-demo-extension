@@ -24,8 +24,6 @@ function getPopupDimension(varVal, minVal, maxVal) {
  * The "Popup" constructor.
  */
 
-const screen = global.screen;
-
 export default function Popup(src, name) {
   var width = window.innerWidth || document.documentElement.clientWidth;
   var height = window.innerHeight || document.documentElement.clientHeight;

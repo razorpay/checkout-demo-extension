@@ -16,8 +16,6 @@ import RazorpayStore, {
   isRecurring,
 } from 'razorpay';
 
-import { format } from 'i18n';
-
 import { delayLoginOTPExperiment } from 'card/helper';
 import { timer } from 'utils/timer';
 import { get } from 'svelte/store';

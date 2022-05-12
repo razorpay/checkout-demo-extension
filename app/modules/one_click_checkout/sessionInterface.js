@@ -127,7 +127,9 @@ export function getLandingView() {
  * Handle all the edit contact functionality for 1CC flows
  */
 export function handleEditContact(logoutFlow = false) {
-  if (!isOneClickCheckout()) return;
+  if (!isOneClickCheckout()) {
+    return;
+  }
   Events.TrackBehav(MiscEvents.EDIT_CONTACT_CLICK, {
     screen_name: navigator.currentActiveRoute?.name,
   });
@@ -202,7 +204,9 @@ export function redirectToPaymentMethods(
   if (shouldUpdateOrder) {
     updateOrder(address, billing_address)
       .then(() => {
-        if (address.cod) showCodLoader.set(true);
+        if (address.cod) {
+          showCodLoader.set(true);
+        }
         session.oneClickCheckoutRedirection(showSnackbar);
         navigator.navigateTo({ path: views.METHODS });
 
@@ -232,7 +236,7 @@ export function redirectToPaymentMethods(
             showCodLoader.set(false);
           });
       })
-      .catch((e) => {
+      .catch(() => {
         session.updateOrderFailure();
         const currhis = get(history);
         const savedAddArr = currhis.find(

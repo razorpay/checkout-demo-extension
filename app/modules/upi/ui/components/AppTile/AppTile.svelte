@@ -6,7 +6,7 @@
   // Props
   export let variant: UPI.AppTileVariant = 'square';
   export let app: UPI.AppConfiguration;
-  export let selected: boolean = false;
+  export let selected = false;
 
   export let onClick: (event: MouseEvent) => void;
 

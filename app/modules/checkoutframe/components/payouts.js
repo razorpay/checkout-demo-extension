@@ -13,7 +13,6 @@ import updateScore from 'analytics/checkoutScore';
 import { querySelector } from 'utils/doc';
 
 export default function ({ topbar }) {
-  const session = getSession();
   const contact = getPayoutContact();
   const accounts = (contact && contact.fund_accounts) || [];
   const upiAccounts = accounts.filter((a) => a.account_type === 'vpa');

@@ -61,7 +61,7 @@ export const append = _.curry2(
  */
 export const prependTo = _.curry2(
   element2((childNode: Element, parentNode: Element) => {
-    let firstChild = parentNode.firstElementChild;
+    const firstChild = parentNode.firstElementChild;
     if (firstChild) {
       parentNode.insertBefore(childNode, firstChild);
     } else {
@@ -92,7 +92,7 @@ export const prepend = _.curry2(
  * @returns {Element} childNode
  */
 export const detach = element1((childNode: Element) => {
-  var parentNode = parent(childNode);
+  const parentNode = parent(childNode);
   if (parentNode) {
     parentNode.removeChild(childNode);
   }
@@ -340,8 +340,8 @@ export const bbox = element1((el: Element) => el.getBoundingClientRect());
 export const firstChild = element1((el: Element) => el.firstChild);
 
 /* https://developer.mozilla.org/en/docs/Web/API/Element/matches */
-var elementProto = _.prototypeOf(ElementConstructor);
-var matchesSelector =
+const elementProto = _.prototypeOf(ElementConstructor);
+const matchesSelector =
   elementProto.matches ||
   elementProto.matchesSelector ||
   elementProto.webkitMatchesSelector ||
@@ -375,10 +375,10 @@ export const on = (
     );
   }
   return (el: Element) => {
-    var attachedCallback = callback;
+    let attachedCallback = callback;
     if (_.isString(delegate)) {
       attachedCallback = function (e: any) {
-        var target = e.target;
+        let target = e.target;
         while (!matches(target, delegate) && target !== el) {
           target = parent(target);
         }

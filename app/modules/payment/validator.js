@@ -22,7 +22,7 @@ export const formatPayment = function (payment) {
 
 function validateData(data) {
   const cardHolderName = data?.['card[name]'];
-  if (Number(cardHolderName) === 0) return; // if name input is only zero prevent throw error
+  if (Number(cardHolderName) === 0) {return;} // if name input is only zero prevent throw error
   if (cardHolderName && luhnCheck(cardHolderName)) {
     _.throwMessage(
       'Error in integration. Card holder name is not valid, Please contact Razorpay for assistance'
