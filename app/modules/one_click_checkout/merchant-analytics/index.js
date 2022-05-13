@@ -44,6 +44,7 @@ export function merchantFBStandardAnalytics(data) {
     data.params = getCartInfo();
     global.Razorpay.sendMessage({
       event: 'fbaevent',
+      eventType: 'track',
       data,
     });
   }

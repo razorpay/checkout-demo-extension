@@ -443,13 +443,13 @@ CheckoutFrame.prototype = {
     }
   },
   onfbaevent: function (data) {
-    const { event, category, params = {} } = data;
+    const { eventType = 'trackCustom', event, category, params = {} } = data;
     if (window?.fbq && typeof window.fbq === 'function') {
       this.rzp.set('enable_fb_analytics', true);
       if (category) {
         params.page = category;
       }
-      window.fbq('track', event, params);
+      window.fbq(eventType, event, params);
     }
   },
 
