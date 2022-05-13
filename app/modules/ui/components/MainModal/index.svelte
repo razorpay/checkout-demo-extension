@@ -96,7 +96,6 @@
     <div id="modal-inner">
       <div id="overlay" />
       <div id="confirmation-dialog" class="showable" />
-      <div id="recurring-cards-wrap" class="overlay showable mfix" />
       <div id="one-cc-account" />
       <div id="one-cc-rtb" />
       <div id="options-wrap" />

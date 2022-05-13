@@ -1,11 +1,16 @@
 import { render, within, fireEvent } from '@testing-library/svelte';
 import RecurringCardsOverlay from '../RecurringCardsOverlay.svelte';
+import { popStack } from 'navstack';
+
+jest.mock('navstack', () => {
+  return {
+    popStack: jest.fn(),
+  };
+});
 
 describe('RecurringCardsOverlay.svelte', () => {
-  function setup(close = () => {}) {
-    return render(RecurringCardsOverlay, {
-      props: { close },
-    });
+  function setup() {
+    return render(RecurringCardsOverlay);
   }
 
   describe('Labels', () => {
@@ -100,15 +105,14 @@ describe('RecurringCardsOverlay.svelte', () => {
 
   describe('close overlay', () => {
     it('should close overlay on click of close icon', () => {
-      const closeFn = jest.fn();
-      const { getByText } = setup(closeFn);
+      const { getByText } = setup();
 
-      expect(closeFn).toHaveBeenCalledTimes(0);
+      expect(popStack).toHaveBeenCalledTimes(0);
 
       const closeEl = getByText('✕');
       fireEvent.click(closeEl);
 
-      expect(closeFn).toHaveBeenCalledTimes(1);
+      expect(popStack).toHaveBeenCalledTimes(1);
     });
   });
 });

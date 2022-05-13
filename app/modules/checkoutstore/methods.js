@@ -48,7 +48,6 @@ import {
   getDevice,
   android,
   AndroidWebView,
-  iOS,
 } from 'common/useragent';
 
 import {

@@ -15,8 +15,7 @@
     SUPER_CARD,
     SUPPORTED_CARDS,
   } from 'ui/labels/recurring-callout-overlay';
-
-  export let close;
+  import { popStack } from 'navstack';
 
   /**
    * wrapping under new Map(), will remove duplicates
@@ -133,23 +132,23 @@
       </div>
     {/each}
   </div>
-  <div class="close recurring-cards-close-icon" on:click={close}>✕</div>
+  <div class="close recurring-cards-close-icon" on:click={popStack}>✕</div>
 </section>
 
 <style>
   .networks-list-container {
-    overflow: scroll;
+    overflow: auto;
     max-height: 400px;
   }
   .recurring-card-overlay-inner {
     border-radius: 3px;
-    display: inline-block;
-    background: #fff;
-    width: 100%;
-    position: relative;
+    width: 440px !important;
+    bottom: auto !important;
     text-align: left;
     top: 50%;
-    transform: translateY(-50%);
+    max-width: 92vw;
+    transform: translateX(-50%) translateY(-50%);
+    left: 50%;
   }
 
   .recurring-networks {
@@ -166,6 +165,7 @@
     white-space: pre-wrap;
   }
   .recurring-cards-title {
+    border-radius: 3px 3px 0 0;
     line-height: 32px;
     font-size: 14px;
     padding: 16px 26px;

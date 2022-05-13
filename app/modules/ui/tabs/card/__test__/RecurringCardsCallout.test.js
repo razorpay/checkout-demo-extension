@@ -1,23 +1,11 @@
 import { fireEvent, render } from '@testing-library/svelte';
 import RecurringCardsCallout from '../RecurringCardsCallout.svelte';
 import RecurringCardsOverlay from '../RecurringCardsOverlay.svelte';
+import { pushOverlay } from 'navstack';
 
-const mockSession = {
-  showOverlay: jest.fn(),
-};
-jest.mock('sessionmanager', () => ({
-  getSession: () => mockSession,
-}));
-
-/**
- * Mocking RecurringCardsOverlay Component
- */
-jest.mock('../RecurringCardsOverlay.svelte', () => {
+jest.mock('navstack', () => {
   return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(function () {
-      this.$destroy = jest.fn();
-    }),
+    pushOverlay: jest.fn(),
   };
 });
 
@@ -41,28 +29,10 @@ describe('RecurringCardsCallout.svelte', () => {
       const viewSupportedLink = getByText('View supported cards');
       fireEvent.click(viewSupportedLink);
 
-      expect(mockSession.showOverlay).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('Recurring cards overlay', () => {
-    it('should initialize overlay component on mount of callout component', () => {
-      expect(RecurringCardsOverlay).toHaveBeenCalledTimes(0);
-
-      render(RecurringCardsCallout);
-
-      expect(RecurringCardsOverlay).toHaveBeenCalledTimes(1);
-    });
-
-    it('should destroy overlay component on unmount of callout component', () => {
-      const { unmount } = render(RecurringCardsCallout);
-      let mockOverlayDestroy = RecurringCardsOverlay.mock.instances[0].$destroy;
-
-      expect(mockOverlayDestroy).toHaveBeenCalledTimes(0);
-
-      unmount();
-
-      expect(mockOverlayDestroy).toHaveBeenCalledTimes(1);
+      expect(pushOverlay).toHaveBeenCalledTimes(1);
+      expect(pushOverlay).toHaveBeenCalledWith({
+        component: RecurringCardsOverlay,
+      });
     });
   });
 });

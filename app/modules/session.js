@@ -233,15 +233,6 @@ function hideOverlay($with) {
   }
 }
 
-function hideRecurringCardsOverlay() {
-  var recurringCardsWrap = $('#recurring-cards-wrap');
-  var wasShown = recurringCardsWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(recurringCardsWrap);
-  }
-  return wasShown;
-}
-
 function hideDowntimeAlert() {
   var downtimeWrap = $('#downtime-wrap');
   if (!downtimeWrap || !downtimeWrap[0]) {
@@ -259,11 +250,7 @@ function hideOverlayMessage() {
   var session = this;
   session.preventErrorDismissal = false;
 
-  if (
-    !hideRecurringCardsOverlay() &&
-    !hideDowntimeAlert() &&
-    !session.hideSvelteOverlay()
-  ) {
+  if (!hideDowntimeAlert() && !session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
@@ -6345,7 +6332,6 @@ Session.prototype = {
 
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,
-  hideRecurringCardsOverlay: hideRecurringCardsOverlay,
   showOverlay: showOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
