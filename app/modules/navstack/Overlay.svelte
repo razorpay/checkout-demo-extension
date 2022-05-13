@@ -5,20 +5,16 @@
 
   export let backPressed: () => void;
   const long = isCtaShown();
-  let respondOutsideClick = false;
 
   function moveToPortal(node: HTMLDivElement) {
     const overlayParent = document.querySelector('#overlay') as HTMLDivElement;
     const backHandling = !overlayParent.children.length;
+
     // add back handler only once
     if (backHandling) {
-      window.addEventListener('click', hide);
-
-      // wait a bit before responding to outside clicks
-      // avoids closing overlay in same click which opened it due to bubbling
-      setTimeout(() => {
-        respondOutsideClick = true;
-      });
+      // it is sufficient to keep click listener on #overlay,
+      // since backdrop in MainModal will handle click outside overlayParent
+      overlayParent.addEventListener('click', hide);
     }
 
     overlayParent.appendChild(node);
@@ -26,21 +22,19 @@
     return {
       destroy() {
         if (backHandling) {
-          window.removeEventListener('click', hide);
+          overlayParent.removeEventListener('click', hide);
         }
         _El.detach(node);
       },
     };
   }
 
+  // if clicked element is outside overlay children, try to go back
   function hide(event: MouseEvent) {
-    // if clicked element is outside overlay children, try to go back
-    // using .matches instead of .closest to support IE11
-    if (
-      respondOutsideClick &&
-      !(event.target as HTMLElement)?.matches('#overlay > div *') &&
-      backPressed
-    ) {
+    // if #overlay > div was the target, i.e. e.target.parent is #overlay
+    const outsideClick = event.target.parentNode === event.currentTarget;
+
+    if (outsideClick && backPressed) {
       backPressed();
     }
   }
