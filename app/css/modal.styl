@@ -811,7 +811,7 @@ i {
   border-radius: $br $br 0 0;
   color: #fff;
   background: #fff;
-  padding: $p;
+  padding: $p $p 8px;
   overflow: visible;
   max-height: $headerh;
   position: relative;
@@ -836,10 +836,6 @@ i {
   &::after {
     transition: 0.2s;
     background: none;
-  }
-
-  &.has-dropdown {
-    padding-bottom: 0;
   }
 
   &.offer-fade {
@@ -893,7 +889,7 @@ i {
   border-radius: $br;
   line-height: 38px;
   float: left;
-  margin-right: 14px;
+  margin: 0 14px 16px 0;
   box-shadow: $bs;
 
   img {
@@ -907,6 +903,7 @@ i {
   white-space: nowrap;
   position: relative;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  margin-bottom: 10px;
 }
 
 #merchant-name {
@@ -1011,11 +1008,6 @@ i {
       background: transparent;
     }
   }
-}
-
-#language-dropdown:not(:empty) {
-  padding-top: 16px;
-  clear: both;
 }
 
 #body.sub {
@@ -1561,21 +1553,6 @@ div.callout span{
   margin-bottom: 5px;
 }
 
-#body-overlay {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.1);
-  z-index: 3;
-}
-
-#body-overlay.shown {
-  display: block;
-}
-
 #recurring-cards-wrap {
   position: absolute;
   top: 0;
@@ -1608,17 +1585,6 @@ div.callout span{
       transform: none;
     }
   }
-}
-
-#secure-card-know-more-wrap {
-  white-space: initial;
-  z-index: 100;
-  width: 100%;
-  position: absolute;
-  top: initial;
-  left: 0;
-  bottom: -55px;
-  transform: translateY(18px);
 }
 
 .hide-topbar {

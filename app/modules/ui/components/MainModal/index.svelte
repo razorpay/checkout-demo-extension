@@ -16,6 +16,8 @@
   import { isOverlayActive } from 'navstack';
   import { getView } from 'checkoutframe/components';
 
+  import LanguageSelector from './LanguageSelector.svelte';
+
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
   const noanim = disableAnimation();
@@ -145,7 +147,7 @@
               </div>
             {/if}
           </div>
-          <div id="language-dropdown" />
+          <LanguageSelector />
         </div>
         {#if isIRCTC()}
           <div
@@ -168,8 +170,6 @@
           >
             <div id="root" />
             <div id="form-fields">
-              <div id="body-overlay" />
-
               {#if isMethodEnabled('emi') && emiBanks.BAJAJ}
                 <div class="tab-content showable screen" id="form-emi" />
               {/if}

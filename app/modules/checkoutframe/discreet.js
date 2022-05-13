@@ -17,7 +17,6 @@ import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svel
 import OffersView from 'ui/components/offers/index.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
-import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as I18n from 'i18n';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
@@ -209,7 +208,6 @@ export default {
   OffersView,
 
   otpView,
-  languageSelectionView,
   UpiCancelReasonPicker,
   CancelReasonPicker,
   NetbankingCancelReasonPicker,

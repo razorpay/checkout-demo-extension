@@ -1,108 +1,33 @@
 <script>
-  import { locale, locales, isLoading } from 'svelte-i18n';
+  import { locale, locales } from 'svelte-i18n';
   import { getLocaleName } from 'i18n/init';
-  import { onMount, onDestroy } from 'svelte';
-  import { shouldUseVernacular } from 'checkoutstore/methods';
-  import * as _El from 'utils/DOM';
-  import { querySelector } from 'utils/doc';
+  import { popStack } from 'navstack';
 
-  const overlayEl = querySelector('#body-overlay');
-
-  const shouldShowDropdown = shouldUseVernacular();
-
-  function handleOutsideClick() {
-    if (dropdownShown) {
-      dropdownShown = false;
-    }
-  }
-
-  $: {
-    if (dropdownShown) {
-      document.body.addEventListener('click', handleOutsideClick);
-    } else {
-      document.body.removeEventListener('click', handleOutsideClick);
-    }
-  }
-
-  $: {
-    _El.keepClass(overlayEl, 'shown', dropdownShown);
-  }
-
-  let dropdownShown = false;
-
-  function toggleDropdown() {
-    dropdownShown = !dropdownShown;
-  }
+  export let top;
 
   function select(code) {
     $locale = code;
-    dropdownShown = false;
+    popStack();
   }
-
-  const header = querySelector('#header');
-
-  // Since it occupies the bottom of header, we need to remove header's padding
-  onMount(() => {
-    if (shouldShowDropdown) {
-      _El.addClass(header, 'has-dropdown');
-    }
-  });
-
-  onDestroy(() => {
-    _El.removeClass(header, 'has-dropdown');
-  });
 </script>
 
-{#if shouldShowDropdown}
-  <div class="outer">
-    <div class="selected" on:click|stopPropagation={toggleDropdown}>
-      {getLocaleName($locale)}
-    </div>
-    {#if dropdownShown}
-      <ul class="dropdown-options">
-        {#each $locales as locale}
-          <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
-        {/each}
-      </ul>
-    {/if}
-  </div>
-{/if}
+<ul class="dropdown-options" style={`top: ${top}px`}>
+  {#each $locales as locale}
+    <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
+  {/each}
+</ul>
 
 <style>
-  .outer {
-    margin: 0 -24px;
-    padding: 6px 24px;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.1);
-    clear: both;
-  }
-
-  .selected {
-    position: relative;
-    width: 56px;
-    padding-right: 14px;
-    cursor: pointer;
-  }
-
-  .selected::after {
-    content: '';
-    font-size: 16px;
-    line-height: 16px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-  }
-
   .dropdown-options {
-    position: absolute;
-    width: 128px;
-    background-color: #fff;
+    width: 128px !important;
+    bottom: auto !important;
     color: #000;
     border-radius: 2px;
     border: 1px solid #ddd;
     padding-left: 0;
-    left: 14px;
+    left: 8px;
+    margin-top: 36px;
+    text-align: left;
   }
 
   li {

@@ -1233,7 +1233,6 @@ Session.prototype = {
     this.setOtpScreen();
     this.setNach();
     this.setOffers();
-    this.setLanguageDropdown();
     this.setSvelteOverlay();
     this.setFeeLabel();
     // make bottom the last element
@@ -5966,7 +5965,6 @@ Session.prototype = {
       'otpView',
       'payLaterView',
       'savedCardsView',
-      'languageSelectionView',
       'svelteOverlay',
       'upiCancelReasonPicker',
       'nbCancelReasonPicker',
@@ -6144,13 +6142,6 @@ Session.prototype = {
         },
       });
     }
-  },
-
-  setLanguageDropdown: function () {
-    var target = docUtil.querySelector('#language-dropdown');
-    this.languageSelectionView = new discreet.languageSelectionView({
-      target: target,
-    });
   },
 
   /**
