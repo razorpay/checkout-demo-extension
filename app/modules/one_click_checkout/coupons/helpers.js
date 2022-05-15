@@ -139,7 +139,6 @@ export function applyCouponCode(code) {
 }
 
 export function successHandler() {
-  fetchCoupons();
   applyCouponCode();
   navigator.replace(views.COUPONS);
 }

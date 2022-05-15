@@ -1,26 +1,34 @@
-const { preferencesParams } = require('./preferences');
+const { makeJSONResponse } = require('../util');
 
-async function sendRewards({ expectRequest, respondJSON, options, rewards }) {
-  await expectRequest(({ URL, params }) => {
-    expect(URL.pathname).toEqual('/v1/rewards');
-
-    if (options.key) {
-      expect(options.key).toEqual(params.key_id);
-    } else {
-      expect(params).not.toHaveProperty('key_id');
-    }
-
-    preferencesParams.forEach((param) => {
-      if (options[param]) {
-        expect(options[param]).toEqual(params[param]);
-      } else {
-        expect(params).not.toHaveProperty(param);
-      }
-    });
-  });
-  await respondJSON(makeRewards());
+async function sendRewardsOneCC(context) {
+  const { getRequest, resetRequest } = context;
+  const request = getRequest(`/v1/checkout/rewards`);
+  if (!request) {
+    sendRewards(context);
+    return;
+  }
+  await request.respond(makeJSONResponse(makeRewards()));
+  resetRequest(request);
 }
 
+async function sendRewards({
+  getRequest,
+  expectRequest,
+  respondJSON,
+  options,
+  rewards,
+}) {
+  await getRequest(`/v1/checkout/rewards`);
+  const request = await expectRequest();
+  expect(request.url).toContain('/checkout/rewards');
+  if (options.key) {
+    expect(options.key).toEqual(request.params.key_id);
+  } else {
+    expect(request.params).not.toHaveProperty('key_id');
+  }
+
+  await respondJSON(makeRewards());
+}
 function makeRewards(rewards) {
   return [];
 }
@@ -28,4 +36,5 @@ function makeRewards(rewards) {
 module.exports = {
   sendRewards,
   makeRewards,
+  sendRewardsOneCC,
 };

@@ -79,6 +79,7 @@
   import { isUnscrollable } from 'one_click_checkout/helper';
   import { isRTBEnabled } from 'rtb/helper';
   import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
+  import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -128,6 +129,7 @@
       },
     });
 
+    updateOrderWithCustomerDetails();
     if (!isUserLoggedIn() && $isIndianCustomer) {
       navigator.navigateTo({ path: views.SAVED_ADDRESSES });
     } else if (!$savedAddresses.length) {
@@ -180,6 +182,7 @@
   onMount(() => {
     setScrollable();
     toggleHeader(true);
+    updateOrderWithCustomerDetails();
     if ($savedAddresses?.length) {
       removeTabInBreadcrumbs(ADDRESS_LABEL);
     }

@@ -1,5 +1,10 @@
 const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
-const { delay, assertVisible, setState } = require('../../util');
+const {
+  delay,
+  assertVisible,
+  setState,
+  makeJSONResponse,
+} = require('../../util');
 const { passRequestNetbanking } = require('../common');
 const { fillUserDetails } = require('../home-page-actions');
 const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
@@ -49,14 +54,26 @@ function getVerifyOTPResponse(inValidOTP, addresses = []) {
 }
 
 async function handleCustomerStatusReq(context, saved_address = false) {
-  await context.getRequest('customers/status');
-  const req = await context.expectRequest();
-  expect(req.method).toBe('GET');
-  expect(req.url).toContain('customers/status');
-  await context.respondJSON({
-    saved: saved_address,
-    saved_address,
-  });
+  let req = context.getRequest(
+    `/v1/customers/status/+91${context.state.contact}`
+  );
+  if (!req) {
+    const req = await context.expectRequest();
+    expect(req.url).toContain('customers/status');
+    expect(req.method).toBe('GET');
+    await context.respondJSON({
+      saved: saved_address,
+      saved_address,
+    });
+    return;
+  }
+  req.respond(
+    makeJSONResponse({
+      saved: saved_address,
+      saved_address,
+    })
+  );
+  context.resetRequest(req);
 }
 
 async function handleUpdateOrderReq(context, orderId) {
@@ -69,13 +86,13 @@ async function handleUpdateOrderReq(context, orderId) {
 
 async function handleCreateOTPReq(context) {
   const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/create');
+  expect(req.method).toBe('POST');
   await context.respondJSON({ success: false });
 }
 
 async function handleVerifyOTPReq(context, inValidOTP = false, options = {}) {
-  await context.getRequest('otp/verify');
+  await context.getRequest('/v1/otp/verify');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/verify');
@@ -87,8 +104,8 @@ async function handleVerifyOTPReq(context, inValidOTP = false, options = {}) {
 async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
   await context.getRequest(`/v1/1cc/check_cod_eligibility`);
   const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
   expect(req.url).toContain('1cc/check_cod_eligibility');
+  expect(req.method).toBe('POST');
   await context.respondJSON({ cod: isThirdWatchEligible });
   await delay(200);
 }
@@ -257,19 +274,30 @@ async function goBack(context) {
 }
 
 async function handleLogoutReq(context, logoutAll) {
-  const req = await context.expectRequest();
-  expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
-  expect(req.method).toBe('DELETE');
-  expect(req.url).toContain('apps/logout');
-  await context.respondJSON([]);
+  let req = context.getRequest('/v1/apps/logout');
+  if (!req) {
+    req = await context.expectRequest();
+    expect(req.url).toContain('apps/logout');
+    expect(req.method).toBe('DELETE');
+    expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
+    await context.respondJSON([]);
+    return;
+  }
+  req.respond(makeJSONResponse([]));
+  context.resetRequest(req);
 }
 
 async function handleResetReq(context, orderId) {
-  await context.getRequest(`/v1/orders/1cc/${orderId}/reset`);
-  const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
-  expect(req.url).toContain('orders/1cc');
-  await context.respondJSON([]);
+  let req = context.getRequest(`/v1/orders/1cc/${orderId}/reset`);
+  if (!req) {
+    const req = await context.expectRequest();
+    expect(req.url).toContain(`v1/orders/1cc/${orderId}/reset`);
+    expect(req.method).toBe('POST');
+    await context.respondJSON([]);
+    return;
+  }
+  req.respond(makeJSONResponse([]));
+  context.resetRequest(req);
 }
 
 async function login(context, options = {}) {
@@ -335,10 +363,7 @@ function getShippingInfoResponse({
   return resp;
 }
 async function handleShippingInfo(context, options = {}) {
-  await context.getRequest(`/v1/merchant/shipping_info`);
-  const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
-  expect(req.url).toContain('merchant/shipping_info');
+  let req = context.getRequest(`/v1/merchant/shipping_info`);
   const resp = getShippingInfoResponse(options);
   const { shipping_fee, cod_fee } = resp.addresses[0];
   const state = {
@@ -348,7 +373,15 @@ async function handleShippingInfo(context, options = {}) {
     state.codFee = cod_fee;
   }
   setState(context, state);
-  await context.respondJSON(resp);
+  if (!req) {
+    const req = await context.expectRequest();
+    expect(req.method).toBe('POST');
+    expect(req.url).toContain('merchant/shipping_info');
+    await context.respondJSON(resp);
+    return;
+  }
+  req.respond(makeJSONResponse(resp));
+  context.resetRequest(req);
 }
 
 module.exports = {

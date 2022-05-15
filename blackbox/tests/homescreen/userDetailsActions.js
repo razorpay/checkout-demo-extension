@@ -14,6 +14,9 @@ const { receiveApiInstruments } = require('./personalization-actions');
 const {
   waitForSkeletonInstrumentsToResolve,
 } = require('./checkout-config/config-utils');
+const {
+  handlePartialOrderUpdate,
+} = require('../../actions/one-click-checkout/order');
 
 /**
  * Asserts that the user details in the strip
@@ -100,10 +103,20 @@ async function fillUserDetails(context, number) {
     }
 
     await context.page.type('#contact', contactToType);
+
+    if (context.options.one_click_checkout) {
+      await context.page.focus('#email');
+      await handlePartialOrderUpdate(context);
+    }
   }
 
   if (!context.prefilledEmail && !context.isEmailOptional && !readonlyEmail) {
     await context.page.type('#email', email);
+
+    if (context.options.one_click_checkout) {
+      await context.page.focus('#contact');
+      await handlePartialOrderUpdate(context);
+    }
   }
 
   const state = {
@@ -139,13 +152,13 @@ async function assertBasicDetailsScreen(context) {
       contact = contact.replace('+91', '');
     }
 
-    expect(await $countryCode.evaluate(el => el.value)).toEqual(countryCode);
-    expect(await $contact.evaluate(el => el.value)).toEqual(contact);
+    expect(await $countryCode.evaluate((el) => el.value)).toEqual(countryCode);
+    expect(await $contact.evaluate((el) => el.value)).toEqual(contact);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
     const $email = await context.page.$('#email');
 
-    expect(await $email.evaluate(el => el.value)).toEqual(
+    expect(await $email.evaluate((el) => el.value)).toEqual(
       context.prefilledEmail
     );
   }

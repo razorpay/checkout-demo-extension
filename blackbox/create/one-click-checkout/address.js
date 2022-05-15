@@ -93,6 +93,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
+      await delay(500);
       await handleAvailableCouponReq(context);
 
       // loggedIn address flows

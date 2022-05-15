@@ -1,5 +1,6 @@
-const { delay, assertVisible } = require('../../util');
+const { delay, assertVisible, makeJSONResponse } = require('../../util');
 const { getDataAttrSelector, formatTextToNumber } = require('./common');
+const { handlePartialOrderUpdate } = require('./order');
 
 function getCouponResponse(isValidCoupon, discountAmount, personalised) {
   if (personalised) {
@@ -54,14 +55,22 @@ async function handleApplyCouponReq(
   discountAmount,
   personalised
 ) {
-  const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
-  expect(req.url).toContain('coupon/apply');
+  let req = context.getRequest('/v1/merchant/coupon/apply');
   const status = isValidCoupon ? 200 : 400;
-  await context.respondJSON(
-    getCouponResponse(isValidCoupon, discountAmount, personalised),
-    status
+  const responseBody = getCouponResponse(
+    isValidCoupon,
+    discountAmount,
+    personalised
   );
+  if (!req) {
+    req = await context.expectRequest();
+    expect(req.method).toBe('POST');
+    expect(req.url).toContain('coupon/apply');
+    await context.respondJSON(responseBody, status);
+    return;
+  }
+  req.respond(makeJSONResponse(responseBody, status));
+  context.resetRequest(req);
 }
 
 async function getOrderSummary(context, isValidCoupon) {
@@ -130,14 +139,20 @@ async function verifyInValidCoupon(context, amount) {
 }
 
 async function handleAvailableCouponReq(context, availableCoupons = []) {
-  const req = await context.expectRequest();
-  expect(req.method).toBe('POST');
-  expect(req.url).toContain('merchant/coupons');
-  await context.respondJSON({ promotions: availableCoupons });
+  let req = context.getRequest('/v1/merchant/coupons');
+  if (!req) {
+    req = await context.expectRequest();
+    expect(req.url).toContain('merchant/coupons');
+    expect(req.method).toBe('POST');
+    await context.respondJSON({ promotions: availableCoupons });
+    return;
+  }
+  req.respond(makeJSONResponse({ promotions: availableCoupons }));
+  context.resetRequest(req);
 }
 
 async function handleRemoveCouponReq(context) {
-  await context.getRequest('coupon/remove');
+  await context.getRequest('/v1/coupon/remove');
   const req = await context.expectRequest();
   expect(req.method).toBe('POST');
   expect(req.url).toContain('coupon/remove');
@@ -161,7 +176,11 @@ async function handleRemoveCoupon(context, amount) {
 async function handleFillUserDetails(context, contact, email) {
   await context.page.waitForSelector('.details-container');
   await context.page.type('#overlay-wrap #contact', contact);
+  await context.page.focus('#overlay-wrap #email');
+  await handlePartialOrderUpdate(context);
   await context.page.type('#overlay-wrap #email', email);
+  await context.page.focus('#overlay-wrap #contact');
+  await handlePartialOrderUpdate(context);
   await context.page.click('.button.details-verify-button');
 }
 

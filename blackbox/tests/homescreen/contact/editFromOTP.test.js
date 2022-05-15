@@ -7,5 +7,4 @@ const createContactTest = require('../../../create/one-click-checkout/contact');
 createContactTest({
   amount: 200 * 100,
   editFromOTP: true,
-  skip: true,
 });

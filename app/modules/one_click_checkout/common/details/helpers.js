@@ -22,6 +22,7 @@ import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { otpReasons } from 'one_click_checkout/otp/constants';
 import { toggleHeader } from 'one_click_checkout/header/helper';
+import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -59,6 +60,7 @@ export const handleDetailsNext = (prevContact) => {
     if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email))) {
       return;
     }
+    updateOrderWithCustomerDetails();
     let view = views.COUPONS;
     if (isLoginMandatory()) {
       if (!isUserLoggedIn()) {

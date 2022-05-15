@@ -5,7 +5,6 @@ const createContactTest = require('../../../create/one-click-checkout/contact');
  * open account tab; edit contact details and proceed to payment
  * */
 createContactTest({
-  skip: true,
   amount: 200 * 100,
   editFromAccount: true,
 });

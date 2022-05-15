@@ -5,6 +5,8 @@ import { timer } from 'utils/timer';
 import { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 
+let cache = {};
+
 /**
  * method to fetch coupons for merchant from backend
  * @returns {Array} a list of coupons for the specific merchant.
@@ -14,10 +16,18 @@ export function getCoupons() {
   Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
 
   return new Promise((resolve, reject) => {
+    const payload = getContactPayload();
+
+    const cacheKey = payload.contact || 'default';
+    if (cache[cacheKey]) {
+      resolve(cache[cacheKey]);
+      return;
+    }
+
     fetch.post({
       url: makeAuthUrl('merchant/coupons'),
       data: {
-        ...getContactPayload(),
+        ...payload,
         order_id: getOrderId(),
       },
       callback: (response) => {
@@ -25,7 +35,8 @@ export function getCoupons() {
           time: getDuration(),
         });
         if (Array.isArray(response.promotions)) {
-          resolve(response.promotions);
+          cache[cacheKey] = response.promotions;
+          resolve(cache[cacheKey]);
         } else {
           reject(response);
         }

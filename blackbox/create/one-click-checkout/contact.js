@@ -11,7 +11,6 @@ const {
 const {
   handleAvailableCouponReq,
 } = require('../../actions/one-click-checkout/coupons.js');
-const { fillUserDetails } = require('../../actions/home-page-actions.js');
 const { delay, randomContact } = require('../../util.js');
 const {
   proceedOneCC,
@@ -33,6 +32,9 @@ const {
   openAccounTab,
   openContactFromAccountTab,
 } = require('../../actions/one-click-checkout/account-tab.js');
+const {
+  fillUserDetails,
+} = require('../../tests/homescreen/userDetailsActions.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -69,22 +71,19 @@ module.exports = function (testFeatures) {
 
       if (editFromHome) {
         await goBack(context);
-        await handleAvailableCouponReq(context);
         await editContactFromHome(context);
       } else if (editFromOTP) {
         await editContactFromOTP(context);
       } else if (editFromAccount) {
         await handleTypeOTP(context);
-        await delay(200);
         await proceedOneCC(context);
         await handleVerifyOTPReq(context);
         await handleShippingInfo(context);
 
-        await handleAvailableCouponReq(context);
         await scrollToEnd(context, '.screen-comp');
-        await delay(800);
+        await delay(1000);
         await scrollToEnd(context, '.screen-comp');
-        await delay(200);
+        await delay(1000);
         await openAccounTab(context);
         await openContactFromAccountTab(context);
       }
@@ -92,15 +91,16 @@ module.exports = function (testFeatures) {
       await resetContactDetails(context);
       await fillUserDetails(context, randomContact());
       await proceedOneCC(context);
-      await handleResetReq(context);
+      await delay(400);
 
+      handleResetReq(context, options.order_id);
       if (editFromAccount) {
-        await handleLogoutReq(context);
+        handleLogoutReq(context);
       }
+      handleCustomerStatusReq(context);
+      handleAvailableCouponReq(context);
 
-      await handleCustomerStatusReq(context);
-      await handleAvailableCouponReq(context);
-
+      await delay(400);
       await proceedOneCC(context);
       await handleCustomerStatusReq(context);
       await fillUserAddress(context, {

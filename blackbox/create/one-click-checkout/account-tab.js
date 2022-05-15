@@ -25,7 +25,7 @@ module.exports = function (testFeatures) {
     testFeatures
   );
 
-  const { logout, logoutAll } = features;
+  const { logout, logoutAll, skip } = features;
 
   describe.each(
     getTestData(title, {
@@ -36,6 +36,11 @@ module.exports = function (testFeatures) {
   )(
     'One Click Checkout Account tab test',
     ({ preferences, title, options }) => {
+      if (skip) {
+        test.skip(title, () => {});
+        return;
+      }
+
       test(title, async () => {
         const context = await openCheckoutWithNewHomeScreen({
           page,

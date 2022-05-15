@@ -218,6 +218,13 @@ module.exports = {
   randomBool: () => randomItem([true, false]),
   randomItem,
 
+  makeJSONResponse(body, status = 200) {
+    return {
+      contentType: 'application/json',
+      body: JSON.stringify(body),
+      status,
+    };
+  },
   /**
    * @param  {Page} puppeteer page to intercept requests on
    * @param  {RegExp} optional url pattern to match interceptor against
@@ -243,6 +250,11 @@ module.exports = {
         allRequests = {};
         reset();
       },
+      resetRequest: (request) => {
+        const path = getRequestPath(request);
+        delete allRequests[path];
+        currentRequest = resolver = null;
+      },
     };
 
     function getRequestPath(request) {
@@ -265,7 +277,8 @@ module.exports = {
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes('html2pdf.bundle.js') ||
         url.includes('locations/autosuggest') ||
-        url.includes('fonts.googleapis.com');
+        url.includes('fonts.googleapis.com') ||
+        url.includes('i.imgur.com');
       if (ignoredUrl || (pattern && !pattern.test(url))) {
         return true;
       }

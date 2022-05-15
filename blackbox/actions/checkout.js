@@ -1,14 +1,16 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
-const devices = require('puppeteer/DeviceDescriptors');
 const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
-const { interceptor } = require('../util');
+const { interceptor, delay } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml, getMockResponse } = require('./callback');
 const { sendPreferences, makePreferencesLogged } = require('./preferences');
-const { sendRewards } = require('./rewards');
+const { sendRewards, sendRewardsOneCC } = require('./rewards');
 const { sendSiftJS } = require('./siftjs');
 const { setExperiments } = require('./experiments');
+const { handleResetReq } = require('./one-click-checkout/common');
+const { handlePartialOrderUpdate } = require('./one-click-checkout/order');
+const puppeteer = require('puppeteer');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const automaticCheckoutPublic =
@@ -210,7 +212,7 @@ module.exports = {
     }
 
     if (emulate) {
-      await page.emulate(devices[emulate]);
+      await page.emulate(puppeteer.devices[emulate]);
     }
 
     page.on('request', checkoutRequestHandler);
@@ -426,7 +428,14 @@ module.exports = {
       if (withSiftJS) {
         await sendSiftJS(returnObj);
       }
-      await sendRewards(returnObj);
+      if (options.one_click_checkout) {
+        await delay(200);
+        sendRewardsOneCC(returnObj),
+          handleResetReq(returnObj, options.order_id),
+          handlePartialOrderUpdate(returnObj);
+      } else {
+        await sendRewards(returnObj);
+      }
     }
     // page takes some time to render
     await delay(200);

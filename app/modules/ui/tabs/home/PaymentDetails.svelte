@@ -79,6 +79,7 @@
     INDIA_COUNTRY_CODE,
     PHONE_REGEX_INDIA,
   } from 'common/constants';
+  import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
 
   const entries = _Obj.entries;
 
@@ -121,6 +122,7 @@
   }
 
   function onContactBlur() {
+    updateOrderWithCustomerDetails();
     Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
       country_code: $country,
       contact_number: $phone,
@@ -128,6 +130,7 @@
   }
 
   function onEmailBlur() {
+    updateOrderWithCustomerDetails();
     Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
       email_id: $email,
     });

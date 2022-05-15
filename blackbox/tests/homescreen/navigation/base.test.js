@@ -5,4 +5,5 @@ createNavigationTest({
   amount: 200 * 100,
   loggedIn: true,
   anon: false,
+  skip: true,
 });
