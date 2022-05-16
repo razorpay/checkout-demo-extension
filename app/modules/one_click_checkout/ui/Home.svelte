@@ -13,11 +13,7 @@
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
-  import {
-    getMerchantOrder,
-    getPrefilledContact,
-    getPrefilledEmail,
-  } from 'razorpay';
+  import { getMerchantOrder } from 'razorpay';
   import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constants import
@@ -47,6 +43,10 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { querySelector } from 'utils/doc';
+  import {
+    getPrefilledContact,
+    getPrefilledEmail,
+  } from 'checkoutframe/customer';
 
   let topbar;
   let isBackEnabled;

@@ -15,6 +15,7 @@
   import { getStore } from 'checkoutstore/cta';
   import { isOverlayActive } from 'navstack';
   import { getView } from 'checkoutframe/components';
+  import { clearOldExperiments } from 'experiments';
 
   import LanguageSelector from './LanguageSelector.svelte';
 
@@ -45,6 +46,7 @@
   }
 
   onMount(() => {
+    clearOldExperiments();
     window.addEventListener('resize', handleResize);
     if (escape) {
       window.addEventListener('keyup', handleKeyInput);

@@ -16,8 +16,6 @@
     getPrefilledCouponCode,
     isContactHidden,
     isEmailHidden,
-    getPrefilledContact,
-    getPrefilledEmail,
     isCodEnabled,
   } from 'razorpay';
   import {
@@ -84,6 +82,10 @@
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import {
+    getPrefilledContact,
+    getPrefilledEmail,
+  } from 'checkoutframe/customer';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();

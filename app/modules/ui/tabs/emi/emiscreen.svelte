@@ -22,11 +22,8 @@
   import { getSession } from 'sessionmanager';
   import { querySelector } from 'utils/doc';
 
-  import {
-    getPrefilledName,
-    isNameReadOnly,
-    getPrefilledCardNumber,
-  } from 'razorpay';
+  import { getPrefilledName, getPrefilledCardNumber } from 'razorpay';
+  import { isNameReadOnly } from 'checkoutframe/customer';
 
   // Props
   export let emiDuration = '';

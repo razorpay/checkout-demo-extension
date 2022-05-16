@@ -34,7 +34,6 @@
 
   import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
   import {
-    isNameReadOnly,
     getCardFeatures,
     isOfferForced,
     isStrictlyRecurring,
@@ -75,6 +74,7 @@
   import { isInstrumentValidForPayment } from 'configurability/validate';
   import { isCardValidForOffer } from 'checkoutstore/offers';
   import { viewAllEMIPlans } from 'emi/helper';
+  import { isNameReadOnly } from 'checkoutframe/customer';
 
   const dispatch = createEventDispatcher();
 
@@ -434,8 +434,6 @@
      * we'll need to perform all vaildations again
      */
 
-    const hasCardMethodInstrument =
-      $methodInstrument && $methodInstrument.method === 'card';
     if ($methodInstrument) {
       if ($methodInstrument.method === 'card') {
         onCardNumberChange();

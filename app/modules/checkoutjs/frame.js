@@ -19,10 +19,10 @@ import {
 const { screen, scrollTo } = global;
 
 const ua_iPhone = iPhone;
-var doc, head, docStyle;
+let doc, head, docStyle;
 
 // there is no "position: fixed" in iphone
-var containerHeight = 460;
+let containerHeight = 460;
 var merchantMarkup = {
   overflow: '',
   metas: null,
@@ -32,7 +32,7 @@ var merchantMarkup = {
   },
 
   resize: function () {
-    var height = global.innerHeight || screen.height;
+    let height = global.innerHeight || screen.height;
     CheckoutFrame.container.style.position =
       height < 450 ? 'absolute' : 'fixed';
     this.el.style.height = Math.max(height, containerHeight) + 'px';
@@ -44,7 +44,7 @@ var merchantMarkup = {
       return;
     }
     if (global.innerHeight < containerHeight) {
-      var maxY = containerHeight - global.innerHeight;
+      let maxY = containerHeight - global.innerHeight;
       if (global.pageYOffset > maxY + 120) {
         smoothScrollTo(maxY);
       }
@@ -68,7 +68,7 @@ function restoreMetas($metas) {
   if ($metas) {
     $metas.forEach(_El.detach);
   }
-  var oldMeta = getMetas();
+  let oldMeta = getMetas();
   if (oldMeta) {
     oldMeta.forEach(_El.appendTo(head));
   }
@@ -80,19 +80,19 @@ function restoreOverflow() {
 
 // to handle absolute/relative url of options.image
 function sanitizeImage(options) {
-  var image = options.image;
+  let image = options.image;
   if (image && _.isString(image)) {
     if (_.isBase64Image(image)) {
       return;
     }
     if (image.indexOf('http')) {
       // not 0
-      var baseUrl =
+      let baseUrl =
         location.protocol +
         '//' +
         location.hostname +
         (location.port ? ':' + location.port : '');
-      var relUrl = '';
+      let relUrl = '';
       if (image[0] !== '/') {
         relUrl += location.pathname.replace(/[^/]*$/g, '');
         if (relUrl[0] !== '/') {
@@ -110,14 +110,14 @@ function makeCheckoutUrl(rzp) {
   //   ? 0.15 // default value
   //   : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
-  var url = RazorpayConfig.frame;
+  let url = RazorpayConfig.frame;
 
   // const useCanary = _.random() < CANARY_PERCENTAGE;
 
   if (!url) {
     url = makeUrl('checkout', false);
 
-    var urlParams = makePrefParams(rzp);
+    let urlParams = makePrefParams(rzp);
     if (!urlParams) {
       url += '/public';
 
@@ -155,13 +155,13 @@ function setTestRibbonInvisible() {
   }
 }
 
-var loader;
+let loader;
 function appendLoader($parent, parent) {
   if (!loader) {
     try {
       loader = document.createElement('div');
       loader.className = 'razorpay-loader';
-      var style =
+      let style =
         'margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;';
       if (parent) {
         style +=
@@ -190,9 +190,9 @@ export default function CheckoutFrame(rzp) {
 CheckoutFrame.prototype = {
   getEl: function (rzp) {
     if (!this.el) {
-      var style =
+      let style =
         'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px; z-index: 2;';
-      var attribs = {
+      let attribs = {
         style: style,
         allowtransparency: true,
         frameborder: 0,
@@ -209,18 +209,18 @@ CheckoutFrame.prototype = {
   },
 
   openRzp: function (rzp) {
-    var el =
+    let el =
       this.el
       |> _El.setStyles({
         // by the time checkout opens, other plugins might resize iframe
         width: '100%',
         height: '100%',
       });
-    var parent = rzp.get('parent');
+    let parent = rzp.get('parent');
     if (parent) {
       parent = resolveElement(parent);
     }
-    var parent2 = parent || CheckoutFrame.container;
+    let parent2 = parent || CheckoutFrame.container;
     appendLoader(parent2, parent);
 
     if (rzp !== this.rzp) {
@@ -248,10 +248,10 @@ CheckoutFrame.prototype = {
   },
 
   makeMessage: function () {
-    var rzp = this.rzp;
-    var options = rzp.get();
+    let rzp = this.rzp;
+    let options = rzp.get();
 
-    var response = {
+    let response = {
       integration: Track.props.integration,
       referer: Track.props.referer || location.href,
       options: options,
@@ -294,7 +294,7 @@ CheckoutFrame.prototype = {
   bind: function () {
     if (!this.listeners) {
       this.listeners = [];
-      var eventPairs = {};
+      let eventPairs = {};
 
       if (ua_iPhone) {
         eventPairs.orientationchange = merchantMarkup.orientationchange;
@@ -363,13 +363,13 @@ CheckoutFrame.prototype = {
   },
 
   onmessage: function (e) {
-    var data = _Obj.parse(e.data);
+    let data = _Obj.parse(e.data);
     if (!data) {
       return;
     }
 
-    var event = data.event;
-    var rzp = this.rzp;
+    let event = data.event;
+    let rzp = this.rzp;
     // source check
     if (
       !e.origin ||
@@ -475,7 +475,7 @@ CheckoutFrame.prototype = {
   onsubmit: function (data) {
     Track.flush();
 
-    var rzp = this.rzp;
+    let rzp = this.rzp;
 
     // check if it was one of the external wallets
     if (data.method === 'wallet') {
@@ -528,8 +528,8 @@ CheckoutFrame.prototype = {
       });
     }
     this.close();
-    var rzp = this.rzp;
-    var handler = rzp.get('handler');
+    let rzp = this.rzp;
+    let handler = rzp.get('handler');
     Analytics.track('checkout_success', {
       r: rzp,
       data,

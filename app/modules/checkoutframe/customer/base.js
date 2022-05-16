@@ -15,7 +15,6 @@ import RazorpayStore, {
   isOneClickCheckout,
   isRecurring,
 } from 'razorpay';
-
 import { delayLoginOTPExperiment } from 'card/helper';
 import { timer } from 'utils/timer';
 import { get } from 'svelte/store';
@@ -110,7 +109,7 @@ Customer.prototype = {
   logged: false,
 
   mark_logged: function (data) {
-    var session = getSession();
+    let session = getSession();
     this.logged = true;
 
     sanitizeTokens(data.tokens);
@@ -137,7 +136,7 @@ Customer.prototype = {
 
     url += '&_[platform]=' + Track.props.platform;
 
-    var device_token = qpmap.device_token;
+    let device_token = qpmap.device_token;
     if (device_token) {
       url += '&device_token=' + device_token;
     }
@@ -261,7 +260,7 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            var errorMsg = '';
+            let errorMsg = '';
             if (isOneClickCheckout()) {
               errorMsg = 'otp.title.incorrect_otp_retry_one_cc';
             } else {

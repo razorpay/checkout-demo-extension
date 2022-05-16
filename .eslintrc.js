@@ -102,6 +102,7 @@ module.exports = {
     'no-prototype-builtins': 0, // Access Object.prototype method 'hasOwnProperty' from target object
     curly: 2, // Require curly braces
     'linebreak-style': [2, 'unix'],
+    'no-var': 1,
     // disable getters and setters
     'no-restricted-syntax': [
       2,

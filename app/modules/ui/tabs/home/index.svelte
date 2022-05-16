@@ -11,7 +11,6 @@
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
-  import Snackbar from 'ui/components/Snackbar.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import {
     getAvailableMethods,
@@ -47,7 +46,6 @@
     upiIntentInstrumentsForAnalytics,
     blocks,
   } from 'checkoutstore/screens/home';
-  import { activeRoute } from 'one_click_checkout/routing/store';
 
   import { customer } from 'checkoutstore/customer';
   import {
@@ -63,7 +61,6 @@
   import {
     isCodAddedToAmount,
     codChargeAmount,
-    shippingCharge,
     isShippingAddedToAmount,
   } from 'one_click_checkout/charges/store';
 
@@ -89,11 +86,8 @@
     isDCCEnabled,
     isPartialPayment as getIsPartialPayment,
     isRecurring,
-    isContactEmailReadOnly,
     isContactOptional,
     isContactEmailHidden,
-    getPrefilledContact,
-    getPrefilledEmail,
     isEmailOptional,
     isContactEmailOptional,
     getMerchantOffers,
@@ -183,6 +177,11 @@
     formatAmountWithCurrency,
     formatAmountWithCurrencyInMinor,
   } from 'helper/currency';
+  import {
+    getPrefilledContact,
+    getPrefilledEmail,
+    isContactEmailReadOnly,
+  } from 'checkoutframe/customer';
   import { formatAmountWithSymbol } from 'common/currency';
 
   const cardOffer = getCardOffer();

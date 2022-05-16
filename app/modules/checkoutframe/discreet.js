@@ -44,12 +44,10 @@ import { initIframe } from 'checkoutframe/iframe';
 import * as Form from 'checkoutframe/form';
 import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
-import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import * as CRED from 'checkoutframe/cred';
 import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
-import * as RazorpayHelper from 'razorpay';
 import * as MethodStore from 'checkoutstore/methods';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
@@ -191,10 +189,6 @@ export default {
   Cta,
   RTBHelper,
 
-  Customer,
-  getCustomer,
-  sanitizeTokens,
-
   MainModal,
   CardlessEmiView,
   emiScreenView,
@@ -256,7 +250,6 @@ export default {
   ChargesStore,
   OneClickCheckoutStore,
   OneClickCheckoutMetaProperties,
-  RazorpayHelper,
   views,
   WalletHelper,
 

@@ -1,6 +1,5 @@
 <script>
   // Utils
-  import { isContactReadOnly } from 'razorpay';
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
@@ -27,6 +26,7 @@
   import { t } from 'svelte-i18n';
 
   import { isOneClickCheckout } from 'razorpay';
+  import { isContactReadOnly } from 'checkoutframe/customer';
 
   // Refs
   let countryField;

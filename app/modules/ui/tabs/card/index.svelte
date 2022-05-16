@@ -65,6 +65,7 @@
     hasFeature,
     isInternational,
     isDCCEnabled,
+    getPrefillMethod,
   } from 'razorpay';
 
   import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
@@ -269,7 +270,7 @@
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
 
-    if (session.get('prefill.method') === 'card') {
+    if (getPrefillMethod() === 'card') {
       if (isApplicationEnabled(session.get('prefill.provider'))) {
         setSelectedApp(session.get('prefill.provider'));
       }

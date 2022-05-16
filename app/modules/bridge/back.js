@@ -9,7 +9,7 @@ import { getCheckoutBridge, storage } from './index';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
-import { isOneClickCheckout } from 'razorpay';
+import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
 import { getView } from 'checkoutframe/components';
 import { isStackPopulated } from 'navstack';
 
@@ -77,7 +77,7 @@ export function backPressed(callback) {
     getView('navStack').backPressed();
   } else if (
     session.tab &&
-    !(session.get('prefill.method') && session.get('theme.hide_topbar'))
+    !(getPrefillMethod() && session.get('theme.hide_topbar'))
   ) {
     /**
      * When an overlay is visible, there's some message
