@@ -161,24 +161,11 @@ function hideOverlay($with) {
   }
 }
 
-function hideDowntimeAlert() {
-  let downtimeWrap = $('#downtime-wrap');
-  if (!downtimeWrap || !downtimeWrap[0]) {
-    return false;
-  }
-  let wasShown = downtimeWrap.hasClass(shownClass);
-  if (wasShown) {
-    hideOverlay(downtimeWrap);
-  }
-  // discreet.UpiScreenStore.resetSelectedUPIAppForPay();
-  return wasShown;
-}
-
 function hideOverlayMessage() {
   let session = this;
   session.preventErrorDismissal = false;
 
-  if (!hideDowntimeAlert() && !session.hideSvelteOverlay()) {
+  if (!session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
