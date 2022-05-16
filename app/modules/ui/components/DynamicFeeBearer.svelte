@@ -20,7 +20,7 @@
   const session = getSession();
   const DYNAMIC_FEE_BEARER_VIEW_TIME = 6000;
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmoutWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isOneClickCheckout();
 
   let label;
   let showFeeDetails = false;
@@ -87,7 +87,7 @@
                 >{formatAmountWithSymbol(
                   getAmount(),
                   getCurrency(),
-                  spaceAmoutWithSymbol
+                  spaceAmountWithSymbol
                 )}</span
               >
             </div>
@@ -101,7 +101,7 @@
                 >{formatAmountWithSymbol(
                   $dynamicFeeObject['convenience_fee'],
                   getCurrency(),
-                  spaceAmoutWithSymbol
+                  spaceAmountWithSymbol
                 )}</span
               >
             </div>

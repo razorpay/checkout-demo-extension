@@ -39,7 +39,7 @@
   export let navstack;
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmoutWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isOneClickCheckout();
   const entries = _Obj.entries;
 
   const isOverlay = navstack?.isOverlay;
@@ -146,7 +146,7 @@
               {formatAmountWithSymbol(
                 amount * 100,
                 'INR',
-                spaceAmoutWithSymbol
+                spaceAmountWithSymbol
               )}
             </div>
           </div>

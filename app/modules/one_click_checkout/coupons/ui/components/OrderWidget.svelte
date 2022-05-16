@@ -58,7 +58,7 @@
 
   const currency = getCurrency();
   const { order } = getIcons();
-  const spaceAmoutWithSymbol = false;
+  const spaceAmountWithSymbol = false;
   let showTotal;
   const cartExperiment = getCartExperiment();
 
@@ -124,7 +124,7 @@
   >
     <p>{$t(AMOUNT_LABEL)}</p>
     <p data-test-id="cart-amount">
-      {formatAmountWithSymbol($cartAmount, currency, spaceAmoutWithSymbol)}
+      {formatAmountWithSymbol($cartAmount, currency, spaceAmountWithSymbol)}
     </p>
   </div>
   {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
@@ -136,7 +136,7 @@
         - {formatAmountWithSymbol(
           $cartDiscount,
           currency,
-          spaceAmoutWithSymbol
+          spaceAmountWithSymbol
         )}
       </p>
     </div>
@@ -153,7 +153,7 @@
             ? formatAmountWithSymbol(
                 $shippingCharge,
                 currency,
-                spaceAmoutWithSymbol
+                spaceAmountWithSymbol
               )
             : $t(FREE_LABEL)}
         </p>
@@ -169,7 +169,7 @@
       {:else}
         <p>{$t(TOTAL_LABEL)}</p>
         <p data-test-id="total-amount">
-          {formatAmountWithSymbol($amount, currency, spaceAmoutWithSymbol)}
+          {formatAmountWithSymbol($amount, currency, spaceAmountWithSymbol)}
         </p>
       {/if}
     </div>

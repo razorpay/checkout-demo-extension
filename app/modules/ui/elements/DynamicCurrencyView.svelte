@@ -80,7 +80,7 @@
     AVS: 'avs-card',
   };
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmoutWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isOneClickCheckout();
 
   let prop = null;
   let entity = null;
@@ -507,7 +507,7 @@
               ? `(${formatAmountWithSymbol(
                   dccAmount,
                   selectedCurrency,
-                  spaceAmoutWithSymbol
+                  spaceAmountWithSymbol
                 )})`
               : ''}
           </div>
@@ -552,7 +552,7 @@
                 ({formatAmountWithSymbol(
                   currencies[originalCurrency].amount,
                   originalCurrency,
-                  spaceAmoutWithSymbol
+                  spaceAmountWithSymbol
                 )})
               </span>
             {/if}

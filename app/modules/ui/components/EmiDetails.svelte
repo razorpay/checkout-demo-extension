@@ -20,7 +20,7 @@
   import { formatAmountWithSymbol } from 'common/currency';
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmoutWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isOneClickCheckout();
 
   let plan;
   let duration;
@@ -37,7 +37,7 @@
       formattedInstallmentAmount = formatAmountWithSymbol(
         installment,
         getCurrency(),
-        spaceAmoutWithSymbol
+        spaceAmountWithSymbol
       );
     }
   }

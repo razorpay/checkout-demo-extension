@@ -24,7 +24,7 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isOneClickCheckout, getCurrency } from 'razorpay';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
@@ -40,7 +40,7 @@
   import { PAY_WITH_INSTALLED_OR_OTHERS } from 'upi/i18n/labels';
   import { captureFeature } from 'upi/events';
   import { getThemeMeta } from 'checkoutstore/theme';
-  import { formatAmountWithCurrency } from 'helper/currency';
+  import { formatAmountWithSymbol } from 'common/currency';
 
   // Props
   export let method = null; // Name of the method
@@ -80,6 +80,9 @@
   $: codLoading = method === 'cod' && $showCodLoader;
 
   function getSubtitleForDisplay(locale) {
+    const currency = getCurrency();
+    const spaceAmountWithSymbol = false;
+
     if (subtitle) {
       return subtitle;
     } else if (method === 'cod' && $codChargeAmount) {
@@ -87,7 +90,13 @@
         <div class="highlight-text">
           ${formatTemplateWithLocale(
             COD_CHARGES_DESCRIPTION,
-            { charge: formatAmountWithCurrency($codChargeAmount) },
+            {
+              charge: formatAmountWithSymbol(
+                $codChargeAmount,
+                currency,
+                spaceAmountWithSymbol
+              ),
+            },
             locale
           )}
         </div>

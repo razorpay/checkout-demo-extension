@@ -98,6 +98,7 @@
     isContactEmailOptional,
     getMerchantOffers,
     isDynamicFeeBearer,
+    getCurrency,
   } from 'razorpay';
 
   import {
@@ -182,6 +183,7 @@
     formatAmountWithCurrency,
     formatAmountWithCurrencyInMinor,
   } from 'helper/currency';
+  import { formatAmountWithSymbol } from 'common/currency';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -1031,7 +1033,13 @@
   }
 
   function showSnackbar(isCodApplied) {
-    const charge = formatAmountWithCurrency($codChargeAmount);
+    const currency = getCurrency();
+    const spaceAmountWithSymbol = false;
+    const charge = formatAmountWithSymbol(
+      $codChargeAmount,
+      currency,
+      spaceAmountWithSymbol
+    );
     const template = isCodApplied
       ? 'methods.descriptions.cod_charge_applied'
       : 'methods.descriptions.cod_charge_removed';

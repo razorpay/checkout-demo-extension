@@ -37,6 +37,7 @@
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'checkoutstore/offers';
   import { cartItems, enableCart } from 'one_click_checkout/cart/store';
+  import { getCurrency } from 'razorpay';
 
   // analytics imports
   import { Events } from 'analytics';
@@ -47,7 +48,7 @@
   import { MODAL_MAX_HEIGHT } from 'one_click_checkout/summary_modal/constants';
   import { getSession } from 'sessionmanager';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
-  import { formatAmountWithCurrency } from 'helper/currency';
+  import { formatAmountWithSymbol } from 'common/currency';
   import { popStack } from 'navstack';
 
   export let ctaVisible = false;
@@ -57,6 +58,8 @@
 
   let tableHeight;
   let backdropHeight;
+  const currency = getCurrency();
+  const spaceAmountWithSymbol = false;
 
   afterUpdate(() => {
     tableHeight = document.getElementById('summary-table').offsetHeight;
@@ -147,7 +150,7 @@
       <div class="summary-row">
         <div>{$t(AMOUNT_LABEL)}</div>
         <div data-test-id="cart-amount">
-          {formatAmountWithCurrency($cartAmount)}
+          {formatAmountWithSymbol($cartAmount, currency, spaceAmountWithSymbol)}
         </div>
       </div>
       {#if $isCouponApplied}
@@ -156,7 +159,11 @@
             {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
           </div>
           <div data-test-id="discount-amount" class="text-green">
-            -{formatAmountWithCurrency($cartDiscount)}
+            -{formatAmountWithSymbol(
+              $cartDiscount,
+              currency,
+              spaceAmountWithSymbol
+            )}
           </div>
         </div>
       {/if}
@@ -165,7 +172,11 @@
           <div>{$t(SHIPPING_CHARGES_LABEL)}</div>
           <div data-test-id="shipping-amount">
             {$shippingCharge
-              ? formatAmountWithCurrency($shippingCharge)
+              ? formatAmountWithSymbol(
+                  $shippingCharge,
+                  currency,
+                  spaceAmountWithSymbol
+                )
               : $t(FREE_LABEL)}
           </div>
         </div>
@@ -174,7 +185,11 @@
         <div class="summary-row">
           <div>{$t(COD_CHARGES_LABEL)}</div>
           <div data-test-id="cod-amount">
-            {formatAmountWithCurrency($codChargeAmount)}
+            {formatAmountWithSymbol(
+              $codChargeAmount,
+              currency,
+              spaceAmountWithSymbol
+            )}
           </div>
         </div>
       {/if}
@@ -191,7 +206,11 @@
             })}
           </div>
           <div data-test-id="offer-amount" class="text-green">
-            -{formatAmountWithCurrency(offerAmount)}
+            -{formatAmountWithSymbol(
+              offerAmount,
+              currency,
+              spaceAmountWithSymbol
+            )}
           </div>
         </div>
       {/if}
@@ -199,7 +218,7 @@
       <div class="summary-row total-charges-text">
         <div>{$t(TOTAL_CHARGES_LABEL)}</div>
         <div data-test-id="total-amount">
-          {formatAmountWithCurrency($amount)}
+          {formatAmountWithSymbol($amount, currency, spaceAmountWithSymbol)}
         </div>
       </div>
     </div>
