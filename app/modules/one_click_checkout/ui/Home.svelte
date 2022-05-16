@@ -28,7 +28,6 @@
 
   // session imports
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
-  import { redirectToMethods } from 'one_click_checkout/sessionInterface';
   import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
 
   // analytics imports
@@ -71,9 +70,9 @@
   onMount(() => {
     setLineItems(getMerchantOrder().line_items || []);
 
-    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
     Analytics.setMeta('initial_loggedIn', isUserLoggedIn());
     Analytics.setMeta('initial_hasSavedAddress', !!$savedAddresses?.length);
+    Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
 
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
@@ -128,20 +127,6 @@
   }
 
   afterUpdate(updateTopBar);
-
-  function onBack() {
-    if (handleBack) {
-      handleBack();
-    }
-    navigator.navigateBack();
-    if (navigator.currentActiveRoute.name === views.METHODS) {
-      /* During on tab switch the destroy method on replaceNode function acts as async and showing CTA
-       * even after switching tab to avoid this we added setTimeout to hide the CTA  */
-      setTimeout(function () {
-        redirectToMethods();
-      }, 0);
-    }
-  }
 
   onDestroy(() => {
     resetRouting();
