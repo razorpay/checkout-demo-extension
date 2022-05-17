@@ -66,7 +66,7 @@
         from: 'overlay',
       });
     } else if (isOverlayActive()) {
-      getView('navStack').backPressed();
+      getView('navstack').backPressed();
     } else {
       next();
     }

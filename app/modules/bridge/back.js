@@ -74,7 +74,7 @@ export function backPressed(callback) {
   } else if (TermsCurtain.isVisible()) {
     TermsCurtain.hide();
   } else if (isStackPopulated()) {
-    getView('navStack').backPressed();
+    getView('navstack').backPressed();
   } else if (
     session.tab &&
     !(getPrefillMethod() && session.get('theme.hide_topbar'))

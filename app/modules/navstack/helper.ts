@@ -33,9 +33,9 @@ export function replaceStack(stackElement: NavStack.StackElement) {
 }
 
 export function isOverlayActive(): boolean {
-  const navStack = get(stack);
-  if (navStack.length > 0) {
-    return Boolean(navStack[navStack.length - 1].overlay);
+  const navstack = get(stack);
+  if (navstack.length > 0) {
+    return Boolean(navstack[navstack.length - 1].overlay);
   }
   return false;
 }

@@ -17,11 +17,11 @@ export function render() {
     target: querySelector('#container'),
   });
 
-  const navStack = new NavigationStack({
+  const navstack = new NavigationStack({
     target: querySelector('#root'),
   });
 
-  componentsMap.navStack = navStack;
+  componentsMap.navstack = navstack;
 
   const topbar = new TopBar({
     target: querySelector('#topbar-wrap'),
@@ -42,7 +42,7 @@ export function render() {
   } else {
     topbar.$on('back', () => {
       if (isStackPopulated()) {
-        navStack.backPressed();
+        navstack.backPressed();
       } else {
         session.back();
       }
