@@ -14,15 +14,13 @@ import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 import { askForOTP } from 'one_click_checkout/common/otp';
 import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 import { isEditContactFlow } from 'one_click_checkout/store';
-import {
-  getCustomerByContact,
-  getCustomerDetails,
-} from 'one_click_checkout/common/helpers/customer';
+import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { otpReasons } from 'one_click_checkout/otp/constants';
-import { toggleHeader } from 'one_click_checkout/header/helper';
 import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
+import hasSavedAddresses from 'one_click_checkout/common/middlewares/hasSavedAddress';
+import { toggleHeader } from 'one_click_checkout/header/helper';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -61,33 +59,22 @@ export const handleDetailsNext = (prevContact) => {
       return;
     }
     updateOrderWithCustomerDetails();
-    let view = views.COUPONS;
+    isEditContactFlow.set(false);
+
     if (isLoginMandatory()) {
       if (!isUserLoggedIn()) {
         askForOTP(otpReasons.mandatory_login);
         return;
       }
     } else {
-      const customer = getCustomerDetails();
-      const params = { skip_otp: true };
-      customer.checkStatus(
-        function () {
-          if (customer.saved_address && !customer.logged) {
-            toggleHeader(true);
-            askForOTP(otpReasons.edit_contact);
-          } else {
-            isEditContactFlow.set(false);
-            navigator.navigateTo({ path: views.COUPONS });
-          }
-        },
-        params,
-        customer.contact
-      );
+      toggleHeader(true);
+      navigator.navigateTo({
+        path: views.COUPONS,
+        overrideMiddlewares: [hasSavedAddresses(views.COUPONS, true)],
+      });
       return;
     }
-
-    isEditContactFlow.set(false);
-    navigator.navigateTo({ path: view });
+    navigator.navigateTo({ path: views.COUPONS });
   }
 };
 

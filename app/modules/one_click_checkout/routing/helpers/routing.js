@@ -14,8 +14,18 @@ export const navigator = {
   get currentActiveRoute() {
     return get(activeRoute);
   },
-  navigateTo: function ({ path, initialize = false, props }) {
-    let nextView = runMiddlewares(getRoute(path), screensHistory, this) || {
+  navigateTo: function ({
+    path,
+    initialize = false,
+    props,
+    overrideMiddlewares = null,
+  }) {
+    let nextView = runMiddlewares(
+      getRoute(path),
+      screensHistory,
+      this,
+      overrideMiddlewares
+    ) || {
       path,
     };
     if (nextView.props) {
@@ -30,7 +40,9 @@ export const navigator = {
       route.props = { ...route.props, ...props };
     }
     activeRoute.set(route);
-    if (nextView === 'otp') {return;}
+    if (nextView === 'otp') {
+      return;
+    }
     if (screensHistory.isInitialized && !initialize) {
       screensHistory.push(route);
     } else {

@@ -13,11 +13,14 @@ const config = {
   ],
 };
 
-export function runMiddlewares(route, history, navigator) {
+export function runMiddlewares(route, history, navigator, overrides = null) {
   if (!route) {
     return;
   }
-  const middlewares = config[route.name] ? [...config[route.name]] : [];
+  let middlewares = config[route.name] ? [...config[route.name]] : [];
+  if (overrides) {
+    middlewares = overrides;
+  }
 
   let nextView;
 
