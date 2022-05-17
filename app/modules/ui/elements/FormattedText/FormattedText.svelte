@@ -17,5 +17,9 @@
     <i>{token.text}</i>
   {:else if token.type === 'bold'}
     <b>{token.text}</b>
-  {:else if token.type === 'emphasis'}<em>{token.text}</em>{/if}
+  {:else if token.type === 'emphasis'}
+    <em>{token.text}</em>
+  {:else if token.type === 'coloredFont'}
+    <span style={`color:${token.color}`}>{token.text}</span>
+  {/if}
 {/each}

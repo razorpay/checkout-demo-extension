@@ -228,9 +228,10 @@ module.exports = {
   /**
    * @param  {Page} puppeteer page to intercept requests on
    * @param  {RegExp} optional url pattern to match interceptor against
+   * @param  {RegExp} [ignorePattern] url pattern to ignore interceptor against
    * @return {Object} containg operations to perform on intercepted request
    */
-  interceptor(page, pattern) {
+  interceptor(page, pattern, ignorePattern) {
     let interceptorEnabled = true;
     let resolver;
     let currentRequest = null;
@@ -279,7 +280,11 @@ module.exports = {
         url.includes('locations/autosuggest') ||
         url.includes('fonts.googleapis.com') ||
         url.includes('i.imgur.com');
-      if (ignoredUrl || (pattern && !pattern.test(url))) {
+      if (
+        ignoredUrl ||
+        (pattern && !pattern.test(url)) ||
+        (ignorePattern && ignorePattern.test(url))
+      ) {
         return true;
       }
     }

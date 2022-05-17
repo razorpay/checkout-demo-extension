@@ -3,6 +3,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
 import { processIntentOnMWeb } from 'upi/payment';
+import { isQRPaymentCancellable } from 'upi/helper';
 import { avoidSessionSubmit } from 'upi/helper';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
@@ -130,6 +131,7 @@ import * as EMIHelper from 'emi/helper';
 const upiPaymentHandlers = {
   processIntentOnMWeb,
   avoidSessionSubmit,
+  isQRPaymentCancellable,
 };
 
 import * as fonts from 'checkoutframe/fonts';

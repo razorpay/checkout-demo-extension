@@ -342,3 +342,14 @@ export const APP_DETECTED_FURTHER_STEPS_TIMEOUT =
 export const USER_CONSENT_FOR_NAVIGATION_TIMEOUT = 4000;
 
 export const UPI_TAB_CALLBACK_NAME = 'fromPopup';
+
+/**
+ * Why 5 seconds early?
+ * Since we cannot tag/classify the payments if failed,
+ * we will cancel 5 seconds early to tag a proper reason to the same.
+ * Confirmed from Product as well
+ * after the timer expiry we cannot mark the payment with cancel reason
+ */
+export const QR_EXPIRE_TIME = (12 * 60 - 5) * 1000;
+export const QR_OFF_SCREEN_POLL_DELAY_BY = 3;
+export const QR_IMAGE_DEFAULT_SIZE = 165;

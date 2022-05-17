@@ -9,6 +9,53 @@ let jsonp_cb = 0;
 let sessionId, trackId, keylessHeader;
 
 /**
+ * this param will be used in fetch.prototype.till to avoid subsequent poll requests
+ *
+ */
+let pausePolling = false;
+let pollDelayBy = 0;
+
+function pausePoll() {
+  if (!pausePolling) {
+    pausePolling = true;
+  }
+}
+
+/**
+ * Reset the polling delay if any
+ * Resume the polling if its paused
+ */
+function resumePoll() {
+  if (pausePolling) {
+    pausePolling = false;
+  }
+  setPollDelayBy(0);
+}
+
+/**
+ *
+ * @param {number} xTimes
+ */
+function setPollDelayBy(xTimes) {
+  if (isNaN(xTimes)) {
+    return;
+  }
+  pollDelayBy = +xTimes;
+}
+/**
+ * This function is used to reset the poll pause/resume before creating a new request
+ * @param  {...any} args
+ * @returns
+ */
+function resetPoll(...args) {
+  resumePoll();
+  if (this) {
+    return this(...args);
+  }
+  return null;
+}
+
+/**
  * Sets the session ID.
  * @param {string} id
  *
@@ -93,21 +140,31 @@ const fetchPrototype = {
     return this;
   },
 
-  till: function (continueUntilFn, retryLimit = 0) {
+  till: function (continueUntilFn, retryLimit = 0, frequency = 3e3) {
+    if (pausePolling) {
+      setTimeout(() => {
+        this.till(continueUntilFn, retryLimit, frequency);
+      }, frequency);
+      return;
+    }
+    /**
+     * Do Not Pass `nextReqFrequency` to `till` function, as that gets compounded in each call
+     */
+    const nextReqFrequency = pollDelayBy ? pollDelayBy * frequency : frequency;
     return this.setReq(
       'timeout',
       setTimeout(() => {
         this.call((response) => {
           // If there is an error, retry again until retry limit.
           if (response.error && retryLimit > 0) {
-            this.till(continueUntilFn, retryLimit - 1);
+            this.till(continueUntilFn, retryLimit - 1, frequency);
           } else if (continueUntilFn(response)) {
-            this.till(continueUntilFn, retryLimit);
+            this.till(continueUntilFn, retryLimit, frequency);
           } else {
             this.options.callback(response);
           }
         });
-      }, 3e3)
+      }, nextReqFrequency)
     );
   },
 
@@ -387,10 +444,14 @@ function jsonp(options) {
   return request;
 }
 
-fetch.post = post;
-fetch.patch = patch;
-fetch.put = put;
+fetch.post = resetPoll.bind(post);
+fetch.patch = resetPoll.bind(patch);
+fetch.put = resetPoll.bind(put);
 fetch.setSessionId = setSessionId;
 fetch.setTrackId = setTrackId;
 fetch.setKeylessHeader = setKeylessHeader;
-fetch.jsonp = jsonp;
+fetch.jsonp = resetPoll.bind(jsonp);
+
+fetch.pausePoll = pausePoll;
+fetch.resumePoll = resumePoll;
+fetch.setPollDelayBy = setPollDelayBy;

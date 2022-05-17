@@ -1,13 +1,22 @@
 import {
   upiNrL0L1Improvements,
+  upiQrOnL1,
   oneClickUPIIntent as oneClickUPIIntentExperiment,
 } from 'upi/experiments';
 import { getOffersForTab } from 'checkoutframe/offers/index';
-import { getPreferences, isCustomerFeeBearer, isRecurring } from 'razorpay';
+import {
+  getPreferences,
+  isCustomerFeeBearer,
+  isDynamicFeeBearer,
+  isRecurring,
+} from 'razorpay';
 import { iOS, isBrave, isDesktop } from 'common/useragent';
 import { OTHER_INTENT_APPS, UPI_APPS } from 'upi/constants';
 import { definePlatform } from './helper/upi';
+import { isUPIFlowEnabled } from 'checkoutstore/methods';
+import { isInternational, hasFeature } from 'razorpay';
 
+//#region One Click UPI Intent
 export function oneClickUPIIntent() {
   /**
    * disable experiment for fee bearer & UPI offer available
@@ -18,6 +27,10 @@ export function oneClickUPIIntent() {
   }
   return oneClickUPIIntentExperiment.enabled();
 }
+
+//#endregion
+
+//#region UPI Tiles
 type EnableUPITilesReturnType = {
   status: boolean;
   variant: UPI.AppStackVariant;
@@ -97,3 +110,25 @@ export function getRecommendedAppsForUPIStack(
 
   return recommended;
 }
+
+//#endregion
+
+//#region QR V2
+/**
+ * Entry Point for UpiQrV2
+ * i.e, Auto-generated timer based Qr
+ * @returns
+ */
+export const enableUpiQrV2 = () => {
+  if (!upiQrOnL1.enabled()) {
+    return false;
+  }
+  return (
+    !hasFeature('disable_l1_qr', false) &&
+    !isInternational() &&
+    isUPIFlowEnabled('qr') &&
+    !isCustomerFeeBearer() &&
+    !isDynamicFeeBearer()
+  );
+};
+//#endregion

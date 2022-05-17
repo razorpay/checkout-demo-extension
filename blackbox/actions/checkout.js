@@ -189,6 +189,7 @@ module.exports = {
     method,
     emulate,
     withSiftJS,
+    networkInterceptorConfig = {},
   }) {
     // Disable animations for testing
     options = {
@@ -340,7 +341,11 @@ module.exports = {
     if (interceptorOptions) {
       interceptorOptions.enableInterceptor();
     } else {
-      interceptorOptions = interceptor(page);
+      interceptorOptions = interceptor(
+        page,
+        networkInterceptorConfig.pattern,
+        networkInterceptorConfig.ignorePattern
+      );
     }
 
     if (withSiftJS) {

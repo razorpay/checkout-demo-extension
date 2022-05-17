@@ -1,2 +1,5 @@
 export * from './payment';
-export { processIntentOnMWeb } from './postPaymentHandlers';
+export {
+  processIntentOnMWeb,
+  clearPaymentRequest,
+} from './postPaymentHandlers';

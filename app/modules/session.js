@@ -2606,7 +2606,12 @@ Session.prototype = {
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
-          tab = 'upi';
+          if (BackStore && typeof BackStore.tab === 'string') {
+            tab = BackStore.tab;
+            BackStore = null;
+          } else {
+            tab = 'upi';
+          }
         } else {
           tab = thisTab;
         }
@@ -3567,9 +3572,20 @@ Session.prototype = {
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
-        self.confirmClose().then(function (confirmed) {
+        self.confirmClose().then((confirmed) => {
           if (confirmed) {
-            self.back(true);
+            if (
+              discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true) === 2
+            ) {
+              /**
+               * Why delay, QR payments hitting with multiple cancel requests
+               */
+              setTimeout(() => {
+                self.hide(confirmed);
+              }, 1000);
+            } else {
+              self.back(true);
+            }
           }
         });
         return;
@@ -3985,12 +4001,20 @@ Session.prototype = {
   },
 
   clearRequest: function (extra) {
-    this.hideTimer();
     if (this.r._payment) {
+      /**
+       * When user clicks back, if there is a payment in progress
+       * we auto-cancel it.
+       * Hence we need a check for QR V2 payments, we won;t show any alert yet user can go out
+       * And we shouldn't mark the payment cancelled
+       */
+      if (!discreet.upiPaymentHandlers.isQRPaymentCancellable(extra)) {
+        return;
+      }
       this.hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
     }
-
+    this.hideTimer();
     if (this.payload && this.payload.method === 'cardless_emi') {
       this.resetCardlessEmiStoreForProvider(this.payload.provider);
     }
@@ -4638,24 +4662,34 @@ Session.prototype = {
     }
 
     if (this.r._payment) {
-      /**
-       * For Cardless EMI, payments are created at the first step,
-       * before the user gets to select a plan.
-       * Thus, we would need to submit again after the
-       * user has created a plan, even though the payment
-       * is already created.
-       *
-       * This does not happen for any other method.
-       */
-      if (data.method === 'cardless_emi') {
+      if (discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true)) {
+        /**
+         * intended empty if block as the cancel happens within above function and flow has to come out of this payment
+         */
+        this.r._payment.off();
+        this.r._payment.clear();
+      } else if (data.method === 'cardless_emi') {
+        /**
+         * For Cardless EMI, payments are created at the first step,
+         * before the user gets to select a plan.
+         * Thus, we would need to submit again after the
+         * user has created a plan, even though the payment
+         * is already created.
+         *
+         * This does not happen for any other method.
+         */
         data.payment_id = this.r._payment.payment_id;
 
         /**
          * If emi_duration is present, this is the final
          * payment submit request.
          * Clear existing payments.
+         * Note: If any QR payment is active, by this time, it was cancelled, hence no errors on other payments
          */
-        if (data.emi_duration) {
+        if (
+          data.emi_duration &&
+          discreet.upiPaymentHandlers.isQRPaymentCancellable({})
+        ) {
           this.r._payment.off();
           this.r._payment.clear();
         }
@@ -4805,11 +4839,30 @@ Session.prototype = {
           'instrumentMeta',
           discreet.getInstrumentMeta(selectedInstrument)
         );
-
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
+          /**
+           * P13N is on home
+           
+           */
+          BackStore = {
+            tab: '',
+            screen: '',
+          };
           Analytics.setMeta('doneByP13n', true);
         }
 
+        if (
+          selectedInstrument._ungrouped &&
+          selectedInstrument._ungrouped.length &&
+          selectedInstrument._ungrouped[0].flow === 'qr' &&
+          !BackStore
+        ) {
+          //  If triggered from custom config, back should take the user to L0
+          BackStore = {
+            tab: '',
+            screen: '',
+          };
+        }
         switch (selectedInstrument.method) {
           case 'card':
           case 'emi': {
@@ -5411,6 +5464,7 @@ Session.prototype = {
     }
 
     this.preferredInstrument = P13n.processInstrument(data, this);
+    discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true);
 
     let payment = this.r.createPayment(data, request);
     payment

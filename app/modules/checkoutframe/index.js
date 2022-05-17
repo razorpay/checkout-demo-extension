@@ -11,7 +11,7 @@ import * as SessionManager from 'sessionmanager';
 import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
-import showTimer from 'checkoutframe/timer';
+import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
@@ -419,6 +419,7 @@ function setSessionPreferences(session, preferences) {
       closeAt = _.now() + timeout * 1000;
     }
     if (closeAt) {
+      checkoutClosesAt.set(closeAt);
       session.timer = showTimer(closeAt, () => {
         session.dismissReason = 'timeout';
         session.modal.hide();

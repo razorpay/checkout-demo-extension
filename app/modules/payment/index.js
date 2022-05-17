@@ -99,7 +99,7 @@ function onPaymentCancel(metaParam) {
     }
 
     Analytics.track('cancel', {
-      data: eventData,
+      data: { ...eventData, ...(metaParam || {}) },
       r: razorpay,
     });
   }

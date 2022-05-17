@@ -15,11 +15,21 @@ const formatters = [
     flag: '<b>',
     type: 'bold',
   },
+  {
+    flag: /<span color=".*?">/,
+    type: 'coloredFont',
+    colorPicker: /color=".*?"/,
+  },
 ];
 
 const tokenizeTextForFormatter = (tokenText, formatter) => {
   return tokenText.split(formatter.flag).map((text, i) => {
-    return { text: text, type: i % 2 ? formatter.type : 'plain' };
+    const type = i % 2 ? formatter.type : 'plain';
+    let color = undefined;
+    if (type === 'coloredFont') {
+      color = tokenText.match(formatter.colorPicker).shift().split('"')[1];
+    }
+    return { text, type, color };
   });
 };
 

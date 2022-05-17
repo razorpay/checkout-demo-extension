@@ -40,6 +40,12 @@ declare namespace UPI {
     app?: AppConfiguration;
     action: AppTileAction;
     payloadData?: Partial<UPIPaymentPayload>;
+    qrFlow?: {
+      onPaymentCreate: (responseData: {
+        intent_url: string;
+        qr_code_url: string;
+      }) => void;
+    };
   }
 
   export type UPIPaymentPayload = {
@@ -65,6 +71,10 @@ declare namespace UPI {
      * For Fee bearer
      */
     fee?: number;
+    /**
+     * For QR flow
+     */
+    '_[upiqr]'?: '1' | '0';
   };
 
   type Platform =
@@ -83,4 +93,15 @@ declare namespace UPI {
       column: number;
     };
   }>;
+
+  export type QRStatus = 'loading' | 'refresh' | 'qr';
+
+  export type PaymentResponseHandler = (
+    status: Payment.PaymentStatus,
+    response: CustomObject<any>
+  ) => void;
+
+  export type PaymentHandlerConfiguration = {
+    [key in Payment.PaymentStatus]?: boolean;
+  };
 }

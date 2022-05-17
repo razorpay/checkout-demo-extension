@@ -105,16 +105,19 @@ async function provideCancellationReason(context, method) {
   );
   await reasonOther.click();
   const submitCancellationReasonButton = await context.page.$(
-    '#cancel_netbanking button.btn'
+    '#cancel_' + method + ' button.btn'
   );
   await submitCancellationReasonButton.click();
   await respondToCancellationRequest(context);
 }
 
-async function respondToCancellationRequest(context) {
+async function respondToCancellationRequest(context, cancelReason) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toContain('/cancel');
   expect(reqorg.method).toEqual('GET');
+  if (cancelReason) {
+    expect(reqorg.params['_[reason]']).toBe(cancelReason);
+  }
   await context.respondJSON({
     error: {
       code: 'BAD_REQUEST_ERROR',
@@ -235,6 +238,16 @@ async function selectBank(context, bank) {
     hidden: true,
   });
 }
+async function cancelTransaction(context) {
+  await context.page.waitFor('#error-message', {
+    timeout: 2000,
+    visible: true,
+  });
+  const cancelButton = await context.page.waitForSelector(
+    '#error-message > span.link'
+  );
+  await cancelButton.click();
+}
 
 async function retryTransaction(context) {
   await context.page.waitFor('#fd-hide', {
@@ -280,4 +293,6 @@ module.exports = {
   provideCancellationReason,
   handleAJAXRequest,
   retryTransactionWithPaypal,
+  respondToCancellationRequest,
+  cancelTransaction,
 };

@@ -17,6 +17,7 @@ const paylaterActions = require('./paylater-actions');
 const personalizationActions = require('./personalization-actions');
 const payoutActions = require('./payout-actions');
 const automaticCheckoutAction = require('./automatic-checkout');
+const qrV2Actions = require('./qr-v2-actions');
 
 module.exports = {
   ...offerActions,
@@ -37,6 +38,7 @@ module.exports = {
   ...personalizationActions,
   ...payoutActions,
   ...automaticCheckoutAction,
+  ...qrV2Actions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,

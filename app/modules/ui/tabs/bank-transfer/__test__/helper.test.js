@@ -75,7 +75,7 @@ describe('#getTimeStamp', () => {
 
   test('when given less than minTime', () => {
     let value = getTimeStamp(lessThanMin);
-    expect(value).toEqual(Math.floor(minTime / 1000));
+    expect(value).toBeGreaterThanOrEqual(Math.floor(minTime / 1000));
   });
   test('when given more than maxTime ', () => {
     let value = getTimeStamp(moreThanMaxTime);

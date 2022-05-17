@@ -118,3 +118,28 @@ export const COLORS = {
 export const INDIA_COUNTRY_ISO_CODE = 'IN';
 
 export const US_COUNTRY_ISO_CODE = 'US';
+
+/**
+ * The following are the reasons for each flow
+ * 1. Automatically created payment
+ *    <within payment lifetime, ex: QR has 12min>
+ *        If user opts for others
+ *                unintended_payment_opt_out
+ *    after payment lifetime
+ *         we manually cancel
+ *                unintended_payment_expired
+ * 2. Payment Created by user/ with user consent
+ *    <within payment lifetime, ex: QR has 12min>
+ *        If user opts for others
+ *                intended_payment_opt_out
+ *    after payment lifetime
+ *        we manually cancel
+ *                Intended_payment_expired
+ *
+ */
+export const PAYMENT_CANCEL_REASONS = {
+  UNINTENDED_OPT_OUT: 'unintended_payment_opt_out',
+  UNINTENDED_EXPIRE: 'unintended_payment_expired',
+  INTENDED_OPT_OUT: 'intended_payment_opt_out',
+  INTENDED_EXPIRE: 'intended_payment_expired',
+};

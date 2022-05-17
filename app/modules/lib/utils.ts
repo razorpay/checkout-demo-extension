@@ -1,4 +1,5 @@
 type anyObject = { [x: string | number]: any };
+import type { CustomObject } from 'types';
 import * as _El from 'utils/DOM';
 /**
  * Scrolls the element into view if it is not completely visible.
@@ -276,4 +277,24 @@ export function abortAjax(ajax: XMLHttpRequest | null) {
     ajax.abort();
     ajax = null;
   }
+}
+
+export function getPreparedUrl(
+  url: string,
+  searchParams: CustomObject<string>
+) {
+  if (!url) {
+    return '';
+  }
+
+  /**
+   * IE Doesn't support new URL
+   */
+  const path = String(url);
+
+  const queryString = Object.entries(searchParams)
+    .map(([key, value]: [key: string, value: string]) => `${key}=${value}`)
+    .join('&');
+
+  return queryString ? path.concat('?', queryString) : path;
 }

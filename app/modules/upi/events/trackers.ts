@@ -1,4 +1,8 @@
 import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
+import type { CustomObject } from 'types';
+import { qrState } from 'upi/ui/components/QR/store';
+import { get } from 'svelte/store';
 import { TRACES, EVENTS } from './constants';
 
 const upiTrackerPayload: {
@@ -126,4 +130,43 @@ export const trackIntentFailure = (reason: object | string) => {
   upiTrackerPayload.reason = reason;
   upiTrackerPayload.response = 'fail';
   baseTracker(EVENTS.INTENT_FAILED, true);
+};
+
+let qrAnalyticsPayload: CustomObject<number | string> = {};
+
+export const trackQRStatus = (
+  type: 'paymentInitiation' | 'paymentResponse' | 'qrLoaded' | 'qrExpired'
+) => {
+  switch (type) {
+    case 'paymentInitiation':
+    case 'paymentResponse':
+      qrAnalyticsPayload[type] = Date.now();
+      break;
+    case 'qrLoaded':
+      qrAnalyticsPayload[type] = Date.now();
+      Analytics.track(EVENTS.QR_ON_L1, {
+        type: AnalyticsTypes.RENDER,
+        data: {
+          ...qrAnalyticsPayload,
+          ...get(qrState),
+        },
+      });
+      break;
+    case 'qrExpired':
+      qrAnalyticsPayload[type] = Date.now();
+      Analytics.track(EVENTS.QR_ON_L1_EXPIRED, {
+        type: AnalyticsTypes.RENDER,
+        data: {
+          ...qrAnalyticsPayload,
+          ...get(qrState),
+        },
+      });
+  }
+};
+
+export const trackRefreshQR = () => {
+  qrAnalyticsPayload = {};
+  Analytics.track(EVENTS.REFRESH_QR_ON_L1, {
+    type: AnalyticsTypes.BEHAV,
+  });
 };

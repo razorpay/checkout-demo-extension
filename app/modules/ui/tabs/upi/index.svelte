@@ -93,6 +93,9 @@
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
+  import Qr from 'upi/ui/components/QR/QR.svelte';
+  import { enableUpiQrV2 } from 'upi/features';
+
   // Constant imports
   import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
   import { filterTruthyKeys } from 'lib/utils';
@@ -351,7 +354,9 @@
       if (hasTokens) {
         selectedToken = null;
       } else {
-        selectedToken = 'new';
+        if (!enableUpiQrV2()) {
+          selectedToken = 'new';
+        }
       }
     }
   }
@@ -394,7 +399,12 @@
         })
         .then(() => {
           if (vpaField) {
-            vpaField.focus();
+            /**
+             * If QRV2 is present don't focus any other fields
+             */
+            if (!enableUpiQrV2()) {
+              vpaField.focus();
+            }
             vpaField.setSelectionRange(0, 0);
           }
         });
@@ -829,6 +839,10 @@
             />
           {/if}
 
+          {#if shouldShowQr && enableUpiQrV2()}
+            <Qr />
+          {/if}
+
           {#if shouldShowCollect}
             <!-- LABEL: Pay using UPI ID -->
             <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
@@ -910,7 +924,7 @@
             />
           {/if}
 
-          {#if shouldShowQr}
+          {#if shouldShowQr && !enableUpiQrV2()}
             <!-- LABEL: Pay using QR Code -->
             <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
             <div class="options" id="showQr">

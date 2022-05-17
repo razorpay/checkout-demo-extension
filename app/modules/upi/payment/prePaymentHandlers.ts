@@ -23,7 +23,7 @@ import { reward } from 'checkoutstore/rewards';
  */
 const setFlowInPayload = (
   data: Partial<UPI.UPIPaymentPayload>,
-  action: 'intent' | 'collect',
+  action: 'intent' | 'collect' | 'qr',
   vpa?: string
 ) => {
   if (!action || !data) {
@@ -37,6 +37,14 @@ const setFlowInPayload = (
     };
   }
   switch (action) {
+    case 'qr':
+      /**
+       * QR flow is similar to intent flow, just we need 1 additional param
+       * Hence add additional param and fallback to intent
+       */
+      data['_[upiqr]'] = '1';
+      setFlowInPayload(data, 'intent');
+      break;
     case 'intent':
       data['_[flow]'] = 'intent';
       if (data.vpa || typeof data.vpa === 'string') {
@@ -141,21 +149,28 @@ const googlePayRequestProcessor = (
   }
 };
 
-function generateRequestParamsForPayment(): Payment.PaymentParams {
+function generateRequestParamsForPayment(
+  payload: Partial<UPI.UPIPaymentPayload>
+): Payment.PaymentParams {
   const session = getSession();
-  return {
+
+  const params: Payment.PaymentParams = {
     feesRedirect: getPreferences('fee_bearer'),
     external: {},
     optional: getOptionalObject(),
     paused: session.get().paused,
   };
+  if (payload['_[upiqr]']) {
+    params.upiqr = true;
+  }
+  return params;
 }
 
 function creatUPIPaymentV2(basePayload?: Partial<UPI.UPIPaymentPayload>) {
   // const session = getSession();
   const paymentPayload = { ...basePayload } as UPI.UPIPaymentPayload;
   const paymentParams: Payment.PaymentParams =
-    generateRequestParamsForPayment();
+    generateRequestParamsForPayment(paymentPayload);
 
   // Add bank in payload for TPV orders
   const bank = getPreferences('order.bank');

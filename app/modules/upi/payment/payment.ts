@@ -9,9 +9,18 @@ import { creatUPIPaymentV2, setFlowInPayload } from './prePaymentHandlers';
 import { definePlatform, resetCallbackOnUPIAppForPay } from 'upi/helper/upi';
 import popupContent from 'upi/helper/intent/popupContent';
 import { upiPopUpForiOSMWeb } from 'upi/helper/intent/upiOniOSMWeb';
-import { adoptSessionUI, handleDeeplinkAction } from './postPaymentHandlers';
+import {
+  adoptSessionUI,
+  handleDeeplinkAction,
+  responseHandler,
+  startUpiPaymentPolling,
+} from './postPaymentHandlers';
 
-function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
+function handleUPIPayments(
+  config: UPI.PaymentProcessConfiguration,
+  onResponse?: UPI.PaymentResponseHandler,
+  skipHandlers?: UPI.PaymentHandlerConfiguration
+) {
   const session = getSession();
   const basePayload: Partial<UPI.UPIPaymentPayload> = {
     ...session.getPayload(),
@@ -39,6 +48,10 @@ function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
     basePayload.upi_app = config?.app?.package_name;
     setFlowInPayload(basePayload, 'intent');
   }
+  if (config.action === 'none' && config.qrFlow) {
+    setFlowInPayload(basePayload, 'qr');
+  }
+
   const { paymentPayload, paymentParams } = creatUPIPaymentV2(basePayload);
 
   if (paymentParams.feesRedirect) {
@@ -88,9 +101,30 @@ function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
    */
   const rzpInstanceWithPayment = (RazorpayStore.razorpayInstance as any)
     .createPayment(paymentPayload, paymentParams)
-    .on('payment.success', session.successHandler.bind(session))
-    .on('payment.error', session.errorHandler.bind(session))
-    .on('payment.cancel', session.cancelHandler.bind(session))
+    .on(
+      'payment.success',
+      responseHandler({
+        status: 'success',
+        onResponse,
+        skipHandlers,
+      })
+    )
+    .on(
+      'payment.error',
+      responseHandler({
+        status: 'error',
+        onResponse,
+        skipHandlers,
+      })
+    )
+    .on(
+      'payment.cancel',
+      responseHandler({
+        status: 'cancel',
+        onResponse,
+        skipHandlers,
+      })
+    )
     .on(
       'payment.upi.coproto_response',
       function (response: {
@@ -101,12 +135,17 @@ function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
           [UPI_POLL_URL]: response.request.url,
           [PENDING_PAYMENT_TS]: Date.now().toString(),
         });
-
-        /**
-         * When the payment response is for intent mweb using deeplink (without specific app)
-         * Invoke the flow where upi intent url is opened using deeplink
-         */
-        if (!paymentPayload.upi_app && response.data.intent_url) {
+        if (config.qrFlow && config.qrFlow.onPaymentCreate) {
+          startUpiPaymentPolling();
+          config.qrFlow.onPaymentCreate(response.data as any);
+        } else if (
+          !Boolean(paymentPayload.upi_app) &&
+          response.data.intent_url
+        ) {
+          /**
+           * When the payment response is for intent mweb using deeplink (without specific app)
+           * Invoke the flow where upi intent url is opened using deeplink
+           */
           handleDeeplinkAction(
             response.data.intent_url,
             config.action,
@@ -146,6 +185,7 @@ function handleUPIPayments(config: UPI.PaymentProcessConfiguration) {
   /**
    * If its using standard checkout then adopt session UI
    */
-  adoptSessionUI(rzpInstanceWithPayment, session);
+  adoptSessionUI(rzpInstanceWithPayment, session, config);
 }
+
 export { handleUPIPayments };

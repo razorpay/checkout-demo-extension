@@ -42,6 +42,7 @@
     "dev-start": "API_SERVER=localhost nodemon server & npm start",
     "func-start": "API_SERVER=https://api-2.func.razorpay.in nodemon server & npm start",
     "live-start": "API_SERVER=https://api.razorpay.com nodemon server & npm start",
+    "dark-start": "API_SERVER=https://api-dark.razorpay.com nodemon server & npm start",
     "start:no-reload": "gulp watch",
     "build": "rollup -c --environment prod && gulp",
     "lint": "eslint app/modules",

@@ -1,6 +1,8 @@
+import { writable } from 'svelte/store';
 import Timer from 'ui/elements/Timer.svelte';
 import { querySelector } from 'utils/doc';
 
+export const checkoutClosesAt = writable(0);
 /**
  * returns a new svelte components mounted on `#bottom`
  * @param  {Number} expiry Absolute timestamp, to stop timer at

@@ -26,4 +26,10 @@ export const upiNrL0L1Improvements = createExperiment(
   0
 );
 
-export { highlightUPIIntentOnDesktop, oneClickUPIIntent };
+/**
+ * Experiment: UPI QR On L1 Feature
+ * Temporary 5% rollout, argument must be 1-0.05=>0.95
+ */
+const upiQrOnL1 = createExperiment('upi_qr_on_l1_percentage_5', 0.95);
+
+export { highlightUPIIntentOnDesktop, oneClickUPIIntent, upiQrOnL1 };

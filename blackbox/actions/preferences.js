@@ -65,9 +65,7 @@ async function sendPreferences({
 function makePreferences(overrides) {
   return {
     options: {},
-    features: {
-      save_vpa: true,
-    },
+
     feature_overrides: {},
     methods: {
       emi: true,
@@ -81,6 +79,11 @@ function makePreferences(overrides) {
       upi_intent: true,
     },
     ...overrides,
+    features: {
+      save_vpa: true,
+      disable_l1_qr: true,
+      ...(overrides && overrides.features ? overrides.features : {}),
+    },
   };
 }
 

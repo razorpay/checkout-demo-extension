@@ -12,5 +12,7 @@ declare namespace Payment {
     };
     paused?: any;
     gpay?: boolean;
+    upiqr?: boolean;
   };
+  export type PaymentStatus = 'cancel' | 'success' | 'error';
 }

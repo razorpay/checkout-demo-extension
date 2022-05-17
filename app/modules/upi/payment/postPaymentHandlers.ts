@@ -5,6 +5,11 @@ import { definePlatform } from '../helper/upi';
 import { tryOpeningIntentUrl } from '../helper/intent/resolver';
 import { captureTrace, trackIntentFailure, TRACES } from 'upi/events';
 
+const startUpiPaymentPolling = () => {
+  // emit success response and trigger polling
+  getSession().r.emit('payment.upi.intent_success_response');
+};
+
 const processIntentOnMWeb = (intentUrl: string) => {
   const session = getSession();
   void tryOpeningIntentUrl(intentUrl).then((response) => {
@@ -16,8 +21,7 @@ const processIntentOnMWeb = (intentUrl: string) => {
 
     if (canProceed) {
       session.showLoadError();
-      // emit success response and trigger polling
-      session.r.emit('payment.upi.intent_success_response');
+      startUpiPaymentPolling();
     } else {
       const metaParam = { upiNoApp: true };
       // clear the payment and dispatch no upi apps message
@@ -71,13 +75,19 @@ function handleDeeplinkAction(
   }
 }
 
-function adoptSessionUI(paymentInstance: any, session: any) {
+function adoptSessionUI(
+  paymentInstance: any,
+  session: any,
+  config: UPI.PaymentProcessConfiguration
+) {
   (document.querySelector('#error-message .link') as HTMLElement).innerHTML =
     format('misc.cancel_action');
   /**
    * Start a general loader with cancel action
    */
-  session.showLoadError();
+  if (!config.qrFlow) {
+    session.showLoadError();
+  }
 
   paymentInstance.on('payment.upi.noapp', function (data: any) {
     session.showLoadError(format('upi.intent_no_apps_error'), true);
@@ -97,4 +107,38 @@ function adoptSessionUI(paymentInstance: any, session: any) {
   });
 }
 
-export { adoptSessionUI, handleDeeplinkAction, processIntentOnMWeb };
+function responseHandler(params: {
+  status: Payment.PaymentStatus;
+  onResponse?: UPI.PaymentResponseHandler;
+  skipHandlers?: UPI.PaymentHandlerConfiguration;
+}) {
+  const { status, onResponse, skipHandlers } = params;
+  return (response: any) => {
+    if (onResponse) {
+      onResponse(status, response);
+    }
+    const session = getSession();
+    /**
+     * session.cancelHandler
+     * session.errorHandler
+     * session.successHandler
+     */
+    if (!skipHandlers || (skipHandlers && skipHandlers[status] !== false)) {
+      session[`${status}Handler`].call(session, response);
+    }
+  };
+}
+
+function clearPaymentRequest(reason: string) {
+  getSession().r.emit('payment.cancel', {
+    '_[reason]': reason,
+  });
+}
+export {
+  adoptSessionUI,
+  handleDeeplinkAction,
+  processIntentOnMWeb,
+  responseHandler,
+  startUpiPaymentPolling,
+  clearPaymentRequest,
+};
