@@ -12,8 +12,8 @@ const map62 = base62Chars
   .reduce((map, chr, i) => _Obj.setProp(map, chr, i), {});
 
 function toBase62(number) {
-  var rixit;
-  var result = '';
+  let rixit;
+  let result = '';
   while (number) {
     rixit = number % 62;
     result = base62Chars[rixit] + result;
@@ -23,7 +23,7 @@ function toBase62(number) {
 }
 
 function makeUid() {
-  var num =
+  let num =
     toBase62(
       String(_.now() - 1388534400000) +
         String('000000' + _.floor(1000000 * _.random())).slice(-6)
@@ -31,7 +31,7 @@ function makeUid() {
     toBase62(_.floor(238328 * _.random())) +
     '0';
 
-  var sum = 0,
+  let sum = 0,
     tempdigit;
 
   num
@@ -53,16 +53,16 @@ function makeUid() {
   return String(num).slice(0, 13) + tempdigit;
 }
 
-var _uid = makeUid();
+let _uid = makeUid();
 
-var trackingProps = {
+let trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
   referer: location.href,
 };
 
 function getCommonTrackingData(r) {
-  var props = {
+  let props = {
     checkout_id: r ? r.id : _uid,
   };
 
@@ -153,9 +153,19 @@ const flushEvents = (mode) => {
   };
 
   try {
+    /**
+     * Attempt sending the events using Beacon API if supported/successful
+     * else fallback to using the Fetch API
+     */
+    let isQueuedSuccessfully = false;
     if (useBeacon) {
-      navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
-    } else {
+      isQueuedSuccessfully = navigator.sendBeacon(
+        postData.url,
+        _Obj.stringify(postData.data)
+      );
+    }
+
+    if (!isQueuedSuccessfully) {
       fetch.post(postData);
     }
   } catch (e) {}
@@ -190,16 +200,16 @@ export default function Track(r, event, data, immediately) {
       data = { message: data.message, stack: data.stack };
     }
 
-    var context = getCommonTrackingData(r);
+    let context = getCommonTrackingData(r);
     context.user_agent = null;
     context.mode = 'live';
-    var order_id = getOrderId();
+    let order_id = getOrderId();
     if (order_id) {
       context.order_id = order_id;
     }
 
-    var options = {};
-    var properties = {
+    let options = {};
+    let properties = {
       options,
     };
 
@@ -209,11 +219,11 @@ export default function Track(r, event, data, immediately) {
 
     options = _Obj.extend(options, _Obj.unflatten(r.get()));
 
-    var handler = r.get('handler');
+    let handler = r.get('handler');
     if (typeof handler === 'function') {
       options.handler = true;
     }
-    var callback_url = r.get('callback_url');
+    let callback_url = r.get('callback_url');
     if (callback_url && typeof callback_url === 'string') {
       options.callback_url = true;
     }
