@@ -1,9 +1,6 @@
 import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import { views } from 'one_click_checkout/routing/constants';
-import {
-  showDetailsOverlay,
-  applyCoupon,
-} from 'one_click_checkout/coupons/sessionInterface';
+import { applyCoupon } from 'one_click_checkout/coupons/sessionInterface';
 import { getCoupons } from 'one_click_checkout/coupons/service';
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
@@ -30,6 +27,8 @@ import { formatAmountWithSymbol } from 'common/currency';
 import { formatTemplateWithLocale } from 'i18n';
 import { locale } from 'svelte-i18n';
 import { cartDiscount } from 'one_click_checkout/charges/store';
+import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+import { pushOverlay } from 'navstack';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -130,7 +129,9 @@ export function applyCouponCode(code) {
           error_description: error?.error?.description,
         });
         if (error.failure_code === ERROR_USER_NOT_LOGGED_IN) {
-          showDetailsOverlay(true);
+          pushOverlay({
+            component: Details,
+          });
           errorCode.set(error.failure_code);
         }
       },

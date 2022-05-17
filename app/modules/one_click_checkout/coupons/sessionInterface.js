@@ -1,8 +1,6 @@
 import { getSession } from 'sessionmanager';
-import AvailableCoupons from 'one_click_checkout/coupons/ui/AvailableCoupons.svelte';
-import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+
 import { hideToast } from 'one_click_checkout/Toast';
-import { showBackdrop } from 'checkoutstore/backdrop';
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { showLoaderView } from 'one_click_checkout/loader/helper.js';
@@ -24,58 +22,6 @@ import {
 } from 'one_click_checkout/coupons/service';
 import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
 import { setOption, getPrefilledCouponCode } from 'razorpay';
-
-/**
- * Method which shows an overlay with available methods.
- * @param {function} onApply callback to be executed when user clicks on apply
- * @param {function} onRemove callback to be executed when user clicks on remove
- */
-export function showAvailableCoupons({ onApply, onRemove }) {
-  Events.Track(CouponEvents.AVAILABLE_COUPONS_CLICKED);
-
-  const session = getSession();
-
-  session.svelteOverlay.$$set({
-    component: AvailableCoupons,
-    props: {
-      onClose: function (e) {
-        session.hideErrorMessage(e);
-      },
-
-      applyCoupon: function (code) {
-        onApply(code);
-        session.hideErrorMessage();
-      },
-
-      removeCoupon: function () {
-        onRemove();
-        session.hideErrorMessage();
-      },
-    },
-  });
-  session.showSvelteOverlay();
-  showBackdrop();
-}
-
-/**
- * Shows the details modal
- * @param {object} cta object with show, hide methods to control CTA display of parent screen
- * @param {string} code coupon code entered by user, to be shown inside
- */
-export function showDetailsOverlay() {
-  const session = getSession();
-
-  session.svelteOverlay.$$set({
-    component: Details,
-    props: {
-      onClose: function () {
-        session.hideErrorMessage();
-      },
-    },
-  });
-  session.showSvelteOverlay();
-  showBackdrop();
-}
 
 /**
  * Calls validate coupon to update BE and emits track events

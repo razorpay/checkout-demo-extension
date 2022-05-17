@@ -27,13 +27,13 @@
   } from 'one_click_checkout/coupons/store';
 
   // utils imports
+  import { popStack } from 'navstack';
   import { isIndianCustomer } from 'checkoutstore';
   import { askForOTP } from 'one_click_checkout/common/otp';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
 
-  export let onClose;
   const { close } = getIcons();
 
   onMount(() => {
@@ -48,18 +48,17 @@
       invalids[0].className += ' focused mature';
       return;
     }
-    onClose();
+    popStack();
     if (!isUserLoggedIn() && $isIndianCustomer) {
       askForOTP(otpReasons.verify_coupon);
     }
-    // couponsCta.hide();
   }
 </script>
 
 <div class="details-container" id="details-container">
   <div class="details-header-row">
     <div class="details-signup-label">{$t(DETAILS_TITLE_LABEL)}</div>
-    <button on:click|preventDefault={onClose}>
+    <button on:click|preventDefault={popStack}>
       <Icon icon={close} />
     </button>
   </div>
@@ -86,6 +85,8 @@
   .details-container {
     text-align: start;
     white-space: initial;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .details-header-row {

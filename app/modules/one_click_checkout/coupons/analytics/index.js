@@ -7,7 +7,6 @@ const events = {
   COUPON_REMOVED: 'coupon_removed',
   COUPON_VALID: 'checkoutCouponValidationSuccess',
   COUPON_INVALID: 'checkoutCouponValidationFailed',
-  AVAILABLE_COUPONS_CLICKED: 'checkoutAvailableCouponsClicked',
   AVAILABLE_COUPONS_MODAL: 'checkoutAvailableCouponsScreenLoaded',
   AVAILABLE_COUPON_CLICKED: 'checkoutAvailableCouponsSelected',
   SHOW_AVAILABLE_COUPONS: 'show_available_coupons',
