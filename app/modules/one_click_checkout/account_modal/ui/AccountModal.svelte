@@ -1,6 +1,7 @@
 <script>
   // svelte imports
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
 
   // UI Imports
   import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
@@ -10,13 +11,10 @@
 
   // utils Imports
   import { handleEditContact } from 'one_click_checkout/sessionInterface';
-  import {
-    handleLogout,
-    handleLogoutAllDevices,
-  } from 'one_click_checkout/account_modal/sessionInterface';
 
   // store imports
   import { shouldUseVernacular } from 'checkoutstore/methods';
+  import { contact as contactStore } from 'checkoutstore/screens/home';
 
   // i18n imports
   import { getBundle } from 'i18n';
@@ -32,6 +30,7 @@
     CHANGE_LANGUAGE,
     BACK,
   } from 'one_click_checkout/account_modal/i18n/labels';
+  import { logUserOut } from 'checkoutframe/customer';
 
   // helper imports
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
@@ -74,7 +73,7 @@
 
   function handleLogoutClick() {
     Events.TrackBehav(AccountEvents.LOGOUT_CLICKED, { screen_name });
-    handleLogout();
+    logUserOut(get(contactStore), false, handleEditContact.bind(null, true));
     hide();
   }
 
@@ -88,7 +87,7 @@
     Events.TrackBehav(AccountEvents.LOGOUT_ALL_DEVICES_CLICKED, {
       screen_name,
     });
-    handleLogoutAllDevices();
+    logUserOut(get(contactStore), true, handleEditContact.bind(null, true));
     hide();
   }
 

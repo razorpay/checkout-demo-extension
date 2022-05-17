@@ -107,6 +107,7 @@ Customer.prototype = {
   wants_skip: false,
   saved: false,
   logged: false,
+  tokens: null,
 
   mark_logged: function (data) {
     let session = getSession();
@@ -275,18 +276,18 @@ Customer.prototype = {
     });
   },
 
-  logout: function (this_device, callback) {
+  logout: function (allDevice, callback) {
     Analytics.track('logout', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        all: !this_device,
+        all: allDevice,
       },
     });
 
     let url = makeAuthUrl(this.r, 'apps/logout');
 
     url = _.appendParamsToUrl(url, {
-      logout: this_device ? 'app' : 'all',
+      logout: !allDevice ? 'app' : 'all',
     });
 
     let ajaxOpts = {
@@ -299,5 +300,10 @@ Customer.prototype = {
 
     Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
+  },
+
+  markLoggedOut: function () {
+    this.logged = false;
+    this.tokens = null;
   },
 };

@@ -181,6 +181,7 @@
     getPrefilledContact,
     getPrefilledEmail,
     isContactEmailReadOnly,
+    logoutUserOnClient,
   } from 'checkoutframe/customer';
   import { formatAmountWithSymbol } from 'common/currency';
 
@@ -685,7 +686,7 @@
     const prevCustomerLoggedIn = prevCustomer && prevCustomer.logged;
 
     if (prevCustomerLoggedIn) {
-      session.logoutUserOnClient(prevCustomer);
+      logoutUserOnClient(prevCustomer);
     }
 
     prevCustomer = $customer;

@@ -1,12 +1,16 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
+  import { get } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
   // Store
   import { showFeeLabel } from 'checkoutstore';
   import { getAmount, isIRCTC, isOneClickCheckout } from 'razorpay';
-  import { isContactPresent } from 'checkoutstore/screens/home';
+  import {
+    isContactPresent,
+    contact as contactStore,
+  } from 'checkoutstore/screens/home';
   import {
     dynamicFeeObject,
     addCardView,
@@ -33,6 +37,7 @@
   import { Events, MiscEvents } from 'analytics';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { views } from 'one_click_checkout/routing/constants';
+  import { logUserOut } from 'checkoutframe/customer';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -173,8 +178,9 @@
   }
 
   function handleLogoutClick() {
-    session.logUserOut(
-      session.getCurrentCustomer(),
+    logUserOut(
+      get(contactStore),
+      false,
       handleOneClickCheckoutEditContact.bind(null, true)
     );
     const current_screen =
@@ -186,8 +192,9 @@
   }
 
   function handleLogoutAllDevicesClick() {
-    session.logUserOutOfAllDevices(
-      session.getCurrentCustomer(),
+    logUserOut(
+      get(contactStore),
+      true,
       handleOneClickCheckoutEditContact.bind(null, true)
     );
     const current_screen =

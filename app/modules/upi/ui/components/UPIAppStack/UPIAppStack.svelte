@@ -37,15 +37,21 @@
   const onAppClickDefiner = definePlatformReturnMethodIdentifier();
   const rowCol = getGridArray<UPI.AppConfiguration>(maxItemInSingleRow, apps);
 
-  function getIndexFromPosition({ row, column }: UPI.UpiAppForPay['position']) {
-    return row * maxItemInSingleRow + column;
+  function getIndexFromPosition(position: UPI.UpiAppForPay['position']) {
+    if (position) {
+      const { row, column } = position;
+      return row * maxItemInSingleRow + column;
+    }
   }
 
   function handleClick(
     app: UPI.AppConfiguration,
     position: UPI.UpiAppForPay['position']
   ) {
-    dispatch('select', { app, index: getIndexFromPosition(position) });
+    dispatch('select', {
+      app,
+      index: getIndexFromPosition(position),
+    });
     const action = onAppClickDefiner(app);
     storeActionForTracker(action);
     if (action === 'none' || variant === 'subText') {

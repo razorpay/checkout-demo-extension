@@ -1974,65 +1974,6 @@ Session.prototype = {
       this.on('blur', '#card_cvv', shiftDown);
     }
   },
-
-  /**
-   * logout the customer instance on client by removing logged in status and clearing existing tokens
-   * @param {Customer} customer The customer to be logged out
-   */
-  logoutUserOnClient: function (customer) {
-    if (customer) {
-      customer.logged = false;
-      customer.tokens = null;
-    }
-
-    this.topBar.setLogged(false);
-  },
-
-  /**
-   * Logs the user out
-   * Once the user state is changed to logged out, p13n will be triggered for logged out user.
-   * we want p13n api to use the logged out cookie (and to prevent race condition), which is why we update the customer
-   * instance as a callback to logout api sucess.
-   * @param {Customer} customer Customer to be logged out
-   * @param {boolean} outOfAllDevices Whether customer session should be logged out for all devices?
-   * @param {function} callback Callback to invoke after logout is success.
-   */
-  _logUserOut: function (customer, outOfAllDevices, callback) {
-    this.topBar.setLogged(false);
-
-    function logoutSuccessCallback(data) {
-      this.logoutUserOnClient(customer);
-
-      callback && callback(data);
-
-      CustomerStore.customer.set(customer);
-
-      if (this.svelteCardTab) {
-        this.svelteCardTab.showLandingView();
-      }
-    }
-
-    if (customer) {
-      customer.logout(outOfAllDevices, logoutSuccessCallback.bind(this));
-    }
-  },
-
-  /**
-   * Logs user out of this device.
-   * @param {Customer} customer
-   */
-  logUserOut: function (customer, callback) {
-    this._logUserOut(customer, false, callback);
-  },
-
-  /**
-   * Logs user out of all devices.
-   * @param {Customer} customer
-   */
-  logUserOutOfAllDevices: function (customer, callback) {
-    this._logUserOut(customer, true, callback);
-  },
-
   bindEvents: function (selector) {
     selector = selector || '#body';
 
