@@ -4,5 +4,4 @@ const createNavigationTest = require('../../../create/one-click-checkout/navigat
 createNavigationTest({
   amount: 200 * 100,
   closeModalOnCross: true,
-  skip: true,
 });

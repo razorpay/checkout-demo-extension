@@ -40,11 +40,6 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout Navigation test', ({ preferences, title, options }) => {
-    if (skip) {
-      test.skip(title, () => {});
-      return;
-    }
-
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,

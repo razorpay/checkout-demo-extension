@@ -36,11 +36,6 @@ module.exports = function (testFeatures) {
   )(
     'One Click Checkout Account tab test',
     ({ preferences, title, options }) => {
-      if (skip) {
-        test.skip(title, () => {});
-        return;
-      }
-
       test(title, async () => {
         const context = await openCheckoutWithNewHomeScreen({
           page,

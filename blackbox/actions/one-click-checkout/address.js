@@ -200,9 +200,14 @@ async function unCheckBillAddress(context) {
  * clicks edit cta from address box and edits the title of address
  */
 async function handleEditAddress(context, isBillingAddress) {
-  const editCTA = await getDataAttrSelector(context, 'edit-cta');
+  const editCTA = await context.page.waitForSelector(
+    '#address-container-selected [data-test-id="edit-cta"]'
+  );
   await editCTA.click();
-  const editMenuCTA = await getDataAttrSelector(context, 'edit-menu-cta');
+  await delay(200);
+  const editMenuCTA = await context.page.waitForSelector(
+    '#address-container-selected [data-test-id="edit-menu-cta"]'
+  );
   await editMenuCTA.click();
   await context.page.waitForSelector('.address-new');
   if (isBillingAddress) {
