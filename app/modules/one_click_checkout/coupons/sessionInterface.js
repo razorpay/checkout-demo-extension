@@ -96,18 +96,3 @@ export function removeCouponCode(callback) {
     Events.TrackRender(CouponEvents.COUPON_REMOVED);
   });
 }
-
-/**
- * Handling the amount in the header
- */
-export function showAmountInTopBar() {
-  const session = getSession();
-
-  session.showAmountInTopBar();
-}
-
-export function hideAmountInTopBar() {
-  const session = getSession();
-
-  session.hideAmountInTopBar();
-}

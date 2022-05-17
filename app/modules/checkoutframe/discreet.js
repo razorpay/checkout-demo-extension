@@ -26,7 +26,6 @@ import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodes';
 import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 import * as merchantAnalyticsConstant from 'one_click_checkout/merchant-analytics/constant';
-import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -249,7 +248,6 @@ export default {
   ChargesHelper,
   ChargesStore,
   OneClickCheckoutStore,
-  OneClickCheckoutMetaProperties,
   views,
   WalletHelper,
 

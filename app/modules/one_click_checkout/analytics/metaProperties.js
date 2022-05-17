@@ -7,6 +7,8 @@ export default {
   IS_MANDATORY_SIGNUP: 'is_mandatory_signup',
   IS_ONE_CLICK_CHECKOUT: 'is_one_click_checkout_enabled',
   HAS_SAVED_ADDRESSES: 'has_saved_addresses',
+  INITIAL_LOGGED_IN: 'initial_loggedIn',
+  INITIAL_HAS_SAVED_ADDRESS: 'initial_hasSavedAddress',
 
   /** Coupon code meta **/
   AVAILABLE_COUPONS_COUNT: 'available_coupons_count',

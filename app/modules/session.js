@@ -10,6 +10,7 @@ import {
   getCustomer,
   sanitizeTokens,
 } from 'checkoutframe/customer';
+import { init1CCMetaData } from 'one_click_checkout/helper';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -645,14 +646,6 @@ function Session(message) {
 }
 
 Session.prototype = {
-  showAmountInTopBar: function () {
-    $('#amount').show();
-  },
-
-  hideAmountInTopBar: function () {
-    $('#amount').hide();
-  },
-
   shouldUseNativeOTP: function () {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
@@ -998,6 +991,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Header.updateAmountFontSize();
     Hacks.initPostRenderHacks();
+    init1CCMetaData();
 
     this.errorHandler(this.params);
 
@@ -1013,9 +1007,6 @@ Session.prototype = {
     );
 
     P13n.trackNumberOfP13nContacts();
-
-    // 1CC MetaProperties
-    this.addOneClickCheckoutMeta();
 
     // Analytics related to orientation
     Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
@@ -1062,31 +1053,6 @@ Session.prototype = {
     updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
-
-  addOneClickCheckoutMeta: function () {
-    // 1CC Specfic meta data
-    Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.ADDRESS_ENABLED,
-      this.get('show_address')
-    );
-    Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.COUPONS_ENABLED,
-      this.get('show_coupons')
-    );
-    Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.COD_ENABLED,
-      this.get('preferences.methods.cod') || false
-    );
-    Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
-      this.get('mandatory_login')
-    );
-    Analytics.setMeta(
-      discreet.OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
-      this.get('one_click_checkout')
-    );
-  },
-
   setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
       target: docUtil.getElementById('form-fields'),

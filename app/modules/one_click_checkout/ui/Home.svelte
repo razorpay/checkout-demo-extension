@@ -40,6 +40,7 @@
     CATEGORIES,
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
+  import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { querySelector } from 'utils/doc';
   import {
@@ -69,11 +70,15 @@
 
   onMount(() => {
     setLineItems(getMerchantOrder().line_items || []);
-
-    Analytics.setMeta('initial_loggedIn', isUserLoggedIn());
-    Analytics.setMeta('initial_hasSavedAddress', !!$savedAddresses?.length);
+    Analytics.setMeta(
+      OneClickCheckoutMetaProperties.INITIAL_LOGGED_IN,
+      isUserLoggedIn()
+    );
+    Analytics.setMeta(
+      OneClickCheckoutMetaProperties.INITIAL_HAS_SAVED_ADDRESS,
+      !!$savedAddresses?.length
+    );
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
-
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,

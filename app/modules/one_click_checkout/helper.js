@@ -1,3 +1,7 @@
+import { getOption, getPreferences } from 'razorpay';
+import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
+import Analytics from 'analytics';
+
 export function clickOutside(node) {
   const handleClick = (event) => {
     if (node && !node.contains(event.target) && !event.defaultPrevented) {
@@ -47,3 +51,26 @@ export const getScrollableParent = (node) => {
     return getScrollableParent(node.parentNode);
   }
 };
+
+export function init1CCMetaData() {
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.ADDRESS_ENABLED,
+    getOption('show_address')
+  );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.COUPONS_ENABLED,
+    getOption('show_coupons')
+  );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.COD_ENABLED,
+    getPreferences('methods.cod') || false
+  );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
+    getOption('mandatory_login')
+  );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
+    getOption('one_click_checkout')
+  );
+}

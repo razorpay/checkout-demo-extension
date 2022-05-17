@@ -46,11 +46,7 @@
   import { locale } from 'svelte-i18n';
 
   // session imports
-  import {
-    removeCouponCode,
-    showAmountInTopBar,
-    hideAmountInTopBar,
-  } from 'one_click_checkout/coupons/sessionInterface';
+  import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
   import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 
@@ -143,7 +139,6 @@
         redirectToPaymentMethods();
       }
     }
-    showAmountInTopBar();
   }
 
   function summaryLoadedEvent() {
@@ -206,7 +201,6 @@
         page_title: CATEGORIES.COUPONS,
       },
     });
-    hideAmountInTopBar();
     if (prefilledCoupon) {
       applyCouponCode(prefilledCoupon);
     }
