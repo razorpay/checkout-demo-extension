@@ -279,7 +279,7 @@ async function handleLogoutReq(context, logoutAll) {
     req = await context.expectRequest();
     expect(req.url).toContain('apps/logout');
     expect(req.method).toBe('DELETE');
-    expect(req.params.logout).toBe(logoutAll ? 'app' : 'all');
+    expect(req.params.logout).toBe(logoutAll ? 'all' : 'app');
     await context.respondJSON([]);
     return;
   }
