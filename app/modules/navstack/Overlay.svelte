@@ -2,9 +2,10 @@
   import { fade } from 'svelte/transition';
   import { isCtaShown } from 'checkoutstore/cta';
   import * as _El from 'utils/DOM';
+  import { isOneClickCheckout } from 'razorpay';
 
   export let backPressed: () => void;
-  const long = isCtaShown();
+  const long = !isOneClickCheckout() && isCtaShown();
 
   function moveToPortal(node: HTMLDivElement) {
     const overlayParent = document.querySelector('#overlay') as HTMLDivElement;
