@@ -962,8 +962,6 @@ Session.prototype = {
     this.isOpen = true;
     this.getEl();
     this.setFormatting();
-    this.improvisePaymentOptions();
-
     es6components.render();
     this.setModal();
     this.setBackdrop();
@@ -1650,15 +1648,6 @@ Session.prototype = {
       },
     });
   },
-
-  improvisePaymentOptions: function () {
-    const oneMethod = MethodStore.getSingleMethod();
-    if (oneMethod) {
-      this.oneMethod = oneMethod;
-      $(this.el).addClass('one-method');
-    }
-  },
-
   /**
    * Anything related to prefilled that needs to be done
    * once everything has rendered,
@@ -5724,7 +5713,7 @@ Session.prototype = {
       data.amount =
         data.amount + storeGetter(discreet.ChargesStore.offerAmount);
     }
-    if (this.oneMethod && this.oneMethod === 'paypal') {
+    if (MethodStore.getSingleMethod() === 'paypal') {
       data.method = 'paypal';
     }
 

@@ -8,7 +8,11 @@
     isOneClickCheckout,
     isIRCTC,
   } from 'razorpay';
-  import { isMethodEnabled, getEMIBanks } from 'checkoutstore/methods';
+  import {
+    isMethodEnabled,
+    getEMIBanks,
+    getSingleMethod,
+  } from 'checkoutstore/methods';
   import { getAmount, disableAnimation, bringInputIntoView } from './helper';
   import { returnAsIs } from 'lib/utils';
   import { overlayStack } from 'checkoutstore/back';
@@ -25,6 +29,7 @@
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
   const isOneClickCheckoutEnabled = isOneClickCheckout();
   let mobileDevice = isMobile();
+  const orderMethod = getSingleMethod();
   export let onClose: any = returnAsIs;
   export let escape = true;
 
@@ -91,6 +96,7 @@
   class:notopbar={getOption('theme.hide_topbar')}
   class:noimage={!getOption('image')}
   class:noanim
+  class:one-method={orderMethod}
 >
   <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="tnc-wrap" />
