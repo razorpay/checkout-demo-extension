@@ -11,6 +11,7 @@ import {
   sanitizeTokens,
 } from 'checkoutframe/customer';
 import { init1CCMetaData } from 'one_click_checkout/helper';
+import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 
 let emo = {};
@@ -5323,30 +5324,8 @@ Session.prototype = {
           this.askOTP(that.otpView, data);
         });
         this.r.on('payment.3ds.required', function () {
-          that.svelteOverlay.$set({
-            component: discreet.AuthOverlay,
-          });
-
-          that.showSvelteOverlay();
+          showAuthOverlay();
           Analytics.track('native_otp:3ds_required:prompt');
-
-          let clearActionListener = that.svelteOverlay.$on(
-            'action',
-            function (event) {
-              let action = event.detail.action;
-              if (action === 'continue') {
-                Analytics.track('native_otp:3ds_required:click', {
-                  type: AnalyticsTypes.BEHAV,
-                });
-                that.r._payment.gotoBank();
-                that.hideSvelteOverlay();
-              }
-            }
-          );
-          var clearHideListener = that.svelteOverlay.$on('hidden', function () {
-            clearActionListener();
-            clearHideListener();
-          });
         });
 
         request.nativeotp = true;

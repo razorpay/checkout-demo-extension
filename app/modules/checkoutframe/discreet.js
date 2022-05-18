@@ -13,7 +13,6 @@ import * as CardHelper from 'card/helper';
 import MainModal from 'ui/components/MainModal/index.svelte';
 import showFeeBearer from 'ui/components/FeeBearer';
 import Overlay from 'ui/components/Overlay.svelte';
-import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
@@ -197,7 +196,6 @@ export default {
   showFeeBearer,
   Backdrop,
   Overlay,
-  AuthOverlay,
   UserConfirmationOverlay,
   OffersView,
 

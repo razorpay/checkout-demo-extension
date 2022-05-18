@@ -1,5 +1,4 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getThemeColor } from 'checkoutstore/theme';
   import { getMiscIcon } from 'checkoutframe/icons';
@@ -12,13 +11,7 @@
     BANK_VERIFICATION_TITLE,
   } from 'ui/labels/card';
 
-  const dispatch = createEventDispatcher();
-
-  function onContinue() {
-    dispatch('action', {
-      action: 'continue',
-    });
-  }
+  export let onContinue;
 </script>
 
 <div class="auth-overlay">
@@ -31,7 +24,7 @@
     <!-- LABEL: Click continue to complete the payment on the bank page -->
     {$t(BANK_VERIFICATION_DESCRIPTION)}
   </span>
-  <button class="btn" on:click={onContinue}>
+  <button class="btn" on:click={() => onContinue()}>
     <!-- LABEL: Continue -->
     {$t(BANK_VERIFICATION_ACTION_CONTINUE)}
   </button>
@@ -42,6 +35,7 @@
     display: flex;
     flex-direction: column;
     white-space: normal;
+    padding: 20px;
   }
   b {
     margin-bottom: 12px;

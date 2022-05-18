@@ -77,7 +77,6 @@
 
 <style>
   .rtb-overlay {
-    box-sizing: border-box;
     padding: 16px;
   }
   .rtb-overlay-header {

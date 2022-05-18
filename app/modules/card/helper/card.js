@@ -1,6 +1,9 @@
 import { shouldRememberCustomer } from 'checkoutstore/index.js';
-import { isGlobalVault } from 'razorpay';
+import RazorpayStore, { isGlobalVault } from 'razorpay';
 import { delayOTP } from 'card/experiments';
+import AuthOverlay from 'ui/components/AuthOverlay.svelte';
+import { popStack, pushOverlay } from 'navstack';
+import { Events } from 'analytics';
 
 export function delayLoginOTPExperiment() {
   /**
@@ -23,4 +26,18 @@ export const getCardByTokenId = (tokens, tokenId) => {
     return null;
   }
   return tokens.items.find((token) => token.id === tokenId);
+};
+
+// 3ds overlay
+export const showAuthOverlay = () => {
+  pushOverlay({
+    component: AuthOverlay,
+    props: {
+      onContinue: () => {
+        popStack();
+        Events.TrackBehav('native_otp:3ds_required:click');
+        RazorpayStore.razorpayInstance?._payment?.gotoBank();
+      },
+    },
+  });
 };

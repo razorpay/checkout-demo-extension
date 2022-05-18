@@ -164,6 +164,5 @@
 <style>
   .fee-bearer {
     padding: 20px;
-    box-sizing: border-box;
   }
 </style>

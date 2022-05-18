@@ -120,7 +120,6 @@
 
 <style>
   .secure-card-know-more-overlay {
-    box-sizing: border-box;
     background: white;
     text-align: start;
     padding: 20px;
