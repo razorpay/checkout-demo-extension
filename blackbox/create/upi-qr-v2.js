@@ -78,7 +78,7 @@ module.exports = function (testFeatures) {
     unintendedOptOut,
   } = features;
   // const anyFeeBearer = feeBearer || dynamicFeeBearer;
-  describe.each(
+  describe.skip.each(
     getTestData(title, {
       options,
       preferences,
