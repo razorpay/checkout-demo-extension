@@ -14,6 +14,7 @@ import { formatTemplateWithLocale } from 'i18n';
 import { debounce } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
+import Analytics from 'analytics';
 
 export const ctaInfo = writable({
   view: '',
@@ -215,8 +216,6 @@ const trackCTAVisibility = debounce(function () {
   // To figure out cases when CTA is shown logically
   // but is not visible physically.
   setTimeout(function () {
-    const session = getSession();
-
     const el = querySelector('#footer-cta');
     if (!el) {
       return;
@@ -224,8 +223,7 @@ const trackCTAVisibility = debounce(function () {
     const bottom = el.getBoundingClientRect().bottom;
     const windowHeight = window.innerHeight;
     const ctaVisible = bottom <= windowHeight;
-
-    session.trackEvent('cta:show', {
+    Analytics.track('cta:show', {
       data: {
         ctaVisible,
         doctypeMissing: document.doctype === null,

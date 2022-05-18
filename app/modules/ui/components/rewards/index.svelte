@@ -36,11 +36,12 @@
   .rewards-wrapper {
     white-space: normal;
     position: relative;
-    background: url('https://cdn.razorpay.com/checkout/rewards_bg.svg');
+    background-image: url('https://cdn.razorpay.com/checkout/rewards_bg.svg');
     background-position-y: -60px;
     background-repeat: no-repeat;
     background-position-x: -50px;
     background-size: 400px 400px;
+    padding: 20px;
   }
   .rewards-header {
     line-height: 1.4;

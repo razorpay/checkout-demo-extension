@@ -2732,10 +2732,6 @@ Session.prototype = {
 
     return valid;
   },
-
-  trackEvent: function (eventName, data) {
-    Analytics.track(eventName, data);
-  },
   tabSwitchStart: 0,
   tabsCount: 0,
   switchTab: function (tab, payload) {

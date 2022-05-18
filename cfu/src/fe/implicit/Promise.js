@@ -32,12 +32,12 @@ function handle(self, deferred) {
   }
   self._handled = true;
   setTimeout(function () {
-    var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+    let cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
     if (cb === null) {
       (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
       return;
     }
-    var ret;
+    let ret;
     try {
       ret = cb(self._value);
     } catch (e) {
@@ -55,7 +55,7 @@ function resolve(self, newValue) {
       throw new TypeError('promise resolved by itself');
     }
     if (_.isNonNullObject(newValue) || _.isFunction(newValue)) {
-      var then = newValue.then;
+      let then = newValue.then;
       if (isPromise(newValue)) {
         self._state = 3;
         self._value = newValue;
@@ -108,7 +108,7 @@ function Handler(onFulfilled, onRejected, promise) {
  * Makes no guarantees about asynchrony.
  */
 function doResolve(fn, self) {
-  var done = false;
+  let done = false;
   try {
     fn(
       function (value) {
@@ -142,7 +142,7 @@ Promise.prototype
     },
 
     then: function (onFulfilled, onRejected) {
-      var prom = new Promise((_) => _);
+      let prom = new Promise((_) => _);
       handle(this, new Handler(onFulfilled, onRejected, prom));
       return prom;
     },
@@ -165,7 +165,7 @@ Promise.all = function (args) {
     if (args.length === 0) {
       return resolve([]);
     }
-    var remaining = args.length;
+    let remaining = args.length;
 
     args.forEach(function res(val, i) {
       try {

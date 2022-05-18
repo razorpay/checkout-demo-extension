@@ -2,6 +2,8 @@
   // Svelte imports
   import { onMount } from 'svelte';
 
+  import { popStack, pushOverlay } from 'navstack';
+
   //i18n
   import { t } from 'svelte-i18n';
 
@@ -12,16 +14,10 @@
 
   import { REWARDS_TOOLTIP_TEXT } from 'ui/labels/rewards';
 
-  //store
-  import { showBackdrop } from 'checkoutstore/backdrop';
-
-  // Utils
-  import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getThemeMeta } from 'checkoutstore/theme';
 
-  const session = getSession();
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
   let snackBar;
@@ -53,16 +49,14 @@
     if (snackBar) {
       snackBar.removeSnackBar();
     }
-    session.svelteOverlay.$$set({
+    pushOverlay({
       component: Rewards,
       props: {
-        onClick: function (e) {
-          session.hideErrorMessage(e);
+        onClick: function () {
+          popStack();
         },
       },
     });
-    session.showSvelteOverlay();
-    showBackdrop();
   }
 </script>
 
