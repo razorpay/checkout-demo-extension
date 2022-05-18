@@ -80,7 +80,7 @@ function adoptSessionUI(
   session: any,
   config: UPI.PaymentProcessConfiguration
 ) {
-  (document.querySelector('#error-message .link') as HTMLElement).innerHTML =
+  (document.querySelector('#error-message .link') as HTMLElement).textContent =
     format('misc.cancel_action');
   /**
    * Start a general loader with cancel action

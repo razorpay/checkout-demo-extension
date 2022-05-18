@@ -304,7 +304,7 @@ function errorHandler(response) {
 
         if (help) {
           if (message) {
-            $(help).html(message);
+            help.textContent = message;
           }
           updateScore('clickOnSubmitWithoutDetails');
           Form.shake();
@@ -694,12 +694,8 @@ Session.prototype = {
    *
    * @param {String} html
    */
-  setRawAmountInHeader: function (html, isRawHtml) {
-    if (isRawHtml) {
-      $('#amount .original-amount').rawHtml(html);
-    } else {
-      $('#amount .original-amount').html(html);
-    }
+  setRawAmountInHeader: function (html) {
+    $('#amount .original-amount').rawHtml(html);
   },
 
   /**
@@ -2504,11 +2500,11 @@ Session.prototype = {
     }
 
     $('#content').toggleClass('has-discount', hasDiscount);
-    $('#amount .discount').html(
-      hasDiscount
-        ? discreet.Currency.formatAmountWithSymbol(amount, currency)
-        : ''
-    );
+
+    docUtil.querySelector('#amount .discount').textContent = hasDiscount
+      ? discreet.Currency.formatAmountWithSymbol(amount, currency)
+      : '';
+
     if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
       $('#amount .original-amount').hide();
     } else {
@@ -5364,7 +5360,7 @@ Session.prototype = {
 
     this.attemptCount++;
 
-    let sub_link = $('#error-message .link');
+    let sub_link = docUtil.querySelector('#error-message .link');
 
     let iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
@@ -5440,7 +5436,7 @@ Session.prototype = {
         }.bind(this)
       );
     } else if (data.method === 'upi') {
-      sub_link.html(I18n.format('misc.cancel_action'));
+      sub_link.textContent = I18n.format('misc.cancel_action');
 
       this.r.on('payment.upi.noapp', function () {
         that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
@@ -5491,7 +5487,7 @@ Session.prototype = {
 
       if (data.provider === 'trustly') {
         // Show goto payment popup link in loader
-        sub_link.html(I18n.format('misc.go_to_payment'));
+        sub_link.textContent = I18n.format('misc.go_to_payment');
       }
 
       this.r.on('payment.app.pending', function () {
@@ -5542,7 +5538,7 @@ Session.prototype = {
       return that.showLoadError();
     } else {
       if (!this.headless) {
-        sub_link.html(I18n.format('misc.go_to_payment'));
+        sub_link.textContent = I18n.format('misc.go_to_payment');
         this.r.on('payment.cancel', function () {
           that.showLoadError(I18n.format('misc.payment_canceled'), true);
         });

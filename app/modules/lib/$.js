@@ -1,4 +1,4 @@
-import { each, escapeHtml, scrollIntoView } from 'lib/utils';
+import { each, scrollIntoView } from 'lib/utils';
 import { isNonNullObject } from 'utils/object';
 
 var $ = function (el) {
@@ -13,12 +13,12 @@ var $ = function (el) {
 
 $.prototype = {
   on: function (event, callback, capture, thisArg) {
-    var el = this[0];
+    let el = this[0];
     if (!el) {
       return;
     }
 
-    var ref;
+    let ref;
     if (_.isString(callback)) {
       callback = thisArg[callback];
     }
@@ -46,7 +46,7 @@ $.prototype = {
   },
 
   prop: function (prop, val) {
-    var el = this[0];
+    let el = this[0];
     if (arguments.length === 1) {
       return el && el[prop];
     }
@@ -70,8 +70,8 @@ $.prototype = {
       );
       return this;
     }
-    var argLen = arguments.length;
-    var el = this[0];
+    let argLen = arguments.length;
+    let el = this[0];
 
     if (argLen === 1) {
       return el && el.getAttribute(attr);
@@ -93,7 +93,7 @@ $.prototype = {
 
   remove: function () {
     try {
-      var el = this[0];
+      let el = this[0];
       el.parentNode.removeChild(el);
     } catch (e) {}
     return this;
@@ -108,7 +108,7 @@ $.prototype = {
   },
 
   addClass: function (str) {
-    var el = this[0];
+    let el = this[0];
     if (str && el) {
       str.split(' ').forEach(function (newClass) {
         el.classList.add(newClass);
@@ -131,14 +131,14 @@ $.prototype = {
   },
 
   qs: function (selector) {
-    var node = this[0];
+    let node = this[0];
     if (node) {
       return node.querySelector(selector);
     }
   },
 
   find: function (selector) {
-    var node = this[0];
+    let node = this[0];
     if (node) {
       return node.querySelectorAll(selector);
     }
@@ -153,7 +153,7 @@ $.prototype = {
   },
 
   css: function (prop, value) {
-    var style = this.prop('style');
+    let style = this.prop('style');
     if (style) {
       if (arguments.length === 1) {
         if (isNonNullObject(prop)) {
@@ -223,16 +223,6 @@ $.prototype = {
     return this;
   },
 
-  html: function (html) {
-    if (arguments.length) {
-      if (this[0]) {
-        this[0].innerHTML = escapeHtml(html);
-      }
-      return this;
-    }
-    return this[0].innerHTML;
-  },
-
   rawHtml: function (html) {
     if (arguments.length) {
       if (this[0]) {
@@ -272,7 +262,7 @@ $.prototype = {
 
   scrollIntoView: function () {
     if (this[0]) {
-      var el = this[0];
+      let el = this[0];
       scrollIntoView(el);
     }
 
@@ -280,7 +270,7 @@ $.prototype = {
   },
 
   click: function () {
-    var $el = this[0];
+    let $el = this[0];
 
     if (!$el) {
       return;
@@ -290,7 +280,7 @@ $.prototype = {
       return $el.click();
     }
 
-    var eventObj = document.createEvent('MouseEvents');
+    let eventObj = document.createEvent('MouseEvents');
     eventObj.initEvent('click', true, true);
     $el.dispatchEvent(eventObj);
   },

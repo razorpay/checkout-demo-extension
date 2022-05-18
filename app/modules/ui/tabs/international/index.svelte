@@ -192,7 +192,7 @@
     const AVSData = get(AVSDccPayload);
     if (AVSData) {
       if (AVSData.header) {
-        session.setRawAmountInHeader(AVSData.header, true);
+        session.setRawAmountInHeader(AVSData.header);
         showAmount(AVSData.cta);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();

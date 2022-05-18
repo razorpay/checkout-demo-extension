@@ -380,7 +380,7 @@
   function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
       if (displayAmount) {
-        session.setRawAmountInHeader(displayAmount, true);
+        session.setRawAmountInHeader(displayAmount);
         showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
         if (isCtaShown()) {
