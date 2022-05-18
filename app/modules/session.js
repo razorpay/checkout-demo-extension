@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-redeclare
-/* global fetch, Promise, _, _Obj */
+/* global fetch, _, _Obj */
 import * as RazorpayHelper from 'razorpay';
 import discreet from 'checkoutframe/discreet';
+import * as Confirm from 'checkoutframe/components/confirm';
 import { formatAmountWithCurrency } from 'helper/currency';
 import {
   getPrefilledContact,
@@ -57,7 +58,6 @@ let preferences,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n,
   NativeStore = discreet.NativeStore,
-  Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
@@ -1322,7 +1322,7 @@ Session.prototype = {
           let payment = self.r._payment;
 
           if (confirmedCancel !== true && payment) {
-            self.confirmClose().then(function (confirmed) {
+            Confirm.confirmClose().then(function (confirmed) {
               if (confirmed) {
                 self.clearRequest({
                   '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
@@ -1695,7 +1695,7 @@ Session.prototype = {
       }
     }
 
-    let beforeReturn = function () {
+    const beforeReturn = function () {
       // Prevents the overlay from closing and not allowing the user to
       // attempt payment again incase of corporate netbanking.
       if (self.isCorporateBanking) {
@@ -1722,30 +1722,17 @@ Session.prototype = {
         return;
       }
 
-      let paymentMethod = this.payload && this.payload.method;
-
-      self.confirmClose().then(function (close) {
-        if (paymentMethod === 'netbanking' && close) {
-          self.r._payment.popup.onClose();
-          return;
-        }
+      Confirm.confirmClose().then((close) => {
         if (close) {
-          // close the iframe as payment is cancelled
-          let payment = self.r._payment;
-          if (
-            payment &&
-            payment.forceIframeElement &&
-            payment.forceIframeElement.window &&
-            payment.forceIframeElement.window.destroy
-          ) {
-            self.r._payment.forceIframeElement.window.destroy();
+          if (self.payload && self.payload.method === 'netbanking') {
+            self.r._payment.popup.onClose();
+          } else {
+            self.clearRequest();
+            if (Bridge.checkout.platform === 'ios') {
+              Bridge.checkout.callIos('hide_nav_bar');
+            }
+            beforeReturn();
           }
-
-          self.clearRequest();
-          if (Bridge.checkout.platform === 'ios') {
-            Bridge.checkout.callIos('hide_nav_bar');
-          }
-          beforeReturn();
         } else {
           // move focus to popup or iframe
           self.r.focus();
@@ -1999,40 +1986,16 @@ Session.prototype = {
       true
     );
 
-    this.on(
-      'focus',
-      selector,
-      'selector',
-      function (e) {
-        $(e.target).addClass('focused');
-      },
-      true
-    );
-
-    this.on(
-      'blur',
-      selector,
-      'selector',
-      function (e) {
-        $(e.target).removeClass('focused');
-      },
-      true
-    );
-
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function () {
-        let beforeReturn = function () {
-          self.hide();
-        };
-
         if (self.get('modal.confirm_close')) {
-          self.confirmClose().then(function (close) {
+          Confirm.confirmClose().then(function (close) {
             if (close) {
-              beforeReturn();
+              self.hide();
             }
           });
         } else {
-          beforeReturn();
+          self.hide();
         }
       });
     }
@@ -2555,19 +2518,6 @@ Session.prototype = {
     Header.updateAmountFontSize();
   },
 
-  confirmClose: function () {
-    return new Promise(function (resolve) {
-      Confirm.show({
-        onPositiveClick: function () {
-          resolve(true);
-        },
-        onNegativeClick: function () {
-          resolve(false);
-        },
-      });
-    });
-  },
-
   back: function (confirmedCancel) {
     let tab = '';
     let payment = this.r._payment;
@@ -2614,7 +2564,7 @@ Session.prototype = {
         this.clearRequest();
         this.otpView.onBack();
       } else {
-        this.confirmClose().then(function (close) {
+        Confirm.confirmClose().then(function (close) {
           if (close) {
             self.back(true);
             self.setOneCCTabLogo('');
@@ -2719,7 +2669,7 @@ Session.prototype = {
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
 
     if (walletOtpPage || cardlessEmiOtpPage) {
-      self.confirmClose().then(function (close) {
+      Confirm.confirmClose().then(function (close) {
         if (close) {
           discreet.OTPScreenStore.tabLogo.set('');
           self.clearRequest({
@@ -3547,7 +3497,7 @@ Session.prototype = {
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
-        self.confirmClose().then((confirmed) => {
+        Confirm.confirmClose().then((confirmed) => {
           if (confirmed) {
             if (
               discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true) === 2
@@ -3751,7 +3701,7 @@ Session.prototype = {
     let session = this;
 
     if (session.get('modal.confirm_close')) {
-      session.confirmClose().then(function (close) {
+      Confirm.confirmClose().then(function (close) {
         if (close) {
           session.hide();
         }
@@ -4783,7 +4733,7 @@ Session.prototype = {
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
           /**
            * P13N is on home
-           
+
            */
           BackStore = {
             tab: '',

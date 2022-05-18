@@ -23,3 +23,12 @@ export function hide(options) {
     confirm.hide(options);
   }
 }
+
+export function confirmClose() {
+  return new Promise(function (resolve) {
+    show({
+      onPositiveClick: () => resolve(true),
+      onNegativeClick: () => resolve(false),
+    });
+  });
+}

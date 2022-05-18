@@ -500,52 +500,6 @@ i {
   z-index: 100;
 }
 
-.selector {
-  padding-bottom: 6px;
-  cursor: pointer;
-  white-space: nowrap;
-  padding-right: 10px;
-  box-sizing: border-box;
-
-  &:hover, &.focused {
-    &::after {
-      transform: scale(1);
-    }
-  }
-
-  input {
-    display: none;
-  }
-
-  .overflow-parent {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .help {
-    white-space: normal;
-
-    &.up {
-      margin-bottom: 12px;
-    }
-  }
-
-  &.disabled {
-    .text.theme-highlight {
-      color: #858585;
-    }
-  }
-
-  &.invalid.mature:not(.focused) .text {
-    color: $danger;
-  }
-
-  .text, i, .overflow-parent {
-    pointer-events: none;
-  }
-}
-
 .options-list {
   border-radius: 2px;
   box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.04);

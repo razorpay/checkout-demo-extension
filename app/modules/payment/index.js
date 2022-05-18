@@ -42,7 +42,7 @@ import * as docUtil from 'utils/doc';
 import { getOption, getOrderId } from 'razorpay';
 
 const RAZORPAY_COLOR = '#528FF0';
-var pollingInterval;
+let pollingInterval;
 
 let createdPaymentsCount = 0;
 
@@ -56,7 +56,7 @@ function clearPollingInterval(force) {
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = {
+    let cancelError = {
       error: {
         code: 'BAD_REQUEST_ERROR',
         description: metaParam?.upiNoApp
@@ -65,17 +65,17 @@ function onPaymentCancel(metaParam) {
         reason: metaParam?.upiNoApp ? 'intent_no_apps_error' : '',
       },
     };
-    var payment_id = this.payment_id;
-    var razorpay = this.r;
-    var eventData = {};
-    var metadata = this.getMetadata();
+    let payment_id = this.payment_id;
+    let razorpay = this.r;
+    let eventData = {};
+    let metadata = this.getMetadata();
     if (metadata) {
       cancelError.error.metadata = metadata;
     }
 
     if (payment_id) {
       eventData.payment_id = payment_id;
-      var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
+      let url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
 
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
@@ -145,7 +145,7 @@ function trackNewPayment(data, params, r) {
 
   updateScore('timeToSubmit');
 
-  var trackingData = getTrackingData(data);
+  let trackingData = getTrackingData(data);
   if (params.downtimeSeverity) {
     trackingData.downtimeSeverity = params.downtimeSeverity;
   }
@@ -205,7 +205,7 @@ export default function Payment(data, params = {}, r) {
     Analytics.setMeta('microapps.gpay', true);
   }
 
-  var avoidPopup = false;
+  let avoidPopup = false;
 
   const isDynamicWallet = isDynamicWalletFlow();
 
@@ -382,9 +382,9 @@ Payment.prototype = {
 
   checkRedirect: function () {
     if (!this.iframe && getOption('redirect')) {
-      var data = this.data;
+      let data = this.data;
       // add callback_url if redirecting
-      var callback_url = getOption('callback_url');
+      let callback_url = getOption('callback_url');
       if (callback_url) {
         data.callback_url = callback_url;
       }
@@ -537,7 +537,7 @@ Payment.prototype = {
       }
 
       this.clear();
-      var errorObj = data.error;
+      let errorObj = data.error;
       if (!_.isNonNullObject(errorObj) || !errorObj.description) {
         if (data.request) {
           if (processCoproto.call(this, data)) {
@@ -582,7 +582,7 @@ Payment.prototype = {
   },
 
   tryAjax: function () {
-    var data = this.data;
+    let data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.feesRedirect) {
       return;
@@ -690,12 +690,12 @@ Payment.prototype = {
   },
 
   trySubmit: function () {
-    var payment = this;
-    var popup = payment.popup;
+    let payment = this;
+    let popup = payment.popup;
 
     // no ajax route was available
     if (popup || this.forceIframeElement) {
-      var data = payment.data;
+      let data = payment.data;
 
       // fix long notes
       _Obj.loop(data, (val, key) => {
@@ -817,7 +817,7 @@ Payment.prototype = {
     if (this.iframe) {
       Medium = Iframe;
     }
-    var popup = new Medium('', 'popup_' + Track.id, this);
+    let popup = new Medium('', 'popup_' + Track.id, this);
     if ((popup && !popup.window) || popup.window.closed !== false) {
       popup.close();
       popup = null;
@@ -842,7 +842,7 @@ Payment.prototype = {
   },
 
   writePopup: function () {
-    var popup = this.popup;
+    let popup = this.popup;
     if (popup) {
       writePopup(popup.window, this);
     }
@@ -881,7 +881,7 @@ Payment.prototype = {
 function pollPaymentData(onComplete) {
   clearPollingInterval(true);
   pollingInterval = setInterval(function () {
-    var paymentData = cookie.get('onComplete');
+    let paymentData = cookie.get('onComplete');
 
     if (paymentData) {
       clearPollingInterval();
@@ -902,7 +902,7 @@ function makeRedirectUrl(fees) {
 
 Razorpay.setFormatter = FormatDelegator;
 
-var razorpayProto = Razorpay.prototype;
+let razorpayProto = Razorpay.prototype;
 
 /**
  * Method to check if a payment adapter is present.
@@ -914,7 +914,7 @@ var razorpayProto = Razorpay.prototype;
 razorpayProto.checkPaymentAdapter = function (adapter, data) {
   // Hack to support web payments api for voth standard and custom checkout
   // TODO - Solution web payments for custom checkout to make them more extensible
-  var adapterPackageNameMap = {
+  let adapterPackageNameMap = {
     gpay: GOOGLE_PAY_PACKAGE_NAME,
     [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
     [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
@@ -945,7 +945,7 @@ razorpayProto.isTezAvailable = function (success, error) {
 };
 
 razorpayProto.postInit = function () {
-  var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
+  let themeColor = this.get('theme.color') || RAZORPAY_COLOR;
 
   this.themeMeta = {
     color: themeColor,
@@ -1101,7 +1101,7 @@ razorpayProto.focus = function () {
 };
 
 razorpayProto.submitOTP = function (otp) {
-  var payment = this._payment;
+  let payment = this._payment;
   payment.ajax = fetch.post({
     url: payment.otpurl,
     data: {
@@ -1113,8 +1113,8 @@ razorpayProto.submitOTP = function (otp) {
 };
 
 razorpayProto.resendOTP = function () {
-  var payment = this._payment;
-  var url =
+  let payment = this._payment;
+  let url =
     payment.resendOtpUrl ||
     makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
 
@@ -1128,8 +1128,8 @@ razorpayProto.resendOTP = function () {
 };
 
 razorpayProto.topupWallet = function () {
-  var payment = this._payment;
-  var isRedirect = this.get('redirect');
+  let payment = this._payment;
+  let isRedirect = this.get('redirect');
   if (!isRedirect) {
     payment.makePopup();
     payment.writePopup();
@@ -1143,7 +1143,7 @@ razorpayProto.topupWallet = function () {
       '_[source]': 'checkoutjs',
     },
     callback: (response) => {
-      var request = response.request;
+      let request = response.request;
       if (isRedirect && !response.error && request) {
         docUtil.redirectTo({
           url: request.url,
@@ -1171,7 +1171,7 @@ export function getCardCurrenciesFromCache(payload) {
 /**
  * Store ongoing currency request
  */
-var CardCurrencyRequests = {};
+let CardCurrencyRequests = {};
 
 /**
  * Currency cache for synchronous retrieval

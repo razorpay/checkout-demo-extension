@@ -76,7 +76,6 @@ import NachScreen from 'ui/tabs/nach/index.svelte';
 import * as cardTab from 'checkoutframe/components/card';
 import * as walletTab from 'checkoutframe/components/wallet';
 import * as Backdrop from 'checkoutframe/components/backdrop';
-import * as Confirm from 'checkoutframe/components/confirm';
 import * as FeeLabel from 'checkoutframe/components/fee';
 import * as internationalTab from 'checkoutframe/components/international';
 import * as InternationalStores from 'checkoutstore/screens/international';
@@ -141,7 +140,6 @@ export default {
   AnalyticsTypes,
   UPIUtils,
   UTILS,
-  Confirm,
   FeeLabel,
   Currency,
   OtpService,
