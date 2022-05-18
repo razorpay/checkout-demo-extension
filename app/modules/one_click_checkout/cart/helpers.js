@@ -79,7 +79,10 @@ export const isCartTruthy = (cart) => {
     });
   });
 
-  const lineItemsTotalAmount = cart.reduce((acc, curr) => acc + +curr.price, 0);
+  const lineItemsTotalAmount = cart.reduce(
+    (acc, curr) => acc + curr.quantity * +curr.price,
+    0
+  );
 
   return areAllItemsTruthy && lineItemsTotalAmount === get(cartAmount);
 };
