@@ -66,7 +66,6 @@ let preferences,
   Header = discreet.Header,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
-  views = discreet.views,
   CardViews = discreet.CardViews,
   merchantAnalytics = discreet.merchantAnalytics,
   merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
@@ -2290,18 +2289,13 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
     if (screen === 'home-1cc') {
-      this.topBar.hide();
       discreet.OffersStore.showOffers.set(false);
     } else {
       discreet.OffersStore.showOffers.set(true);
       if (screen) {
         this.topBar.show();
-        $('.elem-email').addClass('mature');
-        $('.elem-contact').addClass('mature');
       } else if (!RazorpayHelper.isOneClickCheckout()) {
         this.topBar.hide();
-      } else if (RazorpayHelper.isOneClickCheckout()) {
-        this.showHomeTopBar();
       }
     }
     let screenEl = '#form-' + (screen || 'common');
@@ -2736,27 +2730,6 @@ Session.prototype = {
       beforeReturn();
     }
   },
-
-  showHomeTopBar: function () {
-    this.topBar.setTab(views.METHODS);
-    this.topBar.setLogged(true);
-    let contact = getPhone();
-    this.topBar.setContact(contact);
-    this.topBar.updateUserDropDown();
-    this.topBar.show();
-  },
-
-  oneClickCheckoutRedirection: function () {
-    this.switchTab('');
-    this.homeTab.addressNext();
-    this.homeTab.next(views.METHODS);
-  },
-
-  updateOrderFailure: function () {
-    let errorMessage = I18n.format('address.order_update_failure');
-    this.showLoadError(errorMessage, true);
-  },
-
   /**
    * Checks if the fields on the homepage are valid or not.
    *

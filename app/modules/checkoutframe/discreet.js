@@ -113,7 +113,6 @@ import * as ChargesStore from 'one_click_checkout/charges/store';
 
 import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
-import { views } from 'one_click_checkout/routing/constants';
 import { Views as CardViews } from 'ui/tabs/card/constant';
 import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
@@ -250,7 +249,6 @@ export default {
   ChargesHelper,
   ChargesStore,
   OneClickCheckoutStore,
-  views,
   WalletHelper,
 
   CardViews,

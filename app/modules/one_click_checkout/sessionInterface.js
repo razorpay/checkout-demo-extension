@@ -51,7 +51,7 @@ import {
   CONFIRM_CANCEL_HEADING,
   CONFIRM_CANCEL_MESSAGE,
 } from 'one_click_checkout/misc/i18n/label';
-import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
+import { format, formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
@@ -62,6 +62,12 @@ import { getThemeMeta } from 'checkoutstore/theme';
 import * as Confirm from 'checkoutframe/components/confirm';
 
 export const historyExists = () => get(history).length;
+
+function updateOrderFailure() {
+  const session = getSession();
+  let errorMessage = format('address.order_update_failure');
+  session.showLoadError(errorMessage, true);
+}
 
 /**
  * Method called, when back action is triggered.
@@ -121,6 +127,13 @@ export const handleBack = () => {
 
 export function getLandingView() {
   return get(history)[0];
+}
+
+function oneClickCheckoutRedirection() {
+  const session = getSession();
+  session.switchTab('');
+  session.homeTab.addressNext();
+  session.homeTab.next(views.METHODS);
 }
 
 /**
@@ -207,7 +220,7 @@ export function redirectToPaymentMethods(
         if (address.cod) {
           showCodLoader.set(true);
         }
-        session.oneClickCheckoutRedirection(showSnackbar);
+        oneClickCheckoutRedirection(showSnackbar);
         navigator.navigateTo({ path: views.METHODS });
 
         thirdWatchCodServiceability(address)
@@ -237,7 +250,7 @@ export function redirectToPaymentMethods(
           });
       })
       .catch(() => {
-        session.updateOrderFailure();
+        updateOrderFailure();
         const currhis = get(history);
         const savedAddArr = currhis.find(
           (item) => item.name === views.SAVED_ADDRESSES
@@ -252,7 +265,7 @@ export function redirectToPaymentMethods(
         }
       });
   } else {
-    session.oneClickCheckoutRedirection();
+    oneClickCheckoutRedirection();
     navigator.navigateTo({ path: views.METHODS });
   }
 }
@@ -268,8 +281,7 @@ export function bindEvents(selector) {
 }
 
 export function redirectToMethods() {
-  const session = getSession();
-  session.oneClickCheckoutRedirection();
+  oneClickCheckoutRedirection();
 }
 
 export function showOrderSummary() {

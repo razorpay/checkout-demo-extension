@@ -1,5 +1,3 @@
-import { getSession } from 'sessionmanager';
-
 import { hideToast } from 'one_click_checkout/Toast';
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
