@@ -125,7 +125,6 @@
             <StateSearchField
               validationText={errors[subInput.id] ? errors[subInput.id] : ''}
               on:blur={() => onBlur(subInput.id)}
-              modifyIconPosition={errors[subInput.id] || errors['city']}
               items={subInput.items}
               onChange={handleInput}
               stateName={formData[subInput.id]}

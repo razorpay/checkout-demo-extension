@@ -141,7 +141,6 @@
     pattern={COUNTRY_CODE_REGEX}
     readonly={isContactReadOnly()}
     icon=""
-    modifyIconPosition={!!validationText}
     formatter={{ type: 'country_code' }}
     label={isOneClickCheckoutEnabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
@@ -175,7 +174,6 @@
     formatter={{ type: 'phone' }}
     label={$t(label)}
     icon=""
-    modifyIconPosition={!!validationText}
     on:input={(e) => {
       phone = e.target.value;
       dispatch('input', e);

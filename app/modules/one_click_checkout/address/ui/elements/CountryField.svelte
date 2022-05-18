@@ -114,7 +114,6 @@
     elemClasses="address-elem"
     labelClasses="address-label"
     {validationText}
-    modifyIconPosition={!!validationText}
     showDropDownIcon={true}
   />
   {#if showExtraLabel && extraLabel}

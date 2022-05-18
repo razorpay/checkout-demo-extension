@@ -60,7 +60,6 @@
   export let leftImage = null;
   export let dir;
   export let disabled = false;
-  export let modifyIconPosition = false;
   export let inputFieldClasses = '';
   export let errorValidationClasses = '';
   export let labelUpperClasses = '';
@@ -445,7 +444,7 @@
     class:with-prediction={isPredictionEnable}
   >
     {#if icon}
-      <i class:icon-invalid={modifyIconPosition}>
+      <i>
         {@html icon}
       </i>
     {/if}
