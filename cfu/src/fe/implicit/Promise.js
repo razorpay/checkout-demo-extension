@@ -226,4 +226,9 @@ if (!_.isFunction(PromiseRuntime.prototype.finally)) {
   PromiseRuntime.prototype.finally = Promise.prototype.finally;
 }
 
+// Add allSettled to runtime if it doesn't exist.
+if (!_.isFunction(PromiseRuntime.allSettled)) {
+  PromiseRuntime.allSettled = Promise.allSettled;
+}
+
 export default PromiseRuntime;

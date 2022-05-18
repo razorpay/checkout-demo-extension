@@ -123,58 +123,6 @@ function autoScrollHeaderIfLandscape() {
   }
 }
 
-const SHORTEST_IPHONE_HEIGHT = 568; // iPhone 5S
-
-/**
- * On iPhone with smaller heights (iPhone 5S),
- * the pay button is not visible on the web.
- *
- * This shifts the pay button to the visible area.
- */
-function shiftIosPayButtonOnSmallerHeights() {
-  if (UserAgent.iPhone) {
-    setTimeout(() => {
-      const footer = querySelector('#footer');
-      /**
-       * On Portrait mode,
-       * if the device is short,
-       * shift the pay button.
-       */
-      if (
-        !isDeviceLandscape() &&
-        global.screen.height <= SHORTEST_IPHONE_HEIGHT
-      ) {
-        _El.addClass(footer, 'shift-ios');
-      }
-    }, 1000);
-
-    if (UserAgent.iPhone) {
-      global.addEventListener('resize', () => {
-        // Device isn't very short. Return.
-        if (global.screen.height > SHORTEST_IPHONE_HEIGHT) {
-          return;
-        }
-
-        const footer = querySelector('#footer');
-
-        /**
-         * If portrait,
-         * and DOM height does not overflow,
-         * shift Pay button
-         */
-        if (
-          !isDeviceLandscape() &&
-          global.screen.height - global.innerHeight >= 56
-        ) {
-          _El.addClass(footer, 'shift-ios');
-        } else {
-          _El.removeClass(footer, 'shift-ios');
-        }
-      });
-    }
-  }
-}
-
 /**
  * Removes extra padding in landscape mode
  */
@@ -197,7 +145,6 @@ function reduceUnneededPaddingIfLandscape() {
 export function initPreRenderHacks() {}
 
 export function initPostRenderHacks() {
-  shiftIosPayButtonOnSmallerHeights();
   decreaseWebViewHeightForAndroidTablets();
   reduceUnneededPaddingIfLandscape();
   autoScrollHeaderIfLandscape();
