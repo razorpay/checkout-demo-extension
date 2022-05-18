@@ -836,7 +836,6 @@
 
     // Reset the card country if entering new card
     $cardCountry = '';
-
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
     isDowntime('network', cardType);
     if (sixDigits) {

@@ -1,30 +1,20 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  import Icon from 'ui/elements/Icon.svelte';
-  import { getThemeColor } from 'checkoutstore/theme';
-
   export let callout = null;
   export let buttonText = null;
-
-  const dispatch = createEventDispatcher();
-
-  function onConfirm() {
-    dispatch('action', {
-      action: 'confirm',
-    });
-  }
+  export let onConfirm;
 </script>
 
-<div class="auth-overlay">
+<div class="user-confirmation-overlay">
   <span class="desc">{callout}</span>
-  <button class="btn" on:click={onConfirm}>{buttonText}</button>
+  <button class="btn" on:click={() => onConfirm?.()}>{buttonText}</button>
 </div>
 
 <style>
-  .auth-overlay {
+  .user-confirmation-overlay {
     display: flex;
     flex-direction: column;
     white-space: normal;
+    padding: 20px;
   }
   .desc {
     font-size: 12px;

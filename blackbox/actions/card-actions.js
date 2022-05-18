@@ -208,7 +208,7 @@ async function enterCardDetails(
 async function agreeToAMEXCurrencyCharges(context) {
   // needed for overlay animation
   await delay(200);
-  context.page.click('#overlay-wrap .btn');
+  context.page.click('#overlay .btn');
   await delay(200);
 }
 

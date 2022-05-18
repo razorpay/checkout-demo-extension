@@ -11,6 +11,7 @@ import {
   sanitizeTokens,
 } from 'checkoutframe/customer';
 import { init1CCMetaData } from 'one_click_checkout/helper';
+import { showConversionChargesCallout } from 'card/helper';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -4026,40 +4027,6 @@ Session.prototype = {
     });
   },
 
-  showConversionChargesCallout: function () {
-    let locale = I18n.getCurrentLocale();
-
-    this.svelteOverlay.$set({
-      component: discreet.UserConfirmationOverlay,
-      props: {
-        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
-        callout: I18n.formatMessageWithLocale(
-          'card.international_currency_charges',
-          locale
-        ),
-      },
-    });
-
-    let that = this;
-
-    this.showSvelteOverlay();
-    let clearActionListener = that.svelteOverlay.$on(
-      'action',
-      function (event) {
-        let action = event.detail.action;
-        if (action === 'confirm') {
-          that.hideSvelteOverlay();
-          Backdrop.hide();
-          that.submit();
-        }
-      }
-    );
-    var clearHideListener = that.svelteOverlay.$on('hidden', function () {
-      clearActionListener();
-      clearHideListener();
-    });
-  },
-
   getAVSPayload: function (selectedInstrument) {
     let isOnAVSScreen = this.svelteCardTab.isOnAVSScreen() || false;
 
@@ -4494,7 +4461,7 @@ Session.prototype = {
     if (
       discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
     ) {
-      this.showConversionChargesCallout();
+      showConversionChargesCallout();
       return;
     }
     payload = this.payload;
