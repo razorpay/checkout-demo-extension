@@ -175,6 +175,7 @@ export default {
       ICIC: 'ICICI',
       ICIC_C: 'ICICI Corporate',
       IDFB: 'IDFC',
+      IDIB: 'Indian Bank',
       INDB: 'IndusInd',
       IOBA: 'IOB',
       KKBK: 'Kotak',

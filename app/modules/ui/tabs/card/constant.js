@@ -14,6 +14,7 @@ export const cardWithRecurringSupport = {
   CIUB: { credit: true, debit: true },
   ESFB: { credit: false, debit: true },
   HSBC: { credit: true, debit: false },
+  IDIB: { credit: false, debit: true },
   KVBL: { credit: true, debit: true },
   PUNB: { credit: true, debit: false },
   IOBA: { credit: true, debit: true },
@@ -47,6 +48,10 @@ export const supportedNetworksAndProviders = {
   HSBC: {
     credit: ['VISA', 'MC'],
     debit: [],
+  },
+  IDIB: {
+    credit: [],
+    debit: ['VISA', 'MC'],
   },
   IOBA: {
     debit: ['VISA', 'MC'],
