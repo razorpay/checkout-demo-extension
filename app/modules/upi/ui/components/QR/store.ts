@@ -2,7 +2,7 @@
  * This store is not supposed to be used outside, hence created within component dir
  */
 
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 interface QrStateType {
   /**
@@ -44,6 +44,21 @@ export function updateQrState(data: Partial<QrStateType>) {
     ...data,
   }));
 }
-export function resetQRState() {
-  updateQrState({ ...initialState, autoGenerate: false });
+
+export function resetQRState(hardReset = false) {
+  const previousState = get(qrState);
+
+  updateQrState(
+    hardReset
+      ? initialState
+      : {
+          ...initialState,
+          /**
+           * On soft reset, auto-generate depends on current state,
+           * i.e, if we have url, means, we have QR payment created, avoid next auto-gen
+           * vice-versa
+           */
+          autoGenerate: previousState.url ? false : previousState.autoGenerate,
+        }
+  );
 }

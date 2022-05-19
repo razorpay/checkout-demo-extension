@@ -14,7 +14,6 @@
   import { QR_EXPIRE_TIME, QR_OFF_SCREEN_POLL_DELAY_BY } from 'upi/constants';
   // Analytics
   import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
   import UPI_EVENTS from 'ui/tabs/upi/events';
 
   // i18n
@@ -31,21 +30,23 @@
 
   const onResponse: UPI.PaymentResponseHandler = (status, response) => {
     // clear the old timer;
-    resetQRState();
     clearTimer();
     switch (status) {
       case 'success':
+        resetQRState();
         break;
       case 'cancel':
+        /** QR Payment might have already cancelled from session hence don't reset again */
         break;
       case 'error':
+        resetQRState();
         Analytics.track(UPI_EVENTS.QR_GENERATION_FAIL, {
           reason: response.error.description,
         });
         break;
     }
   };
-  const createQRPayment = (manualRefresh: boolean = true) => {
+  const createQRPayment = (manualRefresh = true) => {
     updateQrState({ status: 'loading', manualRefresh });
     if (manualRefresh) {
       trackRefreshQR();
@@ -65,7 +66,6 @@
               () => {
                 clearActiveQRPayment(true);
                 trackQRStatus('qrExpired');
-                resetQRState();
               },
               true
             );

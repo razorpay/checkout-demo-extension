@@ -43,6 +43,10 @@ const setFlowInPayload = (
        * Hence add additional param and fallback to intent
        */
       data['_[upiqr]'] = '1';
+      /**
+       * QR flow will fail if save parameter sent
+       */
+      delete data.save;
       setFlowInPayload(data, 'intent');
       break;
     case 'intent':

@@ -1,4 +1,5 @@
 import $ from 'lib/$';
+import { resetQRState } from 'upi/ui/components/QR/store';
 
 export function Modal() {
   let timeout: NodeJS.Timeout | null;
@@ -36,7 +37,7 @@ export function Modal() {
       this.isShown = false;
       this.container.removeClass('drishy');
       const self = this;
-
+      resetQRState(true);
       timeout = setTimeout(
         function () {
           self.hidden();
