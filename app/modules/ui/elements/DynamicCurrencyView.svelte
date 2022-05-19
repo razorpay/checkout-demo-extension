@@ -64,9 +64,9 @@
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   import {
-    DCC_VIEW_FOR_PROVIDERS,
-    INTERNATIONAL_PROVIDERS,
-  } from 'ui/tabs/international/constants';
+    isDCCEnabledForProvider,
+    isInternationalProvider,
+  } from 'common/international';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -75,8 +75,6 @@
     ADD_CARD: 'add-card',
     HOME_SCREEN: 'home-screen',
     PAYPAL_WALLET: 'paypal',
-    TRUSTLY_PROVIDER: 'trustly',
-    POLI_PROVIDER: 'poli',
     AVS: 'avs-card',
   };
   // Remove the space between Amount and symbol on Magic Checkout Flow
@@ -166,7 +164,7 @@
       }
     } else if (view === Views.PAYPAL_WALLET) {
       prop = { walletCode: 'paypal' };
-    } else if (INTERNATIONAL_PROVIDERS.includes(view)) {
+    } else if (isInternationalProvider(view)) {
       prop = { provider: view };
     } else {
       prop = null;
@@ -237,7 +235,7 @@
      * as this component get destroyed with state
      */
     if (
-      DCC_VIEW_FOR_PROVIDERS.includes(session?.dccPayload?.view) &&
+      isDCCEnabledForProvider(session?.dccPayload?.view) &&
       session?.dccPayload?.currency
     ) {
       selectedCurrency = session.dccPayload.currency;
@@ -345,7 +343,7 @@
 
   $: {
     if (entity) {
-      if (INTERNATIONAL_PROVIDERS.includes(view)) {
+      if (isInternationalProvider(view)) {
         updateNVSEntities(entity, AVSRequired);
       } else {
         AVSScreenMap.update((value) => ({ ...value, [entity]: AVSRequired }));

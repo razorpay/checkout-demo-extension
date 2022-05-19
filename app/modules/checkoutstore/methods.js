@@ -71,6 +71,11 @@ import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { isNonNullObject } from 'utils/object';
 import { getUniqueValues } from 'utils/array';
 
+import {
+  isMerchantInternationalMethodEnabled,
+  isMerchantInternationalAppEnabled,
+} from 'common/international';
+
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
 }
@@ -304,7 +309,7 @@ const ALL_METHODS = {
   },
 
   international() {
-    return isApplicationEnabled('trustly') || isApplicationEnabled('poli');
+    return isMerchantInternationalMethodEnabled();
   },
 };
 
@@ -618,7 +623,6 @@ export function isUPIOtmFlowEnabled(method) {
 
 export function isApplicationEnabled(app) {
   const allCardApps = getCardApps().all || [];
-  const merchantMethods = getMerchantMethods();
 
   switch (app) {
     case 'google_pay':
@@ -626,17 +630,10 @@ export function isApplicationEnabled(app) {
     case 'cred':
       return isCREDEnabled();
     case 'trustly':
-      /**
-       * Trustly is an international app, will come under international payment methods
-       * @returns boolean
-       */
-      return merchantMethods.app?.trustly;
     case 'poli':
-      /**
-       * Poli is an international app, will come under international payment methods
-       * @returns boolean
-       */
-      return merchantMethods.app?.poli;
+    case 'sofort':
+    case 'giropay':
+      return isMerchantInternationalAppEnabled(app);
   }
 
   return false;
@@ -1187,7 +1184,7 @@ export function getInternationalProviders() {
   }
 
   const apps = getAppsForMethod(method).filter((provider) =>
-    isApplicationEnabled(provider.code)
+    isMerchantInternationalAppEnabled(provider.code)
   );
 
   return apps;

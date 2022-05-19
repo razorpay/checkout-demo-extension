@@ -152,7 +152,8 @@
     isInternationalInPreferredInstrument,
     getInternationalProviderName,
     updateInternationalProviders,
-  } from 'ui/tabs/international/helper';
+    isDCCEnabledForProvider,
+  } from 'common/international';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
@@ -165,7 +166,6 @@
     ACTIONS,
     CATEGORIES,
   } from 'one_click_checkout/merchant-analytics/constant';
-  import { DCC_VIEW_FOR_PROVIDERS } from 'ui/tabs/international/constants';
   import {
     PAY_NOW_CTA_LABEL,
     PLACE_ORDER_CTA_LABEL,
@@ -1282,7 +1282,7 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if (isDCCEnabled() || DCC_VIEW_FOR_PROVIDERS.includes(dccView)) && !isDynamicFeeBearer()}
+      {#if (isDCCEnabled() || isDCCEnabledForProvider(dccView)) && !isDynamicFeeBearer()}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}

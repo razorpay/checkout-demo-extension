@@ -40,6 +40,7 @@ import { assertPaymentSuccessMetadata, popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import { getOption, getOrderId } from 'razorpay';
+import { isInternationalProvider } from 'common/international';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -237,8 +238,8 @@ export default function Payment(data, params = {}, r) {
         // CRED collect flow for razorpay.js
         avoidPopup = false;
       }
-      if (['trustly', 'poli'].includes(data.provider)) {
-        // Trustly & Poli app only works with popup
+      if (isInternationalProvider(data.provider)) {
+        // Trustly, Poli, Sofort, Giropay app only works with popup
         avoidPopup = false;
       }
     }

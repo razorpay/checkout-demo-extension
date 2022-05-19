@@ -32,6 +32,14 @@ export default {
         name: 'Poli',
         subtext: ' ',
       },
+      sofort: {
+        name: 'Sofort',
+        subtext: ' ',
+      },
+      giropay: {
+        name: 'Giropay',
+        subtext: ' ',
+      },
     },
   },
   bajaj_finserv: {
@@ -846,7 +854,7 @@ export default {
       cod_charge: '{charge} extra charge applicable.',
       cod_charge_applied: '{charge} cash on delivery charge added',
       cod_charge_removed: '{charge} cash on delivery charge removed',
-      international: 'Trustly & POLI',
+      international: 'Trustly, Poli, Sofort & Giropay',
       offline_challan: 'Cash/Cheque/DD deposit via Bank branch',
     },
     prefixes: {

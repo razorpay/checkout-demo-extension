@@ -1,10 +1,7 @@
-export const PROVIDERS = {
-  TRUSTLY: 'trustly',
-  POLI: 'poli',
-};
+import { INTERNATIONAL_APPS } from 'common/international';
 
 export const NVS_COUNTRY_MAP = {
-  [PROVIDERS.TRUSTLY]: [
+  [INTERNATIONAL_APPS.TRUSTLY]: [
     'AT',
     'BE',
     'CZ',
@@ -22,14 +19,12 @@ export const NVS_COUNTRY_MAP = {
     'SE',
     'GB',
   ],
-  [PROVIDERS.POLI]: ['AU'],
+  [INTERNATIONAL_APPS.POLI]: ['AU'],
+  [INTERNATIONAL_APPS.SOFORT]: ['AT', 'BE', 'DE', 'IT', 'NL', 'PL', 'ES'],
+  [INTERNATIONAL_APPS.GIROPAY]: ['DE'],
 };
 
 export const VIEWS_MAP = {
   SELECT_PROVIDERS: 'SELECT_PROVIDERS',
   NVS_FORM: 'NVS_FORM',
 };
-
-export const INTERNATIONAL_PROVIDERS = [PROVIDERS.TRUSTLY, PROVIDERS.POLI];
-
-export const DCC_VIEW_FOR_PROVIDERS = ['paypal', ...INTERNATIONAL_PROVIDERS];

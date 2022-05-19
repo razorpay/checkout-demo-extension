@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import { getInternationalAppsConfig } from 'common/international';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -23,24 +24,7 @@ const providers = {
     },
   },
   // international provider
-  trustly: {
-    code: 'trustly',
-    logo: cdnUrl + 'international/trustly.png',
-    uri: '',
-    package_name: '',
-    isCompatibleWithSDK: ({ platform }) => {
-      return platform === 'android' || platform === 'ios';
-    },
-  },
-  poli: {
-    code: 'poli',
-    logo: cdnUrl + 'international/poli.png',
-    uri: '',
-    package_name: '',
-    isCompatibleWithSDK: ({ platform }) => {
-      return platform === 'android' || platform === 'ios';
-    },
-  },
+  ...getInternationalAppsConfig(),
 };
 
 export const getProvider = (code) => providers[code] || {};
@@ -50,7 +34,12 @@ export const getAppsForMethod = (method) => {
     case 'card':
       return [providers.google_pay.code, providers.cred.code];
     case 'international':
-      return [providers.trustly, providers.poli];
+      return [
+        providers.trustly,
+        providers.poli,
+        providers.sofort,
+        providers.giropay,
+      ];
     default:
       return [];
   }

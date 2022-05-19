@@ -97,7 +97,7 @@ import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
-import { isInternationalInPreferredInstrument } from 'ui/tabs/international/helper';
+import { isInternationalInPreferredInstrument } from 'common/international';
 
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 import * as UTILS from 'lib/utils.js';
