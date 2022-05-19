@@ -167,21 +167,19 @@ function hideOverlayMessage() {
   let session = this;
   session.preventErrorDismissal = false;
 
-  if (!session.hideSvelteOverlay()) {
-    if (session.tab === 'nach') {
-      if (!session.nachScreen.shouldHideOverlay()) {
-        return;
-      }
+  if (session.tab === 'nach') {
+    if (!session.nachScreen.shouldHideOverlay()) {
+      return;
     }
+  }
 
-    if (
-      $('#confirmation-dialog').hasClass('animate') ||
-      docUtil.getElementById('options-wrap').children.length
-    ) {
-      makeHidden(docUtil.getElementById('error-message'));
-    } else {
-      hideOverlay($('#error-message'));
-    }
+  if (
+    $('#confirmation-dialog').hasClass('animate') ||
+    docUtil.getElementById('options-wrap').children.length
+  ) {
+    makeHidden(docUtil.getElementById('error-message'));
+  } else {
+    hideOverlay($('#error-message'));
   }
 }
 
@@ -1091,7 +1089,6 @@ Session.prototype = {
     this.setOtpScreen();
     this.setNach();
     this.setOffers();
-    this.setSvelteOverlay();
     this.setFeeLabel();
     // make bottom the last element
     docUtil
@@ -3632,27 +3629,6 @@ Session.prototype = {
       target: docUtil.querySelector('#error-message'),
     });
   },
-
-  setSvelteOverlay: function () {
-    this.svelteOverlay = new discreet.Overlay({
-      target: docUtil.querySelector('#modal-inner'),
-    });
-  },
-
-  showSvelteOverlay: function () {
-    if (!this.svelteOverlay) {
-      this.setSvelteOverlay();
-    }
-    showOverlay();
-    this.svelteOverlay.show();
-  },
-
-  hideSvelteOverlay: function () {
-    if (this.svelteOverlay) {
-      this.svelteOverlay.hide();
-    }
-  },
-
   /**
    * Show fees UI if `fee` is missing in payload
    */
