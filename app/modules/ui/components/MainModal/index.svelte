@@ -104,7 +104,6 @@
     <div id="modal-inner">
       <div id="overlay" />
       <div id="confirmation-dialog" class="showable" />
-      <div id="one-cc-account" />
       <div id="one-cc-rtb" />
       <div id="options-wrap" />
       <div id="error-message" class="overlay showable">

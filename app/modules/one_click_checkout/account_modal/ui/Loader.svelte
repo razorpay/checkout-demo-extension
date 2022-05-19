@@ -49,7 +49,7 @@
     box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.08);
     background-color: #fef5e5;
     position: absolute;
-    bottom: -55px;
+    bottom: 0;
   }
   .content {
     display: flex;

@@ -4,7 +4,7 @@ import { stack } from './store';
 // IMPORTANT: this function should be used to create utilities around stack manipulation
 function updater(deleteCount: number, newElement?: NavStack.StackElement) {
   stack.update((value) => {
-    const newArray = value.slice(0, -deleteCount);
+    const newArray = deleteCount ? value.slice(0, -deleteCount) : value;
     if (newElement) {
       newArray.push(newElement);
     }
