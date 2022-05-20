@@ -640,7 +640,7 @@ export function isApplicationEnabled(app) {
 }
 
 export function isCREDEnabled() {
-  return getMerchantMethods().app?.cred;
+  return getMerchantMethods().app?.cred && !isInternational();
 }
 
 /**
