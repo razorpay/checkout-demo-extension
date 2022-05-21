@@ -4521,7 +4521,7 @@ Session.prototype = {
     }
 
     if (this.r._payment) {
-      if (discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true)) {
+      if (discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true) === 2) {
         /**
          * intended empty if block as the cancel happens within above function and flow has to come out of this payment
          */
@@ -4545,10 +4545,7 @@ Session.prototype = {
          * Clear existing payments.
          * Note: If any QR payment is active, by this time, it was cancelled, hence no errors on other payments
          */
-        if (
-          data.emi_duration &&
-          discreet.upiPaymentHandlers.isQRPaymentCancellable({})
-        ) {
+        if (data.emi_duration) {
           this.r._payment.off();
           this.r._payment.clear();
         }
