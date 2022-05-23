@@ -10,8 +10,10 @@ const replace = require('rollup-plugin-replace');
 const resolve = require('@rollup/plugin-node-resolve');
 const pCSS = require('rollup-plugin-css-only');
 const preprocess = require('svelte-preprocess');
+const { terser } = require('rollup-plugin-terser');
+
 const eslint = require('./scripts/eslint');
-const isProd = require('./prod');
+const isProd = Boolean(require('./prod'));
 const { readFile } = require('fs');
 const { dirname } = require('path');
 
@@ -25,8 +27,11 @@ const resolveSrc = (importerFile, srcPath) =>
 const getSrcContent = (file) =>
   new Promise((resolve, reject) => {
     readFile(file, (error, data) => {
-      if (error) reject(error);
-      else resolve(data.toString());
+      if (error) {
+        reject(error);
+      } else {
+        resolve(data.toString());
+      }
     });
   });
 
@@ -55,10 +60,6 @@ const getPlugins = ({ src }) => {
   }
   const paths = src.concat(commonFeDir, 'node_modules');
 
-  if (isProd) {
-    eslint.lint(isWatching)(paths);
-  }
-
   // Order of plugins is important:
   // svelte needs to be before babel so that by the time
   // babel is run, svelte has become JS
@@ -77,7 +78,7 @@ const getPlugins = ({ src }) => {
       __SIFT_BEACON_KEY__: JSON.stringify('4dbbb1f7b6'),
       __CYBER_SOURCE_RZP_ORG_ID__: JSON.stringify('1snn5n9w'),
     }),
-    typescript({ sourceMap: !isProd }),
+    typescript({ sourceMap: !isProd, inlineSources: !isProd }),
 
     include({
       paths,
@@ -86,6 +87,10 @@ const getPlugins = ({ src }) => {
 
     svelte({
       extensions: ['.svelte'],
+      compilerOptions: {
+        // enable run-time checks when not in production
+        dev: !isProd,
+      },
       preprocess: [
         preprocess({ defaults: { style: 'scss' } }),
         {
@@ -115,6 +120,8 @@ const getPlugins = ({ src }) => {
     }),
 
     inject(globals),
+
+    isProd && terser(),
   ];
 };
 

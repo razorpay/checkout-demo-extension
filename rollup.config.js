@@ -1,5 +1,6 @@
 const { rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
 const livereload = require('rollup-plugin-livereload');
+// const production = process.env.NODE_ENV === 'production' || process.env.prod;
 
 const plugins = getPlugins({
   src: ['app/modules/', 'node_modules/'],
@@ -9,8 +10,7 @@ if (process.env.NODE_ENV === 'dev') {
   plugins.push(
     livereload({
       watch: [
-        'app/js/generated',
-        'app/css/generated',
+        'dist/v1/',
         'app/index.html',
         'app/checkout.html',
         'app/custom.html',
@@ -22,9 +22,9 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 const modules = {
-  'entry/razorpay': 'Razorpay',
-  'entry/checkout': 'Razorpay',
-  'entry/checkout-frame': 'Razorpay',
+  'entry/razorpay': 'razorpay',
+  'entry/checkout': 'checkout',
+  'entry/checkout-frame': 'checkout-frame',
 };
 
 function getOptions(module) {
@@ -32,10 +32,10 @@ function getOptions(module) {
     ...rollupCommon,
     input: `app/modules/${module}.js`,
     output: {
-      file: `app/js/generated/${module}.js`,
+      file: `app/dist/v1/${modules[module]}.js`,
       format: 'iife',
       strict: false,
-      name: modules[module],
+      name: 'Razorpay',
     },
     plugins,
     onwarn: function (warning) {
@@ -57,4 +57,6 @@ function getOptions(module) {
   };
 }
 
-module.exports = Object.keys(modules).map((m) => getOptions(m));
+const entryPoint = Object.keys(modules);
+const buildConfig = entryPoint.map((m) => getOptions(m));
+module.exports = buildConfig;

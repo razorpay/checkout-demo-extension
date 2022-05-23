@@ -1,5 +1,4 @@
 import * as _ from './_';
-import * as _Arr from './_Arr';
 
 // https://vocajs.com/
 const proto = _.prototypeOf(String);

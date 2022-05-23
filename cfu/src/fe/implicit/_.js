@@ -256,9 +256,9 @@ export const interval = (func, delay) => {
  *
  * @returns {function (): number}
  */
-export const timer = (x) => {
+export const timer = () => {
   var then = now();
-  return (x) => now() - then;
+  return () => now() - then;
 };
 
 /**

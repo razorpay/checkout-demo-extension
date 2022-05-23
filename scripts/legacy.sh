@@ -1,0 +1,1 @@
+cd ./app/dist/v1/; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;

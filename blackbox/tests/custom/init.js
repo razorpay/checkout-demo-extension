@@ -7,7 +7,7 @@ const apiPrefix = 'https://api.razorpay.com/v1/checkout';
 const customCheckout = `${prefix}/custom`;
 const callbackURL = `${prefix}/callback_response`;
 const popupInitialPage = `${prefix}/mockup`;
-const razorpayJS = `${prefix}/js/generated/entry/razorpay.js`;
+const razorpayJS = `${prefix}/dist/v1/razorpay.js`;
 const otpBundle = 'https://cdn.razorpay.com/static/otp/bundle.js';
 const redirectPage = 'v1/payments/create/checkout';
 const mockPageSubmit =
@@ -16,7 +16,7 @@ const mockSubmitPageCardlessEMI = 'https://api.razorpay.com/v1/otp/verify';
 
 const walletTopUpURL = 'https://walletapi.mobikwik.com/wallet';
 
-const jsContent = readFileSync('app/js/generated/entry/razorpay.js');
+const jsContent = readFileSync('app/dist/v1/razorpay.js');
 const htmlContent = readFileSync('app/razorpay.test.html');
 const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
 const otpPageBundle = readFileSync('blackbox/fixtures/otpbundle.js');

@@ -1,6 +1,5 @@
 # outputs
 /app/dist
-/app/js/generated
 /app/modules/generated
 /app/index.html
 /coverage

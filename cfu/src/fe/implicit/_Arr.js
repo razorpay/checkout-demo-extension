@@ -9,7 +9,6 @@ import * as _ from './_';
 export const isSimilar = (x) => _.isNumber(_.lengthOf(x));
 
 const proto = _.prototypeOf(Array);
-const protoSlice = proto.slice;
 
 /**
  * Loops through the array and calls
