@@ -113,6 +113,7 @@
 
     getSession().submit();
     selectedInstrumentId.set(null);
+    popStack();
   }
 </script>
 
