@@ -2,8 +2,9 @@ import { submitForm } from 'common/form';
 import { checkValidFlow } from './utils';
 import FLOWS from 'config/FLOWS';
 import { iOS, android } from 'common/useragent';
-import { getPaymentEntity } from 'razorpay';
 import * as errorService from 'error-service';
+import { PAYMENT_ENTITIES } from 'razorpay/constant';
+import { getKey, getPaymentEntity } from 'razorpay';
 /**
  * popupIframeCheck check for given method is required to open in iframe inside
  * popup. If required it will do necessary steps to load the page
@@ -116,32 +117,51 @@ export function assertPaymentSuccessMetadata(data) {
       return;
     }
 
-    const expectedEntities = [
-      'razorpay_signature',
-      `razorpay_${paymentEntity}_id`,
-    ];
+    const isEntityPresent = Object.values(PAYMENT_ENTITIES).some(
+      (entity) => !!data[`razorpay_${entity}_id`]
+    );
 
-    expectedEntities.forEach((entity) => {
-      // Raise an error if an expected entity is not present
-      if (!data[entity]) {
-        errorService.capture(new Error(`ValidationError: Missing ${entity}`), {
-          severity: errorService.SEVERITY_LEVELS.S2, // TODO: Change it to S0 after monitoring for a few days
-          analytics: {
-            event: 'validation:failed',
-            data: {
-              validationFailure: {
-                flow: 'payment_success',
-                field: entity,
-                value: data[entity], // This will (should?) always be an empty value
-                data,
-              },
-            },
-          },
-        });
-      }
-    });
+    if (!isEntityPresent) {
+      raiseValidationError({
+        entity: `razorpay_${paymentEntity}_id`,
+        data,
+        severity: errorService.SEVERITY_LEVELS.S2,
+      });
+    }
+
+    /**
+     * `razorpay_signature` is generated based on the following conditions
+     *  1. A payment entity is present (Verified above)
+     *  2. An active merchant key/secret is available
+     */
+    const isSignatureGenerationPossible = !!getKey();
+
+    if (isSignatureGenerationPossible && !data['razorpay_signature']) {
+      raiseValidationError({
+        entity: 'razorpay_signature',
+        data,
+        severity: errorService.SEVERITY_LEVELS.S2,
+      });
+    }
   } catch (e) {
     // Adding this try/catch block to ensure any potential errors here
     // do not cause any cascading failures as this is in the critical payment oncomplete flow
   }
+}
+
+function raiseValidationError({ entity, data, severity }) {
+  const analytics = {
+    event: 'validation:failed',
+    data: {
+      validationFailure: {
+        flow: 'payment_success',
+        field: entity,
+        data,
+      },
+    },
+  };
+  errorService.capture(new Error(`ValidationError: Missing ${entity}`), {
+    severity,
+    analytics,
+  });
 }

@@ -115,3 +115,10 @@ export const getName = () => {
 export const getAmount = () => {
   return getOption('amount');
 };
+
+/**
+ * Get merchant key by looking into
+ * 1. getPreferences('merchant_key') for other cases where keyless auth is performed
+ * 2. getOption('key') - default scenario where merchant also passes the key
+ */
+export const getKey = () => getPreferences('merchant_key') || getOption('key');
