@@ -82,6 +82,10 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout Address test', ({ preferences, title, options }) => {
+    if (skip) {
+      test.skip(title, () => {});
+      return;
+    }
     test(title, async () => {
       preferences.methods.cod = true;
       const context = await openCheckoutWithNewHomeScreen({
