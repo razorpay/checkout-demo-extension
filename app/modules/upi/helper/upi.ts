@@ -7,7 +7,6 @@ import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
 import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import { get, Writable } from 'svelte/store';
 import { showDowntimeAlert } from 'checkoutframe/downtimes/utils';
-import { getSession } from 'sessionmanager';
 import { storePlatformForTracker } from 'upi/events/trackers';
 
 /**
@@ -164,7 +163,6 @@ export const initiateNecessaryFlow = (
     setData(data);
     if (downtimeSevere === 'high') {
       showDowntimeAlert(name || app_name);
-      getSession().showOverlay(getSession().getDowntimeAlertDialog());
     }
   }
 };
