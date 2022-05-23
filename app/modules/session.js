@@ -173,10 +173,7 @@ function hideOverlayMessage() {
     }
   }
 
-  if (
-    $('#confirmation-dialog').hasClass('animate') ||
-    docUtil.getElementById('options-wrap').children.length
-  ) {
+  if ($('#confirmation-dialog').hasClass('animate')) {
     makeHidden(docUtil.getElementById('error-message'));
   } else {
     hideOverlay($('#error-message'));

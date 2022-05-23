@@ -18,6 +18,7 @@
   import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
   import { isOverlayActive } from 'navstack';
+  import OneCCLoader from 'one_click_checkout/loader/Loader.svelte';
   import { getView } from 'checkoutframe/components';
   import { clearOldExperiments } from 'experiments';
 
@@ -105,7 +106,6 @@
       <div id="overlay" />
       <div id="confirmation-dialog" class="showable" />
       <div id="one-cc-rtb" />
-      <div id="options-wrap" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
           <img
@@ -122,6 +122,7 @@
         <button id="fd-hide" class="btn">Retry</button>
         <div id="cancel_upi" />
       </div>
+
       <div id="content" class:one-cc={isOneClickCheckoutEnabled}>
         <div id="header-1cc">
           <div id="header-1cc-wrap" />
@@ -189,7 +190,9 @@
             >
               <span id="footer-cta">{cta}</span>
             </div>
-            <div id="one-cc-loader" />
+            {#if isOneClickCheckoutEnabled}
+              <OneCCLoader />
+            {/if}
             <div id="one-cc-footer" />
             <button type="submit" />
           </form>

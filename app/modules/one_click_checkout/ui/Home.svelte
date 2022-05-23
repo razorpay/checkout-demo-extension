@@ -4,7 +4,6 @@
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
-  import Loader from 'one_click_checkout/loader/Loader.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Router from 'one_click_checkout/routing/component/Router.svelte';
@@ -85,9 +84,6 @@
     });
     merchantFBStandardAnalytics({
       event: ACTIONS.INITIATECHECKOUT,
-    });
-    new Loader({
-      target: querySelector('#one-cc-loader'),
     });
     const checkoutTopbar = document.querySelector('#topbar-wrap');
     if (checkoutTopbar) {
