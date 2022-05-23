@@ -1,6 +1,7 @@
 <script>
+  import { onDestroy } from 'svelte';
+
   // UI Imports
-  import Backdrop from 'one_click_checkout/common/ui/Backdrop.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   //i18n Imports
   import {
@@ -22,61 +23,45 @@
   import { getMerchantName } from 'razorpay';
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+  import { popStack } from 'navstack';
 
   const { circle_check, rtb_close } = getIcons();
   const merchantName = getMerchantName();
-  let visible = false;
   let listItems = [RTB_HIGHLIGHT1, RTB_HIGHLIGHT2, RTB_HIGHLIGHT3];
 
-  export function show() {
-    visible = true;
-  }
-
-  export function hide() {
+  onDestroy(() => {
     Events.TrackBehav(RTBEvents.RTB_BADGE_DISMISSED, {
       screen_name: getCurrentScreen(),
     });
-    visible = false;
-  }
-
-  function handleBackdropClick(event) {
-    if (event.target === event.currentTarget) {
-      hide();
-    }
-  }
+  });
 </script>
 
-<Backdrop {visible} on:click={handleBackdropClick}>
-  <div class="rtb-container">
-    <div class="rtb-header">
-      <div class="rtb-icon">
-        <!-- It is done intentionally. Both RTB Badges styles were getting else wise over lapped-->
-        {#if visible}
-          <TrustedBadgeIcon height="62" width="60" />
-        {/if}
-      </div>
-      <div class="rtb-header-section">
-        <div class="rtb-header-text">{merchantName}</div>
-        <div class="rtb-title">{$t(RTB_HEADER)}</div>
-        <hr align="left" class="rtb-separator" />
-      </div>
-      <div class="rtb-close" on:click={hide}>
-        <Icon icon={rtb_close} />
-      </div>
+<div class="rtb-container">
+  <div class="rtb-header">
+    <div class="rtb-icon">
+      <TrustedBadgeIcon height="62" width="60" />
     </div>
-    <div class="rtb-content">
-      <div class="rtb-summary">
-        {formatTemplateWithLocale(RTB_CONTENT, { merchantName }, $locale)}
-      </div>
-      {#each listItems as listItem}
-        <div class="rtb-list">
-          <Icon icon={circle_check} />
-          <span class="rtb-list-text">{$t(listItem)}</span>
-        </div>
-      {/each}
+    <div class="rtb-header-section">
+      <div class="rtb-header-text">{merchantName}</div>
+      <div class="rtb-title">{$t(RTB_HEADER)}</div>
+      <hr align="left" class="rtb-separator" />
+    </div>
+    <div class="rtb-close" on:click={popStack}>
+      <Icon icon={rtb_close} />
     </div>
   </div>
-</Backdrop>
+  <div class="rtb-content">
+    <div class="rtb-summary">
+      {formatTemplateWithLocale(RTB_CONTENT, { merchantName }, $locale)}
+    </div>
+    {#each listItems as listItem}
+      <div class="rtb-list">
+        <Icon icon={circle_check} />
+        <span class="rtb-list-text">{$t(listItem)}</span>
+      </div>
+    {/each}
+  </div>
+</div>
 
 <style>
   .rtb-container {

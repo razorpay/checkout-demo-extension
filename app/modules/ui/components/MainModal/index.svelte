@@ -105,7 +105,6 @@
     <div id="modal-inner">
       <div id="overlay" />
       <div id="confirmation-dialog" class="showable" />
-      <div id="one-cc-rtb" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
           <img
