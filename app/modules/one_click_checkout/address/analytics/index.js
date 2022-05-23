@@ -43,6 +43,7 @@ const address = {
   // New Events
   NEW_ADDRESS_SCREEN_LOADED_V2: '1cc_add_new_address_screen_loaded_completed',
   INPUT_ENTERED_name_V2: '1cc_add_new_address_name_entered',
+  INPUT_ENTERED_contact_V2: '1cc_add_new_address_contact_entered',
   INPUT_ENTERED_country_V2: '1cc_add_new_address_country_entered',
   INPUT_ENTERED_zipcode_V2: '1cc_add_new_address_pincode_entered',
   INPUT_ENTERED_line1_V2: '1cc_add_new_address_line1_entered',

@@ -615,19 +615,21 @@
         });
     }
     if (id === 'line1') {
-      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`], {
+      Events.Track(AddressEvents.INPUT_ENTERED_line1_V2, {
         input_length: $formData?.name?.length,
       });
     } else if (
       id === 'zipcode' &&
       addressType === ADDRESS_TYPES.SHIPPING_ADDRESS
     ) {
-      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`], {
+      Events.Track(AddressEvents.INPUT_ENTERED_zipcode_V2, {
         country: $selectedCountryISO,
         country_code: $formData?.contact?.countryCode,
       });
+    } else if (id === 'country_name') {
+      Events.Track(AddressEvents.INPUT_ENTERED_country_V2);
     } else {
-      Events.Track(AddressEvents[`INPUT_ENTERED_${id}`]);
+      Events.Track(AddressEvents[`INPUT_ENTERED_${id}_V2`]);
     }
   };
 
