@@ -228,11 +228,7 @@
   }
 
   function onAddressHeaderClick() {
-    let view = views.SAVED_ADDRESSES;
-    if ($savedAddresses.length <= 1) {
-      view = views.ADD_ADDRESS;
-    }
-    navigator.navigateTo({ path: view });
+    navigator.navigateTo({ path: views.SAVED_ADDRESSES });
   }
 </script>
 
