@@ -69,7 +69,7 @@
     position: absolute;
     background: #fff;
     text-align: start;
-    bottom: -55px;
+    bottom: 0px;
     width: 100%;
     padding: 16px;
   }
