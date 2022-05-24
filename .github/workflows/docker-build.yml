@@ -42,8 +42,6 @@ jobs:
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
         with:
           path: |
             app/dist
@@ -73,8 +71,6 @@ jobs:
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
         with:
           path: |
             app/dist
@@ -102,8 +98,6 @@ jobs:
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
         with:
           path: |
             app/dist
@@ -131,8 +125,6 @@ jobs:
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
         with:
           path: |
             app/dist
@@ -145,6 +137,13 @@ jobs:
         run: npm ci
       - name: Run All base FTs
         run: NODE_ENV=production npx jest blackbox/tests/homescreen/[uU]**/*.test.js
+  fts:
+    needs: [partial-FTs-A-and-CustomFTs, partial-FTs-BCDEFGHIJKLMNO, partial-FTs-PQRSTvwxyz, partial-FTs-u]
+    name: fts
+    runs-on: [self-hosted]
+    steps:
+      - name: Fts Done
+        run: echo "All Tests Passed"
   build-and-push-image: # independent of rest
     name: build and push
     runs-on: [self-hosted]
