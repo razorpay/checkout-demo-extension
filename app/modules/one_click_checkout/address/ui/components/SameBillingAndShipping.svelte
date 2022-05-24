@@ -52,6 +52,6 @@
     position: absolute;
     bottom: 0;
     width: calc(100% - 24px);
-    padding: 12px 0 4px 24px;
+    padding: 12px 0 4px 16px;
   }
 </style>

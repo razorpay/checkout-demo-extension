@@ -5,6 +5,7 @@
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+  import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
 
   // store imports
   import { showFeeLabel } from 'checkoutstore';
@@ -30,7 +31,7 @@
   } from 'checkoutstore/dynamicfee';
 
   const dispatch = createEventDispatcher();
-  const { back_arrow, double_arrow } = getIcons();
+  const { double_arrow } = getIcons();
   let shown = true;
   let highlightText;
   let isBackEnabled = true;
@@ -75,7 +76,7 @@
     <div class="title-section">
       {#if isBackEnabled}
         <span class="back" on:click={handleBackClick}>
-          <Icon icon={back_arrow} />
+          <Icon icon={back_arrow()} />
         </span>
       {/if}
       {#if $activeRoute?.topbarTitle || !blackListedTabTitle?.includes($tabTitle)}

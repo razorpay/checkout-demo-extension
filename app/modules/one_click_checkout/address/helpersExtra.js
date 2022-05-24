@@ -67,7 +67,16 @@ export const formatAddress = (
  * format the address received from api
  */
 export const formatApiAddress = (payload, type = 'shipping_address') => {
-  const { country, line1, line2, city, state, zipcode } = payload;
+  const {
+    country,
+    line1,
+    line2,
+    city,
+    state,
+    zipcode,
+    source_type,
+    serviceability = false,
+  } = payload;
   const countryISO =
     country ||
     (type === 'shipping_address'
@@ -76,6 +85,8 @@ export const formatApiAddress = (payload, type = 'shipping_address') => {
 
   return {
     ...formatAddress(payload, type),
+    source_type,
+    serviceability,
     formattedLine1: removeTrailingCommas(line1 ?? ''),
     formattedLine2: removeTrailingCommas(line2 ?? ''),
     formattedLine3: `${city}, ${state}, ${getCountryName(

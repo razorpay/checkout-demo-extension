@@ -17,6 +17,7 @@
     isContactHidden,
     isEmailHidden,
     isCodEnabled,
+    getConsentViewCount,
   } from 'razorpay';
   import {
     checkServiceabilityStatus,
@@ -32,6 +33,7 @@
   import {
     isBillingSameAsShipping,
     savedAddresses,
+    consentViewCount,
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore';
   import {
@@ -64,6 +66,7 @@
   import {
     fetchCoupons,
     applyCouponCode,
+    onSubmitLogoutUser,
   } from 'one_click_checkout/coupons/helpers';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { toggleHeader } from 'one_click_checkout/header/helper';
@@ -72,16 +75,16 @@
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isUnscrollable } from 'one_click_checkout/helper';
   import { isRTBEnabled } from 'rtb/helper';
-  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
-
-  // constant imports
-  import { views } from 'one_click_checkout/routing/constants';
-  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
   import {
     getPrefilledContact,
     getPrefilledEmail,
   } from 'checkoutframe/customer';
+
+  // constant imports
+  import { views } from 'one_click_checkout/routing/constants';
+  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
@@ -95,9 +98,21 @@
   $: ctaDisabled =
     (!$contact && !isContactHidden()) ||
     (!$email && !isEmailHidden()) ||
-    ($savedAddresses.length && !$selectedAddress.serviceability);
+    ($savedAddresses.length && !$selectedAddress?.serviceability);
 
-  function onSubmit() {
+  function onSubmitLoggedInUser() {
+    if (!$savedAddresses.length) {
+      navigator.navigateTo({ path: views.ADD_ADDRESS });
+    } else {
+      if (!$isBillingSameAsShipping) {
+        navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
+      } else {
+        redirectToPaymentMethods();
+      }
+    }
+  }
+
+  function handleOnSubmit() {
     if (!CONTACT_REGEX.test($contact) || !EMAIL_REGEX.test($email)) {
       showValidations = true;
       return;
@@ -129,15 +144,9 @@
 
     updateOrderWithCustomerDetails();
     if (!isUserLoggedIn() && $isIndianCustomer) {
-      navigator.navigateTo({ path: views.SAVED_ADDRESSES });
-    } else if (!$savedAddresses.length) {
-      navigator.navigateTo({ path: views.ADD_ADDRESS });
+      onSubmitLogoutUser();
     } else {
-      if (!$isBillingSameAsShipping) {
-        navigator.navigateTo({ path: views.SAVED_BILLING_ADDRESS });
-      } else {
-        redirectToPaymentMethods();
-      }
+      onSubmitLoggedInUser();
     }
   }
 
@@ -177,6 +186,7 @@
   }
 
   onMount(() => {
+    $consentViewCount = $consentViewCount || getConsentViewCount();
     setScrollable();
     toggleHeader(true);
     updateOrderWithCustomerDetails();
@@ -264,7 +274,7 @@
     </div>
     <div class="separator" />
     <CTA
-      on:click={onSubmit}
+      on:click={handleOnSubmit}
       {onViewDetailsClick}
       disabled={ctaDisabled}
       handleDisable

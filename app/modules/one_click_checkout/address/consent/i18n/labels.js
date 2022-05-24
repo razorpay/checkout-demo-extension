@@ -1,0 +1,9 @@
+export const MODAL_TITLE = 'address.consent_modal_title';
+export const MODAL_CONTENT_LABEL = 'address.consent_modal_content_label';
+export const MODAL_CTA_LABEL = 'address.consent_modal_cta_label';
+export const BANNER_TITLE = 'address.consent_banner_title';
+export const BANNER_CONTENT_LABEL = 'address.consent_banner_content_label';
+export const BANNER_CTA_LABEL = 'address.consent_banner_cta_label';
+export const MODAL_ERROR_TITLE = 'address.consent_error_title';
+export const MODAL_ERROR_CONTENT_LABEL = 'address.consent_error_content_label';
+export const MODAL_ERROR_CTA_LABEL = 'address.consent_error_cta_label';

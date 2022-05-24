@@ -5,6 +5,7 @@
   // ui imports
   import Icon from 'ui/elements/Icon.svelte';
   import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
+  import AddressConsentBanner from 'one_click_checkout/address/consent/ui/AddressConsentBanner.svelte';
 
   // store imports
   import { selectedAddress as selectedShippingAddress } from 'one_click_checkout/address/shipping_address/store';
@@ -59,11 +60,12 @@
     });
   }
 
-  function handleRadioClick(id, index) {
+  function handleRadioClick(id, index, addressSource) {
     if ($activeRoute?.name === views.SAVED_ADDRESSES) {
       Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
         address_id: id,
         address_position_index: index,
+        address_source: addressSource || 'magic_saved',
       });
       Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
         top_shown_address: !index,
@@ -119,6 +121,7 @@
       Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
         address_id: $selectedShippingAddress?.id,
         address_position_index: 0,
+        address_source: $selectedShippingAddress?.source_type || null,
       });
       Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
         top_shown_address: true,
@@ -152,15 +155,18 @@
       <div class="address-box">
         <AddressBox
           address={addr}
-          on:select={() => handleRadioClick(addr.id, index)}
+          on:select={() => handleRadioClick(addr.id, index, addr?.source_type)}
           on:editClick
           isSelected={$selectedAddressId === addr.id}
           {checkServiceability}
-          loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+          loading={$checkServiceabilityStatus ===
+            SERVICEABILITY_STATUS.LOADING && !addr.serviceability}
         />
       </div>
     {/each}
   </div>
+
+  <AddressConsentBanner />
 </div>
 
 <style>

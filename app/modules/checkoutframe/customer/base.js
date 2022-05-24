@@ -225,10 +225,10 @@ Customer.prototype = {
 
   submitOTP: function (data, callback, queryParams) {
     let user = this;
-
+    const isOneCCEnabled = isOneClickCheckout();
     // TODO: fix this
     data.contact = this.contact || getCustomer(get(contact)).contact;
-    let url = 'otp/verify';
+    let url = isOneCCEnabled ? '1cc/otp/verify' : 'otp/verify';
 
     if (queryParams) {
       url = _.appendParamsToUrl(url, queryParams);
@@ -262,7 +262,7 @@ Customer.prototype = {
             getSession().errorHandler(data);
           } else {
             let errorMsg = '';
-            if (isOneClickCheckout()) {
+            if (isOneCCEnabled) {
               errorMsg = 'otp.title.incorrect_otp_retry_one_cc';
             } else {
               errorMsg = 'otp.title.incorrect_otp_retry';

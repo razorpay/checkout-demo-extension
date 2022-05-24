@@ -48,6 +48,7 @@ import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
 import solid_down_arrow from 'one_click_checkout/address/icons/solid_down_arrow';
+import consent_location from 'one_click_checkout/address/consent/icons/location';
 import { AVAILABLE_METHODS } from 'common/constants';
 
 /**
@@ -93,6 +94,7 @@ const availIconNames = [...AVAILABLE_METHODS].concat([
   'user',
   'caret_circle_right',
   'solid_down_arrow',
+  'consent_location',
 ]);
 
 function getIconFn(iconName) {
@@ -253,6 +255,9 @@ function getIconFn(iconName) {
 
     case 'solid_down_arrow':
       return solid_down_arrow;
+
+    case 'consent_location':
+      return consent_location;
   }
 }
 

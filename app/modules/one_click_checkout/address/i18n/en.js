@@ -1,4 +1,5 @@
 import billingAddressLabels from 'one_click_checkout/address/billing_address/i18n/en';
+import addressConsentLabels from 'one_click_checkout/address/consent/i18n/en';
 
 // Texts and labels
 export default {
@@ -55,4 +56,5 @@ export default {
   office: 'Office',
   others: 'Others',
   ...billingAddressLabels,
+  ...addressConsentLabels,
 };

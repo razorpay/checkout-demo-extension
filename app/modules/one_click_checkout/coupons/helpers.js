@@ -1,10 +1,32 @@
-import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
-import { views } from 'one_click_checkout/routing/constants';
+// UI imports
+import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+
+// svelte imports
+import { get } from 'svelte/store';
+
+// session imports
 import { applyCoupon } from 'one_click_checkout/coupons/sessionInterface';
-import { getCoupons } from 'one_click_checkout/coupons/service';
+
+// Analytics imports
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
-import { get } from 'svelte/store';
+import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+import {
+  CATEGORIES,
+  ACTIONS,
+} from 'one_click_checkout/merchant-analytics/constant';
+import otpEvents from 'one_click_checkout/otp/analytics';
+
+// i18n imports
+import { formatTemplateWithLocale } from 'i18n';
+import { locale } from 'svelte-i18n';
+import { COUPON_TOAST_MESSAGE } from 'one_click_checkout/coupons/i18n/labels';
+
+// service imports
+import { getCoupons } from 'one_click_checkout/coupons/service';
+
+// store imports
 import {
   availableCoupons,
   couponInputValue,
@@ -12,23 +34,37 @@ import {
   couponInputSource,
   couponAppliedIndex,
 } from 'one_click_checkout/coupons/store';
-import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
-import MetaProperties from 'one_click_checkout/analytics/metaProperties';
-import { navigator } from 'one_click_checkout/routing/helpers/routing';
-import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-import {
-  CATEGORIES,
-  ACTIONS,
-} from 'one_click_checkout/merchant-analytics/constant';
-import { showToast, TOAST_THEME, TOAST_SCREEN } from 'one_click_checkout/Toast';
-import { COUPON_TOAST_MESSAGE } from 'one_click_checkout/coupons/i18n/labels';
-import { getCurrency } from 'razorpay';
-import { formatAmountWithSymbol } from 'common/currency';
-import { formatTemplateWithLocale } from 'i18n';
-import { locale } from 'svelte-i18n';
 import { cartDiscount } from 'one_click_checkout/charges/store';
-import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+import { getRoute } from 'one_click_checkout/routing/store';
+import { maxlength } from 'checkoutstore/screens/otp';
+import { showBanner, consentViewCount, consentGiven } from 'one_click_checkout/address/store';
+import * as OtpScreenStore from 'checkoutstore/screens/otp';
+
+// utils imports
+import { getCurrency } from 'razorpay';
+import { screensHistory as history } from 'one_click_checkout/routing/History';
+import { mergeObjOnKey } from 'one_click_checkout/common/utils';
+import {
+  createOTP,
+  updateOTPStore,
+} from 'one_click_checkout/common/otpHelpers';
+import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { showToast, TOAST_THEME, TOAST_SCREEN } from 'one_click_checkout/Toast';
+import { formatAmountWithSymbol } from 'common/currency';
+import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import { pushOverlay } from 'navstack';
+import { showAddressConsentModal } from 'one_click_checkout/address/consent';
+
+// constant imports
+import {
+  RESEND_OTP_INTERVAL,
+  OTP_TEMPLATES,
+  otpReasons,
+} from 'one_click_checkout/otp/constants';
+import { OTP_PARAMS } from 'one_click_checkout/common/constants';
+import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
+import { views } from 'one_click_checkout/routing/constants';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -150,4 +186,76 @@ export function skipCouponOTP() {
 
 export function skipCouponListOTP() {
   navigator.replace(views.COUPONS_LIST);
+}
+
+export function handleCreateOTP() {
+  const customer = getCustomerDetails();
+  const { otpLabels, otpProps } = getRoute(views.SAVED_ADDRESSES);
+
+  history.config[views.OTP].props = {
+    ...history.config[views.OTP].props,
+    ...otpProps,
+    otpReason: OTP_TEMPLATES.access_address,
+  };
+  history.config[views.OTP].otpParams = {
+    loading: {
+      templateData: { phone: customer.contact },
+      ...mergeObjOnKey(OTP_PARAMS, otpLabels, 'loading'),
+    },
+    sent: mergeObjOnKey(OTP_PARAMS, otpLabels, 'sent'),
+    verifying: mergeObjOnKey(OTP_PARAMS, otpLabels, 'verifying'),
+  };
+
+  updateOTPStore({ ...history.config[views.OTP].otpParams.loading });
+  Events.TrackRender(otpEvents.OTP_LOAD, {
+    is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
+    otp_reason: otpReasons.access_address,
+  });
+  createOTP(
+    () => {
+      updateOTPStore({
+        ...history.config[views.OTP]?.otpParams?.sent,
+        resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
+        digits: new Array(get(maxlength)),
+      });
+    },
+    null,
+    OTP_TEMPLATES.access_address
+  );
+  navigator.navigateTo({
+    path: views.OTP,
+    props: history.config[views.OTP].props,
+  });
+}
+
+export function handleAddrConsentSubmit() {
+  if (get(consentGiven)) {
+    handleCreateOTP();
+  } else {
+    navigator.navigateTo({ path: views.ADD_ADDRESS });
+  }
+}
+
+export function onSubmitLogoutUser() {
+  const customer = getCustomerDetails();
+  const sms_hash = customer.r.get('sms_hash');
+  const params = { skip_otp: true };
+  if (sms_hash) {
+    params.sms_hash = sms_hash;
+  }
+
+  customer.checkStatus(
+    function (customerData) {
+      consentViewCount.set(customerData['1cc_consent_banner_views'] || 0);
+      if (customer.saved_address) {
+        handleCreateOTP();
+      } else if (get(showBanner)) {
+        showAddressConsentModal({ onSubmit: handleAddrConsentSubmit });
+      } else {
+        navigator.navigateTo({ path: views.ADD_ADDRESS });
+      }
+    },
+    params,
+    customer.contact
+  );
 }

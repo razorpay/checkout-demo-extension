@@ -5,9 +5,10 @@ import { get } from 'svelte/store';
 import { makeAuthUrl } from 'checkoutstore';
 import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { getContactPayload } from 'one_click_checkout/store';
+import { contact } from 'checkoutstore/screens/home';
 
 // analytics import
-import { Events } from 'analytics';
+import { Events, Track } from 'analytics';
 import AddressEvents from 'one_click_checkout/address/analytics';
 
 // utils import
@@ -26,6 +27,7 @@ import {
   getDevicePayload,
   hydrateSamePincodeAddresses,
 } from 'one_click_checkout/address/helpersExtra';
+import { getDeviceId } from 'fingerprint';
 
 // i18n imports
 import {
@@ -394,6 +396,53 @@ export function getStatesList(country) {
         }
         if (availableStateList && !availableStateList[country]) {
           availableStateList[country] = response;
+        }
+        resolve(response);
+      },
+    });
+  });
+}
+
+/**
+ * @returns Promise which returns updated view count of consent modal & banner
+ **/
+export function updateAddressConsentView() {
+  const payload = {
+    unique_id: Track.makeUid(),
+    contact: get(contact),
+  };
+
+  return new Promise((resolve, reject) => {
+    fetch.put({
+      url: makeAuthUrl('1cc/consent/address/view'),
+      data: payload,
+      callback: (response) => {
+        if (response.error) {
+          reject(response.error);
+          return;
+        }
+        resolve(response);
+      },
+    });
+  });
+}
+
+/**
+ * @returns Promise which returns array of third party addresses
+ **/
+export function updateAddressConsent() {
+  const payload = {
+    device_id: getDeviceId(),
+  };
+
+  return new Promise((resolve, reject) => {
+    fetch.put({
+      url: makeAuthUrl('1cc/address/consent'),
+      data: payload,
+      callback: (response) => {
+        if (response.error) {
+          reject(response.error);
+          return;
         }
         resolve(response);
       },

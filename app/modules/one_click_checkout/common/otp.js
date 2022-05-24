@@ -9,7 +9,7 @@ import { views } from 'one_click_checkout/routing/constants';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import otpEvents from 'one_click_checkout/otp/analytics';
-import { Events } from 'analytics';
+import { Events, Track } from 'analytics';
 import {
   mergeObjOnKey,
   isNumericalString,
@@ -26,6 +26,8 @@ import {
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
 import { submitAttemptIndex } from 'one_click_checkout/otp/store';
+import { consentGiven } from 'one_click_checkout/address/store';
+import { getDeviceId } from 'fingerprint';
 
 let customer;
 
@@ -147,6 +149,12 @@ export const submitOTP = () => {
   };
 
   updateOTPStore(verifying);
+  if (get(consentGiven)) {
+    submitPayload.address_consent = {
+      unique_id: Track.makeUid(),
+      device_id: getDeviceId(),
+    };
+  }
   customer.submitOTP(submitPayload, postSubmit);
   submitAttemptIndex.set(get(submitAttemptIndex) + 1);
   Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK, {

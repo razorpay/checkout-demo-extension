@@ -27,3 +27,6 @@ export const getMerchantName = () => getOption('name');
 
 export const isCodEnabled = () =>
   getPreferences('preferences.methods.cod') || false;
+
+export const getConsentViewCount = () =>
+  getPreferences('customer.1cc_consent_banner_views') || 0;
