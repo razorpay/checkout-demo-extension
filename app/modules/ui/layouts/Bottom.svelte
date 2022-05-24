@@ -1,5 +1,7 @@
 <script>
   import * as _El from 'utils/DOM';
+  import { isStackPopulated } from 'navstack/helper';
+
   export let tab;
 
   function replaceNode(node) {
@@ -7,8 +9,12 @@
     // TODO: test and go it for all cases
     // const element = document.getElementById(node?.firstElementChild?.id);
     const element = document.getElementById('secured-message');
-    if (!element || tab !== 'home-1cc') {
-      document.querySelector('#bottom')?.appendChild(node);
+    const parent = document.querySelector(
+      isStackPopulated() ? '#root' : '#bottom'
+    );
+
+    if (parent && (!element || tab !== 'home-1cc')) {
+      parent.appendChild(node);
     }
 
     return {

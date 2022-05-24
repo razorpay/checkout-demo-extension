@@ -1,5 +1,7 @@
 <script>
   import { getSession } from 'sessionmanager';
+  import { isASubscription, getPreferences, getPrefillMethod } from 'razorpay';
+  import { getView } from 'checkoutframe/components';
 
   // UI Imports
   import Screen from 'ui/layouts/Screen.svelte';
@@ -8,6 +10,7 @@
   import AccountNumberField from 'ui/elements/fields/emandate/AccountNumberField.svelte';
   import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
   import NameField from 'ui/elements/fields/emandate/NameField.svelte';
+  import RecurringCallout from './RecurringCallout.svelte';
   import { getDirectionForField } from 'ui/elements/fields/helpers';
   // Svelte imports
   import { fade } from 'svelte/transition';
@@ -54,6 +57,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { popStack } from 'navstack';
   import { getAnimationOptions } from 'svelte-utils';
   import {
     getAuthType,
@@ -61,8 +65,6 @@
     getPrefillBankDetails,
   } from 'netbanking/helper';
   import { getThemeMeta } from 'checkoutstore/theme';
-
-  const session = getSession();
 
   // Prefill
   const prefilledBank = getPrefillBank();
@@ -74,6 +76,7 @@
 
   const isPrefilledBankAvailable =
     prefilledBank && isEMandateBankEnabled(prefilledBank);
+
   const isPrefilledAuthTypeAvailable =
     prefilledAuthType &&
     isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
@@ -105,8 +108,6 @@
 
   // set field directions
   const dir = getDirectionForField();
-  // Set tab title overrides
-  session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
 
   function setInitialState() {
     if (isPrefilledBankAvailable) {
@@ -144,14 +145,19 @@
     );
   }
 
+  // set topbar title for given screen
+  function setTopTitle(tab) {
+    getView('topbar').setTab(tab);
+  }
+
   export function onShown() {
-    active = true;
     setInitialState();
     showLandingView();
     setCtaVisibility(currentView);
+    setTopTitle('emandate'); // set emandate title
   }
 
-  export function onBack() {
+  export function preventBack() {
     Analytics.track('emandate:back', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -159,34 +165,22 @@
       },
     });
 
-    const shouldGoToNBScreen =
-      !isPrefilledBankAvailable &&
-      (currentView === Views.AUTH_SELECTION || shouldSkipAuthSelection());
-
-    if (shouldGoToNBScreen) {
-      $selectedBank = '';
-      active = false;
-      session.switchTab('netbanking');
-      return true;
-    }
-
-    if (currentView === Views.BANK_DETAILS) {
-      if (shouldSkipAuthSelection()) {
-        active = false;
-        return false;
-      }
-
+    if (currentView === Views.BANK_DETAILS && !shouldSkipAuthSelection()) {
       setView(Views.AUTH_SELECTION);
-      active = true;
-      return true;
+      return true; // prevent back
     }
 
-    active = false;
-    return false;
+    if (isPrefilledBankAvailable) {
+      getSession().switchTab('');
+    } else {
+      setTopTitle('netbanking'); // set title for netbanking tab
+      $selectedBank = '';
+    }
   }
 
   export function getPayload() {
-    return {
+    const data = {
+      method: 'emandate',
       'bank_account[account_number]': $accountNumber,
       'bank_account[ifsc]': $ifsc,
       'bank_account[name]': $name,
@@ -194,6 +188,13 @@
       auth_type: $authType,
       bank: $selectedBank,
     };
+
+    if (isASubscription('emandate')) {
+      data.amount = 0;
+      data.recurring_token = getPreferences('subscription.recurring_token');
+    }
+
+    return data;
   }
 
   const Views = {
@@ -211,10 +212,8 @@
     bankName = getLongBankName($selectedBank, $locale, defaultBankName);
   }
 
-  let active = false;
-
   function resetBank() {
-    session.switchTab('netbanking');
+    popStack();
     // Wait for transition to complete before resetting bank
     setTimeout(() => {
       $selectedBank = '';
@@ -229,11 +228,7 @@
     currentView = view;
   }
 
-  $: {
-    if (active) {
-      setCtaVisibility(currentView);
-    }
-  }
+  $: setCtaVisibility(currentView);
 
   function setCtaVisibility(view) {
     setTimeout(() => {
@@ -262,9 +257,11 @@
 
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
+
+  onShown();
 </script>
 
-<Tab method="emandate" overrideMethodCheck pad={false}>
+<Tab method="emandate" overrideMethodCheck pad={false} shown={true}>
   <Screen>
     <div id="emandate-inner">
       {#if currentView === Views.AUTH_SELECTION}
@@ -405,6 +402,7 @@
       {/if}
     </div>
   </Screen>
+  <RecurringCallout />
 </Tab>
 
 <style>

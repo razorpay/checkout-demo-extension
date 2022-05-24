@@ -15,10 +15,9 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
-  import Callout from 'ui/elements/Callout.svelte';
+  import RecurringCallout from 'ui/tabs/emandate/RecurringCallout.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import Bottom from 'ui/layouts/Bottom.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
@@ -39,7 +38,6 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
-    RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
@@ -477,12 +475,7 @@
       }}
     />
 
-    <Bottom>
-      <!-- Show recurring message for recurring payments -->
-      {#if recurring}
-        <Callout>{$t(RECURRING_CALLOUT)}</Callout>
-      {/if}
-    </Bottom>
+    <RecurringCallout />
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />
     {/if}
