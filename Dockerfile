@@ -38,7 +38,7 @@ RUN if [[ -n $TRAFFIC_ENV ]]; then \
     else \
     cd /checkout_build \
     && npm install \
-    && NODE_ENV=production npm test \
+    && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     fi
 

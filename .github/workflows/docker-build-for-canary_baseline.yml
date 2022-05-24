@@ -2,8 +2,8 @@
 
 name: 'Canary Baseline: Build & push to Harbor'
 
-# Controls when the action will run. Triggers the workflow on every push
-on: [push]
+# Controls when the action will run. Triggers the workflow on every pull_request
+on: [pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -31,7 +31,7 @@ jobs:
 
       - name: Set up Docker Buildx
         id: docker
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           install: true
       - name: Login to Harbor
@@ -48,7 +48,7 @@ jobs:
           # build number prefix for canary: 1
           CURRENT_BUILD_NUMBER: '1${{ env.RUN_BUILD_NUMBER }}'
           BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_PATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile
           build-args: |
@@ -71,7 +71,7 @@ jobs:
           BUILD_PATH_FOR_BRANCH: '${{ env.BUCKET_BASE_PATH_FOR_BRANCH }}/${{ steps.vars.outputs.branch }}'
         # skip build if canary is failed
         if: steps.canary_build.outcome == 'success'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile
           build-args: |
