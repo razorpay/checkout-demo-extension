@@ -33,6 +33,7 @@ export const SAVED_ADDRESS_LABEL = 'address.saved_address_label';
 export const SAME_ADDRESS_LABEL = 'address.same_address_checkbox_label';
 export const GENERIC_ERROR_LABEL = 'address.error_label';
 export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
+export const NAME_ERROR_LABEL = 'address.name_error_label';
 export const ZIPCODE_ERROR_LABEL = 'address.zipcode_error_label';
 export const GENERIC_PATTERN_ERROR_LABEL =
   'address.generic_pattern_error_label';

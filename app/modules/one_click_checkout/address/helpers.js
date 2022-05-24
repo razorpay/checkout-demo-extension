@@ -25,6 +25,7 @@ import {
   INDIA_CONTACT_ERROR_LABEL,
   CONTACT_ERROR_LABEL,
   PINCODE_ERROR_LABEL,
+  NAME_ERROR_LABEL,
 } from 'one_click_checkout/address/i18n/labels';
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
@@ -70,7 +71,7 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
     return REQUIRED_LABEL;
   }
 
-  if (['landmark', 'zipcode', 'contact'].includes(formInput.id)) {
+  if (['name', 'landmark', 'zipcode', 'contact'].includes(formInput.id)) {
     let pattern = formInput.pattern;
     if (formInput.id === 'contact') {
       if (input?.countryCode === INDIA_COUNTRY_CODE) {
@@ -87,6 +88,8 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
         return input?.countryCode === INDIA_COUNTRY_CODE
           ? INDIA_CONTACT_ERROR_LABEL
           : CONTACT_ERROR_LABEL;
+      } else if (formInput.id === 'name') {
+        return NAME_ERROR_LABEL;
       } else if (formInput.id === 'landmark') {
         return LANDMARK_ERROR_LABEL;
       } else if (formInput.id === 'zipcode') {

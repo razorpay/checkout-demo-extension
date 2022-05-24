@@ -144,6 +144,7 @@
       label: NAME_LABEL,
       required: true,
       autofillToken: 'name',
+      pattern: '^.{2,64}$',
     },
     {
       id: 'contact',
@@ -239,11 +240,10 @@
   const dispatch = createEventDispatcher();
 
   const isFormComplete = () => {
-    let completed = false;
     const { countryCode, phoneNum } = $formData?.contact || {};
     for (let key in $formData) {
       if (
-        ['landmark', 'tag', 'cod'].includes(key) ||
+        ['landmark', 'tag', 'cod', 'type'].includes(key) ||
         (key === 'zipcode' && !INPUT_FORM[pinIndex][pinSubIndex]?.required)
       ) {
         continue;
@@ -254,20 +254,25 @@
           !PHONE_REGEX_INDIA.test(phoneNum)) ||
           (countryCode !== INDIA_COUNTRY_CODE && !phonePattern.test(phoneNum)))
       ) {
-        completed = false;
-        return completed;
+        return false;
       }
       if (
         INPUT_FORM[pinIndex][pinSubIndex]?.unserviceableText !==
           SERVICEABLE_LABEL &&
         checkServiceability
       ) {
-        completed = false;
-        return completed;
+        return false;
       }
-      if (!$formData[key]) {
-        completed = false;
-        return completed;
+
+      const field = findItem(INPUT_FORM, key);
+      const isError = validateInputField(
+        $formData[key],
+        field,
+        $selectedCountryISO
+      );
+
+      if (isError || !$formData[key]) {
+        return false;
       }
     }
     return true;
@@ -388,11 +393,7 @@
     // If invalid field, then re-validate the input and update error messages
     if (errors[key]) {
       const field = findItem(INPUT_FORM, key);
-      const errorLabel = validateInputField(
-        $formData[key],
-        field,
-        $selectedCountryISO
-      );
+      const errorLabel = validateInputField(value, field, $selectedCountryISO);
       errors[key] = errorLabel ? $t(errorLabel) : null;
     }
     // checks if pincode has been filled and autofills city, state for the same
