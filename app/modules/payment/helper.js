@@ -125,7 +125,7 @@ export function assertPaymentSuccessMetadata(data) {
       raiseValidationError({
         entity: `razorpay_${paymentEntity}_id`,
         data,
-        severity: errorService.SEVERITY_LEVELS.S2,
+        severity: errorService.SEVERITY_LEVELS.S1,
       });
     }
 
@@ -140,7 +140,7 @@ export function assertPaymentSuccessMetadata(data) {
       raiseValidationError({
         entity: 'razorpay_signature',
         data,
-        severity: errorService.SEVERITY_LEVELS.S2,
+        severity: errorService.SEVERITY_LEVELS.S1,
       });
     }
   } catch (e) {
