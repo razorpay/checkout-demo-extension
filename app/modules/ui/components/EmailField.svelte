@@ -23,6 +23,7 @@
   // Utils
   import { isEmailOptional } from 'razorpay';
   import { isEmailReadOnly } from 'checkoutframe/customer';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   const isOptional = isEmailOptional();
   const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
@@ -33,7 +34,7 @@
   // Form Validation for email - specifically for 1cc
   let validationText;
   export let showValidations = false;
-  $: validationText = !EMAIL_VALIDATOR.test(value) ? $t(EMAIL_HELP_TEXT) : null;
+  $: validationText = !validateEmail(value) ? $t(EMAIL_HELP_TEXT) : null;
 </script>
 
 <div>

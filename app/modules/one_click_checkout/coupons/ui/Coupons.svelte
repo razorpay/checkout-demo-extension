@@ -85,6 +85,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
   import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
@@ -113,7 +114,7 @@
   }
 
   function handleOnSubmit() {
-    if (!CONTACT_REGEX.test($contact) || !EMAIL_REGEX.test($email)) {
+    if (!CONTACT_REGEX.test($contact) || !validateEmail($email)) {
       showValidations = true;
       return;
     }

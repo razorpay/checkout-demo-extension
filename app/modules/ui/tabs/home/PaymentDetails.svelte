@@ -80,6 +80,7 @@
     PHONE_REGEX_INDIA,
   } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   const entries = _Obj.entries;
 
@@ -178,6 +179,10 @@
   const showAddress = isAddressEnabled() && !isPartialPayment();
 
   function onSubmitClick() {
+    if (!CONTACT_REGEX.test($contact) || !validateEmail($email)) {
+      showValidations = true;
+      return;
+    }
     Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
       contact: $contact,
       email: $email,
