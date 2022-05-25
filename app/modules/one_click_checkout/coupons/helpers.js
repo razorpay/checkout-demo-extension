@@ -37,7 +37,11 @@ import {
 import { cartDiscount } from 'one_click_checkout/charges/store';
 import { getRoute } from 'one_click_checkout/routing/store';
 import { maxlength } from 'checkoutstore/screens/otp';
-import { showBanner, consentViewCount, consentGiven } from 'one_click_checkout/address/store';
+import {
+  showBanner,
+  consentViewCount,
+  consentGiven,
+} from 'one_click_checkout/address/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 
 // utils imports

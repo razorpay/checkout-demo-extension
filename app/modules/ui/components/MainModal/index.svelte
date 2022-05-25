@@ -36,10 +36,6 @@
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
-      // Element wants to handle "Escape" by itself
-      if (hasClass(e.target, 'no-escape')) {
-        return;
-      }
       if (onClose) {
         preCloseCheck(onClose);
       }

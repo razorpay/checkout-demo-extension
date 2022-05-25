@@ -167,7 +167,7 @@ export const validateFormValues = (formValues: FormValuesType) => {
     const value = (formValues[key] as string).trim();
     if (
       key !== FORM_FIELDS.line2 &&
-      (value === '' || SPACIAL_CHAR_REGEX.test(value ))
+      (value === '' || SPACIAL_CHAR_REGEX.test(value))
     ) {
       isValid = false;
       errors[key] = true;
@@ -221,6 +221,7 @@ export const getAllCountries = (
             response && Array.isArray(response)
               ? response.map((country) => {
                   return {
+                    _key: country.countryAlpha2Code.toUpperCase(),
                     key: country.countryAlpha2Code.toUpperCase(),
                     label: toTitleCase(country.countryName),
                     type: FORM_FIELDS.country,
@@ -266,6 +267,7 @@ export const getStatesWithCountryCode = (
             response
               ? response.states.map((state) => {
                   return {
+                    _key: state.stateCode,
                     key: state.stateCode,
                     label: toTitleCase(state.stateName),
                     type: FORM_FIELDS.state,

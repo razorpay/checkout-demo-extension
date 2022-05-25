@@ -15,10 +15,8 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
-  import RecurringCallout from 'ui/tabs/emandate/RecurringCallout.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import CTAOneCC from 'one_click_checkout/cta/index.svelte';
@@ -35,7 +33,6 @@
     CORPORATE_RADIO_LABEL,
     RETAIL_RADIO_LABEL,
     SELECTION_RADIO_TEXT,
-    SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
   } from 'ui/labels/netbanking';
@@ -75,6 +72,7 @@
 
   // Other Imports
   import { isOneClickCheckout } from 'razorpay';
+  import triggerSearchModal from 'components/SearchModal';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -99,9 +97,6 @@
       selectedBankName = null;
     }
   }
-
-  // State
-  let searchModalOpen = false;
 
   // Refs
   let radioContainer;
@@ -134,13 +129,23 @@
   }
 
   function showSearch() {
-    searchModalOpen = true;
+    triggerSearchModal({
+      identifier: 'netbanking_bank_select',
+      placeholder: SEARCH_PLACEHOLDER,
+      all: SEARCH_ALL,
+      items: translatedBanksArr,
+      keys: ['code', 'name', 'original'],
+      component: BankSearchItem,
+      onClose: onSearchHide,
+      onSelect: (data) => {
+        $selectedBank = data.code;
+        onSearchHide();
+      },
+    });
     Analytics.track(NETBANKING_EVENTS.DROPDOWN_CLICK);
   }
 
-  function hideSearch() {
-    searchModalOpen = false;
-
+  function onSearchHide() {
     // Restore focus
     if (bankSelect) {
       bankSelect.focus();
@@ -456,26 +461,6 @@
       {/if}
     </div>
 
-    <!-- LABEL: Select bank to pay -->
-    <!-- LABEL: Search for bank -->
-    <!-- LABEL: All banks -->
-    <SearchModal
-      identifier="netbanking_bank_select"
-      title={$t(SEARCH_TITLE)}
-      placeholder={$t(SEARCH_PLACEHOLDER)}
-      all={$t(SEARCH_ALL)}
-      items={translatedBanksArr}
-      bind:open={searchModalOpen}
-      keys={['code', 'name', 'original']}
-      component={BankSearchItem}
-      on:close={hideSearch}
-      on:select={({ detail }) => {
-        $selectedBank = detail.code;
-        hideSearch();
-      }}
-    />
-
-    <RecurringCallout />
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />
     {/if}

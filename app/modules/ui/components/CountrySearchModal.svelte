@@ -1,14 +1,17 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { t } from 'svelte-i18n';
   import { formatMessageWithLocale } from 'i18n';
   import { Track } from 'analytics';
-  import SearchModal from 'ui/elements/SearchModal.svelte';
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
   import {
     COUNTRY_SEARCH_ALL,
     COUNTRY_SEARCH_PLACEHOLDER,
   } from 'ui/labels/home';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
+  import triggerSearchModal from 'components/SearchModal';
+
+  const dispatch = createEventDispatcher();
 
   export let open = false;
   let countryCodesList;
@@ -63,16 +66,23 @@
   }
 
   const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
-</script>
 
-<SearchModal
-  identifier={searchIdentifier}
-  placeholder={$t(COUNTRY_SEARCH_PLACEHOLDER)}
-  all={$t(COUNTRY_SEARCH_ALL)}
-  items={countryCodesList}
-  keys={['country_code', 'country', 'name', 'original']}
-  component={CountryCodeSearchItem}
-  bind:open
-  on:close
-  on:select
-/>
+  $: {
+    if (open) {
+      triggerSearchModal({
+        identifier: searchIdentifier,
+        placeholder: COUNTRY_SEARCH_PLACEHOLDER,
+        all: COUNTRY_SEARCH_ALL,
+        items: countryCodesList,
+        keys: ['country_code', 'country', 'name', 'original'],
+        component: CountryCodeSearchItem,
+        onClose: (data) => {
+          dispatch('close', data);
+        },
+        onSelect: (data) => {
+          dispatch('select', data);
+        },
+      });
+    }
+  }
+</script>

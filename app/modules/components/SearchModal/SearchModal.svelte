@@ -1,71 +1,62 @@
-<script>
+<script lang="ts">
   /**
    * ARIA guidelines: https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.0pattern/combobox-autocomplete-list.html
    */
 
   // Svelte imports
-  import { createEventDispatcher, onMount, tick, onDestroy } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
-  import { showCta, hideCta } from 'checkoutstore/cta';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
   import { isOneClickCheckout } from 'razorpay';
-  import * as _El from 'utils/DOM';
-
-  // Store imports
-  import { overlayStack } from 'checkoutstore/back';
 
   // Utils imports
-  import { isMobile } from 'common/useragent';
   import { Track } from 'analytics';
-  import { isElementCompletelyVisibleInContainer } from 'lib/utils';
+  import { isElementCompletelyVisibleInContainer, returnAsIs } from 'lib/utils';
   import * as Search from 'checkoutframe/search';
   import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
+  import { popStack } from 'navstack';
 
   // Props
   export let placeholder = 'Type to search';
-  export let sortSearchResult;
+  export let sortSearchResult: any;
   export let autocomplete = 'off';
   export let inputType = 'text';
-  export let items = [];
+  export let items: any[] = [];
   export let identifier = Track.makeUid();
-  export let component;
-  export let keys;
-  export let all;
-  export let open = false;
+  export let component: any;
+  export let keys: string[];
+  export let all: string;
+  export let onSelect = returnAsIs;
+  export let onClose = returnAsIs;
 
   const IDs = {
     overlay: `${identifier}_search_overlay`,
     results: `${identifier}_search_results`,
-    resultItem: (item) => `${identifier}_${item._key}_search_result`,
-    allItem: (item) => `${identifier}_${item._key}_search_all`,
+    resultItem: (item: any, index: number) =>
+      `${identifier}_${item._key}_${index}_search_result`,
+    allItem: (item: any, index: number) =>
+      `${identifier}_${item._key}_${index}_search_all`,
   };
-
-  onMount(() => {
-    document.querySelector('#modal-inner')?.appendChild(containerRef);
-  });
-
-  const dispatch = createEventDispatcher();
 
   // Variables for searching library
   const cache = Search.createCache();
 
   // Variables
   let query = '';
-  let results = [];
+  let results: any[] = [];
   let shownItems = items;
-  let focusedIndex = null;
-  let activeDescendantIdRef;
+  let focusedIndex: number | null = null;
+  let activeDescendantIdRef: string;
 
   // Refs
-  let containerRef;
   let inputRef;
   let resultsContainerRef;
 
@@ -109,10 +100,10 @@
     }
 
     if (index < results.length) {
-      return `#${IDs.resultItem(results[index])}`;
+      return `#${IDs.resultItem(results[index], index)}`;
     } else {
       index = index - results.length;
-      return `#${IDs.allItem(items[index])}`;
+      return `#${IDs.allItem(items[index], index)}`;
     }
   }
 
@@ -154,77 +145,21 @@
     });
   }
 
-  function dispatchClose(meta) {
+  function dispatchClose(meta, destroyed) {
     // Consumer can figure out whether or not to actually close
     // by looking at `event.detail.meta.from`
-    dispatch('close', { meta });
-  }
-
-  function onSelect(item) {
-    dispatch('select', item);
-  }
-
-  function focus() {
-    if (!inputRef) {
-      return;
+    if (!destroyed) {
+      popStack();
     }
-
-    /**
-     * Focus on input field on Desktop.
-     * Handle focus on the parent on mobile.
-     */
-    if (isMobile()) {
-      const parent = _El.parent(inputRef);
-
-      if (parent) {
-        parent.focus();
-      }
-    } else {
-      inputRef.focus();
+    if (onClose) {
+      onClose({ meta });
     }
-  }
-
-  function removeFromOverlayStack() {
-    // Remove the overlay from $overlayStack
-    const overlay = $overlayStack.find((overlay) => overlay.id === IDs.overlay);
-    $overlayStack = $overlayStack.filter(
-      (overlayItem) => overlayItem !== overlay
-    );
   }
 
   onDestroy(() => {
-    removeFromOverlayStack();
+    dispatchClose({}, true);
     cache.clear();
   });
-
-  function openWithOverlay() {
-    query = '';
-    // Wait for UI updates before focusing
-    tick().then(focus);
-
-    // Add to $overlayStack
-    $overlayStack = $overlayStack.concat([
-      {
-        id: IDs.overlay,
-        component: 'SearchModal',
-        back: (meta) => {
-          dispatchClose(meta);
-        },
-      },
-    ]);
-  }
-
-  $: {
-    if (open) {
-      openWithOverlay();
-      hideCta();
-    } else {
-      removeFromOverlayStack();
-      if (open === false) {
-        showCta();
-      }
-    }
-  }
 
   function escapeHandler(event) {
     if (_.getKeyFromEvent(event) === 27) {
@@ -290,168 +225,146 @@
     }
   }
 
+  function onSelectHandler(result) {
+    if (onSelect) {
+      onSelect(result);
+    }
+    popStack();
+  }
+
   function submitHandler() {
     if (_.isNumber(focusedIndex)) {
       const result = shownItems[focusedIndex];
-
-      onSelect(result);
+      onSelectHandler(result);
     }
   }
 </script>
 
-<div bind:this={containerRef}>
-  {#if open}
-    <div class="search-curtain">
-      <div
+<!-- <div id="searchModal"> -->
+<!-- <div id="searchModal" class="search-curtain"> -->
+<!-- <div
         class="search-curtain-bg"
         on:click={() => dispatchClose({ from: 'overlay' })}
         in:fade={getAnimationOptions({ duration: 200 })}
         out:fade={getAnimationOptions({ duration: 200 })}
+      /> -->
+<div
+  class="search-box"
+  in:fly={getAnimationOptions({ duration: 200, y: -100 })}
+  out:fade={getAnimationOptions({ duration: 200 })}
+>
+  <Stack vertical>
+    <form
+      on:submit|preventDefault={submitHandler}
+      class="search-field"
+      class:search-field-1cc={isOneClickCheckoutEnabled}
+    >
+      <div class="icon">
+        <Icon
+          icon={isOneClickCheckoutEnabled
+            ? getMiscIcon('search_one_cc')
+            : getMiscIcon('search')}
+        />
+      </div>
+      <input
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-haspopup="true"
+        aria-owns={`#${IDs.results}`}
+        aria-expanded="true"
+        aria-activedescendant={activeDescendantIdRef}
+        {autocomplete}
+        placeholder={$t(placeholder)}
+        on:focus={() => (inputRef.type = inputType)}
+        on:keyup={escapeHandler}
+        on:keydown={arrowKeysHandler}
+        bind:value={query}
+        bind:this={inputRef}
       />
-      <div
-        class="search-box"
-        in:fly={getAnimationOptions({ duration: 200, y: -100 })}
-        out:fade={getAnimationOptions({ duration: 200 })}
-      >
-        <Stack vertical>
-          <form
-            on:submit|preventDefault={submitHandler}
-            class="search-field"
-            class:search-field-1cc={isOneClickCheckoutEnabled}
-          >
-            <div class="icon">
-              <Icon
-                icon={isOneClickCheckoutEnabled
-                  ? getMiscIcon('search_one_cc')
-                  : getMiscIcon('search')}
-              />
-            </div>
-            <input
-              class="no-escape"
-              type="text"
-              role="combobox"
-              aria-autocomplete="list"
-              aria-haspopup="true"
-              aria-owns={`#${IDs.results}`}
-              aria-expanded="true"
-              aria-activedescendant={activeDescendantIdRef}
-              {autocomplete}
-              {placeholder}
-              on:focus={() => (inputRef.type = inputType)}
-              on:keyup={escapeHandler}
-              on:keydown={arrowKeysHandler}
-              bind:value={query}
-              bind:this={inputRef}
-            />
-          </form>
-          <div
-            class="search-results"
-            class:has-query={query}
-            id={IDs.results}
-            aria-label={$t('misc.search_results_label')}
-            role="listbox"
-            bind:this={resultsContainerRef}
-            class:search-dropdown-1cc={isOneClickCheckoutEnabled}
-          >
-            {#if query}
-              {#if results.length}
-                <!-- LABEL: Results -->
-                <div class="list results">
-                  {#each results as item, index (IDs.resultItem(item))}
-                    <div
-                      class="list-item"
-                      class:list-item-1cc={isOneClickCheckoutEnabled}
-                      class:focused={index === focusedIndex}
-                      id={IDs.resultItem(item)}
-                      role="option"
-                      aria-selected={index === focusedIndex}
-                      on:click={() => onSelect(item)}
-                    >
-                      <svelte:component this={component} {item} />
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <!-- LABEL: No results for "{query}" -->
-                <div class="no-results">
-                  {formatTemplateWithLocale(
-                    'misc.search_no_results',
-                    { query },
-                    $locale
-                  )}
-                </div>
-              {/if}
-            {/if}
-            {#if all}
-              {#if isOneClickCheckoutEnabled}
-                <div class="list-header list-header-1cc">
-                  <div class="divider" />
-                  <div class="text">{all}</div>
-                </div>
-              {:else}
-                <div class="list-header">
-                  <div class="text">{all}</div>
-                  <div class="divider" />
-                </div>
-              {/if}
-            {/if}
-            <div class="list">
-              {#each items as item, index (IDs.allItem(item))}
-                <div
-                  class="list-item"
-                  class:focused={index + results.length === focusedIndex}
-                  class:list-item-1cc={isOneClickCheckoutEnabled}
-                  id={IDs.allItem(item)}
-                  role="option"
-                  aria-selected={index + results.length === focusedIndex}
-                  on:click={() => onSelect(item)}
-                >
-                  <svelte:component this={component} {item} />
-                </div>
-              {/each}
-            </div>
+    </form>
+    <div
+      class="search-results"
+      class:has-query={query}
+      id={IDs.results}
+      aria-label={$t('misc.search_results_label')}
+      role="listbox"
+      bind:this={resultsContainerRef}
+      class:search-dropdown-1cc={isOneClickCheckoutEnabled}
+    >
+      {#if query}
+        {#if results.length}
+          <!-- LABEL: Results -->
+          <div class="list results">
+            {#each results as item, index (IDs.resultItem(item, index))}
+              <div
+                class="list-item"
+                class:list-item-1cc={isOneClickCheckoutEnabled}
+                class:focused={index === focusedIndex}
+                id={IDs.resultItem(item, index)}
+                role="option"
+                aria-selected={index === focusedIndex}
+                on:click={() => onSelectHandler(item)}
+              >
+                <svelte:component this={component} {item} />
+              </div>
+            {/each}
           </div>
-        </Stack>
+        {:else}
+          <!-- LABEL: No results for "{query}" -->
+          <div class="no-results">
+            {formatTemplateWithLocale(
+              'misc.search_no_results',
+              { query },
+              $locale
+            )}
+          </div>
+        {/if}
+      {/if}
+      {#if all}
+        {#if isOneClickCheckoutEnabled}
+          <div class="list-header list-header-1cc">
+            <div class="divider" />
+            <div class="text">{$t(all)}</div>
+          </div>
+        {:else}
+          <div class="list-header">
+            <div class="text">{$t(all)}</div>
+            <div class="divider" />
+          </div>
+        {/if}
+      {/if}
+      <div class="list">
+        {#each items as item, index (IDs.allItem(item, index))}
+          <div
+            class="list-item"
+            class:focused={index + results.length === focusedIndex}
+            class:list-item-1cc={isOneClickCheckoutEnabled}
+            id={IDs.allItem(item, index)}
+            role="option"
+            aria-selected={index + results.length === focusedIndex}
+            on:click={() => onSelectHandler(item)}
+          >
+            <svelte:component this={component} {item} />
+          </div>
+        {/each}
       </div>
     </div>
-  {/if}
+  </Stack>
 </div>
+<!-- </div> -->
 
+<!-- </div> -->
 <style>
-  .search-curtain {
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-    text-align: left;
-    font-family: 'lato', ubuntu, helvetica, sans-serif;
-  }
-
-  .search-curtain-bg {
-    background-color: rgba(0, 0, 0, 0.5);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 581px;
-  }
-
-  .search-curtain {
-    display: flex;
-    z-index: 101;
-  }
-
   .search-box {
     position: relative;
     background-color: white;
     width: 100%;
     height: 100%;
-    width: 90%;
+    width: 90% !important;
     height: 90%;
+    top: 5%;
+    left: 5%;
   }
 
   .search-box > :global(.stack) {
@@ -543,6 +456,7 @@
     border-bottom: 1px solid #eeeeee;
     color: #424242;
     cursor: pointer;
+    text-align: left;
   }
 
   .has-query .list.results .list-item:last-child {

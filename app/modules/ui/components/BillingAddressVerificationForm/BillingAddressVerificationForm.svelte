@@ -11,7 +11,6 @@
 
   // components
   import Field from 'ui/components/Field.svelte';
-  import SearchModal from 'ui/elements/SearchModal.svelte';
   import CountrySearchItem from 'ui/elements/search-item/Country.svelte';
 
   // i18n
@@ -23,7 +22,6 @@
     FORM_FIELDS,
     FormFieldType,
     SearchModalFieldSType,
-    SearchModalFieldType,
     FormValuesType,
     FormErrorsType,
     FilterCallbackType,
@@ -44,6 +42,7 @@
     validateFormValues,
     findCountryByCodeOrName,
   } from './helper';
+  import triggerSearchModal from 'components/SearchModal';
 
   // props
   export let value: FormValuesType = {};
@@ -51,13 +50,12 @@
   export let filterCountries: FilterCallbackType = null;
   export let filterStates: FilterCallbackType = null;
 
+  let searchModalOpen = false;
+
   // states
   let formErrors: FormErrorsType = {};
   let formFields: (FormFieldType | FormFieldType[])[] = [];
-  let visibleModal: SearchModalFieldType | null = null;
   let searchModalFields: SearchModalFieldSType;
-  let whichSearchModalVisible: null | FORM_FIELDS.country | FORM_FIELDS.state =
-    null;
   let isStatesLoading = false;
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -75,19 +73,29 @@
   $: !searchModalFields && (searchModalFields = createSearchModalFields($t));
   $: formType,
     (formFields = createFormFields($t, FORM_FIELDS_TYPE_MAPPING[formType]));
-  $: visibleModal = whichSearchModalVisible
-    ? searchModalFields[whichSearchModalVisible]
-    : null;
 
   // handlers
   const handleShowSearchModal = (
     whichSearchModal: null | FORM_FIELDS.country | FORM_FIELDS.state
   ) => {
-    whichSearchModalVisible = whichSearchModal;
-  };
-
-  const handleHideSearchModal = () => {
-    whichSearchModalVisible = null;
+    if (whichSearchModal && !searchModalOpen) {
+      const modalData = searchModalFields[whichSearchModal];
+      searchModalOpen = true;
+      triggerSearchModal({
+        identifier: `billing-address-verification-location-${whichSearchModal}`,
+        placeholder: modalData?.placeholder || '',
+        all: modalData?.all,
+        sortSearchResult: null,
+        autocomplete: 'donot-autocomplete',
+        items: modalData?.data || [],
+        keys: modalData?.keys || ['label'],
+        component: CountrySearchItem,
+        onClose: () => {
+          searchModalOpen = false;
+        },
+        onSelect: handleOnSelectChange,
+      });
+    }
   };
 
   const handleSearchFieldClick = (field: FormFieldType) => {
@@ -134,21 +142,17 @@
       });
   };
 
-  const handleOnSelectChange = (
-    event: CustomEvent<{
-      type: FORM_FIELDS.country | FORM_FIELDS.state;
-      key: string;
-      label: string;
-    }>
-  ) => {
-    const data = event.detail;
+  const handleOnSelectChange = (data: {
+    type: FORM_FIELDS.country | FORM_FIELDS.state;
+    key: string;
+    label: string;
+  }) => {
     handleOnInput(data.type, data.label);
     if (data.type === FORM_FIELDS.country) {
       handleOnInput(FORM_FIELDS.countryCode, data.key);
       handleOnInput(FORM_FIELDS.state, '');
       handleFetchStates(data.key);
     }
-    handleHideSearchModal();
   };
 
   const handleFieldInput = (id: FORM_FIELDS, evt: Event) => {
@@ -308,20 +312,6 @@
       {/if}
     </div>
   {/each}
-
-  <SearchModal
-    all={visibleModal?.all}
-    sortSearchResult={null}
-    component={CountrySearchItem}
-    items={visibleModal?.data || []}
-    autocomplete="donot-autocomplete"
-    keys={visibleModal?.keys || ['label']}
-    open={whichSearchModalVisible !== null}
-    placeholder={visibleModal?.placeholder || ''}
-    identifier="billing-address-verification-location"
-    on:close={handleHideSearchModal}
-    on:select={handleOnSelectChange}
-  />
 </form>
 
 <style lang="css">

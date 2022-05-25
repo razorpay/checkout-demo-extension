@@ -34,7 +34,6 @@
     CHANGE,
     LOADING_CURRENCIES,
     MORE,
-    SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
     PAY_CONVERSION_FEE,
@@ -60,13 +59,13 @@
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
-  import SearchModal from 'ui/elements/SearchModal.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   import {
     isDCCEnabledForProvider,
     isInternationalProvider,
   } from 'common/international';
+  import triggerSearchModal from 'components/SearchModal';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -88,7 +87,6 @@
   let selectedCurrency = null;
   let originalCurrency = getCurrency();
   let payFee;
-  let searchModalOpen = false;
   let entityWithAmount = null;
   let cardCurrency;
   const session = getSession();
@@ -301,7 +299,6 @@
 
   function onSelect(currency) {
     selectedCurrency = currency;
-    searchModalOpen = false;
     setDCCPayload({ currency });
   }
 
@@ -459,7 +456,18 @@
   }
 
   function showCurrenciesModal() {
-    searchModalOpen = true;
+    triggerSearchModal({
+      identifier: 'dcc_currency_select',
+      placeholder: SEARCH_PLACEHOLDER,
+      all: SEARCH_ALL,
+      autocomplete: 'transaction-currency',
+      items: sortedCurrencies,
+      keys: ['currency', 'name', 'symbol'],
+      component: CurrencySearchItem,
+      onSelect: (data) => {
+        onSelect(data.currency);
+      },
+    });
   }
 
   function getCardByTokenId(tokenId) {
@@ -570,23 +578,6 @@
         {/if}
         <span class="arrow">&#xe604;</span>
       </div>
-
-      <!-- LABEL: Select currency to pay -->
-      <!-- LABEL: Search for currency -->
-      <!-- LABEL: All currencies -->
-      <SearchModal
-        identifier="dcc_currency_select"
-        title={$t(SEARCH_TITLE)}
-        placeholder={$t(SEARCH_PLACEHOLDER)}
-        all={$t(SEARCH_ALL)}
-        autocomplete="transaction-currency"
-        items={sortedCurrencies}
-        keys={['currency', 'name', 'symbol']}
-        component={CurrencySearchItem}
-        bind:open={searchModalOpen}
-        on:close={() => (searchModalOpen = false)}
-        on:select={({ detail }) => onSelect(detail.currency)}
-      />
     </Stack>
     {#if explicitUI && selectedCurrency !== originalCurrency}
       <div class="dcc-charges">

@@ -242,11 +242,13 @@ describe('Test getAllCountries', () => {
     });
     const response = [
       {
+        _key: 'US',
         key: 'US',
         label: 'United States',
         type: 'country',
       },
       {
+        _key: 'CA',
         key: 'CA',
         label: 'Canada',
         type: 'country',
@@ -273,11 +275,13 @@ describe('Test getStatesWithCountryCode', () => {
     });
     const response = [
       {
+        _key: 'CA-AB',
         key: 'CA-AB',
         label: 'Alberta',
         type: 'state',
       },
       {
+        _key: 'CA-BC',
         key: 'CA-BC',
         label: 'British Columbia',
         type: 'state',
