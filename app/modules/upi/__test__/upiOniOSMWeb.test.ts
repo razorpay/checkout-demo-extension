@@ -40,6 +40,7 @@ describe('upiPopUpForiOSMWeb utility tests', () => {
     window.open = jest.fn();
     originalOpen = window.open;
     window.open = mockedOpen as any;
+    jest.useFakeTimers();
   });
   afterEach(() => {
     window.open = originalOpen;
@@ -138,7 +139,7 @@ describe('#tryOpeningIntentUrlOniOSMWeb', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers('legacy');
+    jest.useFakeTimers();
     jest.spyOn(global, 'setTimeout');
     userAgentSpy = jest.spyOn(window.navigator, 'userAgent', 'get');
 

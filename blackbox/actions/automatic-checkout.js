@@ -17,7 +17,6 @@ async function handleAutomaticCheckoutButtonClick(context) {
   const { preferences, sendPreferences, sendRewards } = context;
   if (preferences) {
     await sendPreferences(context);
-    await sendRewards(context);
   }
 }
 

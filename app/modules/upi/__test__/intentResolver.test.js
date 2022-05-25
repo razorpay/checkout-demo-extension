@@ -14,7 +14,9 @@ describe('#tryOpeningIntentUrl', () => {
   const intentUrl = 'valid-intent-url';
 
   beforeEach(() => {
-    jest.useFakeTimers('legacy');
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
     jest.spyOn(global, 'setTimeout');
   });
 

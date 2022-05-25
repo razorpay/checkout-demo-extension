@@ -30,17 +30,10 @@ SHELL ["/bin/bash", "-c"]
 # because of post install script 
 RUN git init 
 
-RUN if [[ -n $TRAFFIC_ENV ]]; then \
-    cd /checkout_build \
+RUN cd /checkout_build \
     && npm install \
     && NODE_ENV=production npm run build \
-    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
-    else \
-    cd /checkout_build \
-    && npm install \
-    && NODE_ENV=production npm run build \
-    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
-    fi
+    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress;
 
 RUN echo "Build_Creation_Date_Time: $(date +'%Y-%m-%dT%H:%M:%S') Build_Number: $BUILD_NUMBER Commit_Id: $GIT_COMMIT_HASH" > /checkout_build/app/dist/v1/info.txt
 

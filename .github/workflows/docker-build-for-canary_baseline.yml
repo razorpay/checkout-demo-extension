@@ -3,7 +3,7 @@
 name: 'Canary Baseline: Build & push to Harbor'
 
 # Controls when the action will run. Triggers the workflow on every pull_request
-on: [pull_request]
+on: [push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

@@ -13,7 +13,7 @@ jobs:
       - name: Use Node v16
         uses: actions/setup-node@v1
         with:
-          node-version: 16.9.0
+          node-version: 16.10.0
       - name: Install Dependencies
         run: npm ci
       - name: Run Unit Tests
@@ -27,8 +27,8 @@ jobs:
           path: |
             app/dist
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  partial-FTs-A-and-CustomFTs:
-    name: fts-1
+  customFTs:
+    name: custom-fts
     needs: [make-build]
     runs-on: [self-hosted]
     container: satantime/puppeteer-node
@@ -38,7 +38,7 @@ jobs:
       - name: Use Node v16
         uses: actions/setup-node@v1
         with:
-          node-version: 16.9.0
+          node-version: 16.10.0
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
@@ -54,20 +54,23 @@ jobs:
         run: npm ci
       - name: Run Custom Checkout FTs
         run: NODE_ENV=production npm run jest:custom
-      - name: Run All base FTs
-        run: NODE_ENV=production npx jest blackbox/tests/homescreen/[aAbB]**/*.test.js
-  partial-FTs-BCDEFGHIJKLMNO:
-    name: fts-2
+      - name: Run Misc FTs
+        run: NODE_ENV=production npx jest blackbox/tests/misc/**/*.test.js
+  functional-test:
+    name: functional-tests
     needs: [make-build]
     runs-on: [self-hosted]
     container: satantime/puppeteer-node
+    strategy:
+      matrix:
+        shard: [1/3, 2/3, 3/3]
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
       - name: Use Node v16
         uses: actions/setup-node@v1
         with:
-          node-version: 16.9.0
+          node-version: 16.10.0
       - name: Cache build
         id: cache-build
         uses: actions/cache@v3
@@ -81,64 +84,10 @@ jobs:
             ${{ runner.os }}-
       - name: Install Dependencies
         run: npm ci
-      - name: Run All base FTs
-        run: NODE_ENV=production npx jest blackbox/tests/homescreen/[bcdefghijklmnoBCDEFGHIJKLMNO]**/*.test.js
-  partial-FTs-PQRSTvwxyz: # exclude U as U has more tests
-    name: fts-3
-    needs: [make-build]
-    runs-on: [self-hosted]
-    container: satantime/puppeteer-node
-    steps:
-      - name: Checkout Codebase
-        uses: actions/checkout@v2
-      - name: Use Node v16
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.9.0
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: |
-            app/dist
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Dependencies
-        run: npm ci
-      - name: Run All base FTs
-        run: NODE_ENV=production npx jest blackbox/tests/homescreen/[PQRSTVWXYZpqrstvwxyz]**/*.test.js
-  partial-FTs-u:
-    name: fts-4
-    needs: [make-build]
-    runs-on: [self-hosted]
-    container: satantime/puppeteer-node
-    steps:
-      - name: Checkout Codebase
-        uses: actions/checkout@v2
-      - name: Use Node v16
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.9.0
-      - name: Cache build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: |
-            app/dist
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Dependencies
-        run: npm ci
-      - name: Run All base FTs
-        run: NODE_ENV=production npx jest blackbox/tests/homescreen/[uU]**/*.test.js
+      - name: Run Fts
+        run: NODE_ENV=production npx jest blackbox/tests/homescreen/**/*.test.js --shard=${{ matrix.shard }}
   fts:
-    needs: [partial-FTs-A-and-CustomFTs, partial-FTs-BCDEFGHIJKLMNO, partial-FTs-PQRSTvwxyz, partial-FTs-u]
+    needs: [customFTs, functional-test]
     name: fts
     runs-on: [self-hosted]
     steps:

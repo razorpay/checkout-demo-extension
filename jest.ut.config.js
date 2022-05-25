@@ -13,7 +13,7 @@ module.exports = {
     '@testing-library/jest-dom/extend-expect',
   ],
   testEnvironment: 'jsdom',
-  timers: 'legacy',
+  fakeTimers: {},
   clearMocks: true, // Automatically clear mock calls and instances before every test.
   collectCoverageFrom: collectCoverageFrom(),
   coverageReporters: ['html-spa', 'text-summary'],

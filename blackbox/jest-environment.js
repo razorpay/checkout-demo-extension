@@ -1,10 +1,10 @@
-const NodeEnvironment = require('jest-environment-node');
+const { TestEnvironment } = require('jest-environment-node');
 const puppeteer = require('puppeteer');
 const DIR = require('./tmpdir');
 const { readFileSync } = require('fs');
 const { delay } = require('./util');
 
-class PuppeteerEnvironment extends NodeEnvironment {
+class PuppeteerEnvironment extends TestEnvironment {
   async setup() {
     const browserWSEndpoint = readFileSync(DIR + '/wsEndpoint', 'utf8');
     const browser = await puppeteer.connect({ browserWSEndpoint });
