@@ -22,6 +22,9 @@ import { contact } from 'checkoutstore/screens/home';
 
 let customers = {};
 let qpmap = _.getQueryParams();
+const URL_NOT_FOUND = 'The requested URL was not found on the server.';
+const ONECC_VERIFY_OTP = '1cc/otp/verify';
+const VERIFY_OTP = 'otp/verify';
 
 export const getCustomer = (contact, savedCustomer, skipStatusCall = false) => {
   // indian contact without +91
@@ -223,12 +226,13 @@ Customer.prototype = {
     });
   },
 
-  submitOTP: function (data, callback, queryParams) {
+  submitOTP: function (data, callback, queryParams, endPoint) {
     let user = this;
+    let otpData = data;
     const isOneCCEnabled = isOneClickCheckout();
     // TODO: fix this
     data.contact = this.contact || getCustomer(get(contact)).contact;
-    let url = isOneCCEnabled ? '1cc/otp/verify' : 'otp/verify';
+    let url = endPoint || (isOneCCEnabled ? ONECC_VERIFY_OTP : VERIFY_OTP);
 
     if (queryParams) {
       url = _.appendParamsToUrl(url, queryParams);
@@ -246,6 +250,11 @@ Customer.prototype = {
       url: url,
       data: data,
       callback: function (data) {
+        if (data?.error?.description === URL_NOT_FOUND && url.includes(ONECC_VERIFY_OTP)) {
+          // The fix is for temporary need to remove once BE API stabilized
+          user.submitOTP(otpData, callback, queryParams, VERIFY_OTP)
+          return
+        }
         if (data.success) {
           user.mark_logged(data);
         }
