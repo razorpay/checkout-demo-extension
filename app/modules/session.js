@@ -176,11 +176,7 @@ function hideOverlayMessage() {
     }
   }
 
-  if ($('#confirmation-dialog').hasClass('animate')) {
-    makeHidden(docUtil.getElementById('error-message'));
-  } else {
-    hideOverlay($('#error-message'));
-  }
+  hideOverlay($('#error-message'));
 }
 
 // this === Session

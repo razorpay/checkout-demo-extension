@@ -6,7 +6,7 @@
   } from 'checkoutstore/backdrop';
 
   // i18n
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
   import {
     CONFIRM_CANCEL_HEADING,
     CONFIRM_CANCEL_MESSAGE,
@@ -15,6 +15,7 @@
   } from 'ui/labels/confirm';
 
   import { fly } from 'svelte/transition';
+  import { onDestroy } from 'svelte';
 
   // LABEL: Cancel payment?
   export let heading = $t(CONFIRM_CANCEL_HEADING);
@@ -49,6 +50,12 @@
   export function isVisible() {
     return visible;
   }
+
+  onDestroy(() => {
+    if (!previousBackdropState) {
+      hideBackdrop();
+    }
+  });
 
   function clickedPositive() {
     hide();

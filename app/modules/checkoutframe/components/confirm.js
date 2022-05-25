@@ -11,6 +11,7 @@ export function isVisible() {
 }
 
 export function show(props) {
+  confirm?.$destroy();
   confirm = new Confirm({
     target: querySelector('#modal-inner'),
     props,

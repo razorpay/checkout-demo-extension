@@ -91,7 +91,6 @@
   <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
     <div id="modal-inner">
       <div id="overlay" />
-      <div id="confirmation-dialog" class="showable" />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
           <img
