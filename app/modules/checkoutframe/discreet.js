@@ -55,7 +55,6 @@ import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as UpiScreenStore from 'checkoutstore/screens/upi';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
-import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
 import { reward as rewardsStore } from 'checkoutstore/rewards';
@@ -226,7 +225,6 @@ export default {
 
   ContactStorage,
   I18n,
-  overlayStackStore,
   rewardsStore,
   CRED,
   downtimeUtils,

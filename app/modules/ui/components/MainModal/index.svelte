@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { hasClass } from 'utils/DOM';
   import { onMount, onDestroy } from 'svelte';
-  import { get } from 'svelte/store';
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
@@ -15,7 +13,6 @@
   } from 'checkoutstore/methods';
   import { getAmount, disableAnimation, bringInputIntoView } from './helper';
   import { returnAsIs } from 'lib/utils';
-  import { overlayStack } from 'checkoutstore/back';
   import { getStore } from 'checkoutstore/cta';
   import { isOverlayActive } from 'navstack';
   import OneCCLoader from 'one_click_checkout/loader/Loader.svelte';
@@ -61,13 +58,7 @@
   });
 
   function preCloseCheck(next: () => void) {
-    const $overlayStack = get(overlayStack);
-    if ($overlayStack.length > 0) {
-      const last: any = $overlayStack[$overlayStack.length - 1];
-      last.back({
-        from: 'overlay',
-      });
-    } else if (isOverlayActive()) {
+    if (isOverlayActive()) {
       getView('navstack').backPressed();
     } else {
       next();

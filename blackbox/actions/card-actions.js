@@ -366,8 +366,8 @@ async function respondCurrencies(context, isAVS = false) {
 async function selectCurrency(context, code) {
   await context.page.waitForSelector('.more-btn');
   await context.page.click('.more-btn');
-  await context.page.type('.search-curtain input', code);
-  await context.page.click('.search-curtain .list-item');
+  await context.page.type('.search-box input', code);
+  await context.page.click('.search-box .list-item');
 }
 
 async function selectAddNewCard(context) {

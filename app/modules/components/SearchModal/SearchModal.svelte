@@ -240,14 +240,6 @@
   }
 </script>
 
-<!-- <div id="searchModal"> -->
-<!-- <div id="searchModal" class="search-curtain"> -->
-<!-- <div
-        class="search-curtain-bg"
-        on:click={() => dispatchClose({ from: 'overlay' })}
-        in:fade={getAnimationOptions({ duration: 200 })}
-        out:fade={getAnimationOptions({ duration: 200 })}
-      /> -->
 <div
   class="search-box"
   in:fly={getAnimationOptions({ duration: 200, y: -100 })}

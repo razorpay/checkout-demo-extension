@@ -6,8 +6,6 @@ import * as Confirm from 'checkoutframe/components/confirm';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
-import { get as storeGetter } from 'svelte/store';
-import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
 import { getView } from 'checkoutframe/components';
@@ -39,15 +37,6 @@ export function backPressed(callback) {
     },
   });
 
-  // The same logic to close overlays using $overlayStack
-  // is present for Modal.handleBackdropClick
-  // Don't forget to update it there too if you change something here.
-  // TODO: DRY
-
-  const $overlayStack = storeGetter(overlayStackStore);
-
-  // TODO: All overlays should be hidden using $overlayStack
-
   if (isOneClickCheckout()) {
     if (session.tab === 'home-1cc') {
       // session
@@ -55,16 +44,6 @@ export function backPressed(callback) {
     } else {
       session.back();
     }
-    return;
-  }
-
-  if ($overlayStack.length > 0) {
-    const last = $overlayStack[$overlayStack.length - 1];
-
-    last.back({
-      from: 'back',
-    });
-
     return;
   }
 
