@@ -110,8 +110,7 @@
     }}
     on:blur
     value={countryName}
-    displayValue={truncateString(countryName, 12)}
-    elemClasses="address-elem"
+    elemClasses="address-elem dropdown-select"
     labelClasses="address-label"
     {validationText}
     showDropDownIcon={true}

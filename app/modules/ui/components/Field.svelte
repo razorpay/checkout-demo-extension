@@ -24,7 +24,6 @@
   export let type = 'text';
   export let name;
   export let value = null;
-  export let displayValue = null;
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
@@ -342,7 +341,7 @@
       type={inputType}
       {name}
       {inputmode}
-      value={displayValue || value}
+      {value}
       {required}
       {autocomplete}
       x-autocompletetype={xautocompletetype}

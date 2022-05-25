@@ -308,4 +308,10 @@
   .show-landmark-label .optional {
     color: #79747e;
   }
+
+  .form-input :global(.dropdown-select input.input-one-click-checkout) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>

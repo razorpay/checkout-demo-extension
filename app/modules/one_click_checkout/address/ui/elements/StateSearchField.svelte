@@ -69,7 +69,6 @@
   name="state"
   autocomplete="off"
   value={stateName}
-  displayValue={truncateString(stateName, 12)}
   on:click={openStateModal}
   on:keydown={downArrowHandler}
   required
@@ -81,7 +80,7 @@
   }}
   on:blur
   {validationText}
-  elemClasses="address-elem"
+  elemClasses="address-elem dropdown-select"
   labelClasses="address-label"
   showDropDownIcon={true}
 />
