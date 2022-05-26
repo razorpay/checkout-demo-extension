@@ -9,7 +9,7 @@ import { isBraveBrowser } from 'common/useragent';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
-var body;
+let body;
 function setBody() {
   body = document.body || document.getElementsByTagName('body')[0];
   if (!body) {
@@ -31,7 +31,7 @@ function needBody(func) {
 const currentScript =
   document.currentScript ||
   (function () {
-    var scripts = querySelectorAll('script');
+    let scripts = querySelectorAll('script');
     return scripts[scripts.length - 1];
   })();
 
@@ -49,7 +49,7 @@ function defaultAutoPostHandler(data) {
     |> _El.submit;
 }
 
-var addAutoCheckoutButton = function (rzp) {
+let addAutoCheckoutButton = function (rzp) {
   currentScript
     |> _El.parent
     |> _El.append(
@@ -64,7 +64,7 @@ var addAutoCheckoutButton = function (rzp) {
       e.preventDefault();
       let form = this;
       let { action, method, target } = form;
-      var options = rzp.get();
+      let options = rzp.get();
       // if data-callback_url is not passed
       if (
         // string check, because there may be an input element named "action"
@@ -72,7 +72,7 @@ var addAutoCheckoutButton = function (rzp) {
         action &&
         !options.callback_url
       ) {
-        var request = {
+        let request = {
           url: action,
           content: form2obj(form),
           method: _.isString(method) ? method : 'get',
@@ -80,7 +80,7 @@ var addAutoCheckoutButton = function (rzp) {
         };
 
         try {
-          var data = btoa(
+          let data = btoa(
             _Obj.stringify({
               request,
               options: _Obj.stringify(options),
@@ -104,13 +104,13 @@ var addAutoCheckoutButton = function (rzp) {
  * If yes, it puts in the button
  */
 function initAutomaticCheckout() {
-  var opts = {};
+  let opts = {};
   _Obj.loop(currentScript.attributes, function (attr) {
-    var name = attr.name.toLowerCase();
+    let name = attr.name.toLowerCase();
     if (/^data-/.test(name)) {
-      var rootObj = opts;
+      let rootObj = opts;
       name = name.replace(/^data-/, '');
-      var val = attr.value;
+      let val = attr.value;
       if (val === 'true') {
         val = true;
       } else if (val === 'false') {
@@ -127,12 +127,12 @@ function initAutomaticCheckout() {
     }
   });
 
-  var key = opts.key;
+  let key = opts.key;
   if (key && key.length > 0) {
     // passing form action as callback_url
     // var form = currentScript |> _El.parent;
     opts.handler = defaultAutoPostHandler;
-    var rzp = Razorpay(opts);
+    let rzp = Razorpay(opts);
     if (!opts.parent) {
       Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp);
       addAutoCheckoutButton(rzp);
@@ -140,7 +140,7 @@ function initAutomaticCheckout() {
   }
 }
 
-var frameContainer;
+let frameContainer;
 function createFrameContainer() {
   if (!frameContainer) {
     frameContainer =
@@ -151,7 +151,7 @@ function createFrameContainer() {
         '<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>'
       )
       |> _El.setStyles({
-        zIndex: 1e9,
+        zIndex: 2147483647,
         position: 'fixed',
         top: 0,
         display: 'none',
@@ -164,9 +164,9 @@ function createFrameContainer() {
       })
       |> _El.appendTo(body);
     CheckoutFrame.container = frameContainer;
-    var frameBackdrop = createFrameBackdrop(frameContainer);
+    let frameBackdrop = createFrameBackdrop(frameContainer);
     CheckoutFrame.backdrop = frameBackdrop;
-    var testRibbon = createTestRibbon(frameBackdrop);
+    let testRibbon = createTestRibbon(frameBackdrop);
     CheckoutFrame.ribbon = testRibbon;
   }
 
@@ -222,8 +222,8 @@ function createTestRibbon(parent) {
   );
 }
 
-var preloadedFrame;
-var isBrave = false;
+let preloadedFrame;
+let isBrave = false;
 /**
  * in iframe isBraveBrowser doesn't work as expected to make sure we detect brave browser
  * we are moving check of isBraveBrowser to checkout.js and pass isBrave flag
@@ -256,7 +256,7 @@ RazorProto.postInit = function () {
   }
 };
 
-var onNew = RazorProto.onNew;
+let onNew = RazorProto.onNew;
 
 RazorProto.onNew = function (event, callback) {
   if (event === 'payment.error') {
@@ -275,7 +275,7 @@ RazorProto.open = needBody(function () {
   }
   this.metadata.openedAt = Date.now();
 
-  var frame = (this.checkoutFrame = getPreloadedFrame(this));
+  let frame = (this.checkoutFrame = getPreloadedFrame(this));
   Track(this, 'open');
 
   if (!frame.el.contentWindow) {
@@ -310,13 +310,13 @@ RazorProto.resume = function (data) {
 };
 
 RazorProto.close = function () {
-  var frame = this.checkoutFrame;
+  let frame = this.checkoutFrame;
   if (frame) {
     frame.postMessage({ event: 'close' });
   }
 };
 
-var initRazorpayCheckout = needBody(function () {
+let initRazorpayCheckout = needBody(function () {
   createFrameContainer();
 
   /**
