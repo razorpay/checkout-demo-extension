@@ -243,7 +243,7 @@
     const { countryCode, phoneNum } = $formData?.contact || {};
     for (let key in $formData) {
       if (
-        ['landmark', 'tag', 'cod', 'type'].includes(key) ||
+        ['id', 'formView', 'landmark', 'tag', 'cod', 'type'].includes(key) ||
         (key === 'zipcode' && !INPUT_FORM[pinIndex][pinSubIndex]?.required)
       ) {
         continue;
@@ -265,12 +265,10 @@
       }
 
       const field = findItem(INPUT_FORM, key);
-      const isError = validateInputField(
-        $formData[key],
-        field,
-        $selectedCountryISO
-      );
-
+      let isError;
+      if (field) {
+        isError = validateInputField($formData[key], field, $selectedCountryISO);
+      }
       if (isError || !$formData[key]) {
         return false;
       }
