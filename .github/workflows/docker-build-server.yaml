@@ -23,3 +23,5 @@ jobs:
           file: scripts/server/Dockerfile
           push: true
           tags: c.rzp.io/razorpay/checkout:server-${{ github.sha }}
+          build-args: |
+             GIT_COMMIT_HASH=${{ github.sha }}
