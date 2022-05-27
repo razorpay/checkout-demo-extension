@@ -72,4 +72,8 @@
   .selected {
     background-color: #f6f9fe;
   }
+
+  :global(.one-cc) .app-instrument {
+    padding: 12px 16px;
+  }
 </style>
