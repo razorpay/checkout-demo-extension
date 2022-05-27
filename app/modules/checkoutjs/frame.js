@@ -13,8 +13,8 @@ import {
   querySelectorAll,
   resolveElement,
   redirectTo,
-  submitForm,
 } from 'utils/doc';
+import { submitForm } from 'common/form';
 
 const { screen, scrollTo } = global;
 
@@ -622,13 +622,13 @@ CheckoutFrame.prototype = {
     const redirect = this.rzp.get('redirect') || shouldRedirect;
 
     if (redirect && callbackUrl) {
-      submitForm(
-        callbackUrl,
-        {
+      submitForm({
+        url: callbackUrl,
+        params: {
           error: data,
         },
-        'post'
-      );
+        method: 'POST',
+      });
     } else {
       global.alert('Oops! Something went wrong.\n' + message);
     }

@@ -492,10 +492,8 @@ function askOTP(
             }
 
             if (bankLogo) {
-              docUtil.querySelector('#tab-title').innerHTML =
-                '<img class="native-otp-bank" src="' +
-                bankLogo +
-                '" onerror="this.style.opacity = 0;">';
+              const logo = `<img class="native-otp-bank" src="${bankLogo}" onerror="this.style.opacity = 0;">`;
+              $('#tab-title').rawHtml(logo);
               thisSession.setOneCCTabLogo(bankLogo);
             }
 

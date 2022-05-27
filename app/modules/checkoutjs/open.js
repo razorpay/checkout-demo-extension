@@ -4,8 +4,9 @@ import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
-import { querySelectorAll, obj2formhtml, form2obj } from 'utils/doc';
+import { querySelectorAll, form2obj } from 'utils/doc';
 import { isBraveBrowser } from 'common/useragent';
+import { appendFormInput, flatten } from 'common/form';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -42,11 +43,10 @@ const currentScript =
   @return {[type]}    [description]
 */
 function defaultAutoPostHandler(data) {
-  currentScript
-    |> _El.parent
-    |> _El.append(_El.create() |> _El.setContents(obj2formhtml(data)))
-    |> _Obj.setProp('onsubmit', returnAsIs)
-    |> _El.submit;
+  const form = _El.parent(currentScript);
+  appendFormInput({ form, data: flatten(data) });
+  _Obj.setProp(form, 'onsubmit', returnAsIs);
+  form.submit();
 }
 
 let addAutoCheckoutButton = function (rzp) {

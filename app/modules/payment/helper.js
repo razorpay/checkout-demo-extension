@@ -86,7 +86,7 @@ export function popupIframeCheck(context, request) {
     }
     submitForm({
       doc: popupIframe.contentWindow.document,
-      path: request.url,
+      url: request.url,
       params: request.content,
       method: request.method,
     });

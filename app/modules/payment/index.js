@@ -501,7 +501,7 @@ Payment.prototype = {
       const doc = window?.parent?.document || window.document;
       submitForm({
         doc,
-        path: url,
+        url,
         params: data,
         method: 'POST',
         target: getOption('target') || '_top',
@@ -718,7 +718,7 @@ Payment.prototype = {
         data['_[iframe_mode]'] = true;
         submitForm({
           doc: this.forceIframeElement.contentWindow.document,
-          path: makeRedirectUrl(payment.fees),
+          url: makeRedirectUrl(payment.fees),
           params: data,
           method: 'POST',
         });
@@ -730,12 +730,12 @@ Payment.prototype = {
         method: 'post',
       };
       if (!popupIframeCheck(this, request)) {
-        docUtil.submitForm(
-          request.url,
-          request.content,
-          request.method,
-          popup.name
-        );
+        submitForm({
+          url: request.url,
+          params: request.content,
+          method: request.method,
+          target: popup.name,
+        });
       }
     }
   },
@@ -744,7 +744,11 @@ Payment.prototype = {
     // If we're in SDK and not in an iframe, redirect directly
     // Not using Bridge.hasCheckoutBridge since bridge.js imports session
     if (global.CheckoutBridge) {
-      docUtil.submitForm(url, content, method);
+      submitForm({
+        url: url,
+        params: content,
+        method: method,
+      });
     }
     // Otherwise, use sendMessage
     else {
@@ -781,7 +785,12 @@ Payment.prototype = {
       // Show loading UI in popup till the bank page loads.
       this.writePopup();
       // Open bank url in the popup
-      docUtil.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
+      submitForm({
+        url: this.gotoBankUrl,
+        params: null,
+        method: 'POST',
+        target: this.popup.name,
+      });
     }
   },
 
@@ -805,12 +814,12 @@ Payment.prototype = {
     // In type: first JSON response, we got request data.
     // Append form into popup and submit.
     const request = this.gotoBankRequest;
-    docUtil.submitForm(
-      request.url,
-      request.content,
-      request.method,
-      this.popup.name
-    );
+    submitForm({
+      url: request.url,
+      params: request.content,
+      method: request.method,
+      target: this.popup.name,
+    });
   },
 
   makePopup: function () {

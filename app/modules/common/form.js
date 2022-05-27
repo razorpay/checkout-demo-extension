@@ -1,7 +1,7 @@
 /**
  * sends a request to the specified url from a form. this will change the window location.
  * @param formData Information of form
- * @param formData.path the path to send the post request to
+ * @param formData.url the path to send the post request to
  * @param formData.params the parameters to add to the url
  * @param formData.method the method to use on the form (default post)
  * @param formData.target target of form action
@@ -9,14 +9,12 @@
  */
 
 export function submitForm(formData) {
-  const { doc = window.document, path, method = 'post', target } = formData;
-  let { params } = formData;
-  if (params) {
-    params = flatten(params);
-  }
+  const { doc = window.document, url, method = 'post', target } = formData;
+  let { params = {} } = formData;
+  params = flatten(params);
 
   if (method && method.toLowerCase() === 'get') {
-    const action = appendParamsToUrl(path, params || '');
+    const action = appendParamsToUrl(url, params || '');
     if (target) {
       window.open(action, target);
     } else if (doc !== window.document) {
@@ -30,26 +28,38 @@ export function submitForm(formData) {
   // It can be made less verbose if you use one.
   const form = doc.createElement('form');
   form.method = method;
-  form.action = path;
+  form.action = url;
   if (target) {
     form.target = target;
   }
 
-  for (const key in params) {
-    if (params.hasOwnProperty(key)) {
-      const hiddenField = doc.createElement('input');
-      hiddenField.type = 'hidden';
-      hiddenField.name = key;
-      hiddenField.value = params[key];
-
-      form.appendChild(hiddenField);
-    }
-  }
-
+  appendFormInput({ doc, form, data: params });
   doc.body.appendChild(form);
   form.submit();
 }
 
+export function appendFormInput({ doc = window.document, form, data }) {
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      const hiddenField = createFormInput({
+        doc,
+        name: key,
+        value: data[key],
+      });
+
+      form.appendChild(hiddenField);
+    }
+  }
+}
+
+function createFormInput(inputData) {
+  const { doc = window.document, name, value } = inputData;
+  const hiddenField = doc.createElement('input');
+  hiddenField.type = 'hidden';
+  hiddenField.name = name;
+  hiddenField.value = value;
+  return hiddenField;
+}
 /**
  * Appends params to the URL from an object
  * @param {string} url
@@ -75,8 +85,8 @@ export function appendParamsToUrl(url, params) {
  * @returns {string}
  */
 export function serialize(obj) {
-  var str = [];
-  for (var p in obj) {
+  const str = [];
+  for (const p in obj) {
     if (obj.hasOwnProperty(p)) {
       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
     }
@@ -85,23 +95,24 @@ export function serialize(obj) {
 }
 
 export function flatten(data = {}) {
-  var result = {};
+  const result = {};
   if (Object.keys(data).length === 0) {
-    return '';
+    return {};
   }
   function recurse(cur, prop) {
     if (Object(cur) !== cur) {
       result[prop] = cur;
     } else if (Array.isArray(cur)) {
-      for (var i = 0, l = cur.length; i < l; i++) {
+      let l = cur.length;
+      for (let i = 0; i < l; i++) {
         recurse(cur[i], prop + '[' + i + ']');
       }
       if (l === 0) {
         result[prop] = [];
       }
     } else {
-      var isEmpty = true;
-      for (var p in cur) {
+      let isEmpty = true;
+      for (const p in cur) {
         isEmpty = false;
         recurse(cur[p], prop ? prop + '[' + p + ']' : p);
       }

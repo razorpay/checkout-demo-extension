@@ -5,15 +5,20 @@ import 'checkoutjs/options';
 import initRazorpayCheckout from 'checkoutjs/open';
 import { Track } from 'analytics';
 import 'analytics/track-errors';
-import { submitForm, resolveElement } from 'utils/doc';
+import { resolveElement } from 'utils/doc';
+import { submitForm } from 'common/form';
 
 Track.props.library = 'checkoutjs';
 
 RazorpayDefaults.handler = function (data) {
   if (_.is(this, Razorpay)) {
-    var callback_url = this.get('callback_url');
+    const callback_url = this.get('callback_url');
     if (callback_url) {
-      submitForm(callback_url, data, 'post');
+      submitForm({
+        url: callback_url,
+        params: data,
+        method: 'POST',
+      });
     }
   }
 };

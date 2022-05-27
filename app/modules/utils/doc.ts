@@ -1,3 +1,4 @@
+import { submitForm } from 'common/form';
 import * as _El from './DOM';
 
 export const documentElement = document.documentElement;
@@ -61,72 +62,12 @@ export function redirectTo(data: {
       data,
     });
   }
-  submitForm(data.url, data.content, data.method, data.target);
-}
-
-/**
- * Submit a form to a url using the given method
- * @param {string} action
- * @param {Object} data
- * @param {string} method
- * @param {string} target
- */
-export function submitForm(
-  action: string,
-  data: any,
-  method: string,
-  target = ''
-) {
-  if (method && method.toLowerCase() === 'get') {
-    action = _.appendParamsToUrl(action, data);
-    if (target) {
-      global.open(action, target);
-    } else {
-      global.location = action;
-    }
-  } else {
-    const attr: { action: string; method: string; target?: string } = {
-      action,
-      method,
-    };
-    if (target) {
-      attr.target = target;
-    }
-    const form = _El.create('form');
-    _El.setAttributes(form, attr);
-    _El.setContents(form, obj2formhtml(data));
-    _El.appendTo(form, documentElement);
-    _El.submit(form);
-    _El.detach(form);
-  }
-}
-
-/**
- * Convert JSON object to HTML input html
- * @param {Object} data
- * @param {string} key
- *
- * @returns {string}
- */
-export function obj2formhtml(
-  data: string | { [x: string]: any },
-  key?: string
-) {
-  if (_.isNonNullObject(data)) {
-    let str = '';
-    _Obj.loop(data, function (value: any, name: string) {
-      if (key) {
-        name = key + '[' + name + ']';
-      }
-      str += obj2formhtml(value, name);
-    });
-    return str;
-  }
-  const input = _El.create('input') as HTMLInputElement;
-  input.type = 'hidden';
-  input.value = data as string;
-  input.name = key as string;
-  return input.outerHTML;
+  submitForm({
+    url: data.url,
+    params: data.content,
+    method: data.method,
+    target: data.target,
+  });
 }
 
 /**

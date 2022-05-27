@@ -1,4 +1,5 @@
 import { each, scrollIntoView } from 'lib/utils';
+import { setContents } from 'utils/DOM';
 import { isNonNullObject } from 'utils/object';
 
 var $ = function (el) {
@@ -226,7 +227,7 @@ $.prototype = {
   rawHtml: function (html) {
     if (arguments.length) {
       if (this[0]) {
-        this[0].innerHTML = html;
+        setContents(this[0], html);
       }
       return this;
     }

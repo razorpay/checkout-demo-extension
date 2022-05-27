@@ -35,7 +35,7 @@ const getParsedDataFromUrl = (url) => {
 };
 
 export const processOtpResponse = function (response) {
-  var error = response.error;
+  let error = response.error;
   Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
@@ -49,14 +49,14 @@ export const processOtpResponse = function (response) {
 };
 
 export const processPaymentCreate = function (response) {
-  var payment = this;
-  var r = payment.r;
+  let payment = this;
+  let r = payment.r;
 
   payment.payment_id = response.payment_id;
 
   Track(r, 'ajax_response', response);
 
-  var popup = payment.popup;
+  let popup = payment.popup;
 
   // race between popup close poll and ajaxCallback. don't continue if payment has been canceled
   if (popup && popup.checkClose && popup.checkClose()) {
@@ -103,8 +103,8 @@ export const processCoproto = function (response) {
      * `createPayment.responseType` is being used to show the otp view for wallets depending on ajax api response, instead of deciding on UI.
      */
     this.emit('createPayment.responseType', response.type);
-    var func = responseTypes[response.type];
-    var isFunction = _.isFunction(func);
+    let func = responseTypes[response.type];
+    let isFunction = _.isFunction(func);
     if (isFunction) {
       func.call(this, response.request, response);
     }
@@ -131,9 +131,9 @@ var responseTypes = {
       }
       request.method = request.http_method || 'post';
     }
-    var direct = request.method === 'direct';
-    var content = request.content;
-    var popup = this.popup;
+    let direct = request.method === 'direct';
+    let content = request.content;
+    let popup = this.popup;
 
     if (
       (this.data && this.data.wallet === 'amazonpay') ||
@@ -189,7 +189,7 @@ var responseTypes = {
       // post submit to iframe
       submitForm({
         doc: IframeElement.contentDocument,
-        path: request.url,
+        url: request.url,
         params: request.content,
         method: request.method,
       });
@@ -204,7 +204,7 @@ var responseTypes = {
         if (!popupIframeCheck(this, request)) {
           submitForm({
             doc: window.document,
-            path: request.url,
+            url: request.url,
             params: request.content,
             method: request.method,
             target: popup.name,
@@ -247,7 +247,7 @@ var responseTypes = {
   },
 
   application: function (request, fullResponse) {
-    var payment = this;
+    let payment = this;
 
     // Save request for later use (polling status)
     payment.request = request;
@@ -273,7 +273,7 @@ var responseTypes = {
       }
 
       // Starting polling API for payment status.
-      var request = payment.request;
+      let request = payment.request;
       Analytics.track('metric:polling_started', {
         data: {
           data: request,
@@ -473,7 +473,7 @@ var responseTypes = {
 
   intent: function (request, fullResponse) {
     const CheckoutBridge = global.CheckoutBridge;
-    var ra = ({ transactionReferenceId } = {}) =>
+    let ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
           url: request.url,
@@ -488,7 +488,7 @@ var responseTypes = {
         })
         .till((response) => response && response.status, 10);
 
-    var intent_url = (fullResponse.data || {}).intent_url;
+    let intent_url = (fullResponse.data || {}).intent_url;
 
     if (this.data.method === 'app') {
       this.emit('app.coproto_response', fullResponse);
