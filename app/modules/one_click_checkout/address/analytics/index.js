@@ -72,6 +72,7 @@ const address = {
   SAVED_ADDRESS_CONTINUE_CLICKED:
     '1cc_saved_address_screen_continue_CTA_clicked',
   TOP_SHOWN_BILLING_ADDRESS: '1cc_used_top_shown_billing_address',
+  EDIT_SAVED_ADDRESS_CLICKED: '1cc_clicked_edit_saved_address',
 };
 
 export default address;

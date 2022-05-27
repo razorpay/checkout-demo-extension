@@ -97,6 +97,7 @@
   }
 
   function handleEditAddressClick({ detail: _address }) {
+    Events.TrackBehav(AddressEvents.EDIT_SAVED_ADDRESS_CLICKED);
     selectedAddressId.set(_address.id);
     if (_address.country) {
       selectedShippingCountryISO.set(_address.country);
