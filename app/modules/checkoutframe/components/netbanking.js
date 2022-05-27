@@ -8,7 +8,6 @@ import { selectedBank } from 'checkoutstore/screens/netbanking';
 import { getSession } from 'sessionmanager';
 import { setView, destroyView } from './';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
-import renderEmandate from 'ui/tabs/emandate';
 import { METHODS } from 'checkoutframe/constants';
 import { querySelector } from 'utils/doc';
 
@@ -42,9 +41,12 @@ function render() {
     const session = getSession();
 
     // Add listener for proceeding automatically only if emandate
+    // TODO session dependency - session.switchTab
     if (method === 'emandate') {
-      session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
-      netbankingTab.$on('bankSelected', renderEmandate);
+      netbankingTab.$on(
+        'bankSelected',
+        session.proceedAutomaticallyAfterSelectingBank.bind(session)
+      );
     }
 
     // TODO session dependency - move session.offers to es6components

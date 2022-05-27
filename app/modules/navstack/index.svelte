@@ -22,9 +22,7 @@
   }
 
   export function getPayload() {
-    if (ref && ref.getPayload) {
-      return ref.getPayload();
-    }
+    return ref.getPayload?.();
   }
 </script>
 

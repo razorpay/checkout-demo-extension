@@ -68,6 +68,7 @@ import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
 import netbankingTab from 'checkoutframe/components/netbanking';
+import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import * as cardTab from 'checkoutframe/components/card';
 import * as walletTab from 'checkoutframe/components/wallet';
@@ -206,6 +207,7 @@ export default {
   upiTab,
   walletTab,
   netbankingTab,
+  EmandateTab,
   NachScreen,
   cardTab,
 

@@ -15,9 +15,6 @@ import { init1CCMetaData } from 'one_click_checkout/helper';
 import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 
-// UI imports
-import renderEmandate from 'ui/tabs/emandate';
-
 let emo = {};
 let ua = navigator.userAgent;
 let preferences,
@@ -1077,6 +1074,7 @@ Session.prototype = {
       this.setHomeTab();
     }
     this.setSvelteCardTab();
+    this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
@@ -1102,6 +1100,14 @@ Session.prototype = {
   setEMI: function () {
     if (!this.emiPlansView) {
       this.emiPlansView = new discreet.emiPlansView();
+    }
+  },
+
+  setEmandate: function () {
+    if (MethodStore.isEMandateEnabled()) {
+      this.emandateView = new discreet.EmandateTab({
+        target: docUtil.querySelector('#form-fields'),
+      });
     }
   },
 
@@ -2282,7 +2288,8 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'paylater' ||
       screen === 'qr' ||
-      (screen === 'netbanking' && RazorpayHelper.isRecurring())
+      (screen === 'netbanking' && RazorpayHelper.isRecurring()) ||
+      screen === 'emandate'
     ) {
       showPaybtn = false;
     }
@@ -2587,6 +2594,10 @@ Session.prototype = {
       }
     } else if (this.tab === 'bank_transfer') {
       es6components.bankTransferTab.destroy();
+    } else if (this.tab === 'emandate') {
+      if (this.emandateView.onBack()) {
+        return;
+      }
     } else if (this.tab === 'international') {
       if (
         this.internationalTab &&
@@ -2819,7 +2830,7 @@ Session.prototype = {
     }
 
     if (tab === 'emandate') {
-      renderEmandate();
+      this.emandateView.onShown();
     }
 
     if (tab === '' && (this.screen === 'upi' || this.screen === 'upi_otm')) {
@@ -3295,11 +3306,21 @@ Session.prototype = {
     return true;
   },
 
+  /**
+   * Once the bank is selected in the banks list,
+   * proceed automatically if some conditions are met.
+   */
+  proceedAutomaticallyAfterSelectingBank: function () {
+    if (this.checkInvalid()) {
+      return;
+    }
+
+    this.switchTab('emandate');
+  },
+
   checkInvalid: function (parent) {
     if (!parent) {
-      // form parent present in navstack
-      const navstack = docUtil.querySelector('#root > [id^=form-]:last-child');
-      parent = navstack || this.getActiveForm();
+      parent = this.getActiveForm();
       const payload = this.payload;
       if (payload && payload.method === 'wallet' && !payload.wallet) {
         return $('#wallets').addClass('invalid');
@@ -3360,11 +3381,7 @@ Session.prototype = {
     }
     let data = HomeScreenStore.getCustomerDetails();
 
-    const navstackPayload = es6components.getView('navstack').getPayload();
-
-    if (navstackPayload) {
-      _Obj.extend(data, navstackPayload);
-    } else if (tab) {
+    if (tab) {
       data.method = tab;
       let activeForm = this.getActiveForm();
 
@@ -3373,6 +3390,7 @@ Session.prototype = {
           '#form-upi',
           '#form-card',
           '#form-wallet',
+          '#form-emandate',
           '#form-upi_otm',
           '#form-international',
         ].includes(activeForm)
@@ -3437,6 +3455,10 @@ Session.prototype = {
         if (this.walletTab.isAnyWalletSelected()) {
           _Obj.extend(data, this.walletTab.getPayload());
         }
+      }
+
+      if (this.tab === 'emandate') {
+        _Obj.extend(data, this.emandateView.getPayload());
       }
 
       if (this.tab === 'netbanking') {
@@ -4555,6 +4577,12 @@ Session.prototype = {
     if (session_options.force_terminal_id) {
       data.force_terminal_id = session_options.force_terminal_id;
     }
+    if (this.tab === 'emandate' && RazorpayHelper.isASubscription('emandate')) {
+      // recurring token
+      data.recurring_token =
+        preferences.subscription && preferences.subscription.recurring_token;
+      data.amount = 0;
+    }
 
     let selectedInstrument = this.getSelectedPaymentInstrument();
 
@@ -5550,6 +5578,7 @@ Session.prototype = {
     let views = [
       'cardlessEmiView',
       'currentScreen',
+      'emandateView',
       'emi',
       'emiPlansView',
       'emiScreenView',

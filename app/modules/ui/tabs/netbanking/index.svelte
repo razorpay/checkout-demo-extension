@@ -35,6 +35,7 @@
     SELECTION_RADIO_TEXT,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
+    RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';

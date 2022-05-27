@@ -979,19 +979,10 @@ i {
 
 #root {
   overflow: auto;
-  display: flex;
-  flex-direction: column;
-  .bottom {
-    margin-top: auto;
-    order: 1;
-  }
 }
 
-#root:not(:empty) {
-  height: 100%;
-  &+ #form-fields {
-    display: none;
-  }
+#root:not(:empty) + #form-fields {
+  display: none;
 }
 
 #form-fields {
