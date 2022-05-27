@@ -5496,8 +5496,11 @@ Session.prototype = {
       }
     }
 
-    // data.amount needed by external libraries relying on `onsubmit` postMessage
-    data.amount = this.get('amount');
+    // data.amount is needed by external libraries relying on `onsubmit` postMessage
+    // data.amount may already be there in case of emandate
+    if (!data.hasOwnProperty('amount')) {
+      data.amount = this.get('amount');
+    }
     let offer = this.getAppliedOffer();
     let hasDiscount = offer && offer.amount !== offer.original_amount;
 
