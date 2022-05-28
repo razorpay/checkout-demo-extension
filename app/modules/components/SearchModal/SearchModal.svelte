@@ -4,7 +4,7 @@
    */
 
   // Svelte imports
-  import { tick, onDestroy } from 'svelte';
+  import { tick, onDestroy, onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
 
   // UI imports
@@ -57,8 +57,8 @@
   let activeDescendantIdRef: string;
 
   // Refs
-  let inputRef;
-  let resultsContainerRef;
+  let inputRef: HTMLInputElement;
+  let resultsContainerRef: HTMLDivElement;
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 
@@ -238,6 +238,10 @@
       onSelectHandler(result);
     }
   }
+
+  onMount(() => {
+    inputRef?.focus();
+  });
 </script>
 
 <div
