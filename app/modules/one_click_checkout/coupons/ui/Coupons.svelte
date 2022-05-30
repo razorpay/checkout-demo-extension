@@ -195,7 +195,11 @@
       removeTabInBreadcrumbs(ADDRESS_LABEL);
     }
     const addressPromise = checkAddressServiceability();
-    const couponsPromise = fetchCoupons();
+    const promiseList = [addressPromise];
+    if (showCoupons) {
+      const couponsPromise = fetchCoupons();
+      promiseList.push(couponsPromise);
+    }
     addressPromise.then(() => {
       Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
         pre_selected_saved_address_id: $selectedAddressId,
@@ -215,7 +219,7 @@
     if (prefilledCoupon) {
       applyCouponCode(prefilledCoupon);
     }
-    Promise.all([addressPromise, couponsPromise]).finally(summaryLoadedEvent);
+    Promise.all(promiseList).finally(summaryLoadedEvent);
   });
 
   onDestroy(() => {
