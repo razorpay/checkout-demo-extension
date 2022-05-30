@@ -55,10 +55,6 @@ export const transform = (tokens, { amount, emi, recurring }) => {
   return tokens;
 };
 
-const filterTokensByMethod = (method) => {
-  return _Arr.filter((token) => token.method === method);
-};
-
 /**
  * Filter out all the saved cards from tokens.
  *
@@ -72,12 +68,3 @@ export const getSavedCards = (tokens) => {
   }
   return tokens.filter((token) => token.method === 'card');
 };
-
-/**
- * Filter out all the saved cards from tokens.
- *
- * @param {Array} tokens
- *
- * @return {Array}
- */
-export const filterUPITokens = filterTokensByMethod('upi');

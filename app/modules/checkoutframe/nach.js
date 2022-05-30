@@ -52,9 +52,9 @@ export function getValidityError(file) {
 
   if (!hasValidExtension(filename, ALLOWED_EXTS)) {
     return {
-      description: `The uploaded file type is not supported. Only ${_Arr
-        .map(ALLOWED_EXTS, (x) => x.toUpperCase())
-        .join(', ')} files are allowed.`,
+      description: `The uploaded file type is not supported. Only ${ALLOWED_EXTS.map(
+        (x) => x.toUpperCase()
+      ).join(', ')} files are allowed.`,
     };
   }
 

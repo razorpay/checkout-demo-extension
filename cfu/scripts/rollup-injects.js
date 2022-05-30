@@ -15,7 +15,6 @@ let injects = {
   fetch: 'fe/implicit/fetch',
   _: ['fe/implicit/_', '*'],
   Promise: 'fe/implicit/Promise',
-  _Arr: ['fe/implicit/_Arr', '*'],
   _Obj: ['fe/implicit/_Obj', '*'],
 };
 

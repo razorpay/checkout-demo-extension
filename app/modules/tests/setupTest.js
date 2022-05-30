@@ -1,5 +1,4 @@
 import * as _ from '../../../cfu/src/fe/implicit/_.js';
-import * as _Arr from '../../../cfu/src/fe/implicit/_Arr.js';
 import * as _Obj from '../../../cfu/src/fe/implicit/_Obj.js';
 
 import initI18n from './init-i18n';
@@ -15,7 +14,6 @@ global.matchMedia = jest.fn(() => ({ matches: false }));
  * Presuming they are pure functions, it would be okay to use them as-is.
  */
 global._ = _;
-global._Arr = _Arr;
 global._Obj = _Obj;
 global.__BUILD_NUMBER__ = '123456789';
 global.fetch = fetch;

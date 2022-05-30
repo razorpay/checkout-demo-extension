@@ -1,5 +1,4 @@
 import * as _ from './_';
-import * as _Arr from './_Arr';
 
 /**
  * Get keys of an object in an array.
@@ -115,11 +114,7 @@ export const loop = _.curry2((o, iteratee) => {
  * @returns {Object}
  */
 export const map = _.curry2((o, iteratee) =>
-  _Arr.reduce(
-    keys(o),
-    (obj, key) => setProp(obj, key, iteratee(o[key], key, o)),
-    {}
-  )
+  keys(o).reduce((obj, key) => setProp(obj, key, iteratee(o[key], key, o)), {})
 );
 
 /**
@@ -131,8 +126,7 @@ export const map = _.curry2((o, iteratee) =>
  * @returns {*}
  */
 export const reduce = _.curry3((o, reducer, initialValue) =>
-  _Arr.reduce(
-    keys(o),
+  keys(o).reduce(
     (accumulator, key) => reducer(accumulator, o[key], key, o),
     initialValue
   )

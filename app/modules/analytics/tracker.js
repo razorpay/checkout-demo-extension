@@ -34,17 +34,16 @@ function makeUid() {
   let sum = 0,
     tempdigit;
 
-  num
-    |> _Arr.loop(function (v, i) {
-      tempdigit = map62[num[num.length - 1 - i]];
-      if ((num.length - i) % 2) {
-        tempdigit *= 2;
-      }
-      if (tempdigit >= 62) {
-        tempdigit = (tempdigit % 62) + 1;
-      }
-      sum += tempdigit;
-    });
+  num.split('').forEach(function (_, i) {
+    tempdigit = map62[num[num.length - 1 - i]];
+    if ((num.length - i) % 2) {
+      tempdigit *= 2;
+    }
+    if (tempdigit >= 62) {
+      tempdigit = (tempdigit % 62) + 1;
+    }
+    sum += tempdigit;
+  });
 
   tempdigit = sum % 62;
   if (tempdigit) {
@@ -76,12 +75,11 @@ function getCommonTrackingData(r) {
     'platform_version',
     'platform',
     'referer',
-  ]
-    |> _Arr.loop((propName) => {
-      if (trackingProps[propName]) {
-        props[propName] = trackingProps[propName];
-      }
-    });
+  ].forEach((propName) => {
+    if (trackingProps[propName]) {
+      props[propName] = trackingProps[propName];
+    }
+  });
 
   return props;
 }
@@ -230,7 +228,7 @@ export default function Track(r, event, data, immediately) {
 
     // Mask prefilled card details
     if (_Obj.hasProp(options, 'prefill')) {
-      _Arr.loop(['card'], (key) => {
+      ['card'].forEach((key) => {
         if (_Obj.hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }
