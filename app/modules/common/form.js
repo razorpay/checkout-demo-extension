@@ -94,7 +94,11 @@ export function serialize(obj) {
   return str.join('&');
 }
 
-export function flatten(data = {}) {
+export function flatten(reqData) {
+  let data = reqData;
+  if (!data) {
+    data = {};
+  }
   const result = {};
   if (Object.keys(data).length === 0) {
     return {};
