@@ -517,11 +517,13 @@
     } catch (err) {}
 
     let data = {};
-    let _token = [];
+    let _token = {};
+    let isTokenInstance = false;
     switch (selectedToken) {
       case 'new':
         // added it for downtime check
         _token = vpaField;
+        isTokenInstance = true;
         data = {
           vpa: getFullVpa(),
           save: shouldRememberVpa(),
@@ -544,6 +546,7 @@
           _token = _Obj
             .getSafely(session.getCurrentCustomer(), 'tokens.items', [])
             .find((token) => token.id === selectedToken);
+          isTokenInstance = false;
 
           Analytics.track('upi:token:switch:default', {
             data: {
@@ -564,12 +567,21 @@
     // Migrating to have all upi related data in the upi block.
     data.upi = {};
     if (_token) {
-      if (getComponentProps(_token, 'downtimeSeverity')) {
-        data.downtimeSeverity = getComponentProps(_token, 'downtimeSeverity');
-        data.downtimeInstrument = getComponentProps(
-          _token,
-          'downtimeInstrument'
-        );
+      try {
+        let downtimeSeverity, downtimeInstrument;
+        if (!isTokenInstance) {
+          downtimeSeverity = _token.downtimeSeverity;
+          downtimeInstrument = _token.downtimeInstrument;
+        }
+        if (downtimeSeverity || getComponentProps(_token, 'downtimeSeverity')) {
+          data.downtimeSeverity =
+            downtimeSeverity || getComponentProps(_token, 'downtimeSeverity');
+          data.downtimeInstrument =
+            downtimeInstrument ||
+            getComponentProps(_token, 'downtimeInstrument');
+        }
+      } catch (e) {
+        // err _token can be instance of vpaField
       }
     }
     /**
