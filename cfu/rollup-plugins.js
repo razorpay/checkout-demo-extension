@@ -125,7 +125,13 @@ const getPlugins = ({ src }) => {
 
     inject(globals),
 
-    isProd && terser(),
+    isProd &&
+      terser({
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+      }),
   ];
 };
 
