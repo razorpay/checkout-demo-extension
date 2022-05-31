@@ -243,8 +243,12 @@
     showAccountTab = isShowAccountTab(addressWrapperEle);
   }
 
-  onMount(() => {
+  function onScreenUpdate() {
     scrollable = isUnscrollable(addressWrapperEle);
+  }
+
+  onMount(() => {
+    onScreenUpdate();
   });
 
   $: {
@@ -290,6 +294,7 @@
           checkServiceability={Resource[addressType].checkServiceability}
           {addressType}
           {addressWrapperEle}
+          {onScreenUpdate}
         />
       {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
         <AddNewAddress
@@ -303,6 +308,7 @@
           {selectedCountryISO}
           {currentView}
           {addressWrapperEle}
+          {onScreenUpdate}
         />
       {/if}
     </div>

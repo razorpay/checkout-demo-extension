@@ -78,7 +78,9 @@
 
   // other imports
   import { isIndianCustomer } from 'checkoutstore';
-  import { savedAddresses } from 'one_click_checkout/address/store';
+  import {
+    savedAddresses,
+  } from 'one_click_checkout/address/store';
   import {
     findItem,
     validateInputField,
@@ -98,7 +100,10 @@
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
 
-  import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
+  import {
+    clickOutside,
+    screenScrollTop,
+  } from 'one_click_checkout/helper';
 
   // props
   export let formData;
@@ -109,6 +114,7 @@
   export let selectedCountryISO;
   export let currentView;
   export let addressWrapperEle;
+  export let onScreenUpdate;
 
   let errors = {};
   let selectedTag = $formData.tag;
@@ -267,7 +273,11 @@
       const field = findItem(INPUT_FORM, key);
       let isError;
       if (field) {
-        isError = validateInputField($formData[key], field, $selectedCountryISO);
+        isError = validateInputField(
+          $formData[key],
+          field,
+          $selectedCountryISO
+        );
       }
       if (isError || !$formData[key]) {
         return false;
@@ -686,6 +696,7 @@
       address_type,
     });
 
+    onScreenUpdate();
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,

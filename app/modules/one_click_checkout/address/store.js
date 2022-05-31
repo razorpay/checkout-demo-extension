@@ -13,3 +13,5 @@ export const showBanner = derived(
 );
 
 export const consentGiven = writable(false);
+
+export const addressScrollable = writable(false);
