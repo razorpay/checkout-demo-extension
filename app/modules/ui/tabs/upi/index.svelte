@@ -564,12 +564,12 @@
     // Migrating to have all upi related data in the upi block.
     data.upi = {};
     if (_token) {
-      const { downtimeSeverity, downtimeInstrument } = _token;
-      if (downtimeSeverity || getComponentProps(_token, 'downtimeSeverity')) {
-        data.downtimeSeverity =
-          downtimeSeverity || getComponentProps(_token, 'downtimeSeverity');
-        data.downtimeInstrument =
-          downtimeInstrument || getComponentProps(_token, 'downtimeInstrument');
+      if (getComponentProps(_token, 'downtimeSeverity')) {
+        data.downtimeSeverity = getComponentProps(_token, 'downtimeSeverity');
+        data.downtimeInstrument = getComponentProps(
+          _token,
+          'downtimeInstrument'
+        );
       }
     }
     /**

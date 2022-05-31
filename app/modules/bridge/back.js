@@ -38,7 +38,9 @@ export function backPressed(callback) {
   });
 
   if (isOneClickCheckout()) {
-    if (session.tab === 'home-1cc') {
+    if (isStackPopulated()) {
+      getView('navstack').backPressed();
+    } else if (session.tab === 'home-1cc') {
       // session
       handleOneClickCheckoutBack();
     } else {

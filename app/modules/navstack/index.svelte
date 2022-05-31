@@ -2,6 +2,7 @@
   import { stack } from './store';
   import { popStack } from './helper';
   import Element from './Element.svelte';
+  import Analytics from 'analytics';
 
   $: elements = $stack.filter((el, idx, array) => {
     // it's the last element, or next element is overlay, or element is overlay
@@ -16,6 +17,14 @@
   }
 
   export function backPressed() {
+    if (!ref) {
+      Analytics.track('ref_not_defined_in_backpressed', {
+        data: {
+          stackLength: $stack.length,
+        },
+      });
+      return;
+    }
     if (!ref.preventBack?.()) {
       popStack();
     }
