@@ -1,6 +1,6 @@
 // util imports
 import { timer } from 'utils/timer';
-
+import fetch from 'utils/fetch';
 // store imports
 import { getOrderId } from 'razorpay';
 import { makeAuthUrl } from 'checkoutstore';

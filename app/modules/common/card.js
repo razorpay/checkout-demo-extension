@@ -4,7 +4,7 @@ import { makeAuthUrl } from 'common/helper';
 import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 import loadScript from 'common/loadScript';
-
+import fetch from 'utils/fetch';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
 
 export const API_NETWORK_CODES_MAP = {

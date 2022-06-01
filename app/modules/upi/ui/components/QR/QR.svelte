@@ -12,6 +12,8 @@
   import { qrState, resetQRState, updateQrState } from './store';
   import { handleUPIPayments } from 'upi/payment';
   import { QR_EXPIRE_TIME, QR_OFF_SCREEN_POLL_DELAY_BY } from 'upi/constants';
+  import fetch from 'utils/fetch';
+
   // Analytics
   import Analytics from 'analytics';
   import UPI_EVENTS from 'ui/tabs/upi/events';
@@ -27,6 +29,7 @@
     QR_SCAN_ON_PHONE,
   } from 'upi/i18n/labels';
   import { trackQRStatus, trackRefreshQR } from 'upi/events';
+  import { returnAsIs } from 'lib/utils';
 
   const onResponse: UPI.PaymentResponseHandler = (status, response) => {
     // clear the old timer;
@@ -84,15 +87,13 @@
     if ($qrState.autoGenerate && !$qrState.url) {
       createQRPayment(false);
     } else if ($qrState.url) {
-      (fetch as unknown as CFU.Fetch).resumePoll();
+      fetch.resumePoll();
     }
   });
   onDestroy(() => {
     if ($qrState.url) {
       // fetch pause
-      (fetch as unknown as CFU.Fetch).setPollDelayBy(
-        QR_OFF_SCREEN_POLL_DELAY_BY
-      );
+      fetch.setPollDelayBy(QR_OFF_SCREEN_POLL_DELAY_BY);
     }
   });
 
@@ -124,7 +125,7 @@
           data-testid="loading"
           data-content="loading"
           class="btn"
-          on:click={() => {}}
+          on:click={returnAsIs}
         >
           <span>{$t('misc.loading')}</span>
           <div class="spinner spinner2" />

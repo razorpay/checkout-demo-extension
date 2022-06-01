@@ -2,7 +2,7 @@ import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { getCustomerCountryISOCode } from 'checkoutstore/screens/home';
-
+import fetch from 'utils/fetch';
 import { getAmount } from 'razorpay';
 import { setRTBVariant } from 'rtb/helper';
 

@@ -1,5 +1,5 @@
 import * as GPay from 'gpay';
-
+import fetch from 'utils/fetch';
 import {
   didUPIIntentSucceed,
   getAppFromPackageName,

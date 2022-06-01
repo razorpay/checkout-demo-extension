@@ -1,6 +1,7 @@
 // constants
 import { FORM_TYPE, FORM_FIELDS } from '../types';
 import { FORM_FIELDS_TYPE_MAPPING } from '../constants';
+import fetch from 'utils/fetch';
 
 // testable
 import {
@@ -38,9 +39,10 @@ let statesResponse = {
   ],
 };
 
-const mockFetch = jest.fn();
-
-global.fetch = mockFetch;
+jest.mock('utils/fetch', () => ({
+  default: jest.fn(),
+  __esModule: true,
+}));
 
 describe('Test createFormFields', () => {
   it('should return fields for AVS', () => {
@@ -233,7 +235,7 @@ describe('Test validateFormValues', () => {
 describe('Test getAllCountries', () => {
   it('Should fetch countries', async () => {
     let callback = () => {};
-    mockFetch.mockImplementationOnce((args) => {
+    (fetch as unknown as jest.Mock).mockImplementationOnce((args) => {
       if (args.callback) {
         callback = args.callback;
         args.callback(countriesResponse);
@@ -256,7 +258,7 @@ describe('Test getAllCountries', () => {
     ];
 
     expect(await getAllCountries(razorpayInstance)).toStrictEqual(response);
-    expect(mockFetch).toHaveBeenCalledWith({
+    expect(fetch).toHaveBeenCalledWith({
       url: expect.stringMatching('/v1/countries'),
       callback,
     });
@@ -266,7 +268,7 @@ describe('Test getAllCountries', () => {
 describe('Test getStatesWithCountryCode', () => {
   it('Should fetch CA states', async () => {
     let callback = () => {};
-    mockFetch.mockImplementationOnce((args) => {
+    (fetch as unknown as jest.Mock).mockImplementationOnce((args) => {
       if (args.callback) {
         callback = args.callback;
         args.callback(statesResponse);
@@ -291,7 +293,7 @@ describe('Test getStatesWithCountryCode', () => {
     expect(
       await getStatesWithCountryCode(razorpayInstance, 'CA')
     ).toStrictEqual(response);
-    expect(mockFetch).toHaveBeenCalledWith({
+    expect(fetch).toHaveBeenCalledWith({
       url: expect.stringMatching('/v1/states/ca'),
       callback,
     });

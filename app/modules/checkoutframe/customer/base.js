@@ -1,5 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/helper';
+import fetch from 'utils/fetch';
 import Analytics, {
   Track,
   Events,
@@ -250,10 +251,13 @@ Customer.prototype = {
       url: url,
       data: data,
       callback: function (data) {
-        if (data?.error?.description === URL_NOT_FOUND && url.includes(ONECC_VERIFY_OTP)) {
+        if (
+          data?.error?.description === URL_NOT_FOUND &&
+          url.includes(ONECC_VERIFY_OTP)
+        ) {
           // The fix is for temporary need to remove once BE API stabilized
-          user.submitOTP(otpData, callback, queryParams, VERIFY_OTP)
-          return
+          user.submitOTP(otpData, callback, queryParams, VERIFY_OTP);
+          return;
         }
         if (data.success) {
           user.mark_logged(data);

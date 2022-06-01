@@ -15,6 +15,7 @@ import AddressEvents from 'one_click_checkout/address/analytics';
 import { makeUrl } from 'common/helper';
 import { getOrderId } from 'razorpay';
 import { timer } from 'utils/timer';
+import fetch from 'utils/fetch';
 import {
   showLoaderView,
   hideLoaderView,

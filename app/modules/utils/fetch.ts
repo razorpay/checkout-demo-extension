@@ -1,12 +1,36 @@
+// TODO make it class
+/** Fetch Types */
+type FetchPrototype = {
+  abort: () => void;
+  call: (callback?: Common.JSFunction) => void;
+  defer: () => void;
+  setReq: (type: string, value: any) => void;
+  till: (
+    continueUntilFn: Common.JSFunction<any, any, 1>,
+    retryLimit: number,
+    frequency?: number
+  ) => void;
+  type?: string;
+  req?: any;
+  options: {
+    url: string;
+    headers?: Common.Object<string>;
+    method?: string;
+    callback: (response: any) => void;
+    data?: string | Common.Object<string>;
+  };
+};
+type options = FetchPrototype['options'];
+
+/** End of types */
+
 const sessionIdHeader = 'X-Razorpay-SessionId';
 const trackIdHeader = 'X-Razorpay-TrackId';
 const Xhr = XMLHttpRequest;
-import * as _ from './_';
-import * as _El from './_El';
-import * as _Obj from './_Obj';
+import * as _El from './DOM';
 const networkError = _.rzpError('Network error');
 let jsonp_cb = 0;
-let sessionId, trackId, keylessHeader;
+let sessionId: string, trackId: string, keylessHeader: string;
 
 /**
  * this param will be used in fetch.prototype.till to avoid subsequent poll requests
@@ -36,7 +60,7 @@ function resumePoll() {
  *
  * @param {number} xTimes
  */
-function setPollDelayBy(xTimes) {
+function setPollDelayBy(xTimes: number) {
   if (isNaN(xTimes)) {
     return;
   }
@@ -47,10 +71,10 @@ function setPollDelayBy(xTimes) {
  * @param  {...any} args
  * @returns
  */
-function resetPoll(...args) {
+function resetPoll(this: any, options: options): FetchPrototype | null {
   resumePoll();
   if (this) {
-    return this(...args);
+    return this(options);
   }
   return null;
 }
@@ -61,7 +85,7 @@ function resetPoll(...args) {
  *
  * @returns {void}
  */
-function setSessionId(id) {
+function setSessionId(id: string) {
   sessionId = id;
 }
 
@@ -71,7 +95,7 @@ function setSessionId(id) {
  *
  * @returns {void}
  */
-function setTrackId(id) {
+function setTrackId(id: string) {
   trackId = id;
 }
 
@@ -81,7 +105,7 @@ function setTrackId(id) {
  *
  * @returns {void}
  */
-function setKeylessHeader(id) {
+function setKeylessHeader(id: string) {
   keylessHeader = id;
 }
 
@@ -93,7 +117,11 @@ function setKeylessHeader(id) {
  *
  * @returns {string}
  */
-function appendQueryParamToUrl(url, paramName, paramValue) {
+function appendQueryParamToUrl(
+  url: string,
+  paramName: string,
+  paramValue: string
+) {
   if (!paramName || !paramValue) {
     return url;
   }
@@ -113,7 +141,10 @@ function appendQueryParamToUrl(url, paramName, paramValue) {
  *
  * @returns {string}
  */
-function appendKeylessHeaderParamToUrl(url, keylessHeader) {
+function appendKeylessHeaderParamToUrl(
+  url: string,
+  keylessHeader: string
+): string {
   return appendQueryParamToUrl(url, 'keyless_header', keylessHeader);
 }
 
@@ -123,24 +154,32 @@ function appendKeylessHeaderParamToUrl(url, keylessHeader) {
  *
  * @returns {Object}
  */
-export default function fetch(options) {
+export default function fetch(this: FetchPrototype | void, options: options) {
   if (!_.is(this, fetch)) {
-    return new fetch(options);
+    return new (fetch as any)(options);
   }
-
-  this.options = normalizeOptions(options);
-  this.defer();
+  (this as FetchPrototype).options = normalizeOptions(options);
+  (this as FetchPrototype).defer();
 }
 
-const fetchPrototype = {
-  setReq: function (type, value) {
+const fetchPrototype: FetchPrototype = {
+  options: {
+    url: '',
+    method: 'get',
+    callback: (_) => _,
+  },
+  setReq: function (type: string, value: any) {
     this.abort();
     this.type = type;
     this.req = value;
     return this;
   },
 
-  till: function (continueUntilFn, retryLimit = 0, frequency = 3e3) {
+  till: function (
+    continueUntilFn: (response: any) => any,
+    retryLimit = 0,
+    frequency = 3e3
+  ) {
     if (pausePolling) {
       setTimeout(() => {
         this.till(continueUntilFn, retryLimit, frequency);
@@ -154,13 +193,13 @@ const fetchPrototype = {
     return this.setReq(
       'timeout',
       setTimeout(() => {
-        this.call((response) => {
+        this.call((response: any) => {
           // If there is an error, retry again until retry limit.
           if (response.error && retryLimit > 0) {
             this.till(continueUntilFn, retryLimit - 1, frequency);
           } else if (continueUntilFn(response)) {
             this.till(continueUntilFn, retryLimit, frequency);
-          } else {
+          } else if (this.options.callback) {
             this.options.callback(response);
           }
         });
@@ -171,7 +210,8 @@ const fetchPrototype = {
   abort: function () {
     // this.req, which may be XMLHttpRequest object, setTimeout ID
     // or jsonp callback counter
-    let { req, type } = this;
+    const self = this;
+    const { req, type } = self;
 
     // return if already null
     if (!req) {
@@ -179,11 +219,11 @@ const fetchPrototype = {
     }
 
     if (type === 'ajax') {
-      this.req.abort();
+      req.abort();
     } else if (type === 'jsonp') {
-      global.Razorpay[this.req] = (_) => _;
+      global.Razorpay[req] = (_: any) => _;
     } else {
-      clearTimeout(this.req);
+      clearTimeout(req);
     }
     this.req = null;
   },
@@ -192,9 +232,9 @@ const fetchPrototype = {
     this.req = setTimeout(() => this.call());
   },
 
-  call: function (callback = this.options.callback) {
-    var { url, method, data, headers } = this.options;
-
+  call: function (this: FetchPrototype, callback = this.options.callback) {
+    const { method, data, headers = {} } = this.options;
+    let { url } = this.options;
     //#region DDoS Protection
     /**
      * These values are added in the query parameter to protect against DDoS. Edge gives
@@ -212,14 +252,14 @@ const fetchPrototype = {
     url = appendKeylessHeaderParamToUrl(url, keylessHeader);
     //#endregion
 
-    var xhr = new Xhr();
+    const xhr = new Xhr();
     this.setReq('ajax', xhr);
 
-    xhr.open(method, url, true);
+    xhr.open(method as string, url, true);
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
-        var json = _Obj.parse(xhr.responseText);
+        let json = _Obj.parse(xhr.responseText);
         if (!json) {
           json = _.rzpError('Parsing error');
           json.xhr = {
@@ -249,7 +289,7 @@ const fetchPrototype = {
       }
     };
     xhr.onerror = function () {
-      var resp = networkError;
+      const resp = networkError;
       resp.xhr = {
         status: 0,
       };
@@ -259,7 +299,7 @@ const fetchPrototype = {
           detail: {
             method,
             url,
-            baseUrl: url.split('?')[0],
+            baseUrl: url?.split('?')[0],
             status: 0,
             xhrErrored: true,
             response: resp,
@@ -278,38 +318,41 @@ const fetchPrototype = {
       headers[trackIdHeader] = trackId;
     }
 
-    headers |> _Obj.loop((v, k) => xhr.setRequestHeader(k, v));
+    _Obj.loop(headers, (v: string, k: string) => xhr.setRequestHeader(k, v));
 
-    xhr.send(data);
+    xhr.send(data as string);
   },
 };
 
 fetchPrototype.constructor = fetch;
 fetch.prototype = fetchPrototype;
 
-function normalizeOptions(options) {
+function normalizeOptions(options: string | options): options {
+  let updatedOptions = options as options;
   if (_.isString(options)) {
-    options = { url: options };
+    updatedOptions = { url: options } as options;
   }
+  if (updatedOptions) {
+    const { method, headers, callback } = updatedOptions;
+    let { data } = updatedOptions;
+    // set normalized defaults
+    if (!headers) {
+      updatedOptions.headers = {};
+    }
+    if (!method) {
+      updatedOptions.method = 'get';
+    }
+    if (!callback) {
+      updatedOptions.callback = (_) => _;
+    }
+    if (_.isNonNullObject(data) && !_.is(data, FormData)) {
+      data = _.obj2query(data);
+    }
+    updatedOptions.data = data;
 
-  var { method, headers, callback, data } = options;
-
-  // set normalized defaults
-  if (!headers) {
-    options.headers = {};
+    return updatedOptions;
   }
-  if (!method) {
-    options.method = 'get';
-  }
-  if (!callback) {
-    options.callback = (_) => _;
-  }
-  if (_.isNonNullObject(data) && !_.is(data, FormData)) {
-    data = _.obj2query(data);
-  }
-  options.data = data;
-
-  return options;
+  return options as options;
 }
 
 /**
@@ -318,7 +361,7 @@ function normalizeOptions(options) {
  *
  * @returns {Object}
  */
-function post(opts) {
+function post(opts: options): FetchPrototype {
   opts.method = 'post';
   if (!opts.headers) {
     opts.headers = {};
@@ -336,7 +379,7 @@ function post(opts) {
  *
  * @returns {Object}
  */
-function put(opts) {
+function put(opts: options): FetchPrototype {
   opts.method = 'put';
   if (!opts.headers) {
     opts.headers = {};
@@ -354,7 +397,7 @@ function put(opts) {
  *
  * @returns {Object}
  */
-function patch(opts) {
+function patch(opts: options): FetchPrototype {
   opts.method = 'PATCH';
   if (!opts.headers) {
     opts.headers = {};
@@ -372,7 +415,7 @@ function patch(opts) {
  *
  * @returns {Object}
  */
-function jsonp(options) {
+function jsonp(options: options): FetchPrototype {
   if (!options.data) {
     options.data = {};
   }
@@ -383,7 +426,7 @@ function jsonp(options) {
   // We need to use attempt numbers to generate unique URLs
   let attemptNumber = 0;
 
-  let request = new fetch(options);
+  const request = new (fetch as any)(options);
   options = request.options;
 
   request.call = function (cb = options.callback) {
@@ -394,7 +437,7 @@ function jsonp(options) {
 
     let done = false;
 
-    const onload = function () {
+    const onload = function (this: any) {
       if (
         !done &&
         (!this.readyState ||
@@ -403,11 +446,11 @@ function jsonp(options) {
       ) {
         done = true;
         this.onload = this.onreadystatechange = null;
-        this |> _El.detach;
+        _El.detach(this);
       }
     };
 
-    let req = (global.Razorpay[callbackName] = function (data) {
+    const req = (global.Razorpay[callbackName] = function (data: any) {
       _Obj.deleteProp(data, 'http_status_code');
       cb(data);
       _Obj.deleteProp(global.Razorpay, callbackName);
@@ -429,16 +472,16 @@ function jsonp(options) {
         callback: `Razorpay.${callbackName}`,
       })
     );
+    const script = _El.create('script');
+    _Obj.extend(script, {
+      src,
+      async: true,
+      onerror: () => cb(networkError),
+      onload,
+      onreadystatechange: onload,
+    });
 
-    _El.create('script')
-      |> _Obj.extend({
-        src,
-        async: true,
-        onerror: () => cb(networkError),
-        onload,
-        onreadystatechange: onload,
-      })
-      |> _El.appendTo(document.documentElement);
+    _El.appendTo(script, document.documentElement);
   };
 
   return request;

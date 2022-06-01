@@ -1,4 +1,6 @@
 import { getOption, getPreferences } from 'razorpay';
+import fetch from 'utils/fetch';
+
 const SESSION_CREATED = 'session_created';
 const SESSION_ERRORED = 'session_errored';
 let sessionCreated = false;

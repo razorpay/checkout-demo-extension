@@ -1,4 +1,5 @@
 import { makeAuthUrl } from 'checkoutstore';
+import fetch from 'utils/fetch';
 
 export function resetOrderApiCall(orderId) {
   return new Promise((resolve) => {

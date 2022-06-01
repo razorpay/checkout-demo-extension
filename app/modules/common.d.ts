@@ -11,4 +11,12 @@ declare namespace Common {
     TWO = '2',
     BOTH = 'both',
   }
+
+  type JSFunction<
+    ReturnType = any,
+    DataType = any,
+    DataRequired = 0
+  > = DataRequired extends 1
+    ? (data: DataType) => ReturnType
+    : (data: DataType) => ReturnType;
 }

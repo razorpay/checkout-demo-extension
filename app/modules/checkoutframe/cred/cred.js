@@ -6,6 +6,7 @@ import { getCustomerDetails } from 'checkoutstore/screens/home';
 import { hasFeature, isContactOptional } from 'razorpay';
 import { CredEvents, Events, Track } from 'analytics';
 import { isEligibilityCheckInProgress } from './store';
+import fetch from 'utils/fetch';
 import {
   CRED_EXPERIMENTAL_OFFER_ID,
   CRED_EXPERIMENT_LOCAL_KEY,

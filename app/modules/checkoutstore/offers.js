@@ -11,6 +11,7 @@ import { writable, derived, get } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
 import { BEHAV } from 'analytics-types';
+import fetch from 'utils/fetch';
 
 export const appliedOffer = writable();
 

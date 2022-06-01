@@ -4,7 +4,7 @@ import { getOrderId } from 'razorpay';
 import { timer } from 'utils/timer';
 import { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
-
+import fetch from 'utils/fetch';
 let cache = {};
 
 /**

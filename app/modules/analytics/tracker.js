@@ -1,6 +1,7 @@
 import { getExperimentsFromStorage } from 'experiments';
 import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
+import fetch from 'utils/fetch';
 
 const CHUNK_SIZE = 5;
 

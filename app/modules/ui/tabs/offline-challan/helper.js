@@ -11,6 +11,7 @@ import { getSDKMeta } from 'checkoutstore/native';
 import { makeAuthUrl } from 'checkoutstore';
 import { copyToClipboard } from 'common/clipboard';
 import loadScript from 'common/loadScript';
+import fetch from 'utils/fetch';
 
 // constants
 import { rupeeDataUrl, jsPdfUrl } from 'ui/tabs/bank-transfer/challanConstants';

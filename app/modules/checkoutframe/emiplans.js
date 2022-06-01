@@ -9,6 +9,7 @@ import { returnAsIs } from 'lib/utils';
 import { METHODS } from 'checkoutframe/constants';
 import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
+import fetch from 'utils/fetch';
 
 const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};
@@ -130,7 +131,7 @@ emiPlansView.prototype = {
       const plan = event.detail;
       const session = getSession();
 
-      var offer = session.getAppliedOffer();
+      let offer = session.getAppliedOffer();
       const isNoCostEmi = offer && offer.emi_subvention;
 
       if (isNoCostEmi && offer.id !== plan.offer_id) {

@@ -5,7 +5,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import { formatPayload } from 'payment/validator';
 import RazorpayStore, { getOption } from 'razorpay';
 import { returnAsIs } from 'lib/utils';
-
+import fetch from 'utils/fetch';
 import {
   supportedCurrencies,
   displayCurrencies,
@@ -42,13 +42,13 @@ export default function Razorpay(overrides) {
   this.id = Track.makeUid();
   Analytics.setR(this);
 
-  var options;
+  let options;
   try {
     options = base_configure(overrides);
     this.get = options.get;
     this.set = options.set;
   } catch (e) {
-    var message = e.message;
+    let message = e.message;
     if (!this.get || !this.isLiveMode()) {
       if (_.isNonNullObject(overrides) && !overrides.parent) {
         global.alert(message);
@@ -84,7 +84,7 @@ export default function Razorpay(overrides) {
   this.postInit();
 }
 
-var RazorProto = (Razorpay.prototype = new Eventer());
+let RazorProto = (Razorpay.prototype = new Eventer());
 
 RazorProto.postInit = returnAsIs;
 
@@ -114,7 +114,7 @@ Razorpay.emi = {
       return Math.ceil(principle / length);
     }
     rate /= 1200;
-    var multiplier = Math.pow(1 + rate, length);
+    let multiplier = Math.pow(1 + rate, length);
     return parseInt((principle * rate * multiplier) / (multiplier - 1), 10);
   },
 
@@ -210,14 +210,14 @@ function base_configure(overrides) {
     _.throwMessage('Invalid options');
   }
 
-  var options = new CheckoutOptions(overrides);
+  let options = new CheckoutOptions(overrides);
   validateOverrides(options, ['amount']);
   setNotes(options);
   return options;
 }
 
 function setNotes(options) {
-  var notes = options.get('notes');
+  let notes = options.get('notes');
   _Obj.loop(notes, function (val, key) {
     if (_.isString(val)) {
       if (val.length > 254) {
@@ -230,7 +230,7 @@ function setNotes(options) {
 }
 
 RazorProto.isLiveMode = function () {
-  var preferences = this.preferences;
+  let preferences = this.preferences;
 
   return (
     (!preferences && /^rzp_l/.test(this.get('key'))) ||
@@ -239,7 +239,7 @@ RazorProto.isLiveMode = function () {
 };
 
 RazorProto.getMode = function () {
-  var preferences = this.preferences;
+  let preferences = this.preferences;
   if (!this.get('key') && !preferences) {
     return 'pending';
   }
@@ -332,11 +332,11 @@ function isValidAmount(amt, min = 100) {
 
 export function makePrefParams(rzp) {
   if (rzp) {
-    var params = {};
+    let params = {};
     /**
      * Set Key
      */
-    var key_id = getOption('key');
+    let key_id = getOption('key');
     if (key_id) {
       params.key_id = key_id;
     }
@@ -376,7 +376,7 @@ export function makePrefParams(rzp) {
       'checkout_config_id',
       'amount',
     ].forEach(function (key) {
-      var value = getOption(key);
+      let value = getOption(key);
       if (value) {
         params[key] = value;
       }
@@ -503,7 +503,7 @@ export function validateOverrides(options, skip = []) {
 
 Razorpay.configure = function (overrides, extra = {}) {
   _Obj.loop(flatten(overrides, RazorpayDefaults), function (val, key) {
-    var defaultValue = RazorpayDefaults[key];
+    let defaultValue = RazorpayDefaults[key];
     if (typeof defaultValue === typeof val) {
       RazorpayDefaults[key] = val;
     }

@@ -1,5 +1,6 @@
 import Analytics from 'analytics';
 import * as Bridge from 'bridge';
+import fetch from 'utils/fetch';
 import Razorpay, {
   makePrefParams,
   validateOverrides,
@@ -180,8 +181,8 @@ export const handleMessage = function (message) {
     return;
   }
 
-  var id = message.id || Track.id;
-  var session = SessionManager.getSession(id);
+  let id = message.id || Track.id;
+  let session = SessionManager.getSession(id);
 
   // response will come here only in case of iframe
   if (('razorpay_payment_id' in message || 'error' in message) && session) {
@@ -208,7 +209,7 @@ export const handleMessage = function (message) {
   }
 
   let transformedOptions = processNativeMessage(message);
-  var options = message.options;
+  let options = message.options;
 
   setAnalyticsMeta(message);
   setTrackingProps(message);
@@ -223,7 +224,7 @@ export const handleMessage = function (message) {
     } catch (e) {
       return Razorpay.sendMessage({ event: 'fault', data: e });
     }
-    var oldSession = SessionManager.getSession();
+    let oldSession = SessionManager.getSession();
     if (oldSession && _.isFunction(oldSession.saveAndClose)) {
       oldSession.saveAndClose();
     }
@@ -403,7 +404,7 @@ function setSessionPreferences(session, preferences) {
   const qpmap = _.getQueryParams() |> _Obj.unflatten;
   const methods = getEnabledMethods();
   if (!methods.length) {
-    var message = 'No appropriate payment method found.';
+    let message = 'No appropriate payment method found.';
     if (isEMandateEnabled() && !razorpayInstance.get('customer_id')) {
       message += '\nMake sure to pass customer_id for e-mandate payments';
     }

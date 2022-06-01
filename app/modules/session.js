@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-redeclare
-/* global fetch, _, _Obj */
+/* global _, _Obj */
 import * as RazorpayHelper from 'razorpay';
 import discreet from 'checkoutframe/discreet';
 import * as Confirm from 'checkoutframe/components/confirm';
@@ -14,6 +14,7 @@ import {
 import { init1CCMetaData } from 'one_click_checkout/helper';
 import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
+import fetch from 'utils/fetch';
 
 let emo = {};
 let ua = navigator.userAgent;

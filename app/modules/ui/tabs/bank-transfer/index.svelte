@@ -19,6 +19,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics, { Events, MetaProperties } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import fetch from 'utils/fetch';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';

@@ -14,6 +14,7 @@ import {
   AVS_COUNTRY_SEARCH_TITLE,
 } from 'ui/labels/avs-form';
 import { SPACIAL_CHAR_REGEX } from './constants';
+import fetch from 'utils/fetch';
 
 // analytics
 import { Track } from 'analytics';
@@ -33,10 +34,11 @@ import {
   FormErrorsType,
 } from './types';
 
-declare function fetch<ResponseType>(options: {
-  url: string;
-  callback: (response: ResponseType) => void;
-}): Promise<ResponseType>;
+// TODO handle response type
+// declare function fetch<ResponseType>(options: {
+//   url: string;
+//   callback: (response: ResponseType) => void;
+// }): Promise<ResponseType>;
 
 const fieldDetails = (t: TranslateType, field: string) => {
   switch (field) {
@@ -208,11 +210,13 @@ export const getAllCountries = (
     url = _.appendParamsToUrl(url, requestPayload);
 
     cache = new Promise<CountryStateReturnType>((resolve, reject) => {
-      fetch<
-        { error: string } | { countryAlpha2Code: string; countryName: string }[]
-      >({
+      fetch({
         url,
-        callback: (response) => {
+        callback: (
+          response:
+            | { error: string }
+            | { countryAlpha2Code: string; countryName: string }[]
+        ) => {
           if (!Array.isArray(response) && response.error) {
             return reject(response.error);
           }
@@ -253,12 +257,12 @@ export const getStatesWithCountryCode = (
     url = _.appendParamsToUrl(url, requestPayload);
 
     const request = new Promise<CountryStateReturnType>((resolve, reject) => {
-      fetch<{
-        error?: string;
-        states: { stateCode: string; stateName: string }[];
-      }>({
+      fetch({
         url,
-        callback: (response) => {
+        callback: (response: {
+          error?: string;
+          states: { stateCode: string; stateName: string }[];
+        }) => {
           if (response.error) {
             return reject(response.error);
           }

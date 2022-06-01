@@ -8,7 +8,7 @@ import {
   getLocaleFromNavigator,
   t,
 } from 'svelte-i18n';
-
+import fetch from 'utils/fetch';
 import { get } from 'svelte/store';
 
 import en from './bundles/en';

@@ -3,7 +3,7 @@ import {
   processCoproto,
   processOtpResponse,
 } from 'payment/coproto';
-
+import fetch from 'utils/fetch';
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 import { returnAsIs } from 'lib/utils';

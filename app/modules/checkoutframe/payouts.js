@@ -1,5 +1,5 @@
 import { makeAuthUrl } from 'checkoutstore';
-
+import fetch from 'utils/fetch';
 const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };

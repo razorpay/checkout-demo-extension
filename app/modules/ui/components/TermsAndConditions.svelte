@@ -2,7 +2,7 @@
   // UI imports
   import * as TermsCurtain from 'checkoutframe/termscurtain';
   import Checkbox from 'ui/elements/Checkbox.svelte';
-
+  import fetch from 'utils/fetch';
   // Props
   export let mode;
 

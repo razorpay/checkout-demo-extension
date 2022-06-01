@@ -3,6 +3,7 @@ import QR from './QR.svelte';
 import { updateQrState } from './store';
 import { handleUPIPayments } from 'upi/payment';
 import { QR_EXPIRE_TIME } from 'upi/constants';
+import fetch from 'utils/fetch';
 
 jest.mock('razorpay', () => ({
   get: jest.fn(),
@@ -109,6 +110,6 @@ describe('QR Component Tests', () => {
     expect(queryByTestId('refresh')).not.toBeInTheDocument();
     expect(queryByTestId('loading')).not.toBeInTheDocument();
     expect(handleUPIPayments).not.toBeCalled();
-    expect((fetch as unknown as CFU.Fetch).resumePoll).toBeCalled;
+    expect(fetch.resumePoll).toBeCalled;
   });
 });
