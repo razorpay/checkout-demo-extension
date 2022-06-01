@@ -143,9 +143,7 @@
   import Info from 'ui/elements/Info.svelte';
   import { Views, cardWithRecurringSupport, AVS_COUNTRIES } from './constant';
 
-  let showAVSInfo = false;
-
-  let AVSInfo = [];
+  let AVSInfo: Array<{ icon: string; label: string }> = [];
   // experiments
   import {
     delayLoginOTPExperiment,
@@ -156,6 +154,7 @@
   } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { pushOverlay } from 'navstack';
 
   let delayOTPExperiment;
   let cardEle;
@@ -187,6 +186,16 @@
         label: $t(AVS_INFO_MESSAGE_3),
       },
     ];
+  }
+
+  function showAVSInfo() {
+    pushOverlay({
+      component: Info,
+      props: {
+        title: $t(AVS_INFO_TITLE),
+        data: AVSInfo,
+      },
+    });
   }
 
   const cardDowntimes = getDowntimes().cards;
@@ -1148,7 +1157,7 @@
             {$t(AVS_HEADING)}
             <span
               on:click={() => {
-                showAVSInfo = true;
+                showAVSInfo();
               }}><Icon icon={icons.question} /></span
             >
           </div>
@@ -1157,11 +1166,6 @@
             value={$AVSBillingAddress}
             on:input={handleAVSFormInput}
             on:blur={handleAVSFormInput}
-          />
-          <Info
-            bind:show={showAVSInfo}
-            title={$t(AVS_INFO_TITLE)}
-            data={AVSInfo}
           />
         </div>
       {:else}

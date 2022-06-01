@@ -51,6 +51,7 @@
     AVS_INFO_MESSAGE_3,
   } from 'ui/labels/card';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { pushOverlay } from 'navstack';
 
   const session = getSession();
   const themeMeta = getThemeMeta();
@@ -74,8 +75,6 @@
   let currentView = VIEWS_MAP.SELECT_PROVIDERS;
 
   let lastView;
-
-  let showNVSInfo = false;
 
   let NVSInfo = [];
 
@@ -167,6 +166,16 @@
         label: $t(AVS_INFO_MESSAGE_3),
       },
     ];
+  }
+
+  function showNVSInfo() {
+    pushOverlay({
+      component: Info,
+      props: {
+        title: $t(AVS_INFO_TITLE),
+        data: NVSInfo,
+      },
+    });
   }
 
   function filterCountries(countries) {
@@ -298,7 +307,7 @@
           {$t(AVS_HEADING)}
           <span
             on:click={() => {
-              showNVSInfo = true;
+              showNVSInfo();
             }}><Icon icon={icons.question} /></span
           >
         </div>
@@ -308,11 +317,6 @@
           value={$NVSFormData}
           on:input={handleAVSFormInput}
           on:blur={handleAVSFormInput}
-        />
-        <Info
-          bind:show={showNVSInfo}
-          title={$t(AVS_INFO_TITLE)}
-          data={NVSInfo}
         />
         <AccountTab {showAccountTab} />
       </div>
