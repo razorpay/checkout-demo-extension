@@ -5,6 +5,7 @@ import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import { querySelectorAll, form2obj } from 'utils/doc';
+import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
 import { isBraveBrowser } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
 
@@ -224,6 +225,7 @@ function createTestRibbon(parent) {
 
 let preloadedFrame;
 let isBrave = false;
+const affordabilityWidgetFid = getAffordabilityWidgetFingerprint();
 /**
  * in iframe isBraveBrowser doesn't work as expected to make sure we detect brave browser
  * we are moving check of isBraveBrowser to checkout.js and pass isBrave flag
@@ -272,6 +274,9 @@ RazorProto.open = needBody(function () {
     this.metadata = {
       isBrave,
     };
+    if (affordabilityWidgetFid) {
+      this.metadata['affordability_widget_fid'] = affordabilityWidgetFid;
+    }
   }
   this.metadata.openedAt = Date.now();
 

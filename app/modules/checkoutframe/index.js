@@ -159,6 +159,12 @@ const setAnalyticsMeta = (message) => {
    */
   if (message.metadata) {
     setBraveBrowser(message.metadata.isBrave);
+    if (message.metadata.affordability_widget_fid) {
+      Events.setMeta(
+        MetaProperties.AFFORDABILITY_WIDGET_FID,
+        message.metadata.affordability_widget_fid
+      );
+    }
     Events.setMeta(MetaProperties.BRAVE_BROWSER, message.metadata.isBrave);
   }
 };

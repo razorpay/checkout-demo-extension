@@ -10,6 +10,7 @@ export default {
   SDK_PLATFORM: 'sdk.platform',
   SDK_VERSION: 'sdk.version',
   BRAVE_BROWSER: 'brave_browser',
+  AFFORDABILITY_WIDGET_FID: 'affordability_widget_fid',
   REWARD_IDS: 'reward_ids',
   REWARD_EXP_VARIANT: 'reward_exp_variant',
   FEATURES: 'features',
