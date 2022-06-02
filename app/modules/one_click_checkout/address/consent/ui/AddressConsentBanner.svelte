@@ -19,11 +19,7 @@
   import ModalEvents from 'one_click_checkout/address/consent/analytics';
 
   // store imports
-  import {
-    savedAddresses,
-    showBanner,
-    consentViewCount,
-  } from 'one_click_checkout/address/store';
+  import { savedAddresses, consentViewCount } from 'one_click_checkout/address/store';
 
   // service imports
   import {
@@ -72,23 +68,21 @@
   };
 </script>
 
-{#if $showBanner}
-  <div class="consent-banner">
-    <div class="consent-icon">
-      <Icon icon={consent_location} />
-    </div>
-    <div class="banner-info">
-      <div class="banner-title">{$t(BANNER_TITLE)}</div>
-      <div class="banner-content">{$t(BANNER_CONTENT_LABEL)}</div>
-      <div class="banner-cta theme" on:click={handleSubmit}>
-        {$t(BANNER_CTA_LABEL)}
-        <div class="cta-icon theme">
-          <Icon icon={back_arrow(getThemeColor())} />
-        </div>
+<div class="consent-banner">
+  <div class="consent-icon">
+    <Icon icon={consent_location} />
+  </div>
+  <div class="banner-info">
+    <div class="banner-title">{$t(BANNER_TITLE)}</div>
+    <div class="banner-content">{$t(BANNER_CONTENT_LABEL)}</div>
+    <div class="banner-cta theme" on:click={handleSubmit}>
+      {$t(BANNER_CTA_LABEL)}
+      <div class="cta-icon theme">
+        <Icon icon={back_arrow(getThemeColor())} />
       </div>
     </div>
   </div>
-{/if}
+</div>
 
 <style>
   .consent-banner {

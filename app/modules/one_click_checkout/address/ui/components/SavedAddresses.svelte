@@ -11,6 +11,7 @@
   import { selectedAddress as selectedShippingAddress } from 'one_click_checkout/address/shipping_address/store';
   import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
+  import { showBanner } from 'one_click_checkout/address/store';
 
   // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
@@ -171,7 +172,9 @@
     {/each}
   </div>
 
-  <AddressConsentBanner />
+  {#if $showBanner}
+    <AddressConsentBanner />
+  {/if}
 </div>
 
 <style>
