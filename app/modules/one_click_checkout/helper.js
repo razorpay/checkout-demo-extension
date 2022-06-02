@@ -1,4 +1,4 @@
-import { getOption, getPreferences } from 'razorpay';
+import { getOption, getPreferences, isOneClickCheckout } from 'razorpay';
 import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 import Analytics from 'analytics';
 
@@ -71,6 +71,6 @@ export function init1CCMetaData() {
   );
   Analytics.setMeta(
     OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
-    getOption('one_click_checkout')
+    isOneClickCheckout()
   );
 }
