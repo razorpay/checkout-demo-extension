@@ -13,7 +13,7 @@
   import CartEvents from 'one_click_checkout/cart/analytics';
 
   export let items = [];
-  export let maxHeight = 'none';
+  export let scrollable = false;
   export let screenName = '';
 
   $: {
@@ -32,19 +32,16 @@
   }
 </script>
 
-<div
-  id="cart-list"
-  class="cart-list-container"
-  style="max-height: {maxHeight};"
->
+<div id="cart-list" class:scrollable>
   {#each items as item}
     <CartItem {...item} />
   {/each}
 </div>
 
 <style>
-  .cart-list-container {
-    overflow: scroll;
+  .scrollable {
+    overflow-y: scroll;
+    max-height: var(--max-height, 'none');
   }
   :global(.cart-item:not(:last-child)) {
     margin-bottom: 16px;

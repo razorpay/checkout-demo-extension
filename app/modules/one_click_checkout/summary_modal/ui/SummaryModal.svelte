@@ -135,12 +135,13 @@
     {#if $enableCart && cartVisible}
       <div class:inset-shadow={showShadow}>
         <CartItemList
-          maxHeight="{(MODAL_MAX_HEIGHT / 100) * backdropHeight -
+          --max-height="{(MODAL_MAX_HEIGHT / 100) * backdropHeight -
             tableHeight -
             40 - // header height
             72 - // margin/paddings
             10}px"
           items={$cartItems}
+          scrollable
         />
       </div>
       {#if !showShadow}
@@ -362,7 +363,7 @@
     background: var(--primary-color);
   }
 
-  .summary-table-wrapper :global(.cart-list-container) {
+  .summary-table-wrapper :global(#cart-list) {
     padding: 0px 16px;
   }
 
@@ -372,7 +373,7 @@
     border-bottom: 1px solid #e1e5ea;
   }
 
-  .inset-shadow :global(.cart-list-container) {
+  .inset-shadow :global(#cart-list) {
     padding-bottom: 16px;
   }
 </style>
