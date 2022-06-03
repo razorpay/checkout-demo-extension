@@ -278,7 +278,7 @@ Customer.prototype = {
             if (isOneCCEnabled) {
               errorMsg = 'otp.title.incorrect_otp_retry_one_cc';
             } else {
-              errorMsg = 'otp.title.incorrect_otp_retry';
+              errorMsg = 'incorrect_otp_retry';
             }
             callback(errorMsg);
           }
