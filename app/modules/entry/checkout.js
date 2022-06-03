@@ -2,6 +2,7 @@ import 'lib/polyfill/checkout';
 import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';
+import 'checkoutjs/magic-checkout-btn';
 import initRazorpayCheckout from 'checkoutjs/open';
 import { Track } from 'analytics';
 import 'analytics/track-errors';
