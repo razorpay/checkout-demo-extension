@@ -30,7 +30,10 @@ import {
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
-import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+import {
+  COUNTRY_POSTALS_MAP,
+  INDIAN_PINCODE_LENGTH,
+} from 'common/countrycodes';
 import { views as addressViews } from 'one_click_checkout/address/constants';
 import { updateAddressesInStore } from './sessionInterface';
 
@@ -93,10 +96,11 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
       } else if (formInput.id === 'landmark') {
         return LANDMARK_ERROR_LABEL;
       } else if (formInput.id === 'zipcode') {
-        if (!COUNTRY_POSTALS_MAP[selectedCountryIso]?.pattern) {
+        if (!COUNTRY_POSTALS_MAP[selectedCountryIso?.toUpperCase()]?.pattern) {
           return;
         }
-        return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE
+        return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE &&
+          value.length !== INDIAN_PINCODE_LENGTH
           ? PINCODE_ERROR_LABEL
           : ZIPCODE_ERROR_LABEL;
       } else {

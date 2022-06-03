@@ -1417,3 +1417,5 @@ export const COUNTRY_POSTALS_MAP = {
     name: 'Zimbabwe',
   },
 };
+
+export const INDIAN_PINCODE_LENGTH = 6;
