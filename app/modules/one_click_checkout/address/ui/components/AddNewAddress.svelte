@@ -109,7 +109,6 @@
   export let selectedCountryISO;
   export let currentView;
   export let addressWrapperEle;
-  export let onScreenUpdate;
 
   let errors = {};
   let selectedTag = $formData.tag;
@@ -691,7 +690,6 @@
       address_type,
     });
 
-    onScreenUpdate();
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,

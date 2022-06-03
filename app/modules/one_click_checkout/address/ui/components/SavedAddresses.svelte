@@ -49,7 +49,6 @@
   export let onAddAddressClick;
   export let addressType;
   export let addressWrapperEle;
-  export let onScreenUpdate;
 
   const dispatch = createEventDispatcher();
 
@@ -134,7 +133,6 @@
       });
       postAddressSelection();
     }
-    onScreenUpdate();
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.ADDRESS,

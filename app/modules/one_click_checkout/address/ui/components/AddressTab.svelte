@@ -1,7 +1,6 @@
 <script>
   // svelte imports
   import { get } from 'svelte/store';
-  import { onMount } from 'svelte';
 
   // UI imports
   import CTA from 'one_click_checkout/cta/index.svelte';
@@ -37,8 +36,6 @@
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
-  import { isUnscrollable } from 'one_click_checkout/helper';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
@@ -84,7 +81,6 @@
     },
   } = Resource[addressType];
   let isFormComplete = false;
-  let showAccountTab;
   const { location } = getIcons();
 
   export function handleAddAddressClick() {
@@ -239,18 +235,6 @@
     }
   }
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(addressWrapperEle);
-  }
-
-  function onScreenUpdate() {
-    scrollable = isUnscrollable(addressWrapperEle);
-  }
-
-  onMount(() => {
-    onScreenUpdate();
-  });
-
   $: {
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       disabled = !isFormComplete || $showLoader;
@@ -275,7 +259,6 @@
       'billing-address-wrapper'
     ]}
     bind:this={addressWrapperEle}
-    on:scroll={onScroll}
   >
     <div class="address-section" class:address-scrollable={scrollable}>
       <slot name="header" />
@@ -294,7 +277,6 @@
           checkServiceability={Resource[addressType].checkServiceability}
           {addressType}
           {addressWrapperEle}
-          {onScreenUpdate}
         />
       {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
         <AddNewAddress
@@ -308,11 +290,10 @@
           {selectedCountryISO}
           {currentView}
           {addressWrapperEle}
-          {onScreenUpdate}
         />
       {/if}
     </div>
-    <AccountTab {showAccountTab} />
+    <AccountTab showAccountTab />
     {#if $activeRoute?.name === views.SAVED_ADDRESSES}
       <hr class="separator" />
     {/if}

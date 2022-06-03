@@ -12,11 +12,11 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   import {
     getAvailableMethods,
     getSectionsDisplayed,
   } from 'ui/tabs/home/helpers';
-  import { isUnscrollable } from 'one_click_checkout/helper';
   import {
     showToast,
     TOAST_THEME,
@@ -193,12 +193,8 @@
   let showHome = false;
   let renderCtaOneCC = false;
   let ctaOneCCDisabled = true;
-  let methodEle;
   let scrollable;
   let preferredMethods;
-  let homeMethodEle;
-  let oneCCResizeObserver;
-
   // TPV
   const tpv = getTPV();
 
@@ -534,8 +530,6 @@
             },
             'api'
           ).then(({ identified, instruments: instrumentsFromApi }) => {
-            // Recalculate the screen size after Preferred Payment Methods loaded due to layout shift happens
-            scrollable = isUnscrollable(methodEle?.parentNode);
             userIdentified = identified;
 
             if (instrumentsFromApi.length) {
@@ -809,20 +803,6 @@
     if (!isOneCCEnabled) {
       showHome = true;
     }
-    // TODO: 120px as hack for payment methods to make the screen scrollable
-    scrollable = isUnscrollable(methodEle?.parentNode, 120);
-
-    if (isOneCCEnabled) {
-      // Recalculate the screen size whenever homeMethodEle resize happened
-      setTimeout(() => {
-        if (homeMethodEle && window?.ResizeObserver) {
-          oneCCResizeObserver = new window.ResizeObserver(() => {
-            scrollable = isUnscrollable(methodEle?.parentNode);
-          });
-          oneCCResizeObserver.observe(homeMethodEle);
-        }
-      });
-    }
 
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
@@ -1090,9 +1070,6 @@
   }
 
   export function onHide() {
-    if (isOneCCEnabled && oneCCResizeObserver) {
-      oneCCResizeObserver.unobserve(homeMethodEle);
-    }
     renderCtaOneCC = false;
   }
 
@@ -1201,11 +1178,10 @@
 </script>
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
-  <Screen pad={false}>
+  <Screen pad={false} removeAccountTab={true}>
     <div
       class="screen-main"
       class:screen-one-cc={scrollable && isOneCCEnabled}
-      bind:this={methodEle}
     >
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
@@ -1266,7 +1242,6 @@
 
           <div
             class="home-methods"
-            bind:this={homeMethodEle}
             in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
           >
             <NewMethodsList
@@ -1278,6 +1253,9 @@
       {/if}
     </div>
 
+    {#if isOneCCEnabled}
+      <AccountTab showAccountTab />
+    {/if}
     <Bottom tab="common">
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
