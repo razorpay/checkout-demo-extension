@@ -155,7 +155,7 @@
   .suggestion-dropdown {
     width: 100%;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     max-height: 170px;
     overflow-y: scroll;
     background: white;
