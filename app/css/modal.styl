@@ -981,8 +981,11 @@ i {
   overflow: auto;
 }
 
-#root:not(:empty) + #form-fields {
-  display: none;
+#root.active {
+  height: 100%;
+  & + #form-fields {
+    display: none;
+  }
 }
 
 #form-fields {

@@ -1,53 +1,53 @@
 <script lang="ts">
-  import { stack } from './store';
+  import { lastOf } from 'utils/array';
+  import { elements, overlays } from './store';
   import { popStack } from './helper';
-  import Element from './Element.svelte';
-  import Analytics from 'analytics';
+  import Overlay from './Overlay.svelte';
 
-  $: elements = $stack.filter((el, idx, array) => {
-    // it's the last element, or next element is overlay, or element is overlay
-    const next = array[idx + 1];
-    return !next || next.overlay || el.overlay;
-  });
+  const overlayRefs: NavStack.ElementRef[] = [];
+  let elementRef: NavStack.ElementRef;
 
-  let ref: NavStack.ElementRef;
+  $: lastEl = lastOf($elements);
+  $: overlayRefs.length = $overlays.length;
 
-  export function isActive() {
-    return Boolean(ref);
+  function lastRef() {
+    return lastOf(overlayRefs) || elementRef;
   }
 
   export function backPressed() {
-    if (!ref) {
-      Analytics.track('ref_not_defined_in_backpressed', {
-        data: {
-          stackLength: $stack.length,
-        },
-      });
-      return;
-    }
-    if (!ref.preventBack?.()) {
-      popStack();
+    const last = lastRef();
+    if (last) {
+      if (!last.preventBack || !last.preventBack()) {
+        popStack();
+      }
     }
   }
 
   export function getPayload() {
-    return ref.getPayload?.();
+    const last = lastRef();
+    if (last && last.getPayload) {
+      return last.getPayload();
+    }
   }
 </script>
 
-{#each elements as element, i (element.component)}
-  <Element isOverlay={element.overlay || false} {backPressed}>
-    {#if i === elements.length - 1}
-      <svelte:component
-        this={element.component}
-        {...element.props || {}}
-        bind:this={ref}
-        navstack={{
-          isOverlay: element.overlay,
-        }}
-      />
-    {:else}
-      <svelte:component this={element.component} {...element.props || {}} />
-    {/if}
-  </Element>
+{#if lastEl}
+  <svelte:component
+    this={lastEl.component}
+    {...lastEl.props || {}}
+    bind:this={elementRef}
+  />
+{/if}
+
+{#each $overlays as overlay, i (overlay.component)}
+  <Overlay {backPressed}>
+    <svelte:component
+      this={overlay.component}
+      {...overlay.props || {}}
+      bind:this={overlayRefs[i]}
+      navstack={{
+        isOverlay: overlay.overlay,
+      }}
+    />
+  </Overlay>
 {/each}

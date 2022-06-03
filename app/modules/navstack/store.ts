@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
-import type { Writable } from 'svelte/store';
+import { Writable, writable } from 'svelte/store';
 
-export const stack: Writable<NavStack.StackElement[]> = writable([]);
+export const elements: Writable<NavStack.StackElement[]> = writable([]);
+export const overlays: Writable<NavStack.StackElement[]> = writable([]);

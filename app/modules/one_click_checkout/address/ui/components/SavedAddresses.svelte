@@ -69,7 +69,7 @@
         address_id: id,
         address_position_index: index,
         address_source: addressSource || defaultAddressType,
-        selection_type: 'manual'
+        selection_type: 'manual',
       });
       Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
         top_shown_address: !index,
@@ -125,8 +125,9 @@
       Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
         address_id: $selectedShippingAddress?.id,
         address_position_index: 0,
-        address_source: $selectedShippingAddress?.source_type || defaultAddressType,
-        selection_type: 'default'
+        address_source:
+          $selectedShippingAddress?.source_type || defaultAddressType,
+        selection_type: 'default',
       });
       Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
         top_shown_address: true,

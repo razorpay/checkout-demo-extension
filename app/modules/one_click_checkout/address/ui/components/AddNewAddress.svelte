@@ -78,9 +78,7 @@
 
   // other imports
   import { isIndianCustomer } from 'checkoutstore';
-  import {
-    savedAddresses,
-  } from 'one_click_checkout/address/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
   import {
     findItem,
     validateInputField,
@@ -100,10 +98,7 @@
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
 
-  import {
-    clickOutside,
-    screenScrollTop,
-  } from 'one_click_checkout/helper';
+  import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
 
   // props
   export let formData;

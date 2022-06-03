@@ -15,6 +15,7 @@
   import { returnAsIs } from 'lib/utils';
   import { getStore } from 'checkoutstore/cta';
   import { isOverlayActive } from 'navstack';
+  import { elements } from 'navstack/store';
   import OneCCLoader from 'one_click_checkout/loader/Loader.svelte';
   import { getView } from 'checkoutframe/components';
   import { clearOldExperiments } from 'experiments';
@@ -160,7 +161,7 @@
             autocomplete="off"
             on:submit|preventDefault={() => false}
           >
-            <div id="root" />
+            <div id="root" class:active={$elements.length} />
             <div id="form-fields">
               {#if isMethodEnabled('emi') && emiBanks.BAJAJ}
                 <div class="tab-content showable screen" id="form-emi" />

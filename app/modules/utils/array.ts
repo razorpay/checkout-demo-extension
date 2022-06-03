@@ -21,3 +21,7 @@ export function getUniqueValues(array: any[], func?: FunctionCallback) {
     }, [])
     .map(JSON.parse);
 }
+
+export function lastOf(array: any[]) {
+  return array[array.length - 1];
+}
