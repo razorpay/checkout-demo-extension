@@ -12,6 +12,8 @@ import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isDesktop } from 'common/useragent';
+import { customPreferredMethodsExperiment } from './experiment';
+import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from './constants';
 
 /**
  * this object is a key/value pair of contact and p13n api data
@@ -56,6 +58,22 @@ export const removeDuplicateApiInstruments = (instruments) => {
   return result;
 };
 
+export const overrideAPIInstruments = (instruments) => {
+  if (!customPreferredMethodsExperiment.enabled()) {
+    return instruments;
+  }
+
+  return instruments.map((instrument) => {
+    if (
+      instrument?.method === 'wallet' &&
+      instrument.instrument === 'phonepe'
+    ) {
+      return DEFAULT_PHONEPE_P13N_V2_INSTRUMENT;
+    }
+    return instrument;
+  });
+};
+
 /**
  * Sets instruments for customer
  * @param {Customer} customer
@@ -70,10 +88,11 @@ export function setInstrumentsForCustomer(
   instruments,
   identified = true
 ) {
-  const transformedInstruments = instruments.map((instrument) =>
-    transformInstrumentToStorageFormat(instrument, {
-      upiApps: getUPIIntentApps().filtered,
-    })
+  const transformedInstruments = overrideAPIInstruments(instruments).map(
+    (instrument) =>
+      transformInstrumentToStorageFormat(instrument, {
+        upiApps: getUPIIntentApps().filtered,
+      })
   );
 
   PREFERRED_INSTRUMENTS_CACHE[cacheKey(customer)] = Promise.resolve({

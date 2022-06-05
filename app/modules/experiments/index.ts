@@ -193,7 +193,7 @@ class Experiment {
    */
   create = (
     name: string,
-    evaluator: Function,
+    evaluator: number | Function,
     options: CreateExperimentOptions = {} as CreateExperimentOptions
   ): SingleExperiment => {
     const { evaluatorArg, overrideFn } = options;

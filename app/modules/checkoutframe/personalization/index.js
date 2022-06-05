@@ -6,9 +6,17 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
+import { customPreferredMethodsExperiment } from './experiment';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
-import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
+import { optimizeInstruments } from 'checkoutframe/personalization/optimizations';
+import { isDesktop } from 'common/useragent';
+import {
+  DEFAULT_PHONEPE_P13N_V1_INSTRUMENT,
+  MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION,
+  MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION,
+} from './constants';
+import { isInternational } from 'razorpay';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -318,6 +326,30 @@ function updateInstrumentForCustomer(instrument, customer) {
   return instruments;
 }
 
+export function overrideStorageInstruments(instruments) {
+  if (!customPreferredMethodsExperiment.enabled()) {
+    return instruments;
+  }
+
+  return (Array.isArray(instruments) ? instruments : []).map((instrument) => {
+    /**
+     * Convert Wallet-PhonePe to UPI-PhonePe as UPI version offers better success metrics
+     */
+    if (instrument.method === 'wallet' && instrument.wallet === 'phonepe') {
+      const updatedInstrument = {
+        ...instrument,
+        ...DEFAULT_PHONEPE_P13N_V1_INSTRUMENT,
+      };
+      delete updatedInstrument.wallet;
+      if (isDesktop()) {
+        updatedInstrument['vendor_vpa'] = '@ybl';
+      }
+      return updatedInstrument;
+    }
+    return instrument;
+  });
+}
+
 /**
  * Returns a list of all instruments for the customer.
  * @param {Object} customer
@@ -333,7 +365,7 @@ export function getAllInstrumentsForCustomer(customer) {
   // Get instrument for contact
   const instruments = instrumentsList[hashFnv32a(contact)] || [];
 
-  return instruments;
+  return overrideStorageInstruments(instruments);
 }
 
 /**
@@ -373,6 +405,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
       instruments,
       upiApps,
       customer,
+      source,
     });
 
     instruments = extendInstruments({
@@ -483,4 +516,10 @@ export function hasAnyInstrumentsOnDevice() {
  */
 export function trackNumberOfP13nContacts() {
   Analytics.setMeta('p13nUsers', _Obj.keys(getAllInstruments()).length);
+}
+
+export function getMaxPreferredMethods() {
+  return customPreferredMethodsExperiment.enabled() && !isInternational()
+    ? MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION
+    : MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION;
 }

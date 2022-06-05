@@ -106,8 +106,6 @@ export const CHECK_ERROR = {
 
 export const INDIA_COUNTRY_CODE = '+91';
 
-export const MAX_PREFERRED_INSTRUMENTS = 3;
-
 export const COLORS = {
   RAZORPAY_COLOR: '#528FF0',
   RAZORPAY_HOVER_COLOR: '#626A74',
