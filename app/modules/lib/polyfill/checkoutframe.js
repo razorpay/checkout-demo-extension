@@ -1,4 +1,3 @@
-import 'promise-polyfill/src/polyfill';
 import { internetExplorer } from 'common/useragent';
 import './prototypes/object';
 import Analytics from 'analytics';
@@ -45,7 +44,7 @@ if (internetExplorer && DOMTokenList) {
     if (arguments.length > 1) {
       return this[arguments[1] ? 'add' : 'remove'](val), !!arguments[1];
     }
-    let oldValue = this.value;
+    var oldValue = this.value;
     return (
       this.remove(oldValue),
       oldValue === this.value && (this.add(val), true) /*|| false*/
@@ -175,20 +174,20 @@ if (!Array.prototype.find) {
         throw TypeError('"this" is null or not defined');
       }
 
-      let o = Object(this);
+      var o = Object(this);
 
-      let len = o.length >>> 0;
+      var len = o.length >>> 0;
 
       if (typeof predicate !== 'function') {
         throw TypeError('predicate must be a function');
       }
 
-      let thisArg = arguments[1];
+      var thisArg = arguments[1];
 
-      let k = 0;
+      var k = 0;
 
       while (k < len) {
-        let kValue = o[k];
+        var kValue = o[k];
         if (predicate.call(thisArg, kValue, k, o)) {
           return kValue;
         }
@@ -210,3 +209,4 @@ import './prototypes/native';
 import './prototypes/customelements';
 import './prototypes/nodelist';
 import './prototypes/array';
+// import './getownpropertydescriptors';
