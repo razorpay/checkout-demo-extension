@@ -90,7 +90,11 @@ jobs:
     needs: [customFTs, functional-test]
     name: fts
     runs-on: [self-hosted]
+    if: always()
     steps:
+      - name: verify failure
+        if: always() && (needs.customFTs.result == 'failure' || needs.functional-test.result == 'failure')
+        run: exit 1
       - name: Fts Done
         run: echo "All Tests Passed"
   build-and-push-image: # independent of rest
