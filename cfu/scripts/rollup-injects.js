@@ -13,7 +13,6 @@ let injects = {
 
   // injects
   _: ['fe/implicit/_', '*'],
-  Promise: 'fe/implicit/Promise',
   _Obj: ['fe/implicit/_Obj', '*'],
 };
 

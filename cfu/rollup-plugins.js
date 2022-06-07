@@ -60,10 +60,6 @@ const getPlugins = ({ src }) => {
   }
   const paths = src.concat(commonFeDir, 'node_modules');
 
-  if (isProd) {
-    eslint.lint(isWatching)(paths);
-  }
-
   // Order of plugins is important:
   // svelte needs to be before babel so that by the time
   // babel is run, svelte has become JS
