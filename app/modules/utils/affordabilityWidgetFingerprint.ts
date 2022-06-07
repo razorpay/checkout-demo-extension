@@ -1,5 +1,5 @@
 function getItemWithExpiry(key: string) {
-  const itemStr = localStorage.getItem(key);
+  const itemStr = localStorage?.getItem(key);
   // if the item doesn't exist, return null
   if (!itemStr) {
     return null;
