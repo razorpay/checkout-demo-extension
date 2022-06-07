@@ -128,7 +128,7 @@ const upiPaymentHandlers = {
   isQRPaymentCancellable,
 };
 
-import * as fonts from 'common/fonts';
+import * as fonts from 'checkoutframe/fonts';
 
 export default {
   $,
