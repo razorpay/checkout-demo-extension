@@ -1,3 +1,4 @@
+import 'lib/polyfill/checkout';
 import Razorpay from 'common/Razorpay';
 import 'payment';
 import 'analytics/track-errors';
