@@ -2,7 +2,7 @@ name: Security
 on:
   pull_request: { }
   push:
-    branches: [ "master","nosemgrep_added" ]
+    branches: [ "master" ]
   schedule:
     - cron: '30 20 * * *'
 jobs:
