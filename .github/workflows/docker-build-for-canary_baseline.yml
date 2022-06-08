@@ -51,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile
-          build-args: |
+          build-args: | # nosemgrep : https://semgrep.dev/s/lJpo
             "AWS_S3_BUCKET_FOR_BUILD=${{ env.AWS_S3_BUCKET_FOR_BUILD }}"
             "AWS_REGION_FOR_BUILD=${{ env.AWS_REGION_FOR_BUILD }}"
             "AWS_ACCESS_KEY=${{ env.AWS_ACCESS_KEY }}"
@@ -74,7 +74,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile
-          build-args: |
+          build-args: | # nosemgrep : https://semgrep.dev/s/lJpo
             "AWS_S3_BUCKET_FOR_BUILD=${{ env.AWS_S3_BUCKET_FOR_BUILD }}"
             "AWS_REGION_FOR_BUILD=${{ env.AWS_REGION_FOR_BUILD }}"
             "AWS_ACCESS_KEY=${{ env.AWS_ACCESS_KEY }}"

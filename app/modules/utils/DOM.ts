@@ -301,7 +301,7 @@ export const setStyles = _.curry2(
  */
 export const setContents = _.curry2(
   elementString((el: Element, html: string) => {
-    el.innerHTML = html;
+    el.innerHTML = html; // nosemgrep : https://semgrep.dev/s/lJpo
     return el;
   })
 );
