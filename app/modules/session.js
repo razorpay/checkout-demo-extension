@@ -142,11 +142,16 @@ function makeHidden(subject) {
   subject.attr('data-hidden', true);
   if (subject[0]) {
     subject.removeClass(shownClass);
-    setTimeout(function () {
-      if (subject.attr('data-hidden')) {
-        subject.hide();
-      }
-    }, 200);
+
+    if (RazorpayHelper.isOneClickCheckout()) {
+      subject.hide();
+    } else {
+      setTimeout(function () {
+        if (subject.attr('data-hidden')) {
+          subject.hide();
+        }
+      }, 200);
+    }
   }
 }
 
