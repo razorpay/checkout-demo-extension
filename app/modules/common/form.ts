@@ -1,3 +1,12 @@
+import { isNonNullObject } from 'utils/object';
+
+type FormData = {
+  url: string;
+  params?: Common.Object<string>;
+  doc?: Window['document'];
+  method?: string;
+  target?: string;
+};
 /**
  * sends a request to the specified url from a form. this will change the window location.
  * @param formData Information of form
@@ -8,7 +17,7 @@
  * @param formData.doc html document object used to create form in that document (default current window.document)
  */
 
-export function submitForm(formData) {
+export function submitForm(formData: FormData) {
   const { doc = window.document, url, method = 'post', target } = formData;
   let { params = {} } = formData;
   params = flatten(params);
@@ -18,9 +27,9 @@ export function submitForm(formData) {
     if (target) {
       window.open(action, target);
     } else if (doc !== window.document) {
-      doc.location = action;
+      doc.location.assign(action);
     } else {
-      window.location = action;
+      window.location.assign(action);
     }
     return;
   }
@@ -38,7 +47,18 @@ export function submitForm(formData) {
   form.submit();
 }
 
-export function appendFormInput({ doc = window.document, form, data }) {
+export function appendFormInput({
+  doc = window.document,
+  form,
+  data,
+}: {
+  form: HTMLFormElement;
+  data: Common.Object;
+  doc?: Window['document'];
+}) {
+  if (!isNonNullObject(data)) {
+    return;
+  }
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
       const hiddenField = createFormInput({
@@ -46,13 +66,16 @@ export function appendFormInput({ doc = window.document, form, data }) {
         name: key,
         value: data[key],
       });
-
       form.appendChild(hiddenField);
     }
   }
 }
 
-function createFormInput(inputData) {
+function createFormInput(inputData: {
+  doc: Window['document'];
+  name: string;
+  value: string;
+}) {
   const { doc = window.document, name, value } = inputData;
   const hiddenField = doc.createElement('input');
   hiddenField.type = 'hidden';
@@ -63,11 +86,11 @@ function createFormInput(inputData) {
 /**
  * Appends params to the URL from an object
  * @param {string} url
- * @param {Object} params
+ * @param {Object | string} params
  *
  * @returns {string}
  */
-export function appendParamsToUrl(url, params) {
+export function appendParamsToUrl(url: string, params: Common.Object | string) {
   if (typeof params === 'object' && params !== null) {
     params = serialize(params);
   }
@@ -84,7 +107,10 @@ export function appendParamsToUrl(url, params) {
  *
  * @returns {string}
  */
-export function serialize(obj) {
+export function serialize(obj: Common.Object) {
+  if (!isNonNullObject(obj)) {
+    obj = {};
+  }
   const str = [];
   for (const p in obj) {
     if (obj.hasOwnProperty(p)) {
@@ -94,20 +120,20 @@ export function serialize(obj) {
   return str.join('&');
 }
 
-export function flatten(reqData) {
+export function flatten(reqData: Common.Object) {
   let data = reqData;
-  if (!data) {
+  if (!isNonNullObject(data)) {
     data = {};
   }
-  const result = {};
+  const result: Common.Object = {};
   if (Object.keys(data).length === 0) {
     return {};
   }
-  function recurse(cur, prop) {
+  function recurse(cur: Common.Object, prop: string) {
     if (Object(cur) !== cur) {
       result[prop] = cur;
     } else if (Array.isArray(cur)) {
-      let l = cur.length;
+      const l = cur.length;
       for (let i = 0; i < l; i++) {
         recurse(cur[i], prop + '[' + i + ']');
       }
