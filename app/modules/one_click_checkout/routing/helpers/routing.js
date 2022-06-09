@@ -14,18 +14,8 @@ export const navigator = {
   get currentActiveRoute() {
     return get(activeRoute);
   },
-  navigateTo: function ({
-    path,
-    initialize = false,
-    props,
-    overrideMiddlewares = null,
-  }) {
-    let nextView = runMiddlewares(
-      getRoute(path),
-      screensHistory,
-      this,
-      overrideMiddlewares
-    ) || {
+  navigateTo: function ({ path, initialize = false, props }) {
+    let nextView = runMiddlewares(getRoute(path), screensHistory, this) || {
       path,
     };
     if (nextView.props) {

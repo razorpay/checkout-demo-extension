@@ -15,6 +15,7 @@ import { init1CCMetaData } from 'one_click_checkout/helper';
 import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 import fetch from 'utils/fetch';
+import { isLoggedIn } from 'checkoutstore/customer';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -5902,7 +5903,8 @@ Session.prototype = {
       sanitizeTokens(saved_customer.tokens);
       customer.tokens = saved_customer.tokens;
 
-      if (saved_customer.tokens) {
+      if (saved_customer.tokens || saved_customer.addresses) {
+        isLoggedIn.set(true);
         customer.logged = true;
         Analytics.setMeta('loggedIn', true);
       }

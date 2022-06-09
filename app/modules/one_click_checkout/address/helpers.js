@@ -114,7 +114,7 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
  * Method called when OTP verification is successful
  */
 export function successHandler() {
-  navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.COUPONS });
+  navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
 }
 
 /**

@@ -11,3 +11,5 @@ customer.subscribe((updatedCustomer) => {
     tokenList.forEach((t) => updateCardTokenMetadata(t.id, t.card));
   }
 });
+
+export const isLoggedIn = writable(false);

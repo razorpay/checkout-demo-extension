@@ -20,6 +20,7 @@ import { delayLoginOTPExperiment } from 'card/helper';
 import { timer } from 'utils/timer';
 import { get } from 'svelte/store';
 import { contact } from 'checkoutstore/screens/home';
+import { isLoggedIn } from 'checkoutstore/customer';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -116,6 +117,7 @@ Customer.prototype = {
   mark_logged: function (data) {
     let session = getSession();
     this.logged = true;
+    isLoggedIn.set(true);
 
     sanitizeTokens(data.tokens);
 
@@ -318,5 +320,7 @@ Customer.prototype = {
   markLoggedOut: function () {
     this.logged = false;
     this.tokens = null;
+
+    isLoggedIn.set(false);
   },
 };

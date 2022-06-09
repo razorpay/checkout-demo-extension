@@ -31,7 +31,6 @@
   import { saveAddress } from 'one_click_checkout/address/helpers';
   import { getCustomer } from 'checkoutframe/customer';
   import { askForOTP } from 'one_click_checkout/common/otp';
-  import { addTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -40,7 +39,6 @@
     SAVED_ADDRESS_CTA_LABEL,
     SHIPPING_CHARGES_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
-  import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
   // Analytics imports
   import Analytics, { Events } from 'analytics';
@@ -118,7 +116,6 @@
   }
 
   onMount(() => {
-    addTabInBreadcrumbs(ADDRESS_LABEL);
     Analytics.setMeta(
       MetaProperties.ADDRESS_SCREEN_TYPE,
       ADDRESS_TYPES.SHIPPING_ADDRESS

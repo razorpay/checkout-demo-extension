@@ -44,7 +44,6 @@
   import { RTBExperiment } from 'rtb/store';
 
   // i18n imports
-  import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
   import { locale } from 'svelte-i18n';
 
   // session imports
@@ -71,7 +70,6 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
-  import { removeTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isUnscrollable } from 'one_click_checkout/helper';
   import { isRTBEnabled } from 'rtb/helper';
@@ -84,7 +82,7 @@
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
-  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
+  import { CONTACT_REGEX } from 'common/constants';
   import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
@@ -191,9 +189,6 @@
     setScrollable();
     toggleHeader(true);
     updateOrderWithCustomerDetails();
-    if ($savedAddresses?.length) {
-      removeTabInBreadcrumbs(ADDRESS_LABEL);
-    }
     const addressPromise = checkAddressServiceability();
     const promiseList = [addressPromise];
     if (showCoupons) {

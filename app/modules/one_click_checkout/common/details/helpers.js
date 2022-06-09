@@ -9,17 +9,12 @@ import {
 import { views } from 'one_click_checkout/routing/constants';
 import { history } from 'one_click_checkout/routing/store';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
-import { isLoginMandatory } from 'one_click_checkout/store';
-import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-import { askForOTP } from 'one_click_checkout/common/otp';
 import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 import { isEditContactFlow } from 'one_click_checkout/store';
 import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
-import { otpReasons } from 'one_click_checkout/otp/constants';
 import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
-import hasSavedAddresses from 'one_click_checkout/common/middlewares/hasSavedAddress';
 import { toggleHeader } from 'one_click_checkout/header/helper';
 
 /**
@@ -61,20 +56,11 @@ export const handleDetailsNext = (prevContact) => {
     updateOrderWithCustomerDetails();
     isEditContactFlow.set(false);
 
-    if (isLoginMandatory()) {
-      if (!isUserLoggedIn()) {
-        askForOTP(otpReasons.mandatory_login);
-        return;
-      }
-    } else {
-      toggleHeader(true);
-      navigator.navigateTo({
-        path: views.COUPONS,
-        overrideMiddlewares: [hasSavedAddresses(views.COUPONS, true)],
-      });
-      return;
-    }
-    navigator.navigateTo({ path: views.COUPONS });
+    toggleHeader(true);
+    navigator.navigateTo({
+      path: views.COUPONS,
+    });
+    return;
   }
 };
 

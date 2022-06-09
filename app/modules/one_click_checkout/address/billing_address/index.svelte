@@ -28,7 +28,6 @@
     ADDRESS_TYPES,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
-  import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
   // Analytics imports
   import AddressEvents from 'one_click_checkout/address/analytics';
@@ -41,7 +40,6 @@
   import { askForOTP } from 'one_click_checkout/common/otp';
   import Resource from 'one_click_checkout/address/resource';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
-  import { addTabInBreadcrumbs } from 'one_click_checkout/topbar/helper';
 
   export let currentView;
 
@@ -99,7 +97,6 @@
   }
 
   onMount(() => {
-    addTabInBreadcrumbs(ADDRESS_LABEL);
     Analytics.setMeta(
       MetaProperties.ADDRESS_SCREEN_TYPE,
       ADDRESS_TYPES.BILLING_ADDRESS

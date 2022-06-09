@@ -10,7 +10,11 @@
   // store imports
   import { showFeeLabel } from 'checkoutstore';
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import { breadcrumbItems, tabTitle } from 'one_click_checkout/topbar/store';
+  import {
+    breadcrumbItems,
+    shouldHideTab,
+    tabTitle,
+  } from 'one_click_checkout/topbar/store';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getAmount } from 'razorpay';
 
@@ -18,11 +22,13 @@
   import { t } from 'svelte-i18n';
   import { PAYMENTS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
+  // UI Imports
+  import BreadcrumbItem from 'one_click_checkout/topbar/ui/BreadcrumbItem.svelte';
+
   // session imports
   import { handleModalClose } from 'one_click_checkout/header/sessionInterface';
 
   // utils imports
-  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { setAmount } from 'one_click_checkout/topbar/sessionInterface';
   import {
     dynamicFeeObject,
@@ -31,7 +37,6 @@
   } from 'checkoutstore/dynamicfee';
 
   const dispatch = createEventDispatcher();
-  const { double_arrow } = getIcons();
   let shown = true;
   let highlightText;
   let isBackEnabled = true;
@@ -91,18 +96,12 @@
     {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$activeRoute?.topbarTitle}
       <div data-test-id="breadcrumb-nav" class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
-          <span
-            class="breadcrumb-text"
-            class:theme={breadcrumbItem === highlightText}
-            class:text-bold={breadcrumbItem === highlightText}
-          >
-            {$t(breadcrumbItem)}
-          </span>
-          {#if i + 1 < $breadcrumbItems.length}
-            <span class="breadcrumb-icon">
-              <Icon icon={double_arrow} />
-            </span>
-          {/if}
+          <BreadcrumbItem
+            selected={breadcrumbItem === highlightText}
+            label={breadcrumbItem}
+            showIcon={i < $breadcrumbItems.length - 1}
+            hide={$shouldHideTab[breadcrumbItem]}
+          />
         {/each}
       </div>
     {/if}
@@ -135,24 +134,12 @@
     display: flex;
     align-items: center;
   }
-  .breadcrumb-text {
-    padding: 0px 2px;
-  }
   .title-section {
     display: flex;
     align-items: center;
     font-weight: 600;
     text-transform: capitalize;
   }
-
-  .text-bold {
-    font-weight: 600;
-  }
-
-  .breadcrumb-icon {
-    padding: 2px 8px 0px;
-  }
-
   .modal-close {
     height: 20px;
   }

@@ -308,7 +308,7 @@
   .otp-title {
     color: #263a4a;
     text-align: center;
-    padding: 0px 20px;
+    padding: 0px 12px;
   }
   .otp-screen-contents {
     display: flex;
