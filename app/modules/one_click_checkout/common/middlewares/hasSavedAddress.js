@@ -86,7 +86,8 @@ const hasSavedAddresses =
                 updateOTPStore({
                   ...history.config[views.OTP].otpParams.sent,
                   resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
-                  digits: new Array(get(OtpScreenStore.maxlength)),
+                  digits: new Array(6),
+                  allowSkip: true,
                 });
               },
               null,

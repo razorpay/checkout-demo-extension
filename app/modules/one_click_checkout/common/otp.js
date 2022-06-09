@@ -178,7 +178,7 @@ export const handleBack = () => {
     accessTime: '',
     errorMessage: '',
     otp: '',
-    digits: new Array(get(OtpScreenStore.maxlength)),
+    digits: new Array(6),
   });
 };
 
