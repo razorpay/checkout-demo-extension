@@ -3,10 +3,7 @@
   import Field from 'ui/components/Field.svelte';
 
   // Utils
-  import {
-    EMAIL_PATTERN,
-    EMAIL_REGEX as EMAIL_VALIDATOR,
-  } from 'common/constants';
+  import { EMAIL_PATTERN } from 'common/constants';
 
   // i18n
   import {
@@ -23,7 +20,8 @@
   // Utils
   import { isEmailOptional } from 'razorpay';
   import { isEmailReadOnly } from 'checkoutframe/customer';
-  import { validateEmail } from 'one_click_checkout/common/validators/email';
+  import { isEmailValid } from 'one_click_checkout/common/validators/email';
+  import { debounce } from 'lib/utils';
 
   const isOptional = isEmailOptional();
   const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
@@ -34,7 +32,14 @@
   // Form Validation for email - specifically for 1cc
   let validationText;
   export let showValidations = false;
-  $: validationText = !validateEmail(value) ? $t(EMAIL_HELP_TEXT) : null;
+
+  const debouncedValidator = debounce((email) => {
+    isEmailValid(email).then((valid) => {
+      validationText = !valid ? $t(EMAIL_HELP_TEXT) : null;
+    });
+  }, 400);
+
+  $: debouncedValidator(value);
 </script>
 
 <div>

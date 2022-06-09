@@ -55,7 +55,7 @@ const randomItem = (set) => set[randomRange(0, set.length - 1)];
 
 const randomEmail = () => {
   const randomFunc = randomLengthString(chrlow);
-  return randomFunc(6, 12) + '@' + randomFunc(3, 8) + '.' + randomFunc(2, 3);
+  return randomFunc(6, 12) + '@razorpay.com';
 };
 
 const randomName = () => {
@@ -279,7 +279,8 @@ module.exports = {
         url.includes('html2pdf.bundle.js') ||
         url.includes('locations/autosuggest') ||
         url.includes('fonts.googleapis.com') ||
-        url.includes('i.imgur.com');
+        url.includes('i.imgur.com') ||
+        url.includes('dns.google');
       if (
         ignoredUrl ||
         (pattern && !pattern.test(url)) ||

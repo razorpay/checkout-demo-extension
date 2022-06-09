@@ -80,7 +80,7 @@
     PHONE_REGEX_INDIA,
   } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
-  import { validateEmail } from 'one_click_checkout/common/validators/email';
+  import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
   const entries = _Obj.entries;
 
@@ -179,15 +179,22 @@
   const showAddress = isAddressEnabled() && !isPartialPayment();
 
   function onSubmitClick() {
-    if (!CONTACT_REGEX.test($contact) || !validateEmail($email)) {
+    if (!CONTACT_REGEX.test($contact)) {
       showValidations = true;
       return;
     }
-    Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
-      contact: $contact,
-      email: $email,
+
+    isEmailValid($email).then((value) => {
+      if (value) {
+        Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
+          contact: $contact,
+          email: $email,
+        });
+        onSubmit(userContact);
+        return;
+      }
+      showValidations = true;
     });
-    onSubmit(userContact);
   }
 
   function handleCountrySelect(countryInfo) {

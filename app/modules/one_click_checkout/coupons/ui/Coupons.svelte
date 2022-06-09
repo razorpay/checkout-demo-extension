@@ -83,7 +83,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
   import { CONTACT_REGEX } from 'common/constants';
-  import { validateEmail } from 'one_click_checkout/common/validators/email';
+  import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
@@ -112,41 +112,47 @@
   }
 
   function handleOnSubmit() {
-    if (!CONTACT_REGEX.test($contact) || !validateEmail($email)) {
+    if (!CONTACT_REGEX.test($contact)) {
       showValidations = true;
       return;
     }
 
-    Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
-    Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
-    Events.TrackBehav(CouponEvents.SUMMARY_CONTINUE_CTA_CLICKED, {
-      coupon_code_applied: $appliedCoupon,
-      address_id: $selectedAddressId,
-      address_country: $selectedAddress?.country,
-      meta: {
-        is_saved_address: !!$savedAddresses?.length,
-      },
-    });
-    Events.Track(CouponEvents.COUPONS_SUBMIT, {
-      input_source: $couponInputSource,
-    });
+    isEmailValid($email).then((valid) => {
+      if (valid) {
+        Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
+        Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
+        Events.TrackBehav(CouponEvents.SUMMARY_CONTINUE_CTA_CLICKED, {
+          coupon_code_applied: $appliedCoupon,
+          address_id: $selectedAddressId,
+          address_country: $selectedAddress?.country,
+          meta: {
+            is_saved_address: !!$savedAddresses?.length,
+          },
+        });
+        Events.Track(CouponEvents.COUPONS_SUBMIT, {
+          input_source: $couponInputSource,
+        });
 
-    merchantAnalytics({
-      event: `${$isCouponApplied ? 'with' : 'without'}_coupons_${
-        ACTIONS.CTA_CLICKED
-      }`,
-      category: CATEGORIES.COUPONS,
-      params: {
-        page_title: CATEGORIES.COUPONS,
-      },
-    });
+        merchantAnalytics({
+          event: `${$isCouponApplied ? 'with' : 'without'}_coupons_${
+            ACTIONS.CTA_CLICKED
+          }`,
+          category: CATEGORIES.COUPONS,
+          params: {
+            page_title: CATEGORIES.COUPONS,
+          },
+        });
 
-    updateOrderWithCustomerDetails();
-    if (!isUserLoggedIn() && $isIndianCustomer) {
-      onSubmitLogoutUser();
-    } else {
-      onSubmitLoggedInUser();
-    }
+        updateOrderWithCustomerDetails();
+        if (!isUserLoggedIn() && $isIndianCustomer) {
+          onSubmitLogoutUser();
+        } else {
+          onSubmitLoggedInUser();
+        }
+        return;
+      }
+      showValidations = true;
+    });
   }
 
   function summaryLoadedEvent() {
