@@ -80,7 +80,8 @@ export const askForOTP = (otp_reason) => {
   createOTP(() => {
     updateOTPStore({
       ...otpParams.sent,
-      digits: new Array(get(OtpScreenStore.maxlength)),
+      digits: new Array(6),
+      allowSkip: true,
     });
   });
 };

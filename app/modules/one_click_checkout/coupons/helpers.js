@@ -36,7 +36,6 @@ import {
 } from 'one_click_checkout/coupons/store';
 import { cartDiscount } from 'one_click_checkout/charges/store';
 import { getRoute } from 'one_click_checkout/routing/store';
-import { maxlength } from 'checkoutstore/screens/otp';
 import {
   showBanner,
   consentViewCount,
@@ -220,7 +219,8 @@ export function handleCreateOTP() {
       updateOTPStore({
         ...history.config[views.OTP]?.otpParams?.sent,
         resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
-        digits: new Array(get(maxlength)),
+        digits: new Array(6),
+        allowSkip: true,
       });
     },
     null,
