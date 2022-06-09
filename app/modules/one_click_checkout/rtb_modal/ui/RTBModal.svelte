@@ -46,7 +46,7 @@
       <div class="rtb-title">{$t(RTB_HEADER)}</div>
       <hr align="left" class="rtb-separator" />
     </div>
-    <div class="rtb-close" on:click={popStack}>
+    <div class="rtb-close" on:click={() => popStack()}>
       <Icon icon={rtb_close} />
     </div>
   </div>

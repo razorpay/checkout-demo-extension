@@ -58,7 +58,7 @@
 <div class="details-container" id="details-container">
   <div class="details-header-row">
     <div class="details-signup-label">{$t(DETAILS_TITLE_LABEL)}</div>
-    <button on:click|preventDefault={popStack}>
+    <button on:click|preventDefault={() => popStack()}>
       <Icon icon={close} />
     </button>
   </div>

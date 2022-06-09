@@ -132,7 +132,9 @@
       </div>
     {/each}
   </div>
-  <div class="close recurring-cards-close-icon" on:click={popStack}>✕</div>
+  <div class="close recurring-cards-close-icon" on:click={() => popStack()}>
+    ✕
+  </div>
 </section>
 
 <style>

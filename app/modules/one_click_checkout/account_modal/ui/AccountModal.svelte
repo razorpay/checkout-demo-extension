@@ -115,7 +115,7 @@
       <p class="account-heading">
         {$t(CHANGE_LANGUAGE)}
       </p>
-      <button class="account-toggle-icon" on:click={popStack}>
+      <button class="account-toggle-icon" on:click={() => popStack()}>
         <Icon icon={arrow_left(13, 13, '#212121')} />
       </button>
     </div>
@@ -141,7 +141,7 @@
           <span class="language-selection">{$t(CHANGE_LANGUAGE)}</span>
         {/if}
       </p>
-      <button class="account-toggle-icon" on:click={popStack}>
+      <button class="account-toggle-icon" on:click={() => popStack()}>
         <Icon icon={arrow_left(13, 13, '#212121')} />
       </button>
     </div>
