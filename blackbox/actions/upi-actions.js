@@ -209,7 +209,7 @@ async function selectUPIOtherApps(context) {
   );
   await otherApps.click();
 }
-async function handleUPIOtherApps(context) {
+async function handleUPIOtherApps(context, isHomeScreen = false) {
   const req = await context.expectRequest();
   expect(req.url).toContain('cancel?key_id');
   const response = {
@@ -227,6 +227,9 @@ async function handleUPIOtherApps(context) {
     `${req.params.callback}(${JSON.stringify(response)})`
   );
 
+  if (isHomeScreen) {
+    return;
+  }
   let errorText =
     'No UPI App on this device.Select other UPI option to proceed.';
   let errorDisplayedInUI = await context.page.$eval(

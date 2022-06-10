@@ -170,7 +170,10 @@ function generateRequestParamsForPayment(
   return params;
 }
 
-function creatUPIPaymentV2(basePayload?: Partial<UPI.UPIPaymentPayload>) {
+function creatUPIPaymentV2(
+  basePayload?: Partial<UPI.UPIPaymentPayload>,
+  additionalInfo?: Payment.PaymentParams['additionalInfo']
+) {
   // const session = getSession();
   const paymentPayload = { ...basePayload } as UPI.UPIPaymentPayload;
   const paymentParams: Payment.PaymentParams =
@@ -226,7 +229,9 @@ function creatUPIPaymentV2(basePayload?: Partial<UPI.UPIPaymentPayload>) {
 
   delete paymentPayload.downtimeSeverity;
   delete paymentPayload.downtimeInstrument;
-
+  if (additionalInfo) {
+    paymentParams.additionalInfo = additionalInfo;
+  }
   return {
     paymentPayload,
     paymentParams,

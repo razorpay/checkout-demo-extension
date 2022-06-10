@@ -41,6 +41,7 @@ import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import { getOption, getOrderId } from 'razorpay';
 import { isInternationalProvider } from 'common/international';
+import { setLatestPayment, updateLatestPaymentStatus } from './history';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -73,7 +74,7 @@ function onPaymentCancel(metaParam) {
     if (metadata) {
       cancelError.error.metadata = metadata;
     }
-
+    updateLatestPaymentStatus('cancel', cancelError);
     if (payment_id) {
       eventData.payment_id = payment_id;
       let url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
@@ -356,7 +357,7 @@ export default function Payment(data, params = {}, r) {
   if (data && data.method === 'app' && data.provider === 'google_pay') {
     delete data.method;
   }
-
+  this.params = params;
   if (params.paused) {
     try {
       this.writePopup();
@@ -458,6 +459,13 @@ Payment.prototype = {
       return;
     }
 
+    setLatestPayment(
+      {
+        data: this.data,
+        params: this.params,
+      },
+      true
+    );
     // show loading screen in popup
     this.writePopup();
     if (!this.tryAjax()) {
@@ -519,6 +527,7 @@ Payment.prototype = {
         r: this.r,
         data: _Obj.clone(data),
       });
+      updateLatestPaymentStatus('success', data);
       this.emit('success', data);
     } else {
       // We report a generic error if postMessage payload does not have
@@ -550,6 +559,7 @@ Payment.prototype = {
       if (data.xhr) {
         Analytics.track('ajax_error', data);
       }
+      updateLatestPaymentStatus('error', data);
       this.emit('error', data);
     }
 

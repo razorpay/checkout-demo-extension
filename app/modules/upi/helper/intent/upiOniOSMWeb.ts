@@ -6,7 +6,7 @@ import {
   USER_CONSENT_FOR_NAVIGATION_TIMEOUT,
 } from 'upi/constants';
 import {
-  captureTrace,
+  trackTrace,
   TRACES,
   trackTabDestroyOniOSMWeb,
   storeUpiPopupEvents,
@@ -55,7 +55,7 @@ export const upiPopUpForiOSMWeb: {
     this.instance = null;
   },
   createWindow(content = '', callBackName = '') {
-    captureTrace(TRACES.IOS_MWEB_TAB_CREATED);
+    trackTrace(TRACES.IOS_MWEB_TAB_CREATED);
     this.reset();
     if (!window.name) {
       window.name = this.parentName;
@@ -139,7 +139,7 @@ export const upiPopUpForiOSMWeb: {
       return null;
     }
     this.instance.location = url;
-    captureTrace(TRACES.IOS_MWEB_TAB_URL_SET);
+    trackTrace(TRACES.IOS_MWEB_TAB_URL_SET);
     return this.instance;
   },
 };
@@ -197,14 +197,14 @@ export const tryOpeningIntentUrlOniOSMWeb = (intentUrl: string) => {
          * Yet, we will wait for X[USER_CONSENT_FOR_NAVIGATION_TIMEOUT] amount of time after focus and decide on user-action.
          *
          */
-        captureTrace(TRACES.IOS_MWEB_TAB_NO_PARENT_EVENTS);
+        trackTrace(TRACES.IOS_MWEB_TAB_NO_PARENT_EVENTS);
         window.addEventListener('focus', () => {
           setTimeout(() => {
-            captureTrace(TRACES.IOS_MWEB_PARENT_FOCUS_TIMEOUT, {
+            trackTrace(TRACES.IOS_MWEB_PARENT_FOCUS_TIMEOUT, {
               parentEvents,
             });
             if (parentEvents.length === 1 && parentEvents.includes('focus')) {
-              captureTrace(TRACES.IOS_MWEB_CONSENT_CANCELLED);
+              trackTrace(TRACES.IOS_MWEB_CONSENT_CANCELLED);
               // CANCEL
               resolve({
                 canProceed: false,
@@ -215,7 +215,7 @@ export const tryOpeningIntentUrlOniOSMWeb = (intentUrl: string) => {
               parentEvents[0] === 'focus' &&
               parentEvents[1] === 'blur'
             ) {
-              captureTrace(TRACES.IOS_MWEB_CONSENT_OPENED);
+              trackTrace(TRACES.IOS_MWEB_CONSENT_OPENED);
               // OPEN
               resolve(true);
             }
@@ -225,7 +225,7 @@ export const tryOpeningIntentUrlOniOSMWeb = (intentUrl: string) => {
     }, APP_DETECTED_FURTHER_STEPS_TIMEOUT);
     const firstTimer = setTimeout(() => {
       const events = upiPopupEvents.getChild();
-      captureTrace(TRACES.IOS_MWEB_FIRST_TIMEOUT, {
+      trackTrace(TRACES.IOS_MWEB_FIRST_TIMEOUT, {
         events,
       });
       /**

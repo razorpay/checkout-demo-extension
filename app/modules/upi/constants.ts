@@ -1,4 +1,4 @@
-import otherApps from './icons/other-apps';
+import upiIcon from 'ui/icons/payment-methods/upi';
 
 export const OTHER_INTENT_APPS: UPI.AppConfiguration = {
   package_name: 'other_intent_apps',
@@ -6,12 +6,10 @@ export const OTHER_INTENT_APPS: UPI.AppConfiguration = {
   handles: [],
   name: 'Others',
   shortcode: 'others',
-  app_icon: otherApps(),
-  // app_icon: 'https://cdn.razorpay.com/static/assets/instrument-request/upi.svg',
+  app_icon: upiIcon('#949494', '#DADADA'),
 };
 
-export const GOOGLE_PAY_PACKAGE_NAME =
-  'com.google.android.apps.nbu.paisa.user';
+export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
 // Not the real package name. We're using this because api returns 'cred' instead of the real package name
 // TODO: get this fixed
@@ -30,7 +28,7 @@ export const UPI_APPS: {
     {
       app_name: 'Google Pay',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
-      app_icon: 'https://cdn.razorpay.com/checkout/googlepay.png',
+      app_icon: 'https://cdn.razorpay.com/app/googlepay.svg',
       handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
       /**
        * Call CheckoutBridge to verify that the user is registered on the app

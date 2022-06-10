@@ -233,7 +233,7 @@ export const floor = Math.floor;
  * @returns {Function}
  */
 export const timeout = (func, delay) => {
-  var timerId = setTimeout(func, delay || 0);
+  let timerId = setTimeout(func, delay || 0);
   return () => clearTimeout(timerId);
 };
 
@@ -245,7 +245,7 @@ export const timeout = (func, delay) => {
  * @returns {Function}
  */
 export const interval = (func, delay) => {
-  var timerId = setInterval(func, delay || 0);
+  let timerId = setInterval(func, delay || 0);
   return () => clearInterval(timerId);
 };
 
@@ -257,7 +257,7 @@ export const interval = (func, delay) => {
  * @returns {function (): number}
  */
 export const timer = () => {
-  var then = now();
+  let then = now();
   return () => now() - then;
 };
 
@@ -269,7 +269,7 @@ export const timer = () => {
  * @returns {Object}
  */
 export function rawError(description, field) {
-  var errorObj = {
+  let errorObj = {
     description: String(description),
   };
   if (field) {
@@ -368,7 +368,7 @@ export function obj2query(obj) {
 export function query2obj(string) {
   // TODO: Support objects and nested objects.
 
-  var obj = {};
+  let obj = {};
   string.split(/=|&/).forEach((param, index, array) => {
     if (index % 2) {
       obj[array[index - 1]] = decodeURIComponent(param);
@@ -403,7 +403,7 @@ export function appendParamsToUrl(url, params) {
  */
 
 export function hex2rgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
         red: parseInt(result[1], 16),

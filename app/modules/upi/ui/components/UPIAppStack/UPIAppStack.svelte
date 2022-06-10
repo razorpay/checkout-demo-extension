@@ -4,6 +4,7 @@
     getDowntimeForUPIApp,
     initiateNecessaryFlow,
     getGridArray,
+    definePlatform,
   } from 'upi/helper';
   import { getRecommendedAppsForUPIStack } from 'upi/features';
   import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
@@ -19,9 +20,10 @@
     trackOtherSelection,
   } from 'upi/events';
   import { OTHER_INTENT_APPS } from 'upi/constants';
+  import { upiUxV1dot1 } from 'upi/experiments';
 
   const upiTiles = enableUPITiles();
-  export let variant: UPI.AppStackVariant = upiTiles.variant;
+  export let variant: UPI.AppStackVariant;
 
   export let method: string;
   export let maxItemInSingleRow = 4;
@@ -29,9 +31,31 @@
   export let onAppClick: (action: UPI.AppTileAction) => void;
   export let withOtherTile = variant === 'row';
   export let onOtherClick: Function;
-  export let apps = getRecommendedAppsForUPIStack(withOtherTile, limit);
+
+  /**
+   * If apps are defined, render them directly,
+   * If apps are given by parent component, its fallback to default.
+   * So on if variant:row, we shouldn't show invalid apps if its SDK
+   */
+  export let apps = getDefaultApps();
   export let normalizeDowntime = true;
 
+  /**
+   * @TODO UPIUX1.1
+   * remove experimentation
+   * Note: Only code inside if is required once we remove the experiment.
+   */
+  function getDefaultApps() {
+    if (upiUxV1dot1.enabled()) {
+      return getRecommendedAppsForUPIStack(
+        withOtherTile,
+        limit,
+        variant === 'row' &&
+          (definePlatform('androidSDK') || definePlatform('iosSDK'))
+      );
+    }
+    return getRecommendedAppsForUPIStack(withOtherTile, limit);
+  }
   const dispatch = createEventDispatcher();
 
   const onAppClickDefiner = definePlatformReturnMethodIdentifier();
@@ -187,8 +211,8 @@
     margin-top: 18px;
     display: -ms-grid;
     display: grid;
-    -ms-grid-columns: 60px 60px 60px 60px;
-    grid-template-columns: 60px 60px 60px 60px;
+    -ms-grid-columns: 50px 50px 50px 50px;
+    grid-template-columns: 50px 50px 50px 50px;
     justify-content: space-between;
     width: 100%;
     margin-top: 18px;

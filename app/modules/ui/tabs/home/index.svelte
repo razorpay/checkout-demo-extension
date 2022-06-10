@@ -184,6 +184,8 @@
     logoutUserOnClient,
   } from 'checkoutframe/customer';
   import { formatAmountWithSymbol } from 'common/currency';
+  import { getAllWebPaymentApps } from 'common/webPaymentsApi';
+  import { definePlatform } from 'upi/helper';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -791,6 +793,9 @@
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
+      ...(definePlatform('mWebAndroid')
+        ? { webPaymentApps: getAllWebPaymentApps() }
+        : {}),
     });
     setTimeout(() => {
       hideCta();
@@ -923,6 +928,9 @@
     Events.Track(HomeEvents.LANDING, {
       view,
       oneMethod: singleMethod,
+      ...(definePlatform('mWebAndroid')
+        ? { webPaymentApps: getAllWebPaymentApps() }
+        : {}),
     });
   }
 
@@ -1179,10 +1187,7 @@
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
   <Screen pad={false} removeAccountTab={true}>
-    <div
-      class="screen-main"
-      class:screen-one-cc={scrollable && isOneCCEnabled}
-    >
+    <div class="screen-main" class:screen-one-cc={scrollable && isOneCCEnabled}>
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}

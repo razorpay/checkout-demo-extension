@@ -1,6 +1,7 @@
 export const UPI_INTENT_BLOCK_HEADING = 'upi.intent_block_heading';
 export const UPI_REDIRECT_TO_APP = 'upi.redirect_to_app';
 export const UPI_REDIRECT_TO_APP_V2 = 'upi.redirect_to_app_v2';
+export const UPI_UX_FAILED_APP_CALLOUT = 'upi.ux_failed_app_callout';
 export const UPI_RECOMMENDED = 'upi.recommended';
 export const UPI_SHOW_OTHER_APPS = 'upi.show_other_apps';
 export const UPI_COLLECT_BLOCK_HEADING = 'upi.collect_block_heading';

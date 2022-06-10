@@ -3,9 +3,10 @@ import {
   avoidSessionSubmit,
   getGridArray,
   definePlatformReturnMethodIdentifier,
+  isNativeIntentAvailable,
 } from '../helper/upi';
 import { enableUPITiles } from 'upi/features';
-import { getSDKMeta } from 'checkoutstore/native';
+import { getSDKMeta, getUPIIntentApps } from 'checkoutstore/native';
 import { isDesktop } from 'common/useragent';
 import {
   getOption,
@@ -168,5 +169,24 @@ describe('#definePlatformReturnMethodIdentifier: utility test', () => {
     const cb = definePlatformReturnMethodIdentifier();
     expect(cb).toBeTruthy();
     expect(cb(OTHER_INTENT_APPS as any)).toBe('none');
+  });
+});
+
+describe('#isNativeIntentAvailable', () => {
+  test('isNativeIntentAvailable -ve case', () => {
+    (getUPIIntentApps as jest.Mock).mockReturnValue({
+      filtered: [],
+    });
+    expect(isNativeIntentAvailable('com.phonepe.app')).toBeFalsy();
+  });
+  test('isNativeIntentAvailable +ve case', () => {
+    (getUPIIntentApps as jest.Mock).mockReturnValue({
+      filtered: [
+        {
+          package_name: 'com.phonepe.app',
+        },
+      ],
+    });
+    expect(isNativeIntentAvailable('com.phonepe.app')).toBeTruthy();
   });
 });

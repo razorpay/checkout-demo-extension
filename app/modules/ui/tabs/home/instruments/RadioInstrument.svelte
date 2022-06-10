@@ -22,6 +22,7 @@
   import { getProvider as getAppProvider } from 'common/apps';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
+  import { getUPIAppDataFromHandle } from 'common/upi';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -156,12 +157,14 @@
         icon = '&#xe70e;';
       }
     } else {
-      title = getInstrumentTitle(
-        'upi',
-        getVpaFromInstrument(instrument),
-        locale
-      );
-      icon = '&#xe70e;';
+      const vpa = getVpaFromInstrument(instrument);
+      title = String(getInstrumentTitle('upi', vpa, locale));
+
+      icon =
+        (vpa &&
+          vpa.split('@').pop() &&
+          getUPIAppDataFromHandle(vpa.split('@').pop()).app_icon) ||
+        themeMeta.icons.upi;
     }
 
     return {

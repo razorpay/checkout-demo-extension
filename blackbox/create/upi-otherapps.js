@@ -98,7 +98,7 @@ module.exports = function (testFeatures) {
         await submit(context);
 
         await respondToUPIAjax(context, { method: 'intent_url' });
-        await handleUPIOtherApps(context);
+        await handleUPIOtherApps(context, L0Flow);
       } else {
         // verify all icons exists
         const allAppsExist = await context.page.evaluate((AppIds) => {
@@ -121,7 +121,7 @@ module.exports = function (testFeatures) {
         await submit(context);
 
         await respondToUPIAjax(context, { method: 'intent_url' });
-        await handleUPIOtherApps(context);
+        await handleUPIOtherApps(context, L0Flow);
       }
     });
   });

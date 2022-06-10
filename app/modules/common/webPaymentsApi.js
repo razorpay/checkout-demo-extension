@@ -51,3 +51,13 @@ export const checkWebPaymentsForApp = (app) => {
     webPaymentsApps[app] = true;
   });
 };
+
+/**
+ * Returns a (key, value) pair for apps where:
+ * key -> package name of app that has an adapter available
+ * value -> is the flow possible (true | false)? (after getting result from adapter)
+ * @returns {object}
+ */
+export const getAllWebPaymentApps = () => {
+  return webPaymentsApps;
+};

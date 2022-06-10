@@ -44,8 +44,8 @@ export const RazorpayDefaults = {
 
 function base_set(flatObj, defObj, objKey, objVal) {
   objKey = objKey.toLowerCase();
-  var defaultVal = defObj[objKey];
-  var defaultType = typeof defaultVal;
+  let defaultVal = defObj[objKey];
+  let defaultType = typeof defaultVal;
 
   if (defaultType === 'object' && defaultVal === null) {
     if (_.isString(objVal)) {
@@ -80,7 +80,7 @@ function base_set(flatObj, defObj, objKey, objVal) {
 
 export function flattenProp(obj, prop, type) {
   _Obj.loop(obj[prop], function (val, key) {
-    var valType = typeof val;
+    let valType = typeof val;
     if (valType === 'string' || valType === 'number' || valType === 'boolean') {
       key = prop + type[0] + key;
       if (type.length > 1) {
@@ -93,7 +93,7 @@ export function flattenProp(obj, prop, type) {
 }
 
 export function flatten(obj, defObj) {
-  var flatObj = {};
+  let flatObj = {};
   _Obj.loop(obj, function (objVal, objKey) {
     if (objKey in flatKeys) {
       _Obj.loop(objVal, function (objSubVal, objSubKey) {
@@ -133,7 +133,7 @@ export default function Options(options) {
     }
   });
   options = flatten(options, RazorpayDefaults);
-  var callback_url = options.callback_url;
+  let callback_url = options.callback_url;
   if (callback_url && shouldRedirect) {
     options.redirect = true;
   }

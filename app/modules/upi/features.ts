@@ -12,7 +12,7 @@ import {
 } from 'razorpay';
 import { iOS, isBrave, isDesktop } from 'common/useragent';
 import { OTHER_INTENT_APPS, UPI_APPS } from 'upi/constants';
-import { definePlatform } from './helper/upi';
+import { definePlatform, isNativeIntentAvailable } from './helper/upi';
 import { isUPIFlowEnabled } from 'checkoutstore/methods';
 import { isInternational, hasFeature } from 'razorpay';
 
@@ -37,7 +37,9 @@ type EnableUPITilesReturnType = {
   config: { apps: UPI.AppConfiguration[] };
 };
 
-export function enableUPITiles(): EnableUPITilesReturnType {
+export function enableUPITiles(
+  validateL0ForSDK?: boolean
+): EnableUPITilesReturnType {
   let response: EnableUPITilesReturnType = {
     status: false,
     config: { apps: [] },
@@ -60,10 +62,23 @@ export function enableUPITiles(): EnableUPITilesReturnType {
     /**
      * using name as status as it will be undefined if feature not present in searched config
      */
+    let variant: UPI.AppStackVariant = isDesktop() ? 'subText' : 'row';
+    if (
+      variant === 'row' &&
+      validateL0ForSDK &&
+      getRecommendedAppsForUPIStack(
+        false,
+        3,
+        definePlatform('androidSDK') || definePlatform('iosSDK')
+      ).length < 1
+    ) {
+      variant = 'subText';
+    }
+
     response = {
       ...response,
       status: Boolean(name),
-      variant: isDesktop() ? 'subText' : 'row',
+      variant,
       config,
     };
   }
@@ -76,7 +91,12 @@ export function enableUPITiles(): EnableUPITilesReturnType {
  */
 export function getRecommendedAppsForUPIStack(
   includeOthers = false,
-  limit = 4
+  limit = 4,
+  /**
+   * This will impact the limit count as we will remove the unavailable applications
+   * Meaning, we will pull recommended apps from list, validate and return reduced(if any) list
+   */
+  validateLimitedAppsWithSDK?: boolean
 ): Array<UPI.AppConfiguration> {
   const { config, status } = enableUPITiles();
   if (!status) {
@@ -101,14 +121,24 @@ export function getRecommendedAppsForUPIStack(
     )
     .slice(0, limit);
 
-  if (includeOthers) {
-    //  Array.prototype.splice() affects current instance
-    recommended.length < limit
-      ? recommended.push(OTHER_INTENT_APPS)
-      : recommended.splice(-1, 1, OTHER_INTENT_APPS);
+  let recommendedAndUpdated = recommended;
+  if (
+    validateLimitedAppsWithSDK &&
+    (definePlatform('androidSDK') || definePlatform('iosSDK'))
+  ) {
+    recommendedAndUpdated = recommended.filter(({ package_name }) =>
+      isNativeIntentAvailable(package_name)
+    );
   }
 
-  return recommended;
+  if (includeOthers) {
+    //  Array.prototype.splice() affects current instance
+    recommendedAndUpdated.length < limit
+      ? recommendedAndUpdated.push(OTHER_INTENT_APPS)
+      : recommendedAndUpdated.splice(-1, 1, OTHER_INTENT_APPS);
+  }
+
+  return recommendedAndUpdated;
 }
 
 //#endregion

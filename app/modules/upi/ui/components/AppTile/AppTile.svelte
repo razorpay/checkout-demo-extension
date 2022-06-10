@@ -54,7 +54,7 @@
     line-height: 12px;
     color: #828282;
     text-align: center;
-    padding: 4px;
+    padding: 4px 0px;
   }
   .app-tile {
     border: 1px solid rgba(22, 47, 86, 0.1);
@@ -74,25 +74,28 @@
     padding: 3px;
     width: 16px;
     height: 16px;
-    margin: 0px 4px;
-  }
-
-  :global(.square-icon) {
-    height: 100%;
+    margin-right: 4px;
   }
 
   :global(.square-icon > img),
   :global(.square-icon > svg) {
-    height: 100%;
+    /** don't set hieght, it will squish the icon*/
+    height: auto;
     width: 34px;
-    align-items: center;
+    display: block;
     flex: 1 1 0;
   }
+
+  :global(div[data-appid='others'] > .square-icon > img),
+  :global(div[data-appid='others'] > .square-icon > svg) {
+    width: 18px;
+  }
+
   :global(.circle-icon > img),
   :global(.circle-icon > svg) {
-    height: 10px;
+    height: auto;
     width: 10px;
-    align-items: center;
+    display: block;
     flex: 1 1 0;
   }
 

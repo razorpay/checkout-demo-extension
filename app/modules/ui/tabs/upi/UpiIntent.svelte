@@ -13,12 +13,8 @@
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
-  import ListHeader from 'ui/elements/ListHeader.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
-
-  import { getMiscIcon } from 'checkoutframe/icons';
 
   import {
     UPI_INTENT_BLOCK_HEADING,
@@ -34,6 +30,7 @@
   import { definePlatform } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { IntentFlowsHeader } from 'upi/ui/components/IntentFlowHeader';
 
   // Props
   export let apps;
@@ -131,22 +128,10 @@
 <div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
-    {#if upiTiles.status === false || showIntentListHeaderForIos}
-      <ListHeader>
-        <i slot="icon">
-          <Icon icon={getMiscIcon('redirect')} />
-        </i>
-        <!-- LABEL: You will be redirected to your UPI app -->
-        <div slot="subtitle">
-          {$t(
-            showIntentListHeaderForIos
-              ? UPI_REDIRECT_TO_APP_V2
-              : UPI_REDIRECT_TO_APP
-          )}
-        </div>
-      </ListHeader>
-    {/if}
-
+    <IntentFlowsHeader
+      visible={showableApps.length || payUsingApps}
+      showRedirectV2message={showIntentListHeaderForIos}
+    />
     {#if upiTiles.status === true}
       {#if Array.isArray(showableApps) && showableApps.length > 0}
         <div class="intent-apps-container uninteractive">
@@ -206,9 +191,7 @@
     {#if payUsingApps}
       <DeprecatedRadioOption
         data={OTHER_INTENT_APPS}
-        icon={upiTiles?.status === true
-          ? otherAppsIcon
-          : OTHER_INTENT_APPS.app_icon}
+        icon={themeMeta.icons.upi}
         iconPlaceholder=".placeholder"
         name="upi_app"
         value={OTHER_INTENT_APPS.package_name}

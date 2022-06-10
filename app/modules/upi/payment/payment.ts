@@ -2,7 +2,7 @@ import { UPI_POLL_URL, PENDING_PAYMENT_TS } from 'common/constants';
 import RazorpayStore from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { UPI_TAB_CALLBACK_NAME } from 'upi/constants';
-import { captureTrace, TRACES } from 'upi/events';
+import { trackTrace, TRACES } from 'upi/events';
 import { getNewIosBridge } from 'bridge';
 import { handleFeeBearer } from 'upi/helper/fee-bearer';
 import { creatUPIPaymentV2, setFlowInPayload } from './prePaymentHandlers';
@@ -52,16 +52,24 @@ function handleUPIPayments(
     setFlowInPayload(basePayload, 'qr');
   }
 
-  const { paymentPayload, paymentParams } = creatUPIPaymentV2(basePayload);
+  const { paymentPayload, paymentParams } = creatUPIPaymentV2(basePayload, {
+    config,
+    referrer:
+      config.action === 'none' && config.qrFlow
+        ? 'QR_V2'
+        : config.action && config.action !== 'none'
+        ? 'UPI_UX'
+        : undefined,
+  });
 
   if (paymentParams.feesRedirect) {
     /**
      * Here the fee redirect screen has to be controlled
      *
      */
-    captureTrace(TRACES.FEE_MODAL_WAITING_FOR_USER);
+    trackTrace(TRACES.FEE_MODAL_WAITING_FOR_USER);
     handleFeeBearer(paymentPayload, ({ amount, fee }) => {
-      captureTrace(TRACES.FEE_MODAL_USER_CONSENT_TAKEN);
+      trackTrace(TRACES.FEE_MODAL_USER_CONSENT_TAKEN);
       /**
        * Once the fee bearer consent is taken , callback will be hit with fee and amount
        * hence that amount and fee will be carry-forwarded with previously prepared payload
@@ -138,10 +146,7 @@ function handleUPIPayments(
         if (config.qrFlow && config.qrFlow.onPaymentCreate) {
           startUpiPaymentPolling();
           config.qrFlow.onPaymentCreate(response.data as any);
-        } else if (
-          !Boolean(paymentPayload.upi_app) &&
-          response.data.intent_url
-        ) {
+        } else if (!paymentPayload.upi_app && response.data.intent_url) {
           /**
            * When the payment response is for intent mweb using deeplink (without specific app)
            * Invoke the flow where upi intent url is opened using deeplink

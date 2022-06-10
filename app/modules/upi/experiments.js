@@ -32,4 +32,15 @@ export const upiNrL0L1Improvements = createExperiment(
  */
 const upiQrOnL1 = createExperiment('upi_qr_on_l1_percentage_5', 0.95);
 
-export { highlightUPIIntentOnDesktop, oneClickUPIIntent, upiQrOnL1 };
+/**
+ * Experiment: UPI UX v1.1
+ * Temporary 2% rollout, argument must be 1-0.02=>0.98
+ */
+const upiUxV1dot1 = createExperiment('upi_ux_v_1_dot_1_percentage_2', 0.98);
+
+export {
+  highlightUPIIntentOnDesktop,
+  oneClickUPIIntent,
+  upiQrOnL1,
+  upiUxV1dot1,
+};

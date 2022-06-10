@@ -1,3 +1,4 @@
+import Analytics from 'analytics';
 import { handleFeeBearer } from '../helper/fee-bearer';
 
 jest.mock('navstack', () => ({
@@ -10,6 +11,17 @@ const argumentData = {
   amount: 100,
   method: 'upi',
   '_[flow]': 'intent',
+};
+const razorpayInstance = {
+  id: 'id',
+  key: 'rzp_test_key',
+  get: (arg: string) => {
+    if (arg === 'amount') {
+      return 100;
+    }
+    return arg;
+  },
+  getMode: () => 'test',
 };
 
 const mockAPIResponse = {
@@ -77,6 +89,7 @@ beforeAll(() => {
 
 describe('handleFeeBearer tests', () => {
   test('should properly load the fee-bearer modal', async () => {
+    Analytics.setR(razorpayInstance);
     const callback = (data: any) => {};
     handleFeeBearer(argumentData as Partial<UPI.UPIPaymentPayload>, callback);
     document.querySelector('.fee-bearer')?.dispatchEvent(new Event('continue'));

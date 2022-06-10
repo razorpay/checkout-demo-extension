@@ -184,3 +184,10 @@ export const getGridArray = <T>(maxInRow = 0, items: T[] = []) => {
     items.slice(i * maxInRow, (i + 1) * maxInRow)
   );
 };
+
+export const isNativeIntentAvailable = (packageName: string) => {
+  return getUPIIntentApps().filtered.some(
+    (deviceApp: { package_name: string }) =>
+      deviceApp.package_name === packageName
+  );
+};

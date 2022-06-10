@@ -41,6 +41,7 @@
   import { captureFeature } from 'upi/events';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatAmountWithSymbol } from 'common/currency';
+  import { upiUxV1dot1 } from 'upi/experiments';
 
   // Props
   export let method = null; // Name of the method
@@ -60,7 +61,12 @@
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
   let _icon = getIconForDisplay();
-  let upiTiles = enableUPITiles();
+  /**
+   * @TODO UPIUX1.1
+   * remove experimentation
+   * Note: enableUPITiles is to be called with true, once we remove the experiment.
+   */
+  let upiTiles = enableUPITiles(upiUxV1dot1.enabled());
 
   let _subtitle;
   $: {
@@ -186,7 +192,7 @@
   <div slot="subtitle" class:subtitle-one-cc={isOneCC}>
     {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'subText'}
       <!-- This component is built with "early return" concept and returns html upon conditions met -->
-      <UPIAppStack onOtherClick={select} {method} />
+      <UPIAppStack onOtherClick={select} {method} variant={upiTiles.variant} />
     {:else}
       {@html _subtitle}
     {/if}
@@ -215,7 +221,7 @@
   <div slot="row">
     {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'row'}
       <!-- This component has earli return and renders on demand -->
-      <UPIAppStack onOtherClick={select} {method} />
+      <UPIAppStack onOtherClick={select} {method} variant={upiTiles.variant} />
     {/if}
   </div>
 </SlottedOption>

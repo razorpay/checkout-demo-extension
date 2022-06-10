@@ -3,7 +3,7 @@ import { getSession } from 'sessionmanager';
 import { enableUPITiles } from '../features';
 import { definePlatform } from '../helper/upi';
 import { tryOpeningIntentUrl } from '../helper/intent/resolver';
-import { captureTrace, trackIntentFailure, TRACES } from 'upi/events';
+import { trackTrace, trackIntentFailure, TRACES } from 'upi/events';
 
 const startUpiPaymentPolling = () => {
   // emit success response and trigger polling
@@ -13,7 +13,7 @@ const startUpiPaymentPolling = () => {
 const processIntentOnMWeb = (intentUrl: string) => {
   const session = getSession();
   void tryOpeningIntentUrl(intentUrl).then((response) => {
-    captureTrace(TRACES.INTENT_PROMISE_RESOLVED, { promiseResponse: response });
+    trackTrace(TRACES.INTENT_PROMISE_RESOLVED, { promiseResponse: response });
     const { canProceed, reason } =
       typeof response === 'object'
         ? (response as any)

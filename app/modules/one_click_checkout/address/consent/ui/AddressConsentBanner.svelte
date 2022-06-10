@@ -19,7 +19,10 @@
   import ModalEvents from 'one_click_checkout/address/consent/analytics';
 
   // store imports
-  import { savedAddresses, consentViewCount } from 'one_click_checkout/address/store';
+  import {
+    savedAddresses,
+    consentViewCount,
+  } from 'one_click_checkout/address/store';
 
   // service imports
   import {

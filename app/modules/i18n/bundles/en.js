@@ -1225,6 +1225,8 @@ export default {
     redirect_to_app: 'You will be redirected to your UPI app',
     redirect_to_app_v2:
       'Choose the app installed on your phone to make the payment directly using the app',
+    ux_failed_app_callout:
+      'Payment failed with <b>{appName}<b>. Please retry payment with a different UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',

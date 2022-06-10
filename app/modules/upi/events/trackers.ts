@@ -13,7 +13,6 @@ const upiTrackerPayload: {
   platform: string | null; // mweb/sdk of ios or android and desktop
   actionsAvailable?: UPI.AppTileAction[]; // possible flows for platform
   action?: UPI.AppTileAction; // flow triggered
-  trace: Common.Object<string | object>; // user behavior with timestamp
   events: {
     // specific to iOS
     beforeReset: Common.Object<string[]>; // events (focus/blur) raised before reset execution
@@ -22,7 +21,6 @@ const upiTrackerPayload: {
   reason?: string | object; // reason of event/instance
 } = {
   features: {},
-  trace: {},
   platform: null,
   events: {
     beforeReset: {},
@@ -43,13 +41,8 @@ export const captureFeature = (feature: string, config: any) => {
  * This is to recreate the user journey in any errors or SR/CR dips
  * @param step
  */
-export const captureTrace = (step: string, data?: any) => {
-  upiTrackerPayload.trace[Date.now()] = data
-    ? {
-        step,
-        data,
-      }
-    : step;
+export const trackTrace = (step: string, data?: object | undefined) => {
+  baseTracker(step, true, data);
 };
 
 export const storeUpiPopupEvents = (
@@ -79,34 +72,35 @@ export const storePlatformForTracker = (
 };
 
 export const storeActionForTracker = (action: UPI.AppTileAction) => {
-  captureTrace(`${TRACES.ACTION_TRIGGERED}:${action}`);
+  trackTrace(`${TRACES.ACTION_TRIGGERED}:${action}`);
   upiTrackerPayload.action = action;
 };
 
 export const baseTracker = (
   eventName: string,
-  immediately = false
+  immediately = false,
+  payload?: object
 ) => {
   Analytics.track(`UPI:${eventName}`, {
-    data: upiTrackerPayload,
+    data: {
+      ...(payload || upiTrackerPayload),
+      timestamp: Date.now(),
+    },
     immediately,
   });
 };
 
 export const trackOtherSelection = (variant: UPI.AppStackVariant) => {
-  captureTrace(TRACES.OTHERS_SELECTED);
   upiTrackerPayload.variant = variant;
   baseTracker(EVENTS.OTHERS_SELECTED, true);
 };
 
 export const trackNoFlowAppSelection = (appForPay: UPI.UpiAppForPay) => {
-  captureTrace(TRACES.APP_FLOW_ABSENT_FALLBACK_OTHERS);
   upiTrackerPayload.appForPay = appForPay;
   baseTracker(EVENTS.APP_FLOW_ABSENT_FALLBACK_OTHERS, true);
 };
 
 export const trackAppSelection = (appForPay: UPI.UpiAppForPay) => {
-  captureTrace(TRACES.APP_SELECTED);
   upiTrackerPayload.appForPay = appForPay;
   baseTracker(EVENTS.APP_SELECTED, true);
 };
@@ -118,12 +112,9 @@ export const trackUserCancelOniOSMweb = () => {
 };
 
 export const trackTabDestroyOniOSMWeb = (forceClose: boolean) => {
-  if (forceClose) {
-    captureTrace(TRACES.IOS_MWEB_TAB_FORCE_DESTROY_CALLED);
-  } else {
-    captureTrace(TRACES.IOS_MWEB_TAB_DESTROY_CALLED);
-  }
-  baseTracker(EVENTS.TAB_DESTROY_ON_IOS_MWEB, true);
+  baseTracker(EVENTS.TAB_DESTROY_ON_IOS_MWEB, true, {
+    forceClose,
+  });
 };
 
 export const trackIntentFailure = (reason: object | string) => {

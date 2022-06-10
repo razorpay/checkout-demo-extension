@@ -14,7 +14,13 @@ import {
 import { init1CCMetaData } from 'one_click_checkout/helper';
 import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
+import {
+  matchLatestPaymentWith,
+  updateLatestPaymentErrorReason,
+} from 'payment/history';
+import { resetSelectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import fetch from 'utils/fetch';
+import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
 
 let emo = {};
@@ -313,10 +319,57 @@ function errorHandler(response) {
   }
 
   if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
-    this.showLoadError(
-      message || I18n.format('misc.error_handling_request'),
-      true
-    );
+    if (upiUxV1dot1.enabled()) {
+      if (
+        matchLatestPaymentWith({
+          referrer: 'UPI_UX',
+          inStatuses: ['cancel', 'error'],
+        })
+      ) {
+        resetSelectedUPIAppForPay();
+      }
+      if (
+        !this.tab &&
+        matchLatestPaymentWith({
+          referrer: 'UPI_UX',
+          inStatuses: ['cancel', 'error'],
+          errorReason: 'automatic',
+        })
+      ) {
+        /**
+         * If user has chosen app tile from L0 and payment is somehow failed,
+         * then we should land the user automatically in l1 with error message as alert in L1
+         */
+
+        this.switchTab('upi');
+        this.hideErrorMessage();
+      } else {
+        /**
+         * As per the new product requirement,
+         * if the payment referer is UPI UX and is cancelled by user in any way,
+         * We should not show any additional half modals.
+         * (in checkout cancelled payment also marked as error at the end, hence we created a history instance
+         * that maintained the full details about the payment)
+         */
+        if (
+          !matchLatestPaymentWith({
+            referrer: 'UPI_UX',
+            inStatuses: ['cancel', 'error'],
+            errorReason: 'manual',
+          })
+        ) {
+          this.showLoadError(
+            message || I18n.format('misc.error_handling_request'),
+            true
+          );
+        }
+      }
+    } else {
+      this.showLoadError(
+        message || I18n.format('misc.error_handling_request'),
+        true
+      );
+    }
   }
 
   if (this.get('retry') === false && this.get('redirect')) {
@@ -352,8 +405,30 @@ function cancelHandler(response) {
     if (this.r._payment && this.r._payment.upi_app) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
-    if (!(response && response.upiNoApp)) {
-      this.showLoadError(I18n.format('misc.payment_incomplete'), true);
+
+    /**
+     * @TODO UPIUX1.1
+     * remove experimentation
+     * Note: Only code inside if is required once we remove the experiment. Completely delete the else
+     */
+    if (upiUxV1dot1.enabled()) {
+      if (
+        !(
+          (response && response.upiNoApp) ||
+          matchLatestPaymentWith({
+            referrer: 'UPI_UX',
+            inStatuses: ['cancel'],
+            paymentId: this.r._payment.payment_id,
+            errorReason: 'manual',
+          })
+        )
+      ) {
+        this.showLoadError(I18n.format('misc.payment_incomplete'), true);
+      }
+    } else {
+      if (!(response && response.upiNoApp)) {
+        this.showLoadError(I18n.format('misc.payment_incomplete'), true);
+      }
     }
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
@@ -1718,6 +1793,13 @@ Session.prototype = {
           if (self.payload && self.payload.method === 'netbanking') {
             self.r._payment.popup.onClose();
           } else {
+            if (this.upiPaymentManualCancelAttempted) {
+              updateLatestPaymentErrorReason(
+                'manual',
+                this.r._payment.payment_id
+              );
+              delete this.upiPaymentManualCancelAttempted;
+            }
             self.clearRequest();
             if (Bridge.checkout.platform === 'ios') {
               Bridge.checkout.callIos('hide_nav_bar');
@@ -1725,6 +1807,9 @@ Session.prototype = {
             beforeReturn();
           }
         } else {
+          if (this.upiPaymentManualCancelAttempted) {
+            delete this.upiPaymentManualCancelAttempted;
+          }
           // move focus to popup or iframe
           self.r.focus();
         }
@@ -2058,6 +2143,13 @@ Session.prototype = {
         } else if (this.payload['_[flow]'] === 'intent') {
           if (Confirm.isVisible()) {
             return;
+          }
+          if (upiUxV1dot1.enabled()) {
+            /**
+             * Possibly user is attepmting for payment cancel
+             *
+             */
+            this.upiPaymentManualCancelAttempted = true;
           }
           this.hideErrorMessage();
         }
