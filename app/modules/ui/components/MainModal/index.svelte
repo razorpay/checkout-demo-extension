@@ -45,6 +45,10 @@
     bringInputIntoView();
   }
 
+  function handleOneCCScreenHeight() {
+    return (isOneClickCheckoutEnabled && mobileDevice && window.screen?.availHeight > 600)
+  }
+
   onMount(() => {
     clearOldExperiments();
     window.addEventListener('resize', handleResize);
@@ -151,7 +155,7 @@
             *Payment charges and taxes as applicable.
           </div>
         {/if}
-        <div id="body" class="sub">
+        <div id="body" class="sub" class:one-cc-screen={handleOneCCScreenHeight()}>
           <div id="topbar-wrap" />
           <div id="messages" />
           <form
@@ -195,5 +199,10 @@
     padding: 0;
     width: 80px;
     height: 80px;
+  }
+  .one-cc-screen {
+    min-height: 440px;
+    height: 440px;
+    flex-basis: 440px;
   }
 </style>
