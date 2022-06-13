@@ -1,4 +1,5 @@
 import Track from './tracker';
+import { hasProp } from 'utils/object';
 
 const META = {};
 const REQUEST_INDEX = {};
@@ -116,12 +117,12 @@ const Analytics = () => ({
       return 0;
     }
 
-    if (!_Obj.hasProp(REQUEST_INDEX, rInstance.id)) {
+    if (!hasProp(REQUEST_INDEX, rInstance.id)) {
       REQUEST_INDEX[rInstance.id] = {};
     }
 
     const requestIndex = REQUEST_INDEX[rInstance.id];
-    if (!_Obj.hasProp(requestIndex, name)) {
+    if (!hasProp(requestIndex, name)) {
       requestIndex[name] = -1;
     }
 

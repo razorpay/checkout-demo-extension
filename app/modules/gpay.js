@@ -1,4 +1,5 @@
 import { CHECK_ERROR } from 'common/constants';
+import { hasProp } from 'utils/object';
 
 const PaymentRequest = global.PaymentRequest;
 
@@ -12,8 +13,8 @@ export const googlePaySupportedMethods = ['https://tez.google.com/pay'];
 export function checkMicroapp() {
   return new Promise((resolve, reject) => {
     if (
-      _Obj.hasProp(global, 'microapps') &&
-      _Obj.hasProp(global.microapps, 'requestPayment')
+      hasProp(global, 'microapps') &&
+      hasProp(global.microapps, 'requestPayment')
     ) {
       return resolve();
     }

@@ -129,7 +129,7 @@ export function setEmiPlansCta(screen, tab) {
  */
 export function getIssuerForEmiFromPayload(payload) {
   const tokens = getCardTab().getTransformedTokens();
-  var issuer = '';
+  let issuer = '';
 
   if (payload.token) {
     if (tokens) {
@@ -165,7 +165,7 @@ export function getIssuerForEmiFromPayload(payload) {
  */
 export function getCardTypeFromPayload(payload) {
   const tokens = getCardTab().getTransformedTokens();
-  var cardType = '';
+  let cardType = '';
 
   if (payload.token) {
     if (tokens) {
@@ -190,7 +190,7 @@ export function getCardTypeFromPayload(payload) {
  * @return {Object}
  */
 export function getEmiText(amount, plan) {
-  var amountPerMonth = Razorpay.emi.calculator(
+  let amountPerMonth = Razorpay.emi.calculator(
     amount,
     plan.duration,
     plan.interest

@@ -25,6 +25,16 @@ export function isNonNullObject(obj) {
 }
 
 /**
+ * Check if the object has a property
+ * @param {Object} obj
+ * @param {string} prop
+ *
+ * @returns {boolean}
+ */
+export const hasProp = (obj, prop) =>
+  isNonNullObject(obj) ? prop in obj : false;
+
+/**
  * Check if the object has any key value pairs or is empty
  * @param {Object} o
  *

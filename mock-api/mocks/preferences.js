@@ -1,5 +1,3 @@
-const { ENDPOINT } = global;
-
 const preferences = {
   dcc2: {
     options: {
@@ -2817,7 +2815,6 @@ const preferences = {
           },
         ],
       },
-      custom_text: [],
       recurring: {
         card: {
           credit: ['MasterCard', 'Visa'],

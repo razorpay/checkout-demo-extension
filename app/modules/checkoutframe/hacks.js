@@ -3,6 +3,7 @@ import { ownerWindow } from 'common/constants';
 import * as UserAgent from 'common/useragent';
 import { compareSemver } from 'lib/utils';
 import * as _El from 'utils/DOM';
+import { hasProp } from 'utils/object';
 
 const Orientation = {
   LANDSCAPE: 'landscape',
@@ -18,12 +19,12 @@ export function getDeviceOrientation() {
   let angle;
 
   // Try getting it from the screen object
-  if (_Obj.hasProp(global.screen, 'orientation')) {
+  if (hasProp(global.screen, 'orientation')) {
     angle = Math.abs(global.screen.orientation.angle || 0);
   }
 
   // If window.screen.orientation is not supported, try getting it from window
-  if (_.isType(angle, 'undefined') && _Obj.hasProp(global, 'orientation')) {
+  if (_.isType(angle, 'undefined') && hasProp(global, 'orientation')) {
     angle = Math.abs(global.orientation || 0);
   }
 

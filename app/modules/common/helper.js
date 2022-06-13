@@ -66,16 +66,16 @@ export const backendEntityIds = [
 // TODO remove first param from usage of makeAuthUrl
 export function makeAuthUrl(r, url) {
   url = makeUrl(url);
-  for (var i = 0; i < backendEntityIds.length; i++) {
-    var prop = backendEntityIds[i];
-    var value = getOption(prop);
+  for (let i = 0; i < backendEntityIds.length; i++) {
+    let prop = backendEntityIds[i];
+    let value = getOption(prop);
     if (prop === 'key') {
       prop = 'key_id';
     } else {
       prop = 'x_entity_id';
     }
     if (value) {
-      var account_id = getOption('account_id');
+      let account_id = getOption('account_id');
       if (account_id) {
         value += '&account_id=' + account_id;
       }

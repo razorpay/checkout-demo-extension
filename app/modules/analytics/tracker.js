@@ -1,6 +1,7 @@
 import { getExperimentsFromStorage } from 'experiments';
 import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
+import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
 
 const CHUNK_SIZE = 5;
@@ -118,7 +119,7 @@ const flushEvents = (mode) => {
   });
 
   // Use sendBeacon if supported.
-  const useBeacon = _Obj.hasProp(navigator, 'sendBeacon');
+  const useBeacon = hasProp(navigator, 'sendBeacon');
 
   const trackingPayload = {
     context: EVT_CTX,
@@ -228,9 +229,9 @@ export default function Track(r, event, data, immediately) {
     }
 
     // Mask prefilled card details
-    if (_Obj.hasProp(options, 'prefill')) {
+    if (hasProp(options, 'prefill')) {
       ['card'].forEach((key) => {
-        if (_Obj.hasProp(options.prefill, key)) {
+        if (hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }
       });

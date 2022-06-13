@@ -1,4 +1,5 @@
 import { getOption, getPreferences } from 'razorpay';
+import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
 
 const SESSION_CREATED = 'session_created';
@@ -28,7 +29,7 @@ function createEventObject(event, severity) {
 
 function trackAvailabilty(event, severity) {
   // Use sendBeacon if supported.
-  const useBeacon = _Obj.hasProp(navigator, 'sendBeacon');
+  const useBeacon = hasProp(navigator, 'sendBeacon');
 
   const trackingPayload = {
     metrics: createEventObject(event, severity),

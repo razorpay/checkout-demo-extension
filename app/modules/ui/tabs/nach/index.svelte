@@ -65,7 +65,7 @@
    * Aborts the upload request
    */
   function abortUpload() {
-    if(abortUploadRequest) {
+    if (abortUploadRequest) {
       abortUploadRequest();
     }
     reset();

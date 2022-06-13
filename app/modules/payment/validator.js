@@ -22,7 +22,9 @@ export const formatPayment = function (payment) {
 
 function validateData(data) {
   const cardHolderName = data?.['card[name]'];
-  if (Number(cardHolderName) === 0) {return;} // if name input is only zero prevent throw error
+  if (Number(cardHolderName) === 0) {
+    return;
+  } // if name input is only zero prevent throw error
   if (cardHolderName && luhnCheck(cardHolderName)) {
     _.throwMessage(
       'Error in integration. Card holder name is not valid, Please contact Razorpay for assistance'
@@ -31,7 +33,7 @@ function validateData(data) {
 }
 
 export const formatPayload = function (payload, params = {}) {
-  var data = _Obj.clone(payload);
+  let data = _Obj.clone(payload);
 
   // Set view for fees.
   if (params.feesRedirect) {
@@ -57,7 +59,7 @@ export const formatPayload = function (payload, params = {}) {
     'recurring_token.expire_by',
   ].forEach((field) => {
     if (!data.hasOwnProperty(field)) {
-      var val = field === 'order_id' ? getOrderId() : getOption(field);
+      let val = field === 'order_id' ? getOrderId() : getOption(field);
       if (val) {
         // send boolean value true as 1
         // 0 wouldn't react this line
@@ -69,7 +71,7 @@ export const formatPayload = function (payload, params = {}) {
     }
   });
 
-  var key_id = getOption('key');
+  let key_id = getOption('key');
   if (!data.key_id && key_id) {
     data.key_id = key_id;
   }
@@ -119,7 +121,7 @@ export const formatPayload = function (payload, params = {}) {
   flattenProp(data, 'notes', '[]');
   flattenProp(data, 'card', '[]');
 
-  var expiry = data['card[expiry]'];
+  let expiry = data['card[expiry]'];
   if (_.isString(expiry)) {
     data['card[expiry_month]'] = expiry.slice(0, 2);
     data['card[expiry_year]'] = expiry.slice(-2);

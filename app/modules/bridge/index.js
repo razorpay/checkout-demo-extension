@@ -10,7 +10,7 @@ export const defineIosBridge = () => {
     index: 0,
     map: {},
     get: function () {
-      var val = this.map[this.index];
+      let val = this.map[this.index];
       delete this.map[this.index];
       return val;
     },
@@ -38,8 +38,8 @@ export const iosLegacyMethod = (method) => {
   return function (data) {
     /* setting up js → ios communication by loading custom protocol inside
      * hidden iframe */
-    var iF = _El.create('iframe');
-    var src = 'razorpay://on' + method;
+    let iF = _El.create('iframe');
+    let src = 'razorpay://on' + method;
     if (data) {
       src += '?' + CheckoutBridge.index;
       CheckoutBridge.map[++CheckoutBridge.index] = data;
@@ -80,7 +80,7 @@ export const notifyBridge = (message) => {
 
   if (message && message.event) {
     let bridgeMethod = `on${message.event}`;
-    var method = CheckoutBridge[bridgeMethod];
+    let method = CheckoutBridge[bridgeMethod];
 
     if (!_.isFunction(method)) {
       return;

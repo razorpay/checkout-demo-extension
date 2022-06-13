@@ -25,10 +25,10 @@ function getPopupDimension(varVal, minVal, maxVal) {
  */
 
 export default function Popup(src, name) {
-  var width = window.innerWidth || document.documentElement.clientWidth;
-  var height = window.innerHeight || document.documentElement.clientHeight;
+  let width = window.innerWidth || document.documentElement.clientWidth;
+  let height = window.innerHeight || document.documentElement.clientHeight;
 
-  var opts = {
+  let opts = {
     width: getPopupDimension(width * 0.7, 895, 1440),
     height: getPopupDimension(height * 0.8, 520, 1060),
     menubar: 'no',
@@ -39,13 +39,13 @@ export default function Popup(src, name) {
 
   // we try to place it at the center of the current window
   // note: this "centering" logic borrowed from the Facebook JavaScript SDK
-  var screenX = null === window.screenX ? window.screenLeft : window.screenX;
-  var screenY = null === window.screenY ? window.screenTop : window.screenY;
-  var outerWidth =
+  let screenX = null === window.screenX ? window.screenLeft : window.screenX;
+  let screenY = null === window.screenY ? window.screenTop : window.screenY;
+  let outerWidth =
     null === window.outerWidth
       ? document.documentElement.clientWidth
       : window.outerWidth;
-  var outerHeight =
+  let outerHeight =
     null === window.outerHeight
       ? document.documentElement.clientHeight - 22
       : window.outerHeight;
@@ -54,7 +54,7 @@ export default function Popup(src, name) {
   opts.top = parseInt(screenY + (outerHeight - opts.height) / 2.5, 10);
 
   // turn the "opts" object into a window.open()-compatible String
-  var optsStr = [];
+  let optsStr = [];
   _Obj.loop(opts, function (val, key) {
     optsStr.push(key + '=' + val);
   });

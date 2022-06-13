@@ -50,7 +50,9 @@
 <span
   use:replaceNode
   on:click={(e) => {
-    if (disabled) {return;}
+    if (disabled) {
+      return;
+    }
     dispatch('click', e);
   }}
   class:disabled

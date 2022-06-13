@@ -59,7 +59,7 @@ export const shouldRedirect =
   check(/Android 4/);
 
 export const shouldFixFixed = check(/iPhone/);
-var chromeVersion = ua.match(/Chrome\/(\d+)/);
+let chromeVersion = ua.match(/Chrome\/(\d+)/);
 if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }

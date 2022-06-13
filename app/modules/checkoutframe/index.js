@@ -39,6 +39,7 @@ import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
+import { hasProp } from 'utils/object';
 import { setBraveBrowser } from 'common/useragent';
 
 let CheckoutBridge = window.CheckoutBridge;
@@ -114,10 +115,7 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set language-related properties.
    */
-  if (
-    _Obj.hasProp(navigator, 'language') ||
-    _Obj.hasProp(navigator, 'userLanguage')
-  ) {
+  if (hasProp(navigator, 'language') || hasProp(navigator, 'userLanguage')) {
     Events.setMeta(
       MetaProperties.NAVIGATOR_LANGUAGE,
       navigator.language || navigator.userLanguage
@@ -127,7 +125,7 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set network-related properties.
    */
-  if (_Obj.hasProp(navigator, 'connection')) {
+  if (hasProp(navigator, 'connection')) {
     const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {

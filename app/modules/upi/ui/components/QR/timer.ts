@@ -12,8 +12,8 @@ type onChangeType = ((readableTimeLeft: string) => void) | undefined;
  * Hence its native JS approach with single store usage.
  */
 class Timer {
-  public readableTimeLeft: string = '';
-  private timeoutAt: number = 0;
+  public readableTimeLeft = '';
+  private timeoutAt = 0;
   private interval: ReturnType<typeof setInterval> | undefined;
   private onExpire: onExpireType;
   private onChange: onChangeType;
