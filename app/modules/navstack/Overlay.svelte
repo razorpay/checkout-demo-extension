@@ -7,16 +7,6 @@
   export let backPressed: () => void;
   const long = !isOneClickCheckout() && isCtaShown();
 
-  function moveToPortal(node: HTMLDivElement) {
-    document.querySelector('#overlay').appendChild(node);
-
-    return {
-      destroy() {
-        _El.detach(node);
-      },
-    };
-  }
-
   // this function is invoked only within modal area
   // backdrop element inside MainModal will handle click outside the modal area
   function hide(event: MouseEvent) {
@@ -29,12 +19,7 @@
   }
 </script>
 
-<div
-  use:moveToPortal
-  transition:fade={{ duration: 200 }}
-  class:long
-  on:click={hide}
->
+<div transition:fade={{ duration: 200 }} class:long on:click={hide}>
   <slot />
 </div>
 

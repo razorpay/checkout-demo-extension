@@ -7,7 +7,7 @@ import { showHeader } from 'one_click_checkout/header';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 import { isOneClickCheckout, isPayout } from 'razorpay';
-import NavigationStack, { isStackPopulated } from 'navstack';
+import { backPressed, isStackPopulated } from 'navstack';
 import { querySelector } from 'utils/doc';
 
 let componentsMap = {};
@@ -16,12 +16,6 @@ export function render() {
   componentsMap.poweredBy = new PoweredBy({
     target: querySelector('#container'),
   });
-
-  const navstack = new NavigationStack({
-    target: querySelector('#root'),
-  });
-
-  componentsMap.navstack = navstack;
 
   const topbar = new TopBar({
     target: querySelector('#topbar-wrap'),
@@ -42,7 +36,7 @@ export function render() {
   } else {
     topbar.$on('back', () => {
       if (isStackPopulated()) {
-        navstack.backPressed();
+        backPressed();
       } else {
         session.back();
       }

@@ -1,10 +1,4 @@
-<script>
-  import {
-    showBackdrop,
-    hideBackdrop,
-    backdropVisible,
-  } from 'checkoutstore/backdrop';
-
+<script lang="ts">
   // i18n
   import { t } from 'svelte-i18n';
   import {
@@ -15,13 +9,12 @@
   } from 'ui/labels/confirm';
 
   import { fly } from 'svelte/transition';
-  import { onDestroy } from 'svelte';
+  import { popStack } from 'navstack';
 
   // LABEL: Cancel payment?
   export let heading = $t(CONFIRM_CANCEL_HEADING);
   // LABEL: Your payment is ongoing. Are you sure you want to cancel the payment?
   export let message = $t(CONFIRM_CANCEL_MESSAGE);
-  export let position = 'top';
   export let layout = 'ltr';
   // LABEL: Yes, cancel
   export let positiveText = $t(CONFIRM_CANCEL_POSITIVE_TEXT);
@@ -29,93 +22,52 @@
   export let negativeText = $t(CONFIRM_CANCEL_NEGATIVE_TEXT);
   export let onPositiveClick = Boolean;
   export let onNegativeClick = Boolean;
-  let previousBackdropState = null;
-  let visible = false;
-
-  function setConfirmDialog(state) {
-    visible = state;
-  }
-
-  export function show() {
-    previousBackdropState = $backdropVisible;
-    showBackdrop();
-    setConfirmDialog(true);
-  }
-
-  export function hide() {
-    hideBackdrop();
-    setConfirmDialog(false);
-  }
-
-  export function isVisible() {
-    return visible;
-  }
-
-  onDestroy(() => {
-    if (!previousBackdropState) {
-      hideBackdrop();
-    }
-  });
 
   function clickedPositive() {
-    hide();
+    popStack();
     onPositiveClick();
   }
 
   function clickedNegative() {
-    if (previousBackdropState) {
-      setConfirmDialog(false);
-    } else {
-      hide();
-    }
+    popStack();
     onNegativeClick();
+  }
+
+  export function preventBack() {
+    onNegativeClick();
+    return false;
   }
 </script>
 
-{#if visible}
-  <div
-    id="confirmation-dialog"
-    class={`confirm-position-${position}`}
-    transition:fly|local={{ duration: 200, y: -24 }}
-  >
-    <div class="confirm-container overlay">
-      <div class="confirm-heading">{heading}</div>
-      <div class="confirm-message">{message}</div>
-      <div class="confirm-buttons" class:reverse={layout === 'rtl'}>
-        <div id="positiveBtn" class="text-btn" on:click={clickedPositive}>
-          {positiveText}
-        </div>
-        <div id="negativeBtn" class="text-btn" on:click={clickedNegative}>
-          {negativeText}
-        </div>
-      </div>
+<div
+  id="confirmation-dialog"
+  transition:fly={{ duration: 300, y: -24 }}
+  class="confirm-container overlay"
+>
+  <div class="confirm-heading">{heading}</div>
+  <div class="confirm-message">{message}</div>
+  <div class="confirm-buttons" class:reverse={layout === 'rtl'}>
+    <div id="positiveBtn" class="text-btn" on:click={clickedPositive}>
+      {positiveText}
+    </div>
+    <div id="negativeBtn" class="text-btn" on:click={clickedNegative}>
+      {negativeText}
     </div>
   </div>
-{/if}
+</div>
 
 <style>
   #confirmation-dialog {
     top: 6px;
-    position: absolute;
-    width: 100%;
     z-index: 999;
+    bottom: auto;
+    width: 95%;
+    left: 2.5%;
   }
-
-  .confirm-position-top .confirm-container {
-    top: 6px;
-  }
-
-  .confirm-position-middle .confirm-container {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
   .confirm-container {
     background: #fff;
-    position: absolute;
     right: 12px;
     left: 12px;
-    z-index: 999;
     text-align: left;
     font-size: 14px;
     padding: 24px;

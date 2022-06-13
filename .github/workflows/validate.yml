@@ -9,7 +9,7 @@ jobs:
         with:
           node-version: 16
       - name: Install dependencies
-        run: npm ci
+        run: npm i
       - uses: reviewdog/action-eslint@v1
         with:
           eslint_flags: 'app/modules'

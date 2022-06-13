@@ -2,13 +2,11 @@ import { getSession } from 'sessionmanager';
 import { UPI_POLL_URL } from 'common/constants';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import * as Confirm from 'checkoutframe/components/confirm';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import { getCheckoutBridge, storage } from './index';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
-import { getView } from 'checkoutframe/components';
-import { isStackPopulated } from 'navstack';
+import { backPressed as navBackPressed, isStackPopulated } from 'navstack';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is
@@ -38,7 +36,7 @@ export function backPressed(callback) {
 
   if (isOneClickCheckout()) {
     if (isStackPopulated()) {
-      getView('navstack').backPressed();
+      navBackPressed();
     } else if (session.tab === 'home-1cc') {
       // session
       handleOneClickCheckoutBack();
@@ -48,11 +46,8 @@ export function backPressed(callback) {
     return;
   }
 
-  if (Confirm.isVisible()) {
-    Confirm.hide(true);
-    Backdrop.show();
-  } else if (isStackPopulated()) {
-    getView('navstack').backPressed();
+  if (isStackPopulated()) {
+    navBackPressed();
   } else if (
     session.tab &&
     !(getPrefillMethod() && session.get('theme.hide_topbar'))

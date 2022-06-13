@@ -14,10 +14,12 @@
   import { getAmount, disableAnimation, bringInputIntoView } from './helper';
   import { returnAsIs } from 'lib/utils';
   import { getStore } from 'checkoutstore/cta';
-  import { isOverlayActive } from 'navstack';
-  import { elements } from 'navstack/store';
+  import NavigationStack, {
+    backPressed,
+    isOverlayActive,
+    OverlayStack,
+  } from 'navstack';
   import OneCCLoader from 'one_click_checkout/loader/Loader.svelte';
-  import { getView } from 'checkoutframe/components';
   import { clearOldExperiments } from 'experiments';
 
   import LanguageSelector from './LanguageSelector.svelte';
@@ -46,7 +48,11 @@
   }
 
   function handleOneCCScreenHeight() {
-    return (isOneClickCheckoutEnabled && mobileDevice && window.screen?.availHeight > 600)
+    return (
+      isOneClickCheckoutEnabled &&
+      mobileDevice &&
+      window.screen?.availHeight > 600
+    );
   }
 
   onMount(() => {
@@ -64,7 +70,7 @@
 
   function preCloseCheck(next: () => void) {
     if (isOverlayActive()) {
-      getView('navstack').backPressed();
+      backPressed();
     } else {
       next();
     }
@@ -94,7 +100,7 @@
   <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
   <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
     <div id="modal-inner">
-      <div id="overlay" />
+      <OverlayStack />
       <div id="error-message" class="overlay showable">
         <div class="omnichannel">
           <img
@@ -154,7 +160,11 @@
             *Payment charges and taxes as applicable.
           </div>
         {/if}
-        <div id="body" class="sub" class:one-cc-screen={handleOneCCScreenHeight()}>
+        <div
+          id="body"
+          class="sub"
+          class:one-cc-screen={handleOneCCScreenHeight()}
+        >
           <div id="topbar-wrap" />
           <div id="messages" />
           <form
@@ -164,7 +174,7 @@
             autocomplete="off"
             on:submit|preventDefault={() => false}
           >
-            <div id="root" class:active={$elements.length} />
+            <NavigationStack />
             <div id="form-fields">
               {#if isMethodEnabled('emi') && emiBanks.BAJAJ}
                 <div class="tab-content showable screen" id="form-emi" />

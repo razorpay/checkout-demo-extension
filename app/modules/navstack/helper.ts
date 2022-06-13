@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
-import { elements, overlays } from './store';
+import { lastOf } from 'utils/array';
+import { elementRef, elements, overlays, overlaysRef } from './store';
 
 // IMPORTANT: this function should be used to create utilities around stack manipulation
 function updater(deleteCount: number, newElement?: NavStack.StackElement) {
@@ -32,9 +33,13 @@ function updater(deleteCount: number, newElement?: NavStack.StackElement) {
 
   if (elementsUpdated) {
     elements.set(_elements);
+    if (!_elements.length) {
+      elementRef.set(null);
+    }
   }
 
   if (overlaysUpdated) {
+    overlaysRef.update((existing) => existing.slice(0, _overlays.length));
     overlays.set(_overlays);
   }
 }
@@ -72,4 +77,24 @@ export function isOverlayActive(component?: any): boolean {
     );
   }
   return !!_overlays.length;
+}
+
+function lastRef() {
+  return lastOf(get(overlaysRef)) || get(elementRef);
+}
+
+export function backPressed() {
+  const last = lastRef();
+  if (last) {
+    if (!last.preventBack || !last.preventBack()) {
+      popStack();
+    }
+  }
+}
+
+export function getPayload() {
+  const last = lastRef();
+  if (last && last.getPayload) {
+    return last.getPayload();
+  }
 }
