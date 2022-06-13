@@ -165,5 +165,6 @@
     font-size: 14px;
     line-height: 20px;
     border: 1px dashed var(--highlight-color);
+    word-break: break-all;
   }
 </style>
