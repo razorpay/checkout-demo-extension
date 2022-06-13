@@ -64,7 +64,12 @@ export function replaceStack(stackElement: NavStack.StackElement) {
   updater(1, stackElement);
 }
 
-export function isOverlayActive(): boolean {
+export function isOverlayActive(component?: any): boolean {
   const _overlays = get(overlays);
+  if (component) {
+    return Boolean(
+      _overlays.find((overlay) => overlay.component === component)
+    );
+  }
   return !!_overlays.length;
 }

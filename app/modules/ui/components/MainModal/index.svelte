@@ -92,7 +92,6 @@
   class:one-method={orderMethod}
 >
   <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
-  <div id="tnc-wrap" />
   <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
     <div id="modal-inner">
       <div id="overlay" />

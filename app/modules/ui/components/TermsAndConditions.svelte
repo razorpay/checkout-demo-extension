@@ -29,8 +29,6 @@
       },
     });
   }
-
-  let agreedToTerms = false;
 </script>
 
 <div class="pad">

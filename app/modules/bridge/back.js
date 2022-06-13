@@ -4,7 +4,6 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Confirm from 'checkoutframe/components/confirm';
 import * as Backdrop from 'checkoutframe/components/backdrop';
-import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
@@ -52,8 +51,6 @@ export function backPressed(callback) {
   if (Confirm.isVisible()) {
     Confirm.hide(true);
     Backdrop.show();
-  } else if (TermsCurtain.isVisible()) {
-    TermsCurtain.hide();
   } else if (isStackPopulated()) {
     getView('navstack').backPressed();
   } else if (
