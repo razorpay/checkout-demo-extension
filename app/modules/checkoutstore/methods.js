@@ -68,7 +68,7 @@ import {
 } from 'checkoutstore/screens/home';
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
-import { isNonNullObject } from 'utils/object';
+import { isNonNullObject, isEmpty } from 'utils/object';
 import { getUniqueValues } from 'utils/array';
 
 import {
@@ -165,7 +165,7 @@ const ALL_METHODS = {
     return (
       getOrderMethod() === 'emandate' &&
       !isInternational() &&
-      !_Obj.isEmpty(getRecurringMethods()?.emandate)
+      !isEmpty(getRecurringMethods()?.emandate)
     );
   },
 
@@ -184,7 +184,7 @@ const ALL_METHODS = {
       getMerchantMethods().card &&
       !isInternational() &&
       !isRecurring() &&
-      !_Obj.isEmpty(getEMIBanks())
+      !isEmpty(getEMIBanks())
     );
   },
 
@@ -226,7 +226,7 @@ const ALL_METHODS = {
     const providers = getCardlessEMIProviders();
     const enabled =
       getOption('method.cardless_emi') !== false || providers.bajaj;
-    return enabled && !_Obj.isEmpty(providers);
+    return enabled && !isEmpty(providers);
   },
 
   paylater() {
@@ -240,7 +240,7 @@ const ALL_METHODS = {
       getAmount() &&
       !isRecurring() &&
       !isInternational() &&
-      !_Obj.isEmpty(getMerchantMethods().paylater)
+      !isEmpty(getMerchantMethods().paylater)
     );
   },
 
@@ -728,7 +728,7 @@ export function getCardNetworks() {
 
 export function getNetbankingBanks() {
   const banks = getMerchantMethods().netbanking;
-  if (_Obj.isEmpty(banks)) {
+  if (isEmpty(banks)) {
     return {};
   }
   return banks;
@@ -953,7 +953,7 @@ export function getEligiblePlansBasedOnMinAmount(plans) {
 export function getEMIBanks(amount) {
   const emiOptions = getMerchantMethods().emi_options;
 
-  if (emiOptions |> _Obj.isEmpty) {
+  if (isEmpty(emiOptions)) {
     return {};
   }
 
@@ -982,7 +982,7 @@ export function getEMIBanks(amount) {
  */
 export function getPayLaterProviders() {
   const paylater = getMerchantMethods().paylater || {};
-  if (_Obj.isEmpty(paylater)) {
+  if (isEmpty(paylater)) {
     return [];
   }
   return Object.keys(paylater).map(getProvider).filter(Boolean);
@@ -1001,7 +1001,7 @@ export function getAppProviders() {
     // explicitly setting of `google_pay`.
     apps.google_pay = true;
   }
-  if (_Obj.isEmpty(apps)) {
+  if (isEmpty(apps)) {
     return [];
   }
   return Object.keys(apps)
@@ -1027,7 +1027,7 @@ export function getCardlessEMIProviders() {
     ...emiMethod,
     ...getMerchantMethods().cardless_emi,
   };
-  if (emiMethod |> _Obj.isEmpty) {
+  if (isEmpty(emiMethod)) {
     emiMethod = {};
   }
 

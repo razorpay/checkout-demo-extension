@@ -23,3 +23,11 @@ export function get(object, path, defval = null) {
 export function isNonNullObject(obj) {
   return obj !== null && typeof obj === 'object';
 }
+
+/**
+ * Check if the object has any key value pairs or is empty
+ * @param {Object} o
+ *
+ * @returns {boolean}
+ */
+export const isEmpty = (obj) => !Object.keys(obj || {}).length;
