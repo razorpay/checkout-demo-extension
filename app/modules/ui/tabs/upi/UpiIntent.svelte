@@ -25,7 +25,11 @@
   } from 'ui/labels/upi';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
-  import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
+  import {
+    OTHER_INTENT_APPS,
+    getOtherAppsLabel,
+    isPreferredApp,
+  } from 'common/upi';
   import { Events } from 'analytics';
   import { definePlatform } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
@@ -95,9 +99,23 @@
     });
   }
 
+  function onUpiAppSelect(packageName) {
+    Analytics.track('upi:app:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        flow: 'intent',
+        package_name: packageName,
+        showRecommended: Boolean(session.showRecommendedUPIApp),
+        recommended: Boolean(
+          session.showRecommendedUPIApp && isPreferredApp(packageName)
+        ),
+      },
+    });
+  }
+
   function onAppSelectFromV2GridUI({ detail }) {
     trackIntentAppSelected(detail.app.app_name, detail.index);
-    session.onUpiAppSelect(detail.app.package_name);
+    onUpiAppSelect(detail.app.package_name);
   }
 
   export function onAppSelect({ detail }, index) {
@@ -114,7 +132,7 @@
       params.downtimeSeverity = downtimeSeverity;
     }
 
-    session.onUpiAppSelect(packageName);
+    onUpiAppSelect(packageName);
     dispatch('select', params);
   }
 

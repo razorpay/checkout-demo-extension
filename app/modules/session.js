@@ -2166,22 +2166,6 @@ Session.prototype = {
       $(e.currentTarget).addClass('expanded');
     });
   },
-
-  onUpiAppSelect: function (packageName) {
-    Analytics.track('upi:app:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        flow: 'intent',
-        package_name: packageName,
-        showRecommended: Boolean(this.showRecommendedUPIApp),
-        recommended: Boolean(
-          this.showRecommendedUPIApp &&
-            discreet.UPIUtils.isPreferredApp(packageName)
-        ),
-      },
-    });
-  },
-
   focus: function (e) {
     if (_El.hasClass(e.target, 'no-focus')) {
       return;
@@ -3686,7 +3670,6 @@ Session.prototype = {
     let session = this;
     let data = session.payload;
     let isFeeMissing = !('fee' in data);
-
     /**
      * Check here if 'fee' is set in payload,
      * If it is present then we have shown the fee breakup to the user,
@@ -3696,7 +3679,6 @@ Session.prototype = {
      */
     if (isFeeMissing) {
       let paymentData = _Obj.clone(this.payload);
-
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
 
@@ -3995,22 +3977,6 @@ Session.prototype = {
       delete value[provider];
     });
   },
-
-  getAVSPayload: function (selectedInstrument) {
-    let isOnAVSScreen = this.svelteCardTab.isOnAVSScreen() || false;
-
-    let isAVSScreenFromHomeScreen =
-      selectedInstrument &&
-      selectedInstrument.method === 'card' &&
-      selectedInstrument.token_id &&
-      isOnAVSScreen;
-
-    return {
-      isOnAVSScreen: isOnAVSScreen,
-      isAVSScreenFromHomeScreen: isAVSScreenFromHomeScreen,
-    };
-  },
-
   isOnNVSForm: function () {
     return this.internationalTab && this.internationalTab.isOnNVSForm();
   },
@@ -4107,7 +4073,8 @@ Session.prototype = {
     let AVSRequired = false;
     let AVSRequiredForEntity = null;
     let AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
-    let AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
+    let AVSData =
+      this.svelteCardTab.getAVSPayload(selectedInstrument || {}) || {};
     let isOnAVSScreen = AVSData.isOnAVSScreen;
     let isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
@@ -4486,21 +4453,12 @@ Session.prototype = {
     return storeGetter(HomeScreenStore.selectedInstrument);
   },
 
-  verifyVpa: function (vpa) {
-    /**
-     * set a timeout of 10s, if the API is taking > 10s to resolove;
-     * attempt payment regardless of verification
-     */
-    return this.r.verifyVpa(vpa, 10000);
-  },
-
   verifyVpaAndContinue: function (data) {
     let self = this;
     self.showLoadError(I18n.format('upi.verifying_vpa_info'));
     $('#overlay-close').hide();
 
-    self
-      .verifyVpa(data.vpa)
+    RazorpayHelper.verifyVPA(data.vpa)
       .then(function () {
         $('#overlay-close').show();
         hideOverlay($('#error-message'));
@@ -4515,7 +4473,6 @@ Session.prototype = {
           vpaValidationError,
           'error.description'
         );
-
         let errorMessage = errorDescription
           ? I18n.translateErrorDescription(
               errorDescription,
@@ -4645,7 +4602,8 @@ Session.prototype = {
 
     let selectedInstrument = this.getSelectedPaymentInstrument();
 
-    let AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
+    let AVSData =
+      this.svelteCardTab.getAVSPayload(selectedInstrument || {}) || {};
     // if AVS is on then screen is set to card but for saved card from home screen requires processing like home screen
     let isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
@@ -5935,9 +5893,7 @@ Session.prototype = {
     }
     return this.tabs[tab];
   },
-
   tabs: {},
-
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,
   showOverlay: showOverlay,

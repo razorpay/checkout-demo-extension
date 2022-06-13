@@ -34,6 +34,12 @@ export const isIRCTC = RazorpayStore.isIRCTC;
 
 export const getCardFeatures = RazorpayStore.getCardFeatures;
 
+/**
+ * set a timeout of 10s, if the API is taking > 10s to resolve;
+ * proceed regardless of verification
+ */
+export const verifyVPA = (vpa) => RazorpayStore.get().verifyVpa(vpa, 10000);
+
 export const getCurrencies = (...args) =>
   RazorpayStore.get().getCurrencies(...args);
 

@@ -36,7 +36,9 @@ class RazorpayStore {
   }
 
   triggerInstanceMethod = (method, args = []) => {
-    if (this.instance) {return this.instance[method].apply(this.instance, args);}
+    if (this.instance) {
+      return this.instance[method].apply(this.instance, args);
+    }
   };
 
   /**
@@ -58,13 +60,17 @@ class RazorpayStore {
    * @returns
    */
   get = (...args) => {
-    if (args.length) {return this.triggerInstanceMethod('get', args);}
+    if (args.length) {
+      return this.triggerInstanceMethod('get', args);
+    }
     return this.instance;
   };
 
   getMerchantOption = (path = '') => {
     const options = this.triggerInstanceMethod('get') || {};
-    if (!path) {return options;}
+    if (!path) {
+      return options;
+    }
     return get(options, path);
   };
 

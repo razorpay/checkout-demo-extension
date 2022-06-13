@@ -1,4 +1,9 @@
-import { getPayoutContact, getDisplayAmount, getOption } from 'razorpay';
+import {
+  getPayoutContact,
+  getDisplayAmount,
+  getOption,
+  verifyVPA,
+} from 'razorpay';
 
 import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
@@ -53,7 +58,7 @@ function onSubmit(data) {
     data.contact_id = getOption('contact_id');
     session.showLoadError(formatMessageWithLocale('misc.processing'));
     const verifyVpa = data.vpa
-      ? session.verifyVpa(data.vpa.address)
+      ? verifyVPA(data.vpa.address)
       : Promise.resolve();
     verifyVpa
       .then(() => createFundAccount(data))

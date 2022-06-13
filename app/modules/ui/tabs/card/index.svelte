@@ -110,12 +110,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
-  import Analytics, {
-    Events,
-    CardEvents,
-    MetaProperties,
-  } from 'analytics/index';
-  import { SAVED_CARD_EVENTS } from 'analytics/card/card';
+  import { Events, CardEvents, MetaProperties } from 'analytics/index';
   import {
     sortBasedOnTokenization,
     shouldShowTnc,
@@ -292,14 +287,14 @@
     if (isInternational() && session.r.isLiveMode()) {
       if (isSiftJSEnabled()) {
         // load sift js
-        injectSiftScript(session.id).catch((_e) => {
+        injectSiftScript(session.id).catch(() => {
           // Do nothing
         });
       }
 
       if (isCyberSourceJsEnabled()) {
         // load cyber source js
-        injectCyberSourceScript(session.id).catch((_e) => {
+        injectCyberSourceScript(session.id).catch(() => {
           // Do nothing
         });
       }
@@ -308,12 +303,12 @@
     const unbsubscribe = defaultDCCCurrency.subscribe((currency) => {
       if (currency && currency !== 'INR' && session.r.isLiveMode()) {
         if (isSiftJSEnabled()) {
-          injectSiftScript(session.id).catch((_e) => {
+          injectSiftScript(session.id).catch(() => {
             // Do nothing
           });
         }
         if (isCyberSourceJsEnabled()) {
-          injectCyberSourceScript(session.id).catch((_e) => {
+          injectCyberSourceScript(session.id).catch(() => {
             // Do nothing
           });
         }
@@ -741,6 +736,20 @@
 
   export function isOnAVSScreen() {
     return currentView === Views.AVS;
+  }
+
+  export function getAVSPayload(selectedInstrument: any) {
+    const isAVSScreen = isOnAVSScreen() || false;
+    const isAVSScreenFromHomeScreen =
+      selectedInstrument &&
+      selectedInstrument.method === 'card' &&
+      selectedInstrument.token_id &&
+      isAVSScreen;
+
+    return {
+      isOnAVSScreen: isAVSScreen,
+      isAVSScreenFromHomeScreen: isAVSScreenFromHomeScreen,
+    };
   }
 
   function getAddCardPayload() {
