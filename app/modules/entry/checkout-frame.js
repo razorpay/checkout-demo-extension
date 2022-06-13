@@ -16,7 +16,9 @@ setSessionConstructor(Session);
 
 Track.props.library = 'checkoutjs';
 
-const trafficEnv = String('__TRAFFIC_ENV__'); // eslint-disable-line no-undef
+const params = _.getQueryParams();
+const trafficEnv = params.traffic_env || String('__TRAFFIC_ENV__'); // eslint-disable-line no-undef
+
 if (trafficEnv) {
   Track.props.env = trafficEnv;
 }

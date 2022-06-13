@@ -72,6 +72,7 @@ const getPlugins = ({ src }) => {
     // isNaN(null) gives true, hence isNaN(parseInt()) is used
     replace({
       __BUILD_NUMBER__: process.env.BUILD_NUMBER || null,
+      __GIT_COMMIT_HASH__: JSON.stringify(process.env.GIT_COMMIT_HASH) || null,
       __CANARY_PERCENTAGE__: process.env.CANARY_PERCENTAGE,
       // env is prod but traffic env can be production/canary/baseline
       __TRAFFIC_ENV__: process.env.TRAFFIC_ENV,

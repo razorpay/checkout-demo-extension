@@ -19,7 +19,17 @@ jobs:
       - name: Run Unit Tests
         run: npm run test:unit
       - name: Make Build
-        run: npm run build
+        run: GIT_COMMIT_HASH=${{ github.sha }} BUILD_NUMBER=${{ github.run_id }} npm run build
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::141592612890:role/gha-prod-frontend_checkout
+          aws-region: ap-south-1
+          role-duration-seconds: 900
+      - name: Copy production build to S3
+        uses: docker://amazon/aws-cli:2.7.6
+        with:
+          args: s3 sync --exclude="*" --include="*.js" --include="*.css" "./app/dist/v1" "s3://rzp-1415-prod-checkout-static/build/${{ github.sha }}" --cache-control "public, max-age=31536000, immutable"
       - name: Cache Build
         id: cache-build
         uses: actions/cache@v3
