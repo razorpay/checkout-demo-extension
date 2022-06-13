@@ -143,7 +143,7 @@ export function isInstrumentForEntireMethod(instrument) {
     return false;
   }
 
-  const currentInsturmentKeys = _Obj.keys(instrument);
+  const currentInsturmentKeys = Object.keys(instrument);
 
   // None of the keys in the config should be present in the instrument
   return config.properties.every((key) => !currentInsturmentKeys.includes(key));

@@ -135,14 +135,14 @@ const ALL_METHODS = {
   },
 
   netbanking() {
-    return (
-      getAmount() &&
-        !isRecurring() &&
-        !isInternational() &&
-        getOption('method.netbanking') !== false &&
-        getNetbankingBanks()
-      |> _Obj.keys
-      |> _.lengthOf
+    return _.lengthOf(
+      Object.keys(
+        getAmount() &&
+          !isRecurring() &&
+          !isInternational() &&
+          getOption('method.netbanking') !== false &&
+          getNetbankingBanks()
+      )
     );
   },
 
@@ -412,7 +412,7 @@ export function getEnabledMethods() {
   if (merchantOrder && isRecurring() && getAmount()) {
     merchantOrderMethod = merchantOrder.method || 'card';
   }
-  let methodsToConsider = _Obj.keys(ALL_METHODS);
+  let methodsToConsider = Object.keys(ALL_METHODS);
 
   if (merchantOrderMethod) {
     methodsToConsider = [merchantOrderMethod];
@@ -981,11 +981,11 @@ export function getEMIBanks(amount) {
   @returns {Array} of providers
  */
 export function getPayLaterProviders() {
-  const paylater = getMerchantMethods().paylater;
+  const paylater = getMerchantMethods().paylater || {};
   if (_Obj.isEmpty(paylater)) {
     return [];
   }
-  return _Obj.keys(paylater).map(getProvider).filter(Boolean);
+  return Object.keys(paylater).map(getProvider).filter(Boolean);
 }
 
 /*
@@ -1004,8 +1004,7 @@ export function getAppProviders() {
   if (_Obj.isEmpty(apps)) {
     return [];
   }
-  return _Obj
-    .keys(apps)
+  return Object.keys(apps)
     .filter(isApplicationEnabled)
     .map(getAppProvider)
     .filter(Boolean);

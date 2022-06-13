@@ -73,7 +73,7 @@
   let otherPlans = [];
   let offerPlans = [];
 
-  $: showActions = actions && _Obj.keys(actions).length;
+  $: showActions = actions && Object.keys(actions || {}).length;
   $: {
     const _otherPlans = [];
     const _offerPlans = [];

@@ -90,7 +90,7 @@
     savings: ACCOUNT_TYPE_SAVINGS,
     current: ACCOUNT_TYPE_CURRENT,
   };
-  const accountTypes = _Obj.keys(accountTextLabels);
+  const accountTypes = Object.keys(accountTextLabels);
 
   if (!accountTypes.includes(prefilledAccountType)) {
     prefilledAccountType = '';

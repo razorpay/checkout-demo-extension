@@ -15,6 +15,7 @@ import {
 import { getAgentPayload } from 'checkoutstore/methods';
 import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
+import { isNonNullObject } from 'utils/object';
 
 /**
  *
@@ -50,7 +51,7 @@ export default function Razorpay(overrides) {
   } catch (e) {
     let message = e.message;
     if (!this.get || !this.isLiveMode()) {
-      if (_.isNonNullObject(overrides) && !overrides.parent) {
+      if (isNonNullObject(overrides) && !overrides.parent) {
         global.alert(message);
       }
     }
@@ -165,7 +166,7 @@ Razorpay.payment = {
       type: AnalyticsTypes.METRIC,
     });
 
-    if (_.isNonNullObject(data)) {
+    if (isNonNullObject(data)) {
       data['_[request_index]'] = Analytics.updateRequestIndex('preferences');
     }
 
@@ -414,7 +415,7 @@ var discreet = {
 
 export const optionValidations = {
   notes: function (notes) {
-    if (_.isNonNullObject(notes) && _.lengthOf(_Obj.keys(notes)) > 15) {
+    if (isNonNullObject(notes) && _.lengthOf(Object.keys(notes)) > 15) {
       return 'At most 15 notes are allowed';
     }
   },

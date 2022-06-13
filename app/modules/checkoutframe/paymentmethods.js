@@ -221,7 +221,7 @@ export function getMethodDescription(method, locale) {
 
 export function getEMIBanksText(locale) {
   const emiBanks = getEMIBanks();
-  const bankNames = _Obj.keys(emiBanks).map((bank) => emiBanks[bank].name);
+  const bankNames = Object.keys(emiBanks).map((bank) => emiBanks[bank].name);
   // Here 15 is the number of banks in the store in banks.js
   // To Do: Do we really need to show list of 15 banks
   return generateTextFromList(bankNames, locale, 15);

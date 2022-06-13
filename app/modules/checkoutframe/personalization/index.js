@@ -505,7 +505,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
  */
 export function hasAnyInstrumentsOnDevice() {
   try {
-    return _Obj.keys(getAllInstruments()).length > 0;
+    return Object.keys(getAllInstruments()).length > 0;
   } catch (err) {}
 
   return false;
@@ -515,7 +515,7 @@ export function hasAnyInstrumentsOnDevice() {
  * Tracks the number of p13n contacts present in storage.
  */
 export function trackNumberOfP13nContacts() {
-  Analytics.setMeta('p13nUsers', _Obj.keys(getAllInstruments()).length);
+  Analytics.setMeta('p13nUsers', Object.keys(getAllInstruments()).length);
 }
 
 export function getMaxPreferredMethods() {

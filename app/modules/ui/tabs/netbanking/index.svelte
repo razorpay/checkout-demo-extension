@@ -229,7 +229,7 @@
      * one bank available, select it automatically to reduce a user click.
      * Of course, do this only when there's nothing preselected.
      */
-    const banksList = _Obj.keys(filteredBanks);
+    const banksList = Object.keys(filteredBanks);
     if (method === 'netbanking' && !$selectedBank && banksList.length === 1) {
       $selectedBank = banksList[0];
     }

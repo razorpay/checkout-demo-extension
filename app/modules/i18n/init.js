@@ -33,7 +33,7 @@ const LOCALES = {
   tel: 'తెలుగు',
 };
 
-const ALLOWED_LOCALES = _Obj.keys(LOCALES);
+const ALLOWED_LOCALES = Object.keys(LOCALES);
 
 function isAllowedLocale(locale) {
   return ALLOWED_LOCALES.some((allowedLocale) => locale === allowedLocale);
