@@ -97,7 +97,7 @@ const Analytics = () => ({
    * @param {String} key
    */
   removeMeta: function (key) {
-    _Obj.deleteProp(META, key);
+    delete META[key];
   },
 
   /**

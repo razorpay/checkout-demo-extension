@@ -109,13 +109,12 @@ function onPaymentCancel(metaParam) {
 
 function getTrackingData(data) {
   // donottrack card number, token, cvv
-  return (
-    data
-    |> _Obj.clone
-    |> _Obj.loop(
-      (val, key, o) => key.slice(0, 4) === 'card' && _Obj.deleteProp(o, key)
-    )
-  );
+  return Object.keys(data).reduce((trackingData, key) => {
+    if (key.slice(0, 4) !== 'card') {
+      trackingData[key] = data[key];
+    }
+    return trackingData;
+  }, {});
 }
 
 function trackNewPayment(data, params, r) {

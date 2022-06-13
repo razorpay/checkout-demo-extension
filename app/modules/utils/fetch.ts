@@ -451,9 +451,9 @@ function jsonp(options: options): FetchPrototype {
     };
 
     const req = (global.Razorpay[callbackName] = function (data: any) {
-      _Obj.deleteProp(data, 'http_status_code');
+      delete data['http_status_code'];
       cb(data);
-      _Obj.deleteProp(global.Razorpay, callbackName);
+      delete global.Razorpay[callbackName];
     });
 
     this.setReq('jsonp', req);

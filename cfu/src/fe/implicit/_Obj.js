@@ -81,18 +81,6 @@ export const setTruthyProp = _.curry3((o, key, value) => {
 });
 
 /**
- * Delete a property/key of the given object
- * @param {Object} o
- * @param {string} key
- *
- * @returns {Object}
- */
-export const deleteProp = _.curry2((o, key) => {
-  delete o[key];
-  return o;
-});
-
-/**
  * Loops through the object
  * @param {Object} o
  * @param {function (value: *, key: string, o: Object): void} iteratee
