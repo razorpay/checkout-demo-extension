@@ -47,11 +47,7 @@
     selectedInstrument,
     methodInstrument,
   } from 'checkoutstore/screens/home';
-  import {
-    appliedOffer,
-    isCardValidForOffer,
-    showOffers,
-  } from 'checkoutstore/offers';
+  import { appliedOffer, isCardValidForOffer, showOffers } from 'offers/store';
   import { querySelector } from 'utils/doc';
 
   export let applicableOffers; // eligible offers array

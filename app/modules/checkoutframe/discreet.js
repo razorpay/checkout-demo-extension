@@ -56,7 +56,7 @@ import * as UpiScreenStore from 'checkoutstore/screens/upi';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 import * as NativeStore from 'checkoutstore/native';
-import * as OffersStore from 'checkoutstore/offers';
+import * as OffersStore from 'offers/store';
 import { reward as rewardsStore } from 'checkoutstore/rewards';
 import * as address from 'one_click_checkout/address/sessionInterface';
 import * as TopbarMagicCheckoutStore from 'one_click_checkout/topbar/store';

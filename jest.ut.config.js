@@ -17,6 +17,7 @@ module.exports = {
   clearMocks: true, // Automatically clear mock calls and instances before every test.
   collectCoverageFrom: collectCoverageFrom(),
   coverageReporters: ['html-spa', 'text-summary'],
+  coveragePathIgnorePatterns: ['/app/modules/utils/modal.ts'],
 };
 
 function collectCoverageFrom() {

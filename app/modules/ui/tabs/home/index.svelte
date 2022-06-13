@@ -65,7 +65,7 @@
   } from 'one_click_checkout/charges/store';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { showOffers as showMethodOffers } from 'checkoutstore/offers';
+  import { showOffers as showMethodOffers } from 'offers/store';
 
   // i18n
   import {

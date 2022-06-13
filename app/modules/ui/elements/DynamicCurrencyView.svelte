@@ -12,7 +12,7 @@
     AVSDccPayload,
   } from 'checkoutstore/screens/card';
 
-  import { amountAfterOffer, appliedOffer } from 'checkoutstore/offers';
+  import { amountAfterOffer, appliedOffer } from 'offers/store';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
 

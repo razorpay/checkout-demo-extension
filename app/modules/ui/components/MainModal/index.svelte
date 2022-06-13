@@ -23,6 +23,7 @@
   import { clearOldExperiments } from 'experiments';
 
   import LanguageSelector from './LanguageSelector.svelte';
+  import { computeOfferClass } from 'offers/store';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
@@ -33,6 +34,8 @@
   const orderMethod = getSingleMethod();
   export let onClose: any = returnAsIs;
   export let escape = true;
+
+  $: offerClasses = $computeOfferClass;
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
@@ -118,7 +121,12 @@
         <div id="cancel_upi" />
       </div>
 
-      <div id="content" class:one-cc={isOneClickCheckoutEnabled}>
+      <div
+        id="content"
+        class:has-fee={offerClasses.hasFee}
+        class:has-discount={offerClasses.hasDiscount}
+        class:one-cc={isOneClickCheckoutEnabled}
+      >
         <div id="header-1cc">
           <div id="header-1cc-wrap" />
           <div id="topbar-onecc-wrap" />
@@ -143,8 +151,12 @@
             </div>
             {#if getOption('amount')}
               <div id="amount">
-                <span class="discount" />
-                <span class="original-amount">{getAmount()}</span>
+                <span class="discount">{offerClasses.discountAmount}</span>
+                <span
+                  class="original-amount"
+                  class:hidden={offerClasses.hideOriginalAmount}
+                  >{getAmount()}</span
+                >
                 <span class="fee" />
               </div>
             {/if}

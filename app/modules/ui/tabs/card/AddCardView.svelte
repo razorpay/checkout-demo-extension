@@ -72,7 +72,7 @@
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
-  import { isCardValidForOffer } from 'checkoutstore/offers';
+  import { isCardValidForOffer } from 'offers/store';
   import { viewAllEMIPlans } from 'emi/helper';
   import { isNameReadOnly } from 'checkoutframe/customer';
 

@@ -2537,21 +2537,9 @@ Session.prototype = {
       session._trySelectingOfferInstrument(offer);
     }, 300);
   },
-  /**
-   * Show the discount amount.
-   */
-  handleDiscount: function () {
-    let offer = this.getAppliedOffer();
-    let hasDiscount = offer && offer.amount !== offer.original_amount;
-    let currency = this.get('currency') || 'INR';
-    let amount;
-    if (offer) {
-      if (RazorpayHelper.isOneClickCheckout()) {
-        amount = storeGetter(discreet.ChargesStore.amount);
-      } else {
-        amount = offer.amount;
-      }
-    }
+
+  getDCCPayload: function () {
+    let currency, amount;
     if (this.dccPayload) {
       /** value of dccPayload set via DynamicCurrencyView.svelte */
       if (this.dccPayload.enable && this.dccPayload.currency) {
@@ -2571,36 +2559,8 @@ Session.prototype = {
           this.dccPayload.currencyPayload.all_currencies[currency].amount;
       }
     }
-
-    // this.offers is undefined for forced offers
-    if (hasDiscount && this.offers) {
-      hasDiscount = this.offers.isCardApplicable();
-    }
-
-    let hasDiscountAndFee =
-      offer && RazorpayHelper.isCustomerFeeBearer() && amount;
-
-    if (hasDiscountAndFee) {
-      $('#content').toggleClass('has-fee', hasDiscountAndFee);
-    } else {
-      $('#content').toggleClass('has-fee', false);
-    }
-
-    $('#content').toggleClass('has-discount', hasDiscount);
-
-    docUtil.querySelector('#amount .discount').textContent = hasDiscount
-      ? discreet.Currency.formatAmountWithSymbol(amount, currency)
-      : '';
-
-    if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
-      $('#amount .original-amount').hide();
-    } else {
-      $('#amount .original-amount')[0].removeAttribute('style');
-    }
-    Cta.setAppropriateCtaText();
-    Header.updateAmountFontSize();
+    return { currency, amount };
   },
-
   back: function (confirmedCancel) {
     let tab = '';
     let payment = this.r._payment;
@@ -5811,8 +5771,6 @@ Session.prototype = {
       }
 
       Analytics.setMeta('forcedOffer', true);
-
-      this.handleDiscount();
     } else {
       let appliedOffer;
       this.getAppliedOffer = function () {
@@ -5828,7 +5786,6 @@ Session.prototype = {
             if (offer && shouldNavigate) {
               session.handleOfferSelection(offer);
             }
-            session.handleDiscount();
           },
           onShown: function () {
             if (session.screen === 'otp') {
@@ -5872,44 +5829,6 @@ Session.prototype = {
    */
   getAppliedOffer: function () {
     return discreet.Offers.getForcedOffer();
-  },
-
-  /**
-   * Says whether or not the offer is applicable
-   * on the provided offer.
-   * @param {string} issuer
-   * @param {Offer} offer
-   *
-   * @return {boolean}
-   */
-  isOfferApplicableOnIssuer: function (issuer, offer) {
-    issuer = issuer.toLowerCase();
-    offer = offer || this.getAppliedOffer();
-
-    if (!offer) {
-      return false;
-    }
-
-    let offerIssuer = (offer.issuer || '').toLowerCase(),
-      offerNetwork = (offer.payment_network || '').toLowerCase();
-
-    if (issuer === 'amex') {
-      return !offerNetwork || offerNetwork === issuer;
-    }
-
-    return !offerIssuer || offerIssuer === issuer;
-  },
-
-  /**
-   * Returns the discounted amount if there's
-   * an amount with the offer applied.
-   *
-   * @returns {Number}
-   */
-  getDiscountedAmount: function () {
-    let appliedOffer = this.getAppliedOffer();
-
-    return (appliedOffer && appliedOffer.amount) || this.get('amount');
   },
 
   /**

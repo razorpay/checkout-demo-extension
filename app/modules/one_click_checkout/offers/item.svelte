@@ -1,6 +1,6 @@
 <script>
   // util imports
-  import { appliedOffer } from 'checkoutstore/offers';
+  import { appliedOffer } from 'offers/store';
   // i18n imports
   import { t } from 'svelte-i18n';
   import {

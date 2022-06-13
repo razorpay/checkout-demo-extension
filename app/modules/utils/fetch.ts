@@ -1,6 +1,6 @@
 // TODO make it class
 /** Fetch Types */
-type FetchPrototype = {
+export type FetchPrototype = {
   abort: () => void;
   call: (callback?: Common.JSFunction) => void;
   defer: () => void;
@@ -17,7 +17,7 @@ type FetchPrototype = {
     headers?: Common.Object<string>;
     method?: string;
     callback: (response: any) => void;
-    data?: string | Common.Object<string>;
+    data?: string | Common.Object<string | string[]>;
   };
 };
 type options = FetchPrototype['options'];

@@ -29,6 +29,10 @@
   } from './label.18n';
   import { formatAmountWithCurrency } from 'helper/currency';
   import { getAmount } from 'razorpay';
+  import {
+    getDiscountedAmount,
+    isOfferApplicableOnIssuer,
+  } from 'offers/helper';
 
   const session = getSession();
   let banks: EMIPlanView.EMIPlanData;
@@ -39,12 +43,12 @@
   let filteredBankList: EMIPlanView.EMIPlan[] = [];
 
   onMount(() => {
-    const discountedAmount = session.getDiscountedAmount();
+    const discountedAmount = getDiscountedAmount();
     const bankData: any = getEMIBanks(discountedAmount);
     if (
       !(
         bankData.AMEX &&
-        (!session.isOfferApplicableOnIssuer('amex') ||
+        (!isOfferApplicableOnIssuer('amex') ||
           discountedAmount > bankData.AMEX.min_amount)
       )
     ) {
@@ -58,8 +62,8 @@
   $: {
     if (banks && selected) {
       let selectedBank = (banks[selected] || {}).code;
-      if (selectedBank && session.isOfferApplicableOnIssuer(selectedBank)) {
-        amount = session.getDiscountedAmount();
+      if (selectedBank && isOfferApplicableOnIssuer(selectedBank)) {
+        amount = getDiscountedAmount();
       } else {
         amount = getAmount();
       }

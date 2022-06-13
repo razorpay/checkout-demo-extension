@@ -6,7 +6,7 @@
   import { pushOverlay } from 'navstack';
 
   // Store imports
-  import { appliedOffer } from 'checkoutstore/offers';
+  import { appliedOffer } from 'offers/store';
 
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';

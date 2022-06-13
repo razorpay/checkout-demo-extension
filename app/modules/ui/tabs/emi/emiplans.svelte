@@ -8,7 +8,7 @@
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // Store
-  import { appliedOffer } from 'checkoutstore/offers';
+  import { appliedOffer } from 'offers/store';
   import {
     showCta,
     hideCta,

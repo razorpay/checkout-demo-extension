@@ -1,6 +1,10 @@
 import { render } from '@testing-library/svelte';
 import { UPIAppStack } from '.';
-import { isCtaShown, showCtaWithDefaultText } from 'checkoutstore/cta';
+import {
+  setWithoutOffer,
+  isCtaShown,
+  showCtaWithDefaultText,
+} from 'checkoutstore/cta';
 
 jest.mock('sessionmanager', () => ({
   getSession: () => ({
@@ -23,6 +27,7 @@ jest.mock('razorpay', () => ({
 }));
 
 jest.mock('checkoutstore/cta', () => ({
+  setWithoutOffer: jest.fn(),
   isCtaShown: () => false,
   showCtaWithDefaultText: jest.fn(),
 }));

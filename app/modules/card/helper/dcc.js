@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { getCurrencies as getCurrenciesData, getCurrency } from 'razorpay';
-import { amountAfterOffer } from 'checkoutstore/offers';
+import { amountAfterOffer } from 'offers/store';
 
 export const getCurrencies = ({
   iin,

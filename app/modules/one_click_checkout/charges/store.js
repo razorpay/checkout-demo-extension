@@ -1,7 +1,5 @@
 import { writable, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
-import { appliedOffer } from 'checkoutstore/offers';
-import { isOneClickCheckout } from 'razorpay';
 import { showAmountInCta } from 'checkoutstore/cta';
 
 // Store to keep track of shipping charge
@@ -15,23 +13,6 @@ amount.subscribe((amount) => {
     session.setAmount(amount);
     showAmountInCta();
   }
-});
-appliedOffer.subscribe((offer) => {
-  if (!isOneClickCheckout()) {
-    return;
-  }
-  let currentAmount = offer ? get(cartAmount) : get(amount);
-  if (offer) {
-    const shippingCharges = get(shippingCharge) || 0;
-    const couponDis = get(cartDiscount) || 0;
-    const offerDiscount = offer.original_amount - offer.amount || 0;
-    currentAmount = currentAmount + shippingCharges - offerDiscount - couponDis;
-    offerAmount.set(offerDiscount);
-  } else {
-    currentAmount = currentAmount + get(offerAmount);
-    offerAmount.set(0);
-  }
-  amount.set(currentAmount);
 });
 
 export const cartAmount = writable(0);

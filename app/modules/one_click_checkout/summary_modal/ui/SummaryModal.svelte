@@ -35,7 +35,7 @@
     appliedCoupon,
     isCouponApplied,
   } from 'one_click_checkout/coupons/store';
-  import { appliedOffer } from 'checkoutstore/offers';
+  import { appliedOffer } from 'offers/store';
   import { cartItems, enableCart } from 'one_click_checkout/cart/store';
   import { getCurrency } from 'razorpay';
 
