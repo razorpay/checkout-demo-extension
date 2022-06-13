@@ -46,58 +46,57 @@ const currentScript =
 function defaultAutoPostHandler(data) {
   const form = _El.parent(currentScript);
   appendFormInput({ form, data: flatten(data) });
-  _Obj.setProp(form, 'onsubmit', returnAsIs);
+  form['onsubmit'] = returnAsIs;
   form.submit();
 }
 
 let addAutoCheckoutButton = function (rzp) {
-  currentScript
-    |> _El.parent
-    |> _El.append(
-      _El.create('input')
-        |> _Obj.extend({
-          type: 'submit',
-          value: rzp.get('buttontext'),
-          className: 'razorpay-payment-button',
-        })
-    )
-    |> _Obj.setProp('onsubmit', function (e) {
-      e.preventDefault();
-      let form = this;
-      let { action, method, target } = form;
-      let options = rzp.get();
-      // if data-callback_url is not passed
-      if (
-        // string check, because there may be an input element named "action"
-        _.isString(action) &&
-        action &&
-        !options.callback_url
-      ) {
-        let request = {
-          url: action,
-          content: form2obj(form),
-          method: _.isString(method) ? method : 'get',
-          target: _.isString(target) && target,
-        };
+  const parent = _El.parent(currentScript);
+  const appendNode = _El.append(
+    parent,
+    _Obj.extend(_El.create('input'), {
+      type: 'submit',
+      value: rzp.get('buttontext'),
+      className: 'razorpay-payment-button',
+    })
+  );
+  appendNode['onsubmit'] = function (e) {
+    e.preventDefault();
+    let form = this;
+    let { action, method, target } = form;
+    let options = rzp.get();
+    // if data-callback_url is not passed
+    if (
+      // string check, because there may be an input element named "action"
+      _.isString(action) &&
+      action &&
+      !options.callback_url
+    ) {
+      let request = {
+        url: action,
+        content: form2obj(form),
+        method: _.isString(method) ? method : 'get',
+        target: _.isString(target) && target,
+      };
 
-        try {
-          let data = btoa(
-            _Obj.stringify({
-              request,
-              options: _Obj.stringify(options),
-              back: location.href,
-            })
-          );
+      try {
+        let data = btoa(
+          _Obj.stringify({
+            request,
+            options: _Obj.stringify(options),
+            back: location.href,
+          })
+        );
 
-          options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
-        } catch (err) {}
-      }
+        options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
+      } catch (err) {}
+    }
 
-      rzp.open();
+    rzp.open();
 
-      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK);
-      return false;
-    });
+    Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK);
+    return false;
+  };
 };
 
 /**
@@ -144,26 +143,25 @@ function initAutomaticCheckout() {
 let frameContainer;
 function createFrameContainer() {
   if (!frameContainer) {
-    frameContainer =
-      _El.create()
-      |> _Obj.setProp('className', 'razorpay-container')
-      |> _Obj.setProp(
-        'innerHTML',
-        '<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>'
-      )
-      |> _El.setStyles({
-        zIndex: 2147483647,
-        position: 'fixed',
-        top: 0,
-        display: 'none',
-        left: 0,
-        height: '100%',
-        width: '100%',
-        '-webkit-overflow-scrolling': 'touch',
-        '-webkit-backface-visibility': 'hidden',
-        'overflow-y': 'visible',
-      })
-      |> _El.appendTo(body);
+    const frameContainerElement = _El.create();
+    frameContainerElement.className = 'razorpay-container';
+    _El.setContents(
+      frameContainerElement,
+      '<style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style>'
+    );
+    _El.setStyles(frameContainerElement, {
+      zIndex: 2147483647,
+      position: 'fixed',
+      top: 0,
+      display: 'none',
+      left: 0,
+      height: '100%',
+      width: '100%',
+      '-webkit-overflow-scrolling': 'touch',
+      '-webkit-backface-visibility': 'hidden',
+      'overflow-y': 'visible',
+    });
+    frameContainer = _El.appendTo(frameContainerElement, body);
     CheckoutFrame.container = frameContainer;
     let frameBackdrop = createFrameBackdrop(frameContainer);
     CheckoutFrame.backdrop = frameBackdrop;
@@ -175,52 +173,49 @@ function createFrameContainer() {
 }
 
 function createFrameBackdrop(container) {
-  return (
-    _El.create()
-    |> _Obj.setProp('className', 'razorpay-backdrop')
-    |> _El.setStyles({
-      'min-height': '100%',
-      transition: '0.3s ease-out',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-    })
-    |> _El.appendTo(container)
-  );
+  const backDropDiv = _El.create();
+  backDropDiv.className = 'razorpay-backdrop';
+  const backdropStyle = {
+    'min-height': '100%',
+    transition: '0.3s ease-out',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+  };
+  _El.setStyles(backDropDiv, backdropStyle);
+  return _El.appendTo(backDropDiv, container);
 }
 
 function createTestRibbon(parent) {
   const rotateRule = 'rotate(45deg)';
   const animRule = 'opacity 0.3s ease-in';
-  return (
-    _El.create('span')
-    |> _Obj.setProp('innerHTML', 'Test Mode')
-    |> _El.setStyles({
-      'text-decoration': 'none',
-      background: '#D64444',
-      border: '1px dashed white',
-      padding: '3px',
-      opacity: '0',
-      '-webkit-transform': rotateRule,
-      '-moz-transform': rotateRule,
-      '-ms-transform': rotateRule,
-      '-o-transform': rotateRule,
-      transform: rotateRule,
-      '-webkit-transition': animRule,
-      '-moz-transition': animRule,
-      transition: animRule,
-      'font-family': 'lato,ubuntu,helvetica,sans-serif',
-      color: 'white',
-      position: 'absolute',
-      width: '200px',
-      'text-align': 'center',
-      right: '-50px',
-      top: '50px',
-    })
-    |> _El.appendTo(parent)
-  );
+  const ribbonElement = _El.create('span');
+  ribbonElement.textContent = 'Test Mode';
+  _El.setStyles(ribbonElement, {
+    'text-decoration': 'none',
+    background: '#D64444',
+    border: '1px dashed white',
+    padding: '3px',
+    opacity: '0',
+    '-webkit-transform': rotateRule,
+    '-moz-transform': rotateRule,
+    '-ms-transform': rotateRule,
+    '-o-transform': rotateRule,
+    transform: rotateRule,
+    '-webkit-transition': animRule,
+    '-moz-transition': animRule,
+    transition: animRule,
+    'font-family': 'lato,ubuntu,helvetica,sans-serif',
+    color: 'white',
+    position: 'absolute',
+    width: '200px',
+    'text-align': 'center',
+    right: '-50px',
+    top: '50px',
+  });
+  return _El.appendTo(ribbonElement, parent);
 }
 
 let preloadedFrame;

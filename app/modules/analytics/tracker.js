@@ -11,7 +11,7 @@ const base62Chars =
 
 const map62 = base62Chars
   .split('')
-  .reduce((map, chr, i) => _Obj.setProp(map, chr, i), {});
+  .reduce((map, chr, i) => ({ ...map, [chr]: i }), {});
 
 function toBase62(number) {
   let rixit;
@@ -249,7 +249,7 @@ export default function Track(r, event, data, immediately) {
      */
 
     options.external_wallets = externalWallets.reduce(
-      (acc, wallet) => acc |> _Obj.setProp(wallet, true),
+      (acc, wallet) => ({ ...acc, [wallet]: true }),
       {}
     );
 

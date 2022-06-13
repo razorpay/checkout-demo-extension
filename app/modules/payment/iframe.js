@@ -34,8 +34,9 @@ export default function Iframe(src, name, payment) {
 
   Analytics.track('iframe:create');
 
-  this.window =
-    this.el.querySelector('iframe').contentWindow |> _Obj.setProp('name', name);
+  const contentWindow = this.el.querySelector('iframe').contentWindow;
+  contentWindow['name'] = name;
+  this.window = contentWindow;
 
   const closeListener =
     querySelector('.iframe-close')
@@ -57,7 +58,7 @@ Iframe.prototype = {
   },
 
   write: function (html) {
-    var pdoc = this.window.document;
+    let pdoc = this.window.document;
     pdoc.write(html);
     pdoc.close();
   },
