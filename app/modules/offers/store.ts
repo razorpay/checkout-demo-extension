@@ -23,43 +23,6 @@ import { setAppropriateCtaText, setWithoutOffer } from 'checkoutstore/cta';
 
 export const appliedOffer: Writable<Offers.OfferItem | null> = writable();
 
-export const computeOfferClass = derived(appliedOffer, ($appliedOffer) => {
-  const session = getSession();
-  const offer = $appliedOffer;
-  let hasDiscount = Boolean(offer && offer.amount !== offer.original_amount);
-  let currency = getOption('currency') || 'INR';
-  let amount;
-  if (offer) {
-    if (isOneClickCheckout()) {
-      amount = get(ChargesStore.amount);
-    } else {
-      amount = offer.amount;
-    }
-  }
-  const { currency: dccCurrency, amount: dccAmount } = session.getDCCPayload();
-  if (dccCurrency) {
-    currency = dccCurrency;
-  }
-  if (dccAmount) {
-    amount = dccAmount;
-  }
-
-  if (hasDiscount && session.offers) {
-    hasDiscount = get(isCardValidForOffer);
-  }
-
-  const hasDiscountAndFee = offer && isCustomerFeeBearer() && amount;
-  const returnObj = {
-    hasFee: Boolean(hasDiscountAndFee),
-    hasDiscount: hasDiscount,
-    discountAmount: hasDiscount ? formatAmountWithSymbol(amount, currency) : '',
-    hideOriginalAmount: Boolean(hasDiscount && isOneClickCheckout()),
-  };
-  setAppropriateCtaText();
-  updateAmountFontSize();
-  return returnObj;
-});
-
 /**
  * to remove circular dep migrate from 1cc
  */
@@ -178,6 +141,50 @@ export const isCardValidForOffer: Readable<boolean> = derived(
         }
       },
     });
+  }
+);
+
+export const computeOfferClass = derived(
+  [appliedOffer, isCardValidForOffer],
+  ([$appliedOffer, $isCardValidForOffer]) => {
+    const session = getSession();
+    const offer = $appliedOffer;
+    let hasDiscount = Boolean(offer && offer.amount !== offer.original_amount);
+    let currency = getOption('currency') || 'INR';
+    let amount;
+
+    if (offer) {
+      if (isOneClickCheckout()) {
+        amount = get(ChargesStore.amount);
+      } else {
+        amount = offer.amount;
+      }
+    }
+    const { currency: dccCurrency, amount: dccAmount } =
+      session.getDCCPayload();
+    if (dccCurrency) {
+      currency = dccCurrency;
+    }
+    if (dccAmount) {
+      amount = dccAmount;
+    }
+
+    if (hasDiscount && session.offers) {
+      hasDiscount = $isCardValidForOffer;
+    }
+
+    const hasDiscountAndFee = offer && isCustomerFeeBearer() && amount;
+    const returnObj = {
+      hasFee: Boolean(hasDiscountAndFee),
+      hasDiscount: hasDiscount,
+      discountAmount: hasDiscount
+        ? formatAmountWithSymbol(amount, currency)
+        : '',
+      hideOriginalAmount: Boolean(hasDiscount && isOneClickCheckout()),
+    };
+    setAppropriateCtaText();
+    updateAmountFontSize();
+    return returnObj;
   }
 );
 

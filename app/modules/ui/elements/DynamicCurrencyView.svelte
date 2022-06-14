@@ -127,11 +127,8 @@
     } else {
       session.dccPayload = Object.assign(session.dccPayload || {}, payload);
     }
-    let offer = session.getAppliedOffer();
-    // if offer applied
-    if (offer) {
-      session.handleDiscount();
-    }
+    // retrigger `computeOfferClass`
+    appliedOffer.set($appliedOffer);
   }
 
   $: allClasses = ['dcc-view'].concat(classes).join(' ');

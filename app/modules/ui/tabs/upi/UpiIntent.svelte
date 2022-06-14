@@ -18,11 +18,11 @@
 
   import {
     UPI_INTENT_BLOCK_HEADING,
-    UPI_REDIRECT_TO_APP,
-    UPI_REDIRECT_TO_APP_V2,
     UPI_RECOMMENDED,
     UPI_SHOW_OTHER_APPS,
   } from 'ui/labels/upi';
+
+  import * as AnalyticsTypes from 'analytics-types';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import {
