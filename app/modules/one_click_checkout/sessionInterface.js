@@ -251,18 +251,6 @@ export function redirectToPaymentMethods(
       })
       .catch(() => {
         updateOrderFailure();
-        const currhis = get(history);
-        const savedAddArr = currhis.find(
-          (item) => item.name === views.SAVED_ADDRESSES
-        );
-        if (savedAddArr && Object.keys(savedAddArr).length > 0) {
-          navigator.navigateBack(views.SAVED_ADDRESSES);
-        } else if (get(savedAddresses)?.length) {
-          navigator.navigateBack(views.ADD_ADDRESS);
-          navigator.replace(views.SAVED_ADDRESSES);
-        } else {
-          navigator.navigateBack(views.ADD_ADDRESS);
-        }
       });
   } else {
     oneClickCheckoutRedirection();
