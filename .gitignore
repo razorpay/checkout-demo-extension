@@ -19,3 +19,6 @@ npm-debug.log
 /httpd.conf
 .idea
 .vscode
+
+test-report.xml
+test-result.json

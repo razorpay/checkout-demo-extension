@@ -28,7 +28,7 @@ export const payWithPaymentRequestApi = (
   successCallback,
   errorCallback
 ) => {
-  var instrumentData = {};
+  let instrumentData = {};
   errorCallback = errorCallback || (() => {});
 
   data.intent_url

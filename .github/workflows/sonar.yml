@@ -1,0 +1,70 @@
+name: Sonar Scanner
+on: [push]
+
+jobs:
+  sonar:
+    name: Sonar Scanner
+    runs-on: [self-hosted]
+    continue-on-error: false
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.10.0
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Unit Tests
+        run: ./scripts/run_tests.sh
+      - name: Set Sonarqube Project
+        id: set_sonar_project
+        run: |
+          BRANCH="$(echo ${GITHUB_REF##*/})";
+          SONAR_PROJECT="CheckoutDevCoverageCheck"
+          if [ "$BRANCH" == "master" ]; then
+            SONAR_PROJECT="CheckoutCoverageCheck";
+          fi
+          echo ::set-output name=sonar_project::$SONAR_PROJECT
+      - name: SonarQube Scan
+        uses: kitabisa/sonarqube-action@v1.1.0
+        with:
+          host: https://sonar.razorpay.com
+          login: ${{ secrets.SONARQUBE_TOKEN }}
+          projectBaseDir: ./
+          projectKey: ${{ steps.set_sonar_project.outputs.sonar_project }}
+          projectName: ${{ steps.set_sonar_project.outputs.sonar_project }}
+          projectVersion: ${{ github.sha }}
+      - name: Find PR Number
+        if: github.ref != 'refs/heads/master'
+        uses: razorpay/gh-find-current-pr@v1
+        id: findPr
+      - name: Code Quality Analysis
+        if: github.ref != 'refs/heads/master' && success() && steps.findPr.outputs.number
+        id: code_quality_analysis
+        uses: docker://razorpay/onggi:nginx
+        with:
+          username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
+          password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
+          entrypoint: /bin/bash
+          args: scripts/quality_analysis.sh
+        env:
+          SONAR_HOST: ${{ secrets.SONARQUBE_HOST }}
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+          GIT_SHA: ${{ github.sha }}
+          BRANCH: ${{ github.ref }}
+      - name: Add Quality Report Comment
+        if: github.ref != 'refs/heads/master' && success() && steps.findPr.outputs.number
+        uses: razorpay/create-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+        with:
+          number: ${{ steps.findPr.outputs.pr }}
+          comment: |
+            ${{ steps.code_quality_analysis.outputs.quality_report }}
+      - name: Check Quality Report result
+        if: github.ref != 'refs/heads/master' && success() && steps.findPr.outputs.number && steps.code_quality_analysis.outputs.quality_report_result != 'pass'
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('Quality report has failed')

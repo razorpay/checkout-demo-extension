@@ -15,18 +15,14 @@ module.exports = {
   testEnvironment: 'jsdom',
   fakeTimers: {},
   clearMocks: true, // Automatically clear mock calls and instances before every test.
-  collectCoverageFrom: collectCoverageFrom(),
-  coverageReporters: ['html-spa', 'text-summary'],
-  coveragePathIgnorePatterns: ['/app/modules/utils/modal.ts'],
+  collectCoverageFrom: ['<rootDir>/app/modules/**/*.*'],
+  coverageDirectory: '<rootDir>/coverage/',
+  coverageReporters: ['json', 'lcov', 'text-summary', 'html-spa'],
+  testResultsProcessor: 'jest-sonar-reporter',
+  coveragePathIgnorePatterns: [
+    'node_modules',
+    '.module.ts',
+    '.d.ts',
+    '/app/modules/utils/modal.ts',
+  ],
 };
-
-function collectCoverageFrom() {
-  if (process.env.__SVELTE_COVERAGE__) {
-    return ['<rootDir>/app/modules/**/*.*'];
-  }
-
-  // use the jest's default mechanism for collecting coverage,
-  // which ever file gets resolved during test execution,
-  // will be considered for coverage
-  return undefined;
-}
