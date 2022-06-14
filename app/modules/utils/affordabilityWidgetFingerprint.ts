@@ -1,10 +1,10 @@
 function getItemWithExpiry(key: string) {
-  const itemStr = localStorage?.getItem(key);
-  // if the item doesn't exist, return null
-  if (!itemStr) {
-    return null;
-  }
   try {
+    const itemStr = localStorage.getItem(key);
+    // if the item doesn't exist, return null
+    if (!itemStr) {
+      return null;
+    }
     const item = JSON.parse(itemStr);
     const now = new Date();
     // compare the expiry time of the item with the current time
