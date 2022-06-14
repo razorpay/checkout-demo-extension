@@ -22,6 +22,10 @@
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+
+  // utils imports
+  import { isIntlShippingEnabled } from 'razorpay';
+
   // constant imports
   import { ADDRESS_TYPES, SOURCE } from 'one_click_checkout/address/constants';
 
@@ -104,9 +108,11 @@
       });
     }
 
-    Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
-      is_prefilled: SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
-    });
+    if (isIntlShippingEnabled()) {
+      Events.TrackBehav(AddressEvents.INPUT_ENTERED_country_V2, {
+        is_prefilled: SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
+      });
+    }
   });
 
   let showLandmark = false;
@@ -131,19 +137,22 @@
               label={`${$t(subInput.label)}${subInput.required ? '*' : ''}`}
             />
           {:else if subInput.id === 'country_name'}
-            <CountryField
-              onChange={handleInput}
-              on:blur={() => onBlur(subInput.id)}
-              validationText={errors[subInput.id] ? errors[subInput.id] : ''}
-              extraLabel={INPUT_FORM[2][1]?.unserviceableText}
-              showExtraLabel={!formData.zipcode && !INPUT_FORM[2][1]?.required}
-              {formData}
-              {addressType}
-              extraLabelClass={INPUT_FORM[2][1]?.unserviceableText ===
-              SERVICEABLE_LABEL
-                ? 'successText'
-                : 'failureText'}
-            />
+            {#if subInput.enabled}
+              <CountryField
+                onChange={handleInput}
+                on:blur={() => onBlur(subInput.id)}
+                validationText={errors[subInput.id] ? errors[subInput.id] : ''}
+                extraLabel={INPUT_FORM[2][1]?.unserviceableText}
+                showExtraLabel={!formData.zipcode &&
+                  !INPUT_FORM[2][1]?.required}
+                {formData}
+                {addressType}
+                extraLabelClass={INPUT_FORM[2][1]?.unserviceableText ===
+                SERVICEABLE_LABEL
+                  ? 'successText'
+                  : 'failureText'}
+              />
+            {/if}
           {:else}
             <Field
               id={subInput.id}

@@ -16,7 +16,7 @@
     getPrefilledCouponCode,
     isContactHidden,
     isEmailHidden,
-    isCodEnabled,
+    isEnableAutoFetchCoupons,
     getConsentViewCount,
   } from 'razorpay';
   import {
@@ -36,15 +36,7 @@
     consentViewCount,
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore';
-  import {
-    shouldShowCoupons,
-    isCodForced,
-    isLoginMandatory,
-  } from 'one_click_checkout/store';
-  import { RTBExperiment } from 'rtb/store';
-
-  // i18n imports
-  import { locale } from 'svelte-i18n';
+  import { shouldShowCoupons } from 'one_click_checkout/store';
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
@@ -72,12 +64,12 @@
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { isUnscrollable } from 'one_click_checkout/helper';
-  import { isRTBEnabled } from 'rtb/helper';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
     getPrefilledContact,
     getPrefilledEmail,
   } from 'checkoutframe/customer';
+  import { initSummaryMetaAnalytics } from 'one_click_checkout/coupons/controller';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -87,6 +79,7 @@
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
+  const enableAutoFetchCoupons = isEnableAutoFetchCoupons();
 
   let ctaDisabled = false;
   let couponEle;
@@ -156,13 +149,7 @@
   }
 
   function summaryLoadedEvent() {
-    Analytics.setMeta('is_RTB_live_on_merchant', isRTBEnabled($RTBExperiment));
-    Analytics.setMeta('is_force_cod_enabled', isCodForced());
-    Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
-    Analytics.setMeta('is_coupons_enabled', showCoupons);
-    Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
-    Analytics.setMeta('summary_screen_default_language', $locale);
-    Analytics.setMeta('is_cod_enabled', isCodEnabled());
+    initSummaryMetaAnalytics()
 
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
@@ -197,7 +184,7 @@
     updateOrderWithCustomerDetails();
     const addressPromise = checkAddressServiceability();
     const promiseList = [addressPromise];
-    if (showCoupons) {
+    if (showCoupons && enableAutoFetchCoupons) {
       const couponsPromise = fetchCoupons();
       promiseList.push(couponsPromise);
     }

@@ -13,6 +13,9 @@
   import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
   import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
 
+  // utils imports
+  import { isBillingAddressEnabled } from 'razorpay';
+
   export let isFixed = false;
   export let shouldSaveAddress = false;
 
@@ -28,14 +31,16 @@
   }
 </script>
 
-<div class="same-address-checkbox" class:checkbox-sticky={isFixed}>
-  <Checkbox
-    on:change={onChange}
-    checked={$isBillingSameAsShipping}
-    id="same-address-checkbox"
-  />
-  <span class="checkbox-text">{$t(SAME_ADDRESS_LABEL)}</span>
-</div>
+{#if isBillingAddressEnabled()}
+  <div class="same-address-checkbox" class:checkbox-sticky={isFixed}>
+    <Checkbox
+      on:change={onChange}
+      checked={$isBillingSameAsShipping}
+      id="same-address-checkbox"
+    />
+    <span class="checkbox-text">{$t(SAME_ADDRESS_LABEL)}</span>
+  </div>
+{/if}
 
 <style>
   .same-address-checkbox {

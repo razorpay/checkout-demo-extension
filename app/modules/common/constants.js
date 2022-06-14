@@ -117,6 +117,8 @@ export const INDIA_COUNTRY_ISO_CODE = 'IN';
 
 export const US_COUNTRY_ISO_CODE = 'US';
 
+export const INDIA_PINCODE_REGEX = '^[1-9][0-9]{5}$';
+
 /**
  * The following are the reasons for each flow
  * 1. Automatically created payment

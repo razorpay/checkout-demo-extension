@@ -76,6 +76,9 @@
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
 
+  // utils imports
+  import { isIntlShippingEnabled } from 'razorpay';
+
   // other imports
   import { isIndianCustomer } from 'checkoutstore';
   import { savedAddresses } from 'one_click_checkout/address/store';
@@ -89,9 +92,9 @@
     INDIA_COUNTRY_CODE,
     PHONE_REGEX_INDIA,
     INDIA_COUNTRY_ISO_CODE,
+    INDIA_PINCODE_REGEX,
   } from 'common/constants';
   import { views } from 'one_click_checkout/routing/constants';
-
   import { fetchSuggestionsResource } from 'one_click_checkout/address/suggestions';
   import {
     hideLoaderView,
@@ -112,12 +115,12 @@
 
   let errors = {};
   let selectedTag = $formData.tag;
-  let called = false;
   let pinIndex = 2;
   let pinSubIndex = 1;
+  let countryIndex = 0;
   let stateIndex = 3;
   let stateSubIndex = 1;
-  let pinPattern;
+  let pinPattern = new RegExp(INDIA_PINCODE_REGEX);
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
@@ -156,6 +159,7 @@
         label: 'Country',
         required: true,
         autofillToken: 'none',
+        enabled: isIntlShippingEnabled(),
       },
       {
         id: 'zipcode',
@@ -241,9 +245,13 @@
 
   const isFormComplete = () => {
     const { countryCode, phoneNum } = $formData?.contact || {};
+    const nonMandatoryFields = ['id', 'formView', 'landmark', 'tag', 'cod', 'type'];
+    if (!INPUT_FORM[pinIndex][countryIndex].enabled) {
+      nonMandatoryFields.push('country_name');
+    }
     for (let key in $formData) {
       if (
-        ['id', 'formView', 'landmark', 'tag', 'cod', 'type'].includes(key) ||
+        nonMandatoryFields.includes(key) ||
         (key === 'zipcode' && !INPUT_FORM[pinIndex][pinSubIndex]?.required)
       ) {
         continue;
@@ -289,6 +297,12 @@
 
       Events.TrackBehav(AddressEvents.SUGGESTION_SELECTED_V2);
     };
+  }
+
+  function getStates(iso = INDIA_COUNTRY_ISO_CODE.toLowerCase()) {
+    getStatesList(iso).then((res) => {
+      INPUT_FORM[stateIndex][stateSubIndex].items = res;
+    });
   }
 
   function handleCountrySelect(name, iso) {
@@ -352,9 +366,8 @@
       const pincodeEle = document.getElementById('zipcode').parentNode;
       pincodeEle.classList.add('invalid');
     }
-    getStatesList($selectedCountryISO).then((res) => {
-      INPUT_FORM[stateIndex][stateSubIndex].items = res;
-    });
+
+    getStates($selectedCountryISO)
   }
 
   const changePincodeStateLabel = () => {
@@ -505,7 +518,10 @@
       });
     }
 
-    if (key === 'country_name' && value !== selectedCountry) {
+    if (
+      key === 'country_name' &&
+      value !== selectedCountry
+    ) {
       if (selectedCountry && selectedCountry !== value && isShippingAddress) {
         Events.Track(AddressEvents.INPUT_ENTERED_country, {
           selection: 'manual',
@@ -666,6 +682,7 @@
     const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
     const address_type = isShippingAddress ? 'shipping' : 'billing';
 
+    $selectedCountryISO = INDIA_COUNTRY_ISO_CODE;
     screenScrollTop(addressWrapperEle);
     if (isShippingAddress && !$formData.zipcode && !$formData.city) {
       $isShippingAddedToAmount = false;
@@ -680,6 +697,9 @@
       $shouldSaveAddress = $isIndianCustomer;
     }
 
+    if (!INPUT_FORM[pinIndex][countryIndex].enabled) {
+      getStates()
+    }
     // Anaytics Events
     Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {
       meta: { saved_address_count: $savedAddresses?.length },

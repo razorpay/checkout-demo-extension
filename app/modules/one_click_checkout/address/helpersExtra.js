@@ -30,12 +30,14 @@ export const formatAddress = (
   },
   address_type = 'shipping_address'
 ) => {
-  const countryISO =
+  let countryISO =
     country ||
     (address_type === 'shipping_address'
       ? storeGetter(selectedShippingCountryISO)
       : storeGetter(selectedBillingCountryISO));
-
+  if (!countryISO) {
+    countryISO = 'in'; // default country is india
+  }
   let contactNumber;
   if (contact && typeof contact === 'object') {
     const { countryCode, phoneNum } = contact;

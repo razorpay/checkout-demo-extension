@@ -27,5 +27,14 @@ export const getMerchantName = () => getOption('name');
 export const isCodEnabled = () =>
   getPreferences('preferences.methods.cod') || false;
 
+export const isBillingAddressEnabled = () =>
+  getPreferences('1cc.configs.one_cc_capture_billing_address') || false;
+
+export const isIntlShippingEnabled = () =>
+  getPreferences('1cc.configs.one_cc_international_shipping') || false;
+
+export const isEnableAutoFetchCoupons = () =>
+  getPreferences('1cc.configs.one_cc_auto_fetch_coupons') || false;
+
 export const getConsentViewCount = () =>
   getPreferences('customer.1cc_consent_banner_views') || 0;
