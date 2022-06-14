@@ -5,6 +5,7 @@ import { ownerWindow } from 'common/constants';
 import Analytics, { Track, MetaProperties } from 'analytics';
 import { getSession } from 'sessionmanager';
 import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
+import { parse } from 'utils/object';
 import * as _El from 'utils/DOM';
 import { body } from 'utils/doc';
 
@@ -104,7 +105,7 @@ export function initIframe() {
 
     try {
       if (typeof data === 'string') {
-        data = _Obj.parse(data) || {};
+        data = parse(data) || {};
       }
       handleMessage(data);
     } catch (err) {}

@@ -28,6 +28,7 @@ const sessionIdHeader = 'X-Razorpay-SessionId';
 const trackIdHeader = 'X-Razorpay-TrackId';
 const Xhr = XMLHttpRequest;
 import * as _El from './DOM';
+import { parse } from 'utils/object';
 const networkError = _.rzpError('Network error');
 let jsonp_cb = 0;
 let sessionId: string, trackId: string, keylessHeader: string;
@@ -259,7 +260,11 @@ const fetchPrototype: FetchPrototype = {
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
-        let json = _Obj.parse(xhr.responseText);
+        let json = parse(xhr.responseText) as {
+          xhr: any;
+          error: boolean;
+          status_code: number;
+        };
         if (!json) {
           json = _.rzpError('Parsing error');
           json.xhr = {

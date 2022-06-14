@@ -5,7 +5,7 @@ import { luhnCheck, returnAsIs } from 'lib/utils';
 import { preventEvent } from 'utils/doc';
 
 const alphanumericRaw = function (value) {
-  var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
+  let returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
 
   if (this.el.maxLength > 0) {
     returnVal = returnVal.slice(0, this.el.maxLength);
@@ -365,8 +365,8 @@ formatterProto.run = function (values) {
   let caretPosition = left.length;
 
   // trim whitespaces/insignificant characters if cursor has moved leftwards
-  var shouldTrim = caretPosition < this.caretPosition;
-  var pretty = this.pretty(this.value, shouldTrim);
+  let shouldTrim = caretPosition < this.caretPosition;
+  let pretty = this.pretty(this.value, shouldTrim);
 
   let shouldUpdateDOM;
   if (values.e) {

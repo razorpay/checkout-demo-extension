@@ -41,3 +41,17 @@ export const hasProp = (obj, prop) =>
  * @returns {boolean}
  */
 export const isEmpty = (obj) => !Object.keys(obj || {}).length;
+
+/**
+ * Parse a string into JSON
+ * @param {string} string
+ *
+ * @returns {Object}
+ */
+export const parse = (string) => {
+  try {
+    return JSON.parse(string);
+  } catch (e) {
+    console.error(e.message);
+  }
+};

@@ -7,6 +7,7 @@ import {
   ACTIONS,
   CATEGORIES,
 } from 'one_click_checkout/merchant-analytics/constant';
+import { parse } from 'utils/object';
 import * as _El from 'utils/DOM';
 import {
   smoothScrollTo,
@@ -354,7 +355,7 @@ CheckoutFrame.prototype = {
   },
 
   onmessage: function (e) {
-    let data = _Obj.parse(e.data);
+    let data = parse(e.data);
     if (!data) {
       return;
     }

@@ -148,12 +148,12 @@ export function hasPaypalOptionInErrorMetadata(errorMetadata) {
  * @param {object} errorMetadata
  */
 export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
-  var errorMessageContainer = document.querySelector('#error-message');
+  let errorMessageContainer = document.querySelector('#error-message');
   if (!errorMessageContainer) {
     return;
   }
 
-  var existingPaypalContainer = document.querySelector('#fd-paypal-container');
+  let existingPaypalContainer = document.querySelector('#fd-paypal-container');
 
   if (!hasPaypalOptionInErrorMetadata(errorMetadata)) {
     // Remove Paypal container and show retry button
@@ -175,17 +175,17 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
 
   // Update error modal with paypal button
   if (hasPaypalOptionInErrorMetadata(errorMetadata)) {
-    var paypalContainer = document.createElement('div');
+    let paypalContainer = document.createElement('div');
     paypalContainer.setAttribute('id', 'fd-paypal-container');
 
     // create paypal button
-    var paypalBtn = document.createElement('button');
+    let paypalBtn = document.createElement('button');
     paypalBtn.classList.add('btn');
     paypalBtn.setAttribute('id', 'fd-paypal');
     paypalBtn.textContent = 'Pay With PayPal';
     paypalContainer.appendChild(paypalBtn);
 
-    var that = this;
+    let that = this;
 
     paypalBtn.addEventListener('click', function () {
       that.hideErrorMessage();
@@ -209,11 +209,11 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     });
 
     // create cancel button
-    var cancelBtn = document.createElement('button');
+    let cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     cancelBtn.style.textDecoration = 'underline';
     cancelBtn.setAttribute('id', 'fd-paypal-cancel');
-    var cancelBtnContainer = document.createElement('div');
+    let cancelBtnContainer = document.createElement('div');
     cancelBtnContainer.classList.add('error-cancel-btn-container');
     cancelBtnContainer.appendChild(cancelBtn);
     paypalContainer.appendChild(cancelBtnContainer);

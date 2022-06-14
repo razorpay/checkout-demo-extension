@@ -1,4 +1,4 @@
-import { hasProp, isEmpty } from 'utils/object';
+import { parse, hasProp, isEmpty } from 'utils/object';
 
 describe('Object Utils', () => {
   describe('hasProp', () => {
@@ -15,9 +15,19 @@ describe('Object Utils', () => {
       expect(hasProp({}, 'company')).toEqual(false);
     });
   });
-});
 
-describe('Object Utils', () => {
+  describe('parse', () => {
+    test('Convert String as Object', () => {
+      expect(parse('{"result":true, "count":10}')).toEqual({
+        result: true,
+        count: 10,
+      });
+    });
+    test('Convert String as Object with empty Object', () => {
+      expect(parse('{}')).toEqual({});
+    });
+  });
+
   describe('isEmpty', () => {
     test('Checks if the Object is empty, returns false if it has value', () => {
       expect(

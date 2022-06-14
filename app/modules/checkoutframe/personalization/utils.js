@@ -1,3 +1,5 @@
+import { parse } from 'utils/object';
+
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 
 /**
@@ -47,7 +49,7 @@ function get() {
   let data;
 
   try {
-    data = _Obj.parse(global.localStorage.getItem(PREFERRED_INSTRUMENTS));
+    data = parse(global.localStorage.getItem(PREFERRED_INSTRUMENTS));
 
     if (_.isArray(data)) {
       data = {};
