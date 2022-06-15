@@ -21,6 +21,9 @@ export function isStrictlyRecurring() {
 export function isSubscription() {
   return isRecurring() && getPreferences('subscription');
 }
+export function isStrictlyRecurringPayment() {
+  return isStrictlyRecurring() || isSubscription();
+}
 
 export function isASubscription(method = null) {
   if (!getPreferences('subscription')) {

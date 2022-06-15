@@ -1,4 +1,9 @@
-import { hasFeature, getCustomSubtextForMethod } from 'razorpay';
+import {
+  hasFeature,
+  getCustomSubtextForMethod,
+  isStrictlyRecurringPayment,
+} from 'razorpay';
+import { shouldRememberCustomer } from 'checkoutstore';
 
 import { getAppProviderSubtext } from 'i18n';
 
@@ -39,4 +44,14 @@ export const shouldShowTnc = (currency, country) => {
     hasFeature('show_mor_tnc', false) &&
     (currency === 'USD' || (!currency && country === 'US'))
   );
+};
+
+export const shouldRememberCard = (isIndianCustomer) => {
+  /**
+   * Recurring payments will always ask for user consent
+   */
+  if (isStrictlyRecurringPayment()) {
+    return shouldRememberCustomer();
+  }
+  return shouldRememberCustomer() && isIndianCustomer;
 };

@@ -31,8 +31,8 @@
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument } from 'checkoutstore/screens/home';
+  import { isIndianCustomer } from 'checkoutstore';
 
-  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
   import {
     getCardFeatures,
     isOfferForced,
@@ -75,6 +75,7 @@
   import { isCardValidForOffer } from 'offers/store';
   import { viewAllEMIPlans } from 'emi/helper';
   import { isNameReadOnly } from 'checkoutframe/customer';
+  import { shouldRememberCard } from './utils';
 
   const dispatch = createEventDispatcher();
 
@@ -90,12 +91,9 @@
   export let isCardSupportedForRecurring;
   export let isScreenScrollable;
 
-  const isSavedCardsEnabled = shouldRememberCustomer();
-
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 
-  let showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
-
+  let showRememberCardCheck = shouldRememberCard($isIndianCustomer);
   let cvvLength = 3;
   let showCardUnsupported = false;
   let lastIin = '';
@@ -133,7 +131,8 @@
      * FIX: adding this assignment in reactive block, so every update has
      *      correct valie
      */
-    showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
+    showRememberCardCheck = shouldRememberCard($isIndianCustomer);
+
     if (!$isCardValidForOffer && isOfferForced()) {
       validCardForOffer = false;
       setCardNumberValidity(false);

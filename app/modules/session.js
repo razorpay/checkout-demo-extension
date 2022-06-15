@@ -1862,6 +1862,42 @@ Session.prototype = {
     }
   },
 
+  /**
+   * - Sending OTP for user verification in case of save=1
+   * - Note: Already existing functionality just moved out of submit method
+   */
+  sendOTP: function () {
+    let session = this;
+
+    this.otpView.updateScreen({
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+        ? 'skip_saving_card_one_cc'
+        : 'skip_saving_card',
+    });
+    Analytics.track('saved_cards:save:otp:ask');
+    this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
+      phone: getPhone(),
+    });
+    this.askOTP(
+      this.otpView,
+      undefined,
+      true,
+      { phone: getPhone() },
+      undefined,
+      undefined,
+      true
+    );
+    let otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
+    this.getCurrentCustomer().createOTP(
+      function () {
+        session.updateCustomerInStore();
+      },
+      null,
+      otpTemplate
+    );
+    return;
+  },
+
   resendOTP: function () {
     let otpProvider;
     let paymentExists = Boolean(this.r._payment);
@@ -4291,12 +4327,10 @@ Session.prototype = {
 
       //
       // 1. If Payment is Recurring &&
-      // 2. Customer is Indian
-      // 3. If on add card screen and save card checkbox is not checked
-      // 4. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
+      // 2. If on add card screen and save card checkbox is not checked
+      // 3. If on saved card screen and consent is not already taken for saved card && checkbox is also not checked
       // ==> Shake the form and show tooltip on checkbox
       let isRecurring = RazorpayHelper.isRecurring();
-      let isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
       let isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
 
       // For saved card screen consent is maintained elsewhere
@@ -4313,7 +4347,6 @@ Session.prototype = {
 
       if (
         isRecurring &&
-        isDomesticCustomer &&
         !rememberCardCheck &&
         !isSavedCardScreenAndConsentAlreadyTaken
       ) {
@@ -5004,35 +5037,22 @@ Session.prototype = {
      * - Ask user to verify phone number if not logged in and wants to save card
      * - Show OTP screen after user agrees to fees
      */
+    let isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
-        this.otpView.updateScreen({
-          skipTextLabel: RazorpayHelper.isOneClickCheckout()
-            ? 'skip_saving_card_one_cc'
-            : 'skip_saving_card',
-        });
-        Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
-          phone: getPhone(),
-        });
-        this.askOTP(
-          this.otpView,
-          undefined,
-          true,
-          { phone: getPhone() },
-          undefined,
-          undefined,
-          true
-        );
-        let otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
-        this.getCurrentCustomer().createOTP(
-          function () {
-            session.updateCustomerInStore();
-          },
-          null,
-          otpTemplate
-        );
-        return;
+        /**
+         * - In case if strictly recurring payment
+         * - Ask user to verify phone if phone number is domestic only
+         */
+        if (RazorpayHelper.isStrictlyRecurringPayment()) {
+          if (isDomesticCustomer) {
+            this.sendOTP();
+            return;
+          }
+        } else {
+          this.sendOTP();
+          return;
+        }
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';
         request.paused = true;

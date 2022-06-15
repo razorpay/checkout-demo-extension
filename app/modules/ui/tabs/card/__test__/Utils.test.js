@@ -1,5 +1,5 @@
 import { setupPreferences } from 'tests/setupPreferences';
-import { shouldShowTnc } from '../utils';
+import { shouldShowTnc, shouldRememberCard } from '../utils';
 
 const razorpayInstance = {
   id: 'id',
@@ -49,5 +49,35 @@ describe('Test showTnC with feature flag', () => {
     expect(shouldShowTnc('USD', 'IN')).toBe(true);
     expect(shouldShowTnc(null, 'IN')).toBe(false);
     expect(shouldShowTnc(null, 'US')).toBe(true);
+  });
+});
+
+describe('Test shouldRememberCard function for subscription', () => {
+  beforeEach(() => setupPreferences('subscription', razorpayInstance));
+  test('Should return true if subscription and phone in domestic', () => {
+    expect(shouldRememberCard(true)).toBe(true);
+  });
+  test('Should return true if subscription and phone in domestic', () => {
+    expect(shouldRememberCard(false)).toBe(true);
+  });
+});
+
+describe('Test shouldRememberCard function for caw', () => {
+  beforeEach(() => setupPreferences('caw', razorpayInstance));
+  test('Should return true if caw and phone in domestic', () => {
+    expect(shouldRememberCard(true)).toBe(true);
+  });
+  test('Should return true if caw and phone in domestic', () => {
+    expect(shouldRememberCard(false)).toBe(true);
+  });
+});
+
+describe('Test shouldRememberCard function for non recurring', () => {
+  beforeEach(() => setupPreferences('nonRecurringTest'));
+  test('Should return false if non recurring & international phone', () => {
+    expect(shouldRememberCard(false)).toBe(false);
+  });
+  test('Should return false if non recurring & domestic phone', () => {
+    expect(shouldRememberCard(true)).toBe(false);
   });
 });

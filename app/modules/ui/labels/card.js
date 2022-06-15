@@ -70,6 +70,10 @@ export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1 =
   'card.save_card_know_more_add_card_modal_content1';
 export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT2 =
   'card.save_card_know_more_add_card_modal_content2';
+export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL =
+  'card.save_card_know_more_add_card_modal_content_international';
+export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL1 =
+  'card.save_card_know_more_add_card_modal_content_international1';
 export const SAVED_CARD_CHECKBOX_TOOLTIP = 'card.saved_card_checkbox_tooltip';
 export const SAVED_CARD_KNOW_MORE_CAW_CONTENT =
   'card.save_card_know_more_add_card_modal_recurring_content';

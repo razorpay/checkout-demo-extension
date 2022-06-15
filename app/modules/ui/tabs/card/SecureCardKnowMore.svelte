@@ -19,16 +19,19 @@
 
   // i18n labels
   import {
+    SAVE_CARD_MODAL_CONTENT,
+    SAVED_CARD_KNOW_MORE_CAW_CONTENT,
+    SAVED_CARD_COMPLIANT_WITH_GUIDELINES,
+    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE,
+    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT,
+    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL,
+    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2,
-    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE,
-    SAVED_CARD_COMPLIANT_WITH_GUIDELINES,
-    SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1,
-    SAVED_CARD_KNOW_MORE_CAW_CONTENT,
-    SAVE_CARD_MODAL_CONTENT,
   } from 'ui/labels/card';
+  import { isIndianCustomer } from 'checkoutstore';
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
   export function preventBack() {
@@ -73,16 +76,24 @@
       <!-- If recurring -->
       {#if isRecurring()}
         <div>
-          <p>
-            {$t(SAVE_CARD_MODAL_CONTENT)}
-          </p>
-          <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
+          {#if $isIndianCustomer}
+            <p>
+              {$t(SAVE_CARD_MODAL_CONTENT)}
+            </p>
+            <p>{$t(SAVED_CARD_KNOW_MORE_CAW_CONTENT)}</p>
+          {:else}
+            <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL)}</p>
+          {/if}
           <div class="recurring-know-more-container">
             <div class="recurring-shield">
               <Icon icon={shield()} />
             </div>
             <div>
-              <p>{$t(SAVED_CARD_COMPLIANT_WITH_GUIDELINES)}</p>
+              {#if $isIndianCustomer}
+                <p>{$t(SAVED_CARD_COMPLIANT_WITH_GUIDELINES)}</p>
+              {:else}
+                <p>{$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_INTERNATIONAL1)}</p>
+              {/if}
             </div>
           </div>
         </div>

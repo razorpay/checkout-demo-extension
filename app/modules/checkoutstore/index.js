@@ -8,8 +8,8 @@ import RazorpayStore, {
   getOption,
   isContactOptional,
   isHDFCVASMerchant,
+  isStrictlyRecurringPayment,
 } from 'razorpay/index';
-
 import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
 
 export const makeAuthUrl = (url) => _makeAuthUrl(RazorpayStore.get(), url);
@@ -18,6 +18,18 @@ export const showFeeLabel = writable(true);
 
 // can't move inside razorpay/helper as it consuming store
 export function shouldRememberCustomer(method = 'card') {
+  /**
+   * - For recurring due RBI circular it's mandatory to
+   *   collect explicit user consent to save card.
+   * - We are already saving card details irrespective of remember
+   *   customer flag.
+   * - Remember Customer = consent to save card
+   * - We are showing remember customer checkbox in every case for recurring
+   *   payments.
+   */
+  if (isStrictlyRecurringPayment()) {
+    return true;
+  }
   if (
     !navigator.cookieEnabled ||
     (method === 'card' && !getOption('features.cardsaving')) ||

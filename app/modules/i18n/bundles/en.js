@@ -303,6 +303,10 @@ export default {
       'This card will be linked to the subscription and future payments will be charged automatically.',
     save_card_know_more_add_card_modal_content1:
       'Your card will be stored securely as a saved payment method as per RBI’s latest guidelines.',
+    save_card_know_more_add_card_modal_content_international:
+      'Saving the card is required to automatically charge your card for future payments on Razorpay',
+    save_card_know_more_add_card_modal_content_international1:
+      'All saved cards are compliant with the latest security guidelines.',
     save_card_know_more_add_card_modal_content_recurring:
       'As per RBI’s latest guidelines, your permission is required to continue keeping this card saved securely for future payments on Razorpay.',
     save_card_know_more_add_card_modal_content_recurring_without_merchant_name:
