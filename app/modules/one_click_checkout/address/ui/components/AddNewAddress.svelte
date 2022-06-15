@@ -697,7 +697,7 @@
     const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
     const address_type = isShippingAddress ? 'shipping' : 'billing';
 
-    $selectedCountryISO = INDIA_COUNTRY_ISO_CODE;
+    $selectedCountryISO = INDIA_COUNTRY_ISO_CODE.toLowerCase();
     screenScrollTop(addressWrapperEle);
     if (isShippingAddress && !$formData.zipcode && !$formData.city) {
       $isShippingAddedToAmount = false;
