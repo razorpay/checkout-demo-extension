@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
 
   export let icon = null;

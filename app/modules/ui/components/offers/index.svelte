@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';

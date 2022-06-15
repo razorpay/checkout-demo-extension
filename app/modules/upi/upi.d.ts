@@ -98,7 +98,7 @@ declare namespace UPI {
 
   export type PaymentResponseHandler = (
     status: Payment.PaymentStatus,
-    response: CustomObject<any>
+    response: Common.Object<any>
   ) => void;
 
   export type PaymentHandlerConfiguration = {

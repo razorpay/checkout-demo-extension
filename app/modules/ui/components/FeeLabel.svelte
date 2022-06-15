@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import DynamicFeeBearer from './DynamicFeeBearer.svelte';

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getCurrencyConfig } from 'common/currency';
 
   export let item;

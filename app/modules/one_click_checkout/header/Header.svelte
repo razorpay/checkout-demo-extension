@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';

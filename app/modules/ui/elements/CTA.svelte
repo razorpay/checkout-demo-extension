@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { afterUpdate, createEventDispatcher } from 'svelte';
   import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
   import * as _El from 'utils/DOM';

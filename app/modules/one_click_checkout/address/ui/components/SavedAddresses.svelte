@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
 

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
 

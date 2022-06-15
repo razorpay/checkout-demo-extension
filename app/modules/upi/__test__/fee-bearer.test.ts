@@ -82,15 +82,15 @@ jest.mock('sessionmanager', () => ({
   }),
 }));
 
-let spy;
-beforeAll(() => {
-  spy = jest.spyOn(document, 'getElementById');
-});
+// let spy;
+// beforeAll(() => {
+//   spy = jest.spyOn(document, 'getElementById');
+// });
 
 describe('handleFeeBearer tests', () => {
   test('should properly load the fee-bearer modal', async () => {
     Analytics.setR(razorpayInstance);
-    const callback = (data: any) => {};
+    const callback = () => {};
     handleFeeBearer(argumentData as Partial<UPI.UPIPaymentPayload>, callback);
     document.querySelector('.fee-bearer')?.dispatchEvent(new Event('continue'));
     document.dispatchEvent(new Event('error'));

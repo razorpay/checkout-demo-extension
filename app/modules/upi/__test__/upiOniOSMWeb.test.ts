@@ -6,7 +6,6 @@ import {
 import {
   APP_DETECTED_FURTHER_STEPS_TIMEOUT,
   APP_DETECTION_OR_MANUAL_CANCEL_TIMEOUT,
-  upiBackCancel,
   USER_CONSENT_FOR_NAVIGATION_TIMEOUT,
 } from '../constants';
 

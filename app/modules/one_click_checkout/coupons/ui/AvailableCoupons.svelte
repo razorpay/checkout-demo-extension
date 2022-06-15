@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import CouponItem from './components/CouponItem.svelte';

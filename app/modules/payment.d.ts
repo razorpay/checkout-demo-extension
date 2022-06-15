@@ -1,5 +1,5 @@
 declare namespace Payment {
-  type PaymentParams = {
+  type PaymentParams<T = any> = {
     [x: string]: T;
     feesRedirect?: boolean;
     external: {
@@ -24,7 +24,7 @@ declare namespace Payment {
   export type PaymentStatus = 'cancel' | 'success' | 'error';
   export type PaymentReferer = 'UPI_UX' | 'QR_V2' | undefined;
   export type PaymentHistoryInstance = Partial<{
-    data: CustomObject<object>;
+    data: Common.Object<object>;
     params: Payment.PaymentParams;
     status: Payment.PaymentStatus;
     statusData: {

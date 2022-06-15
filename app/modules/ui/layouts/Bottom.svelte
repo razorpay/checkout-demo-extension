@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import * as _El from 'utils/DOM';
   export let tab;
 

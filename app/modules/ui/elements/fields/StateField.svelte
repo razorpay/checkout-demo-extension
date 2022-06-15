@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { STATE_HELP, STATE_LABEL } from 'ui/labels/home';
   import { t } from 'svelte-i18n';
 

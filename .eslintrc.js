@@ -6,7 +6,18 @@ var globalRollupReplace = [
   '__CYBER_SOURCE_RZP_ORG_ID__',
   '__BUILD_NUMBER__',
 ];
-globals = ['window', 'console']
+const globalTypeNameSpace = [
+  'NodeJS',
+  'UPI',
+  'Common',
+  'Payment',
+  'Downtime',
+  'Offers',
+  'NavStack',
+  'EMIPlanView',
+];
+
+globals = ['window', 'console', ...globalTypeNameSpace]
   .concat(Object.keys(globals))
   .concat(globalRollupReplace);
 
@@ -56,7 +67,7 @@ module.exports = {
         project: ['./tsconfig.json'], // Specify it only for TypeScript files
       },
       rules: {
-        'no-undef': 0, // disable it will handle by typescript
+        'no-undef': 2,
         '@typescript-eslint/no-unsafe-assignment': 0,
         '@typescript-eslint/no-unsafe-call': 0, // can enable later
         '@typescript-eslint/no-unsafe-member-access': 0, // can enable later

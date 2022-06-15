@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Icon from 'ui/elements/Icon.svelte';
   import info from 'ui/icons/payment-methods/info';
   export let variant = 'default';

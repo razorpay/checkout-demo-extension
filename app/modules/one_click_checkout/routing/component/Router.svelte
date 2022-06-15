@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import Route from 'one_click_checkout/routing/component/Route.svelte';
   import {

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from 'ui/components/rewards/RewardCard.svelte';

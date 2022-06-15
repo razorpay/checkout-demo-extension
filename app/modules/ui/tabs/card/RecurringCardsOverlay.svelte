@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { t, locale } from 'svelte-i18n';
   import {
     formatMessageWithLocale,

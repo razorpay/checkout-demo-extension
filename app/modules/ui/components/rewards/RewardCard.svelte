@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   //Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';

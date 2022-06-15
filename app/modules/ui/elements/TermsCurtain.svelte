@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { popStack } from 'navstack';
 
   // UI imports

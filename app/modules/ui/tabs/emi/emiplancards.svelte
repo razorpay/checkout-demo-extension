@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { isOneClickCheckout } from 'razorpay';
 
   import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';

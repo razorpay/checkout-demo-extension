@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // constants
   import RazorpayConfig from 'common/RazorpayConfig';
 

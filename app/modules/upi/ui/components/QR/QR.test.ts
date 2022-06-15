@@ -64,14 +64,13 @@ describe('QR Component Tests', () => {
       url: '',
       autoGenerate: true,
     });
-    const { getByText, debug, getByTestId } = render(QR, {});
+    const { getByText, getByTestId } = render(QR, {});
     expect(
       getByText('Scan the QR using any UPI app on your phone.')
     ).toBeInTheDocument();
     expect(getByTestId('loading')).toBeInTheDocument();
     expect(handleUPIPayments).toBeCalled();
-    const [payload, onResponse, config] = (handleUPIPayments as any).mock
-      .calls[0];
+    const [payload, onResponse] = (handleUPIPayments as any).mock.calls[0];
 
     payload.qrFlow.onPaymentCreate({
       intent_url: 'test-url',
@@ -103,7 +102,7 @@ describe('QR Component Tests', () => {
       url: 'test-url',
       autoGenerate: false,
     });
-    const { getByText, debug, getByTestId, queryByTestId } = render(QR, {});
+    const { getByText, queryByTestId } = render(QR, {});
     expect(
       getByText('Scan the QR using any UPI app on your phone.')
     ).toBeInTheDocument();

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Utils imports
   import { getThemeMeta } from 'checkoutstore/theme';
   import Analytics from 'analytics';

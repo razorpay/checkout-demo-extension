@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // svelte imports
   import { t } from 'svelte-i18n';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { getSession } from 'sessionmanager';
 
   // UI Imports

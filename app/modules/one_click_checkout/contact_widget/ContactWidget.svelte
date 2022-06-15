@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';

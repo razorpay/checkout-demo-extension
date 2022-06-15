@@ -1,10 +1,5 @@
 import { render } from '@testing-library/svelte';
 import { UPIAppStack } from '.';
-import {
-  setWithoutOffer,
-  isCtaShown,
-  showCtaWithDefaultText,
-} from 'checkoutstore/cta';
 
 jest.mock('sessionmanager', () => ({
   getSession: () => ({

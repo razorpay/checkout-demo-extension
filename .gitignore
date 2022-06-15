@@ -21,4 +21,4 @@ npm-debug.log
 .vscode
 
 test-report.xml
-test-result.json
+test-results.json

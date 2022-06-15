@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import { Track } from 'analytics';
   import Stack from 'ui/layouts/Stack.svelte';

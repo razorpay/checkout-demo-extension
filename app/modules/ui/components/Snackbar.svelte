@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let align;
   export let snackbar;
   export let shown;
