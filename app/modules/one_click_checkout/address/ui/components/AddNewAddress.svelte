@@ -100,7 +100,7 @@
     hideLoaderView,
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
-
+  import { showOptimisedAddr } from 'razorpay'
   import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
 
   // props
@@ -115,16 +115,18 @@
 
   let errors = {};
   let selectedTag = $formData.tag;
-  let pinIndex = 2;
+  let pinIndex;
   let pinSubIndex = 1;
+  let stateIndex;
   let countryIndex = 0;
-  let stateIndex = 3;
   let stateSubIndex = 1;
   let pinPattern = new RegExp(INDIA_PINCODE_REGEX);
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
   let stateCode = '';
   let lastUpdateState = '';
+  let INPUT_FORM = [];
+  let enabledOptimisedAddr = showOptimisedAddr()
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
@@ -141,7 +143,7 @@
     }
   };
 
-  let INPUT_FORM = [
+  const PERSONAL_INFO_FORM = [
     {
       id: 'name',
       label: NAME_LABEL,
@@ -152,7 +154,10 @@
     {
       id: 'contact',
       required: true,
-    },
+    }
+  ]
+
+  const DELHIVERY_INFO_FORM = [
     [
       {
         id: 'country_name',
@@ -239,7 +244,17 @@
         );
       },
     },
-  ];
+  ]
+
+  if (enabledOptimisedAddr) {
+    pinIndex = 0;
+    stateIndex = 1;
+    INPUT_FORM = [...DELHIVERY_INFO_FORM, ...PERSONAL_INFO_FORM]
+  } else {
+    pinIndex = 2;
+    stateIndex = 3;
+    INPUT_FORM = [...PERSONAL_INFO_FORM, ...DELHIVERY_INFO_FORM]
+  }
 
   const dispatch = createEventDispatcher();
 
@@ -708,6 +723,7 @@
 
     Events.TrackRender(AddressEvents.NEW_ADDRESS_SCREEN_LOADED_V2, {
       address_type,
+      address_flow_experimentation_enabled: enabledOptimisedAddr,
     });
 
     merchantAnalytics({
@@ -716,7 +732,7 @@
     });
     changePincodeStateLabel();
     const el = document.querySelector(
-      '#addressForm > div:nth-child(1) > div > #name'
+      enabledOptimisedAddr ? '#zipcode' : '#name'
     );
     el.focus();
   });
