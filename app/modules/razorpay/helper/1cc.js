@@ -39,7 +39,4 @@ export const isEnableAutoFetchCoupons = () =>
 export const getConsentViewCount = () =>
   getPreferences('customer.1cc_consent_banner_views') || 0;
 
-export const showOptimisedAddr = () =>
-  localStorage.getItem('1cc_address_flow_exp')
-    ? JSON.parse(localStorage.getItem('1cc_address_flow_exp'))
-    : false;
+export const showOptimisedAddr = () => getPreferences('1cc_address_flow_exp');
