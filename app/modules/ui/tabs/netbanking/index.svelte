@@ -239,7 +239,7 @@
     !recurring && hasMultipleOptions($selectedBank, filteredBanks);
   $: corporateSelected = isCorporateCode($selectedBank);
   $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Obj.entries(filteredBanks).map((entry) => ({
+  $: banksArr = Object.entries(filteredBanks).map((entry) => ({
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],

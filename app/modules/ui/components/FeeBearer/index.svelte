@@ -40,8 +40,6 @@
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
   const spaceAmountWithSymbol = !isOneClickCheckout();
-  const entries = _Obj.entries;
-
   const isOverlay = navstack?.isOverlay;
   const session = getSession();
   const fee_label = session.get('fee_label');
@@ -123,7 +121,7 @@
     <b>{$t(BREAKUP_TITLE)}</b>
     <br />
     <div class="fees-container">
-      {#each entries(feeBreakup) as [type, amount] (type)}
+      {#each Object.entries(feeBreakup) as [type, amount] (type)}
         {#if allowedKeys.includes(type)}
           <div class="fee">
             <div class="fee-title">

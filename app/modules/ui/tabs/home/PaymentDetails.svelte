@@ -82,8 +82,6 @@
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
-  const entries = _Obj.entries;
-
   // Props
   export let tpv;
   export let newCta;
@@ -266,7 +264,7 @@
         bind:address={$address}
         bind:pincode={$pincode}
         bind:state={$state}
-        states={entries(STATES)}
+        states={Object.entries(STATES)}
       />
     </div>
   {/if}

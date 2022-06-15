@@ -49,7 +49,7 @@ export function getCommonBankName(code) {
  * @return {Array<{name: string, code: string, logo: string}>}
  */
 const transformBanks = (bankObj) =>
-  _Obj.entries(bankObj).map((entry) => ({
+  Object.entries(bankObj).map((entry) => ({
     name: entry[1],
     code: entry[0],
     logo: getBankLogo(entry[0]),

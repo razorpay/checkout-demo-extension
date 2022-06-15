@@ -110,7 +110,7 @@
         }
       );
 
-      plans = _Obj.entries(_plans);
+      plans = Object.entries(_plans);
     }
   }
 

@@ -417,7 +417,7 @@
       i++;
     }
 
-    const sorted = _Obj.entries(currencies).sort((_a, _b) => {
+    const sorted = Object.entries(currencies).sort((_a, _b) => {
       const a = _a[CODE];
       const b = _b[CODE];
       if (a === cardCurrency) {

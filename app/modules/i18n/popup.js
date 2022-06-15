@@ -62,9 +62,11 @@ function defaultTranslatePaymentPopup(label, data) {
  * @returns {string}
  */
 function replaceLabels(string, data) {
-  _Obj.entries(data).forEach(([key, value]) => {
-    string = string.replace(`{${key}}`, value);
-  });
+  if (data) {
+    Object.entries(data)?.forEach(([key, value]) => {
+      string = string.replace(`{${key}}`, value);
+    });
+  }
   return string;
 }
 

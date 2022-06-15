@@ -383,9 +383,9 @@
           let isCurrentCardsNetworkEnabledForMerchant = true;
 
           // Find the entry in API_NETWORK_CODES_MAP
-          let networkEntry = _Obj
-            .entries(API_NETWORK_CODES_MAP)
-            .find((map) => map[1] === cardMetaData.network);
+          let networkEntry = Object.entries(API_NETWORK_CODES_MAP).find(
+            (map) => map[1] === cardMetaData.network
+          );
 
           if (networkEntry) {
             const apiNetwork = networkEntry[0]; // Card's network in API-representation

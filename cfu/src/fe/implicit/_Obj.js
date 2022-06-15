@@ -223,26 +223,6 @@ export const flatten = (o, prefix = '') => {
 };
 
 /**
- * Returns an array with subarrays consisting of key and value pairs
- * @param {Object} o
- *
- * @returns {Array}
- */
-export const entries = (o) => {
-  const list = [];
-
-  if (!_.isNonNullObject(o)) {
-    return list;
-  }
-
-  loop(o, (val, key) => {
-    list.push([key, val]);
-  });
-
-  return list;
-};
-
-/**
  * Returns an array with the values of the object
  * @param {Object} o
  *
