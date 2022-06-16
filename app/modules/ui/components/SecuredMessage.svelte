@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { t } from 'svelte-i18n';
   import { slide } from 'svelte/transition';
   import { getAnimationOptions } from 'svelte-utils';

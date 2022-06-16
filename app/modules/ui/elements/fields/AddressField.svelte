@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { input, focus, blur } from 'actions/input';
 
   import { ADDRESS_LABEL, ADDRESS_HELP } from 'ui/labels/home';

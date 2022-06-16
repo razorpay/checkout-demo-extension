@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { getOption, getMerchantKey, getOrderId } from 'razorpay';
   //store
   import { phone, email } from 'checkoutstore/screens/home';

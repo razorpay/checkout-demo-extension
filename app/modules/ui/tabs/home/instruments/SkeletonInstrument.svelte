@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { slide } from 'svelte/transition';
 </script>
 

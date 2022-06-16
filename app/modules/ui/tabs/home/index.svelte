@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { tick, onDestroy } from 'svelte';
 
   // Store

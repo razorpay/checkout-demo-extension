@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { isOneClickCheckout } from 'razorpay';
   import { fade } from 'svelte/transition';
 

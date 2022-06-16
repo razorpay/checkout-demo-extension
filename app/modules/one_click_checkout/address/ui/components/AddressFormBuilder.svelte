@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { createEventDispatcher, onMount } from 'svelte';
 
   // i18n

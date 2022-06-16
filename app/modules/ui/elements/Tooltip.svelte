@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { onMount, onDestroy } from 'svelte';
   import { querySelector } from 'utils/doc';

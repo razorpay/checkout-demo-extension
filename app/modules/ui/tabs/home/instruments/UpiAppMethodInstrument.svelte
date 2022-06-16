@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';

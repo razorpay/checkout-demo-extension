@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   export let callout = null;
   export let buttonText = null;
   export let onConfirm;

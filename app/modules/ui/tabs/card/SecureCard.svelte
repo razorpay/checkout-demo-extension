@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Declarations and Import Statements
   import SecureCardKnowMore from './SecureCardKnowMore.svelte';
   import { t } from 'svelte-i18n';

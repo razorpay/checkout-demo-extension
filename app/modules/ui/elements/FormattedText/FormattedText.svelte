@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { tokenizeTextForFormatters } from './tokenizer';
 
   export let text = '';

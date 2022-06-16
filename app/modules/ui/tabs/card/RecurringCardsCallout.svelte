@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { t } from 'svelte-i18n';
   import WarningIcon from './RecurringCardsWarningIcon.svelte';
   import { pushOverlay } from 'navstack';

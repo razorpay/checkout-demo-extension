@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import LinkButton from 'components/LinkButton.svelte';
   import { createEventDispatcher, onDestroy } from 'svelte';

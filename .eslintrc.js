@@ -1,11 +1,7 @@
 var globals = require('./cfu/scripts/rollup-injects.js');
 
 delete globals.include;
-var globalRollupReplace = [
-  '__SIFT_BEACON_KEY__',
-  '__CYBER_SOURCE_RZP_ORG_ID__',
-  '__BUILD_NUMBER__',
-];
+
 const globalTypeNameSpace = [
   'NodeJS',
   'UPI',
@@ -17,6 +13,11 @@ const globalTypeNameSpace = [
   'EMIPlanView',
 ];
 
+var globalRollupReplace = [
+  '__SIFT_BEACON_KEY__',
+  '__CYBER_SOURCE_RZP_ORG_ID__',
+  '__BUILD_NUMBER__',
+];
 globals = ['window', 'console', ...globalTypeNameSpace]
   .concat(Object.keys(globals))
   .concat(globalRollupReplace);

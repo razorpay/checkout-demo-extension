@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { getOption, getOrgDetails, isOneClickCheckout } from 'razorpay';
   import { onMount } from 'svelte';
   import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';

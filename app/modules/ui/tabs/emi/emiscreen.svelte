@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
   import * as _El from 'utils/DOM';

@@ -57,7 +57,6 @@ module.exports = function (testFeatures) {
     'one-click-checkout',
     testFeatures
   );
-
   const {
     skip,
     loggedIn,
@@ -88,14 +87,16 @@ module.exports = function (testFeatures) {
     }
     test(title, async () => {
       preferences.methods.cod = true;
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
       await delay(500);
-      await handleAvailableCouponReq(context);
-
+      if (options.show_coupons) {
+        await handleAvailableCouponReq(context);
+      }
       // loggedIn address flows
       if (loggedIn) {
         if (addresses.length) {

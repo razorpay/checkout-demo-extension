@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { get } from 'svelte/store';
 

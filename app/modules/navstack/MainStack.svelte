@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { lastOf } from 'utils/array';
   import { elementRef, elements } from './store';
 

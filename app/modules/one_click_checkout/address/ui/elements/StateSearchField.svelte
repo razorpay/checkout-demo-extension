@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { t } from 'svelte-i18n';
   import { Track } from 'analytics';
   import Field from 'ui/components/Field.svelte';

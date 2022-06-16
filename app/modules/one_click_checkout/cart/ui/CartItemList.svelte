@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // ui imports
   import CartItem from 'one_click_checkout/cart/ui/CartItem.svelte';
 

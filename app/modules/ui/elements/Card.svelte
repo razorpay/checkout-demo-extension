@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Props
   export let selected = false;
   export let error = false;

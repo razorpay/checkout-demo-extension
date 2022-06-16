@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import OfferItemMagicCheckout from 'one_click_checkout/offers/item.svelte';
   // util imports

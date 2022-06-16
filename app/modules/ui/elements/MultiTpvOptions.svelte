@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI Imports
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';

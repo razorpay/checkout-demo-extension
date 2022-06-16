@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Props
   export let classes = [];
   export let visible = true;

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { _ as t } from 'svelte-i18n';

@@ -5,7 +5,7 @@
   };
 </script>
 
-<script lang="ts">
+<script>
   // svelte imports
   import { onMount, onDestroy, tick, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';

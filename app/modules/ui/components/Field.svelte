@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { t } from 'svelte-i18n';
   // Utils imports
   import { getSession } from 'sessionmanager';

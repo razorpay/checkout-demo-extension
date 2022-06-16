@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import Field from 'ui/components/Field.svelte';
 
   import { PINCODE_HELP, PINCODE_LABEL } from 'ui/labels/home';

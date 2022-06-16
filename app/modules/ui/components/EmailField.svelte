@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import Field from 'ui/components/Field.svelte';
 

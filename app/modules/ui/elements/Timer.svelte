@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { onDestroy } from 'svelte';
   import { locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';

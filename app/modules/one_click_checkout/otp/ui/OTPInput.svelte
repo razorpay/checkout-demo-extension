@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { digits, disableCTA } from 'checkoutstore/screens/otp';
   import { showFeeLabel } from 'checkoutstore/index.js';
 

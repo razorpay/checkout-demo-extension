@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import Callout from 'ui/elements/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';

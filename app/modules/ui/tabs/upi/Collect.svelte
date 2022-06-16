@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { onMount } from 'svelte';
 

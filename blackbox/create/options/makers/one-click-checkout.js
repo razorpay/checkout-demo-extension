@@ -33,6 +33,14 @@ function makePreferences(features, preferences) {
     partial_payment: false,
   };
 
+  if (features.showCoupons) {
+    preferences['1cc'] = {
+      configs: {
+        one_cc_auto_fetch_coupons: true,
+      },
+    };
+  }
+
   return preferences;
 }
 

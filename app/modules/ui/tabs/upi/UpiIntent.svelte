@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
   import { t, locale } from 'svelte-i18n';

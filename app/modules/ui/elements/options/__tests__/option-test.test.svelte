@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import Option from '../Slotted/Option.svelte';
   export let withRow = false;
 </script>

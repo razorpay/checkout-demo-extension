@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { isOneClickCheckout } from 'razorpay';
 
   export let type = 'button';

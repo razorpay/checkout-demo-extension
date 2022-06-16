@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { onDestroy } from 'svelte';
 
   // UI Imports

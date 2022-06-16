@@ -47,7 +47,7 @@
     "build": "npm run clean && rollup -c --environment prod && gulp && ./scripts/legacy.sh",
     "lint": "eslint app/modules",
     "lint-fix": "eslint app/modules --fix",
-    "svelte-check": "svelte-check --tsconfig tsconfig.json --ignore app/modules/**/__test__/*.test.js",
+    "svelte-check": "svelte-check --tsconfig tsconfig.json --threshold error --output human",
     "clean": "./scripts/clean.sh",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
     "jest:custom": "jest blackbox/tests/custom/**/*.test.js",

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
 

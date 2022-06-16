@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/dom';
 import { render } from '@testing-library/svelte';
 import { IntentFlowsHeader } from '.';
 import { getLastUpiUxErroredPaymentApp } from 'upi/helper/upiUx';
@@ -16,6 +17,9 @@ describe('IntentFlowsHeader', () => {
     (getLastUpiUxErroredPaymentApp as jest.Mock).mockReturnValue({});
     const result = render(IntentFlowsHeader, {
       visible: true,
+    });
+    const result2 = render(IntentFlowsHeader, {
+      visible: false,
     });
     expect(result).toBeTruthy();
     expect(

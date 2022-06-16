@@ -46,8 +46,9 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
-
-      await handleAvailableCouponReq(context);
+      if (options.show_coupons) {
+        await handleAvailableCouponReq(context);
+      }
       if (closeModalOnBack || closeModalOnCross) {
         if (closeModalOnBack) {
           await goBack(context);

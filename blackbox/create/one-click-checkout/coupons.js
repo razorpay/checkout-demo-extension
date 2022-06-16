@@ -63,8 +63,9 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
-
-      await handleAvailableCouponReq(context, availableCoupons);
+      if (options.show_coupons) {
+        await handleAvailableCouponReq(context, availableCoupons);
+      }
       await handleCouponView(context);
       if (personalised) {
         await applyCoupon(context, couponCode);

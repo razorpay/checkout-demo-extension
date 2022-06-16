@@ -64,7 +64,10 @@ const {
 } = require('../tests/homescreen/actions');
 const { delay } = require('../util.js');
 
-const { respondToPaymentFailure } = require('../actions/card-actions');
+const {
+  respondToPaymentFailure,
+  selectConsentCollectorForTokenization,
+} = require('../actions/card-actions');
 const {
   expectStatesAPI,
   expectCountriesAPI,
@@ -172,6 +175,10 @@ module.exports = function (testFeatures) {
         dcc,
         internationalCard,
       });
+
+      if (recurringOrder && options.remember_customer) {
+        await selectConsentCollectorForTokenization(context);
+      }
 
       if (dcc) {
         await selectCurrencyAndVerifyAmount({

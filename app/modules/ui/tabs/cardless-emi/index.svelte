@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';

@@ -1,8 +1,4 @@
-<script>
-  let props = $$props;
-</script>
-
-<h3 on:click {...props}>
+<h3 on:click {...$$props}>
   <slot />
 </h3>
 

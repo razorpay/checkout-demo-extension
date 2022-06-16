@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // svelte imports
   import { onDestroy, onMount } from 'svelte';
   import { get } from 'svelte/store';

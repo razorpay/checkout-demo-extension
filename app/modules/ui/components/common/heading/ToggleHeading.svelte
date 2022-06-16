@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import Heading from 'ui/components/common/heading/Heading.svelte';
 
   export let expanded = false;

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI Imports
   import CardBox from 'ui/elements/CardBox.svelte';
   import Field from 'ui/components/Field.svelte';

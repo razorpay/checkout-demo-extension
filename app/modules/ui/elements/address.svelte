@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI Imports
   import AddressField from 'ui/elements/fields/AddressField.svelte';
   import PinCodeField from 'ui/elements/fields/PinCodeField.svelte';

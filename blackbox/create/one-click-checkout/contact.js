@@ -57,7 +57,9 @@ module.exports = function (testFeatures) {
         preferences,
       });
 
-      await handleAvailableCouponReq(context);
+      if (options.show_coupons) {
+        await handleAvailableCouponReq(context);
+      }
 
       await fillUserDetails(context, randomContact());
       await delay(500);

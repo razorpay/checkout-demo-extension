@@ -42,9 +42,9 @@ module.exports = function (testFeatures) {
           options,
           preferences,
         });
-
-        await handleAvailableCouponReq(context);
-
+        if (options.show_coupons) {
+          await handleAvailableCouponReq(context);
+        }
         const screenEle = await context.page.waitForSelector('.screen-comp');
         await scrollToEnd(context, screenEle);
         await delay(800);

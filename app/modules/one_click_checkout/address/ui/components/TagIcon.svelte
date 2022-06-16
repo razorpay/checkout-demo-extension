@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import Icon from 'ui/elements/Icon.svelte';
   import home from 'one_click_checkout/address/icons/home';
   import work from 'one_click_checkout/address/icons/work';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // svelte imports
   import { fly, fade } from 'svelte/transition';
 

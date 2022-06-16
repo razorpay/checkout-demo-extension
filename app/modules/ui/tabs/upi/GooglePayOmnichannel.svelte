@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';

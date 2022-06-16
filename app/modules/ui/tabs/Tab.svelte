@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Utils imports
   import { isMethodEnabled } from 'checkoutstore/methods';
   import { isOneClickCheckout } from 'razorpay';

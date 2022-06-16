@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
 

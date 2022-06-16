@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { getAmount } from 'razorpay';
 
   // i18n

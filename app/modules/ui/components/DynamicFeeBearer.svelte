@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { onMount, onDestroy, tick } from 'svelte';
 
   //UI imports

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Util imports
   import { Track } from 'analytics';
 

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import RazorpayConfig from 'common/RazorpayConfig';
   export let height = 24;
   export let width = 22;

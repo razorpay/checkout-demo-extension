@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // UI imports
   import * as TermsCurtain from 'checkoutframe/termscurtain';
   import Checkbox from 'ui/elements/Checkbox.svelte';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { getLongBankName } from 'i18n';

@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // svelte imports
   import { createEventDispatcher, tick } from 'svelte';
 

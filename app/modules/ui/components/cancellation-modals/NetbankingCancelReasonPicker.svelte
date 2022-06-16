@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { getSession } from 'sessionmanager';
   import * as _El from 'utils/DOM';
   import {
