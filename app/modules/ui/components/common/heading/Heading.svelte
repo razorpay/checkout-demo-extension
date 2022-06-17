@@ -1,3 +1,7 @@
+<script>
+  // without script eslint throw error for $$props
+</script>
+
 <h3 on:click {...$$props}>
   <slot />
 </h3>

@@ -35,4 +35,17 @@ beforeAll(() => {
       }
     },
   });
+
+  page.on('pageerror', (e) => {
+    const message = e.message;
+    // we can't detect type using instanceof
+    if (
+      message.startsWith('ReferenceError') ||
+      message.startsWith('TypeError')
+      ) {
+        console.log('error', message);
+        // console error will not failed the test only close will trigger error
+      page.close();
+    }
+  });
 });
