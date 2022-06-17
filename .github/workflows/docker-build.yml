@@ -19,7 +19,7 @@ jobs:
       - name: Run Unit Tests
         run: npm run test:unit
       - name: Make Build
-        run: GIT_COMMIT_HASH=${{ github.sha }} BUILD_NUMBER=${{ github.run_id }} npm run build
+        run: NODE_ENV=production GIT_COMMIT_HASH=${{ github.sha }} BUILD_NUMBER=${{ github.run_id }} npm run build
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

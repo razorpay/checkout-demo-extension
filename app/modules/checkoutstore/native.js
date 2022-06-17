@@ -4,6 +4,7 @@ import {
   getCardApps as getSortedCardApps,
   getAppsForMethod,
 } from 'common/apps';
+import { BUILD_NUMBER } from 'common/constants';
 
 let message;
 let cardApps = { all: getAppsForMethod('card') };
@@ -63,7 +64,7 @@ export function getSDKMeta() {
     platform: qpmap.platform || 'web',
     library: 'checkoutjs',
     // eslint-disable-next-line no-undef
-    version: (qpmap.version || __BUILD_NUMBER__ || 0) + '',
+    version: (qpmap.version || BUILD_NUMBER) + '',
   };
 }
 
@@ -166,7 +167,7 @@ const messageTransformers = {
   },
 
   addPreviousData: (transfomed, message) => {
-    var data = message.data;
+    let data = message.data;
     if (data) {
       if (_.isString(data)) {
         try {
@@ -180,7 +181,7 @@ const messageTransformers = {
   },
 
   useTrackingProps: (transfomed, message) => {
-    var props = ['referer', 'integration'];
+    let props = ['referer', 'integration'];
 
     _Obj.loop(props, (prop) => {
       if (!(message[prop] |> _.isUndefined)) {

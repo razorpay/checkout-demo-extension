@@ -16,6 +16,7 @@ import { getAgentPayload } from 'checkoutstore/methods';
 import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import { isNonNullObject } from 'utils/object';
+import { BUILD_NUMBER } from './constants';
 
 /**
  *
@@ -385,7 +386,7 @@ export function makePrefParams(rzp) {
 
     // To differentiate that preferences is being hit from Checkout
     // eslint-disable-next-line no-undef
-    params['_[build]'] = __BUILD_NUMBER__ || 0;
+    params['_[build]'] = BUILD_NUMBER;
     params['_[checkout_id]'] = rzp.id;
     params['_[library]'] = Track.props.library;
     params['_[platform]'] = Track.props.platform;

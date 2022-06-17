@@ -6,6 +6,7 @@ import { checkDowntime } from 'checkoutframe/downtimes';
 import loadScript from 'common/loadScript';
 import fetch from 'utils/fetch';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
+import { CYBER_SOURCE_RZP_ORG_ID, SIFT_BEACON_KEY } from 'common/constants';
 
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
@@ -473,7 +474,7 @@ export function addDowntimesToSavedCards(cards, downtimes) {
   return cardsWithDowntime;
 }
 
-export function injectSiftScript(sessionId, beaconKey = __SIFT_BEACON_KEY__) {
+export function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
   if (document.getElementById('__sift_script') || !sessionId || !beaconKey) {
     return Promise.resolve();
   }
@@ -507,7 +508,7 @@ export function injectSiftScript(sessionId, beaconKey = __SIFT_BEACON_KEY__) {
  */
 export function injectCyberSourceScript(
   sessionId,
-  orgId = __CYBER_SOURCE_RZP_ORG_ID__
+  orgId = CYBER_SOURCE_RZP_ORG_ID
 ) {
   const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=${sessionId}`;
   return loadScript(csUrl, 'cyberSourceScript');

@@ -13,6 +13,7 @@ import {
   CRED_OFFER_EXPERIMENTS,
   CRED_MERCHANT_CONSENT,
 } from './constants';
+import { BUILD_NUMBER } from 'common/constants';
 
 let CRED_ELIGIBILITY_CACHE = undefined;
 
@@ -255,7 +256,7 @@ export const checkCREDEligibility = function (contact) {
         entity: 'cred',
         value: contact,
         '_[checkout_id]': session?.id || this?.id,
-        '_[build]': __BUILD_NUMBER__ || 0,
+        '_[build]': BUILD_NUMBER,
         '_[library]': Track.props.library,
         '_[platform]': Track.props.platform,
         ...agentPayload,

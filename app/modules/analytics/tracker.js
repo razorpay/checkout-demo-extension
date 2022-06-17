@@ -3,6 +3,7 @@ import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
 import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
+import { BUILD_NUMBER } from 'common/constants';
 
 const CHUNK_SIZE = 5;
 
@@ -259,7 +260,7 @@ export default function Track(r, event, data, immediately) {
 
     // Add build number
     // eslint-disable-next-line no-undef
-    properties.build_number = __BUILD_NUMBER__ || 0;
+    properties.build_number = BUILD_NUMBER;
 
     // Add canary_percentage
     // Add current experiments

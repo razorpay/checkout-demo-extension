@@ -140,3 +140,14 @@ export function smoothScrollBy(y: number) {
     requestAnimationFrame(step);
   }, 100);
 }
+
+/**
+ * Insert css from given url into head tag
+ * @param {string} url
+ */
+export function loadCSS(url: string) {
+  const link = _El.create('link') as HTMLLinkElement;
+  link.rel = 'stylesheet';
+  link.href = url;
+  document.head.appendChild(link);
+}

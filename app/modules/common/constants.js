@@ -143,3 +143,21 @@ export const PAYMENT_CANCEL_REASONS = {
   INTENDED_OPT_OUT: 'intended_payment_opt_out',
   INTENDED_EXPIRE: 'intended_payment_expired',
 };
+
+export const SIFT_BEACON_KEY = '4dbbb1f7b6';
+export const CYBER_SOURCE_RZP_ORG_ID = '1snn5n9w';
+
+export const BUILD_NUMBER = __BUILD_NUMBER__; // eslint-disable-line no-undef
+export const TRAFFIC_ENV = __TRAFFIC_ENV__ || '__S_TRAFFIC_ENV__'; // eslint-disable-line no-undef
+export const COMMIT_HASH = __GIT_COMMIT_HASH__; // eslint-disable-line no-undef
+
+export const STATIC_CDN_PREFIX = BUILD_NUMBER
+  ? `https://checkout-static.razorpay.com/build/${COMMIT_HASH}`
+  : '/dist/v1';
+
+export const FRAME_CSS_URL = STATIC_CDN_PREFIX + '/css/checkout.css';
+export const FRAME_JS_URL = STATIC_CDN_PREFIX + '/checkout-frame.js';
+export const FRAME_1CC_CSS_URL =
+  STATIC_CDN_PREFIX + '/1cc' + '/css/checkout.css';
+export const FRAME_1CC_JS_URL =
+  STATIC_CDN_PREFIX + '/1cc' + '/checkout-frame.js';

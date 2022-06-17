@@ -4,6 +4,7 @@ import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
 import { getOption, getOrderId } from 'razorpay';
+import { BUILD_NUMBER } from 'common/constants';
 
 export const formatPayment = function (payment) {
   let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
@@ -114,7 +115,7 @@ export const formatPayload = function (payload, params = {}) {
   data['_[shield][tz]'] = -new Date().getTimezoneOffset();
 
   // eslint-disable-next-line no-undef
-  data['_[build]'] = __BUILD_NUMBER__ || 0;
+  data['_[build]'] = BUILD_NUMBER;
 
   // flatten notes, card
   // notes.abc -> notes[abc]
