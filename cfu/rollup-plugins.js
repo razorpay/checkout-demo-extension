@@ -75,7 +75,7 @@ const getPlugins = ({ src }) => {
       __GIT_COMMIT_HASH__: JSON.stringify(process.env.GIT_COMMIT_HASH) || null,
       __CANARY_PERCENTAGE__: process.env.CANARY_PERCENTAGE,
       // env is prod but traffic env can be production/canary/baseline
-      __TRAFFIC_ENV__: process.env.TRAFFIC_ENV,
+      __TRAFFIC_ENV__: JSON.stringify(process.env.TRAFFIC_ENV),
       __SIFT_BEACON_KEY__: JSON.stringify('4dbbb1f7b6'),
       __CYBER_SOURCE_RZP_ORG_ID__: JSON.stringify('1snn5n9w'),
     }),

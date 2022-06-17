@@ -17,11 +17,7 @@ setSessionConstructor(Session);
 Track.props.library = 'checkoutjs';
 
 const params = _.getQueryParams();
-const trafficEnv = params.traffic_env || String('__TRAFFIC_ENV__'); // eslint-disable-line no-undef
-
-if (trafficEnv) {
-  Track.props.env = trafficEnv;
-}
+Track.props.env = params.traffic_env || __TRAFFIC_ENV__ || '__S_TRAFFIC_ENV__'; // eslint-disable-line no-undef
 RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
 startErrorCapturing();

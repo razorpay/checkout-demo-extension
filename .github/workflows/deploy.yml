@@ -1,54 +1,37 @@
 name: Deploy
 
-on:
-  workflow_dispatch:
-    inputs:
-      commit:
-        required: true
-        description: Commit to deploy
-      env:
-        type: choice
-        description: Target environment
-        required: true
-        default: canary
-        options:
-          - baseline
-          - canary
-          - production
+on: deployment
 
 jobs:
-  build:
+  deploy:
+    if: github.event.deployment.task == 'static'
     runs-on: self-hosted
-    container:
-      image: c.rzp.io/razorpay/checkout:cff525cb72dff476923523515e6cc69153820782
-      credentials:
-        username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
-        password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
 
     steps:
-      - name: Check if commit belongs to master
-        if: ${{ github.event.inputs.env != 'canary' }}
-        run: |
-          curl -s --header \
-            "Authorization: token ${{ github.token }}" \
-            "https://api.github.com/search/commits?q=repo:razorpay/checkout+hash:${{ github.event.inputs.commit }}" \
-            | jq -e '.items | first'
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::101860328116:role/gha-stage-checkout-static-action
+          role-to-assume: arn:aws:iam::141592612890:role/gha-prod-frontend_checkout
           aws-region: ap-south-1
           role-duration-seconds: 900
 
       - name: Add ENV and push
+        uses: docker://amazon/aws-cli:2.7.7
+        with:
+          entrypoint: scripts/deploy.sh
+          args: ${{ github.event.deployment.payload.commit_id }} ${{ github.event.deployment.payload.canary }} ${{ github.event.deployment.payload.baseline }} ${{ github.event.deployment.payload.production }}
+
+      - name: Mark Deployment Success on GitHub
+        if: ${{ success() }}
         run: |
-          aws s3 sync \
-            s3://rzp-1415-prod-checkout-static/build/${{ github.event.inputs.commit }} \
-            build \
-          && find build \
-            -name '*.js' \
-            -exec sed -i -- "s#__TRAFFIC_ENV__#${{ github.event.inputs.env }}#g" {} \; \
-          && aws s3 sync \
-            build \
-            s3://rzp-1415-prod-checkout-static-${{ github.event.inputs.env }}/v1"
+          curl --location --request POST 'https://api.github.com/repos/razorpay/checkout/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "cdn",
+            "state": "success"
+          }'
