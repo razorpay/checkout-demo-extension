@@ -13,6 +13,13 @@ jobs:
     secrets:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
+  security-packagevulnerability:
+    uses: razorpay/security-action/.github/workflows/package_scan.yml@master
+    with:
+      PROGRAMMING_LANGUAGE: "JAVASCRIPT"
+    secrets:
+      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+
   security-statuscheck:
     needs: [ security-sast ]
     if: always()
