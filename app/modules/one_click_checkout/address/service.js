@@ -63,6 +63,7 @@ export function getCityState(pincode, country) {
   }
 
   if (addressPromiseCache[pincode]) {
+    hideLoaderView();
     return addressPromiseCache[pincode];
   }
 
