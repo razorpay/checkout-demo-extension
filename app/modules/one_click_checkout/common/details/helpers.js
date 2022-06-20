@@ -61,6 +61,9 @@ export const handleDetailsNext = (prevContact) => {
       path: views.COUPONS,
     });
     return;
+  } else {
+    toggleHeader(true);
+    navigator.navigateBack();
   }
 };
 
