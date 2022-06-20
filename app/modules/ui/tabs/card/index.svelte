@@ -1277,7 +1277,7 @@
     </Bottom>
     {#if renderCtaOneCC}
       <CTAOneCC on:click={() => session.preSubmit()}>
-        {session.emiPlansForNewCard
+        {session.emiPlansForNewCard && session.tab === 'emi'
           ? $t(SELECT_EMI_PLAN_LABEL)
           : $t(PAY_NOW_CTA_LABEL)}
       </CTAOneCC>
