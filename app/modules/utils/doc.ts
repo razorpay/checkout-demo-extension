@@ -146,8 +146,12 @@ export function smoothScrollBy(y: number) {
  * @param {string} url
  */
 export function loadCSS(url: string) {
-  const link = _El.create('link') as HTMLLinkElement;
-  link.rel = 'stylesheet';
-  link.href = url;
-  document.head.appendChild(link);
+  return new Promise((resolve, reject) => {
+    const link = _El.create('link') as HTMLLinkElement;
+    link.rel = 'stylesheet';
+    link.href = url;
+    link.onload = () => resolve(link);
+    link.onerror = () => reject(new Error(`Failed to load ${url}`));
+    document.head.appendChild(link);
+  });
 }
