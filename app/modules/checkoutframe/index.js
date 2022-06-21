@@ -337,8 +337,7 @@ function getPrefsPromisified(session) {
 }
 
 function isFrameCssAvailable() {
-  let links = document.getElementsByTagName('link');
-  return [...links].some((link) => String(link.href).endsWith(FRAME_CSS_URL));
+  return Boolean(document.querySelector(`link[href$="${FRAME_CSS_URL}"]`));
 }
 
 function fetchPrefs(session) {
