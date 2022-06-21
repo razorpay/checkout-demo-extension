@@ -86,6 +86,7 @@
   export let tpv;
   export let newCta;
   export let onSubmit;
+  export let valid = false;
   export let showValidations = false;
 
   const order = getMerchantOrder();
@@ -103,6 +104,10 @@
   };
   let disabled = true;
   let validationText;
+  let validEmail = false;
+  let validContact = false;
+
+  $: valid = validEmail && validContact;
 
   function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
@@ -238,6 +243,7 @@
           on:countrySelect={handleCountrySelect}
           {showValidations}
           {validationText}
+          bind:valid={validContact}
         />
       </div>
     {/if}
@@ -247,6 +253,7 @@
           bind:value={$email}
           on:blur={trackEmailFilled}
           {showValidations}
+          bind:valid={validEmail}
         />
       </div>
     {/if}

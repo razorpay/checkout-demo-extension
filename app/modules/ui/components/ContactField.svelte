@@ -7,9 +7,12 @@
   import CountrySearchModal from 'ui/components/CountrySearchModal.svelte';
 
   import {
+    CONTACT_REGEX,
     COUNTRY_CODE_PATTERN,
+    INDIA_COUNTRY_CODE,
     PHONE_PATTERN,
     PHONE_PATTERN_INDIA,
+    PHONE_REGEX_INDIA,
   } from 'common/constants';
 
   // i18n
@@ -22,6 +25,10 @@
     MOBILE_NUMBER,
     MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
+  import {
+    CONTACT_ERROR_LABEL,
+    INDIA_CONTACT_ERROR_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
 
   import { t } from 'svelte-i18n';
 
@@ -36,6 +43,7 @@
   export let country;
   export let phone;
   export let isOptional;
+  export let valid = false;
   export let inAddress = false;
   export let validationText;
   export let showValidations = false;
@@ -122,6 +130,19 @@
       phoneField.focus();
     }
   }
+
+  function validateContact(country, phone) {
+    if (country === INDIA_COUNTRY_CODE) {
+      return !PHONE_REGEX_INDIA.test(phone)
+        ? $t(INDIA_CONTACT_ERROR_LABEL)
+        : null;
+    } else {
+      return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
+    }
+  }
+
+  $: validationText = validateContact(country, phone);
+  $: valid = !validationText;
 </script>
 
 <div class="fields-container">

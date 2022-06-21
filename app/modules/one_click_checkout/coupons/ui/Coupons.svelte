@@ -86,11 +86,11 @@
   let scrollable = false;
   let orderWidget;
   let showValidations = false;
+  let contactDetailsValid = false;
 
   $: ctaDisabled =
-    (!$contact && !isContactHidden()) ||
-    (!$email && !isEmailHidden()) ||
-    ($savedAddresses.length && !$selectedAddress?.serviceability);
+    ($savedAddresses.length && !$selectedAddress?.serviceability) ||
+    !contactDetailsValid;
 
   function onSubmitLoggedInUser() {
     if (!$savedAddresses.length) {
@@ -149,7 +149,7 @@
   }
 
   function summaryLoadedEvent() {
-    initSummaryMetaAnalytics()
+    initSummaryMetaAnalytics();
 
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
@@ -233,7 +233,7 @@
     class:coupon-scrollable={scrollable}
   >
     <div class="widget-wrapper contact-wrapper">
-      <ContactWidget {showValidations} />
+      <ContactWidget {showValidations} bind:valid={contactDetailsValid} />
     </div>
     <div class="separator" />
 

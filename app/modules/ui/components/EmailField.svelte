@@ -31,11 +31,13 @@
 
   // Form Validation for email - specifically for 1cc
   let validationText;
+  export let valid = false;
   export let showValidations = false;
 
   const debouncedValidator = debounce((email) => {
-    isEmailValid(email).then((valid) => {
-      validationText = !valid ? $t(EMAIL_HELP_TEXT) : null;
+    isEmailValid(email).then((isValid) => {
+      validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
+      valid = isValid;
     });
   }, 400);
 
