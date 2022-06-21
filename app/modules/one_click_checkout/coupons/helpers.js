@@ -68,6 +68,7 @@ import {
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
 import { views } from 'one_click_checkout/routing/constants';
+import { showLoader } from 'one_click_checkout/loader/store';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -248,9 +249,11 @@ export function onSubmitLogoutUser() {
     params.sms_hash = sms_hash;
   }
 
+  showLoader.set(true);
   customer.checkStatus(
     function (customerData) {
       consentViewCount.set(customerData['1cc_consent_banner_views'] || 0);
+      showLoader.set(false);
       if (customer.saved_address) {
         handleCreateOTP();
       } else if (get(showBanner)) {
