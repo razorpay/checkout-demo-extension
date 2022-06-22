@@ -193,8 +193,8 @@
    */
   onDestroy(() => {
     isDestroyed = true;
+    setDCCPayload({ view }, view === Views.PAYPAL_WALLET);
     updateAmountInHeaderAndCTA();
-    setDCCPayload({ view });
   });
 
   $: {
