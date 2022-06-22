@@ -73,10 +73,10 @@ export const sanitizeTokens = (tokens) => {
   const recurring = isRecurring();
   const recurringMethods = getRecurringMethods();
   const recurringCreditCardNetworks = recurringMethods?.card?.credit ?? [];
+  const recurringPrepaidCardNetworks = recurringMethods?.card?.prepaid ?? [];
   const recurringDebitCardIssuers = Object.keys(
     recurringMethods?.card?.debit ?? {}
   );
-
   if (tokens) {
     tokens.items = tokens.items.filter((token) => {
       if (recurring) {
@@ -93,6 +93,8 @@ export const sanitizeTokens = (tokens) => {
             return recurringCreditCardNetworks.includes(card.network);
           } else if (cardType === 'debit') {
             return recurringDebitCardIssuers.includes(card.issuer);
+          } else if (cardType === 'prepaid') {
+            return recurringPrepaidCardNetworks.includes(card.network);
           } else {
             return false;
           }
