@@ -119,11 +119,11 @@ function makeCheckoutUrl(rzp) {
     }
   }
 
-  // enable to load CDN based assets
-  // url = _.appendParamsToUrl(url, {
-  //   traffic_env: __TRAFFIC_ENV__, // eslint-disable-line no-undef
-  //   build: __GIT_COMMIT_HASH__, // eslint-disable-line no-undef
-  // });
+  // enables loading CDN based assets
+  url = _.appendParamsToUrl(url, {
+    traffic_env: __TRAFFIC_ENV__, // eslint-disable-line no-undef
+    build: __GIT_COMMIT_HASH__, // eslint-disable-line no-undef
+  });
 
   return url;
 }
