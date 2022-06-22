@@ -51,8 +51,7 @@ export const capture = (
 
 const ERROR_TRACKING_URLS = [
   'https://checkout.razorpay.com',
-  'https://prod-checkout-canary.razorpay.com',
-  'https://checkout-baseline.razorpay.com',
+  'https://checkout-static.razorpay.com',
 ];
 
 export function isUrlApplicableForErrorTracking(url) {
