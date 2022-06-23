@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import DeprecatedOption from 'ui/elements/options/DeprecatedOption.svelte';
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';

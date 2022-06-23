@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Util imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';

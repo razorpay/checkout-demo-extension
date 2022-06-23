@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // util imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'razorpay';

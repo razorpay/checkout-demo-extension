@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { t } from 'svelte-i18n';
   import { formatMessageWithLocale } from 'i18n';

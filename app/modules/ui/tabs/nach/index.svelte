@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Refs
   let fileInput;
 

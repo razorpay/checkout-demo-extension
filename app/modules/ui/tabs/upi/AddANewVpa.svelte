@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';

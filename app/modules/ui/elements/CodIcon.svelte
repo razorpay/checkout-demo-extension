@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Icon from 'ui/elements/Icon.svelte';
   import cod from 'ui/icons/payment-methods/cod';
   import { getTheme } from 'one_click_checkout/sessionInterface';

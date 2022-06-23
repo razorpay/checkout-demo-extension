@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';

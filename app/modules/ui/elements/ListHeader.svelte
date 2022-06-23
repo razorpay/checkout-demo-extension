@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   export let warningMode = false;

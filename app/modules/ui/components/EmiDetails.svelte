@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Store
   import { selectedPlan } from 'checkoutstore/emi';
 

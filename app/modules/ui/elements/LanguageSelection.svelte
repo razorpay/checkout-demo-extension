@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { locale, locales } from 'svelte-i18n';
   import { getLocaleName } from 'i18n/init';
   import { popStack } from 'navstack';

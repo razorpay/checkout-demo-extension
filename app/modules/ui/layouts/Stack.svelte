@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Props
   export let horizontal = false;
   export let vertical = false;

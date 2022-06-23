@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Field from 'ui/components/Field.svelte';
 
   import { isOneClickCheckout } from 'razorpay';

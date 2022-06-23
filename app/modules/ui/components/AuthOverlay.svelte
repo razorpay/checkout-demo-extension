@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Icon from 'ui/elements/Icon.svelte';
   import { getThemeColor } from 'checkoutstore/theme';
   import { getMiscIcon } from 'checkoutframe/icons';

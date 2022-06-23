@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Props
   export let disabled = false;
   export let code = '';

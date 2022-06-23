@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
 

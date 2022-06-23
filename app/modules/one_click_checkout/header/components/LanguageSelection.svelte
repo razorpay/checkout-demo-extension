@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Icons Specific Imports
   import Icon from 'ui/elements/Icon.svelte';
   import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';

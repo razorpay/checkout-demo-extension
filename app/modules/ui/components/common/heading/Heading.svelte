@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // without script eslint throw error for $$props
 </script>
 

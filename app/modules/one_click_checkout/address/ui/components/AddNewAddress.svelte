@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // svelte imports
   import { t } from 'svelte-i18n';
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
@@ -100,7 +100,7 @@
     hideLoaderView,
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
-  import { showOptimisedAddr } from 'razorpay'
+  import { showOptimisedAddr } from 'razorpay';
   import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
 
   // props
@@ -126,7 +126,7 @@
   let stateCode = '';
   let lastUpdateState = '';
   let INPUT_FORM = [];
-  let enabledOptimisedAddr = showOptimisedAddr()
+  let enabledOptimisedAddr = showOptimisedAddr();
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
@@ -154,8 +154,8 @@
     {
       id: 'contact',
       required: true,
-    }
-  ]
+    },
+  ];
 
   const DELHIVERY_INFO_FORM = [
     [
@@ -244,23 +244,30 @@
         );
       },
     },
-  ]
+  ];
 
   if (enabledOptimisedAddr) {
     pinIndex = 0;
     stateIndex = 1;
-    INPUT_FORM = [...DELHIVERY_INFO_FORM, ...PERSONAL_INFO_FORM]
+    INPUT_FORM = [...DELHIVERY_INFO_FORM, ...PERSONAL_INFO_FORM];
   } else {
     pinIndex = 2;
     stateIndex = 3;
-    INPUT_FORM = [...PERSONAL_INFO_FORM, ...DELHIVERY_INFO_FORM]
+    INPUT_FORM = [...PERSONAL_INFO_FORM, ...DELHIVERY_INFO_FORM];
   }
 
   const dispatch = createEventDispatcher();
 
   const isFormComplete = () => {
     const { countryCode, phoneNum } = $formData?.contact || {};
-    const nonMandatoryFields = ['id', 'formView', 'landmark', 'tag', 'cod', 'type'];
+    const nonMandatoryFields = [
+      'id',
+      'formView',
+      'landmark',
+      'tag',
+      'cod',
+      'type',
+    ];
     if (!INPUT_FORM[pinIndex][countryIndex].enabled) {
       nonMandatoryFields.push('country_name');
     }
@@ -382,7 +389,7 @@
       pincodeEle.classList.add('invalid');
     }
 
-    getStates($selectedCountryISO)
+    getStates($selectedCountryISO);
   }
 
   const changePincodeStateLabel = () => {
@@ -533,10 +540,7 @@
       });
     }
 
-    if (
-      key === 'country_name' &&
-      value !== selectedCountry
-    ) {
+    if (key === 'country_name' && value !== selectedCountry) {
       if (selectedCountry && selectedCountry !== value && isShippingAddress) {
         Events.Track(AddressEvents.INPUT_ENTERED_country, {
           selection: 'manual',
@@ -713,7 +717,7 @@
     }
 
     if (!INPUT_FORM[pinIndex][countryIndex].enabled) {
-      getStates()
+      getStates();
     }
     // Anaytics Events
     Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {

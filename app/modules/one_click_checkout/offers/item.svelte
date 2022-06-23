@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // util imports
   import { appliedOffer } from 'offers/store';
   // i18n imports

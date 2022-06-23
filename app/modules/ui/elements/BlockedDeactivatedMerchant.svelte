@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import CTA from 'ui/elements/CTA.svelte';
   import { getSession } from 'sessionmanager';
   const session = getSession();

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { t } from 'svelte-i18n';
   import { fly, fade } from 'svelte/transition';
   import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';

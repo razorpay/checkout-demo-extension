@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // UI imports
   import { onMount } from 'svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
