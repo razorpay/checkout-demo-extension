@@ -4,7 +4,7 @@ ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY page.conf /usr/local/openresty/nginx/conf/page.conf
+COPY page.ljbc /page.ljbc
 
 WORKDIR /app
 

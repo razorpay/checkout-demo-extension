@@ -9,6 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Make luajit bytecode
+        uses: docker://openresty/openresty:1.19.9.1-12-alpine
+        with:
+          entrypoint: /usr/local/openresty/luajit/bin/luajit
+          args: -bg scripts/server/page.lua scripts/server/page.ljbc
+
       - uses: docker/login-action@v1
         with:
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
