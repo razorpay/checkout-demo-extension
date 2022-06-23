@@ -159,6 +159,13 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
       }
 
       if (isMethodEnabled(method)) {
+        /**
+         * QR instruments filter logic is added in upi method filter itself
+         * hence the override
+         */
+        if (method === 'qr') {
+          method = 'upi';
+        }
         if (METHOD_FILTERS[method]) {
           return METHOD_FILTERS[method](instrument, { customer });
         }
