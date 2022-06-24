@@ -18,7 +18,7 @@ import {
   matchLatestPaymentWith,
   updateLatestPaymentErrorReason,
 } from 'payment/history';
-import { resetSelectedUPIAppForPay } from 'checkoutstore/screens/upi';
+import { handleErrorModal } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
@@ -320,57 +320,7 @@ function errorHandler(response) {
   }
 
   if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
-    if (upiUxV1dot1.enabled()) {
-      if (
-        matchLatestPaymentWith({
-          referrer: 'UPI_UX',
-          inStatuses: ['cancel', 'error'],
-        })
-      ) {
-        resetSelectedUPIAppForPay();
-      }
-      if (
-        !this.tab &&
-        matchLatestPaymentWith({
-          referrer: 'UPI_UX',
-          inStatuses: ['cancel', 'error'],
-          errorReason: 'automatic',
-        })
-      ) {
-        /**
-         * If user has chosen app tile from L0 and payment is somehow failed,
-         * then we should land the user automatically in l1 with error message as alert in L1
-         */
-
-        this.switchTab('upi');
-        this.hideErrorMessage();
-      } else {
-        /**
-         * As per the new product requirement,
-         * if the payment referer is UPI UX and is cancelled by user in any way,
-         * We should not show any additional half modals.
-         * (in checkout cancelled payment also marked as error at the end, hence we created a history instance
-         * that maintained the full details about the payment)
-         */
-        if (
-          !matchLatestPaymentWith({
-            referrer: 'UPI_UX',
-            inStatuses: ['cancel', 'error'],
-            errorReason: 'manual',
-          })
-        ) {
-          this.showLoadError(
-            message || I18n.format('misc.error_handling_request'),
-            true
-          );
-        }
-      }
-    } else {
-      this.showLoadError(
-        message || I18n.format('misc.error_handling_request'),
-        true
-      );
-    }
+    handleErrorModal.call(this, message);
   }
 
   if (this.get('retry') === false && this.get('redirect')) {
