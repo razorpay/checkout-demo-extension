@@ -56,7 +56,9 @@
     "test:all": "npm run test:unit && npm run build && npm run jest && npm run jest:custom",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "NODE_ENV=test && jest --config jest.ut.config.js",
+    "test:unit:1cc": "NODE_ENV=test && jest --config jest.1cc.ut.config.js",
     "test:unit:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.ut.config.js --coverage --outputFile test-results.json --json",
+    "test:unit:1cc:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.1cc.ut.config.js --coverage --outputFile test-1cc-results.json --json 2>&1 | tee log-1cc.txt",
     "test": "npm run test:all",
     "postinstall": "chmod -R +x ./git-hooks/ && git config core.hooksPath ./git-hooks",
     "pretty-lint": "exec ./git-hooks/pre-commit"

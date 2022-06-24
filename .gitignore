@@ -22,3 +22,6 @@ npm-debug.log
 
 test-report.xml
 test-results.json
+test-1cc-results.json
+log-1cc.txt
+ut1ccMetrics.csv

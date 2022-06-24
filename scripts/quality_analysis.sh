@@ -235,6 +235,28 @@ then
   echo "|Code Smells|$MASTER_CODE_SMELLS|$DEV_CODE_SMELLS|👍 Cool! You have not added any new code smells.|" >> report.md
 fi
 
+chmod 755 ${GITHUB_WORKSPACE}/ut1ccMetrics.csv
+
+STATEMENTS=$( cut -d "," -f 1 ${GITHUB_WORKSPACE}/ut1ccMetrics.csv)
+BRANCHES=$( cut -d "," -f 2 ${GITHUB_WORKSPACE}/ut1ccMetrics.csv)
+FUNCTIONS=$( cut -d "," -f 3 ${GITHUB_WORKSPACE}/ut1ccMetrics.csv)
+LINES=$( cut -d "," -f 4 ${GITHUB_WORKSPACE}/ut1ccMetrics.csv)
+
+echo "#### One Click Checkout UT Report" >> report.md
+
+STATEMENT_LIST=(${STATEMENTS//:/ })
+BRANCHES_LIST=(${BRANCHES//:/ })
+FUNCTIONS_LIST=(${FUNCTIONS//:/ })
+LINES_LIST=(${LINES//:/ })
+
+echo "|Metric|Coverage|" >> report.md
+echo "|:---|:---|" >> report.md
+
+echo "|"${STATEMENT_LIST[0]}"|"${STATEMENT_LIST[1]}"|" >> report.md
+echo "|"${BRANCHES_LIST[0]}"|"${BRANCHES_LIST[1]}"|" >> report.md
+echo "|"${FUNCTIONS_LIST[0]}"|"${FUNCTIONS_LIST[1]}"|" >> report.md
+echo "|Overall|"${LINES_LIST[1]}"|" >> report.md
+
 chmod 755 ${GITHUB_WORKSPACE}/utMetrics.csv
 
 START_TIME=$( cut -d "," -f 1 ${GITHUB_WORKSPACE}/utMetrics.csv)
