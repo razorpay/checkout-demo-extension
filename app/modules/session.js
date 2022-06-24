@@ -22,6 +22,8 @@ import { resetSelectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
+import { avoidSessionSubmit, isQRPaymentCancellable } from 'upi/helper';
+import { processIntentOnMWeb } from 'upi/payment';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -39,7 +41,6 @@ let preferences,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
-  upiPaymentHandlers = discreet.upiPaymentHandlers,
   AnalyticsTypes = discreet.AnalyticsTypes,
   Analytics = discreet.Analytics,
   UTILS = discreet.UTILS,
@@ -3558,9 +3559,7 @@ Session.prototype = {
         // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
         Confirm.confirmClose().then((confirmed) => {
           if (confirmed) {
-            if (
-              discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true) === 2
-            ) {
+            if (isQRPaymentCancellable({}, true) === 2) {
               /**
                * Why delay, QR payments hitting with multiple cancel requests
                */
@@ -3969,7 +3968,7 @@ Session.prototype = {
        * Hence we need a check for QR V2 payments, we won;t show any alert yet user can go out
        * And we shouldn't mark the payment cancelled
        */
-      if (!discreet.upiPaymentHandlers.isQRPaymentCancellable(extra)) {
+      if (!isQRPaymentCancellable(extra)) {
         return;
       }
       this.hideOverlayMessage();
@@ -4034,7 +4033,7 @@ Session.prototype = {
     /**
      * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
      */
-    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+    if (avoidSessionSubmit()) {
       return;
     }
 
@@ -4525,7 +4524,7 @@ Session.prototype = {
      * to avoid regular pre-submit and submit flows from sessionjs
      * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
      */
-    if (discreet.upiPaymentHandlers.avoidSessionSubmit()) {
+    if (avoidSessionSubmit()) {
       return;
     }
     let locale = I18n.getCurrentLocale();
@@ -4561,7 +4560,7 @@ Session.prototype = {
     }
 
     if (this.r._payment) {
-      if (discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true) === 2) {
+      if (isQRPaymentCancellable({}, true) === 2) {
         /**
          * intended empty if block as the cancel happens within above function and flow has to come out of this payment
          */
@@ -5326,7 +5325,7 @@ Session.prototype = {
     }
 
     this.preferredInstrument = P13n.processInstrument(data, this);
-    discreet.upiPaymentHandlers.isQRPaymentCancellable({}, true);
+    isQRPaymentCancellable({}, true);
 
     let payment = this.r.createPayment(data, request);
     payment
@@ -5460,7 +5459,7 @@ Session.prototype = {
          * Invoke the flow where upi intent url is opened using deeplink
          */
         if (data.upi_app === null && response.data.intent_url) {
-          upiPaymentHandlers.processIntentOnMWeb(response.data.intent_url);
+          processIntentOnMWeb(response.data.intent_url);
         }
       });
 

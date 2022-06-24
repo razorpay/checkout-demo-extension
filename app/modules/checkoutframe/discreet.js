@@ -2,9 +2,6 @@ import $ from 'lib/$';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import { processIntentOnMWeb } from 'upi/payment';
-import { isQRPaymentCancellable } from 'upi/helper';
-import { avoidSessionSubmit } from 'upi/helper';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -121,12 +118,6 @@ import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
 import * as NetbankingHelper from 'netbanking/helper';
 import * as EMIHelper from 'emi/helper';
-
-const upiPaymentHandlers = {
-  processIntentOnMWeb,
-  avoidSessionSubmit,
-  isQRPaymentCancellable,
-};
 
 import * as fonts from 'common/fonts';
 
@@ -255,7 +246,6 @@ export default {
   TopbarMagicCheckoutStore,
 
   CommonConstants,
-  upiPaymentHandlers,
 
   // Offline Challan
   offlineChallanTab,
