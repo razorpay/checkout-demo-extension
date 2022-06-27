@@ -4,10 +4,40 @@ import {
   setLatestPayment,
   updateLatestPaymentErrorReason,
   updateLatestPaymentStatus,
+  getAllPaymentInstances,
 } from 'payment/history';
-import experiment from 'rtb/events/experiment';
 
 describe('Payment History Utility Tests', () => {
+  test('getAllPaymentInstances', () => {
+    expect(getAllPaymentInstances()).toMatchObject([]);
+    setLatestPayment(
+      {
+        data: {},
+      },
+      true
+    );
+    expect(getAllPaymentInstances()).toMatchObject([
+      {
+        data: {},
+        errorReason: 'automatic',
+      },
+    ]);
+  });
+  test('getLatestPayment: when no payment happened, should return nothing', () => {
+    expect(getLatestPayment()).toMatchObject({});
+  });
+  test('getLatestPayment: when a payment happened, should return the object', () => {
+    setLatestPayment(
+      {
+        data: {},
+      },
+      true
+    );
+    expect(getLatestPayment()).toMatchObject({
+      data: {},
+      errorReason: 'automatic',
+    });
+  });
   test('setLatestPayment-init', () => {
     setLatestPayment(
       {

@@ -38,6 +38,9 @@ export const updateLatestPaymentStatus = (
   });
 };
 export const getLatestPayment = () => {
+  if (!paymentsStack.length) {
+    return {};
+  }
   return paymentsStack[paymentsStack.length - 1];
 };
 
