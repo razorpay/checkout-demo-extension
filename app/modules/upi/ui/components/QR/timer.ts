@@ -105,7 +105,7 @@ export const startTimer = (
 
   timer = new Timer(
     overrideByCheckoutTimer && dismissTime
-      ? dismissTime - Date.now()
+      ? Math.min(dismissTime - Date.now(), timeLimit)
       : timeLimit,
     onExpire,
     (time: string) => readableTimeLeft.set(time)
