@@ -19,6 +19,7 @@ import {
   removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
+import * as _El from 'utils/DOM';
 
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
@@ -46,6 +47,7 @@ import feature_overrides from 'checkoutframe/overrideConfig';
 import { getElementById, loadCSS } from 'utils/doc';
 import { hasProp } from 'utils/object';
 import { setBraveBrowser } from 'common/useragent';
+import { appendLoader } from 'common/loader';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -331,10 +333,22 @@ function processPreferences(preferences, session) {
 
 function getPrefsPromisified(session) {
   return new Promise((resolve) => {
+    let loader;
+    try {
+      loader = Bridge.hasCheckoutBridge()
+        ? appendLoader(document.body, false, Boolean(CheckoutBridge))
+        : null;
+    } catch (e) {
+      // e
+    }
     session.prefCall = Razorpay.payment.getPrefs(
       getPreferenecsParams(session.r),
       (preferences) => {
         resolve(preferences);
+        if (loader) {
+          _El.detach(loader);
+          loader = null;
+        }
       }
     );
   });

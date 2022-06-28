@@ -16,6 +16,7 @@ import {
   redirectTo,
 } from 'utils/doc';
 import { submitForm } from 'common/form';
+import { appendLoader } from 'common/loader';
 
 const { screen, scrollTo } = global;
 
@@ -148,24 +149,6 @@ function setTestRibbonInvisible() {
 }
 
 let loader;
-function appendLoader($parent, parent) {
-  if (!loader) {
-    try {
-      loader = document.createElement('div');
-      loader.className = 'razorpay-loader';
-      let style =
-        'margin:-25px 0 0 -25px;height:50px;width:50px;animation:rzp-rot 1s infinite linear;-webkit-animation:rzp-rot 1s infinite linear;border: 1px solid rgba(255, 255, 255, 0.2);border-top-color: rgba(255, 255, 255, 0.7);border-radius: 50%;';
-      if (parent) {
-        style +=
-          'margin: 100px auto -150px;border: 1px solid rgba(0, 0, 0, 0.2);border-top-color: rgba(0, 0, 0, 0.7);';
-      } else {
-        style += 'position:absolute;left:50%;top:50%;';
-      }
-      loader.setAttribute('style', style);
-      _El.appendTo(loader, $parent);
-    } catch (e) {}
-  }
-}
 
 export default function CheckoutFrame(rzp) {
   doc = document.body;
@@ -213,7 +196,9 @@ CheckoutFrame.prototype = {
       parent = resolveElement(parent);
     }
     let parent2 = parent || CheckoutFrame.container;
-    appendLoader(parent2, parent);
+    if (!loader) {
+      loader = appendLoader(parent2, parent);
+    }
 
     if (rzp !== this.rzp) {
       if (_El.parent(el) !== parent2) {
