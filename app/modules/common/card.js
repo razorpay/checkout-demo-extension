@@ -153,8 +153,8 @@ const cardLengths = {
   '': 19,
 };
 
-export const getCardType = (cardNumber) => {
-  cardNumber = cardNumber.replace(/\D/g, '');
+export const getCardType = (cardNumber = '') => {
+  cardNumber = (cardNumber || '').replace(/\D/g, '');
   let cardType = '';
   cardPatterns.forEach((card) => {
     if (card.regex.test(cardNumber)) {

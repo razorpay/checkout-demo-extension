@@ -29,6 +29,10 @@ describe('common/card', () => {
     expect(Card.getCardType(testCards.diners)).toBe('diners');
     expect(Card.getCardType(testCards.discover)).toBe('discover');
     expect(Card.getCardType(testCards.jcb)).toBe('jcb');
+
+    expect(Card.getCardType('')).toBe('');
+    expect(Card.getCardType()).toBe('');
+    expect(Card.getCardType(null)).toBe('');
   });
 
   test('getNetworkFromCardNumber', function () {
