@@ -143,9 +143,10 @@
       const decodeRequiredParams = ['config'];
       // Augment defaultParams with queryParams
       for (var i in queryParams) {
-        defaultParams[i] = decodeRequiredParams.includes(i)
-          ? JSON.parse(decodeURIComponent(queryParams[i]))
-          : queryParams[i];
+        defaultParams[i] =
+          decodeRequiredParams.indexOf(i) !== -1
+            ? JSON.parse(decodeURIComponent(queryParams[i]))
+            : queryParams[i];
       }
 
       var params = defaultParams;
@@ -174,7 +175,7 @@
 
       params.handler = function (resp) {
         document.querySelector('div#1').innerHTML = resp.razorpay_payment_id;
-        document.querySelector('div#2').innerHTML =  resp.razorpay_signature;
+        document.querySelector('div#2').innerHTML = resp.razorpay_signature;
       };
 
       loadCheckout(domain, function () {
