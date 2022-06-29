@@ -155,13 +155,7 @@
     Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
   }
 
-  $: {
-    disabled = !(CONTACT_REGEX.test($contact) && EMAIL_REGEX.test($email));
-
-    if ($country === INDIA_COUNTRY_CODE) {
-      disabled = !PHONE_REGEX_INDIA.test($phone);
-    }
-  }
+  $: disabled = !valid;
 
   onMount(() => {
     merchantAnalytics({
