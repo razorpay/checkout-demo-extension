@@ -224,7 +224,7 @@ CheckoutFrame.prototype = {
     this.onload();
   },
 
-  makeMessage: function () {
+  makeMessage: function (eventName) {
     let rzp = this.rzp;
     let options = rzp.get();
 
@@ -235,6 +235,17 @@ CheckoutFrame.prototype = {
       library: Track.props.library,
       id: rzp.id,
     };
+
+    if (eventName) {
+      response.event = eventName;
+    }
+
+    if (rzp._order) {
+      // _order is the order object and is added to the
+      // instance from the plugin side. This is for the prefetch prefs flow
+      // refer handleMessage for how it's used
+      response._order = rzp._order;
+    }
 
     if (rzp.metadata) {
       response.metadata = rzp.metadata;
@@ -337,6 +348,13 @@ CheckoutFrame.prototype = {
     response.id = this.rzp.id;
     response = _Obj.stringify(response);
     this.el?.contentWindow?.postMessage(response, '*');
+  },
+
+  prefetchPrefs: function (rzp) {
+    if (rzp !== this.rzp) {
+      this.rzp = rzp;
+    }
+    this.postMessage(this.makeMessage('prefetch'));
   },
 
   onmessage: function (e) {
@@ -594,6 +612,7 @@ CheckoutFrame.prototype = {
 
     Track.flush();
     this.rzp.close();
+    this.rzp.emit('fault.close');
 
     const callbackUrl = this.rzp.get('callback_url');
     const redirect = this.rzp.get('redirect') || shouldRedirect;

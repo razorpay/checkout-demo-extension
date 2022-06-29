@@ -268,6 +268,11 @@ RazorProto.onNew = function (event, callback) {
   }
 };
 
+RazorProto.initAndPrefetchPrefs = function () {
+  preloadedFrame.prefetchPrefs(this);
+  return this;
+};
+
 RazorProto.open = needBody(function () {
   if (!this.metadata) {
     this.metadata = {

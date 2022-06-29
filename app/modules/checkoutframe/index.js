@@ -5,6 +5,8 @@ import Razorpay, {
   makePrefParams,
   validateOverrides,
   getSdkMetaForRequestPayload,
+  setPrefetchedPrefs,
+  getPrefetchedPrefs,
 } from 'common/Razorpay';
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
@@ -45,7 +47,7 @@ import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById, loadCSS } from 'utils/doc';
-import { hasProp } from 'utils/object';
+import { hasProp, isEmpty } from 'utils/object';
 import { setBraveBrowser } from 'common/useragent';
 import { appendLoader } from 'common/loader';
 
@@ -251,12 +253,36 @@ export const handleMessage = function (message) {
     SessionManager.setSession(session);
   }
 
+  if (message.event === 'prefetch') {
+    setParamsForDdosProtection(session);
+    getPrefsPromisified(session)
+      .then((preferences) => {
+        processPrefetchPrefs(preferences);
+      })
+      .catch(() => {
+        Razorpay.sendMessage({
+          event: 'event',
+          data: {
+            event: 'prefs_prefetch',
+            data: 'error',
+          },
+        });
+      });
+    return;
+  }
+
   if (message.event === 'open' || options) {
+    syncOptionsAndSessionInstance(session, options);
     // triggering the open event, adding a safe check for sdk
     if (Bridge.hasCheckoutBridge()) {
       Track(session.r, MiscEvents.OPEN);
     }
 
+    if (!isEmpty(message._order)) {
+      // for prefetch prefs flow as there order object will need to be passed separately
+      const prefetchedPrefsObj = getPrefetchedPrefs();
+      setPrefetchedPrefs({ ...prefetchedPrefsObj, order: message._order });
+    }
     // NOTE: call this before making any XHR or jsonp call
     setParamsForDdosProtection(session);
 
@@ -270,6 +296,15 @@ export const handleMessage = function (message) {
     }
   } catch (e) {}
 };
+
+function syncOptionsAndSessionInstance(session, options) {
+  const sessionOptions = session.r.get();
+  const updatedOptions = { ...sessionOptions, ...options };
+
+  Object.keys(updatedOptions).map((optionKey) => {
+    session.r.set(optionKey, updatedOptions[optionKey]);
+  });
+}
 
 /**
  * Set all the necessary values to fetch, so that these values get
@@ -331,6 +366,17 @@ function processPreferences(preferences, session) {
   }
 }
 
+function processPrefetchPrefs(preferences) {
+  setPrefetchedPrefs(preferences);
+  Razorpay.sendMessage({
+    event: 'event',
+    data: {
+      event: 'prefs_prefetch',
+      data: 'success',
+    },
+  });
+}
+
 function getPrefsPromisified(session) {
   return new Promise((resolve) => {
     let loader;
@@ -364,7 +410,6 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
   performPrePrefsFetchOperations();
-
   // We don't want to load CSS if it is already loaded
   const frameCSSPromise = isFrameCssAvailable()
     ? Promise.resolve()

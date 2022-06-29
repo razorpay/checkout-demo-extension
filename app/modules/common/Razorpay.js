@@ -15,8 +15,10 @@ import {
 import { getAgentPayload } from 'checkoutstore/methods';
 import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
-import { isNonNullObject } from 'utils/object';
+import { isEmpty, isNonNullObject } from 'utils/object';
 import { BUILD_NUMBER } from './constants';
+
+let prefetchedPrefs;
 
 /**
  *
@@ -149,6 +151,18 @@ function getPrefsJsonp(data, callback) {
   });
 }
 
+export function setPrefetchedPrefs(prefs) {
+  prefetchedPrefs = prefs;
+}
+
+export function getPrefetchedPrefs() {
+  return prefetchedPrefs;
+}
+
+export function deletePrefsCache() {
+  prefetchedPrefs = null;
+}
+
 Razorpay.payment = {
   getMethods: function (callback) {
     return getPrefsJsonp(
@@ -169,6 +183,15 @@ Razorpay.payment = {
 
     if (isNonNullObject(data)) {
       data['_[request_index]'] = Analytics.updateRequestIndex('preferences');
+    }
+
+    if (!isEmpty(prefetchedPrefs) && !isEmpty(prefetchedPrefs.order)) {
+      Analytics.track('prefs:end', {
+        type: AnalyticsTypes.METRIC,
+        data: { time: prefsApiTimer() },
+      });
+      callback(prefetchedPrefs);
+      return;
     }
 
     return fetch({

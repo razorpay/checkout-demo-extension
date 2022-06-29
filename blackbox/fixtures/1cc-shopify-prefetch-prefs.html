@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+  <button id="prefetch-pay">
+    Prefetch & pay
+  </button>
+
+  Test
+</body>
+<script>
+  function prefetchPromise(razorpayCheckout) {
+    return new Promise(resolve => {
+      if (!razorpayCheckout.initAndPrefetchPrefs) {
+        resolve('prefetch failed');
+        return;
+      }
+
+      razorpayCheckout.initAndPrefetchPrefs();
+      razorpayCheckout.on('prefs_prefetch', function(status) {
+        if (status === 'success') {
+          resolve();
+        } else {
+          resolve('prefetch failed');
+        }
+      });
+    });
+  }
+  var order_obj = {
+    "amount": 100000,
+    "amount_paid": 0,
+    "amount_due": 100000,
+    "currency": "INR",
+    "offer_id": null,
+    "line_items_total": 100000
+  }
+  document.getElementById('prefetch-pay').onclick = function (e) {
+    e.preventDefault();
+    var rzp1 = new Razorpay({ key: 'rzp_test_1DP5mmOlF5G5ag' });
+    prefetchPromise(rzp1).then((res) => {
+      if (res === 'prefetch failed') {
+        rzp1.open(); // needs atleast order_id
+        return;
+      }
+      rzp1._order = order_obj;
+      rzp1.open();
+    });
+  };
+</script>
+
+</html>

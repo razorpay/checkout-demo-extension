@@ -22,6 +22,7 @@ import { handleErrorModal } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
+import { deletePrefsCache } from 'common/Razorpay';
 import { avoidSessionSubmit, isQRPaymentCancellable } from 'upi/helper';
 import { processIntentOnMWeb } from 'upi/payment';
 
@@ -5632,6 +5633,7 @@ Session.prototype = {
       });
       this.listeners = [];
       this.bits = [];
+      deletePrefsCache();
       if (this.mainModal) {
         this.mainModal.$destroy();
       }

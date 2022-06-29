@@ -21,10 +21,14 @@ const checkoutFrameJs = 'https://checkout.razorpay.com/v1/checkout-frame.js';
 const checkoutJs = 'https://checkout.razorpay.com/v1/checkout.js';
 const mockPageSubmit =
   'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
+const shopifyPreview = 'https://www.shopifypreview.com/';
 
 const htmlContent = readFileSync('blackbox/fixtures/checkout-public.html');
 const autoHtmlContent = readFileSync(
   'blackbox/fixtures/automatic-checkout.html'
+);
+const prefetchPrefsHtmlContent = readFileSync(
+  'blackbox/fixtures/1cc-shopify-prefetch-prefs.html'
 );
 const jsContent = readFileSync('app/dist/v1/checkout-frame.js');
 const checkoutJsContent = readFileSync('app/dist/v1/checkout.js');
@@ -39,6 +43,8 @@ function checkoutRequestHandler(request) {
   }
   if (url.startsWith(checkoutPublic)) {
     return request.respond({ body: htmlContent });
+  } else if (url.startsWith(shopifyPreview)) {
+    return request.respond({ body: prefetchPrefsHtmlContent });
   } else if (url.endsWith('favicon.ico')) {
     return request.respond({ status: 204 });
   } else if (url.endsWith('checkout.css')) {
@@ -477,6 +483,37 @@ module.exports = {
       ...interceptorOptions,
       sendPreferences,
       sendRewards,
+    };
+    // page takes some time to render
+    await delay(200);
+    return returnObj;
+  },
+  async prefetchPrefsAndOpenCheckout({ page, preferences }) {
+    let checkoutUrl = shopifyPreview;
+    if (interceptorOptions) {
+      interceptorOptions.disableInterceptor();
+      interceptorOptions.resetAllRequest();
+      page.removeListener('request', cdnRequestHandler);
+    } else {
+      await page.setRequestInterception(true);
+    }
+
+    page.on('request', checkoutRequestHandler);
+    await page.goto(checkoutUrl);
+
+    page.removeListener('request', checkoutRequestHandler);
+    page.on('request', cdnRequestHandler);
+    if (interceptorOptions) {
+      interceptorOptions.enableInterceptor();
+    } else {
+      interceptorOptions = interceptor(page);
+    }
+
+    const returnObj = {
+      page,
+      preferences,
+      ...interceptorOptions,
+      sendPreferences,
     };
     // page takes some time to render
     await delay(200);
