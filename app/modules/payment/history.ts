@@ -60,33 +60,41 @@ export const matchLatestPaymentWith = (dataToMatch: {
   paymentId?: string;
   errorReason?: Payment.PaymentHistoryInstance['errorReason'];
 }) => {
-  const { status, statusData, params = {}, errorReason } = getLatestPayment();
-  const { additionalInfo: { referrer = undefined } = {} } =
-    params as Payment.PaymentParams;
-  const result: boolean[] = [];
-  if (dataToMatch.referrer) {
-    result.push(referrer === 'UPI_UX');
-  }
-  if (Array.isArray(dataToMatch.inStatuses)) {
-    result.push(
-      dataToMatch.inStatuses.includes(status as Payment.PaymentStatus)
+  try {
+    const { status, statusData, params = {}, errorReason } = getLatestPayment();
+    const { additionalInfo: { referrer = undefined } = {} } =
+      params as Payment.PaymentParams;
+    const result: boolean[] = [];
+    if (
+      typeof dataToMatch !== 'object' ||
+      Object.keys(dataToMatch).length < 1
+    ) {
+      return;
+    }
+    if (dataToMatch.referrer) {
+      result.push(referrer === 'UPI_UX');
+    }
+    if (Array.isArray(dataToMatch.inStatuses)) {
+      result.push(
+        dataToMatch.inStatuses.includes(status as Payment.PaymentStatus)
+      );
+    }
+    if (dataToMatch.errorReason) {
+      result.push(dataToMatch.errorReason === errorReason);
+    }
+    if (dataToMatch.paymentId) {
+      result.push(
+        Boolean(
+          statusData &&
+            statusData.error &&
+            statusData.error.metadata &&
+            statusData.error.metadata.payment_id === dataToMatch.paymentId
+        )
+      );
+    }
+    return result.reduce(
+      (prevResult, currentCheckResult) => prevResult && currentCheckResult,
+      true
     );
-  }
-  if (dataToMatch.errorReason) {
-    result.push(dataToMatch.errorReason === errorReason);
-  }
-  if (dataToMatch.paymentId) {
-    result.push(
-      Boolean(
-        statusData &&
-          statusData.error &&
-          statusData.error.metadata &&
-          statusData.error.metadata.payment_id === dataToMatch.paymentId
-      )
-    );
-  }
-  return result.reduce(
-    (prevResult, currentCheckResult) => prevResult && currentCheckResult,
-    true
-  );
+  } catch (e) {}
 };

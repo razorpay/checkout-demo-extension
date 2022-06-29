@@ -135,4 +135,15 @@ describe('Payment History Utility Tests', () => {
       })
     ).toBe(false);
   });
+  test('matchLatestPaymentWith without any payment case and invalid data case', () => {
+    expect(
+      matchLatestPaymentWith({
+        referrer: 'UPI_UX',
+        inStatuses: ['cancel', 'error'],
+        errorReason: 'automatic',
+      })
+    ).toBe(false);
+    expect(matchLatestPaymentWith({} as any)).toBeFalsy();
+    expect(matchLatestPaymentWith('' as any)).toBeFalsy();
+  });
 });
