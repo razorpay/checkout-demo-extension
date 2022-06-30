@@ -59,6 +59,7 @@ describe('QR Component Tests', () => {
     expect(render(QR, {})).toBeTruthy();
   });
   it('should render loading->qr->expire view properly', async () => {
+    jest.useFakeTimers();
     updateQrState({
       status: 'loading',
       url: '',

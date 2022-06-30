@@ -73,6 +73,7 @@ describe('upiPopUpForiOSMWeb utility tests', () => {
     expect(upiPopUpForiOSMWeb.instance).toBeNull();
   });
   it('should have be able to destroy window', () => {
+    jest.useFakeTimers();
     upiPopUpForiOSMWeb.createWindow('test-content', testCbName);
 
     expect(typeof upiPopUpForiOSMWeb.instance).toBe('object');
