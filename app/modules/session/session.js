@@ -25,6 +25,7 @@ import { isLoggedIn } from 'checkoutstore/customer';
 import { deletePrefsCache } from 'common/Razorpay';
 import { avoidSessionSubmit, isQRPaymentCancellable } from 'upi/helper';
 import { processIntentOnMWeb } from 'upi/payment';
+import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1743,7 +1744,16 @@ Session.prototype = {
       Confirm.confirmClose().then((close) => {
         if (close) {
           if (self.payload && self.payload.method === 'netbanking') {
-            self.r._payment.popup.onClose();
+            try {
+              if (!self.r._payment?.popup) {
+                // in webview probably
+                self.clearRequest();
+              } else {
+                self.r._payment.popup.onClose();
+              }
+            } catch (e) {
+              captureError(e.message, { severity: SEVERITY_LEVELS.S2 });
+            }
           } else {
             if (this.upiPaymentManualCancelAttempted) {
               updateLatestPaymentErrorReason(
