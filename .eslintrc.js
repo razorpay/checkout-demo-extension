@@ -92,7 +92,7 @@ module.exports = {
     // See https://github.com/sveltejs/eslint-plugin-svelte3/issues/70
     'svelte3/ignore-styles': () => true,
   },
-  ignorePatterns: ['node_modules'],
+  ignorePatterns: ['node_modules', 'vision', 'playwright.config.ts'],
   rules: {
     // fixable by prettier
     indent: 0,

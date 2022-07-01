@@ -109,6 +109,43 @@ jobs:
         run: exit 1
       - name: Fts Done
         run: echo "All Tests Passed"
+  e2e-vision-testing:
+    name: vision testing
+    runs-on: [self-hosted]
+    env:
+      NODE_ENV: production
+    needs: [make-build]
+    container: mcr.microsoft.com/playwright:v1.22.0-focal
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.10.0
+      - name: Cache build
+        id: cache-build
+        uses: actions/cache@v3
+        with:
+          path: |
+            app/dist
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.run_id }}
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Vision Tests
+        env:
+          CI: true
+        run: npm run vision:test
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: vision-results
+          path: vision-results
   build-and-push-image: # independent of rest
     name: build and push
     runs-on: [self-hosted]

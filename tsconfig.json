@@ -19,5 +19,5 @@
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
   "include": ["app/modules/**/*", "./global.d.ts", "app/modules/**/*.d.ts"],
-  "exclude": ["node_modules/*", "blackbox/*", "mock-api/*"]
+  "exclude": ["node_modules/*", "blackbox/*", "mock-api/*", "vision/*"]
 }
