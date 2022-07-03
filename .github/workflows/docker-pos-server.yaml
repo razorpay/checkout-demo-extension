@@ -1,0 +1,53 @@
+name: Build POS Image
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: docker/login-action@v1
+        with:
+          password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
+          registry: c.rzp.io
+          username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
+
+      - uses: docker/setup-buildx-action@v1
+
+      - run: |
+          sed "s#TARGET#-canary#" scripts/pos/nginx.conf > scripts/pos/nginx-canary.conf
+          sed "s#TARGET#-baseline#" scripts/pos/nginx.conf > scripts/pos/nginx-baseline.conf
+          sed "s#TARGET##" scripts/pos/nginx.conf > scripts/pos/nginx-prod.conf
+          sed "s#TARGET#canary#" scripts/pos/Dockerfile > scripts/pos/Dockerfile-canary
+          sed "s#TARGET#baseline#" scripts/pos/Dockerfile > scripts/pos/Dockerfile-baseline
+          sed "s#TARGET#prod#" scripts/pos/Dockerfile > scripts/pos/Dockerfile-prod
+
+      - uses: docker/build-push-action@v2
+        with:
+          context: scripts/pos
+          file: scripts/pos/Dockerfile-prod
+          push: true
+          tags: c.rzp.io/razorpay/checkout:pos-prod-${{ github.sha }}
+          build-args: |
+             GIT_COMMIT_HASH=${{ github.sha }}
+
+      - uses: docker/build-push-action@v2
+        with:
+          context: scripts/pos
+          file: scripts/pos/Dockerfile-canary
+          push: true
+          tags: c.rzp.io/razorpay/checkout:pos-canary-${{ github.sha }}
+          build-args: |
+             GIT_COMMIT_HASH=${{ github.sha }}
+
+      - uses: docker/build-push-action@v2
+        with:
+          context: scripts/pos
+          file: scripts/pos/Dockerfile-baseline
+          push: true
+          tags: c.rzp.io/razorpay/checkout:pos-baseline-${{ github.sha }}
+          build-args: |
+             GIT_COMMIT_HASH=${{ github.sha }}

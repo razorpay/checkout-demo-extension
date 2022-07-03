@@ -9,12 +9,20 @@ DIST_canary="E2RK6LAT9F78JF"
 DIST_baseline="E2C4TJ1SGQAY82"
 DIST_production="E10EFYGUV7S9YQ"
 
+COMMIT=$1
+CANARY=$2
+BASELINE=$3
+PRODUCTION=$4
+
 deploy_to_env() {
   ENV=$1
 
   # make a copy of build folder
   rm -rf envbuild
   cp -r build envbuild
+
+  # put commit_id in build folder
+  echo $COMMIT > envbuild/commit.txt
 
   # put env in copied file
   find envbuild -name '*.js' -exec sed -i -- "s#__S_TRAFFIC_ENV__#$ENV#g" {} \;
@@ -24,7 +32,7 @@ deploy_to_env() {
   BUCKET=${!BUCKET}
 
   # copy result to env specific bucket
-  aws --output text s3 sync envbuild s3://$BUCKET/v1 --cache-control "max-age=120, s-maxage=300"
+  aws --output text s3 sync envbuild s3://$BUCKET/v1 --cache-control "max-age=120,s-maxage=600,stale-while-revalidate=120"
 
   # invalidate
   DIST="DIST_$ENV"
@@ -32,11 +40,6 @@ deploy_to_env() {
 
   aws --output text cloudfront create-invalidation --distribution-id $DIST --paths "/v1/*"
 }
-
-COMMIT=$1
-CANARY=$2
-BASELINE=$3
-PRODUCTION=$4
 
 # copy build folder to disk
 aws --output text s3 sync s3://$BUCKET_production/build/$COMMIT build
