@@ -1,5 +1,11 @@
 name: Sonar Scanner
-on: [pull_request]
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
 
 jobs:
   sonar:
