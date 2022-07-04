@@ -73,8 +73,10 @@ jobs:
     runs-on: [self-hosted]
     container: satantime/puppeteer-node
     strategy:
+      # fail-fast parameter defines whether to cancel all other jobs of matrix if one fails and its default value is true
+      fail-fast: false
       matrix:
-        shard: [1/3, 2/3, 3/3]
+        shard: [1/5, 2/5, 3/5, 4/5, 5/5]
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
