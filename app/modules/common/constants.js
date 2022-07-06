@@ -156,8 +156,3 @@ export const STATIC_CDN_PREFIX = BUILD_NUMBER
   : '/dist/v1';
 
 export const FRAME_CSS_URL = STATIC_CDN_PREFIX + '/css/checkout.css';
-export const FRAME_JS_URL = STATIC_CDN_PREFIX + '/checkout-frame.js';
-export const FRAME_1CC_CSS_URL =
-  STATIC_CDN_PREFIX + '/1cc' + '/css/checkout.css';
-export const FRAME_1CC_JS_URL =
-  STATIC_CDN_PREFIX + '/1cc' + '/checkout-frame.js';

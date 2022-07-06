@@ -2,6 +2,7 @@ import { makePrefParams } from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
+import { COMMIT_HASH, TRAFFIC_ENV } from 'common/constants';
 import Analytics, { Track } from 'analytics';
 import {
   ACTIONS,
@@ -122,8 +123,8 @@ function makeCheckoutUrl(rzp) {
 
   // enables loading CDN based assets
   url = _.appendParamsToUrl(url, {
-    traffic_env: __TRAFFIC_ENV__, // eslint-disable-line no-undef
-    build: __GIT_COMMIT_HASH__, // eslint-disable-line no-undef
+    traffic_env: TRAFFIC_ENV,
+    build: COMMIT_HASH,
   });
 
   return url;
