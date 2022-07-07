@@ -8,8 +8,6 @@ import { querySelectorAll, form2obj } from 'utils/doc';
 import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
 import { isBraveBrowser } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
-import Interface from 'common/interface';
-import { capture, SEVERITY_LEVELS } from 'error-service';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -236,10 +234,8 @@ function getPreloadedFrame(rzp) {
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
-    Interface.iframeReference = preloadedFrame.el;
-    _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame))(global);
-    _El.append(frameContainer, preloadedFrame.el);
-    setupIframeFreezeCheck();
+    global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
+    frameContainer |> _El.append(preloadedFrame.el);
   }
 
   return preloadedFrame;
@@ -346,40 +342,5 @@ let initRazorpayCheckout = needBody(function () {
     initAutomaticCheckout();
   } catch (e) {}
 });
-
-/**
- * This function will setup ping mechanism at 2s interval
- * It will send ping in every 1s and we are checking ping received in every 3.5s i.e.
- * at least one ping should received in 3.5s if not we consider iframe in block state
- */
-function setupIframeFreezeCheck() {
-  try {
-    let pingReceived = false;
-    const interval = setInterval(() => {
-      if (pingReceived) {
-        pingReceived = false;
-      } else {
-        // trigger error
-        capture(new Error(`Iframe Freeze Alert`), {
-          severity: SEVERITY_LEVELS.S2,
-        });
-        clearInterval(interval);
-      }
-    }, 3500);
-    // ping after 2s
-    setTimeout(() => {
-      Interface.sendMessage('ping');
-    }, 1000);
-
-    Interface.subscribe('pong', () => {
-      pingReceived = true;
-      setTimeout(() => {
-        Interface.sendMessage('ping');
-      }, 1000);
-    });
-  } catch (e) {
-    // e
-  }
-}
 
 export default initRazorpayCheckout;

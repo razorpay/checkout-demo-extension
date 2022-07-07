@@ -12,7 +12,6 @@ import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
 import { startErrorCapturing } from 'error-service';
 import { TRAFFIC_ENV } from 'common/constants';
-import Interface from 'common/interface';
 
 setSessionConstructor(Session);
 
@@ -24,7 +23,3 @@ RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
 startErrorCapturing();
 initIframe();
-
-Interface.subscribe('ping', () => {
-  Interface.publishToParent('pong');
-});
