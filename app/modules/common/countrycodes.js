@@ -283,6 +283,7 @@ function removeLeadingZeroes(number) {
  * @returns {string}
  */
 function sanitizeNumber(number) {
+  number = number + ''; // make sure its string
   // Decide whether or not to add plus
   if (hasAtLeastTwoLeadingZeroes(number)) {
     number = `+${removeLeadingZeroes(number)}`;

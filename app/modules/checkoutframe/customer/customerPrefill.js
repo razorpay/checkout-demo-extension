@@ -5,6 +5,7 @@ import {
   getPreferences,
   shouldStoreCustomerInStorage,
 } from 'razorpay';
+import { capture, SEVERITY_LEVELS } from 'error-service';
 
 /**
  * A valid contact can only contain
@@ -23,32 +24,45 @@ function doesContactHaveValidCharacters(contact) {
 }
 
 export const getPrefilledContact = () => {
-  let prefilledContact = getOption('prefill.contact');
-  const savedCustomer = getPreferences('customer');
-
-  if (savedCustomer && savedCustomer.contact) {
-    /* saved card details take priority over prefill */
-    prefilledContact = savedCustomer.contact;
-  } else if (shouldStoreCustomerInStorage()) {
-    // from localstorage
-    const storedUserDetails = ContactStorage.get();
-    // Pick details from storage if not given in prefill
-    if (!prefilledContact && storedUserDetails.contact) {
-      prefilledContact = storedUserDetails.contact;
-    }
-  }
-
-  // validate contact detail
-  if (prefilledContact) {
-    if (doesContactHaveValidCharacters(prefilledContact)) {
-      const formattedContact = findCountryCode(prefilledContact);
-      const newContact = '+' + formattedContact.code + formattedContact.phone;
-      if (prefilledContact !== newContact) {
-        prefilledContact = newContact;
+  // added for error capturing
+  const analyticData = {};
+  try {
+    let prefilledContact = getOption('prefill.contact');
+    const savedCustomer = getPreferences('customer');
+    if (savedCustomer && savedCustomer.contact) {
+      /* saved card details take priority over prefill */
+      prefilledContact = savedCustomer.contact;
+    } else if (shouldStoreCustomerInStorage()) {
+      // from localstorage
+      const storedUserDetails = ContactStorage.get();
+      // Pick details from storage if not given in prefill
+      if (!prefilledContact && storedUserDetails.contact) {
+        prefilledContact = storedUserDetails.contact;
       }
     }
+    analyticData.prefilledContact = prefilledContact;
+    analyticData.typeOfPrefilledContact = typeof prefilledContact;
+
+    // validate contact detail
+    if (prefilledContact) {
+      if (doesContactHaveValidCharacters(prefilledContact)) {
+        const formattedContact = findCountryCode(prefilledContact);
+        const newContact = '+' + formattedContact.code + formattedContact.phone;
+        if (prefilledContact !== newContact) {
+          prefilledContact = newContact;
+        }
+      }
+    }
+    return prefilledContact;
+  } catch (e) {
+    capture(e, {
+      severity: SEVERITY_LEVELS.S2,
+      analytics: {
+        data: analyticData,
+      },
+    });
   }
-  return prefilledContact;
+  return '';
 };
 
 export const getPrefilledEmail = () => {
