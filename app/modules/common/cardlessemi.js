@@ -7,7 +7,7 @@ const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
 const config = {
   walnut369: {
-    name: 'Walnut369',
+    name: 'Axio',
     fee_bearer_customer: false,
     headless: false,
     // section: 'recommended',

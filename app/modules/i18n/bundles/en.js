@@ -336,7 +336,7 @@ export default {
       cards: 'EMI on Cards',
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
-      walnut369: 'Walnut 369',
+      walnut369: 'Axio',
       sezzle: 'Sezzle',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
@@ -355,7 +355,7 @@ export default {
     select_option_title: 'Select an option',
     select_recommended_title: 'Recommended',
     other_options: 'Other Options',
-    walnut_banner_text: 'Get No Cost EMI quickly with Walnut 369',
+    walnut_banner_text: 'Get No Cost EMI quickly with Axio',
   },
   countries: {
     AD: 'Andorra',
