@@ -22,7 +22,7 @@ jobs:
         uses: docker://amazon/aws-cli:2.7.7
         with:
           entrypoint: scripts/deploy.sh
-          args: ${{ github.event.deployment.payload.commit_id }} ${{ github.event.deployment.payload.canary }} ${{ github.event.deployment.payload.baseline }} ${{ github.event.deployment.payload.production }}
+          args: ${{ github.event.deployment.payload.commit_id }} ${{ github.event.deployment.payload.canary }} ${{ github.event.deployment.payload.baseline }} ${{ github.event.deployment.payload.production }} ${{ github.event.deployment.payload.one_cc }}
 
       - name: Mark Deployment Success on GitHub
         if: ${{ success() }}

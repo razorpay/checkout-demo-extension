@@ -13,6 +13,7 @@ COMMIT=$1
 CANARY=$2
 BASELINE=$3
 PRODUCTION=$4
+ONE_CC=$5
 
 deploy_to_env() {
   ENV=$1
@@ -42,7 +43,13 @@ deploy_to_env() {
 }
 
 # copy build folder to disk
-aws --output text s3 sync s3://$BUCKET_production/build/$COMMIT build
+if [ "$ONE_CC" == "yes" ]
+then 
+  mkdir build
+  aws --output text s3 cp s3://$BUCKET_production/build/$COMMIT/checkout-1cc.js build
+else
+  aws --output text s3 sync s3://$BUCKET_production/build/$COMMIT build
+fi
 
 if [ "$CANARY" == "yes" ]; then
   deploy_to_env "canary"

@@ -77,6 +77,7 @@ WORKDIR /app/dist/v1
 
 # Rename *.x.gz to *.x so that we serve gzipped files
 RUN mv checkout.js.gz checkout.js
+RUN mv checkout-1cc.js.gz checkout-1cc.js
 RUN mv checkout-frame.js.gz checkout-frame.js
 RUN mv razorpay.js.gz razorpay.js
 RUN mv css/checkout.css.gz css/checkout.css
