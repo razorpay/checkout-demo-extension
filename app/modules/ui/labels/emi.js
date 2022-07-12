@@ -48,3 +48,5 @@ export const SBIN_DEBIT_DESCRIPTION_CONVENIENCE =
 export const ICICI_BANK_EMI = 'emi.icici_bank_emi';
 export const ICICI_DEBIT_DESCRIPTION_CONVENIENCE =
   'emi.icici_debit_description_convenience';
+export const KOTAK_CREDIT_DESCRIPTION_CONVENIENCE =
+  'emi.kotak_credit_description_convenience';

@@ -41,6 +41,7 @@
     SBIN_DEBIT_DESCRIPTION_CONVENIENCE,
     ICICI_BANK_EMI,
     ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
+    KOTAK_CREDIT_DESCRIPTION_CONVENIENCE,
   } from 'ui/labels/emi';
   import { formatAmountWithCurrency } from 'helper/currency';
 
@@ -75,7 +76,7 @@
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
   const SBIN_BANK_CODE = 'SBIN';
-
+  const KOTAK_BANK_CODE = 'KKBK';
   const ICICI_BANK_CODE = 'ICIC';
 
   $: {
@@ -263,6 +264,14 @@
           <span style="display:block">
             {formatTemplateWithLocale(
               ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
+              $locale
+            )}
+          </span>
+        {:else if bank === KOTAK_BANK_CODE}
+          <!-- A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on Kotak Credit Card -->
+          <span style="display:block">
+            {formatTemplateWithLocale(
+              KOTAK_CREDIT_DESCRIPTION_CONVENIENCE,
               $locale
             )}
           </span>
