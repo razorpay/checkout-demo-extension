@@ -1,22 +1,31 @@
 import { getOption, getPreferences } from 'razorpay';
 import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
+import { TRAFFIC_ENV } from 'common/constants';
 
 const SESSION_CREATED = 'session_created';
 const SESSION_ERRORED = 'session_errored';
 let sessionCreated = false;
 let sessionErrored = false;
+
+function getEventName(event) {
+  const isCanary = TRAFFIC_ENV === 'canary' ? '.canary' : '';
+  const isBaseline = TRAFFIC_ENV === 'baseline' ? '.baseline' : '';
+  if (event === SESSION_CREATED) {
+    return `checkout${isCanary || isBaseline}.sessionCreated.metrics`;
+  } else {
+    return `checkout${isCanary || isBaseline}.sessionErrored.metrics`;
+  }
+}
 function createEventObject(event, severity) {
-  const name =
-    event === SESSION_CREATED
-      ? 'checkout.sessionCreated.metrics'
-      : 'checkout.sessionErrored.metrics';
+  const name = getEventName(event);
   const metrics = [
     {
       name,
       labels: [
         {
           type: event,
+          env: TRAFFIC_ENV,
         },
       ],
     },
