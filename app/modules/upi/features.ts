@@ -45,6 +45,13 @@ export function enableUPITiles(
     config: { apps: [] },
     variant: 'subText',
   };
+  // if UPI intent is disable hide intent from L0/L1
+  if (
+    (window.CheckoutBridge && !isUPIFlowEnabled('intent')) ||
+    (!window.CheckoutBridge && !isUPIFlowEnabled('intentUrl'))
+  ) {
+    return response;
+  }
 
   if (
     isRecurring() ||

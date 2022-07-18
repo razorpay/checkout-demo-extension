@@ -17,7 +17,7 @@ module.exports = {
   clearMocks: true, // Automatically clear mock calls and instances before every test.
   collectCoverageFrom: ['<rootDir>/app/modules/**/*.*'],
   coverageDirectory: '<rootDir>/coverage/',
-  coverageReporters: ['json', 'lcov', 'text-summary', 'html-spa'],
+  coverageReporters: ['html', 'json', 'lcov', 'text-summary'],
   testResultsProcessor: 'jest-sonar-reporter',
   coveragePathIgnorePatterns: [
     'node_modules',

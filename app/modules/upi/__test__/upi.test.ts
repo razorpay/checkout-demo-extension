@@ -7,6 +7,7 @@ import {
 } from '../helper/upi';
 import { enableUPITiles } from 'upi/features';
 import { getSDKMeta, getUPIIntentApps } from 'checkoutstore/native';
+import { isUPIFlowEnabled } from 'checkoutstore/methods';
 import { isDesktop } from 'common/useragent';
 import {
   getOption,
@@ -28,8 +29,13 @@ jest.mock('../experiments', () => ({
     enabled: () => true,
   },
 }));
+jest.mock('checkoutstore/methods', () => ({
+  isUPIFlowEnabled: jest.fn(() => true),
+}));
 jest.mock('checkoutstore/native', () => ({
-  getSDKMeta: jest.fn(() => {}),
+  getSDKMeta: jest.fn(() => ({
+    platform: '',
+  })),
   getUPIIntentApps: jest.fn(),
 }));
 jest.mock('razorpay', () => ({
@@ -154,18 +160,38 @@ describe('#getGridArray utility test', () => {
 
 describe('#definePlatformReturnMethodIdentifier: utility test', () => {
   test('should return none for desktop', () => {
-    (getOption as jest.Mock).mockReturnValue(true);
-    (getMerchantMethods as jest.Mock).mockReturnValue({ upi: true });
-    (isDesktop as jest.Mock).mockReturnValue(true);
+    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
+    (isDesktop as jest.Mock).mockReturnValueOnce(true);
+    (isUPIFlowEnabled as jest.Mock).mockReturnValueOnce(false);
     const cb = definePlatformReturnMethodIdentifier();
     expect(cb).toBeTruthy();
     expect(cb(UPI_APPS.preferred[0] as any)).toBe('none');
   });
 
+  test('should return nativeIntent for android SDK', () => {
+    (getSDKMeta as jest.Mock).mockReturnValueOnce({
+      platform: 'android',
+    });
+    (getUPIIntentApps as jest.Mock).mockReturnValue({
+      filtered: [
+        {
+          package_name: 'com.google.android.apps.nbu.paisa.user',
+        },
+      ],
+    });
+    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
+    (isUPIFlowEnabled as jest.Mock).mockReturnValueOnce(true);
+    const cb = definePlatformReturnMethodIdentifier();
+    expect(cb).toBeTruthy();
+    expect(cb(UPI_APPS.preferred[0] as any)).toBe('nativeIntent');
+  });
+
   test('should return none for other click', () => {
-    (getOption as jest.Mock).mockReturnValue(true);
-    (getMerchantMethods as jest.Mock).mockReturnValue({ upi: true });
-    (isDesktop as jest.Mock).mockReturnValue(true);
+    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
+    (isDesktop as jest.Mock).mockReturnValueOnce(true);
     const cb = definePlatformReturnMethodIdentifier();
     expect(cb).toBeTruthy();
     expect(cb(OTHER_INTENT_APPS as any)).toBe('none');

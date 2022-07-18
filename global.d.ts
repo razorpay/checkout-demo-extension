@@ -7,6 +7,7 @@ interface Window {
   Razorpay: any;
   Event: any;
   Element: any;
+  CheckoutBridge: any;
 }
 
 declare const global: Window;

@@ -80,8 +80,12 @@ export function definePlatformReturnMethodIdentifier(): (
     }
     return actionOrder?.find((action: UPI.AppTileAction) =>
       (actionQualifier as any)[action].reduce(
-        (result: boolean, currentFunction: (packageName: string) => boolean) =>
-          result && currentFunction(package_name),
+        (
+          result: boolean,
+          currentFunction: (packageName: string) => boolean
+        ) => {
+          return result && currentFunction(package_name);
+        },
         true
       )
     ) as UPI.AppTileAction;

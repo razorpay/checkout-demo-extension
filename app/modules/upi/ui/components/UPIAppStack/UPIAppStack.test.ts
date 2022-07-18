@@ -1,5 +1,6 @@
 import { render } from '@testing-library/svelte';
 import { UPIAppStack } from '.';
+import { isUPIFlowEnabled } from 'checkoutstore/methods';
 import {
   setWithoutOffer,
   isCtaShown,
@@ -14,6 +15,10 @@ jest.mock('sessionmanager', () => ({
       },
     },
   }),
+}));
+
+jest.mock('checkoutstore/methods', () => ({
+  isUPIFlowEnabled: jest.fn(() => true),
 }));
 
 jest.mock('razorpay', () => ({
