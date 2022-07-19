@@ -56,8 +56,24 @@ const Analytics = () => ({
    */
   track: function (
     name,
-    { type, data = {}, r = rInstance, immediately = false } = {}
+    { type, data = {}, r = rInstance, immediately = false, isError } = {}
   ) {
+    // when we get any error on mount of script we don't have r instance
+    // due to that we are unable to track those events
+    if (isError && !r) {
+      // in those case of error we need logs
+      // mock r
+      r = {
+        id: Track.id,
+        getMode: () => 'live',
+        get: (arg) => {
+          if (typeof arg === 'string') {
+            return false;
+          }
+          return {};
+        },
+      };
+    }
     let calculatedMeta = calculateMeta(META);
     data = sanitizeEventData(data);
     if (_.isNonNullObject(data)) {
@@ -75,7 +91,7 @@ const Analytics = () => ({
 
     data.meta = calculatedMeta;
 
-    data.meta.request_index = REQUEST_INDEX[rInstance.id];
+    data.meta.request_index = REQUEST_INDEX[r.id];
 
     // Add type to the name.
     if (type) {

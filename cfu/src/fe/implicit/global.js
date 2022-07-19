@@ -1,3 +1,4 @@
+import '../../error-service/index';
 export const global = window;
 export const document = global.document;
 export const Boolean = global.Boolean;

@@ -98,6 +98,7 @@ module.exports = {
     indent: 0,
     semi: 0,
     quotes: 0,
+    'no-else-return': 2,
     'no-var': 0,
     'no-debugger': 2, // not allow debugger in source
     'no-empty': 0, // allow empty block, usually after catch(e){}

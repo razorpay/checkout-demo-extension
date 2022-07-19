@@ -8,6 +8,7 @@ import { querySelectorAll, form2obj } from 'utils/doc';
 import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
 import { isBraveBrowser } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
+import Interface from 'common/interface';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -234,6 +235,8 @@ function getPreloadedFrame(rzp) {
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
+    Interface.iframeReference = preloadedFrame.el;
+    Interface.setId(Track.id);
     global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
     frameContainer |> _El.append(preloadedFrame.el);
   }

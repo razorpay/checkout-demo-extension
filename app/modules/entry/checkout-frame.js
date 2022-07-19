@@ -1,4 +1,5 @@
-import 'lib/polyfill/checkoutframe';
+import 'lib/polyfill/checkoutframe'; // need always at top
+import 'error-service/init';
 import 'utils/modal';
 import { setSessionConstructor } from 'sessionmanager';
 import { initIframe } from 'checkoutframe/iframe';
@@ -10,7 +11,6 @@ import 'payment';
 import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
-import { startErrorCapturing } from 'error-service';
 import { TRAFFIC_ENV } from 'common/constants';
 
 setSessionConstructor(Session);
@@ -21,5 +21,4 @@ const params = _.getQueryParams();
 Track.props.env = params.traffic_env || TRAFFIC_ENV;
 RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
-startErrorCapturing();
 initIframe();

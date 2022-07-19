@@ -1,6 +1,8 @@
 import { getOption, getPreferences } from 'razorpay';
 import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
+import { syncAvailability } from 'common/meta';
+import Interface from 'common/interface';
 import { TRAFFIC_ENV } from 'common/constants';
 
 const SESSION_CREATED = 'session_created';
@@ -13,9 +15,8 @@ function getEventName(event) {
   const isBaseline = TRAFFIC_ENV === 'baseline' ? '.baseline' : '';
   if (event === SESSION_CREATED) {
     return `checkout${isCanary || isBaseline}.sessionCreated.metrics`;
-  } else {
-    return `checkout${isCanary || isBaseline}.sessionErrored.metrics`;
   }
+  return `checkout${isCanary || isBaseline}.sessionErrored.metrics`;
 }
 function createEventObject(event, severity) {
   const name = getEventName(event);
@@ -62,9 +63,12 @@ function trackAvailabilty(event, severity) {
     },
   };
   const key = getPreferences('merchant_key') || getOption('key') || '';
-  if (key && key.indexOf('test_') > -1) {
+  const isErrorSession = event === SESSION_ERRORED;
+  // in case of error track anyway
+  if ((key && key.indexOf('test_') > -1) || (!key && !isErrorSession)) {
     return;
   }
+
   if (
     (!sessionCreated && event === SESSION_CREATED) ||
     (!sessionErrored && event === SESSION_ERRORED)
@@ -81,7 +85,15 @@ function trackAvailabilty(event, severity) {
       if (event === SESSION_ERRORED) {
         sessionErrored = true;
       }
+      syncAvailability(sessionCreated, sessionErrored);
     } catch (e) {}
   }
 }
+
+Interface.subscribe('syncAvailability', (data) => {
+  const { sessionCreated: session, sessionErrored: error } = data.data || {};
+  sessionCreated = typeof session === 'boolean' ? session : sessionCreated;
+  sessionErrored = typeof error === 'boolean' ? error : sessionErrored;
+});
+
 export { trackAvailabilty };

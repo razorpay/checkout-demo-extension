@@ -190,7 +190,10 @@ const setTrackingProps = (message) => {
 };
 
 export const handleMessage = function (message) {
-  if ('id' in message && !validUID(message.id)) {
+  if (
+    ('id' in message && !validUID(message.id)) ||
+    message._module === 'interface'
+  ) {
     return;
   }
 

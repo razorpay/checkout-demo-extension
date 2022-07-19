@@ -1,6 +1,7 @@
 import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
 import Analytics, { ErrorEvents, trackAvailabilty } from 'analytics/index';
+import Interface from 'common/interface';
 
 /**
  * @param {String|Error|Object} error -
@@ -42,6 +43,7 @@ export const capture = (
        * Defaulting to true to ensure we capture all reported errors
        */
       immediately: Boolean(immediately),
+      isError: true,
     });
   } catch (e) {
     // try/catch to ensure `captureError` does not contribute to more
@@ -56,13 +58,16 @@ const ERROR_TRACKING_URLS = [
 
 export function isUrlApplicableForErrorTracking(url) {
   return ERROR_TRACKING_URLS.some(function (availableUrl) {
-    return url.startsWith(availableUrl);
+    return url.indexOf(availableUrl) === 0;
   });
 }
 
 export function startErrorCapturing() {
+  const existingOnError = window.onerror;
+  Interface.sendMessage('clearMountErrorListener');
   window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
     if (typeof url === 'string' && !isUrlApplicableForErrorTracking(url)) {
+      existingOnError?.(errorMsg, url, lineNumber, column, errorObj, true);
       return;
     }
     const error = {
@@ -81,6 +86,7 @@ export function startErrorCapturing() {
         data: error,
       },
     });
+    existingOnError?.(errorMsg, url, lineNumber, column, errorObj, true);
   };
 
   window.addEventListener('unhandledrejection', function (event) {
