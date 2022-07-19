@@ -77,8 +77,7 @@ export const capture = (
       // e
     }
     Track(eventName, {
-      data: {
-        ...(typeof data === 'object' ? data : {}),
+      data: window.Object.assign({}, typeof data === 'object' ? data : {}, {
         /**
          * Intentionally overriding data.error prop to ensure
          * we're following the same structure across all errors
@@ -86,7 +85,7 @@ export const capture = (
          * look at restructuring how the data is passed
          */
         error: constructErrorObject(error, { severity, unhandled }),
-      },
+      }),
       /**
        * Constructing analytics.immediately property
        * Defaulting to true to ensure we capture all reported errors

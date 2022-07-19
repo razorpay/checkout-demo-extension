@@ -97,16 +97,15 @@ export const isMobile = () => {
 
 // This does not consume user agent because brave uses the same user agent as chrome.
 // Brave enough! https://www.reddit.com/r/brave_browser/comments/dueif0/detect_brave_browser/
-export const isBraveBrowser = () => {
-  return new Promise((res) => {
-    if (navigator.brave) {
-      navigator.brave.isBrave().then((r) => {
-        res(r);
-      });
-    } else {
-      res(false);
+export const isBraveBrowser = async () => {
+  if (navigator.brave) {
+    try {
+      return await navigator.brave.isBrave();
+    } catch (e) {
+      return false;
     }
-  });
+  }
+  return false;
 };
 
 export const setBraveBrowser = (res = false) => {

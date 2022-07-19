@@ -1,5 +1,11 @@
 const plugins = [
   [
+    '@babel/plugin-transform-runtime',
+    {
+      regenerator: true,
+    },
+  ],
+  [
     require('@babel/plugin-proposal-pipeline-operator'),
     { proposal: 'minimal' },
   ],
@@ -7,6 +13,7 @@ const plugins = [
 ];
 
 module.exports = {
+  runtimeHelpers: true,
   plugins,
   presets: [
     [

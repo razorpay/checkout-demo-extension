@@ -16,10 +16,8 @@ export const constructErrorObject = (error, tags) => {
         const { name, message, stack, fileName, lineNumber, columnNumber } =
           error;
 
-        customError = {
-          // this won't copy non-enumerable
-          ...JSON.parse(JSON.stringify(error)),
-
+        // this won't copy non-enumerable (JSON)
+        customError = window.Object.assign(JSON.parse(JSON.stringify(error)), {
           // Handling common non-enumerable properties
           name,
           message,
@@ -28,7 +26,7 @@ export const constructErrorObject = (error, tags) => {
           lineNumber,
           columnNumber,
           tags,
-        };
+        });
       }
       break;
 

@@ -7,9 +7,10 @@ const babelPlugin = require('rollup-plugin-babel');
 const svelte = require('rollup-plugin-svelte');
 const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
-const resolve = require('@rollup/plugin-node-resolve');
+const { nodeResolve: resolve } = require('@rollup/plugin-node-resolve');
 const pCSS = require('rollup-plugin-css-only');
 const preprocess = require('svelte-preprocess');
+const commonjs = require('rollup-plugin-commonjs');
 const { terser } = require('rollup-plugin-terser');
 
 const eslint = require('./scripts/eslint');
@@ -116,6 +117,7 @@ const getPlugins = ({ src }) => {
       extensions: ['.js', '.mjs', '.svelte'],
     }),
 
+    commonjs(), // use it after babel becoz of |> operator
     inject(globals),
 
     isProd &&
