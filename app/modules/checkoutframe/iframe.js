@@ -8,6 +8,7 @@ import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
 import { parse } from 'utils/object';
 import * as _El from 'utils/DOM';
 import { body } from 'utils/doc';
+import { captureSentryHttpFailure } from 'sentry/failure';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
@@ -15,7 +16,7 @@ import { body } from 'utils/doc';
  * @param  {any}    data   Extra data to be sent to the method
  */
 function handleNewIOSMethods(method, data) {
-  var color = {
+  let color = {
     /**
      * Currently can't set theme color as it's not available onload
      * TODO: Set color in whenever available after discussing with iOS team
@@ -30,7 +31,7 @@ function handleNewIOSMethods(method, data) {
 
   data = data || {};
 
-  var navData;
+  let navData;
 
   switch (method) {
     case 'load':
@@ -59,7 +60,7 @@ const platformSpecific = {
     /* TODO: define this only in older iOS SDKs, directly call new iOS Bridge
      * from notify Bridge for newer SDKs */
     let CheckoutBridge = Bridge.defineIosBridge();
-    var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
+    let bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
 
     bridgeMethods.forEach((prop) => {
       let method;
@@ -92,7 +93,7 @@ export function initIframe() {
   const parseMessage = (e) => {
     /* not concerned about adding/removing listeners,
      * iframe is razorpay's fiefdom */
-    var data = e.data;
+    let data = e.data;
     const session = getSession();
     const iframeFlow = session?.r?._payment?.forceIframeElement || {};
     if (
@@ -132,6 +133,7 @@ export function initIframe() {
 
       flush();
     });
+  window.addEventListener('sentry_http_failure', captureSentryHttpFailure);
 
   defineGlobalsForBridge();
 
@@ -152,7 +154,7 @@ export function initIframe() {
     delete Track.props.referer;
     Track.props.platform = 'mobile_sdk';
 
-    var os = qpmap.platform;
+    let os = qpmap.platform;
     if (os) {
       Track.props.os = os;
     }

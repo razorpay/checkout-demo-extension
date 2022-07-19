@@ -12,6 +12,7 @@ import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
 import { TRAFFIC_ENV } from 'common/constants';
+import { startSentryMonitoring } from 'sentry/http';
 
 setSessionConstructor(Session);
 
@@ -21,4 +22,5 @@ const params = _.getQueryParams();
 Track.props.env = params.traffic_env || TRAFFIC_ENV;
 RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
+startSentryMonitoring();
 initIframe();

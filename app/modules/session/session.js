@@ -26,6 +26,7 @@ import { deletePrefsCache } from 'common/Razorpay';
 import { avoidSessionSubmit, isQRPaymentCancellable } from 'upi/helper';
 import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
+import { injectSentry } from 'sentry';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1103,6 +1104,7 @@ Session.prototype = {
       OneClickCheckoutStore.shouldShowCoupons() ||
       OneClickCheckoutStore.shouldShowAddress();
     if (RazorpayHelper.isOneClickCheckout() && isCouponsOrAddressEnabled) {
+      injectSentry();
       this.setOneClickCheckoutHome();
     }
     if (!RazorpayHelper.isPayout()) {

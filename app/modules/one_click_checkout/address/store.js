@@ -1,5 +1,5 @@
 // Svelte store for address
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 
 export const savedAddresses = writable([]);
 
@@ -15,3 +15,5 @@ export const showBanner = derived(
 export const consentGiven = writable(false);
 
 export const addressScrollable = writable(false);
+
+export const getSavedAddresses = () => get(savedAddresses);

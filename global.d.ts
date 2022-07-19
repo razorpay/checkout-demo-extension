@@ -8,6 +8,8 @@ interface Window {
   Event: any;
   Element: any;
   CheckoutBridge: any;
+  Sentry: any;
+  msCrypto: any;
 }
 
 declare const global: Window;

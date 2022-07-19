@@ -16,6 +16,11 @@ module.exports = {
   fakeTimers: {},
   clearMocks: true, // Automatically clear mock calls and instances before every test.
   collectCoverageFrom: ['<rootDir>/app/modules/**/*.*'],
+  testMatch: [
+    '**/__tests__/*.[jt]s?(x)',
+    '**/__test__/*.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)',
+  ],
   coverageDirectory: '<rootDir>/coverage/',
   coverageReporters: ['html', 'json', 'lcov', 'text-summary'],
   testResultsProcessor: 'jest-sonar-reporter',
