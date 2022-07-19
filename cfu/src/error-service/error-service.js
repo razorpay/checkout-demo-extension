@@ -147,12 +147,12 @@ export function startErrorCapturing() {
     } catch (e) {
       // e
     }
-    try { 
+    try {
       const { topic } = inputData || {};
       if (topic && topic === 'clearMountErrorListener') {
         window.removeEventListener('error', errorHandler, { capture: true });
-      } 
-    } catch(e) {
+      }
+    } catch (e) {
       // e
     }
   });
