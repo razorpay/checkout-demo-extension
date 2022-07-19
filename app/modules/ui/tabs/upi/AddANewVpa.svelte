@@ -29,7 +29,7 @@
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
   import { phone } from 'checkoutstore/screens/home';
-  import { suggestionVPA } from 'common/upi';
+  import { suggestionVPA, suggestionVPAForRecurring } from 'common/upi';
   import { getThemeMeta } from 'checkoutstore/theme';
 
   // Props
@@ -234,7 +234,11 @@
               atIndex < currentVaue.length - 1
             ) {
               const predictionInput = currentVaue.substr(atIndex + 1);
-              const predictions = suggestionVPA.filter((vpa) =>
+              const currentSuggestionVPAList = recurring
+                ? suggestionVPAForRecurring
+                : suggestionVPA;
+
+              const predictions = currentSuggestionVPAList.filter((vpa) =>
                 vpa.startsWith(predictionInput)
               );
               const value = `${currentVaue.substr(0, atIndex)}@${
