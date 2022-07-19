@@ -5001,10 +5001,10 @@ Session.prototype = {
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         /**
-         * - In case if strictly recurring payment
+         * - In case if recurring payment and recurring=preferred payments
          * - Ask user to verify phone if phone number is domestic only
          */
-        if (RazorpayHelper.isStrictlyRecurringPayment()) {
+        if (RazorpayHelper.isRecurringOrPreferredPayment()) {
           if (isDomesticCustomer) {
             this.sendOTP();
             return;

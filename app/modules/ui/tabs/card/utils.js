@@ -1,7 +1,7 @@
 import {
   hasFeature,
   getCustomSubtextForMethod,
-  isStrictlyRecurringPayment,
+  isRecurringOrPreferredPayment,
 } from 'razorpay';
 import { shouldRememberCustomer } from 'checkoutstore';
 
@@ -48,9 +48,9 @@ export const shouldShowTnc = (currency, country) => {
 
 export const shouldRememberCard = (isIndianCustomer) => {
   /**
-   * Recurring payments will always ask for user consent
+   * Recurring and preferred recurring payments will always ask for user consent
    */
-  if (isStrictlyRecurringPayment()) {
+  if (isRecurringOrPreferredPayment()) {
     return shouldRememberCustomer();
   }
   return shouldRememberCustomer() && isIndianCustomer;
