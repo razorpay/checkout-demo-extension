@@ -25,6 +25,7 @@ const modules = {
   'entry/razorpay': 'razorpay',
   'entry/checkout': 'checkout',
   'entry/checkout-frame': 'checkout-frame',
+  'entry/sdk-loader': 'sdk-loader',
 };
 
 function getOptions(module) {

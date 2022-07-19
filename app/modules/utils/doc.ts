@@ -150,8 +150,22 @@ export function loadCSS(url: string) {
     const link = _El.create('link') as HTMLLinkElement;
     link.rel = 'stylesheet';
     link.href = url;
-    link.onload = () => resolve(link);
-    link.onerror = () => reject(new Error(`Failed to load ${url}`));
+    link.onload = resolve;
+    link.onerror = reject;
     document.head.appendChild(link);
+  });
+}
+
+/**
+ * Insert js from given url into head tag
+ * @param {string} url
+ */
+export function loadJS(url: string) {
+  return new Promise((resolve, reject) => {
+    const script = _El.create('script') as HTMLScriptElement;
+    script.src = url;
+    script.onerror = reject;
+    script.onload = resolve;
+    document.head.appendChild(script);
   });
 }

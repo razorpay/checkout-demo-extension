@@ -1,4 +1,5 @@
 # outputs
+/scripts/server/page.ljbc
 /app/dist
 /app/modules/generated
 /app/js/generated
