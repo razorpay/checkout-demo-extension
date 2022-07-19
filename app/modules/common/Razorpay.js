@@ -237,12 +237,11 @@ function base_configure(overrides) {
 
   let options = new CheckoutOptions(overrides);
   validateOverrides(options, ['amount']);
-  setNotes(options);
+  setNotes(options.get('notes'));
   return options;
 }
 
-function setNotes(options) {
-  let notes = options.get('notes');
+export function setNotes(notes) {
   _Obj.loop(notes, function (val, key) {
     if (_.isString(val)) {
       if (val.length > 254) {

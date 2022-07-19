@@ -7,7 +7,10 @@ import Razorpay, {
   getSdkMetaForRequestPayload,
   setPrefetchedPrefs,
   getPrefetchedPrefs,
+  setNotes,
 } from 'common/Razorpay';
+import { flatten, RazorpayDefaults } from 'common/options';
+import { shouldRedirect } from 'common/useragent';
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
@@ -52,6 +55,8 @@ import { setBraveBrowser } from 'common/useragent';
 import { appendLoader } from 'common/loader';
 
 let CheckoutBridge = window.CheckoutBridge;
+
+let isPrefetchPrefsFlowFor1cc = false;
 
 const showModal = (session) => {
   Razorpay.sendMessage({ event: 'render' });
@@ -253,6 +258,7 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'prefetch') {
+    isPrefetchPrefsFlowFor1cc = true;
     setParamsForDdosProtection(session);
     getPrefsPromisified(session)
       .then((preferences) => {
@@ -271,7 +277,17 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'open' || options) {
-    syncOptionsAndSessionInstance(session, options);
+    if (isPrefetchPrefsFlowFor1cc) {
+      /**
+       * In the prefetch flow, instance creation is the first step and at that point we don't have all the
+       * options we need to pass to the frame. Some options are set into the razorpay instance
+       * using the .set() method. Since the session is created during the instance creation step
+       * itself, when finally .open() is called there is a disparity b/w the instance in session(session.r)
+       * and the razorpay instance. This function is meant to sync the two instances.
+       */
+      syncOptionsAndSessionInstance(session, options);
+    }
+
     // triggering the open event, adding a safe check for sdk
     if (Bridge.hasCheckoutBridge()) {
       Track(session.r, MiscEvents.OPEN);
@@ -298,8 +314,26 @@ export const handleMessage = function (message) {
 
 function syncOptionsAndSessionInstance(session, options) {
   const sessionOptions = session.r.get();
-  const updatedOptions = { ...sessionOptions, ...options };
 
+  // normalize options
+  if (
+    typeof options.retry === 'object' &&
+    typeof options.retry.enabled === 'boolean'
+  ) {
+    options.retry = options.retry.enabled;
+  }
+
+  const flattenedOptions = flatten(options, RazorpayDefaults);
+  const updatedOptions = { ...sessionOptions, ...flattenedOptions };
+
+  let callback_url = updatedOptions.callback_url;
+  if (callback_url && shouldRedirect) {
+    updatedOptions.redirect = true;
+  }
+
+  setNotes(updatedOptions.notes || {});
+
+  // run loop to update the instance with the synced options
   Object.keys(updatedOptions).map((optionKey) => {
     session.r.set(optionKey, updatedOptions[optionKey]);
   });
