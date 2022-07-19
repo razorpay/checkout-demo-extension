@@ -198,6 +198,7 @@ module.exports = {
     emulate,
     withSiftJS,
     networkInterceptorConfig = {},
+    personalizationDefault,
   }) {
     // Disable animations for testing
     options = {
@@ -230,6 +231,10 @@ module.exports = {
 
     if (typeof options.personalization === 'undefined') {
       options.personalization = false;
+    }
+
+    if (personalizationDefault) {
+      options.personalization = undefined;
     }
 
     await setExperiments(page, experiments);

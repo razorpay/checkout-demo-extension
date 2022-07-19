@@ -1,5 +1,7 @@
 import { setupPreferences } from 'tests/setupPreferences';
 
+import { phone } from 'checkoutstore/screens/home';
+
 import {
   INTERNATIONAL_APPS,
   isInternationalProvider,
@@ -10,6 +12,8 @@ import {
   isMerchantInternationalAppEnabled,
   isMerchantInternationalMethodEnabled,
   isInternationalInPreferredInstrument,
+  isCustomerWithIntlPhone,
+  getIntlCustomerPhoneNumber,
 } from '../international';
 
 describe('Test getInternationalAppsConfig', () => {
@@ -293,5 +297,30 @@ describe('Test isMerchantInternationalAppEnabled', () => {
   });
   test('Should return true if giropay is enabled in preferences', () => {
     expect(isMerchantInternationalAppEnabled('giropay')).toBe(true);
+  });
+});
+
+describe('Test isCustomerWithIntlPhone', () => {
+  test('Should return false if countryCode is IN', () => {
+    expect(isCustomerWithIntlPhone('IN')).toBe(false);
+  });
+  test('Should return true if countryCode is US', () => {
+    expect(isCustomerWithIntlPhone('US')).toBe(true);
+  });
+  test('Should return falsy value if countryCode is undefined', () => {
+    expect(isCustomerWithIntlPhone()).toBeFalsy();
+  });
+});
+
+describe('Test getIntlCustomerPhoneNumber', () => {
+  test('Should return customer contact', () => {
+    expect(getIntlCustomerPhoneNumber('8888888888')).toEqual('8888888888');
+  });
+  test('Should not return customer contact', () => {
+    expect(getIntlCustomerPhoneNumber()).toEqual('');
+  });
+  test('Should return customer contact from store', () => {
+    phone.set('9999999999');
+    expect(getIntlCustomerPhoneNumber()).toEqual('9999999999');
   });
 });

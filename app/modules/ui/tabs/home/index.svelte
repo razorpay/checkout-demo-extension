@@ -45,6 +45,7 @@
     setEmail,
     upiIntentInstrumentsForAnalytics,
     blocks,
+    countryISOCode,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -153,6 +154,7 @@
     getInternationalProviderName,
     updateInternationalProviders,
     isDCCEnabledForProvider,
+    isCustomerWithIntlPhone,
   } from 'common/international';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
@@ -736,11 +738,11 @@
 
     /**
      * We're currently not allowing
-     * local customers to use p13n.
+     * local customers to use p13n, if customer phone number is Indian(+91).
      * But we should, after filtering out
      * all saved cards.
      */
-    if (session.local) {
+    if (session.local && !isCustomerWithIntlPhone($countryISOCode)) {
       return false;
     }
 

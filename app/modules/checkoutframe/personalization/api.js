@@ -12,6 +12,11 @@ import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isDesktop } from 'common/useragent';
+import {
+  isCustomerWithIntlPhone,
+  getIntlCustomerPhoneNumber,
+} from 'common/international';
+
 import { customPreferredMethodsExperiment } from './experiment';
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from './constants';
 
@@ -114,10 +119,16 @@ export function setInstrumentsForCustomer(
 function getInstrumentsFromApi(customer) {
   const session = getSession();
 
+  const countryISOCode = getCustomerCountryISOCode();
+  const isIntlPhone = isCustomerWithIntlPhone(countryISOCode);
+  const customerContact = isIntlPhone
+    ? getIntlCustomerPhoneNumber(customer.contact)
+    : customer.contact;
+
   const url = _.appendParamsToUrl(makeAuthUrl(session.r, 'personalisation'), {
-    contact: customer.contact,
+    contact: customerContact,
     amount: getAmount(),
-    country_code: getCustomerCountryISOCode().toLocaleLowerCase(),
+    country_code: countryISOCode.toLocaleLowerCase(),
   });
 
   const p13nFetchStart = new Date();
@@ -151,8 +162,8 @@ function getInstrumentsFromApi(customer) {
         };
 
         // preference is given to customer specific data
-        if (customer && customer.contact) {
-          apiInstrumentsData = data[customer.contact] || apiInstrumentsData;
+        if (customer && customerContact) {
+          apiInstrumentsData = data[customerContact] || apiInstrumentsData;
         }
         const apiInstruments = removeDuplicateApiInstruments(
           apiInstrumentsData.instruments
