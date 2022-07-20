@@ -16,6 +16,7 @@
   export let stateName;
   export let label = '';
   export let validationText;
+  export let showValidations = false;
 
   let stateField;
   let id = 'state';
@@ -83,4 +84,5 @@
   elemClasses="address-elem dropdown-select"
   labelClasses="address-label"
   showDropDownIcon={true}
+  {showValidations}
 />

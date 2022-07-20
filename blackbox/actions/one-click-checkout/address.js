@@ -189,6 +189,19 @@ async function handleCheckUnserviceable(context, addAddress) {
   ).toBe(true);
 }
 
+/**
+ * checks if address form has any invalid input
+ * @param {object} context
+ */
+async function checkInvalidAddressForm(context) {
+  await assertVisible('.error-field-one-click-checkout');
+  expect(
+    await context.page.$eval('#one-cc-cta', (el) =>
+      el.classList.contains('disabled')
+    )
+  ).toBe(true);
+}
+
 async function unCheckBillAddress(context) {
   await context.page.waitForSelector('#same-address-checkbox');
   await context.page.$eval('#same-address-checkbox', (ele) => ele.click());
@@ -253,4 +266,5 @@ module.exports = {
   handleEditAddress,
   handleEditAddressReq,
   handleBillingAddress,
+  checkInvalidAddressForm,
 };

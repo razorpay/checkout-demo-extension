@@ -27,6 +27,7 @@
   export let formData;
   export let addressType;
   export let validationText;
+  export let showValidations = false;
 
   let countryName;
   let id = 'country_name';
@@ -113,6 +114,7 @@
     elemClasses="address-elem dropdown-select"
     labelClasses="address-label"
     {validationText}
+    {showValidations}
     showDropDownIcon={true}
   />
   {#if showExtraLabel && extraLabel}

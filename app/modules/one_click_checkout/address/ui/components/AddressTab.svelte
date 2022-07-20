@@ -55,6 +55,7 @@
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
+  let addNewAddressRef;
 
   let addressWrapperEle;
   let scrollable = false;
@@ -136,11 +137,11 @@
     if (ADDRESS_FORM_VIEWS.includes(currentView)) {
       const elementId = Resource[addressType].formId;
       const inpError = validateInput(elementId);
-      if (inpError) {
+      if (!isFormComplete || inpError) {
         error = inpError;
         error.text = formatTemplateWithLocale(
-          error.label.text,
-          { field: error.label.field },
+          error.label?.text,
+          { field: error.label?.field },
           $locale
         );
         Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
@@ -149,6 +150,7 @@
           is_billing_same_as_shipping: $isBillingSameAsShipping,
           opted_to_save_address: !!$shouldSaveAddress,
         });
+        addNewAddressRef.handleAllInputsBlur();
         return;
       }
       merchantAnalytics({
@@ -290,6 +292,7 @@
           {selectedCountryISO}
           {currentView}
           {addressWrapperEle}
+          bind:this={addNewAddressRef}
         />
       {/if}
     </div>
@@ -299,7 +302,7 @@
     {/if}
   </div>
   <slot name="footer" />
-  <CTA on:click={onSubmit} {disabled} />
+  <CTA on:click={onSubmit} handleDisable {disabled} />
 </div>
 
 <style>

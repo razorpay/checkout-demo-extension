@@ -14,6 +14,7 @@
   export let validationText;
   export let suggestionsResource;
   export let autofocus;
+  export let showValidations = false;
 
   export let handleValidation;
 
@@ -61,4 +62,5 @@
   {suggestions}
   on:suggestion-select={onSuggestionSelect}
   {autofocus}
+  {showValidations}
 />

@@ -29,7 +29,11 @@ const {
   handleEditAddress,
   handleEditAddressReq,
   handleBillingAddress,
+  checkInvalidAddressForm,
 } = require('../../actions/one-click-checkout/address');
+const {
+  assertAddressTab,
+} = require('../../actions/one-click-checkout/navigation');
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
@@ -72,6 +76,7 @@ module.exports = function (testFeatures) {
     inValidOTP,
     addLandmark,
     addresses = [],
+    invalidAddress,
   } = features;
 
   describe.each(
@@ -181,6 +186,14 @@ module.exports = function (testFeatures) {
             await handleShippingInfo(context, options);
           }
         } else {
+          if (invalidAddress) {
+            await delay(400);
+            await proceedOneCC(context);
+            await checkInvalidAddressForm(context);
+            await assertAddressTab(context);
+            return;
+          }
+
           await fillUserAddress(context, {
             saveAddress,
             isCODEligible,

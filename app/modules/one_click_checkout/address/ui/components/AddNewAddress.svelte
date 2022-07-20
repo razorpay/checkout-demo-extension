@@ -102,6 +102,7 @@
   } from 'one_click_checkout/loader/helper';
   import { showOptimisedAddr } from 'razorpay';
   import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
+  import { flatten } from 'one_click_checkout/common/utils';
 
   // props
   export let formData;
@@ -127,6 +128,8 @@
   let lastUpdateState = '';
   let INPUT_FORM = [];
   let enabledOptimisedAddr = showOptimisedAddr();
+  let showValidations = false;
+
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
   const isCityStateAutopopulateDisabled = isAutopopulateDisabled();
@@ -596,6 +599,13 @@
     }
   };
 
+  export const handleAllInputsBlur = () => {
+    showValidations = true;
+    flatten(INPUT_FORM).forEach((element) => {
+      onInputFieldBlur({ detail: { id: element.id } });
+    });
+  };
+
   const onInputFieldBlur = ({ detail }) => {
     const { id } = detail;
     const field = findItem(INPUT_FORM, id);
@@ -756,6 +766,7 @@
       {INPUT_FORM}
       {pinIndex}
       {addressType}
+      {showValidations}
       on:blur={onInputFieldBlur}
     />
 

@@ -33,3 +33,21 @@ export function removeTrailingCommas(str) {
 
   return '';
 }
+
+/**
+ *
+ * @param {Array} arr
+ * @returns flat array
+ */
+export const flatten = function (arr) {
+  let flatArray = [];
+  for (let index = 0; index < arr.length; index++) {
+    const element = arr[index];
+    if (Array.isArray(element)) {
+      flatArray = flatArray.concat(flatten(element));
+    } else {
+      flatArray.push(element);
+    }
+  }
+  return flatArray;
+};
