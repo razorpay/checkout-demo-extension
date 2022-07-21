@@ -14,7 +14,7 @@
 
 2.  CDN: `cdn.yml` is the workflow used to push the content from `repo/cdn` to production cdn bucket and content will be served on the cloudfront with
 
-    > bucket-name: **checkout-live**
+    > bucket-name: **rzp-1415-prod-checkout-live**
     >
     > path ( in bucket ): checkout/
     >

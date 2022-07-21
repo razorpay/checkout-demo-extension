@@ -26,11 +26,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.PROD_AWS_ACCESS_SECRET }}
-          aws-region: us-east-1
+          aws-region: ap-south-1
 
       - name: Deploy to Prod Environment
         env:
-          PROD_CDN_BUCKET: checkout-live
+          PROD_CDN_BUCKET: rzp-1415-prod-checkout-live
           DIR_PATH_IN_REPO: cdn
         run: |
           if [ "$(ls -A $DIR_PATH_IN_REPO)" ]; then
