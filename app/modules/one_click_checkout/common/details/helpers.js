@@ -11,59 +11,36 @@ import { history } from 'one_click_checkout/routing/store';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 import { isEditContactFlow } from 'one_click_checkout/store';
-import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
-import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
-import { resetOrder } from 'one_click_checkout/charges/helpers';
+import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
 import { toggleHeader } from 'one_click_checkout/header/helper';
-
-/**
- * Method to handle submission of new details by a logged in user
- * @param {number} prevContact the contact number of the user
- * @returns Boolean
- */
-const handleContactFlow = (prevContact) => {
-  const prevCustomer = getCustomerByContact(prevContact);
-  if (get(contact) === prevContact) {
-    isEditContactFlow.set(false);
-    const isCurrentTabHome = navigator.isRedirectionFromMethods();
-    if (isCurrentTabHome) {
-      redirectToPaymentMethods({
-        shouldUpdateOrder: false,
-        showSnackbar: false,
-      });
-    }
-    return false;
-  }
-  resetOrder(true);
-  navigator.navigateTo({ path: views.DETAILS, initialize: true });
-  if (prevCustomer?.logged) {
-    prevCustomer.logout(false);
-  }
-  return true;
-};
+import { handleContactFlow } from 'one_click_checkout/common/details/handleContactFlow';
 
 export const handleDetailsNext = (prevContact) => {
   let continueNext = true;
   if (get(isEditContactFlow)) {
     continueNext = handleContactFlow(prevContact);
   }
+  isEditContactFlow.set(false);
+  toggleHeader(true);
+
   if (continueNext) {
     // validations
     if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email))) {
       return;
     }
     updateOrderWithCustomerDetails();
-    isEditContactFlow.set(false);
 
-    toggleHeader(true);
     navigator.navigateTo({
       path: views.COUPONS,
     });
     return;
   } else {
-    toggleHeader(true);
+    const isCurrentTabHome = navigator.isRedirectionFromMethods();
     navigator.navigateBack();
+    if (isCurrentTabHome) {
+      redirectToMethods();
+    }
   }
 };
 
