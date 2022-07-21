@@ -47,8 +47,10 @@ export function enableUPITiles(
   };
   // if UPI intent is disable hide intent from L0/L1
   if (
-    (window.CheckoutBridge && !isUPIFlowEnabled('intent')) ||
-    (!window.CheckoutBridge && !isUPIFlowEnabled('intentUrl'))
+    !(
+      getPreferences('methods.upi_intent') &&
+      Boolean(getPreferences('methods.upi_type.intent', 1))
+    )
   ) {
     return response;
   }
@@ -60,35 +62,35 @@ export function enableUPITiles(
     definePlatform('mWebiOS')
   ) {
     return response;
-  } else {
-    const { name, config = {} } =
-      getPreferences('feature_overrides.features')?.find(
-        ({ name }: { name: string }) => name === 'enableUPITiles'
-      ) || {};
-
-    /**
-     * using name as status as it will be undefined if feature not present in searched config
-     */
-    let variant: UPI.AppStackVariant = isDesktop() ? 'subText' : 'row';
-    if (
-      variant === 'row' &&
-      validateL0ForSDK &&
-      getRecommendedAppsForUPIStack(
-        false,
-        3,
-        definePlatform('androidSDK') || definePlatform('iosSDK')
-      ).length < 1
-    ) {
-      variant = 'subText';
-    }
-
-    response = {
-      ...response,
-      status: Boolean(name),
-      variant,
-      config,
-    };
   }
+  const { name, config = {} } =
+    getPreferences('feature_overrides.features')?.find(
+      ({ name }: { name: string }) => name === 'enableUPITiles'
+    ) || {};
+
+  /**
+   * using name as status as it will be undefined if feature not present in searched config
+   */
+  let variant: UPI.AppStackVariant = isDesktop() ? 'subText' : 'row';
+  if (
+    variant === 'row' &&
+    validateL0ForSDK &&
+    getRecommendedAppsForUPIStack(
+      false,
+      3,
+      definePlatform('androidSDK') || definePlatform('iosSDK')
+    ).length < 1
+  ) {
+    variant = 'subText';
+  }
+
+  response = {
+    ...response,
+    status: Boolean(name),
+    variant,
+    config,
+  };
+
   return response;
 }
 

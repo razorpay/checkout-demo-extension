@@ -89,35 +89,62 @@ describe('definePlatform: Utility test', () => {
 describe('enableUPITiles: feature test', () => {
   afterEach(() => {
     (getPreferences as jest.Mock).mockRestore();
+    (isRecurring as jest.Mock).mockRestore();
   });
   test("should be disabled if pref doesn't have data", () => {
-    (getPreferences as jest.Mock).mockReturnValueOnce([]);
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce([]);
     expect(enableUPITiles()?.status).toBeFalsy();
   });
   test('should be disabled if recurring', () => {
-    (getPreferences as jest.Mock).mockReturnValueOnce([]);
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce([]);
     (isRecurring as jest.Mock).mockReturnValueOnce(true);
     expect(enableUPITiles()?.status).toBeFalsy();
   });
-  test('should be enabled if preferences available', () => {
-    (getPreferences as jest.Mock).mockReturnValueOnce(
-      feature_overrides.features
-    );
-    (isRecurring as jest.Mock).mockReturnValueOnce(false);
 
-    expect(enableUPITiles().status).toBeTruthy();
+  test('should be disabled if upi_intent disable', () => {
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce([]);
+    (isRecurring as jest.Mock).mockReturnValueOnce(true);
+    expect(enableUPITiles()?.status).toBeFalsy();
   });
+
+  test('should be enabled if preferences available', () => {
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(feature_overrides.features);
+    (isRecurring as jest.Mock).mockReturnValueOnce(false);
+    const response = enableUPITiles();
+    expect(response.status).toBeTruthy();
+  });
+
   test('should be subtext mode for desktop', () => {
     (isDesktop as jest.Mock).mockReturnValue(true);
-    (getPreferences as jest.Mock).mockReturnValue(feature_overrides.features);
-    expect(enableUPITiles()?.status).toBeTruthy();
-    expect(enableUPITiles()?.variant).toBe('subText');
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(feature_overrides.features);
+    const response = enableUPITiles();
+    expect(response?.status).toBeTruthy();
+    expect(response?.variant).toBe('subText');
   });
   test('should be row mode for NON_DESKTOP_MODE', () => {
-    (getPreferences as jest.Mock).mockReturnValue(feature_overrides.features);
+    (getPreferences as jest.Mock)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(feature_overrides.features);
     (isDesktop as jest.Mock).mockReturnValue(false);
-    expect(enableUPITiles()?.status).toBeTruthy();
-    expect(enableUPITiles()?.variant).toBe('row');
+    const response = enableUPITiles();
+    expect(response?.status).toBeTruthy();
+    expect(response?.variant).toBe('row');
   });
 });
 
