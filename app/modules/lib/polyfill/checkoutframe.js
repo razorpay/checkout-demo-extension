@@ -210,3 +210,4 @@ import './prototypes/native';
 import './prototypes/customelements';
 import './prototypes/nodelist';
 import './prototypes/array';
+import './prototypes/string';
