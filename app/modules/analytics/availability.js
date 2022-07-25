@@ -11,12 +11,16 @@ let sessionCreated = false;
 let sessionErrored = false;
 
 function getEventName(event) {
-  const isCanary = TRAFFIC_ENV === 'canary' ? '.canary' : '';
-  const isBaseline = TRAFFIC_ENV === 'baseline' ? '.baseline' : '';
   if (event === SESSION_CREATED) {
-    return `checkout${isCanary || isBaseline}.sessionCreated.metrics`;
+    return `checkout.${TRAFFIC_ENV}.sessionCreated.metrics`.replace(
+      '.production',
+      ''
+    );
   }
-  return `checkout${isCanary || isBaseline}.sessionErrored.metrics`;
+  return `checkout.${TRAFFIC_ENV}.sessionErrored.metrics`.replace(
+    '.production',
+    ''
+  );
 }
 function createEventObject(event, severity) {
   const name = getEventName(event);
