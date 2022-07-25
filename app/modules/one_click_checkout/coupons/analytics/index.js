@@ -39,6 +39,7 @@ const events = {
   CUSTOM_COUPON_ENTERED: '1cc_coupons_screen_custom_coupon_entered',
   COUPON_APPLY_BUTTON_CLICKED: '1cc_coupons_screen_coupon_applied',
   COUPON_VALIDATION_COMPLETED: '1cc_coupons_screen_coupon_validation_completed',
+  SUMMARY_CONTACT_CHANGE_CLICKED:'1cc_clicked_change_contact_summary_screen',
 };
 
 export default events;

@@ -51,7 +51,7 @@
   // analytics imports
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { ContactDetailsEvents } from 'analytics/home/events';
+  import ContactDetailsEvents from 'one_click_checkout/contact_widget/analytics';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
 
@@ -165,9 +165,11 @@
         page_title: CATEGORIES.LOGIN,
       },
     });
-    Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
-      previousScreen: screensHistory.previousRoute(),
-    });
+    if (isOneCCEnabled) {
+      Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
+        previousScreen: screensHistory.previousRoute(),
+      });
+    }
     if (isOneCCEnabled && isEditDetailScreen) {
       toggleHeader(false);
     }

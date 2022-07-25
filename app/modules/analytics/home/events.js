@@ -15,13 +15,6 @@ const homeScreen = {
   PROCEED: 'proceed',
 };
 
-const ContactDetailsEvents = {
-  CONTACT_SCREEN_LOAD: 'checkoutConsumerDetailScreenLoaded',
-  CONTACT_INPUT: 'checkoutConsumerContactEntered',
-  CONTACT_EMAIL_INPUT: 'checkoutConsumerEmailtEntered',
-  CONTACT_DETAILS_SUBMIT: 'checkoutConsumerDetailSubmitted',
-};
-
 // All card related events
 const events = {
   ...homeScreen,
@@ -35,4 +28,4 @@ const COD_EVENTS = {
 
 export default getEventsName('home', events);
 
-export { ContactDetailsEvents, COD_EVENTS, homeScreen as HOME_EVENTS };
+export { COD_EVENTS, homeScreen as HOME_EVENTS };

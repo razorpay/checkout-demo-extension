@@ -19,6 +19,10 @@
   } from 'razorpay';
   import { isEditContactFlow } from 'one_click_checkout/store';
 
+  // Analytics
+  import { Events } from 'analytics';
+  import SummaryEvents from 'one_click_checkout/coupons/analytics';
+
   // Utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
@@ -55,6 +59,7 @@
   const { user } = getIcons();
 
   function editContact() {
+    Events.TrackBehav(SummaryEvents.SUMMARY_CONTACT_CHANGE_CLICKED);
     isEditContactFlow.set(true);
     navigator.navigateTo({ path: views.DETAILS });
   }
