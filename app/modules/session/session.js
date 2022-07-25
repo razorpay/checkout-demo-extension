@@ -1586,7 +1586,10 @@ Session.prototype = {
   retryWithPaypal: function () {
     if (this.screen !== 'wallet') {
       // switch to wallet tab and select paypal
-      if (this.svelteCardTab) {
+      if (
+        this.svelteCardTab &&
+        typeof this.svelteCardTab.setTabVisible === 'function'
+      ) {
         this.svelteCardTab.setTabVisible(false);
       }
       this.switchTab('wallet');
@@ -2259,7 +2262,11 @@ Session.prototype = {
      * onShown is different from tabVisible. As in case of card onShown trigger even we are asking for saved card OTP.
      * tabVisible will trigger on actual tab shown only.
      */
-    if (screen === 'card' && this.svelteCardTab) {
+    if (
+      screen === 'card' &&
+      this.svelteCardTab &&
+      typeof this.svelteCardTab.setTabVisible === 'function'
+    ) {
       this.svelteCardTab.setTabVisible(true);
     }
 
@@ -5591,6 +5598,7 @@ Session.prototype = {
       'nbCancelReasonPicker',
       'timer',
       'oneClickCheckoutHome',
+      'svelteCardTab',
     ];
 
     let session = this;
