@@ -4,7 +4,6 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
-  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
   import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
 
   // store imports
@@ -24,9 +23,6 @@
 
   // UI Imports
   import BreadcrumbItem from 'one_click_checkout/topbar/ui/BreadcrumbItem.svelte';
-
-  // session imports
-  import { handleModalClose } from 'one_click_checkout/header/sessionInterface';
 
   // utils imports
   import { setAmount } from 'one_click_checkout/topbar/sessionInterface';
@@ -80,7 +76,7 @@
   <div id="topbar-new" class:topbar-header={!$headerVisible}>
     <div class="title-section">
       {#if isBackEnabled}
-        <span class="back" on:click={handleBackClick}>
+        <span class="back" data-testid="back" on:click={handleBackClick}>
           <Icon icon={back_arrow()} />
         </span>
       {/if}
@@ -88,11 +84,6 @@
         {$activeRoute?.topbarTitle ? $t($activeRoute.topbarTitle) : $tabTitle}
       {/if}
     </div>
-    {#if $activeRoute?.topbarTitle}
-      <button class="modal-close" on:click={handleModalClose}>
-        <Icon icon={close()} />
-      </button>
-    {/if}
     {#if !$activeRoute?.hideBreadcrumb && !$tabTitle && !$activeRoute?.topbarTitle}
       <div data-test-id="breadcrumb-nav" class="breadcrumb">
         {#each $breadcrumbItems as breadcrumbItem, i}
