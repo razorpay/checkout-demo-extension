@@ -423,6 +423,9 @@ function askOTP(
   errorMessage,
   isRazorpayOTP
 ) {
+  if (!this.isOpen) {
+    return;
+  }
   let origText = textView; // ಠ_ಠ
   let qpmap = _.getQueryParams();
   let thisSession = this;
@@ -485,9 +488,7 @@ function askOTP(
       allowSkip: session.get('subscription_card_change') ? false : true,
     });
   }
-  if (view) {
-    view.updateScreen(otpProperties);
-  }
+  view.updateScreen(otpProperties);
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
@@ -2658,11 +2659,10 @@ Session.prototype = {
         !isNVSFormHomeScreenView
       ) {
         return;
-      } else {
-        // destroy the international tab view
-        discreet.internationalTab.destroy();
-        this.internationalTab = null;
       }
+      // destroy the international tab view
+      discreet.internationalTab.destroy();
+      this.internationalTab = null;
     } else if (this.tab === 'offline_challan') {
       discreet.offlineChallanTab.destroy();
     } else if (!this.tab) {
@@ -3417,9 +3417,8 @@ Session.prototype = {
     if (form === 'emi') {
       if (form === 'emi' && this.screen === 'emi') {
         return '#add-emi-container';
-      } else {
-        form = 'card';
       }
+      form = 'card';
     }
     if (form === 'gpay') {
       form = 'upi';
