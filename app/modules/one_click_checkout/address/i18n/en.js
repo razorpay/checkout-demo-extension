@@ -34,6 +34,8 @@ export default {
   saved_address_label: 'Your address has been saved',
   error_label: 'Address should be less than 255 characters',
   landmark_error_label: 'Enter characters between 2 to 32 only.',
+  name_lang_error: 'Enter your name in English only.',
+  address_lang_error: 'Enter an address in English only.',
   name_error_label: 'Enter characters between 2 to 64 only.',
   unserviceable_label: 'Unserviceable',
   serviceable_label: 'Serviceable',

@@ -14,6 +14,7 @@ import {
   putCustomerAddress,
 } from 'one_click_checkout/address/service';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { allowLangEngOnly } from 'razorpay';
 
 // Constants imports
 import {
@@ -26,6 +27,8 @@ import {
   CONTACT_ERROR_LABEL,
   PINCODE_ERROR_LABEL,
   NAME_ERROR_LABEL,
+  NAME_LANG_ERROR_LABEL,
+  ADDRESS_LANG_ERROR,
 } from 'one_click_checkout/address/i18n/labels';
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
@@ -34,7 +37,7 @@ import {
   COUNTRY_POSTALS_MAP,
   INDIAN_PINCODE_LENGTH,
 } from 'common/countrycodes';
-import { views as addressViews } from 'one_click_checkout/address/constants';
+import { views as addressViews, ENG_LANG_REGEX_PATTERN } from 'one_click_checkout/address/constants';
 import { updateAddressesInStore } from './sessionInterface';
 
 /**
@@ -66,6 +69,7 @@ export const validateInput = (elementId = 'addressForm') => {
 
 export const validateInputField = (value, formInput, selectedCountryIso) => {
   const input = { ...value };
+  const fieldsReqLangCheck = ['name', 'state', 'city', 'landmark', 'line1', 'line2'];
   if (formInput.id === 'contact') {
     value = value.phoneNum;
   }
@@ -74,6 +78,18 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
     return REQUIRED_LABEL;
   }
 
+  if (allowLangEngOnly() && fieldsReqLangCheck.includes(formInput.id)) {
+    const exp = new RegExp(ENG_LANG_REGEX_PATTERN);
+    const valid = exp.test(value);
+
+    if (value && !valid) {
+      if (formInput.id === 'name') {
+        return NAME_LANG_ERROR_LABEL;
+      } else {
+        return ADDRESS_LANG_ERROR;
+      }
+    }
+  }
   if (['name', 'landmark', 'zipcode', 'contact'].includes(formInput.id)) {
     let pattern = formInput.pattern;
     if (formInput.id === 'contact') {
