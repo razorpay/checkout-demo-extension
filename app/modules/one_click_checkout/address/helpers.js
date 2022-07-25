@@ -28,6 +28,7 @@ import {
   CONTACT_ERROR_LABEL,
   PINCODE_ERROR_LABEL,
   NAME_ERROR_LABEL,
+  CITY_STATE_ERROR_LABEL,
   NAME_LANG_ERROR_LABEL,
   ADDRESS_LANG_ERROR,
 } from 'one_click_checkout/address/i18n/labels';
@@ -91,38 +92,43 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
       }
     }
   }
-  if (['name', 'landmark', 'zipcode', 'contact'].includes(formInput.id)) {
-    let pattern = formInput.pattern;
-    if (formInput.id === 'contact') {
-      if (input?.countryCode === INDIA_COUNTRY_CODE) {
-        pattern = INDIAN_CONTACT_PATTERN;
-        value = value?.replace(/^0+/, '');
-      } else {
-        pattern = PHONE_PATTERN;
-      }
+  
+  if (['country_name', 'line1', 'line2'].includes(formInput.id)) {
+    return;
+  }
+
+  let pattern = formInput.pattern;
+  if (formInput.id === 'contact') {
+    if (input?.countryCode === INDIA_COUNTRY_CODE) {
+      pattern = INDIAN_CONTACT_PATTERN;
+      value = value?.replace(/^0+/, '');
+    } else {
+      pattern = PHONE_PATTERN;
     }
-    const exp = new RegExp(pattern);
-    const valid = exp.test(value);
-    if (value && !valid) {
-      if (formInput.id === 'contact') {
-        return input?.countryCode === INDIA_COUNTRY_CODE
-          ? INDIA_CONTACT_ERROR_LABEL
-          : CONTACT_ERROR_LABEL;
-      } else if (formInput.id === 'name') {
-        return NAME_ERROR_LABEL;
-      } else if (formInput.id === 'landmark') {
-        return LANDMARK_ERROR_LABEL;
-      } else if (formInput.id === 'zipcode') {
-        if (!COUNTRY_POSTALS_MAP[selectedCountryIso?.toUpperCase()]?.pattern) {
-          return;
-        }
-        return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE &&
-          value.length !== INDIAN_PINCODE_LENGTH
-          ? PINCODE_ERROR_LABEL
-          : ZIPCODE_ERROR_LABEL;
-      } else {
-        return GENERIC_PATTERN_ERROR_LABEL;
+  }
+  const exp = new RegExp(pattern);
+  const valid = exp.test(value);
+  if (value && !valid) {
+    if (formInput.id === 'contact') {
+      return input?.countryCode === INDIA_COUNTRY_CODE
+        ? INDIA_CONTACT_ERROR_LABEL
+        : CONTACT_ERROR_LABEL;
+    } else if (formInput.id === 'name') {
+      return NAME_ERROR_LABEL;
+    } else if (formInput.id === 'landmark') {
+      return LANDMARK_ERROR_LABEL;
+    } else if (formInput.id === 'city' || formInput.id === 'state') {
+      return CITY_STATE_ERROR_LABEL;
+    } else if (formInput.id === 'zipcode') {
+      if (!COUNTRY_POSTALS_MAP[selectedCountryIso?.toUpperCase()]?.pattern) {
+        return;
       }
+      return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE &&
+        value.length !== INDIAN_PINCODE_LENGTH
+        ? PINCODE_ERROR_LABEL
+        : ZIPCODE_ERROR_LABEL;
+    } else {
+      return GENERIC_PATTERN_ERROR_LABEL;
     }
   }
 };

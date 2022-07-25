@@ -45,6 +45,7 @@
     ADDRESS_TYPES,
     SOURCE,
     views as addressViews,
+    CITY_STATE_REGEX_PATTERN,
   } from 'one_click_checkout/address/constants';
   import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
   import {
@@ -187,12 +188,14 @@
         label: CITY_LABEL,
         required: true,
         autofillToken: 'none',
+        pattern: CITY_STATE_REGEX_PATTERN,
       },
       {
         id: 'state',
         label: STATE_LABEL,
         required: true,
         items: [],
+        pattern: CITY_STATE_REGEX_PATTERN,
         disabled: false,
         readonly: false,
       },

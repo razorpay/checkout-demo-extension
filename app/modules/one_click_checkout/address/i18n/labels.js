@@ -34,6 +34,7 @@ export const SAVED_ADDRESS_LABEL = 'address.saved_address_label';
 export const SAME_ADDRESS_LABEL = 'address.same_address_checkbox_label';
 export const GENERIC_ERROR_LABEL = 'address.error_label';
 export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
+export const CITY_STATE_ERROR_LABEL = 'address.city_state_error_label';
 export const NAME_LANG_ERROR_LABEL = 'address.name_lang_error';
 export const ADDRESS_LANG_ERROR = 'address.address_lang_error';
 export const NAME_ERROR_LABEL = 'address.name_error_label';

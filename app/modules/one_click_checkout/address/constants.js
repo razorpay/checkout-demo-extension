@@ -119,4 +119,5 @@ export const SOURCE = {
   OVERIDDEN: 'overidden', // 2
 };
 
+export const CITY_STATE_REGEX_PATTERN = "^((?![0-9$&+,:;=?@#|'<>.^*()%!-]).)*$";
 export const ENG_LANG_REGEX_PATTERN = "^[0-9a-zA-Z&+,:;@#'./*()\\s-]*$";

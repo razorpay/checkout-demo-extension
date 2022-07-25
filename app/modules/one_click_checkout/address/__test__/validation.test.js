@@ -3,6 +3,7 @@ import { validateInputField } from 'one_click_checkout/address/helpers';
 import addressLabels from 'one_click_checkout/address/i18n/en';
 import { setupPreferences } from 'tests/setupPreferences';
 import { INDIA_PINCODE_REGEX, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
+import { CITY_STATE_REGEX_PATTERN } from 'one_click_checkout/address/constants';
 
 const razorpayInstance = {
   id: 'id',
@@ -22,7 +23,81 @@ const {
   pincode_label: PINCODE_LABEL,
   pincode_error_message: PINCODE_ERROR_LABEL,
   zipcode_error_label: ZIPCODE_ERROR_LABEL,
+  state_label: STATE_LABEL,
+  city_state_error_label: CITY_STATE_ERROR_LABEL,
 } = addressLabels;
+
+const cityStateInvalidValue = [
+  '637$%^',
+  '@#$!',
+  'Salem@#$!',
+  '2345Salem@#$!',
+  '33456',
+];
+
+const cityStateValidValue = [
+  'Salem',
+  'Kerala',
+  'Bengaluru',
+  'Karnataka',
+];
+
+const cityFieldDataInvalid = [
+  [
+    {
+      value: cityStateInvalidValue,
+      props: {
+        id: 'city',
+        label: CITY_LABEL,
+        required: true,
+        autofillToken: 'none',
+        pattern: CITY_STATE_REGEX_PATTERN,
+      },
+    },
+    CITY_STATE_ERROR_LABEL,
+  ],
+  [
+    {
+      value: cityStateInvalidValue,
+      props: {
+        id: 'state',
+        label: STATE_LABEL,
+        required: true,
+        items: [],
+        pattern: CITY_STATE_REGEX_PATTERN,
+      },
+    },
+    CITY_STATE_ERROR_LABEL,
+  ],
+];
+
+const cityFieldDataValid = [
+  [
+    {
+      value: cityStateValidValue,
+      props: {
+        id: 'city',
+        label: CITY_LABEL,
+        required: true,
+        autofillToken: 'none',
+        pattern: CITY_STATE_REGEX_PATTERN,
+      },
+    }
+  ],
+  [
+    {
+      value: cityStateValidValue,
+      props: {
+        id: 'state',
+        label: STATE_LABEL,
+        required: true,
+        items: [],
+        pattern: CITY_STATE_REGEX_PATTERN,
+      },
+    }
+  ],
+];
+
 
 const fieldData = [
   [
@@ -100,6 +175,38 @@ const pincodeFieldProps = {
   hideStatusText: false,
   pattern: INDIA_PINCODE_REGEX,
 };
+
+describe('Validate City Field on Address Form for invalid case', () => {
+  test.each(cityFieldDataInvalid)(
+    'should return error message for wrong value',
+    (field, errorMsg) => {
+      if (Array.isArray(field.value)) {
+        const { value: listOfValues, props } = field;
+        listOfValues.forEach((value) => {
+          expect(
+            formatMessageWithLocale(validateInputField(value, props))
+          ).toBe(errorMsg);
+        });
+      }
+    }
+  );
+});
+
+describe('Validate City Field on Address Form for valid case', () => {
+  test.each(cityFieldDataValid)(
+    'should return undefined for correct value',
+    (field) => {
+      if (Array.isArray(field.value)) {
+        const { value: listOfValues, props } = field;
+        listOfValues.forEach((value) => {
+          expect(
+            validateInputField(value, props)
+          ).toBeUndefined();
+        });
+      }
+    }
+  );
+});
 
 describe('Validate Input Field for Address Form', () => {
   beforeEach(() => {
