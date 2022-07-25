@@ -14,6 +14,7 @@ import {
   putCustomerAddress,
 } from 'one_click_checkout/address/service';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { views } from 'one_click_checkout/routing/constants';
 import { allowLangEngOnly } from 'razorpay';
 
 // Constants imports
@@ -227,5 +228,16 @@ export const findItem = (array, id) => {
         return result;
       }
     }
+  }
+};
+
+export const shouldShowCheckbox = (route) => {
+  switch (route) {
+    case views.ADD_BILLING_ADDRESS:
+      return false;
+    case views.EDIT_BILLING_ADDRESS:
+      return false;
+    default:
+      return true;
   }
 };

@@ -85,6 +85,7 @@
   import {
     findItem,
     validateInputField,
+    shouldShowCheckbox,
   } from 'one_click_checkout/address/helpers';
   import { toTitleCase } from 'lib/utils';
   import {
@@ -799,6 +800,7 @@
   onDestroy(() => {
     hideToast();
   });
+
 </script>
 
 <div>
@@ -815,7 +817,7 @@
       on:blur={onInputFieldBlur}
     />
 
-    {#if $activeRoute?.name !== views.ADD_BILLING_ADDRESS}
+    {#if shouldShowCheckbox($activeRoute?.name)}
       <SameBillingAndShipping
         shouldSaveAddress={true}
         on:toggle={trackSameBillingAndShippingCheckbox}
