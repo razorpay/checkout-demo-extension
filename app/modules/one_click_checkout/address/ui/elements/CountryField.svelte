@@ -45,7 +45,7 @@
     if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
       Events.Track(AddressEvents.INPUT_ENTERED_country, {
         selection: 'prefilled',
-        country: countryISO.toLocaleLowerCase(),
+        country: countryISO?.toLocaleLowerCase(),
       });
     }
   });
