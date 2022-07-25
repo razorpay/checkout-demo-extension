@@ -4,6 +4,10 @@ const {
 } = require('../../tests/homescreen/open');
 const { getTestData } = require('../../actions');
 const {
+  resetContactDetails,
+  checkPhoneValidation,
+} = require('../../actions/one-click-checkout/contact.js');
+const {
   handleAvailableCouponReq,
 } = require('../../actions/one-click-checkout/coupons');
 const {
@@ -40,6 +44,8 @@ const {
 } = require('../../tests/homescreen/userDetailsActions');
 const { delay } = require('../../util');
 
+const INDIAN_CONTACT_ERROR_LABEL = 'Enter a 10-digit number only.';
+const CONTACT_ERROR_LABEL = 'Enter a valid mobile number.';
 /**
  * @param {*} testFeatures
  * @param {*} testFeatures.loggedIn to generate a pre-loggedIn flow
@@ -159,6 +165,13 @@ module.exports = function (testFeatures) {
         }
       } else {
         // logged out / guest user flows
+
+        await checkPhoneValidation(context, '995239840', INDIAN_CONTACT_ERROR_LABEL);
+        await resetContactDetails(context);
+        await checkPhoneValidation(context, '99523984078', INDIAN_CONTACT_ERROR_LABEL);
+        await resetContactDetails(context);
+        await checkPhoneValidation(context, '1000000000', CONTACT_ERROR_LABEL);
+        await resetContactDetails(context);
 
         await fillUserDetails(context);
         await proceedOneCC(context);

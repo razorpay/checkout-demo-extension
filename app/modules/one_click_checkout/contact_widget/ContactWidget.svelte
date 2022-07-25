@@ -11,7 +11,7 @@
   } from 'one_click_checkout/contact_widget/i18n/labels';
 
   // Store Imports
-  import { contact, isContactPresent, email } from 'checkoutstore/screens/home';
+  import { contact, isContactPresent, email, country } from 'checkoutstore/screens/home';
   import {
     isContactHidden,
     isEmailHidden,
@@ -24,9 +24,9 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { findCountryCode } from 'common/countrycodes';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
+  import { getPhoneNumberRegex } from 'one_click_checkout/helper';
 
   // Constant Imports
-  import { CONTACT_REGEX } from 'common/constants';
   import { views } from 'one_click_checkout/routing/constants';
 
   // Svelte imports
@@ -60,7 +60,8 @@
   }
 
   onMount(() => {
-    const isContactValid = CONTACT_REGEX.test($contact);
+    const phoneNumberRegex = getPhoneNumberRegex($country);
+    const isContactValid = phoneNumberRegex.test($contact);
 
     isEmailValid($email).then((isEmailValid) => {
       if (isEmailValid && isContactValid) {

@@ -12,7 +12,8 @@
     INDIA_COUNTRY_CODE,
     PHONE_PATTERN,
     PHONE_PATTERN_INDIA,
-    PHONE_REGEX_INDIA,
+    INDIAN_CONTACT_REGEX,
+    PHONE_NUMBER_LENGTH_INDIA,
   } from 'common/constants';
 
   // i18n
@@ -131,13 +132,18 @@
     }
   }
 
+  function getIndErrLabel(phone) {
+    return phone?.length === PHONE_NUMBER_LENGTH_INDIA
+      ? $t(CONTACT_ERROR_LABEL)
+      : $t(INDIA_CONTACT_ERROR_LABEL);
+  }
+
   function validateContact(country, phone) {
     if (country === INDIA_COUNTRY_CODE) {
-      return !PHONE_REGEX_INDIA.test(phone)
-        ? $t(INDIA_CONTACT_ERROR_LABEL)
-        : null;
+      return !INDIAN_CONTACT_REGEX.test(phone) ? getIndErrLabel(phone) : null;
+    } else {
+      return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
     }
-    return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
 
   $: validationText = validateContact(country, phone);

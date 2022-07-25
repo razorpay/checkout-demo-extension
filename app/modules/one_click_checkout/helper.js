@@ -1,6 +1,7 @@
 import { getOption, getPreferences, isOneClickCheckout } from 'razorpay';
 import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 import Analytics from 'analytics';
+import { CONTACT_REGEX, INDIA_COUNTRY_CODE, INDIAN_CONTACT_REGEX } from 'common/constants';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
@@ -65,4 +66,8 @@ export function init1CCMetaData() {
     OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
     isOneClickCheckout()
   );
+}
+
+export function getPhoneNumberRegex(country) {
+  return country === INDIA_COUNTRY_CODE ? INDIAN_CONTACT_REGEX : CONTACT_REGEX;
 }

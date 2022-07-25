@@ -11,11 +11,9 @@
   import CTA from 'one_click_checkout/cta/index.svelte';
 
   // store imports
-  import { contact, email } from 'checkoutstore/screens/home';
+  import { contact, email, country } from 'checkoutstore/screens/home';
   import {
     getPrefilledCouponCode,
-    isContactHidden,
-    isEmailHidden,
     isEnableAutoFetchCoupons,
     getConsentViewCount,
   } from 'razorpay';
@@ -63,6 +61,7 @@
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { getPhoneNumberRegex } from 'one_click_checkout/helper';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
     getPrefilledContact,
@@ -73,7 +72,6 @@
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
-  import { CONTACT_REGEX } from 'common/constants';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
@@ -102,7 +100,8 @@
   }
 
   function handleOnSubmit() {
-    if (!CONTACT_REGEX.test($contact)) {
+    const phoneNumberRegex = getPhoneNumberRegex($country);
+    if (!phoneNumberRegex.test($contact)) {
       showValidations = true;
       return;
     }
