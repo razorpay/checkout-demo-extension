@@ -26,7 +26,7 @@
 <div class="emi-contact">
   <!-- LABEL: SELECTED DEBIT CARD -->
   <h3 class="title">{$t(CARD_BOX_TITLE)}</h3>
-  <CardBox entity={isSavedCard ? $selectedCard.token : $cardNumber} />
+  <CardBox entity={isSavedCard ? $selectedCard?.token : $cardNumber} />
   <!-- LABEL: MOBILE NUMBER -->
   <h3 class="title">{$t(CONTACT_TITLE)}</h3>
   <div class="contact selected no-autofill-overlay">

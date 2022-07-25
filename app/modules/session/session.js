@@ -2953,7 +2953,9 @@ Session.prototype = {
       maxlength: 6,
     });
 
-    this.svelteCardTab.onShown();
+    if (!(this.tab === 'emi' && Object.keys(storeGetter(EmiStore.emiDurations)).length)) {
+      this.svelteCardTab.onShown();
+    }
 
     let self = this;
     let customer = self.getCurrentCustomer();
