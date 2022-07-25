@@ -256,6 +256,10 @@ async function handleBillingAddress(context, isAdd, addresses) {
   }
 }
 
+async function checkStateFieldDisabled(context) {
+  expect(await context.page.$eval('#state', (element) => element.disabled)).toBeTruthy()
+}
+
 module.exports = {
   fillUserAddress,
   handleAddAddress,
@@ -266,5 +270,6 @@ module.exports = {
   handleEditAddress,
   handleEditAddressReq,
   handleBillingAddress,
+  checkStateFieldDisabled,
   checkInvalidAddressForm,
 };

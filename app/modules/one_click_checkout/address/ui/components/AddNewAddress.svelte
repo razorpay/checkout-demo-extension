@@ -127,8 +127,8 @@
   let stateCode = '';
   let lastUpdateState = '';
   let INPUT_FORM = [];
-  let enabledOptimisedAddr = showOptimisedAddr();
   let showValidations = false;
+  const enabledOptimisedAddr = showOptimisedAddr();
 
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
@@ -191,6 +191,8 @@
         label: STATE_LABEL,
         required: true,
         items: [],
+        disabled: false,
+        readonly: false,
       },
     ],
     {
@@ -411,6 +413,17 @@
     }
   };
 
+  const setStateDisabledReadonly = ({ disabled, readonly = false }) => {
+    INPUT_FORM[stateIndex][stateSubIndex].disabled = disabled;
+    INPUT_FORM[stateIndex][stateSubIndex].readonly = readonly;
+  }
+
+  const toggleStateField = (value) => {
+    if ($selectedCountryISO === INDIA_COUNTRY_ISO_CODE.toLowerCase()) {
+      setStateDisabledReadonly(value)
+    }
+  }
+
   export function onUpdate(key, value, extra) {
     /**
      * onUpdate gets fired twice for every input change.
@@ -444,6 +457,7 @@
         !$formData.city
       ) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+        toggleStateField({ disabled: false });
       }
       if (pinPattern.test(value)) {
         showLoaderView();
@@ -475,12 +489,12 @@
                   is_prefilled: SOURCE.PREFILLED,
                   meta: { state: res[value].state },
                 });
-                onUpdate('city', toTitleCase(res[value].city) || '');
-                onUpdate('state', toTitleCase(res[value].state) || '');
+                resetCityState(res[value]);
               }
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+              toggleStateField({ disabled: false });
               showPincodeToast($formData.zipcode);
             }
             $formData.cod = res[value]?.cod;
@@ -503,6 +517,7 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
+            toggleStateField({ disabled: false });
             showPincodeToast($formData.zipcode);
           })
           .finally(() => {
@@ -510,6 +525,7 @@
           });
       } else if (INPUT_FORM[pinIndex][pinSubIndex]?.required) {
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
+        toggleStateField({ disabled: false });
         codChargeAmount.set(0);
         resetCharges();
       }
@@ -527,8 +543,11 @@
         Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
           is_prefilled: SOURCE.PREFILLED,
         });
-        onUpdate('city', toTitleCase(response.city) || '');
-        onUpdate('state', toTitleCase(response.state) || '');
+        resetCityState(response);
+      }).catch(() => {
+        toggleStateField({ disabled: false, readonly: true });
+        onUpdate('city', '');
+        onUpdate('state', '');
       });
     }
 
@@ -557,6 +576,7 @@
         $formData.city = '';
         $formData.state = '';
         $formData.zipcode = '';
+        setStateDisabledReadonly({ disabled: false, readonly: false });
       }
     }
 
@@ -581,6 +601,14 @@
     dispatch('formCompletion', {
       isComplete: isFormComplete(),
     });
+  }
+
+  const resetCityState = (value) => {
+    const { city, state } = value || {};
+    const readonly = !state;
+    toggleStateField({ disabled: !!state, readonly });
+    onUpdate('city', toTitleCase(city) || '');
+    onUpdate('state', toTitleCase(state) || '');
   }
 
   const updateTag = (tag) => {
@@ -647,18 +675,19 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               SERVICEABLE_LABEL;
             if (!isCityStateAutopopulateDisabled) {
-              onUpdate('city', toTitleCase(res[zipcode].city) || '');
-              onUpdate('state', toTitleCase(res[zipcode].state) || '');
+              resetCityState(res[zipcode]);
             }
           } else {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
+            toggleStateField({ disabled: false });
             showPincodeToast($formData.zipcode);
           }
         })
         .catch(() => {
           INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
             UNSERVICEABLE_LABEL;
+          toggleStateField({ disabled: false });
           showPincodeToast($formData.zipcode);
         });
     }

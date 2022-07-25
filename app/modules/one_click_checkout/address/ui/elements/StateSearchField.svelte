@@ -8,7 +8,6 @@
     STATE_SEARCH_ALL,
     STATE_SEARCH_PLACEHOLDER,
   } from 'one_click_checkout/address/i18n/labels';
-  import { truncateString } from 'utils/strings';
   import triggerSearchModal from 'components/SearchModal';
 
   export let items = [];
@@ -16,6 +15,8 @@
   export let stateName;
   export let label = '';
   export let validationText;
+  export let disabled = false;
+  export let readonly = false;
   export let showValidations = false;
 
   let stateField;
@@ -62,6 +63,12 @@
     }
     return stateList;
   }
+
+  function handleOnFocus(event) {
+    if (readonly) {
+      openStateModal(event)
+    }
+  }
 </script>
 
 <Field
@@ -72,6 +79,7 @@
   value={stateName}
   on:click={openStateModal}
   on:keydown={downArrowHandler}
+  on:focus={handleOnFocus}
   required
   icon=""
   label={label || `${$t(STATE_LABEL)}*`}
@@ -83,6 +91,8 @@
   {validationText}
   elemClasses="address-elem dropdown-select"
   labelClasses="address-label"
+  {disabled}
   showDropDownIcon={true}
+  {readonly}
   {showValidations}
 />

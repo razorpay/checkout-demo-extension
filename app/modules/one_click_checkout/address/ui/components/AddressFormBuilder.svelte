@@ -136,6 +136,8 @@
               onChange={handleInput}
               stateName={formData[subInput.id]}
               label={`${$t(subInput.label)}${subInput.required ? '*' : ''}`}
+              disabled={subInput.disabled}
+              readonly={subInput.readonly}
               {showValidations}
             />
           {:else if subInput.id === 'country_name'}

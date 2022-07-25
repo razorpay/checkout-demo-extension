@@ -29,6 +29,7 @@ const {
   handleEditAddress,
   handleEditAddressReq,
   handleBillingAddress,
+  checkStateFieldDisabled,
   checkInvalidAddressForm,
 } = require('../../actions/one-click-checkout/address');
 const {
@@ -128,9 +129,11 @@ module.exports = function (testFeatures) {
               },
               addresses
             );
+            await checkStateFieldDisabled(context);
 
             if (editBillingAddress || addBillingAddress) {
               await handleBillingAddress(context, addBillingAddress, addresses);
+              await checkStateFieldDisabled(context);
             }
           } else {
             // edit shipping address
