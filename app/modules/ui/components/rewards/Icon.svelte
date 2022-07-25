@@ -28,16 +28,19 @@
       type: AnalyticsTypes.RENDER,
     });
     setTimeout(() => {
-      snackBar = new Snackbar({
-        target: document.getElementById('rewards-cta'),
-        props: {
-          align: 'bottom',
-          parentElem: 'rewards-cta',
-          shown,
-          timer: 5000,
-          text: $t(REWARDS_TOOLTIP_TEXT),
-        },
-      });
+      const targetEl = document.getElementById('rewards-cta');
+      if (targetEl) {
+        snackBar = new Snackbar({
+          target: targetEl,
+          props: {
+            align: 'bottom',
+            parentElem: 'rewards-cta',
+            shown,
+            timer: 5000,
+            text: $t(REWARDS_TOOLTIP_TEXT),
+          },
+        });
+      }
     }, 1000);
   });
 
