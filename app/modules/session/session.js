@@ -2728,7 +2728,7 @@ Session.prototype = {
   checkCommonValid: function () {
     let selector = '#form-common';
 
-    if (this.homeTab.onMethodsScreen()) {
+    if (this.homeTab && this.homeTab.onMethodsScreen()) {
       // Validate any additional input (like contact)
       selector = '.instrument.selected';
     }

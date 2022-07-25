@@ -105,7 +105,7 @@ $.prototype = {
   },
 
   hasClass: function (str) {
-    return this[0].classList.contains(str);
+    return this[0]?.classList?.contains(str);
   },
 
   addClass: function (str) {
