@@ -3,6 +3,7 @@ import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { views } from 'one_click_checkout/routing/constants';
 import { get } from 'svelte/store';
 import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
+import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 /**
  * Method to handle submission of new details by a logged in user
