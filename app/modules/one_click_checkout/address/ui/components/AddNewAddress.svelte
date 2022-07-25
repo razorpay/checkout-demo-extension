@@ -177,6 +177,7 @@
         autofillToken: 'postal-code',
         disabled: false,
         hideStatusText: false,
+        pattern: INDIA_PINCODE_REGEX,
       },
     ],
     [
