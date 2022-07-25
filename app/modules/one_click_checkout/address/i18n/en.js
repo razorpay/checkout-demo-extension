@@ -13,6 +13,7 @@ export default {
   house_label: 'House Number, Apartment',
   area_label: 'Area, Colony, Street, Sector*',
   landmark_label: 'Landmark',
+  landmark_optional_label: 'Landmark (Optional)',
   shipping_address_label: 'Delivery Address',
   save_label: 'Save As',
   cta_label: 'Continue',

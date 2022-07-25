@@ -39,7 +39,8 @@ export const isEnableAutoFetchCoupons = () =>
 export const getConsentViewCount = () =>
   getPreferences('customer.1cc_consent_banner_views') || 0;
 
-export const showOptimisedAddr = () => getPreferences('1cc_address_flow_exp');
+export const showOptimisedAddr = () =>
+  getPreferences('1cc_address_flow_exp') === 'true';
 
 export const allowLangEngOnly = () =>
   getPreferences('features.one_cc_input_english');

@@ -5,8 +5,6 @@
   import { t } from 'svelte-i18n';
   import {
     SERVICEABLE_LABEL,
-    ADD_LANDMARK,
-    OPTIONAL,
     UNSERVICEABLE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
 
@@ -18,6 +16,7 @@
   import AutoCompleteInput from 'one_click_checkout/address/ui/components/AutoCompleteInput.svelte';
   import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
   import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
+  import LandmarkField from 'one_click_checkout/address/ui/components/LandmarkField.svelte'
 
   // analytics imports
   import { Events } from 'analytics';
@@ -115,12 +114,6 @@
       });
     }
   });
-
-  let showLandmark = false;
-
-  const handleLandmarkToggle = () => {
-    showLandmark = true;
-  };
 </script>
 
 <form {id}>
@@ -215,31 +208,20 @@
         />
       {:else if input.autocomplete}
         {#if input.id === 'landmark'}
-          {#if showLandmark}
-            <AutoCompleteInput
-              id={input.id}
-              label={input.label}
-              value={formData[input.id]}
-              suggestionsResource={input.suggestionsResource}
-              validationText={errors[input.id] ? errors[input.id] : ''}
-              on:blur={() => onBlur(input.id)}
-              on:input={({ detail: e }) =>
-                handleInput(input.id, e.target.textContent)}
-              on:select={input.onSelect}
-              autofocus={true}
-              handleValidation={onBlur}
-              {showValidations}
-            />
-          {:else}
-            <span
-              on:click={() => handleLandmarkToggle()}
-              data-test-id="toggle-landmark-cta"
-              class="show-landmark-label"
-            >
-              + {$t(ADD_LANDMARK)}
-              <span class="optional"> {$t(OPTIONAL)} </span>
-            </span>
-          {/if}
+          <LandmarkField
+            id={input.id}
+            label={input.label}
+            value={formData[input.id]}
+            suggestionsResource={input.suggestionsResource}
+            validationText={errors[input.id] ? errors[input.id] : ''}
+            onBlur={() => onBlur(input.id)}
+            onInput={({ detail: e }) =>
+              handleInput(input.id, e.target.textContent)}
+            onSelect={input.onSelect}
+            autofocus={true}
+            handleValidation={onBlur}
+            {showValidations}
+          />
         {:else}
           <AutoCompleteInput
             id={input.id}
@@ -316,17 +298,6 @@
   form :global(.elem > i) {
     transform: rotate(-90deg) scale(0.5);
     top: 50%;
-  }
-
-  .show-landmark-label {
-    margin: 8px 0px;
-    color: var(--highlight-color);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .show-landmark-label .optional {
-    color: #79747e;
   }
 
   .form-input :global(.dropdown-select input.input-one-click-checkout) {

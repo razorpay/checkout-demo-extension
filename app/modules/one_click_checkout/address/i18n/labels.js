@@ -9,6 +9,7 @@ export const INTERNATIONAL_PINCODE_LABEL =
 export const HOUSE_LABEL = 'address.house_label';
 export const AREA_LABEL = 'address.area_label';
 export const LANDMARK_LABEL = 'address.landmark_label';
+export const LANDMARK_OPTIONAL_LABEL = 'address.landmark_optional_label';
 export const SHIPPING_ADDRESS_LABEL = 'address.shipping_address_label';
 export const SAVE_LABEL = 'address.save_label';
 export const CTA_LABEL = 'address.cta_label';
