@@ -1,11 +1,11 @@
-import { getContactPayload } from 'one_click_checkout/store';
-import { makeAuthUrl } from 'checkoutstore';
-import { getOrderId } from 'razorpay';
-import { timer } from 'utils/timer';
-import { Events } from 'analytics';
-import CouponEvents from 'one_click_checkout/coupons/analytics';
 import fetch from 'utils/fetch';
-let cache = {};
+import { Events } from 'analytics';
+import { timer } from 'utils/timer';
+import { getOrderId } from 'razorpay';
+import { makeAuthUrl } from 'checkoutstore';
+import { getContactPayload } from 'one_click_checkout/store';
+import CouponEvents from 'one_click_checkout/coupons/analytics';
+import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';
 
 /**
  * method to fetch coupons for merchant from backend
@@ -18,9 +18,11 @@ export function getCoupons() {
   return new Promise((resolve, reject) => {
     const payload = getContactPayload();
 
-    const cacheKey = payload.contact || 'default';
-    if (cache[cacheKey]) {
-      resolve(cache[cacheKey]);
+    const key = payload.contact || 'default';
+    const cachedValue = getCache(key);
+
+    if (cachedValue) {
+      resolve(cachedValue);
       return;
     }
 
@@ -35,8 +37,8 @@ export function getCoupons() {
           time: getDuration(),
         });
         if (Array.isArray(response.promotions)) {
-          cache[cacheKey] = response.promotions;
-          resolve(cache[cacheKey]);
+          setCache(key, response.promotions);
+          resolve(response.promotions);
         } else {
           reject(response);
         }

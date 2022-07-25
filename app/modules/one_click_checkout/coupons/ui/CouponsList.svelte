@@ -21,7 +21,10 @@
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
 
   // utils imports
-  import { applyCouponCode } from 'one_click_checkout/coupons/helpers';
+  import {
+    applyCouponCode,
+    fetchCoupons,
+  } from 'one_click_checkout/coupons/helpers';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideCta } from 'checkoutstore/cta';
   import { timer } from 'utils/timer';
@@ -31,6 +34,7 @@
   import CouponEvents from 'one_click_checkout/coupons/analytics';
 
   onMount(() => {
+    fetchCoupons();
     hideCta();
     toggleHeader(false);
     Events.TrackRender(CouponEvents.COUPON_SCREEN_LOADED, {

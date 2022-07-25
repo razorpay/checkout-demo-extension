@@ -59,7 +59,6 @@ describe('domain mx records validator', () => {
 
 describe('email validator', () => {
   test('goutam.goutam.com resolves to false', () => {
-    console.log(isEmailValid('goutam.goutam.com'));
     expect(isEmailValid('goutam.goutam.com')).resolves.toBe(false);
   });
   test('goutam@xyz.com resolved to false', () => {
