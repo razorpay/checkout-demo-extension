@@ -485,8 +485,9 @@ function askOTP(
       allowSkip: session.get('subscription_card_change') ? false : true,
     });
   }
-
-  view.updateScreen(otpProperties);
+  if (view) {
+    view.updateScreen(otpProperties);
+  }
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
