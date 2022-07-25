@@ -737,11 +737,26 @@
     showTooltip = false;
   }
 
+  function handleFormValidation() {
+    Object.keys($formData).forEach((key) => {
+      if ($formData[key]) {
+        const field = findItem(INPUT_FORM, key);
+        const errorLabel = field && validateInputField(
+          $formData[key],
+          field,
+          $selectedCountryISO
+        );
+        errors[key] = errorLabel ? $t(errorLabel) : null;
+      }
+    })
+  }
+
   onMount(() => {
     const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
     const address_type = isShippingAddress ? 'shipping' : 'billing';
 
     $selectedCountryISO = INDIA_COUNTRY_ISO_CODE.toLowerCase();
+    INPUT_FORM[pinIndex][pinSubIndex].pattern = INDIA_PINCODE_REGEX;
     screenScrollTop(addressWrapperEle);
     if (isShippingAddress && !$formData.zipcode && !$formData.city) {
       $isShippingAddedToAmount = false;
@@ -769,7 +784,7 @@
       address_type,
       address_flow_experimentation_enabled: enabledOptimisedAddr,
     });
-
+    handleFormValidation()
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,

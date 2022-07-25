@@ -54,10 +54,6 @@
   const onBlur = (id) => {
     dispatch('blur', { id });
 
-    if (id === 'landmark' && !formData[id]) {
-      showLandmark = false;
-    }
-
     // Analytics Event
 
     const fieldError = errors[id];
@@ -174,6 +170,7 @@
                 'pincode-unserviceable-label'}"
               elemClasses={'address-elem'}
               handleInput
+              showValidations={!!errors[subInput.id] || showValidations}
               autocomplete={subInput.autofillToken ?? 'off'}
               showServicableIcon={!subInput?.hideStatusText &&
                 subInput.unserviceableText === SERVICEABLE_LABEL}
@@ -181,7 +178,6 @@
               inputFieldClasses={!subInput?.hideStatusText &&
                 subInput.unserviceableText === UNSERVICEABLE_LABEL &&
                 'pincode-unserviceable-wrapper'}
-              {showValidations}
             />
           {/if}
         {/each}
@@ -193,7 +189,7 @@
           bind:phone={phoneNum}
           inAddress
           validationText={errors[input.id] ? errors[input.id] : ''}
-          {showValidations}
+          showValidations={!!errors[input.id] || showValidations}
         />
       {:else if input.wrapped}
         <WrappedInput
@@ -253,6 +249,7 @@
           placeholder={input.placeholder}
           loader={input.loader}
           validationText={errors[input.id] ? errors[input.id] : ''}
+          showValidations={!!errors[input.id] || showValidations}
           labelClasses="address-label"
           extraLabel={formData[input.id] && input.unserviceableText}
           elemClasses="address-elem"
@@ -262,7 +259,6 @@
             : 'failureText'}
           autocomplete={input.autofillToken ?? 'off'}
           disabled={input.disabled}
-          {showValidations}
         />
       {/if}
     </div>
