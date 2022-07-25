@@ -5,6 +5,7 @@
     let script = document.createElement('script');
     script.src = prefix + '/checkout-frame.js' + (retry ? '?retry' : '');
     if (!retry) {
+      script.crossOrigin = 'anonymous';
       script.onerror = function () {
         addJs(true);
       };
