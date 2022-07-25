@@ -49,6 +49,8 @@ then
   aws --output text s3 cp s3://$BUCKET_production/build/$COMMIT/checkout-1cc.js build
 else
   aws --output text s3 sync s3://$BUCKET_production/build/$COMMIT build
+  cp scripts/sdk-loader.js build
+  sed -i "s#COMMIT#$COMMIT#" build/sdk-loader.js
 fi
 
 if [ "$CANARY" == "yes" ]; then
