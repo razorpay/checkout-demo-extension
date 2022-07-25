@@ -1281,7 +1281,10 @@ Session.prototype = {
   },
 
   setEmiScreen: function () {
-    if (!MethodStore.getEMIBanks().BAJAJ) {
+    if (
+      !MethodStore.getEMIBanks().BAJAJ ||
+      !MethodStore.isMethodEnabled('emi')
+    ) {
       return;
     }
 
@@ -4317,7 +4320,8 @@ Session.prototype = {
       if (
         isRecurring &&
         !rememberCardCheck &&
-        !isSavedCardScreenAndConsentAlreadyTaken
+        !isSavedCardScreenAndConsentAlreadyTaken &&
+        this.tab === 'card'
       ) {
         let showSavedCardTooltip = CardScreenStore.showSavedCardTooltip;
         Form.shake();

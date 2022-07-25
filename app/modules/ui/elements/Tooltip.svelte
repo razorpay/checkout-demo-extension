@@ -223,7 +223,7 @@
     if (!parent) {
       return;
     }
-    while (!_El.hasClass(parent, 'has-tooltip')) {
+    while (_El.parent(parent) && !_El.hasClass(parent, 'has-tooltip')) {
       parent = _El.parent(parent);
     }
 
