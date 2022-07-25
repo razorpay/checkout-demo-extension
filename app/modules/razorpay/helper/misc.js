@@ -37,8 +37,8 @@ export function getCustomSubtextForMethod(code) {
 export function isBlockedDeactivated() {
   const preferences = getPreferences();
   if (
-    !preferences.hasOwnProperty('blocked') ||
-    !preferences.hasOwnProperty('activated')
+    !preferences?.hasOwnProperty('blocked') ||
+    !preferences?.hasOwnProperty('activated')
   ) {
     return false;
   }
