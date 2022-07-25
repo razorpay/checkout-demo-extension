@@ -105,7 +105,7 @@ const ERROR_TRACKING_URLS = [
 
 function isUrlApplicableForErrorTracking(url) {
   return ERROR_TRACKING_URLS.some(function (availableUrl) {
-    return url.indexOf(availableUrl) !== 0;
+    return url.indexOf(availableUrl) !== -1;
   });
 }
 
