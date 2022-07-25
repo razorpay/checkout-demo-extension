@@ -8,7 +8,6 @@
   import { getPayLaterProviders } from 'checkoutstore/methods';
   import { createProvider } from 'common/paylater';
   import { isOneClickCheckout } from 'razorpay';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -21,9 +20,6 @@
   const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
   );
-
-  let payLaterEle;
-  let showAccountTab;
 
   /**
    * Filters providers against the given instrument.
@@ -56,13 +52,10 @@
     $methodInstrument
   );
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(payLaterEle);
-  }
 </script>
 
 <Tab method="paylater" pad={false}>
-  <div class="paylater-container" bind:this={payLaterEle} on:scroll={onScroll}>
+  <div class="paylater-container">
     <div class="paylater-wrapper" class:screen-one-cc={isOneClickCheckout()}>
       <input type="hidden" name="provider" />
       <input type="hidden" name="ott" />
@@ -81,7 +74,7 @@
         {/each}
       </div>
     </div>
-    <AccountTab {showAccountTab} />
+    <AccountTab />
   </div>
 </Tab>
 

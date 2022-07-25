@@ -18,14 +18,6 @@ export function clickOutside(node) {
   };
 }
 
-export function isUnscrollable(element, scrollableValue = 5) {
-  const { scrollHeight, offsetHeight } = element || {};
-  // Assuming the element is scrollable if the scrollHeight height is more than 5px compared to offsetHeight
-  if (scrollHeight - offsetHeight <= scrollableValue) {
-    return true;
-  }
-}
-
 export function screenScrollTop(element) {
   if (element) {
     element.scrollTop = 0;

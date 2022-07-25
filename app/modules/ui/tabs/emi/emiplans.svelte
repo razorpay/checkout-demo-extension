@@ -38,7 +38,6 @@
   import { isMethodUsable } from 'checkoutstore/methods';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { isOneClickCheckout } from 'razorpay';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
   import { getSession } from 'sessionmanager';
 
   // Props
@@ -57,7 +56,6 @@
 
   let ctaOneCCHidden = true;
   let renderCtaOneCC = false;
-  let showAccountTab;
 
   // Constants
   const Views = {
@@ -67,7 +65,6 @@
   const isOneCCEnabled = isOneClickCheckout();
   // Local variables
   let currentView = Views.PLANS;
-  let emiPlanEle;
 
   // plans without offer
   let otherPlans = [];
@@ -181,17 +178,12 @@
 
   $: ctaOneCCHidden = expanded === -1;
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(emiPlanEle);
-  }
 </script>
 
 <div
   id="form-emiplans"
   class="tab-content showable screen pad vertical-pad"
   class:one-cc={isOneCCEnabled}
-  on:scroll={onScroll}
-  bind:this={emiPlanEle}
 >
   <div class:emiplans-one-cc={isOneCCEnabled}>
     {#if currentView === Views.PLANS}
@@ -280,7 +272,7 @@
       </CTAOneCC>
     {/if}
   </div>
-  <AccountTab {showAccountTab} />
+  <AccountTab />
 </div>
 
 <style>

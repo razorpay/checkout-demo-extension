@@ -10,6 +10,7 @@
     getOption,
     getOrderId,
     isCustomerFeeBearer,
+    isOneClickCheckout,
   } from 'razorpay';
 
   // Utils imports
@@ -29,6 +30,7 @@
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
   import showFeeBearer from 'ui/components/FeeBearer';
+  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
 
   // i18n
   import {
@@ -63,6 +65,8 @@
     BANK_TRANSFER_PDF_INIT_FAILURE,
   } from './events';
   import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
+
+  const isOneCCEnabled = isOneClickCheckout();
 
   // adding 3rd party script for printing, adding here to not increase unnecessary bundle size
   function addScript(url, content) {
@@ -226,8 +230,8 @@
   };
 </script>
 
-<Tab method="bank_transfer" shown={true}>
-  <div class="bank_transfer-container">
+<Tab method="bank_transfer" shown={true} pad={!isOneCCEnabled}>
+  <div class="bank_transfer-container" class:one-cc={isOneCCEnabled} >
     {#if loading}
       <!-- LABEL: Getting bank details... -->
       <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
@@ -296,6 +300,7 @@
     {/if}
     <div id="challan-wrapper" />
   </div>
+  <AccountTab />
 </Tab>
 
 <style>
@@ -354,5 +359,10 @@
     text-align: left;
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
+  }
+  .one-cc {
+    min-height: 110%;
+    padding: 16px;
+    margin: 0px 14px;
   }
 </style>

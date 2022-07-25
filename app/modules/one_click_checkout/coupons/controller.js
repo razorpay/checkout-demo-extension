@@ -27,7 +27,10 @@ import {
 } from 'razorpay';
 
 export function initSummaryMetaAnalytics() {
-  Analytics.setMeta('is_RTB_live_on_merchant', isRTBEnabled(get(RTBExperiment)));
+  Analytics.setMeta(
+    'is_RTB_live_on_merchant',
+    isRTBEnabled(get(RTBExperiment))
+  );
   Analytics.setMeta('is_force_cod_enabled', isCodForced());
   Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
   Analytics.setMeta('is_coupons_enabled', shouldShowCoupons());

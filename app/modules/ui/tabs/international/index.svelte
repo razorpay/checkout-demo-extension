@@ -26,7 +26,6 @@
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
   import { isOneClickCheckout } from 'razorpay';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   //UI Imports
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -79,8 +78,6 @@
   let NVSInfo = [];
 
   let tabVisible = false;
-  let internationalEle;
-  let showAccountTab;
 
   const handleProviderSelect = (provider) => {
     directlyToNVS = false;
@@ -253,16 +250,11 @@
     Events.Track(EVENTS.SCREEN_LOAD);
   });
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(internationalEle);
-  }
 </script>
 
 <Tab method="international" pad={false} overrideMethodCheck>
   <div
     class="international-wrapper"
-    on:scroll={onScroll}
-    bind:this={internationalEle}
     class:international-one-cc={isOneCCEnabled}
   >
     {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
@@ -318,9 +310,9 @@
           on:input={handleAVSFormInput}
           on:blur={handleAVSFormInput}
         />
-        <AccountTab {showAccountTab} />
       </div>
     {/if}
+    <AccountTab />
     <Bottom tab="international">
       {#if $selectedInternationalProvider}
         <DynamicCurrencyView

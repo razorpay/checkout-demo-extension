@@ -89,7 +89,6 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
-  export let isScreenScrollable;
 
   const isOneClickCheckoutEnabled = isOneClickCheckout();
 
@@ -142,7 +141,6 @@
   }
 
   onMount(() => {
-    isScreenScrollable();
     Events.TrackBehav(CardEvents.ADD_NEW_CARD, {
       PayWithSavedCard: delayOTPExperiment,
     });

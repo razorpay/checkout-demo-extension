@@ -3,7 +3,6 @@
   import { onMount } from 'svelte';
 
   import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
   import { isOneClickCheckout } from 'razorpay';
 
   // Props
@@ -14,7 +13,6 @@
   let contentRef;
 
   let bottomShadow = false;
-  let showAccountTab;
 
   /**
    * Figure out if shadows need to be shown
@@ -32,8 +30,6 @@
 
     const isContentOverflowing = scrollHeight > offsetHeight;
 
-    // Allowing the Scroll behavior only for 1CC screens, In 1CC Screen Component used by Coupons
-    showAccountTab = isShowAccountTab(contentRef);
     if (isContentOverflowing && !isOneClickCheckout()) {
       if (scrollHeight - offsetHeight - scrollTop >= threshold) {
         // Content hidden on the bottom
@@ -62,7 +58,9 @@
   on:scroll={onScroll}
 >
   <slot />
-  <AccountTab showAccountTab={showAccountTab && !removeAccountTab} />
+  {#if !removeAccountTab}
+    <AccountTab />
+  {/if}
 </div>
 <div class="shadow shadow-top" />
 <div class="shadow shadow-bottom" />
@@ -81,6 +79,7 @@
 
   .one-cc {
     scroll-behavior: smooth;
+    display: block;
   }
 
   /* @TODO */

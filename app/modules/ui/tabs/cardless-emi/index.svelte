@@ -14,7 +14,6 @@
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
   import { isOneClickCheckout } from 'razorpay';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -55,8 +54,6 @@
         : OTHER_OPTIONS,
     recommended: SELECT_RECOMMENDED_TITLE,
   };
-  let cardlessEmiEle;
-  let showAccountTab;
 
   /**
    * Returns _all_ Cardless EMI providers
@@ -139,17 +136,12 @@
     return code;
   }
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(cardlessEmiEle);
-  }
 </script>
 
 <div
   class="tab-content showable screen collapsible"
   id="form-cardless_emi"
   class:content-one-cc={isOneCCEnabled}
-  on:scroll={onScroll}
-  bind:this={cardlessEmiEle}
   class:one-cc={isOneCCEnabled}
 >
   <div class="cardless-emi-wrapper" class:screen-one-cc={isOneCCEnabled}>
@@ -190,7 +182,7 @@
         {/each}
       </div>
     {/each}
-    <AccountTab {showAccountTab} />
+    <AccountTab />
   </div>
 </div>
 

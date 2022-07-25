@@ -21,7 +21,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
   import { getAnimationOptions } from 'svelte-utils';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -47,8 +46,6 @@
 
   let filteredWallets = wallets;
   let renderCtaOneCC = false;
-  let walletEle;
-  let showAccountTab;
 
   const isOneCCEnabled = isOneClickCheckout();
   $: {
@@ -187,16 +184,11 @@
     renderCtaOneCC = false;
   });
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(walletEle);
-  }
 </script>
 
 <Tab method="wallet" pad={false}>
   <div
     class="wallet-wrapper"
-    bind:this={walletEle}
-    on:scroll={onScroll}
     class:wallet-one-cc={isOneCCEnabled}
   >
     <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
@@ -238,7 +230,7 @@
         </SlottedRadioOption>
       {/each}
     </div>
-    <AccountTab {showAccountTab} />
+    <AccountTab />
   </div>
   <Bottom tab="wallet">
     <!-- skip dcc check as paypal 1cc doesn't depend upon dcc -->

@@ -47,7 +47,7 @@ module.exports = function (testFeatures) {
         }
         const screenEle = await context.page.waitForSelector('.screen-comp');
         await scrollToEnd(context, screenEle);
-        await delay(800);
+        await delay(1700);
         await scrollToEnd(context, screenEle);
         await delay(200);
         await openAccounTab(context);

@@ -12,7 +12,6 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
   import {
     getAvailableMethods,
     getSectionsDisplayed,
@@ -197,7 +196,6 @@
   let showHome = false;
   let renderCtaOneCC = false;
   let ctaOneCCDisabled = true;
-  let scrollable;
   let preferredMethods;
   // TPV
   const tpv = getTPV();
@@ -1188,8 +1186,11 @@
 </script>
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
-  <Screen pad={false} removeAccountTab={true}>
-    <div class="screen-main" class:screen-one-cc={scrollable && isOneCCEnabled}>
+  <Screen pad={false}>
+    <div
+      class="screen-main"
+      class:screen-one-cc={isOneCCEnabled}
+    >
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}
@@ -1259,10 +1260,6 @@
         </div>
       {/if}
     </div>
-
-    {#if isOneCCEnabled}
-      <AccountTab showAccountTab />
-    {/if}
     <Bottom tab="common">
       {#if cardOffer}
         <CardOffer offer={cardOffer} />

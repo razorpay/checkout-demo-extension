@@ -36,6 +36,7 @@
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
   import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
+  import { isBillingAddressEnabled } from 'razorpay';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
@@ -58,7 +59,6 @@
   let addNewAddressRef;
 
   let addressWrapperEle;
-  let scrollable = false;
   let addresses;
   $: {
     if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
@@ -83,6 +83,7 @@
   } = Resource[addressType];
   let isFormComplete = false;
   const { location } = getIcons();
+  const captureBillingAddr = isBillingAddressEnabled();
 
   export function handleAddAddressClick() {
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
@@ -260,9 +261,10 @@
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
+    class:capture-billing-disabled={!captureBillingAddr && currentView === addressViews.SAVED_ADDRESSES}
     bind:this={addressWrapperEle}
   >
-    <div class="address-section" class:address-scrollable={scrollable}>
+    <div class="address-section">
       <slot name="header" />
       <slot name="inner-header" />
       <div class="label-container">
@@ -296,8 +298,8 @@
         />
       {/if}
     </div>
-    <AccountTab showAccountTab />
-    {#if $activeRoute?.name === views.SAVED_ADDRESSES}
+    <AccountTab />
+    {#if $activeRoute?.name === views.SAVED_ADDRESSES && captureBillingAddr}
       <hr class="separator" />
     {/if}
   </div>
@@ -313,8 +315,6 @@
   }
 
   .address-wrapper {
-    display: flex;
-    flex-direction: column;
     padding-top: 26px;
     overflow: auto;
     /* subtracting topbar and cta height from body's height for address-wrapper */
@@ -358,6 +358,7 @@
   .address-section {
     /* TODO: to replace left/right padding with variable */
     padding: 0px 16px 16px;
+    min-height: 120%;
   }
 
   .address-scrollable {
@@ -367,5 +368,9 @@
   .separator {
     border-top: 1px solid #e0e0e0;
     margin-bottom: 12px;
+  }
+
+  .capture-billing-disabled {
+    height: calc(100% - 30px);
   }
 </style>

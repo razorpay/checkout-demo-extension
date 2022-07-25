@@ -42,7 +42,6 @@
     defaultDCCCurrency,
     cardCountry,
     showSavedCardTooltip,
-    cardScreenScrollable,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -128,7 +127,6 @@
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
-  import { isUnscrollable } from 'one_click_checkout/helper';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -988,16 +986,12 @@
     Events.TrackBehav(eventName, eventData);
   }
 
-  function isScreenScrollable() {
-    $cardScreenScrollable = isUnscrollable(cardEle?.parentNode);
-  }
 
   export function onShown() {
     //#region cards-tokenization
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
-    setTimeout(isScreenScrollable, 0);
     renderCtaOneCC = true;
     $selectedCard = null;
     //#endregion
@@ -1058,7 +1052,7 @@
   <Screen pad={false}>
     <div
       bind:this={cardEle}
-      class:screen-one-cc={isOneCCEnabled && $cardScreenScrollable}
+      class:screen-one-cc={isOneCCEnabled}
     >
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
@@ -1124,7 +1118,6 @@
             {delayOTPExperiment}
             {isCardSupportedForRecurring}
             {cardEle}
-            {isScreenScrollable}
           />
           {#if showEmiCta}
             <EmiActions

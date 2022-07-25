@@ -95,7 +95,6 @@
     <CartCta
       screenName={SCREEN_LIST[views.COUPONS]}
       variant={CART_EXPERIMENTS.VARIANT_A}
-      on:toggleItems
     />
   {/if}
 </div>
@@ -110,7 +109,6 @@
       <CartCta
         screenName={SCREEN_LIST[views.COUPONS]}
         variant={CART_EXPERIMENTS.VARIANT_B}
-        on:toggleItems
       />
     {/if}
     {#if cartItemsToShow.length}

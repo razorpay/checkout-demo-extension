@@ -2564,7 +2564,6 @@ Session.prototype = {
 
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
-      CardScreenStore.cardScreenScrollable.set(false);
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,

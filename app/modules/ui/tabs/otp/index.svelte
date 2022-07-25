@@ -30,7 +30,6 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
-  import { isShowAccountTab } from 'one_click_checkout/account_modal/helper';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -89,8 +88,6 @@
   let otpPromptVisible;
   let compact;
   let allowSkipButton = $allowSkip;
-  let otpEle;
-  let showAccountTab;
   const session = getSession();
   // As of Jan 2021, Safari is the only browser that supports one-time-code
   let autoCompleteMethod = 'off';
@@ -183,9 +180,6 @@
     invoke('resend', event);
   }
 
-  function onScroll() {
-    showAccountTab = isShowAccountTab(otpEle);
-  }
 </script>
 
 <div
@@ -194,8 +188,6 @@
   class:loading={$loading}
   class:showable={addShowableClass}
   class:tab-content-one-cc={isOneCC}
-  on:scroll={onScroll}
-  bind:this={otpEle}
 >
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
@@ -413,7 +405,7 @@
       {$t(VERIFY_LABEL)}
     </CTAOneCC>
   {/if}
-  <AccountTab {showAccountTab} />
+  <AccountTab />
 </div>
 
 <style>

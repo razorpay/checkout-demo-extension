@@ -85,7 +85,6 @@
         });
       }
     }
-    dispatch('toggleItems', e);
     $areAllCartItemsShown = !$areAllCartItemsShown;
   };
 </script>

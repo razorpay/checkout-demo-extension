@@ -63,7 +63,6 @@
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-  import { isUnscrollable } from 'one_click_checkout/helper';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
     getPrefilledContact,
@@ -82,8 +81,6 @@
   const enableAutoFetchCoupons = isEnableAutoFetchCoupons();
 
   let ctaDisabled = false;
-  let couponEle;
-  let scrollable = false;
   let orderWidget;
   let showValidations = false;
   let contactDetailsValid = false;
@@ -173,13 +170,8 @@
     });
   }
 
-  function setScrollable() {
-    scrollable = isUnscrollable(couponEle?.parentNode);
-  }
-
   onMount(() => {
     $consentViewCount = $consentViewCount || getConsentViewCount();
-    setScrollable();
     toggleHeader(true);
     updateOrderWithCustomerDetails();
     const addressPromise = checkAddressServiceability();
@@ -226,12 +218,7 @@
 </script>
 
 <Screen pad={false}>
-  <div
-    data-test-id="summary-screen"
-    class="coupon-container"
-    bind:this={couponEle}
-    class:coupon-scrollable={scrollable}
-  >
+  <div data-test-id="summary-screen" class="coupon-container">
     <div class="widget-wrapper contact-wrapper">
       <ContactWidget {showValidations} bind:valid={contactDetailsValid} />
     </div>
@@ -259,7 +246,7 @@
       id="order-widget"
       bind:this={orderWidget}
     >
-      <OrderWidget on:toggleItems={setScrollable} />
+      <OrderWidget />
     </div>
     <div class="separator" />
     <CTA
@@ -289,7 +276,7 @@
     padding-bottom: 26px;
   }
 
-  .coupon-scrollable {
-    min-height: 110%;
+  .coupon-container {
+    min-height: 120%;
   }
 </style>

@@ -158,7 +158,7 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     const availBanksList = transformBanks(availBanks);
 
     /* Indexing to avoid search */
-    var bankIndexMap = availBanksList.reduce(function (map, bank) {
+    let bankIndexMap = availBanksList.reduce(function (map, bank) {
       map[bank.code] = bank;
       return map;
     }, {});
@@ -174,7 +174,7 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
 
       /* remove empty and duplicated banks */
       .filter(function (bankObj) {
-        var bankVal = bankObj && bankIndexMap[bankObj.code];
+        let bankVal = bankObj && bankIndexMap[bankObj.code];
         if (bankVal) {
           /* remove from index to avoid repetition */
           bankIndexMap[bankObj.code] = false;
