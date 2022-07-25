@@ -1726,8 +1726,8 @@ Session.prototype = {
 
     const beforeReturn = function () {
       // Prevents the overlay from closing and not allowing the user to
-      // attempt payment again incase of corporate netbanking.
-      if (self.isCorporateBanking) {
+      // attempt payment again incase of corporate netbanking and preventErrorDismissal is true.
+      if (self.isCorporateBanking || self.preventErrorDismissal) {
         return;
       }
 
@@ -4462,14 +4462,14 @@ Session.prototype = {
 
   verifyVpaAndContinue: function (data) {
     let self = this;
-    self.showLoadError(I18n.format('upi.verifying_vpa_info'));
+    self.showLoadError(I18n.format('upi.verifying_vpa_info'), false, true);
     $('#overlay-close').hide();
 
     RazorpayHelper.verifyVPA(data.vpa)
       .then(function () {
         $('#overlay-close').show();
-        hideOverlay($('#error-message'));
         setTimeout(function () {
+        hideOverlay($('#error-message'));
           self.submit({
             vpaVerified: true,
           });
