@@ -152,6 +152,7 @@ export function handleEditContact(logoutFlow = false) {
   }
   const params = { path: views.DETAILS };
   if (logoutFlow) {
+    isEditContactFlow.set(false);
     resetOrder(true);
     params.initialize = true;
   } else {
