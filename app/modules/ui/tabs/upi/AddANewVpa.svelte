@@ -116,7 +116,9 @@
   }
 
   export function focus() {
-    vpaField.focus();
+    if (typeof vpaField.focus === 'function') {
+      vpaField.focus();
+    }
   }
 
   export function setSelectionRange(
@@ -133,7 +135,7 @@
 
   function focusAfterTimeout() {
     setTimeout(() => {
-      if (vpaField) {
+      if (vpaField && typeof vpaField.focus === 'function') {
         vpaField.focus();
       }
     }, 200);

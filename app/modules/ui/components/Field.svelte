@@ -233,7 +233,9 @@
   }
 
   export function focus() {
-    input.focus();
+    if (typeof input.focus === 'function') {
+      input.focus();
+    }
   }
 
   export function blur() {

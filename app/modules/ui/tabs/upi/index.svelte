@@ -402,7 +402,7 @@
             /**
              * If QRV2 is present don't focus any other fields
              */
-            if (!enableUpiQrV2()) {
+            if (!enableUpiQrV2() && typeof vpaField.focus === 'function') {
               vpaField.focus();
             }
             vpaField.setSelectionRange(0, 0);
