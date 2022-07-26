@@ -279,7 +279,7 @@ const fetchPrototype: FetchPrototype = {
               detail: {
                 method,
                 url,
-                baseUrl: url.split('?')[0],
+                baseUrl: url?.split('?')[0],
                 status: xhr.status,
                 xhrErrored: false,
                 response: json,
