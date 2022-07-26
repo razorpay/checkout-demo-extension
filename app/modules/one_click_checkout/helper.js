@@ -25,6 +25,13 @@ export function screenScrollTop(element) {
   }
 }
 export const isScrollable = (node) => {
+  // getComputedStyle is allowed only on ElementNode
+  // https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle#throws
+  const isElementNode = node.nodeType === node.ELEMENT_NODE;
+  if (!isElementNode) {
+    return false;
+  }
+
   const hasScrollableContent = node.scrollHeight > node.clientHeight;
 
   const overflowYStyle = window.getComputedStyle(node).overflowY;

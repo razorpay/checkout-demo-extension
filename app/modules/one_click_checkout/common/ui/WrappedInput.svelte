@@ -62,12 +62,15 @@
 
   function onInput(e) {
     const parentNode = getScrollableParent(e.target);
-    const { bottom: parentBottom } = parentNode.getBoundingClientRect();
-    const { bottom: targetBottom } = e.target.getBoundingClientRect();
-    // if autocomplete input is at the end of screen, scroll it into view
-    if (parentBottom - targetBottom < 100) {
-      inputField.scrollIntoView(true);
+    if (parentNode) {
+      const { bottom: parentBottom } = parentNode.getBoundingClientRect();
+      const { bottom: targetBottom } = e.target.getBoundingClientRect();
+      // if autocomplete input is at the end of screen, scroll it into view
+      if (parentBottom - targetBottom < 100) {
+        inputField.scrollIntoView(true);
+      }
     }
+
     dispatch('input', e);
   }
 
