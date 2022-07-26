@@ -29,6 +29,7 @@ import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
+import { isDebitIssuer } from 'common/bank';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -551,13 +552,20 @@ function askOTP(
             }
           }
 
-          if (origText.mode === 'hdfc_debit_emi') {
+          if (origText.mode === 'debit_emi') {
             let next = _Obj.getSafely(origText, 'request.content.next');
             // HDFC Debit EMI next array is same as wallet.
             // It's "resend_otp" not "otp_resend".
             if (!next || next.indexOf('resend_otp') === -1) {
               view.updateScreen({
                 allowResend: false,
+              });
+            }
+
+            // For KKBK DC EMI we are receiving "otp_resend" in next array
+            if (origText.next && origText.next.indexOf('otp_resend') !== -1) {
+              view.updateScreen({
+                allowResend: true,
               });
             }
             // Don't show secondary action like go to bank in HDFC Debit EMI
@@ -3018,12 +3026,14 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
+    let activeEmiPlan = EmiStore.getEmiDurationForNewCard();
     if (
       !skipOTPFlow &&
       customer.haveSavedCard &&
       !customer.logged &&
       !this.wants_skip &&
-      this.screen !== 'card'
+      this.screen !== 'card' &&
+      !activeEmiPlan
     ) {
       self.askOTPForSavedCard();
     } else {
@@ -5174,16 +5184,16 @@ Session.prototype = {
       }
     }
 
-    let emiCode, emiContact, isHDFCDebitEMI;
+    let emiCode, emiContact, isDebitEMI;
     if (data.method === 'emi') {
       emiCode = cardTab.getIssuerForEmiFromPayload(data);
-      isHDFCDebitEMI = emiCode === 'HDFC_DC';
+      isDebitEMI = isDebitIssuer(emiCode);
       emiContact = discreet.storeGetter(HomeScreenStore.emiContact);
-      if (isHDFCDebitEMI && emiContact) {
+      if (isDebitEMI && emiContact) {
         data.contact = emiContact;
       }
-      if (isHDFCDebitEMI) {
-        data['_[mode]'] = 'hdfc_debit_emi';
+      if (isDebitEMI) {
+        data['_[mode]'] = 'debit_emi';
       }
     }
 
@@ -5252,8 +5262,8 @@ Session.prototype = {
             EmiStore.setBajajTCAcceptedConsent();
             return;
           }
-        } else if (isHDFCDebitEMI) {
-          // Skip Native OTP for EMI with HDFC Debit Cards
+        } else if (isDebitEMI) {
+          // Skip Native OTP for EMI with Debit Cards
           shouldUseNativeOTP = true;
         }
       }
@@ -5315,7 +5325,7 @@ Session.prototype = {
         maxlength: 4,
         digits: new Array(4),
       });
-    } else if (isHDFCDebitEMI) {
+    } else if (isDebitEMI) {
       this.otpView.updateScreen({
         maxlength: 6,
         digits: new Array(6),

@@ -1,25 +1,30 @@
 <script lang="ts">
   // UI imports
   import * as TermsCurtain from 'checkoutframe/termscurtain';
+  import { isDebitIssuer } from 'common/bank';
+  import RazorpayConfig from 'common/RazorpayConfig';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import fetch from 'utils/fetch';
   // Props
-  export let mode;
+  export let mode: string;
 
-  // Constants
-  const URL = {
-    hdfc_debit_tnc:
-      'https://cdn.razorpay.com/static/assets/hdfc/debitemi/tnc.json',
-    hdfc_debit_schedule:
-      'https://cdn.razorpay.com/static/assets/hdfc/debitemi/schedule.json',
-  };
+  function getTncUrl(bank: string, type: string) {
+    const formattedBankName = bank.replace('_DC', '').toLowerCase();
+    // Constants
+    const cdnUrl = RazorpayConfig.cdn;
+    const URL = {
+      tnc: `${cdnUrl}static/assets/${formattedBankName}/debitemi/tnc.json`,
+      schedule: `${cdnUrl}static/assets/${formattedBankName}/debitemi/schedule.json`,
+    };
+    return URL[type];
+  }
 
-  function showTerms(type) {
+  function showTerms(type: string, mode: string) {
     TermsCurtain.show({
       loading: true,
     });
     fetch({
-      url: URL[type],
+      url: getTncUrl(mode, type),
       callback: function (response) {
         TermsCurtain.show({
           loading: false,
@@ -32,7 +37,7 @@
 </script>
 
 <div class="pad">
-  {#if mode === 'HDFC_DC'}
+  {#if isDebitIssuer(mode)}
     <div class="agreement-checkbox">
       <Checkbox
         id="emi-tnc"
@@ -45,14 +50,14 @@
       I expressly acknowledge that I agree to all the
       <span
         class="actionlink theme-highlight"
-        on:click={(event) => showTerms('hdfc_debit_tnc')}
+        on:click={() => showTerms('tnc', mode)}
       >
         terms and conditions
       </span>
       which I fully understand and have gone through
       <span
         class="actionlink theme-highlight"
-        on:click={(event) => showTerms('hdfc_debit_schedule')}
+        on:click={() => showTerms('schedule', mode)}
       >
         schedule of charges
       </span>

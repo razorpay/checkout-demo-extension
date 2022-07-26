@@ -73,6 +73,7 @@
 
   import { Safari } from 'common/useragent';
   import { VERIFY_LABEL } from 'one_click_checkout/cta/i18n';
+  import { isDebitEMIBank, isDebitIssuer } from 'common/bank';
 
   // Props
   export let on = {};
@@ -99,7 +100,7 @@
   // We don't want to show EMI details on loading state or error state.
   $: otpPromptVisible = !$action && !$loading;
 
-  $: compact = $mode === 'HDFC_DC' || ($ipAddress && $accessTime);
+  $: compact = isDebitIssuer($mode) || ($ipAddress && $accessTime);
 
   $: if ($action === 'paypal') {
     Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_ON_OTP_SCREEN, {
@@ -195,7 +196,7 @@
     class:heading-1cc={isOneCC}
     class:otp-wrapper-1cc={isOneCC}
   >
-    {#if otpPromptVisible && $mode === 'HDFC_DC'}
+    {#if otpPromptVisible && isDebitEMIBank($mode)}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
       <CardBox

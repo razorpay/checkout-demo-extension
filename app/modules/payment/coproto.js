@@ -155,22 +155,21 @@ const responseTypes = {
         this.redirect(request);
 
         return;
-      } else {
-        // ಠ_ಠ - Should not reach here.
-        Analytics.track('native_otp:error', {
-          data: {
-            error: 'REDIRECT_PARAMS_MISSING',
-          },
-        });
-        // If request.method = 'direct', then we've got HTML in content key.
-        // Else we got request (method = get/post) with content.
-        if (direct) {
-          this.gotoBankHtml = content;
-        } else {
-          this.gotoBankRequest = request;
-        }
-        return this.emit('3ds.required');
       }
+      // ಠ_ಠ - Should not reach here.
+      Analytics.track('native_otp:error', {
+        data: {
+          error: 'REDIRECT_PARAMS_MISSING',
+        },
+      });
+      // If request.method = 'direct', then we've got HTML in content key.
+      // Else we got request (method = get/post) with content.
+      if (direct) {
+        this.gotoBankHtml = content;
+      } else {
+        this.gotoBankRequest = request;
+      }
+      return this.emit('3ds.required');
     } else if (
       /** check for forceIframe feature use by walnut 369 & its only for Standard checkout */
       isRazorpayFrame() &&
@@ -617,13 +616,12 @@ const responseTypes = {
 
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
           return responseTypes['gpay'].call(this, request, fullResponse);
-        } else {
-          return responseTypes['web_payments'].call(
-            this,
-            fullResponse,
-            this.upi_app
-          );
         }
+        return responseTypes['web_payments'].call(
+          this,
+          fullResponse,
+          this.upi_app
+        );
       }
     } else if (this.upi_app) {
       // upi_app will only be set for UPI intent payments.
@@ -648,11 +646,11 @@ const responseTypes = {
       this.emit('otp.required');
     } else if (
       this.data.method === 'emi' &&
-      this.data['_[mode]'] === 'hdfc_debit_emi'
+      this.data['_[mode]'] === 'debit_emi'
     ) {
       this.otpurl = fullResponse.submit_url;
       // TODO: Remove this explicit assignment when backend starts sending it.
-      fullResponse.mode = 'hdfc_debit_emi';
+      fullResponse.mode = 'debit_emi';
       this.emit('otp.required', fullResponse);
     } else {
       Analytics.setMeta('headless', true);

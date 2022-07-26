@@ -75,6 +75,7 @@ import {
   isMerchantInternationalMethodEnabled,
   isMerchantInternationalAppEnabled,
 } from 'common/international';
+import { DEBIT_EMI_BANKS, isDebitEMIBank, isDebitIssuer } from 'common/bank';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -85,8 +86,6 @@ const AUTH_TYPES = {
   DEBIT_CARD: 'debitcard',
   ADHAAR: 'aadhaar',
 };
-
-const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
 const ALL_METHODS = {
   card() {
@@ -393,10 +392,12 @@ export function isDebitEMIEnabled() {
 }
 
 export function isContactRequiredForEMI(bank, cardType) {
-  if (bank === 'HDFC_DC') {
+  // if bank code is HDFC_DC, KKBK_DC etc
+  if (isDebitIssuer(bank)) {
     return true;
   }
-  if (bank === 'HDFC' && cardType === 'debit') {
+  // if bank is HDFC and cardtype is debit
+  if (isDebitEMIBank(bank, cardType)) {
     return true;
   }
 }
@@ -905,7 +906,7 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
     // Then use "HDFC_DC" plans and not "HDFC" plans.
     // If code is "HDFC_DC" then don't append "_DC" at the end.
     const debitCode = code + '_DC';
-    if (DEBIT_EMI_BANKS.includes(debitCode)) {
+    if (isDebitIssuer(debitCode)) {
       code = debitCode;
     } else {
       return;

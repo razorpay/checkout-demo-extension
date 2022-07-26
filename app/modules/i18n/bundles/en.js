@@ -188,6 +188,7 @@ export default {
       VIJB: 'Vijaya Bank',
       YESB: 'Yes',
       HSBC: 'HSBC',
+      KKBK_DC: 'Kotak',
     },
   },
   callouts: {
@@ -690,8 +691,13 @@ export default {
       'https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm',
     hdfc_debit_description_convenience:
       ' Convenience Fee of ₹199 + GST applicable for EMI transactions on HDFC Bank Cards.',
+    debit_description_convenience:
+      'Convenience Fee of ₹199 + GST applicable for EMI transactions on {bank} Bank Cards.',
     hdfc_debit_description_includes_interest: '(includes interest).',
+    debit_description_includes_interest: '(includes interest).',
     hdfc_debit_description_min_balance:
+      'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
+    debit_description_min_balance:
       'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
     interest_charged_label: 'Interest charged by the bank',
     no_cost_discount_label: 'No Cost EMI offer discount',
@@ -753,6 +759,7 @@ export default {
     SCBL: 'Standard Chartered Bank',
     UTIB: 'Axis Bank',
     YESB: 'Yes Bank',
+    KKBK_DC: 'Kotak Debit Cards',
   },
   emi_modal: {
     emi_tenure: '{duration} Months',

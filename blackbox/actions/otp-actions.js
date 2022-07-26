@@ -19,6 +19,12 @@ async function handleOtpVerification(context, walletissuer = 'freecharge') {
   });
 }
 
+async function acceptTermsandConditions(context) {
+  await delay(500);
+  await context.page.waitForSelector('#emi-tnc');
+  await context.page.click('#emi-tnc');
+}
+
 async function typeOTPandSubmit(context, otpValue = '5555') {
   await typeOTP(context, otpValue);
   await delay(500);
@@ -94,4 +100,5 @@ module.exports = {
   verifyOTP,
   resendOTP,
   goToBankPage,
+  acceptTermsandConditions,
 };

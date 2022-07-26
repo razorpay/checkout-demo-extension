@@ -25,6 +25,12 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+
+  handleCardValidationForNativeOTP,
+  typeOTPandSubmit,
+  verifyOTP,
+  resendOTP,
+  acceptTermsandConditions,
 } = require('../actions/common');
 
 const {
@@ -43,7 +49,7 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'emi',
     testFeatures
@@ -57,6 +63,7 @@ module.exports = function(testFeatures) {
     offers,
     optionalContact,
     optionalEmail,
+    debitEmi,
   } = features;
 
   describe.each(
@@ -79,6 +86,16 @@ module.exports = function(testFeatures) {
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
 
+      // sending a debit emi card for DC EMI flow and manipulating the iin response
+      const cardType = debitEmi
+        ? {
+            nativeOtp: true,
+            issuer: 'HDFC',
+            type: 'debit',
+            cardType: 'VISA',
+          }
+        : {};
+
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
       }
@@ -100,7 +117,7 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
       await selectPaymentMethod(context, 'emi');
-      await enterCardDetails(context);
+      await enterCardDetails(context, cardType);
       if (offers) {
         await viewOffers(context);
         await selectOffer(context, '9');
@@ -131,8 +148,27 @@ module.exports = function(testFeatures) {
         await handleFeeBearer(context);
       }
 
+      if (debitEmi) {
+        await submit(context);
+      }
+
       if (callbackUrl) {
         await expectRedirectWithCallback(context, { method: 'emi' });
+      } else if (debitEmi) {
+        await handleCardValidationForNativeOTP(context, {
+          coproto: 'otp',
+          expectCallbackUrl: callbackUrl,
+        });
+        await acceptTermsandConditions(context);
+        await typeOTPandSubmit(context);
+        await verifyOTP(context, 'fail');
+        await resendOTP(context);
+        await acceptTermsandConditions(context);
+        await typeOTPandSubmit(context);
+        await verifyOTP(context, 'paas');
+        await handleEMIValidation(context, {
+          urlShouldContain: '/v1/gateway/mocksharp/payment/otp_submit',
+        });
       } else {
         await handleEMIValidation(context);
         await handleMockSuccessDialog(context);
