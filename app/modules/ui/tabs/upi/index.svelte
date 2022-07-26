@@ -27,6 +27,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCta } from 'checkoutstore/cta';
+  import { iOS } from 'common/useragent';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import {
     intentVpaPrefill,
@@ -99,6 +100,7 @@
   // Constant imports
   import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
   import { filterTruthyKeys } from 'lib/utils';
+  import { filterUPIIntentAppsForAutopayIntent } from './helpers';
 
   // Props
   export let selectedApp = undefined;
@@ -177,7 +179,6 @@
   let selectedBankForRecurring = null;
 
   const currentScreen = 'upi';
-
   let startDate,
     endDate,
     orderAmount,
@@ -246,7 +247,6 @@
       intentUrl: isFlowEnabled('intentUrl'),
       qr: isFlowEnabled('qr'),
     };
-
     if (!instrument || instrument.method !== 'upi') {
       return availableFlows;
     }
@@ -307,6 +307,21 @@
       intentApps = getRecommendedAppsForUPIStack(false, 3);
     } else {
       intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+      if (isRecurring()) {
+        intentApps = filterUPIIntentAppsForAutopayIntent(intentApps);
+        /**
+         * If no intent app is available
+         * don't show intent flow at all
+         */
+        if (!intentApps || !intentApps.length) {
+          intent = false;
+          selectedToken = 'new';
+        }
+        // Autopay intent is disabled on ios sdk for recurring
+        if (iOS) {
+          intent = false;
+        }
+      }
     }
   }
 

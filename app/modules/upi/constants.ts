@@ -11,6 +11,10 @@ export const OTHER_INTENT_APPS: UPI.AppConfiguration = {
 
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
+
+export const BHIM_UPI_PACKAGE_NAME = 'in.org.npci.upiapp';
+export const PAYTM_PACKAGE_NAME = 'net.one97.paytm';
+
 // Not the real package name. We're using this because api returns 'cred' instead of the real package name
 // TODO: get this fixed
 export const CRED_PACKAGE_NAME = 'cred';
@@ -393,3 +397,6 @@ export const UPI_TAB_CALLBACK_NAME = 'fromPopup';
 export const QR_EXPIRE_TIME = (12 * 60 - 5) * 1000;
 export const QR_OFF_SCREEN_POLL_DELAY_BY = 3;
 export const QR_IMAGE_DEFAULT_SIZE = 165;
+
+// Recurring: App supporting autopay intent registration
+export const APPS_SUPPORTING_AUTOPAY_INTENT = [BHIM_UPI_PACKAGE_NAME];
