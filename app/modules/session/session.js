@@ -1151,6 +1151,10 @@ Session.prototype = {
   },
 
   selectCardlessEmiProvider: function (providerCode) {
+    if (!MethodStore.isMethodEnabled('cardless_emi')) {
+      return;
+    }
+
     Analytics.track('cardless_emi:provider:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
