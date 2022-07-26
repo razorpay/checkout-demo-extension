@@ -5,6 +5,10 @@ import { qrState } from 'upi/ui/components/QR/store';
 import { get } from 'svelte/store';
 import { TRACES, EVENTS } from './constants';
 
+function getScreenFromParent(parent: UPI.QRParent) {
+  return parent === 'homeScreen' ? 'L0' : 'L1';
+}
+
 const upiTrackerPayload: {
   appForPay?: UPI.UpiAppForPay; // App chosen to pay
   response?: any; // response of intent => fail keyword for failed payments
@@ -125,9 +129,18 @@ export const trackIntentFailure = (reason: object | string) => {
 
 let qrAnalyticsPayload: CustomObject<number | string> = {};
 
+function getQRCTA() {
+  const QRStateData = get(qrState);
+  return QRStateData.autoGenerate ? 'SHOW' : 'REFRESH';
+}
+
 export const trackQRStatus = (
-  type: 'paymentInitiation' | 'paymentResponse' | 'qrLoaded' | 'qrExpired'
+  type: 'paymentInitiation' | 'paymentResponse' | 'qrLoaded' | 'qrExpired',
+  parentState: UPI.QRParent
 ) => {
+  const parent = getScreenFromParent(parentState);
+  const QRStateData = get(qrState);
+  const CTA = QRStateData.autoGenerate ? 'SHOW' : 'REFRESH';
   switch (type) {
     case 'paymentInitiation':
     case 'paymentResponse':
@@ -135,29 +148,48 @@ export const trackQRStatus = (
       break;
     case 'qrLoaded':
       qrAnalyticsPayload[type] = Date.now();
-      Analytics.track(EVENTS.QR_ON_L1, {
+      Analytics.track(EVENTS.QR_RENDERED, {
         type: AnalyticsTypes.RENDER,
         data: {
           ...qrAnalyticsPayload,
-          ...get(qrState),
+          ...QRStateData,
+          CTA,
+          parent,
         },
       });
       break;
     case 'qrExpired':
       qrAnalyticsPayload[type] = Date.now();
-      Analytics.track(EVENTS.QR_ON_L1_EXPIRED, {
+      Analytics.track(EVENTS.QR_EXPIRED, {
         type: AnalyticsTypes.RENDER,
         data: {
           ...qrAnalyticsPayload,
-          ...get(qrState),
+          ...QRStateData,
+          CTA,
+          parent,
         },
       });
   }
 };
 
-export const trackRefreshQR = () => {
+export const trackQRGenerate = (parent: UPI.QRParent) => {
   qrAnalyticsPayload = {};
-  Analytics.track(EVENTS.REFRESH_QR_ON_L1, {
+  Analytics.track(EVENTS.QR_CTA_CLICK, {
     type: AnalyticsTypes.BEHAV,
+    data: {
+      parent: getScreenFromParent(parent),
+      CTA: getQRCTA(),
+    },
+  });
+};
+
+export const renderQRSection = (parent: UPI.QRParent) => {
+  qrAnalyticsPayload = {};
+  Analytics.track(EVENTS.QR_SECTION_RENDERED, {
+    type: AnalyticsTypes.RENDER,
+    data: {
+      parent: getScreenFromParent(parent),
+      CTA: getQRCTA(),
+    },
   });
 };

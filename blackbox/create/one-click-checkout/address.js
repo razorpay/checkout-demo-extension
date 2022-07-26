@@ -166,9 +166,17 @@ module.exports = function (testFeatures) {
       } else {
         // logged out / guest user flows
 
-        await checkPhoneValidation(context, '995239840', INDIAN_CONTACT_ERROR_LABEL);
+        await checkPhoneValidation(
+          context,
+          '995239840',
+          INDIAN_CONTACT_ERROR_LABEL
+        );
         await resetContactDetails(context);
-        await checkPhoneValidation(context, '99523984078', INDIAN_CONTACT_ERROR_LABEL);
+        await checkPhoneValidation(
+          context,
+          '99523984078',
+          INDIAN_CONTACT_ERROR_LABEL
+        );
         await resetContactDetails(context);
         await checkPhoneValidation(context, '1000000000', CONTACT_ERROR_LABEL);
         await resetContactDetails(context);

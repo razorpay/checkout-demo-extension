@@ -1,6 +1,6 @@
-import { render } from '@testing-library/svelte';
-import QR from './QR.svelte';
-import { updateQrState } from './store';
+import { render, fireEvent } from '@testing-library/svelte';
+import QR from '../QR.svelte';
+import { updateQrState } from '../store';
 import { handleUPIPayments } from 'upi/payment';
 import { QR_EXPIRE_TIME } from 'upi/constants';
 import fetch from 'utils/fetch';
@@ -58,10 +58,10 @@ describe('QR Component Tests', () => {
   it('should render without any errors', async () => {
     expect(render(QR, {})).toBeTruthy();
   });
-  it('should render loading->qr->expire view properly', async () => {
-    jest.useFakeTimers();
+
+  it('should render show->qr->expire view properly', async () => {
     updateQrState({
-      status: 'loading',
+      status: 'refresh',
       url: '',
       autoGenerate: true,
     });
@@ -69,7 +69,12 @@ describe('QR Component Tests', () => {
     expect(
       getByText('Scan the QR using any UPI app on your phone.')
     ).toBeInTheDocument();
-    expect(getByTestId('loading')).toBeInTheDocument();
+    expect(getByTestId('refresh')).toBeInTheDocument();
+    /**
+     * click on SHOW QR (which is using same refresh testid/component)
+     */
+    fireEvent.click(getByTestId('refresh'));
+
     expect(handleUPIPayments).toBeCalled();
     const [payload, onResponse, config] = (handleUPIPayments as any).mock
       .calls[0];

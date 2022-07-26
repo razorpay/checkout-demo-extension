@@ -249,7 +249,6 @@
   onMount(() => {
     Events.Track(EVENTS.SCREEN_LOAD);
   });
-
 </script>
 
 <Tab method="international" pad={false} overrideMethodCheck>

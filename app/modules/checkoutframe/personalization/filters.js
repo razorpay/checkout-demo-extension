@@ -14,6 +14,8 @@ import {
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
 import { highlightUPIIntentOnDesktop } from 'upi/experiments';
+import { get } from 'svelte/store';
+import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
 
 /**
  * Map of filter fn for each method
@@ -86,6 +88,7 @@ const METHOD_FILTERS = {
   },
 
   upi: (instrument, { customer }) => {
+    const isUPIQROnL0 = get(qrRenderState).homeScreenQR;
     // We allow upi id linked to only few banks for recurring.
     // In p13n intent and qr user can attempt payment with
     // non supported apps, so this should be filtered out.
@@ -106,18 +109,21 @@ const METHOD_FILTERS = {
           .map((token) => `${token.vpa.username}@${token.vpa.handle}`);
 
         return tokenVpas.indexOf(instrument.vpa) >= 0;
-      } else {
-        return false;
       }
+      return false;
     }
 
     // Allow QR instruments
     if (instrument['_[upiqr]']) {
-      return true;
+      /**
+       * If QR-V2 is rendered on home-screen,
+       * We should not show the same instrument in p13n
+       */
+      return !isUPIQROnL0;
     }
 
     // Allow intent instruments with an app name
-    if (instrument['_[flow]'] === 'intent') {
+    if (instrument['_[flow]'] === 'intent' && !isUPIQROnL0) {
       return Boolean(instrument.upi_app);
     }
 

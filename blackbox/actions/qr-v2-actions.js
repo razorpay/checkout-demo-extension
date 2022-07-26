@@ -1,25 +1,67 @@
-var querystring = require('querystring');
-const { assertVisible } = require('../util');
+const { assertVisible, delay, assertHidden } = require('../util');
 async function assertRefreshButton(context) {
-  assertVisible('div[data-testid="refresh"]');
+  await assertVisible('div[data-testid="refresh"]');
+}
+async function assertQrV2Timer(context) {
+  const timerSelector = '.qr-content > #callout-text';
+  let element = await page.$(timerSelector);
+  if (!element) {
+    element = await page.waitForSelector('.qr-content > #callout-text', {
+      visible: true,
+      timeout: 1500,
+    });
+  }
+  expect(element && element.innerHTML).toBeTruthy();
+}
+
+async function assetQrV2DowntimeCallout(context) {
+  const downtimeCalloutSelector =
+    'div.qrv2-downtime-callout > div.downtime-callout';
+
+  let element = await page.$(downtimeCalloutSelector);
+  if (!element) {
+    element = await page.waitForSelector(downtimeCalloutSelector, {
+      visible: true,
+    });
+  }
+  expect(element).toBeTruthy();
+}
+async function assertQrV2TimerHidden(context) {
+  await context.page.waitForSelector('#callout-text');
+  expect(
+    await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) {
+        throw `Element ${sel} is not present`;
+      }
+      return el.innerHTML;
+    }, '.qr-content > #callout-text')
+  ).toBeFalsy();
 }
 
 async function clickOnRefreshButton(context) {
-  const refreshButton = await context.page.waitForSelector(
-    'div[data-testid="refresh"]'
-  );
-
+  await delay(250);
   /**
    * Direct clicks not working
    */
-  await context.page.evaluate(
-    (refreshButton) => refreshButton.click(),
-    refreshButton
+  await context.page.evaluate((refreshButton) => {
+    const ele = document.querySelector(refreshButton);
+    if (ele) {
+      ele.click();
+    }
+  }, `div[data-testid="refresh"]`);
+}
+
+async function assertQRV2(context, homescreen = false) {
+  await assertVisible(
+    `.methods-block[data-block="${homescreen ? 'homeScreen' : 'upiScreen'}-qr"]`
   );
 }
 
-async function assertQRV2(context) {
-  await assertVisible('div[data-testid="qrV2"]');
+async function assertQRV2Hidden(context, homescreen = false) {
+  await assertHidden(
+    `.methods-block[data-block="${homescreen ? 'homeScreen' : 'upiScreen'}-qr"]`
+  );
 }
 
 async function respondToQRV2Ajax(
@@ -88,4 +130,8 @@ module.exports = {
   respondToQRV2Ajax,
   assertRefreshButton,
   clickOnRefreshButton,
+  assertQRV2Hidden,
+  assertQrV2Timer,
+  assertQrV2TimerHidden,
+  assetQrV2DowntimeCallout,
 };

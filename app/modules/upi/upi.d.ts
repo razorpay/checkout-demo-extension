@@ -104,4 +104,5 @@ declare namespace UPI {
   export type PaymentHandlerConfiguration = {
     [key in Payment.PaymentStatus]?: boolean;
   };
+  export type QRParent = 'homeScreen' | 'upiScreen';
 }

@@ -34,6 +34,7 @@
   } from 'ui/labels/methods';
   // helpers
   import { setDynamicFees } from './helpers';
+  import QrWrapper from 'upi/ui/components/QRWrapper/QRWrapper.svelte';
 
   onDestroy(() => {
     deselectInstrument();
@@ -70,6 +71,7 @@
   }
 </script>
 
+<QrWrapper parent="homeScreen" />
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
     <RazorpayCluster {block} on:selectInstrument />

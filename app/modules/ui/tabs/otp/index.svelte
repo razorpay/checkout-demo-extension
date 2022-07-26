@@ -179,7 +179,6 @@
     Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
     invoke('resend', event);
   }
-
 </script>
 
 <div

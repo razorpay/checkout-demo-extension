@@ -9,7 +9,7 @@ const app = {
   app_name: 'PhonePe',
   handles: ['ybl'],
 };
-const spyOnConsoleLog = jest.spyOn((global as any).console, 'log');
+const testOnClickFunction = jest.fn(() => {});
 
 describe('App tile', () => {
   it('should be rendered', async () => {
@@ -17,7 +17,7 @@ describe('App tile', () => {
       selected: false,
       variant: 'square',
       app,
-      onClick: console.log,
+      onClick: testOnClickFunction,
     });
     expect(result).toBeTruthy();
   });
@@ -26,7 +26,7 @@ describe('App tile', () => {
       selected: true,
       variant: 'square',
       app,
-      onClick: console.log,
+      onClick: testOnClickFunction,
     });
     expect(result).toBeTruthy();
     expect(result.queryByText(app.app_name)).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('App tile', () => {
       selected: true,
       variant: 'circle',
       app,
-      onClick: console.log,
+      onClick: testOnClickFunction,
     });
     expect(result).toBeTruthy();
     expect(result.queryByText(app.app_name)).not.toBeInTheDocument();
@@ -46,11 +46,11 @@ describe('App tile', () => {
       selected: true,
       variant: 'circle',
       app,
-      onClick: console.log,
+      onClick: testOnClickFunction,
     });
     expect(result).toBeTruthy();
     expect(result.queryByText(app.app_name)).not.toBeInTheDocument();
     fireEvent.click(result.getByTestId('app-tile'));
-    expect(spyOnConsoleLog).toBeCalled();
+    expect(testOnClickFunction).toBeCalled();
   });
 });

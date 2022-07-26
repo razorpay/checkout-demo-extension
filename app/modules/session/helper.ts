@@ -42,6 +42,11 @@ export function handleErrorModal(this: Session, message: string) {
           referrer: 'UPI_UX',
           inStatuses: ['cancel', 'error'],
           errorReason: 'manual',
+        }) &&
+        !matchLatestPaymentWith({
+          referrer: 'QR_V2',
+          inStatuses: ['cancel', 'error'],
+          errorReason: 'manual',
         })
       ) {
         this.showLoadError(
@@ -51,6 +56,17 @@ export function handleErrorModal(this: Session, message: string) {
       }
     }
   } else {
-    this.showLoadError(message || format('misc.error_handling_request'), true);
+    if (
+      !matchLatestPaymentWith({
+        referrer: 'QR_V2',
+        inStatuses: ['cancel', 'error'],
+        errorReason: 'manual',
+      })
+    ) {
+      this.showLoadError(
+        message || format('misc.error_handling_request'),
+        true
+      );
+    }
   }
 }

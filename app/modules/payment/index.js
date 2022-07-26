@@ -93,6 +93,7 @@ function onPaymentCancel(metaParam) {
           } else if (!response.error || metaParam?.upiNoApp) {
             response = cancelError;
           }
+          response._silent = metaParam?._silent || false;
           this.complete(response);
         },
       });
@@ -563,7 +564,9 @@ Payment.prototype = {
         Analytics.track('ajax_error', data);
       }
       updateLatestPaymentStatus('error', data);
-      this.emit('error', data);
+      // silent cancel the payment without showing the error message in UI
+      // currently use in UPI QR when amount changes
+      this.emit(!data._silent ? 'error' : 'silent_error', data);
     }
 
     this.off();

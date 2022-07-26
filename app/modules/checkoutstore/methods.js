@@ -355,12 +355,10 @@ function isMethodEnabledForBrowser(method) {
 
     if (checker) {
       return checker();
-    } else {
-      return false;
     }
-  } else {
-    return true;
+    return false;
   }
+  return true;
 }
 
 export function isMethodEnabled(method) {
@@ -1094,9 +1092,8 @@ export function getWallets() {
       if (noRedirectFacebookWebViewSession) {
         // Only power wallets are supported on Facebook browser w/o callback_url
         return wallet.power;
-      } else {
-        return true;
       }
+      return true;
     });
 
   return getSortedWallets(result);

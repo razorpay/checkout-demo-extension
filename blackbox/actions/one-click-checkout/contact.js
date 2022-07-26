@@ -23,9 +23,12 @@ async function editContactFromOTP(context) {
 
 async function checkPhoneValidation(context, phoneNumber, errMsg) {
   await context.page.type('#contact', phoneNumber);
-  await context.page.$eval('#contact', element => element.blur());
-  const validationErr = await context.page.$eval('.input-validation-error', element => element.textContent);
-  expect(validationErr).toBe(errMsg)
+  await context.page.$eval('#contact', (element) => element.blur());
+  const validationErr = await context.page.$eval(
+    '.input-validation-error',
+    (element) => element.textContent
+  );
+  expect(validationErr).toBe(errMsg);
 }
 
 module.exports = {

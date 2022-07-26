@@ -139,4 +139,42 @@ describe(' Session/ helper / #handleErrorModal function tests', () => {
     expect(sessionMock.hideErrorMessage as jest.Mock).not.toBeCalled();
     expect(sessionMock.showLoadError).not.toBeCalled();
   });
+
+  it('when in Home screen and payment attempt is from QR-V2 and the payment is manually cancelled, then DO NOT show error modal', () => {
+    (upiUxV1dot1.enabled as jest.Mock).mockReturnValue(false);
+    setLatestPayment({
+      params: {
+        additionalInfo: {
+          referrer: 'QR_V2',
+        },
+      } as any,
+      status: 'error',
+      errorReason: 'automatic',
+    });
+
+    handleErrorModal.call(sessionMock as unknown as Session, testErrorMessage);
+    expect(sessionMock.showLoadError).toBeCalled();
+  });
+
+  it('when NOT in Home screen, (and in UPI screen) and payment attempt is from QR-V2 and the payment is NOT manually cancelled, then DO show error modal', () => {
+    (upiUxV1dot1.enabled as jest.Mock).mockReturnValue(true);
+    setLatestPayment({
+      params: {
+        additionalInfo: {
+          referrer: 'QR_V2',
+        },
+      } as any,
+      status: 'error',
+      errorReason: 'automatic',
+    });
+
+    handleErrorModal.call(
+      { ...sessionMock, tab: 'upi' } as unknown as Session,
+      testErrorMessage
+    );
+    expect(resetSelectedUPIAppForPay as jest.Mock).not.toBeCalled();
+    expect(sessionMock.switchTab as jest.Mock).not.toBeCalled();
+    expect(sessionMock.hideErrorMessage as jest.Mock).not.toBeCalled();
+    expect(sessionMock.showLoadError).toBeCalled();
+  });
 });

@@ -9,7 +9,7 @@
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { Events, DowntimeEvents, MetaProperties } from 'analytics/index';
-
+  import { sanitizeHTML } from 'utils/security';
   // helper imports
   import { isOneClickCheckout } from 'razorpay';
 
@@ -17,17 +17,21 @@
   export let severe;
   export let showIcon = false;
   export let downtimeInstrument;
+  export let avoidTrackers = false;
+  export let customMessage = undefined;
 
   onMount(() => {
-    Events.setMeta(MetaProperties.DOWNTIME_CALLOUTSHOWN, true);
-    Events.TrackRender(DowntimeEvents.CALLOUT_SHOW, {
-      instrument: downtimeInstrument,
-      downtimeSeverity: severe,
-      downtimeMethod: $selectedInstrument?.method,
-    });
+    if (!avoidTrackers) {
+      Events.setMeta(MetaProperties.DOWNTIME_CALLOUTSHOWN, true);
+      Events.TrackRender(DowntimeEvents.CALLOUT_SHOW, {
+        instrument: downtimeInstrument,
+        downtimeSeverity: severe,
+        downtimeMethod: $selectedInstrument?.method,
+      });
 
-    if ($selectedInstrument?.method === 'netbanking') {
-      downtimeInstrument = getLongBankName(downtimeInstrument, $locale);
+      if ($selectedInstrument?.method === 'netbanking') {
+        downtimeInstrument = getLongBankName(downtimeInstrument, $locale);
+      }
     }
   });
 </script>
@@ -42,7 +46,9 @@
     </div>
   {/if}
   <div>
-    {#if $selectedInstrument?.method === 'card'}
+    {#if customMessage}
+      {@html sanitizeHTML(customMessage)}
+    {:else if $selectedInstrument?.method === 'card'}
       <FormattedText
         text={formatTemplateWithLocale(
           DOWNTIME_CALLOUT_CARDS,

@@ -702,9 +702,8 @@
       (currentView === Views.AVS && lastView === Views.ADD_CARD)
     ) {
       return getAddCardPayload();
-    } else {
-      return getSavedCardPayload();
     }
+    return getSavedCardPayload();
   }
 
   function getAppPayload() {
@@ -986,7 +985,6 @@
     Events.TrackBehav(eventName, eventData);
   }
 
-
   export function onShown() {
     //#region cards-tokenization
     /**
@@ -1050,10 +1048,7 @@
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div
-      bind:this={cardEle}
-      class:screen-one-cc={isOneCCEnabled}
-    >
+    <div bind:this={cardEle} class:screen-one-cc={isOneCCEnabled}>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta && !delayOTPExperiment}

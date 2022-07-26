@@ -207,7 +207,6 @@
         });
       })
       .catch((err) => {
-        console.log(err);
         Analytics.track(BANK_TRANSFER_PDF_INIT_FAILURE, {
           data: {
             error: err,
@@ -231,7 +230,7 @@
 </script>
 
 <Tab method="bank_transfer" shown={true} pad={!isOneCCEnabled}>
-  <div class="bank_transfer-container" class:one-cc={isOneCCEnabled} >
+  <div class="bank_transfer-container" class:one-cc={isOneCCEnabled}>
     {#if loading}
       <!-- LABEL: Getting bank details... -->
       <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>

@@ -23,11 +23,11 @@ const DOWNTIME_METHOD_COPY_MAP = {
 
 /**
  * Copy downtimes between methods if needed.
- * @param {Object} downtimes
+ * @param { Object<string, Array<Downtime.RawDowntime>>}  downtimes
  *
- * @return {Object}
+ * @return { Object<string, Array<Downtime.RawDowntime>>}
  */
-function copyMethodsIfNeeded(downtimes) {
+export function copyMethodsIfNeeded(downtimes) {
   _Obj.loop(DOWNTIME_METHOD_COPY_MAP, (target, dest) => {
     if (downtimes[target]) {
       downtimes[dest] = downtimes[target];
@@ -40,15 +40,15 @@ function copyMethodsIfNeeded(downtimes) {
 /**
  * Takes a list of downtimes
  * and groups them by the method.
- * @param {Array<Object>} allDowntimes
+ * @param {Array<Downtime.RawDowntime>} allDowntimes
  *
- * @returns {Object<method, Array>} downtimes
+ * @returns {Object<string, Array<Downtime.RawDowntime>>} downtimes
  */
-function groupDowntimesByMethod(allDowntimes) {
+export function groupDowntimesByMethod(allDowntimes) {
   const downtimes = {};
 
   allDowntimes.forEach((downtime) => {
-    const { method } = downtime;
+    const { method } = downtime || {};
 
     if (!hasProp(downtimes, method)) {
       downtimes[method] = [];

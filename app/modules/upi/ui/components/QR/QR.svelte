@@ -8,10 +8,20 @@
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';
   import { clearActiveQRPayment, getQRImage } from 'upi/helper';
-  import { startTimer, readableTimeLeft, clearTimer } from './timer';
+  import {
+    startTimer,
+    readableTimeLeft,
+    clearTimer,
+    isCheckoutTimerBeyondCurrentTimer,
+    getRelativeGracefulTime,
+  } from './timer';
   import { qrState, resetQRState, updateQrState } from './store';
   import { handleUPIPayments } from 'upi/payment';
-  import { QR_EXPIRE_TIME, QR_OFF_SCREEN_POLL_DELAY_BY } from 'upi/constants';
+  import {
+    QR_EXPIRE_TIME,
+    QR_GRACEFUL_CANCEL_TIME,
+    QR_OFF_SCREEN_POLL_DELAY_BY,
+  } from 'upi/constants';
   import fetch from 'utils/fetch';
 
   // Analytics
@@ -27,9 +37,13 @@
     REFRESH_QR,
     QR_EXPIRED,
     QR_SCAN_ON_PHONE,
+    SHOW_QR,
+    TIMER_CALLOUT_QR_LINE0,
   } from 'upi/i18n/labels';
-  import { trackQRStatus, trackRefreshQR } from 'upi/events';
+  import { renderQRSection, trackQRStatus, trackQRGenerate } from 'upi/events';
   import { returnAsIs } from 'lib/utils';
+
+  export let parent: UPI.QRParent;
 
   const onResponse: UPI.PaymentResponseHandler = (status, response) => {
     // clear the old timer;
@@ -45,6 +59,7 @@
         resetQRState();
         Analytics.track(UPI_EVENTS.QR_GENERATION_FAIL, {
           reason: response.error.description,
+          parent,
         });
         break;
     }
@@ -52,41 +67,53 @@
   const createQRPayment = (manualRefresh = true) => {
     updateQrState({ status: 'loading', manualRefresh });
     if (manualRefresh) {
-      trackRefreshQR();
+      trackQRGenerate(parent);
     }
-    trackQRStatus('paymentInitiation');
+    trackQRStatus('paymentInitiation', parent);
     handleUPIPayments(
       {
         action: 'none',
         qrFlow: {
           onPaymentCreate: (data) => {
-            updateQrState({
-              url: data.qr_code_url || data.intent_url,
-            });
-            trackQRStatus('paymentResponse');
-            startTimer(
-              QR_EXPIRE_TIME,
+            trackQRStatus('paymentResponse', parent);
+            const timerExpiresAt = startTimer(
+              getRelativeGracefulTime(QR_EXPIRE_TIME, QR_GRACEFUL_CANCEL_TIME),
               () => {
                 clearActiveQRPayment(true);
-                trackQRStatus('qrExpired');
-              },
-              true
+                trackQRStatus('qrExpired', parent);
+              }
             );
+            updateQrState({
+              url: data.qr_code_url || data.intent_url,
+              renderTimer: isCheckoutTimerBeyondCurrentTimer(
+                timerExpiresAt + QR_GRACEFUL_CANCEL_TIME
+              ),
+            });
           },
         },
       },
       onResponse,
       {
         cancel: false,
-        error: false,
+        error: true,
       }
     );
   };
 
   onMount(() => {
-    if ($qrState.autoGenerate && !$qrState.url) {
-      createQRPayment(false);
-    } else if ($qrState.url) {
+    renderQRSection(parent);
+    /**
+     * Intended Comment
+     * The following logic is to auto generate QR on first time of component loading
+     * Due to various reasons of Payment DB and SR/CR issues we are temporarily
+     * disabling this feature and making a CTA SHOW QR on image
+     * When qrState.state is refresh and qrState.autoGenerate:true, we are showing SHOW QR CTA
+     *
+     */
+    // if ($qrState.autoGenerate && !$qrState.url) {
+    //   createQRPayment(false);
+    // } else
+    if ($qrState.url) {
       fetch.resumePoll();
     }
   });
@@ -106,7 +133,7 @@
     }
 
     updateQrState({ status: 'qr' });
-    trackQRStatus('qrLoaded');
+    trackQRStatus('qrLoaded', parent);
   }
 </script>
 
@@ -115,7 +142,7 @@
     <img
       data-testid="qrv2-img"
       alt="QRV2"
-      src={getQRImage($qrState.url)}
+      src={getQRImage(String($qrState.url))}
       on:load={qrImageLoaded}
       class:blur={$qrState.status !== 'qr'}
     />
@@ -137,7 +164,8 @@
           class="btn"
           on:click={() => createQRPayment()}
         >
-          {$t(REFRESH_QR)}
+          <!-- Instead of creating a new QR state, we will reuse the refresh state with autoGenerate to detect the show QR need -->
+          {$t($qrState.autoGenerate ? SHOW_QR : REFRESH_QR)}
         </div>
       {/if}
     </div>
@@ -157,9 +185,11 @@
     </div>
 
     <div id="callout-text">
-      {#if $qrState.status === 'refresh'}
+      {#if $qrState.status === 'refresh' && !$qrState.autoGenerate}
         {$t(QR_EXPIRED)}
-      {:else if $qrState.url}
+      {:else if $qrState.renderTimer && $qrState.url}
+        <!-- label: QR Code is valid for  -->
+        <div>{$t(TIMER_CALLOUT_QR_LINE0)}</div>
         <FormattedText
           text={formatTemplateWithLocale(
             TIMER_CALLOUT_QR,
@@ -175,9 +205,10 @@
 <style>
   .qrv2 {
     display: flex;
-    margin: 20px;
+    margin: 10px;
     justify-content: space-between;
   }
+
   .qr-content {
     margin: 10px 0px 10px 20px;
     text-align: left;
@@ -188,28 +219,29 @@
     justify-content: center;
   }
   .psp-logos {
-    width: 100%;
+    width: 110px;
     padding: 10px 0px 16px 0px;
     display: flex;
     justify-content: space-between;
   }
   .psp-logos > img {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
   #callout-text {
     color: #757575;
   }
   .blur {
-    filter: blur(4px);
+    filter: blur(1px);
+    opacity: 0.5;
   }
 
   .qr-image {
     position: relative;
     overflow: hidden;
-    width: 160px;
-    height: 160px;
-    flex: 0 0 160px;
+    width: 140px;
+    height: 140px;
+    flex: 0 0 140px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -228,6 +260,7 @@
     border-style: solid;
     content: '';
   }
+
   /**
   .qr-image:after creates transparent rohmbus and create cutting-highliting borders for QR image 
   */
@@ -243,7 +276,7 @@
   }
   .qr-image img {
     z-index: 1;
-    width: 150px;
+    width: 136px;
   }
 
   .img-btn {
@@ -253,7 +286,10 @@
   }
   .btn {
     border-radius: 100px;
-    padding: 0px 12px;
+    padding: 0 16px;
+    font-size: 14px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
+    text-transform: initial;
   }
 
   .btn[data-content='loading'] {

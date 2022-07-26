@@ -5,6 +5,7 @@ import { QR_IMAGE_DEFAULT_SIZE } from 'upi/constants';
 import { clearPaymentRequest } from 'upi/payment';
 import { qrState, resetQRState } from 'upi/ui/components/QR/store';
 import { PAYMENT_CANCEL_REASONS } from 'common/constants';
+import { appliedOffer } from 'offers/store';
 
 /**
  * Why this method?
@@ -17,10 +18,13 @@ import { PAYMENT_CANCEL_REASONS } from 'common/constants';
  */
 function getQRPaymentTestUrlForImage() {
   return getPreparedUrl('upi://pay', {
-    pa: 'upi@razopay',
+    pa: 'razorpay.pg@hdfcbank',
     pn: 'Razorpay',
     tr: 'M10rKVfkNww2eBE',
-    am: '1.02',
+    am: (
+      parseInt(getOption('amount') || getPreferences('order.amount') || 10000) /
+      100
+    ).toString(),
     cu: 'INR',
     mc: '5411',
     tn: `${getPreferences('merchant_name', '')}${
@@ -55,7 +59,7 @@ export function getQRImage(url?: string, imageSize?: number) {
   return getPreparedUrl('https://chart.googleapis.com/chart', searchParams);
 }
 
-function isQRPaymentActive() {
+export function isQRPaymentActive() {
   return Boolean(get(qrState).url);
 }
 enum QRPaymentCancelStatus {
@@ -67,14 +71,15 @@ enum QRPaymentCancelStatus {
 
 export function isQRPaymentCancellable(
   metaProps: { '_[reason]'?: string },
-  autoCancelIfAny?: boolean
+  autoCancelIfAny?: boolean,
+  cancelSilent?: boolean
 ) {
   const activeQRPayment = isQRPaymentActive();
   if (!activeQRPayment) {
     return QRPaymentCancelStatus.NO_ACTIVE_PAYMENT;
   }
   if (activeQRPayment && autoCancelIfAny) {
-    clearActiveQRPayment();
+    clearActiveQRPayment(false, cancelSilent);
     return QRPaymentCancelStatus.ACTIVE_BUT_AUTO_CANCELLED;
   }
   if (
@@ -91,7 +96,7 @@ export function isQRPaymentCancellable(
   return QRPaymentCancelStatus.ACTIVE_BUT_FAILED_TO_CANCEL;
 }
 
-export function clearActiveQRPayment(expired?: boolean) {
+export function clearActiveQRPayment(expired = false, silent = false) {
   if (!isQRPaymentActive()) {
     return;
   }
@@ -106,5 +111,14 @@ export function clearActiveQRPayment(expired?: boolean) {
       : PAYMENT_CANCEL_REASONS.UNINTENDED_OPT_OUT;
   }
   resetQRState();
-  clearPaymentRequest(reason);
+  clearPaymentRequest(reason, silent);
 }
+
+appliedOffer.subscribe((offer) => {
+  // clear QR payment after offer apply or removed
+  setTimeout(() => {
+    if (!offer || (offer && offer.payment_method === 'upi')) {
+      isQRPaymentCancellable({}, true, true);
+    }
+  });
+});

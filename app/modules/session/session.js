@@ -22,8 +22,9 @@ import { handleErrorModal } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
+import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
+import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
-import { avoidSessionSubmit, isQRPaymentCancellable } from 'upi/helper';
 import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import { injectSentry } from 'sentry';
@@ -1759,7 +1760,10 @@ Session.prototype = {
         // returning from this point prevents confirmClose from being called because it's not needed
         return;
       }
-
+      // don't show confirm on click of backdrop for QR payment(L0/L1)
+      if (this.r._payment?.data?.['_[upiqr]'] === '1') {
+        return;
+      }
       Confirm.confirmClose().then((close) => {
         if (close) {
           if (self.payload && self.payload.method === 'netbanking') {
@@ -2018,6 +2022,7 @@ Session.prototype = {
   },
 
   setAmount: function (amount) {
+    const previousAmount = this.get().amount;
     this.get().amount = amount;
 
     let offer = this.getAppliedOffer();
@@ -2028,6 +2033,16 @@ Session.prototype = {
       } else {
         this.updateAmountInHeaderForOffer(offer.amount);
       }
+    }
+    if (previousAmount !== amount) {
+      /**
+       * In case of partial payments, the user opts for
+       *  change of amount or
+       *  change of partial/full
+       * init happens again, we need to cancel previous QR payment with proper reason.
+       */
+      isQRPaymentCancellable({}, true, true);
+      initUpiQrV2();
     }
   },
 
@@ -2822,7 +2837,6 @@ Session.prototype = {
     if (tab === '') {
       this.homeTab.onShown();
     }
-
     if (tab) {
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
@@ -2962,7 +2976,12 @@ Session.prototype = {
       maxlength: 6,
     });
 
-    if (!(this.tab === 'emi' && Object.keys(storeGetter(EmiStore.emiDurations)).length)) {
+    if (
+      !(
+        this.tab === 'emi' &&
+        Object.keys(storeGetter(EmiStore.emiDurations)).length
+      )
+    ) {
       this.svelteCardTab.onShown();
     }
 
@@ -4478,7 +4497,7 @@ Session.prototype = {
       .then(function () {
         $('#overlay-close').show();
         setTimeout(function () {
-        hideOverlay($('#error-message'));
+          hideOverlay($('#error-message'));
           self.submit({
             vpaVerified: true,
           });

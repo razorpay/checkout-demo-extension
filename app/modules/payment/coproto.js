@@ -112,7 +112,7 @@ export const processCoproto = function (response) {
   }
 };
 
-var responseTypes = {
+const responseTypes = {
   // this === payment
 
   cardless_emi: function (request, fullResponse) {

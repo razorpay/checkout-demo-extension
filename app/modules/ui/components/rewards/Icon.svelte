@@ -17,6 +17,8 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { get } from 'svelte/store';
+  import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
 
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
@@ -27,21 +29,23 @@
     Analytics.track('rewards:icon:show', {
       type: AnalyticsTypes.RENDER,
     });
-    setTimeout(() => {
-      const targetEl = document.getElementById('rewards-cta');
-      if (targetEl) {
-        snackBar = new Snackbar({
-          target: targetEl,
-          props: {
-            align: 'bottom',
-            parentElem: 'rewards-cta',
-            shown,
-            timer: 5000,
-            text: $t(REWARDS_TOOLTIP_TEXT),
-          },
-        });
-      }
-    }, 1000);
+    if (!get(qrRenderState).homeScreenQR) {
+      setTimeout(() => {
+        const targetEl = document.getElementById('rewards-cta');
+        if (targetEl) {
+          snackBar = new Snackbar({
+            target: targetEl,
+            props: {
+              align: 'bottom',
+              parentElem: 'rewards-cta',
+              shown,
+              timer: 5000,
+              text: $t(REWARDS_TOOLTIP_TEXT),
+            },
+          });
+        }
+      }, 1000);
+    }
   });
 
   function showRewards() {

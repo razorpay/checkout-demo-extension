@@ -622,7 +622,7 @@
     position: absolute;
     list-style: none;
     background: #fff;
-    z-index: 1;
+    z-index: 10;
     padding: 0;
     margin: 0;
 

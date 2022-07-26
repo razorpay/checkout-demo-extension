@@ -81,7 +81,6 @@ function makePreferences(overrides) {
     ...overrides,
     features: {
       save_vpa: true,
-      disable_l1_qr: true,
       ...(overrides && overrides.features ? overrides.features : {}),
     },
   };

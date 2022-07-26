@@ -202,6 +202,17 @@ module.exports = {
       }, sel)
     ).toBeGreaterThan(0);
   },
+  assertHidden: async (sel) => {
+    expect(
+      await page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (el) {
+          throw `Element ${sel} is present`;
+        }
+        return 0;
+      }, sel)
+    ).toBeFalsy();
+  },
 
   chrlow,
   chrup,
@@ -227,7 +238,7 @@ module.exports = {
   },
   /**
    * @param  {Page} puppeteer page to intercept requests on
-   * @param  {RegExp} optional url pattern to match interceptor against
+   * @param  {RegExp} [pattern] url pattern to match interceptor against
    * @param  {RegExp} [ignorePattern] url pattern to ignore interceptor against
    * @return {Object} containg operations to perform on intercepted request
    */
@@ -281,7 +292,9 @@ module.exports = {
         url.includes('locations/autosuggest') ||
         url.includes('fonts.googleapis.com') ||
         url.includes('i.imgur.com') ||
-        url.includes('dns.google');
+        url.includes('dns.google') ||
+        url.includes('chart.googleapis.com'); // QR img generation happens via google charts api, hence ignore as home-screen tests gets issue when L0 QR is being rendered with dummy image on load
+
       if (
         ignoredUrl ||
         (pattern && !pattern.test(url)) ||

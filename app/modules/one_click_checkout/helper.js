@@ -1,7 +1,11 @@
 import { getOption, getPreferences, isOneClickCheckout } from 'razorpay';
 import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 import Analytics from 'analytics';
-import { CONTACT_REGEX, INDIA_COUNTRY_CODE, INDIAN_CONTACT_REGEX } from 'common/constants';
+import {
+  CONTACT_REGEX,
+  INDIA_COUNTRY_CODE,
+  INDIAN_CONTACT_REGEX,
+} from 'common/constants';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
@@ -47,9 +51,8 @@ export const getScrollableParent = (node) => {
 
   if (isScrollable(node)) {
     return node;
-  } else {
-    return getScrollableParent(node.parentNode);
   }
+  return getScrollableParent(node.parentNode);
 };
 
 export function init1CCMetaData() {

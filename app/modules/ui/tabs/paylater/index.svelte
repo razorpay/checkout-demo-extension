@@ -51,7 +51,6 @@
     providers,
     $methodInstrument
   );
-
 </script>
 
 <Tab method="paylater" pad={false}>

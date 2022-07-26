@@ -86,7 +86,7 @@ RUN mv css/checkout.css.gz css/checkout.css
 RUN if [ -z "$TRAFFIC_ENV" ]; then \
     aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_BRANCH/v1 \
     --acl public-read \
-    --cache-control "max-age=2700, must-revalidate" \
+    --cache-control "max-age=10, must-revalidate" \
     --content-encoding gzip \
     --exclude "*" \
     --include "*.js" \
@@ -94,7 +94,7 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     # Commit based branch storage (CSS and JS files)
     aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_COMMIT/v1 \
     --acl public-read \
-    --cache-control "max-age=2700, must-revalidate" \
+    --cache-control "max-age=10, must-revalidate" \
     --content-encoding gzip \
     --exclude "*" \
     --include "*.js" \
@@ -102,14 +102,14 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     # Commit based branch storage (Including info.txt and commit.txt)
     aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_COMMIT/v1 \
     --acl public-read \
-    --cache-control "max-age=2700, must-revalidate" \
+    --cache-control "max-age=10, must-revalidate" \
     --content-type "text/plain; charset=utf-8" \
     --exclude "*" \
     --include "*.txt"; \
     else \
     aws s3 sync /app/dist/v1 s3://$AWS_S3_BUCKET_FOR_BUILD/$BUILD_PATH_FOR_BRANCH/$TRAFFIC_ENV/v1 \
     --acl public-read \
-    --cache-control "max-age=2700, must-revalidate" \
+    --cache-control "max-age=10, must-revalidate" \
     --content-encoding gzip \
     --exclude "*" \
     --include "*.js" \

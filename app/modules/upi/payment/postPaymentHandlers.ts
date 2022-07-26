@@ -129,9 +129,10 @@ function responseHandler(params: {
   };
 }
 
-function clearPaymentRequest(reason: string) {
+function clearPaymentRequest(reason: string, silent = false) {
   getSession().r.emit('payment.cancel', {
     '_[reason]': reason,
+    _silent: silent,
   });
 }
 export {

@@ -26,10 +26,9 @@ import getOwnPropertyDescriptor from './prototypes/getownpropertydescriptors';
           if (value) {
             el.prototype.setAttribute.call(this, 'disabled', '');
             return;
-          } else {
-            el.prototype.removeAttribute.call(this, 'disabled');
-            return;
           }
+          el.prototype.removeAttribute.call(this, 'disabled');
+          return;
         },
       });
     }

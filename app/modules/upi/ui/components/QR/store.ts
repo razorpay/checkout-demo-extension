@@ -23,6 +23,10 @@ interface QrStateType {
    * count at cancellation:>0 => User intentionally created payment but somehow cancel happened
    */
   manualRefresh?: boolean;
+  /**
+   * This is to define whether QR timer has to rendered or not
+   */
+  renderTimer?: boolean;
 }
 
 const initialState: QrStateType = {
@@ -35,7 +39,9 @@ const initialState: QrStateType = {
   url: '',
   autoGenerate: true,
   manualRefresh: false,
+  renderTimer: true,
 };
+
 export const qrState = writable<QrStateType>(initialState);
 
 export function updateQrState(data: Partial<QrStateType>) {

@@ -1143,7 +1143,7 @@ export default {
     payment_status_checking: 'Checking payment status...',
     retry: 'Retry',
     scan_on_phone:
-      'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
+      'Scan the QR code using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
     view_amount_details: 'View Details',
   },
   tab_titles: {

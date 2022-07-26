@@ -33,14 +33,21 @@ export const upiNrL0L1Improvements = createExperiment(
 const upiQrOnL1 = createExperiment('upi_qr_on_l1_percentage_5', 0.95);
 
 /**
+ * Experiment: UPI QR On L0 Feature
+ * Temporary 5% rollout, argument must be 1-0.05=>0.95
+ */
+const upiQrOnL0 = createExperiment('upi_qr_on_l0_percentage_5', 0.95);
+
+/**
  * Experiment: UPI UX v1.1
  * Temporary 10% rollout, argument must be 1-0.10=>0.90
  */
-const upiUxV1dot1 = createExperiment('upi_ux_v_1_dot_1_percentage_10', 0.90);
+const upiUxV1dot1 = createExperiment('upi_ux_v_1_dot_1_percentage_10', 0.9);
 
 export {
   highlightUPIIntentOnDesktop,
   oneClickUPIIntent,
   upiQrOnL1,
+  upiQrOnL0,
   upiUxV1dot1,
 };

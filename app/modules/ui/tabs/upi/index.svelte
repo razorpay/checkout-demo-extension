@@ -94,12 +94,12 @@
   import { getComponentProps } from 'utils/svelteUtils';
   import { getThemeMeta } from 'checkoutstore/theme';
 
-  import Qr from 'upi/ui/components/QR/QR.svelte';
-  import { enableUpiQrV2 } from 'upi/features';
+  import QRWrapper from 'upi/ui/components/QRWrapper/QRWrapper.svelte';
 
   // Constant imports
   import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
   import { filterTruthyKeys } from 'lib/utils';
+  import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
   import { filterUPIIntentAppsForAutopayIntent } from './helpers';
 
   // Props
@@ -369,7 +369,7 @@
       if (hasTokens) {
         selectedToken = null;
       } else {
-        if (!enableUpiQrV2()) {
+        if (!$qrRenderState.upiScreenQR) {
           selectedToken = 'new';
         }
       }
@@ -417,7 +417,10 @@
             /**
              * If QRV2 is present don't focus any other fields
              */
-            if (!enableUpiQrV2() && typeof vpaField.focus === 'function') {
+            if (
+              !$qrRenderState.upiScreenQR &&
+              typeof vpaField.focus === 'function'
+            ) {
               vpaField.focus();
             }
             vpaField.setSelectionRange(0, 0);
@@ -639,9 +642,8 @@
       if (selectedApp !== undefined) {
         selectedApp = undefined;
         return true;
-      } else {
-        return false;
       }
+      return false;
     }
 
     return false;
@@ -866,8 +868,8 @@
             />
           {/if}
 
-          {#if shouldShowQr && enableUpiQrV2()}
-            <Qr />
+          {#if shouldShowQr && $qrRenderState.upiScreenQRPosition === 'top' && $qrRenderState.upiScreenQR}
+            <QRWrapper parent="upiScreen" />
           {/if}
 
           {#if shouldShowCollect}
@@ -951,26 +953,30 @@
             />
           {/if}
 
-          {#if shouldShowQr && !enableUpiQrV2()}
-            <!-- LABEL: Pay using QR Code -->
-            <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
-            <div class="options" id="showQr">
-              <NextOption
-                icon={qrIcon}
-                tabindex="0"
-                attributes={{
-                  role: 'button',
-                  'aria-label':
-                    'Show QR Code - Scan the QR code using your UPI app',
-                }}
-                on:select={selectQrMethod}
-              >
-                <!-- LABEL: Show QR Code -->
-                <div>{$t(SHOW_QR_CODE)}</div>
-                <!-- LABEL: Scan the QR code using your UPI app -->
-                <div class="desc">{$t(SCAN_QR_CODE)}</div>
-              </NextOption>
-            </div>
+          {#if shouldShowQr}
+            {#if $qrRenderState.upiScreenQRPosition === 'bottom' && $qrRenderState.upiScreenQR}
+              <QRWrapper parent="upiScreen" />
+            {:else if !$qrRenderState.upiScreenQR}
+              <!-- LABEL: Pay using QR Code -->
+              <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
+              <div class="options" id="showQr">
+                <NextOption
+                  icon={qrIcon}
+                  tabindex="0"
+                  attributes={{
+                    role: 'button',
+                    'aria-label':
+                      'Show QR Code - Scan the QR code using your UPI app',
+                  }}
+                  on:select={selectQrMethod}
+                >
+                  <!-- LABEL: Show QR Code -->
+                  <div>{$t(SHOW_QR_CODE)}</div>
+                  <!-- LABEL: Scan the QR code using your UPI app -->
+                  <div class="desc">{$t(SCAN_QR_CODE)}</div>
+                </NextOption>
+              </div>
+            {/if}
           {/if}
         </div>
       {/if}

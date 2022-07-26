@@ -135,7 +135,6 @@
     }
     return code;
   }
-
 </script>
 
 <div

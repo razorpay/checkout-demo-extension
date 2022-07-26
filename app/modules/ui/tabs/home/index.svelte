@@ -12,6 +12,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
+  import { initUpiQrV2 } from 'upi/features';
   import {
     getAvailableMethods,
     getSectionsDisplayed,
@@ -664,6 +665,11 @@
     updateBlocks({
       showPreferredLoader: shouldUsePersonalization(),
     });
+
+    /**
+     * Partial Payments Related Handling will happen from session
+     */
+    initUpiQrV2();
   });
 
   // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
@@ -910,9 +916,8 @@
     if (singleMethod) {
       if (isRecurring()) {
         return DETAILS;
-      } else {
-        return METHODS;
       }
+      return METHODS;
     }
 
     /**
@@ -984,10 +989,9 @@
       if (isRecurring()) {
         selectMethod(singleMethod);
         return;
-      } else {
-        showMethods();
-        return;
       }
+      showMethods();
+      return;
     }
 
     showMethods();
@@ -1187,10 +1191,7 @@
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
   <Screen pad={false}>
-    <div
-      class="screen-main"
-      class:screen-one-cc={isOneCCEnabled}
-    >
+    <div class="screen-main" class:screen-one-cc={isOneCCEnabled}>
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}
@@ -1306,7 +1307,7 @@
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
-    margin-top: 28px;
+    margin-top: 16px;
   }
 
   .details-container {

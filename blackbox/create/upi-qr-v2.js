@@ -30,10 +30,14 @@ const {
   viewOffers,
   selectOffer,
   assertQRV2,
+  assertQRV2Hidden,
   goBackFromTopbar,
   cancelTransaction,
   retryTransaction,
   provideCancellationReason,
+  assertQrV2Timer,
+  assertQrV2TimerHidden,
+  assetQrV2DowntimeCallout,
 } = require('../actions/common');
 const {
   // Generic
@@ -51,9 +55,23 @@ const {
   // Personalization
   selectPersonalizationPaymentMethod,
   verifyPersonalizationText,
+  handlePartialPayment,
 } = require('../tests/homescreen/actions');
 const { delay } = require('../../mock-api/utils.js');
 
+const upiDowntime = {
+  id: 'down_DEW7D9S10PEsl1',
+  entity: 'payment.downtime',
+  method: 'upi',
+  begin: 1567686386,
+  end: null,
+  status: 'started',
+  scheduled: false,
+  severity: 'high',
+  instrument: {},
+  created_at: 1567686387,
+  updated_at: 1567686387,
+};
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'upi-qr',
@@ -70,17 +88,33 @@ module.exports = function (testFeatures) {
     // feeBearer,
     // dynamicFeeBearer,
     offers,
-    partialPayments,
-
+    partialPayment,
     silentFailure,
     persistent,
     intendedOptOut,
-    unintendedOptOut,
+    disable_homescreen_qr = false,
+    disable_upiscreen_qr = false,
+    disable_l0_experiment,
+    disable_l1_experiment,
+    upiMethodDown,
+    top3AppsDown,
+    crossBorderCheckout,
+    recurringCheckout,
+    feeBearerCheckout,
+    timeOut,
+    pspDowntimeCallout,
+    apiErrorCase,
+    homeScreenQr,
+    upiScreenQr,
   } = features;
   // const anyFeeBearer = feeBearer || dynamicFeeBearer;
-  describe.skip.each(
+  describe.each(
     getTestData(title, {
-      options,
+      options: {
+        ...options,
+        timeOut,
+        amount: upiScreenQr && !homeScreenQr ? 6000 : 1000,
+      },
       preferences,
     })
   )('UPI QR V2 tests', ({ preferences, title, options }) => {
@@ -91,15 +125,64 @@ module.exports = function (testFeatures) {
       //   }
       // }
       preferences.methods.upi = true;
+      qrFeatureFlags = {
+        disable_homescreen_qr,
+        disable_upiscreen_qr,
+      };
       if (preferences.features) {
-        preferences.features.disable_l1_qr = false;
+        preferences.features = { ...preferences.features, ...qrFeatureFlags };
       } else {
-        preferences.features = { disable_l1_qr: false };
+        preferences.features = qrFeatureFlags;
+      }
+      if (feeBearerCheckout) {
+        preferences.fee_bearer = true;
       }
       // if (dynamicFeeBearer) {
       //   preferences.fee_bearer = true;
       //   preferences.order = modifyPreferencesForDynamicFeeBearer();
       // }
+      if (upiMethodDown) {
+        preferences.payment_downtime = {
+          entity: 'collection',
+          count: 1,
+          items: [
+            ...((preferences.payment_downtime &&
+              preferences.payment_downtime.items) ||
+              []),
+            upiDowntime,
+          ],
+        };
+      }
+      if (top3AppsDown) {
+        preferences.payment_downtime = {
+          entity: 'collection',
+          count: 1,
+          items: [
+            ...((preferences.payment_downtime &&
+              preferences.payment_downtime.items) ||
+              []),
+            ...['google_pay', 'phonepe', 'paytm'].map((psp) => ({
+              ...upiDowntime,
+              instrument: { psp },
+            })),
+          ],
+        };
+      }
+      if (pspDowntimeCallout) {
+        preferences.payment_downtime = {
+          entity: 'collection',
+          count: 1,
+          items: [
+            ...((preferences.payment_downtime &&
+              preferences.payment_downtime.items) ||
+              []),
+            {
+              ...upiDowntime,
+              instrument: { psp: 'paytm' },
+            },
+          ],
+        };
+      }
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -113,7 +196,7 @@ module.exports = function (testFeatures) {
 
       const missingUserDetails = optionalContact && optionalEmail;
 
-      const isHomeScreenSkipped = missingUserDetails && !partialPayments; // and not TPV
+      const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
 
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
@@ -123,7 +206,7 @@ module.exports = function (testFeatures) {
         await fillUserDetails(context, '8888888881');
       }
 
-      if (partialPayments) {
+      if (partialPayment) {
         await handlePartialPayment(context, '100');
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
@@ -142,8 +225,40 @@ module.exports = function (testFeatures) {
       //   await verifyPersonalizationText(context, 'qr');
       //   await selectPersonalizationPaymentMethod(context, '1');
       // } else {
-      await selectPaymentMethod(context, 'upi');
-      await assertQRV2(context);
+      if (homeScreenQr) {
+        if (
+          disable_homescreen_qr ||
+          upiMethodDown ||
+          top3AppsDown ||
+          (options.amount > 5000 * 100 && !upiScreenQr && homeScreenQr) ||
+          feeBearerCheckout
+        ) {
+          await assertQRV2Hidden(context, homeScreenQr);
+          return;
+        } else {
+          await assertQRV2(context, homeScreenQr);
+          if (pspDowntimeCallout) {
+            await assetQrV2DowntimeCallout(context);
+          }
+        }
+      }
+      if (upiScreenQr) {
+        await selectPaymentMethod(context, 'upi');
+        if (
+          disable_upiscreen_qr ||
+          upiMethodDown ||
+          top3AppsDown ||
+          feeBearerCheckout
+        ) {
+          await assertQRV2Hidden(context);
+          return;
+        } else {
+          await assertQRV2(context);
+          if (pspDowntimeCallout) {
+            await assetQrV2DowntimeCallout(context);
+          }
+        }
+      }
 
       // }
 
@@ -161,29 +276,46 @@ module.exports = function (testFeatures) {
       // }
 
       /**
+       * With a new change ot
+       * SHOW QR (Remove auto generate QR), QR will not be generated until unless user opts
+       * and every cancel reason is intended only
+       * P.S REFRESH QR and SHOW QR are same component but different Text Content
+       */
+      await clickOnRefreshButton(context);
+      /**
        * Chart API calls are ignored, hence don't try to resolve QR image calls
        * since we are not resolving QR image, the view will be with loading button only
        */
-      await respondToQRV2Ajax(context);
+      await respondQrV2APIAndAssertElements(context, timeOut);
 
       if (persistent) {
         /**
          * QR must be persistent and running as is
          */
-        await goBackFromTopbar(context);
-        await selectPaymentMethod(context, 'upi');
-        await assertQRV2(context);
+        if (upiScreenQr) {
+          await goBackFromTopbar(context);
+          await selectPaymentMethod(context, 'upi');
+          await assertQRV2(context);
+        }
+        if (homeScreenQr) {
+          await assertQRV2(context, homeScreenQr);
+          await selectPaymentMethod(context, 'upi');
+          await goBackFromTopbar(context);
+        }
+        /**
+         * If homescreen, the user
+         */
       }
-      if (unintendedOptOut || intendedOptOut) {
-        await attemptNewVPACollectPayment(
-          context,
-          'unintended_payment_opt_out'
-        );
+      if (intendedOptOut) {
+        if (homeScreenQr) {
+          await selectPaymentMethod(context, 'upi');
+        }
+        await attemptNewVPACollectPayment(context, 'intended_payment_opt_out');
         if (intendedOptOut) {
           await respondToQRV2PaymentStatus(context, null, 'created');
           await cancelPaymentFullyAttemptRetry(context);
           await clickOnRefreshButton(context);
-          await respondToQRV2Ajax(context);
+          await respondQrV2APIAndAssertElements(context, timeOut);
           await attemptNewVPACollectPayment(
             context,
             'intended_payment_opt_out'
@@ -191,11 +323,14 @@ module.exports = function (testFeatures) {
         }
         return;
       }
-      if (silentFailure) {
-        respondToQRV2PaymentStatus(context, null, 'error');
-        // assertRefreshButton(context);
+      if (silentFailure || apiErrorCase) {
+        await respondToQRV2PaymentStatus(context, null, 'error');
+        if (apiErrorCase) {
+          await retryTransaction(context);
+        }
+        assertRefreshButton(context);
       } else {
-        respondToQRV2PaymentStatus(context);
+        await respondToQRV2PaymentStatus(context);
       }
     });
   });
@@ -213,4 +348,14 @@ async function attemptNewVPACollectPayment(context, expectedCancelReason) {
   await respondToCancellationRequest(context, expectedCancelReason);
   await handleUPIAccountValidation(context, 'BHIM@upi');
   await handleSaveVpaRequest(context);
+}
+
+async function respondQrV2APIAndAssertElements(context, timeOut) {
+  await respondToQRV2Ajax(context);
+
+  if (timeOut && timeOut < 11 * 60 + 55) {
+    await assertQrV2TimerHidden(context);
+  } else {
+    await assertQrV2Timer(context);
+  }
 }

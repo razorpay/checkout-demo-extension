@@ -207,9 +207,8 @@
       return !PHONE_REGEX_INDIA.test($phone)
         ? $t(INDIA_CONTACT_ERROR_LABEL)
         : null;
-    } else {
-      return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
     }
+    return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
 </script>
 

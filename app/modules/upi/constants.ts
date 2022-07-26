@@ -19,6 +19,41 @@ export const PAYTM_PACKAGE_NAME = 'net.one97.paytm';
 // TODO: get this fixed
 export const CRED_PACKAGE_NAME = 'cred';
 
+export const googlePayUpiConfig: UPI.AppConfiguration = {
+  app_name: 'Google Pay',
+  package_name: GOOGLE_PAY_PACKAGE_NAME,
+  app_icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+  handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+  /**
+   * Call CheckoutBridge to verify that the user is registered on the app
+   * and only display if they are.
+   */
+  verify_registration: true,
+  shortcode: 'google_pay',
+};
+export const phonepeUpiConfig: UPI.AppConfiguration = {
+  package_name: 'com.phonepe.app',
+  app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
+  shortcode: 'phonepe',
+  app_name: 'PhonePe',
+  handles: ['ybl'],
+};
+export const paytmUpiConfig: UPI.AppConfiguration = {
+  name: 'PayTM',
+  app_name: 'PayTM UPI',
+  package_name: 'net.one97.paytm',
+  shortcode: 'paytm',
+  app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
+  handles: ['paytm'],
+};
+const bhimUpiConfig: UPI.AppConfiguration = {
+  package_name: 'in.org.npci.upiapp',
+  shortcode: 'bhim',
+  app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
+  app_name: 'Bhim',
+  handles: ['upi'],
+};
+
 export const UPI_APPS: {
   preferred: Array<UPI.AppConfiguration>;
   whitelist: Array<Partial<UPI.AppConfiguration>>;
@@ -29,40 +64,10 @@ export const UPI_APPS: {
    * There are apps that were built for UPI.
    */
   preferred: [
-    {
-      app_name: 'Google Pay',
-      package_name: GOOGLE_PAY_PACKAGE_NAME,
-      app_icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-      handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-      /**
-       * Call CheckoutBridge to verify that the user is registered on the app
-       * and only display if they are.
-       */
-      verify_registration: true,
-      shortcode: 'google_pay',
-    },
-    {
-      package_name: 'com.phonepe.app',
-      app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
-      shortcode: 'phonepe',
-      app_name: 'PhonePe',
-      handles: ['ybl'],
-    },
-    {
-      name: 'PayTM',
-      app_name: 'PayTM UPI',
-      package_name: 'net.one97.paytm',
-      shortcode: 'paytm',
-      app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
-      handles: ['paytm'],
-    },
-    {
-      package_name: 'in.org.npci.upiapp',
-      shortcode: 'bhim',
-      app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
-      app_name: 'Bhim',
-      handles: ['upi'],
-    },
+    googlePayUpiConfig,
+    phonepeUpiConfig,
+    paytmUpiConfig,
+    bhimUpiConfig,
   ],
 
   /**
@@ -394,9 +399,13 @@ export const UPI_TAB_CALLBACK_NAME = 'fromPopup';
  * Confirmed from Product as well
  * after the timer expiry we cannot mark the payment with cancel reason
  */
-export const QR_EXPIRE_TIME = (12 * 60 - 5) * 1000;
+export const QR_GRACEFUL_CANCEL_TIME = 5 * 1000;
+export const QR_EXPIRE_TIME = 12 * 60 * 1000;
 export const QR_OFF_SCREEN_POLL_DELAY_BY = 3;
-export const QR_IMAGE_DEFAULT_SIZE = 165;
-
+export const QR_IMAGE_DEFAULT_SIZE = 141;
+/***
+ * Currently Rs.2000
+ */
+export const QR_HOMESCREEN_AMOUNT_LIMIT = 2000 * 100;
 // Recurring: App supporting autopay intent registration
 export const APPS_SUPPORTING_AUTOPAY_INTENT = [BHIM_UPI_PACKAGE_NAME];

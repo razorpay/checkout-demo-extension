@@ -37,6 +37,7 @@
   } from 'ui/labels/qr';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
+  import { isQRPaymentActive, isQRPaymentCancellable } from 'upi/helper';
 
   // Props
   export let view = 'qr';
@@ -115,7 +116,18 @@
   function createPayment() {
     view = 'qr';
     loading = true;
-
+    /**
+     * L0 QR is active then we need to cancel
+     * as L2 & L0 QR logic are different.
+     */
+    if (isQRPaymentActive()) {
+      isQRPaymentCancellable({}, true, true);
+      // on cancel create QR payment for L2 again
+      session.r.once('payment.silent_error', () => {
+        setTimeout(createPayment);
+      });
+      return;
+    }
     session.preferredInstrument = processInstrument(paymentData);
     const offer = session.getAppliedOffer();
     // UPI offer applicable to QR also

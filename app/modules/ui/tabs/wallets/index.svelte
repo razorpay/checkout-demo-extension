@@ -183,14 +183,10 @@
   onDestroy(() => {
     renderCtaOneCC = false;
   });
-
 </script>
 
 <Tab method="wallet" pad={false}>
-  <div
-    class="wallet-wrapper"
-    class:wallet-one-cc={isOneCCEnabled}
-  >
+  <div class="wallet-wrapper" class:wallet-one-cc={isOneCCEnabled}>
     <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
       {#each filteredWallets as wallet, i (wallet.code)}
         <SlottedRadioOption

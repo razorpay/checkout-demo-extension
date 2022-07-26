@@ -141,9 +141,8 @@
   function validateContact(country, phone) {
     if (country === INDIA_COUNTRY_CODE) {
       return !INDIAN_CONTACT_REGEX.test(phone) ? getIndErrLabel(phone) : null;
-    } else {
-      return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
     }
+    return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
 
   $: validationText = validateContact(country, phone);

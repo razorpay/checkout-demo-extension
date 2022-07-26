@@ -177,7 +177,6 @@
   }
 
   $: ctaOneCCHidden = expanded === -1;
-
 </script>
 
 <div
