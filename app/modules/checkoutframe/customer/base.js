@@ -38,9 +38,8 @@ export const getCustomer = (contact, savedCustomer, skipStatusCall = false) => {
   if (!(contact in customers)) {
     if (indianContact) {
       return getCustomer('+91' + contact, savedCustomer);
-    } else {
-      customers[contact] = new Customer(contact, savedCustomer, skipStatusCall);
     }
+    customers[contact] = new Customer(contact, savedCustomer, skipStatusCall);
   }
   return customers[contact];
 };
@@ -95,9 +94,8 @@ export const sanitizeTokens = (tokens) => {
             return recurringDebitCardIssuers.includes(card.issuer);
           } else if (cardType === 'prepaid') {
             return recurringPrepaidCardNetworks.includes(card.network);
-          } else {
-            return false;
           }
+          return false;
         }
       }
 
@@ -125,7 +123,7 @@ Customer.prototype = {
 
     this.tokens = data.tokens;
 
-    if (!session.local) {
+    if (!session.local && session.isOpen) {
       session.topBar.setLogged(true);
     }
 

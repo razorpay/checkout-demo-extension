@@ -2800,6 +2800,10 @@ Session.prototype = {
      * Validate fields on common screen.
      */
     /** it will be override everytime switch tab uses */
+
+    if (!this.isOpen) {
+      return;
+    }
     this.switchTabPayload = payload;
     this.tabsCount++;
     if (this.tabsCount > 5) {
@@ -3840,13 +3844,16 @@ Session.prototype = {
               OtpService.resetCount('razorpay');
 
               self.updateCustomerInStore();
-              self.svelteCardTab.showLandingView().then(function () {
-                self.showCardTab();
-                /**
-                 * In case p13n from storage we store token_id if we after otp verify select other card in presubmit it pick storage card data
-                 */
-                HomeScreenStore.selectedInstrumentId.set(null);
-              });
+
+              if (this.isOpen) {
+                self.svelteCardTab?.showLandingView().then(function () {
+                  self.showCardTab();
+                  /**
+                   * In case p13n from storage we store token_id if we after otp verify select other card in presubmit it pick storage card data
+                   */
+                  HomeScreenStore.selectedInstrumentId.set(null);
+                });
+              }
             } else {
               Analytics.track('behav:otp:incorrect', {
                 wallet: isWallet,
