@@ -28,6 +28,7 @@ import { deletePrefsCache } from 'common/Razorpay';
 import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import { injectSentry } from 'sentry';
+import { validateAndFetchPrefilledWallet } from 'wallet/helper';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -824,7 +825,7 @@ Session.prototype = {
       this.switchTab(tab);
     }
 
-    let prefilledWallet = this.get('prefill.wallet');
+    let prefilledWallet = validateAndFetchPrefilledWallet();
     if (prefilledWallet) {
       let selectedWalletEl = $('#wallet-radio-' + prefilledWallet);
 
