@@ -96,6 +96,14 @@ export const notifyBridge = (message) => {
       data = _Obj.stringify(data);
     }
 
-    method.call(CheckoutBridge, data);
+    try {
+      method.call(CheckoutBridge, data);
+    } catch (e) {
+      // for legacy sdk versions  <= 1.5.5, bridge  method might not expect any argument
+      // which causes Method Not Found error, retry without argument
+      if (e.message === 'Method not found') {
+        method.call(CheckoutBridge);
+      }
+    }
   }
 };
