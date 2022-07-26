@@ -484,7 +484,11 @@ Payment.prototype = {
     }
 
     if (typeof data !== 'object') {
-      data = JSON.parse(data);
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        return;
+      }
     }
 
     if (data._time) {
