@@ -686,11 +686,19 @@ Payment.prototype = {
      * which is only application on create/checkout ( response can be HTML )
      * Hence avoid ajax route for such calls
      * razorpayjs + (card |emi ) + (save:1 | token )
+     *
+     * recurring: Due to recent contract update, recurring is not expecting save=1 from merchant
+     * recurring || subscription_id are being considered as consent to save card
+     * Hence all recurring payments with card/emi on custom needs to be redirected to create/checkout route
      */
+
     if (
       Track.props.library === 'razorpayjs' &&
       ['card', 'emi'].includes(data.method) &&
-      (Number(data.save) === 1 || data.token)
+      (Number(data.save) === 1 ||
+        data.token ||
+        data.recurring ||
+        data.subscription_id)
     ) {
       return;
     }
