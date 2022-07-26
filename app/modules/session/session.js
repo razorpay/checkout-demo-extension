@@ -4070,6 +4070,9 @@ Session.prototype = {
       if (this.checkCommonValidAndTrackIfInvalid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
+          Analytics.track('contact_details:cta_click', {
+            type: AnalyticsTypes.BEHAV,
+          });
           if (this.homeTab.shouldGoNext()) {
             this.homeTab.next();
             return discreet.CRED.checkCREDEligibilityForUpdatedContact();

@@ -13,6 +13,7 @@ const homeScreen = {
   P13N_EXPERIMENT: 'p13n:experiment',
   LANDING: 'landing',
   PROCEED: 'proceed',
+  CONTACT_SCREEN_LOAD: 'complete:contact_details',
 };
 
 // All card related events

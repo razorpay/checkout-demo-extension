@@ -39,6 +39,7 @@
     getMerchantOrder,
     isContactEmailOptional,
     isContactOptional,
+    isEmailOptional,
     isOneClickCheckout,
   } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
@@ -49,7 +50,7 @@
   import { screensHistory } from 'one_click_checkout/routing/History';
 
   // analytics imports
-  import Analytics, { Events } from 'analytics';
+  import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import ContactDetailsEvents from 'one_click_checkout/contact_widget/analytics';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
@@ -169,7 +170,14 @@
       Events.TrackRender(ContactDetailsEvents.CONTACT_SCREEN_LOAD, {
         previousScreen: screensHistory.previousRoute(),
       });
+    } else {
+      Events.TrackRender(HomeEvents.CONTACT_SCREEN_LOAD, {
+        previousScreen: screensHistory.previousRoute(),
+        isContactOptional: isContactOptional(),
+        isEmailOptional: isEmailOptional(),
+      });
     }
+
     if (isOneCCEnabled && isEditDetailScreen) {
       toggleHeader(false);
     }

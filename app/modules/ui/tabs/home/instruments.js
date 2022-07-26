@@ -6,6 +6,7 @@ import {
   hiddenMethods,
   hiddenInstruments,
 } from 'checkoutstore/screens/home';
+import { getSession } from 'sessionmanager';
 import { updateBlocksForExperiments } from './helpers';
 import { get as storeGetter } from 'svelte/store';
 import { getBlockConfig } from 'configurability';
@@ -327,7 +328,8 @@ export function setBlocks(
 
   const hasCustomConfig = parsedConfig._meta.hasCustomizations;
   Analytics.setMeta('config.custom', hasCustomConfig);
-
+  const session = getSession();
+  const onMethodScreen = session.homeTab?.onMethodsScreen();
   Analytics.track('config:blocks', {
     type: AnalyticsTypes.RENDER,
     data: {
@@ -335,6 +337,7 @@ export function setBlocks(
       merchant: merchantConfig,
       source: configSource,
       custom: hasCustomConfig,
+      onMethodScreen,
     },
   });
 

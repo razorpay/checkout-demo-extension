@@ -238,8 +238,6 @@
     view = HOME_VIEWS.METHODS;
 
     onShown();
-
-    Events.TrackBehav(HomeEvents.METHODS_SHOWN);
   }
 
   export function canGoBack() {
@@ -817,6 +815,12 @@
 
     deselectInstrument();
     if (view === HOME_VIEWS.METHODS) {
+      const sections = getSectionsDisplayed($blocks);
+      Events.TrackBehav(HomeEvents.METHODS_SHOWN, {
+        is_P13n_shown: sections.includes('p13n'),
+        is_Custom_shown: sections.includes('custom'),
+        is_Generic_shown: sections.includes('generic'),
+      });
       hideCta();
     } else {
       setDetailsCta();
