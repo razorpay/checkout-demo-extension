@@ -6,3 +6,4 @@ app/modules/**/__tests__/*.*
 app/modules/tests/**/*.*
 .eslintrc.js
 blackbox/
+scripts/sdk-loader.js
