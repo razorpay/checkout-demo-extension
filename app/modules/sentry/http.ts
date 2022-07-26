@@ -6,8 +6,8 @@ import {
   SENTRY_ENVIRONMENT,
   SENTRY_RELEASE_VERSION,
   SENTRY_PUBLIC_KEY,
-  SENTRY_DOMAIN,
   SENTRY_PROJECT_ID,
+  SENTRY_BASE_URL,
 } from './constants';
 import { uuid4 } from './uuid';
 import { getContext } from './context';
@@ -67,7 +67,7 @@ export function captureError(error: Error) {
           );
         }
       },
-      url: `${SENTRY_DOMAIN}/api/${SENTRY_PROJECT_ID}/store/`,
+      url: `${SENTRY_BASE_URL}/api/${SENTRY_PROJECT_ID}/store/`,
       data: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',

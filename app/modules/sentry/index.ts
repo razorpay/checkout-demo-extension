@@ -1,10 +1,5 @@
 import { setContext } from './context';
-import {
-  SENTRY_PUBLIC_KEY,
-  SENTRY_DOMAIN,
-  SENTRY_PROJECT_ID,
-  SENTRY_RELEASE_VERSION,
-} from './constants';
+import { SENTRY_RELEASE_VERSION, SENTRY_DSN } from './constants';
 
 export function injectSentry() {
   if (window.location.hostname !== 'api.razorpay.com') {
@@ -19,7 +14,7 @@ export function injectSentry() {
   script.crossOrigin = 'anonymous';
   script.onload = function () {
     window.Sentry.init({
-      dsn: `https://${SENTRY_PUBLIC_KEY}@${SENTRY_DOMAIN}/${SENTRY_PROJECT_ID}`,
+      dsn: SENTRY_DSN,
       release: SENTRY_RELEASE_VERSION,
     });
     setContext();
