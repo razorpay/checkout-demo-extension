@@ -3795,18 +3795,14 @@ Session.prototype = {
         // card tab only past this
         // card filled by logged out user + remember me
         if (this.payload) {
-          let isRedirect = this.get('redirect');
-          if (!isRedirect) {
-            this.submit();
-          }
           callback = (msg) => {
             if (this.getCurrentCustomer().logged) {
               // OTP verification successful
               OtpService.resetCount('razorpay');
 
-              if (isRedirect) {
-                this.submit();
-              } else {
+              this.submit();
+              let isRedirect = this.get('redirect');
+              if (!isRedirect) {
                 this.r.emit('payment.resume');
               }
               this.showLoadError();
