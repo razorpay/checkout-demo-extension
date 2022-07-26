@@ -1164,6 +1164,11 @@ Session.prototype = {
 
     // User selected EMI on Cards
     if (providerCode === 'cards') {
+      /**
+       * setting payload to null because in some case if we select some cardless_emi
+       * and then select emi on cards then payload methods remains as cardless_emi with provider
+       */
+      this.payload = null;
       this.switchTab('emi');
       return;
     }
