@@ -76,6 +76,11 @@ export const UPI_APPS: {
    */
   whitelist: [
     {
+      app_name: 'IntentSample',
+      shortcode: 'intentsample',
+      package_name: 'com.sumedh.intentsample',
+    },
+    {
       name: 'WhatsApp Business',
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
