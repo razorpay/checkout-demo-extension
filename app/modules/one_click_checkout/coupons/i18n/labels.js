@@ -21,3 +21,4 @@ export const APPLIED_LABEL = 'coupons.applied_label';
 export const COUPON_DETAIL_LABEL = 'coupons.coupon_detail_label';
 export const COUPON_OTP_LABEL = 'coupons.coupon_otp_label';
 export const COUPON_LABEL = 'coupons.coupon_label';
+export const INVALID_EMAIL_LABEL = 'coupons.invalid_email_label';

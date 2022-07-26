@@ -1,4 +1,6 @@
 export const ERROR_USER_NOT_LOGGED_IN = 'LOGIN_REQUIRED';
+export const ERROR_INPUT_VALIDATION_FAILED = 'input_validation_failed';
+
 export const LOADING_STATUS = 'loading';
 export const OTP_LABELS = {
   loading: {

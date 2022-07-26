@@ -1019,13 +1019,12 @@ razorpayProto.verifyVpa = function (vpa = '', timeout = 0) {
       });
 
       return Promise.resolve(cachedVpaResponse);
-    } else {
-      Analytics.track('validate:vpa:invalid', {
-        data: cachedEventData,
-      });
-
-      return Promise.reject(cachedVpaResponse);
     }
+    Analytics.track('validate:vpa:invalid', {
+      data: cachedEventData,
+    });
+
+    return Promise.reject(cachedVpaResponse);
   }
 
   return new Promise((resolve, reject) => {

@@ -80,7 +80,7 @@
 
   let ctaDisabled = false;
   let orderWidget;
-  let showValidations = false;
+  let showValidations = $contact || $email;
   let contactDetailsValid = false;
 
   $: ctaDisabled =

@@ -21,4 +21,5 @@ export default {
   coupon_detail_label: 'To use the coupon',
   coupon_otp_label: 'verify your contact details with an OTP.',
   coupon_label: 'Coupons',
+  invalid_email_label: 'Please enter a valid email to use this coupon.',
 };

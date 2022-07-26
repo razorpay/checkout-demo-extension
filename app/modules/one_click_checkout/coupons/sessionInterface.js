@@ -1,9 +1,13 @@
+// svelte imports
+import { get } from 'svelte/store';
+import { locale } from 'svelte-i18n';
+
 import { hideToast } from 'one_click_checkout/Toast';
 import Analytics, { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { showLoaderView } from 'one_click_checkout/loader/helper.js';
 import { showLoader } from 'one_click_checkout/loader/store';
-import { get } from 'svelte/store';
+
 import {
   couponInputValue,
   couponState,
@@ -18,8 +22,13 @@ import {
   removeCoupon,
   validateCoupon,
 } from 'one_click_checkout/coupons/service';
-import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
 import { setOption, getPrefilledCouponCode } from 'razorpay';
+
+// i18n imports
+import { formatMessageWithLocale } from 'i18n';
+import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
+import { INVALID_EMAIL_LABEL } from 'one_click_checkout/coupons/i18n/labels';
+import { ERROR_INPUT_VALIDATION_FAILED } from 'one_click_checkout/coupons/constants';
 
 /**
  * Calls validate coupon to update BE and emits track events
@@ -48,6 +57,16 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
     .catch((error) => {
       if (onInvalid) {
         onInvalid(error);
+      }
+      const { reason, field } = error.error || {};
+      if (reason === ERROR_INPUT_VALIDATION_FAILED && field === 'email') {
+        updateFailureReasonInStore({
+          failure_reason: formatMessageWithLocale(
+            INVALID_EMAIL_LABEL,
+            get(locale)
+          ),
+        });
+        return;
       }
       // TODO: Check for failure_code and trigger login if required\
       updateFailureReasonInStore(error);
