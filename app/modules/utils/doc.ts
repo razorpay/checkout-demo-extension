@@ -157,7 +157,15 @@ export function loadCSS(url: string) {
 }
 
 /**
- * Insert js from given url into head tag
+ * checks if given stylesheet url exists in dom
+ * @returns boolean
+ */
+export function isCssLoaded(url: string) {
+  return !!document.querySelector(`link[href$="${url}"]`);
+}
+
+/**
+ *  Insert js from given url into head tag
  * @param {string} url
  */
 export function loadJS(url: string) {
