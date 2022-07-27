@@ -21,7 +21,7 @@ describe('Open checkout with customer_id', () => {
     })[0];
   });
 
-  test('should call personalization api if customer phone number is international', async () => {
+  test('should call personalization api if customer phone number is international and customer_id', async () => {
     const customerId = 'cust_randomId';
     const customerPhone = randomContact();
     const customerEmail = randomEmail();
@@ -74,5 +74,61 @@ describe('Open checkout with customer_id', () => {
       },
       rtb_experiment: { experiment: false },
     });
+  });
+
+  test('should call personalization api if customer phone number is international and without customer_id', async () => {
+    const customerPhone = randomContact();
+    testData.options = {
+      order_id: 'order_Id',
+    };
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options: testData.options,
+      preferences: testData.preferences,
+      method: 'card',
+      personalizationDefault: true,
+    });
+
+    await context.page.type('#contact', customerPhone);
+
+    await context.page.click('#country-code');
+    await context.page.waitForSelector('.list-item');
+    await delay(200);
+    // select US country code
+    await context.page.evaluate(() => {
+      Array.from(document.querySelectorAll('.list-item')).forEach((el) => {
+        if (el.id.indexOf('US_1') > -1) {
+          el.click();
+        }
+      });
+    });
+
+    await delay(200);
+    await context.page.click('#footer');
+
+    // expect personalization api call
+    await context.getRequest('/v1/personalisation');
+    const req = await context.expectRequest();
+    expect(req.url).toContain('/personalisation');
+    await context.respondJSON({
+      preferred_methods: {
+        [`+1${customerPhone}`]: {
+          instruments: [{ instrument: 'paypal', method: 'wallet' }],
+          is_customer_identified: true,
+          user_aggregates_available: false,
+          versionID: 'v1',
+        },
+      },
+      rtb_experiment: { experiment: false },
+    });
+
+    const preferredPaymentMethod = await context.page.evaluate(() => {
+      return document
+        .querySelector('[data-id="rzp.preferred_0_0_wallet_false"]')
+        .textContent.trim();
+    });
+    expect(preferredPaymentMethod).toEqual(
+      'Wallet - PayPal Only accounts issued outside India accepted'
+    );
   });
 });

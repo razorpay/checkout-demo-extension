@@ -1,6 +1,7 @@
 import { isDesktop } from 'common/useragent';
 import { getAmount, isInternational } from 'razorpay';
 import type { Method } from 'types/types';
+import { isInternationalCustomer } from 'common/international';
 import {
   ALLOWED_METHODS_GT_PIVOT_AMOUNT,
   ALLOWED_METHODS_LTE_PIVOT_AMOUNT,
@@ -50,7 +51,11 @@ export const optimizeForAmount = (
   /**
    * Since we have a pivot amount, lets do this only for non-international payments.
    */
-  if (!customPreferredMethodsExperiment.enabled() || isInternational()) {
+  if (
+    !customPreferredMethodsExperiment.enabled() ||
+    isInternationalCustomer() ||
+    isInternational()
+  ) {
     return instruments;
   }
   let ALLOWED_METHODS: Method[] = [];
@@ -76,7 +81,11 @@ export const optimizeForDevice = (
   /**
    * Since we have a pivot amount, lets do this only for non-international payments.
    */
-  if (!customPreferredMethodsExperiment.enabled() || isInternational()) {
+  if (
+    !customPreferredMethodsExperiment.enabled() ||
+    isInternationalCustomer() ||
+    isInternational()
+  ) {
     return instruments;
   }
   const ALLOWED_METHODS = isDesktop()

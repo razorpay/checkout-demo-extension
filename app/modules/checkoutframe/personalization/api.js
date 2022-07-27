@@ -14,7 +14,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import { isDesktop } from 'common/useragent';
 import {
   isCustomerWithIntlPhone,
-  getIntlCustomerPhoneNumber,
+  getCustomerContactNumber,
 } from 'common/international';
 
 import { customPreferredMethodsExperiment } from './experiment';
@@ -122,7 +122,7 @@ function getInstrumentsFromApi(customer) {
   const countryISOCode = getCustomerCountryISOCode();
   const isIntlPhone = isCustomerWithIntlPhone(countryISOCode);
   const customerContact = isIntlPhone
-    ? getIntlCustomerPhoneNumber(customer.contact)
+    ? getCustomerContactNumber(customer.contact)
     : customer.contact;
 
   const url = _.appendParamsToUrl(makeAuthUrl(session.r, 'personalisation'), {
@@ -192,9 +192,8 @@ export function getInstrumentsForCustomer(customer) {
 
   if (cached) {
     return cached;
-  } else {
-    return getInstrumentsFromApi(customer);
   }
+  return getInstrumentsFromApi(customer);
 }
 
 // changes needed to translate api format instruments to storage format

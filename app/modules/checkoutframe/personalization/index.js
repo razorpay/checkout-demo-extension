@@ -11,6 +11,7 @@ import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from '.
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { optimizeInstruments } from 'checkoutframe/personalization/optimizations';
 import { isDesktop } from 'common/useragent';
+import { isInternationalCustomer } from 'common/international';
 import {
   DEFAULT_PHONEPE_P13N_V1_INSTRUMENT,
   MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION,
@@ -519,7 +520,8 @@ export function trackNumberOfP13nContacts() {
 }
 
 export function getMaxPreferredMethods() {
-  return customPreferredMethodsExperiment.enabled() && !isInternational()
+  return customPreferredMethodsExperiment.enabled() &&
+    !(isInternational() || isInternationalCustomer())
     ? MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION
     : MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION;
 }
