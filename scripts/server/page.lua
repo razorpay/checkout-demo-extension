@@ -26,8 +26,13 @@ response = [[
 <script>
   function _retry() {
     var script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/sdk-loader.js';
+    script.src = ']] .. js .. [[';
     document.body.appendChild(script);
+  }
+  if (!window.Intl) {
+    try {
+      document.write('\x3Cscript src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.en|always">\x3C/script>');
+    } catch(e) {}
   }
 </script>
 <script src="]] .. js .. [[" crossorigin onerror="_retry()"></script>
