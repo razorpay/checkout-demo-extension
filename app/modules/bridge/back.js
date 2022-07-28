@@ -49,7 +49,7 @@ export function backPressed(callback) {
   if (isStackPopulated()) {
     navBackPressed();
   } else if (
-    session.tab &&
+    session?.tab &&
     !(getPrefillMethod() && session.get('theme.hide_topbar'))
   ) {
     /**
@@ -70,12 +70,12 @@ export function backPressed(callback) {
       session.back();
     }
   } else {
-    if (session.homeTab?.canGoBack()) {
+    if (session?.homeTab?.canGoBack()) {
       session.homeTab.hideMethods();
     } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
       CheckoutBridge[callback]();
     } else {
-      if (session.get('theme.close_button')) {
+      if (session?.get('theme.close_button')) {
         session.closeModal();
       }
     }
