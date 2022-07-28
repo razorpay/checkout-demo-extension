@@ -530,7 +530,9 @@ const UPI_METHODS = {
     !isRecurring() &&
     !isPayout() &&
     getOption('method.qr') &&
-    !isMobileByMediaQuery(),
+    !isMobileByMediaQuery() &&
+    getMerchantMethods().upi_intent &&
+    Boolean(getPreferences('methods.upi_type.intent', 1)),
   intent: () =>
     !isPayout() &&
     getMerchantMethods().upi_intent &&
