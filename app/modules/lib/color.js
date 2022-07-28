@@ -13,8 +13,13 @@ const canvas = _El.create('canvas'),
 // canvas.getImageData().data returns a Uint8Array with length 4 (r,g,b,a),
 // However, in Brave Browser, if device recognition is blocked,
 // the length of this array will be zero.
-const canvasFingerprintingBlocked =
-  ctx.getImageData(0, 0, 1, 1).data.length === 0;
+const canvasFingerprintingBlocked = () => {
+  try {
+    return ctx.getImageData(0, 0, 1, 1).data.length === 0;
+  } catch (error) {
+    return true;
+  }
+};
 
 const getPixelDataFallback = (color) => {
   const d = document.createElement('div');
@@ -26,7 +31,7 @@ const getPixelDataFallback = (color) => {
 };
 
 const getPixelData = (color) => {
-  if (canvasFingerprintingBlocked) {
+  if (canvasFingerprintingBlocked()) {
     return getPixelDataFallback(color);
   }
   // reset background to white
