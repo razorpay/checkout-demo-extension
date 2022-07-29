@@ -58,47 +58,49 @@ const Analytics = () => ({
     name,
     { type, data = {}, r = rInstance, immediately = false, isError } = {}
   ) {
-    // when we get any error on mount of script we don't have r instance
-    // due to that we are unable to track those events
-    if (isError && !r) {
-      // in those case of error we need logs
-      // mock r
-      r = {
-        id: Track.id,
-        getMode: () => 'live',
-        get: (arg) => {
-          if (typeof arg === 'string') {
-            return false;
-          }
-          return {};
-        },
-      };
-    }
-    let calculatedMeta = calculateMeta(META);
-    data = sanitizeEventData(data);
-    if (_.isNonNullObject(data)) {
-      data = _Obj.clone(data);
-    } else {
-      data = {
-        data,
-      };
-    }
+    try {
+      // when we get any error on mount of script we don't have r instance
+      // due to that we are unable to track those events
+      if (isError && !r) {
+        // in those case of error we need logs
+        // mock r
+        r = {
+          id: Track.id,
+          getMode: () => 'live',
+          get: (arg) => {
+            if (typeof arg === 'string') {
+              return false;
+            }
+            return {};
+          },
+        };
+      }
+      let calculatedMeta = calculateMeta(META);
+      data = sanitizeEventData(data);
+      if (_.isNonNullObject(data)) {
+        data = _Obj.clone(data);
+      } else {
+        data = {
+          data,
+        };
+      }
 
-    // If data.meta exists, add it to calculatedMeta.
-    if (data.meta && _.isNonNullObject(data.meta)) {
-      calculatedMeta = _Obj.extend(calculatedMeta, data.meta);
-    }
+      // If data.meta exists, add it to calculatedMeta.
+      if (data.meta && _.isNonNullObject(data.meta)) {
+        calculatedMeta = _Obj.extend(calculatedMeta, data.meta);
+      }
 
-    data.meta = calculatedMeta;
+      data.meta = calculatedMeta;
 
-    data.meta.request_index = REQUEST_INDEX[r.id];
+      data.meta.request_index = r ? REQUEST_INDEX[r.id] : null;
 
-    // Add type to the name.
-    if (type) {
-      name = `${type}:${name}`;
-    }
+      // Add type to the name.
+      if (type) {
+        name = `${type}:${name}`;
+      }
 
-    Track(r, name, data, immediately);
+      Track(r, name, data, immediately);
+    } catch (e) {}
   },
 
   /**
