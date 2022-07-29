@@ -63,10 +63,6 @@ export const emiBanks = [
     name: 'Kotak Mahindra Bank',
   },
   {
-    code: 'KKBK_DC',
-    name: 'Kotak Debit Cards',
-  },
-  {
     code: 'HDFC_DC',
     name: 'HDFC Debit Cards',
   },
@@ -123,9 +119,6 @@ export const emiBanks = [
     name: 'HSBC Credit Cards',
   },
 ];
-
-export const DEBIT_EMI_ISSUERS = ['KKBK', 'HDFC'];
-export const DEBIT_EMI_BANKS = DEBIT_EMI_ISSUERS.map((bank) => `${bank}_DC`);
 
 export const getBankFromCardCache = (cardNum) => {
   const cardFeatures = getCardMetadata(cardNum);
@@ -252,31 +245,4 @@ export function normalizeBankCode(bankCode) {
  */
 export function isCorporateCode(bankCode) {
   return /_C$/.test(bankCode);
-}
-
-/**
- * Checks if the given bank is debit emi issuer or not.
- *
- * @param {String} bankCode
- * @param {String} cardType
- * @return {boolean}
- */
-export function isDebitEMIBank(bankCode, type = '') {
-  // use debit card issuers list if _DC is not passed in the bank code
-  let debitCardIssuers = DEBIT_EMI_ISSUERS;
-
-  // if card type check for whether type is debit and card belongs to EMI issuers
-  if (type) {
-    if (type === 'debit' && debitCardIssuers.includes(bankCode)) {
-      return true;
-    }
-  } else if (debitCardIssuers.includes(bankCode)) {
-    return true;
-  }
-  return false;
-}
-
-// Checks if the selected bank code is eligible for DC EMI
-export function isDebitIssuer(bankCode) {
-  return DEBIT_EMI_BANKS.includes(bankCode);
 }

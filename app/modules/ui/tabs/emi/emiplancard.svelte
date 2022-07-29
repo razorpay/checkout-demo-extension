@@ -14,7 +14,7 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale, getShortBankName } from 'i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   import {
     PLAN_TITLE,
@@ -29,6 +29,9 @@
     SHOW_MORE,
     SHOW_LESS,
     CITI_URL,
+    HDFC_DEBIT_DESCRIPTION_MIN_BALANCE,
+    HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
+    HDFC_DEBIT_DESCRIPTION_CONVENIENCE,
     DESCRIPTION_MONTHLY_INSTALLMENT,
     PROCESSING_FEE,
     STAMP_DUTY,
@@ -39,12 +42,8 @@
     ICICI_BANK_EMI,
     ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
     KOTAK_CREDIT_DESCRIPTION_CONVENIENCE,
-    DEBIT_DESCRIPTION_MIN_BALANCE,
-    DEBIT_DESCRIPTION_INCLUDES_INTEREST,
-    DEBIT_DESCRIPTION_CONVENIENCE,
   } from 'ui/labels/emi';
   import { formatAmountWithCurrency } from 'helper/currency';
-  import { isDebitIssuer } from 'common/bank';
 
   // Props
   export let amount;
@@ -75,6 +74,7 @@
   const AXIS_BANK_CODE = 'UTIB';
   const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
+  const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
   const SBIN_BANK_CODE = 'SBIN';
   const KOTAK_BANK_CODE = 'KKBK';
   const ICICI_BANK_CODE = 'ICIC';
@@ -190,13 +190,13 @@
         </ul>
       {/if}
       {#if isCardEmi}
-        {#if isDebitIssuer(bank)}
+        {#if bank === HDFC_BANK_DEBIT_CODE}
           <!-- TODO: Combine both labels and allow inline-block from within template -->
           <!-- LABEL: No minimum balance is required. There will be no amount blocked on your card. You will pay -->
-          {$t(DEBIT_DESCRIPTION_MIN_BALANCE)}
+          {$t(HDFC_DEBIT_DESCRIPTION_MIN_BALANCE)}
           <span class="inline-block">{formattedAmountPerMonth}/mo</span>
           <!-- LABEL: (includes interest). -->
-          {$t(DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
+          {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
         {:else if bank === CITI_BANK_CODE}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account. EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(
@@ -249,13 +249,9 @@
             $locale
           )}
         {/if}
-        {#if bank === HDFC_BANK_CODE || isDebitIssuer(bank)}
-          <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on {bank} Cards. -->
-          {formatTemplateWithLocale(
-            DEBIT_DESCRIPTION_CONVENIENCE,
-            { bank: getShortBankName(bank.replace('_DC', ''), $locale) },
-            $locale
-          )}
+        {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
+          <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC Bank Cards. -->
+          {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
         {:else if bank === SBIN_BANK_CODE}
           <span style="display:block">
             {formatTemplateWithLocale(

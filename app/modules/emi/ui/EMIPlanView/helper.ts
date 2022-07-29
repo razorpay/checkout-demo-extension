@@ -1,8 +1,7 @@
 /** helper related to EMIPlanView */
 
-import { isDebitEMIBank } from 'common/bank';
-
 /** constant */
+const banksWithDebitEmi = ['HDFC'];
 const bankOverrides: Partial<EMIPlanView.EMIPlanData> = {
   SBIN: {
     code: 'SBIN',
@@ -39,7 +38,7 @@ export function filterBanksAgainstInstrument(
 
   const debitEmiinclusiveIssuers = instrument.issuers.reduce(
     (pV: string[], bankCode) => {
-      if (isDebitEMIBank(bankCode)) {
+      if (banksWithDebitEmi.includes(bankCode)) {
         pV.push(`${bankCode}_DC`);
       }
       pV.push(bankCode);

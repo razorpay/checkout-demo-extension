@@ -1,30 +1,25 @@
 <script lang="ts">
   // UI imports
   import * as TermsCurtain from 'checkoutframe/termscurtain';
-  import { isDebitIssuer } from 'common/bank';
   import RazorpayConfig from 'common/RazorpayConfig';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import fetch from 'utils/fetch';
   // Props
   export let mode: string;
 
-  function getTncUrl(bank: string, type: string) {
-    const formattedBankName = bank.replace('_DC', '').toLowerCase();
-    // Constants
-    const cdnUrl = RazorpayConfig.cdn;
-    const URL = {
-      tnc: `${cdnUrl}static/assets/${formattedBankName}/debitemi/tnc.json`,
-      schedule: `${cdnUrl}static/assets/${formattedBankName}/debitemi/schedule.json`,
-    };
-    return URL[type];
-  }
+  // Constants
+  const cdnUrl = RazorpayConfig.cdn;
+  const URL = {
+    hdfc_debit_tnc: `${cdnUrl}static/assets/hdfc/debitemi/tnc.json`,
+    hdfc_debit_schedule: `${cdnUrl}static/assets/hdfc/debitemi/schedule.json`,
+  };
 
-  function showTerms(type: string, mode: string) {
+  function showTerms(type: string) {
     TermsCurtain.show({
       loading: true,
     });
     fetch({
-      url: getTncUrl(mode, type),
+      url: URL[type],
       callback: function (response) {
         TermsCurtain.show({
           loading: false,
@@ -37,7 +32,7 @@
 </script>
 
 <div class="pad">
-  {#if isDebitIssuer(mode)}
+  {#if mode === 'HDFC_DC'}
     <div class="agreement-checkbox">
       <Checkbox
         id="emi-tnc"
@@ -50,14 +45,14 @@
       I expressly acknowledge that I agree to all the
       <span
         class="actionlink theme-highlight"
-        on:click={() => showTerms('tnc', mode)}
+        on:click={(event) => showTerms('hdfc_debit_tnc')}
       >
         terms and conditions
       </span>
       which I fully understand and have gone through
       <span
         class="actionlink theme-highlight"
-        on:click={() => showTerms('schedule', mode)}
+        on:click={(event) => showTerms('hdfc_debit_schedule')}
       >
         schedule of charges
       </span>
