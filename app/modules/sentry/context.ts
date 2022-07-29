@@ -16,13 +16,19 @@ export function createContext(): Context {
   const options = session.r.get();
   const customer = getCustomerDetails();
 
-  // strip pii information
-  if (options.prefill) {
-    delete options.prefill;
-  }
+  // mask pii information
+  const maskedOptions = Object.keys(options).reduce(
+    (masked: Record<string, any>, key: string) => {
+      masked[key] = key.startsWith('prefill')
+        ? options[key]?.replace(/[A-Za-z0-9]/g, '*')
+        : options[key];
+      return masked;
+    },
+    {}
+  );
 
   return {
-    options,
+    options: maskedOptions,
     checkout_id: session.r?.id,
     order_id: options.order_id,
     logged_in: !!customer?.logged,

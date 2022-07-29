@@ -69,11 +69,9 @@ describe('createContext() method', () => {
         id: 'mock_checkout',
         get: () => ({
           ...common_options,
-          prefill: {
-            name: 'Goutam B Seervi',
-            contact: '+91999999999',
-            email: 'goutam@test.com',
-          },
+          'prefill.name': 'Goutam B Seervi',
+          'prefill.contact': '+91999999999',
+          'prefill.email': 'goutam@test.com',
         }),
       },
     });
@@ -84,7 +82,12 @@ describe('createContext() method', () => {
     const context = contextModule.createContext();
 
     expect(context).toEqual({
-      options: common_options,
+      options: {
+        ...common_options,
+        'prefill.name': '****** * ******',
+        'prefill.contact': '+***********',
+        'prefill.email': '******@****.***',
+      },
       checkout_id: 'mock_checkout',
       order_id: 'order_test',
       logged_in: false,
