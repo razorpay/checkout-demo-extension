@@ -199,9 +199,8 @@ export const getCardSpacing = (maxLen) => {
   if (maxLen !== 19) {
     if (maxLen < 16) {
       return /(^.{4}|.{6})/g;
-    } else {
-      return /(.{4})/g;
     }
+    return /(.{4})/g;
   }
 };
 
@@ -510,6 +509,6 @@ export function injectCyberSourceScript(
   sessionId,
   orgId = CYBER_SOURCE_RZP_ORG_ID
 ) {
-  const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=${sessionId}`;
+  const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=razorpay${sessionId}`;
   return loadScript(csUrl, 'cyberSourceScript');
 }

@@ -146,7 +146,7 @@ export const PAYMENT_CANCEL_REASONS = {
 };
 
 export const SIFT_BEACON_KEY = '4dbbb1f7b6';
-export const CYBER_SOURCE_RZP_ORG_ID = '1snn5n9w';
+export const CYBER_SOURCE_RZP_ORG_ID = 'k8vif92e';
 
 export const BUILD_NUMBER = __BUILD_NUMBER__; // eslint-disable-line no-undef
 export const TRAFFIC_ENV = __TRAFFIC_ENV__ || '__S_TRAFFIC_ENV__'; // eslint-disable-line no-undef
