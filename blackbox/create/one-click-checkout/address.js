@@ -22,6 +22,7 @@ const {
   handleShippingInfo,
   login,
   goBack,
+  checkSkipOTPHidden,
 } = require('../../actions/one-click-checkout/common');
 const {
   handleAddAddress,
@@ -61,6 +62,7 @@ const CONTACT_ERROR_LABEL = 'Enter a valid mobile number.';
  * @param {*} testFeatures.inValidOTP is OTP valid
  * @param {*} testFeatures.addLandmark add landmark in new address
  * @param {*} testFeatures.addresses user saved addresses
+ * @param {*} testFeatures.mandatoryLogin user has to login after details/summary screen
  *
  */
 module.exports = function (testFeatures) {
@@ -84,6 +86,7 @@ module.exports = function (testFeatures) {
     addLandmark,
     addresses = [],
     invalidAddress,
+    mandatoryLogin,
   } = features;
 
   describe.each(
@@ -201,6 +204,9 @@ module.exports = function (testFeatures) {
             await delay(400);
             await proceedOneCC(context);
           } else {
+            if (mandatoryLogin) {
+              await checkSkipOTPHidden();
+            }
             await proceedOneCC(context);
             await handleVerifyOTPReq(context, inValidOTP, { addresses });
             if (inValidOTP) {
@@ -210,6 +216,22 @@ module.exports = function (testFeatures) {
             await handleShippingInfo(context, options);
           }
         } else {
+          if (mandatoryLogin) {
+            await handleCreateOTPReq(context);
+            await handleTypeOTP(context);
+            await delay(200);
+            await checkSkipOTPHidden();
+            await proceedOneCC(context);
+            await handleVerifyOTPReq(context, inValidOTP, {
+              addresses,
+              mandatoryLogin,
+            });
+            if (inValidOTP) {
+              await checkInvalidOTP(context);
+              return;
+            }
+          }
+
           if (invalidAddress) {
             await delay(400);
             await proceedOneCC(context);
@@ -243,7 +265,11 @@ module.exports = function (testFeatures) {
         }
 
         // to show OTP screen to save address
-        if (saveAddress && (!addresses.length || skipAccessOTP)) {
+        if (
+          saveAddress &&
+          !mandatoryLogin &&
+          (!addresses.length || skipAccessOTP)
+        ) {
           await delay(200);
           await handleCreateOTPReq(context);
           if (skipSaveOTP) {
@@ -256,9 +282,10 @@ module.exports = function (testFeatures) {
         }
       }
 
+      await delay(200);
       await proceedOneCC(context);
 
-      if (saveAddress && !skipSaveOTP) {
+      if (saveAddress && (!skipSaveOTP || mandatoryLogin)) {
         await handleCustomerAddressReq(context);
       }
 

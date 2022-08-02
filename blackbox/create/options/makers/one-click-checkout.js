@@ -1,12 +1,10 @@
 function makeOptions(features, options) {
-  const { showCoupons, showAddress, mandatoryLogin, orderId, callbackUrl } =
-    features;
+  const { showCoupons, showAddress, orderId, callbackUrl } = features;
 
   options = {
     one_click_checkout: true,
     show_address: showAddress,
     show_coupons: showCoupons,
-    mandatory_login: mandatoryLogin,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
 
@@ -20,11 +18,12 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { amount } = features;
+  const { amount, mandatoryLogin } = features;
 
   preferences.features = {
     one_click_checkout: true,
     one_cc_merchant_dashboard: true,
+    one_cc_mandatory_login: mandatoryLogin ?? false,
   };
 
   preferences.order = {

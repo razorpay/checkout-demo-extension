@@ -25,14 +25,6 @@ export const shouldShowCoupons = () =>
  */
 export const isCodForced = () => getOption('force_cod');
 
-/**
- * @returns boolean
- * Checks for mandatory_login option
- */
-export const isLoginMandatory = () => {
-  return getOption('mandatory_login');
-};
-
 export function getContactPayload() {
   const payload = {};
   if (get(email)) {

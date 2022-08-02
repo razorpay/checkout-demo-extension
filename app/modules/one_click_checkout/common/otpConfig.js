@@ -20,4 +20,5 @@ const otp = {
   isBackEnabled: true,
   breadcrumHighlight: ADDRESS_LABEL,
 };
+
 export default otp;

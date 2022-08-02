@@ -1,4 +1,4 @@
-<div class="async-loading loading">
+<div class="async-loading loading" data-testId="async-loader">
   <div class="message">
     <slot />
   </div>

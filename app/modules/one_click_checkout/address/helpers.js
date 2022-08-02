@@ -5,6 +5,7 @@ import { get } from 'svelte/store';
 // Store imports
 import { newUserAddress } from 'one_click_checkout/address/shipping_address/store';
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
+import { savedAddresses } from 'one_click_checkout/address/store';
 
 // Helper imports
 import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
@@ -13,7 +14,7 @@ import {
   postCustomerAddress,
   putCustomerAddress,
 } from 'one_click_checkout/address/service';
-import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { navigator as viewsNavigator } from 'one_click_checkout/routing/helpers/routing';
 import { views } from 'one_click_checkout/routing/constants';
 import { allowLangEngOnly } from 'razorpay';
 
@@ -39,7 +40,10 @@ import {
   COUNTRY_POSTALS_MAP,
   INDIAN_PINCODE_LENGTH,
 } from 'common/countrycodes';
-import { views as addressViews, ENG_LANG_REGEX_PATTERN } from 'one_click_checkout/address/constants';
+import {
+  views as addressViews,
+  ENG_LANG_REGEX_PATTERN,
+} from 'one_click_checkout/address/constants';
 import { updateAddressesInStore } from './sessionInterface';
 
 /**
@@ -71,7 +75,14 @@ export const validateInput = (elementId = 'addressForm') => {
 
 export const validateInputField = (value, formInput, selectedCountryIso) => {
   const input = { ...value };
-  const fieldsReqLangCheck = ['name', 'state', 'city', 'landmark', 'line1', 'line2'];
+  const fieldsReqLangCheck = [
+    'name',
+    'state',
+    'city',
+    'landmark',
+    'line1',
+    'line2',
+  ];
   if (formInput.id === 'contact') {
     value = value.phoneNum;
   }
@@ -87,12 +98,11 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
     if (value && !valid) {
       if (formInput.id === 'name') {
         return NAME_LANG_ERROR_LABEL;
-      } else {
-        return ADDRESS_LANG_ERROR;
       }
+      return ADDRESS_LANG_ERROR;
     }
   }
-  
+
   if (['country_name', 'line1', 'line2'].includes(formInput.id)) {
     return;
   }
@@ -127,9 +137,8 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
         value.length !== INDIAN_PINCODE_LENGTH
         ? PINCODE_ERROR_LABEL
         : ZIPCODE_ERROR_LABEL;
-    } else {
-      return GENERIC_PATTERN_ERROR_LABEL;
     }
+    return GENERIC_PATTERN_ERROR_LABEL;
   }
 };
 
@@ -137,11 +146,21 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
  * Method called when OTP verification is successful
  */
 export function successHandler() {
-  navigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
+  viewsNavigator.navigateTo({ path: ONE_CC_HOME_VIEWS.SAVED_ADDRESSES });
 }
 
 /**
- * Method called when OTP verification is successfull and address has to be saved.
+ * Method called when mandatory login OTP verification is successful
+ */
+export function mandatoryLoginSuccessHandler() {
+  const path = get(savedAddresses).length
+    ? ONE_CC_HOME_VIEWS.SAVED_ADDRESSES
+    : ONE_CC_HOME_VIEWS.ADD_ADDRESS;
+  viewsNavigator.replace(path);
+}
+
+/**
+ * Method called when OTP verification is successful and address has to be saved.
  * @param {object} service address service instance
  */
 export function addressSaveOTPSuccessHandler(service) {
@@ -163,7 +182,7 @@ export function addressSaveOTPSkipHandler() {
  * Method called when user skips otp for accessing saved address.
  */
 export const skipOTPHandle = () => {
-  navigator.replace(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
+  viewsNavigator.replace(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
 };
 
 /**
@@ -198,21 +217,21 @@ export const saveAddress = () => {
         updateAddressesInStore(Object.values(res));
         return res;
       });
-    } else {
-      let postPayload = { shipping_address };
-      let putPayload = { billing_address };
-      if (payload.shipping_address?.formView === addressViews.EDIT_ADDRESS) {
-        postPayload = { billing_address };
-        putPayload = { shipping_address };
-      }
-      return Promise.all([
-        postCustomerAddress(postPayload),
-        putCustomerAddress(putPayload),
-      ]).then((response) => {
-        response.forEach((res) => updateAddressesInStore(Object.values(res)));
-        return response;
-      });
     }
+
+    let postPayload = { shipping_address };
+    let putPayload = { billing_address };
+    if (payload.shipping_address?.formView === addressViews.EDIT_ADDRESS) {
+      postPayload = { billing_address };
+      putPayload = { shipping_address };
+    }
+    return Promise.all([
+      postCustomerAddress(postPayload),
+      putCustomerAddress(putPayload),
+    ]).then((response) => {
+      response.forEach((res) => updateAddressesInStore(Object.values(res)));
+      return response;
+    });
   }
   return Promise.resolve(false);
 };

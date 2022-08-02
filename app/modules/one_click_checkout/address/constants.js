@@ -42,6 +42,26 @@ export const OTP_LABELS = {
     textView: 'verifying_otp',
   },
 };
+
+export const MANDATORY_OTP_LABELS = {
+  loading: {
+    headingText: 'none',
+    textView: 'otp_sending_generic',
+  },
+  sent: {
+    headingText: 'mandate_login',
+    textView: 'mandate_login',
+    loading: false,
+    showInput: true,
+    action: false,
+    otp: '',
+  },
+  verifying: {
+    headingText: 'none',
+    textView: 'verifying_otp',
+  },
+};
+
 export const ADD_ADDRESS_OTP_LABELS = {
   loading: {
     headingText: 'none',

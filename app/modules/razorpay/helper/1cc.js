@@ -30,6 +30,9 @@ export const isCodEnabled = () =>
 export const isBillingAddressEnabled = () =>
   getPreferences('1cc.configs.one_cc_capture_billing_address') || false;
 
+export const isMandatoryLoginEnabled = () =>
+  getPreferences('features.one_cc_mandatory_login') || false;
+
 export const isIntlShippingEnabled = () =>
   getPreferences('1cc.configs.one_cc_international_shipping') || false;
 

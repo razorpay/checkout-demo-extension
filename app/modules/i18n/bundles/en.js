@@ -796,8 +796,6 @@ export default {
     email_label_required: 'Email',
     full_amount_label: 'Pay in full',
     ifsc_label: 'IFSC Code',
-    mandatory_login_callout:
-      'We will use this information to process your order',
     min_amount_label: 'Minimum first amount',
     multi_tpv_netbanking_title: 'A/C: {accountNumber}',
     multi_tpv_title: 'Pay Using',

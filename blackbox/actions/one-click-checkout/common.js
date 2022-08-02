@@ -4,39 +4,47 @@ const {
   assertVisible,
   setState,
   makeJSONResponse,
+  assertHidden,
 } = require('../../util');
 const { passRequestNetbanking } = require('../common');
 const { fillUserDetails } = require('../home-page-actions');
 const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
 
-function getVerifyOTPResponse(inValidOTP, addresses = []) {
+function getVerifyOTPResponse(inValidOTP, addresses = [], mandatoryLogin) {
+  let successAddresses;
+
+  if (addresses.length) {
+    successAddresses = addresses;
+  } else if (mandatoryLogin) {
+    successAddresses = [];
+  } else {
+    successAddresses = [
+      {
+        id: 'ISXW2w9b7WcgMA',
+        entity_id: 'IPmBz5KJ03rXr3',
+        entity_type: 'customer',
+        line1: 'Gandhi nagar',
+        line2: 'MG Road',
+        city: 'Bengaluru',
+        zipcode: '560001',
+        state: 'Karnataka',
+        country: 'in',
+        type: 'shipping_address',
+        primary: true,
+        deleted_at: null,
+        created_at: 1638433514,
+        updated_at: 1638433514,
+        tag: '',
+        landmark: 'test land',
+        name: 'Razorpay',
+        contact: '+919952398433',
+      },
+    ];
+  }
   const successResp = {
     success: 1,
     session_id: 'IU7w1z3PBZnA6O',
-    addresses: addresses.length
-      ? addresses
-      : [
-          {
-            id: 'ISXW2w9b7WcgMA',
-            entity_id: 'IPmBz5KJ03rXr3',
-            entity_type: 'customer',
-            line1: 'Gandhi nagar',
-            line2: 'MG Road',
-            city: 'Bengaluru',
-            zipcode: '560001',
-            state: 'Karnataka',
-            country: 'in',
-            type: 'shipping_address',
-            primary: true,
-            deleted_at: null,
-            created_at: 1638433514,
-            updated_at: 1638433514,
-            tag: '',
-            landmark: 'test land',
-            name: 'Razorpay',
-            contact: '+919952398433',
-          },
-        ],
+    addresses: successAddresses,
   };
 
   const failureResp = {
@@ -97,7 +105,7 @@ async function handleVerifyOTPReq(context, inValidOTP = false, options = {}) {
   expect(req.method).toBe('POST');
   expect(req.url).toContain('otp/verify');
   await context.respondJSON(
-    getVerifyOTPResponse(inValidOTP, options.addresses)
+    getVerifyOTPResponse(inValidOTP, options.addresses, options.mandatoryLogin)
   );
 }
 
@@ -239,6 +247,10 @@ async function checkInvalidOTP(context) {
   );
 }
 
+async function checkSkipOTPHidden() {
+  await assertHidden('#otp-sec');
+}
+
 function getDataAttrSelector(context, selectorValue) {
   return context.page.waitForSelector(`[data-test-id=${selectorValue}]`);
 }
@@ -329,7 +341,9 @@ async function mockPaymentSteps(
   await selectBank(context, 'SBIN');
   await proceedOneCC(context);
   await passRequestNetbanking(context);
+  await delay(200);
   await handleMockSuccessDialog(context);
+  await delay(400);
 }
 
 async function closeModal(context) {
@@ -394,6 +408,7 @@ module.exports = {
   handleVerifyOTPReq,
   handleSkipOTP,
   checkInvalidOTP,
+  checkSkipOTPHidden,
   getDataAttrSelector,
   scrollToEnd,
   formatTextToNumber,

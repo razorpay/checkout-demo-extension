@@ -44,7 +44,6 @@
   } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { getAnimationOptions } from 'svelte-utils';
   import { screensHistory } from 'one_click_checkout/routing/History';
@@ -72,7 +71,6 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { views } from 'one_click_checkout/routing/constants';
-  import { MANDATORY_LOGIN_CALLOUT } from 'ui/labels/home';
   import {
     CONTACT_REGEX,
     EMAIL_REGEX,
@@ -225,9 +223,6 @@
   class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
-  {#if isLoginMandatory()}
-    <div class="details-callout">{$t(MANDATORY_LOGIN_CALLOUT)}</div>
-  {/if}
   {#if isOneCCEnabled && isEditDetailScreen}
     <div class="contact-title">
       <Icon icon={user} />

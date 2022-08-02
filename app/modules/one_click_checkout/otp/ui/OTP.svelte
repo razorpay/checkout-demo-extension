@@ -267,7 +267,11 @@
               <ResendButton id="otp-resend" on:resend={onResend} />
             {/if}
             {#if $allowSkip}
-              <LinkButton id="otp-sec" on:click={onSkip}>
+              <LinkButton
+                id="otp-sec"
+                data-testId="otp-sec-skip-btn"
+                on:click={onSkip}
+              >
                 {$t(`otp.skip_text.${$skipTextLabel}`)}
               </LinkButton>
             {:else if $allowBack}

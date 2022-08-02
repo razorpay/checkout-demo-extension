@@ -5,6 +5,7 @@ import BillingAddress from 'one_click_checkout/address/billing_address/index.sve
 import {
   OTP_LABELS as ADDRESS_OTP_LABELS,
   ADD_ADDRESS_OTP_LABELS,
+  MANDATORY_OTP_LABELS,
 } from 'one_click_checkout/address/constants';
 import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 
@@ -13,6 +14,7 @@ import {
   skipOTPHandle as addressOTPSkipHandler,
   addressSaveOTPSuccessHandler,
   addressSaveOTPSkipHandler,
+  mandatoryLoginSuccessHandler,
 } from 'one_click_checkout/address/helpers';
 
 export const savedAddress = {
@@ -28,6 +30,13 @@ export const savedAddress = {
     skipOTPHandle: addressOTPSkipHandler,
   },
   breadcrumHighlight: ADDRESS_LABEL,
+};
+
+export const mandatoryLoginOTPOverrides = {
+  otpLabels: MANDATORY_OTP_LABELS,
+  otpProps: {
+    successHandler: mandatoryLoginSuccessHandler,
+  },
 };
 
 export const savedBillingAddress = {

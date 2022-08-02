@@ -45,7 +45,9 @@
 </script>
 
 <div class="countdown-container">
-  <div class="countdown-text"><p>{formatToMMSS(count)}</p></div>
+  <div class="countdown-text" data-testId="countdown-text">
+    <p>{formatToMMSS(count)}</p>
+  </div>
   <svg viewBox="-{width / 2} -{height / 2} {width} {height}" {height} {width}>
     <g fill="none" stroke="currentColor" stroke-width="3">
       <circle stroke="#E0E0E0" r={radius} />

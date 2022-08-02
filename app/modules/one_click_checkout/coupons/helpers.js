@@ -44,7 +44,7 @@ import {
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 
 // utils imports
-import { getCurrency } from 'razorpay';
+import { getCurrency, isMandatoryLoginEnabled } from 'razorpay';
 import { screensHistory as history } from 'one_click_checkout/routing/History';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import {
@@ -69,6 +69,7 @@ import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
 import { views } from 'one_click_checkout/routing/constants';
 import { showLoader } from 'one_click_checkout/loader/store';
+import { mandatoryLoginOTPOverrides } from 'one_click_checkout/address/config';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -194,12 +195,18 @@ export function skipCouponListOTP() {
 
 export function handleCreateOTP() {
   const customer = getCustomerDetails();
-  const { otpLabels, otpProps } = getRoute(views.SAVED_ADDRESSES);
+  const isMandatoryLogin = isMandatoryLoginEnabled();
+  const template = isMandatoryLogin
+    ? OTP_TEMPLATES.mandatory_login
+    : OTP_TEMPLATES.access_address;
+  const { otpLabels, otpProps } = isMandatoryLogin
+    ? mandatoryLoginOTPOverrides
+    : getRoute(views.SAVED_ADDRESSES);
 
   history.config[views.OTP].props = {
     ...history.config[views.OTP].props,
     ...otpProps,
-    otpReason: OTP_TEMPLATES.access_address,
+    otpReason: template,
   };
   history.config[views.OTP].otpParams = {
     loading: {
@@ -213,7 +220,9 @@ export function handleCreateOTP() {
   updateOTPStore({ ...history.config[views.OTP].otpParams.loading });
   Events.TrackRender(otpEvents.OTP_LOAD, {
     is_otp_skip_cta_visibile: get(OtpScreenStore.allowSkip),
-    otp_reason: otpReasons.access_address,
+    otp_reason: isMandatoryLogin
+      ? otpReasons.mandatory_login
+      : otpReasons.access_address,
   });
   createOTP(
     () => {
@@ -221,11 +230,11 @@ export function handleCreateOTP() {
         ...history.config[views.OTP]?.otpParams?.sent,
         resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
         digits: new Array(6),
-        allowSkip: true,
+        allowSkip: !isMandatoryLogin,
       });
     },
     null,
-    OTP_TEMPLATES.access_address
+    template
   );
   navigator.navigateTo({
     path: views.OTP,
@@ -234,7 +243,7 @@ export function handleCreateOTP() {
 }
 
 export function handleAddrConsentSubmit() {
-  if (get(consentGiven)) {
+  if (get(consentGiven) || isMandatoryLoginEnabled()) {
     handleCreateOTP();
   } else {
     navigator.navigateTo({ path: views.ADD_ADDRESS });
@@ -259,7 +268,11 @@ export function onSubmitLogoutUser() {
       } else if (get(showBanner)) {
         showAddressConsentModal({ onSubmit: handleAddrConsentSubmit });
       } else {
-        navigator.navigateTo({ path: views.ADD_ADDRESS });
+        if (isMandatoryLoginEnabled()) {
+          handleCreateOTP();
+        } else {
+          navigator.navigateTo({ path: views.ADD_ADDRESS });
+        }
       }
     },
     params,

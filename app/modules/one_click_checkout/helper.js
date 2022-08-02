@@ -1,4 +1,9 @@
-import { getOption, getPreferences, isOneClickCheckout } from 'razorpay';
+import {
+  getOption,
+  getPreferences,
+  isMandatoryLoginEnabled,
+  isOneClickCheckout,
+} from 'razorpay';
 import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 import Analytics from 'analytics';
 import {
@@ -70,7 +75,7 @@ export function init1CCMetaData() {
   );
   Analytics.setMeta(
     OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
-    getOption('mandatory_login')
+    isMandatoryLoginEnabled()
   );
   Analytics.setMeta(
     OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,

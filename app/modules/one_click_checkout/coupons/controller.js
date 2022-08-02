@@ -8,11 +8,7 @@ import { locale } from 'svelte-i18n';
 import Analytics from 'analytics';
 
 // store imports
-import {
-  shouldShowCoupons,
-  isCodForced,
-  isLoginMandatory,
-} from 'one_click_checkout/store';
+import { shouldShowCoupons, isCodForced } from 'one_click_checkout/store';
 import { RTBExperiment } from 'rtb/store';
 
 // utils imports
@@ -24,6 +20,7 @@ import {
   isIntlShippingEnabled,
   isGoogleAnalyticsEnabled,
   isFacebookAnalyticsEnabled,
+  isMandatoryLoginEnabled,
 } from 'razorpay';
 
 export function initSummaryMetaAnalytics() {
@@ -32,7 +29,7 @@ export function initSummaryMetaAnalytics() {
     isRTBEnabled(get(RTBExperiment))
   );
   Analytics.setMeta('is_force_cod_enabled', isCodForced());
-  Analytics.setMeta('is_mandatory_signup_enabled', isLoginMandatory());
+  Analytics.setMeta('is_mandatory_signup_enabled', isMandatoryLoginEnabled());
   Analytics.setMeta('is_coupons_enabled', shouldShowCoupons());
   Analytics.setMeta('is_thirdwatch_insured', !isCodForced());
   Analytics.setMeta('summary_screen_default_language', get(locale));
