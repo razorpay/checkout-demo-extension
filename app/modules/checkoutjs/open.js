@@ -327,18 +327,11 @@ RazorProto.close = function () {
 let initRazorpayCheckout = needBody(function () {
   createFrameContainer();
 
-  /**
-   * On Safari, we do not want to preload the iframe.
-   * Because every time a user visits a page with the
-   * Razorpay iframe on it, it counts towards one day
-   * on the LocalStorage counter.
-   *
-   * More details:
-   * https://docs.google.com/document/d/1DSqQ2w70pepJFsf2roQmvRrWaYFaWOLinwcIonfoWQI/edit?usp=sharing
-   */
-  // if (!Safari) {
-  preloadedFrame = getPreloadedFrame();
-  // }
+  if (window.Intl) {
+    preloadedFrame = getPreloadedFrame();
+  } else {
+    Events.Track(MiscEvents.INTL_MISSING);
+  }
 
   // Get the ball rolling in case we are in manual mode
   try {

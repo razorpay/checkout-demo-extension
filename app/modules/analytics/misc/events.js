@@ -9,6 +9,7 @@ const events = {
   EDIT_CONTACT_CLICK: 'checkoutEditContactDetailsOptionClicked',
   CUSTOMER_STATUS_API_INITIATED: '1cc_customer_status_api_call_initiated',
   CUSTOMER_STATUS_API_COMPLETED: '1cc_customer_status_api_call_completed',
+  INTL_MISSING: 'intl_missing',
 };
 
 export default events;
