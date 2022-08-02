@@ -42,6 +42,40 @@ const ajax = {
       gateway: 'cybersource',
     },
   },
+  kkbk_dc: {
+    type: 'otp',
+    request: {
+      url: 'https://api-dark.razorpay.com/v1/payments/pay_Ef3hpkiFpLkCmn/otp_submit/c835ea3d470d473c48cb56431f898fb526dbc33c?key_id=rzp_live_cepk1crIu9VkJU',
+      content: {
+        type: 'otp',
+        bank: 'HDFC',
+        next: ['submit_otp', 'resend_otp'],
+      },
+      method: 'POST',
+    },
+    version: 1,
+    payment_id: 'pay_Ef3hpkiFpLkCmn',
+    gateway:
+      'eyJpdiI6IjZHYTZXNE9uXC91NlVkYzdjS0ZVN2Z3PT0iLCJ2YWx1ZSI6Ik9rYVwvN1hKRGxxS3ZmQjM2alwvblhUZjl2YjdzVFUwSGk5VWpiaG55ekZNST0iLCJtYWMiOiJiOGRiMTI3M2MwNDY2YjcyYTg0OTA0MmU0YTY1MTM2YmY0YmYxMDJjNmExNzM4YjU5ZTUwODk5NGY3NzU5N2Y1In0=',
+    submit_url:
+      ENDPOINT +
+      '/v1/payments/pay_EfZEwe28YBctRJ/otp_submit/5bc33a3afc07cad92ed16f750e1b393d894fdf86?key_id=rzp_live_ILgsfZCZoFIKMb',
+    contact: '+919723461024',
+    amount: '6,000.00',
+    formatted_amount: '₹ 6000',
+    wallet: null,
+    merchant: 'Incredible',
+    merchant_id: 'CNoxEwowM0nMIT',
+    redirect:
+      'https://api-dark.razorpay.com/v1/payments/pay_Ef3hpkiFpLkCmn/authentication/redirect?key_id=rzp_live_cepk1crIu9VkJU',
+    metadata: {
+      issuer: 'KKBK',
+      network: 'VISA',
+      last4: '0176',
+      iin: '416021',
+      gateway: 'cybersource',
+    },
+  },
   hdfc_dc_error: {
     error: {
       code: 'BAD_REQUEST_ERROR',

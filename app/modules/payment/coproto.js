@@ -646,11 +646,11 @@ const responseTypes = {
       this.emit('otp.required');
     } else if (
       this.data.method === 'emi' &&
-      this.data['_[mode]'] === 'hdfc_debit_emi'
+      this.data['_[mode]'] === 'debit_emi'
     ) {
       this.otpurl = fullResponse.submit_url;
       // TODO: Remove this explicit assignment when backend starts sending it.
-      fullResponse.mode = 'hdfc_debit_emi';
+      fullResponse.mode = 'debit_emi';
       this.emit('otp.required', fullResponse);
     } else {
       Analytics.setMeta('headless', true);
