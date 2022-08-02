@@ -10,17 +10,27 @@ const SESSION_ERRORED = 'session_errored';
 let sessionCreated = false;
 let sessionErrored = false;
 
+let env = TRAFFIC_ENV;
+try {
+  if (
+    location.href.indexOf('https://api.razorpay.com/v1/checkout/public') === 0
+  ) {
+    const envPrefix = 'traffic_env=';
+    const envString = location.search
+      .slice(1)
+      .split('&')
+      .filter((a) => a.indexOf(envPrefix) === 0)[0];
+    if (envString) {
+      env = envString.slice(envPrefix.length);
+    }
+  }
+} catch (e) {}
+
 function getEventName(event) {
   if (event === SESSION_CREATED) {
-    return `checkout.${TRAFFIC_ENV}.sessionCreated.metrics`.replace(
-      '.production',
-      ''
-    );
+    return `checkout.${env}.sessionCreated.metrics`.replace('.production', '');
   }
-  return `checkout.${TRAFFIC_ENV}.sessionErrored.metrics`.replace(
-    '.production',
-    ''
-  );
+  return `checkout.${env}.sessionErrored.metrics`.replace('.production', '');
 }
 function createEventObject(event, severity) {
   const name = getEventName(event);
@@ -30,7 +40,7 @@ function createEventObject(event, severity) {
       labels: [
         {
           type: event,
-          env: TRAFFIC_ENV,
+          env,
         },
       ],
     },
