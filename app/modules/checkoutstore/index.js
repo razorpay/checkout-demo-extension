@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { writable, derived } from 'svelte/store';
-import { contact, phone } from 'checkoutstore/screens/home';
+import { contact, phone, selectedInstrument } from 'checkoutstore/screens/home';
 import hdfcVASDisplayConfig from 'constants/hdfcVASDisplayConfig';
 
 import RazorpayStore, {
@@ -30,6 +30,7 @@ export function shouldRememberCustomer(method = 'card') {
   if (isRecurringOrPreferredPayment()) {
     return true;
   }
+
   if (
     !navigator.cookieEnabled ||
     (method === 'card' && !getOption('features.cardsaving')) ||
@@ -44,6 +45,18 @@ export function shouldRememberCustomer(method = 'card') {
   // @TODO fix savedcard tests and remove below condition
   if (RazorpayStore.getMerchantOption('remember_customer') === true) {
     return true;
+  }
+
+  // Since saved cards are not shown if the
+  // instrument has iins, hence avoiding
+  // making otp request to fetch saved cards
+  // information if instrument has iins
+  const currentInstrument = get(selectedInstrument);
+  if (currentInstrument) {
+    const hasIins = Boolean(currentInstrument.iins);
+    if (hasIins) {
+      return false;
+    }
   }
   // this will pick default option
   return getOption('remember_customer');
