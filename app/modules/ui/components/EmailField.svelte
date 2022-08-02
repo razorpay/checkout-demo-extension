@@ -15,10 +15,10 @@
   import { t } from 'svelte-i18n';
 
   // Props
-  export let value;
+  export let value: string;
 
   // Utils
-  import { isEmailOptional } from 'razorpay';
+  import { isEmailOptional, isOneClickCheckout } from 'razorpay';
   import { isEmailReadOnly } from 'checkoutframe/customer';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
   import { debounce } from 'lib/utils';
@@ -55,9 +55,10 @@
     readonly={isEmailReadOnly()}
     label={$t(label)}
     icon=""
-    on:input={(e) => (value = e.target.value)}
+    on:input={(e) => (value = e.target?.value)}
     on:blur
     helpText={$t(EMAIL_HELP_TEXT)}
+    autocomplete={isOneClickCheckout() ? 'email' : 'off'}
     {validationText}
     {showValidations}
   />

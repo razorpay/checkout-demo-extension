@@ -31,6 +31,7 @@ const events = {
   SUMMARY_LANGUAGE_CHANGED: '1cc_summary_screen_language_changed',
   SUMMARY_MOBILE_ENTERED: '1cc_summary_screen_contact_number_entered',
   SUMMARY_EMAIL_ENTERED: '1cc_summary_screen_contact_email_entered',
+  SUMMARY_EMAIL_INPUT: '1cc_summary_screen_email_input',
   SUMMARY_BILLING_SAME_AS_SHIPPING:
     '1cc_summary_screen_billing_same_as_shipping_address',
   SUMMARY_SELECTED_SAVED_ADDRESS: '1cc_summary_screen_selected_saved_address',
@@ -39,7 +40,7 @@ const events = {
   CUSTOM_COUPON_ENTERED: '1cc_coupons_screen_custom_coupon_entered',
   COUPON_APPLY_BUTTON_CLICKED: '1cc_coupons_screen_coupon_applied',
   COUPON_VALIDATION_COMPLETED: '1cc_coupons_screen_coupon_validation_completed',
-  SUMMARY_CONTACT_CHANGE_CLICKED:'1cc_clicked_change_contact_summary_screen',
+  SUMMARY_CONTACT_CHANGE_CLICKED: '1cc_clicked_change_contact_summary_screen',
 };
 
 export default events;

@@ -80,6 +80,7 @@
   } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
+  import { getInputSource } from 'one_click_checkout/helper';
 
   // Props
   export let tpv;
@@ -133,9 +134,12 @@
   }
 
   function onEmailBlur() {
+    const source = getInputSource('email');
+
     updateOrderWithCustomerDetails();
     Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
       email_id: $email,
+      source,
     });
   }
 

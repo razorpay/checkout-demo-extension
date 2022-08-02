@@ -11,6 +11,7 @@ import {
   INDIA_COUNTRY_CODE,
   INDIAN_CONTACT_REGEX,
 } from 'common/constants';
+import { getElementById } from 'utils/doc';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
@@ -85,4 +86,16 @@ export function init1CCMetaData() {
 
 export function getPhoneNumberRegex(country) {
   return country === INDIA_COUNTRY_CODE ? INDIAN_CONTACT_REGEX : CONTACT_REGEX;
+}
+
+/**
+ * Determines source of input - wether it was a manual entry or via autocomplete suggestions.
+ * Autofill, changes background of input to a different color. We compare this with initial color passed by us.
+ *
+ */
+export function getInputSource(elementId, defaultColor = 'rgba(0, 0, 0, 0)') {
+  const el = getElementById(elementId);
+  const currentBackground = window?.getComputedStyle(el)?.backgroundColor;
+
+  return currentBackground === defaultColor ? 'manual' : 'selection';
 }
