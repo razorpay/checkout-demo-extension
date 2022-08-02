@@ -437,11 +437,7 @@
 
         // First figure out which source to attempt using
         if (instrumentsFromStorage.length) {
-          if (Math.random() < 0.5) {
-            instrumentsSource = SOURCES.STORAGE;
-          } else {
-            instrumentsSource = SOURCES.API;
-          }
+          instrumentsSource = SOURCES.STORAGE;
         } else {
           instrumentsSource = SOURCES.API;
         }
