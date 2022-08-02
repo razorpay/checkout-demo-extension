@@ -35,25 +35,11 @@
   /**
    * If apps are defined, render them directly,
    * If apps are given by parent component, its fallback to default.
-   * So on if variant:row, we shouldn't show invalid apps if its SDK
    */
   export let apps = getDefaultApps();
   export let normalizeDowntime = true;
 
-  /**
-   * @TODO UPIUX1.1
-   * remove experimentation
-   * Note: Only code inside if is required once we remove the experiment.
-   */
   function getDefaultApps() {
-    if (upiUxV1dot1.enabled()) {
-      return getRecommendedAppsForUPIStack(
-        withOtherTile,
-        limit,
-        variant === 'row' &&
-          (definePlatform('androidSDK') || definePlatform('iosSDK'))
-      );
-    }
     return getRecommendedAppsForUPIStack(withOtherTile, limit);
   }
   const dispatch = createEventDispatcher();

@@ -40,9 +40,9 @@ const upiQrOnL0 = createExperiment('upi_qr_on_l0_percentage_5', 0.95);
 
 /**
  * Experiment: UPI UX v1.1
- * Temporary 10% rollout, argument must be 1-0.10=>0.90
+ * Temporary full rollout, argument must be 0
  */
-const upiUxV1dot1 = createExperiment('upi_ux_v_1_dot_1_percentage_10', 0.9);
+const upiUxV1dot1 = createExperiment('upi_ux_v_1_dot_1_percentage_100', 0);
 
 export {
   highlightUPIIntentOnDesktop,
