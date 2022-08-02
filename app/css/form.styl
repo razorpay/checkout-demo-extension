@@ -261,7 +261,10 @@ button {
   border: none;
   outline: none;
   &[type=submit] {
-    display: none;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    overflow: hidden;
   }
 }
 
