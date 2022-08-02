@@ -28,15 +28,15 @@ export const upiNrL0L1Improvements = createExperiment(
 
 /**
  * Experiment: UPI QR On L1 Feature
- * Temporary 5% rollout, argument must be 1-0.05=>0.95
+ * Temporary 10% rollout, argument must be 1-0.10=>0.90
  */
-const upiQrOnL1 = createExperiment('upi_qr_on_l1_percentage_5', 0.95);
+const upiQrOnL1 = createExperiment('upi_qr_on_l1_percentage_10', 0.9);
 
 /**
  * Experiment: UPI QR On L0 Feature
- * Temporary 5% rollout, argument must be 1-0.05=>0.95
+ * Temporary 10% rollout, argument must be 1-0.10=>0.90
  */
-const upiQrOnL0 = createExperiment('upi_qr_on_l0_percentage_5', 0.95);
+const upiQrOnL0 = createExperiment('upi_qr_on_l0_percentage_10', 0.9);
 
 /**
  * Experiment: UPI UX v1.1
