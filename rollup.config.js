@@ -36,6 +36,7 @@ function getOptions(module) {
       format: 'iife',
       strict: false,
       name: 'Razorpay',
+      sourcemap: true,
     },
     plugins,
     onwarn: function (warning) {

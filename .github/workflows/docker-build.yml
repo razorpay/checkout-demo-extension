@@ -30,6 +30,10 @@ jobs:
         uses: docker://amazon/aws-cli:2.7.6
         with:
           args: s3 sync --exclude="*" --include="*.js" --include="*.css" "./app/dist/v1" "s3://rzp-1415-prod-checkout-static/build/${{ github.sha }}" --cache-control "public,max-age=31536000,immutable"
+      - name: Copy sourcemaps to S3
+        uses: docker://amazon/aws-cli:2.7.6
+        with:
+          args: s3 sync --exclude="*" --include="*.map" "./app/dist/v1" "s3://rzp-1415-prod-checkout-static/build/${{ github.sha }}" --acl private --cache-control "public,max-age=31536000,immutable"
       - name: Cache Build
         id: cache-build
         uses: actions/cache@v3

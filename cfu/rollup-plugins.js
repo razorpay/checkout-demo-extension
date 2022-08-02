@@ -76,7 +76,7 @@ const getPlugins = ({ src }) => {
       // env is prod but traffic env can be production/canary/baseline
       __TRAFFIC_ENV__: JSON.stringify(process.env.TRAFFIC_ENV),
     }),
-    typescript({ sourceMap: !isProd, inlineSources: !isProd }),
+    typescript({ sourceMap: true, inlineSources: !isProd }),
 
     include({
       paths,
@@ -90,7 +90,7 @@ const getPlugins = ({ src }) => {
         dev: !isProd,
       },
       preprocess: [
-        preprocess({ defaults: { style: 'scss' } }),
+        preprocess({ defaults: { style: 'scss' }, sourceMap: true }),
         {
           script: async (svelteFile) => {
             if (!isProd) {
