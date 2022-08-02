@@ -35,12 +35,7 @@ const cityStateInvalidValue = [
   '33456',
 ];
 
-const cityStateValidValue = [
-  'Salem',
-  'Kerala',
-  'Bengaluru',
-  'Karnataka',
-];
+const cityStateValidValue = ['Salem', 'Kerala', 'Bengaluru', 'Karnataka'];
 
 const cityFieldDataInvalid = [
   [
@@ -82,7 +77,7 @@ const cityFieldDataValid = [
         autofillToken: 'none',
         pattern: CITY_STATE_REGEX_PATTERN,
       },
-    }
+    },
   ],
   [
     {
@@ -94,10 +89,9 @@ const cityFieldDataValid = [
         items: [],
         pattern: CITY_STATE_REGEX_PATTERN,
       },
-    }
+    },
   ],
 ];
-
 
 const fieldData = [
   [
@@ -199,9 +193,7 @@ describe('Validate City Field on Address Form for valid case', () => {
       if (Array.isArray(field.value)) {
         const { value: listOfValues, props } = field;
         listOfValues.forEach((value) => {
-          expect(
-            validateInputField(value, props)
-          ).toBeUndefined();
+          expect(validateInputField(value, props)).toBeUndefined();
         });
       }
     }
@@ -228,7 +220,11 @@ describe('Validate Input Field for Address Form', () => {
 
     expect(
       formatMessageWithLocale(
-        validateInputField(pincodeFieldValue, pincodeFieldProps, INDIA_COUNTRY_ISO_CODE)
+        validateInputField(
+          pincodeFieldValue,
+          pincodeFieldProps,
+          INDIA_COUNTRY_ISO_CODE
+        )
       )
     ).toBe(PINCODE_ERROR_LABEL);
   });
@@ -236,7 +232,11 @@ describe('Validate Input Field for Address Form', () => {
     const pincodeFieldValue = '637402';
 
     expect(
-      validateInputField(pincodeFieldValue, pincodeFieldProps, INDIA_COUNTRY_ISO_CODE)
+      validateInputField(
+        pincodeFieldValue,
+        pincodeFieldProps,
+        INDIA_COUNTRY_ISO_CODE
+      )
     ).toBeUndefined();
   });
   test('pincode validation for international on invalid case', () => {

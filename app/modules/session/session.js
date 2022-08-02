@@ -5058,62 +5058,6 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data);
     }
 
-    if (request.feesRedirect) {
-      this.showFeesUi();
-      return;
-    }
-
-    /**
-     * - Ask user to verify phone number if not logged in and wants to save card
-     * - Show OTP screen after user agrees to fees
-     */
-    let isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
-    if (data.save && !this.getCurrentCustomer().logged) {
-      if (this.screen === 'card') {
-        /**
-         * - In case if recurring payment and recurring=preferred payments
-         * - Ask user to verify phone if phone number is domestic only
-         */
-        if (RazorpayHelper.isRecurringOrPreferredPayment()) {
-          if (isDomesticCustomer) {
-            this.sendOTP();
-            return;
-          }
-        } else {
-          this.sendOTP();
-          return;
-        }
-      } else if (!this.headless) {
-        request.message = 'Verifying OTP...';
-        request.paused = true;
-      }
-    }
-    delete data.app_token;
-
-    Razorpay.sendMessage({
-      event: 'submit',
-      data: data,
-    });
-
-    let wallet = data.wallet;
-    let walletObj;
-
-    if (data.method === 'wallet') {
-      walletObj = freqWallets[wallet];
-
-      if (!walletObj || walletObj.custom) {
-        return;
-      }
-
-      if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
-        request.external.amazonpay = true;
-      }
-    }
-
-    if (this.modal) {
-      this.modal.options.backdropclose = false;
-    }
-
     if (data.method === 'international' && NVSEntity) {
       data.provider = NVSEntity;
     }
@@ -5193,6 +5137,62 @@ Session.prototype = {
           });
         }
       }
+    }
+
+    if (request.feesRedirect) {
+      this.showFeesUi();
+      return;
+    }
+
+    /**
+     * - Ask user to verify phone number if not logged in and wants to save card
+     * - Show OTP screen after user agrees to fees
+     */
+    let isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+    if (data.save && !this.getCurrentCustomer().logged) {
+      if (this.screen === 'card') {
+        /**
+         * - In case if recurring payment and recurring=preferred payments
+         * - Ask user to verify phone if phone number is domestic only
+         */
+        if (RazorpayHelper.isRecurringOrPreferredPayment()) {
+          if (isDomesticCustomer) {
+            this.sendOTP();
+            return;
+          }
+        } else {
+          this.sendOTP();
+          return;
+        }
+      } else if (!this.headless) {
+        request.message = 'Verifying OTP...';
+        request.paused = true;
+      }
+    }
+    delete data.app_token;
+
+    Razorpay.sendMessage({
+      event: 'submit',
+      data: data,
+    });
+
+    let wallet = data.wallet;
+    let walletObj;
+
+    if (data.method === 'wallet') {
+      walletObj = freqWallets[wallet];
+
+      if (!walletObj || walletObj.custom) {
+        return;
+      }
+
+      if (this.hasAmazonpaySdk && wallet === 'amazonpay') {
+        request.external.amazonpay = true;
+      }
+    }
+
+    if (this.modal) {
+      this.modal.options.backdropclose = false;
     }
 
     let emiCode, emiContact, isDebitEMI;

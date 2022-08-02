@@ -8,6 +8,11 @@ async function expectCountriesAPI({ expectRequest, respondJSON }) {
       countryAlpha2Code: 'gb',
       countryAlpha3Code: 'GBR',
     },
+    {
+      countryName: 'Australia',
+      countryAlpha2Code: 'au',
+      countryAlpha3Code: 'AUS',
+    },
   ]);
 }
 

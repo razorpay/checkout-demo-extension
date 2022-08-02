@@ -38,41 +38,40 @@ function handleDeeplinkAction(
 ) {
   if (!intentUrl || action !== 'deepLinkIntent') {
     return;
-  } else {
-    const [, queryParams] = intentUrl.split('?');
-
-    let appUrlScheme = '';
-    /**
-     * handleDeeplinkAction directly depends on the url-scheme provided as a part of
-     * enableUPITiles feature config, if feature is absent, app specific url trigger not required.
-     */
-    const upiTileFeature = enableUPITiles();
-
-    let apps: UPI.AppConfiguration[] = [];
-    if (upiTileFeature.status && upiTileFeature.config) {
-      apps = upiTileFeature.config.apps;
-    }
-
-    const { url_schema } =
-      apps?.find(({ shortcode }) => shortcode === app?.shortcode) || {};
-
-    if (typeof url_schema === 'object') {
-      const platform = definePlatform('mWebAndroid')
-        ? 'android'
-        : definePlatform('mWebiOS')
-        ? 'ios'
-        : undefined;
-      appUrlScheme = platform ? url_schema[platform] : '';
-    } else {
-      appUrlScheme = String(url_schema);
-    }
-
-    if (!appUrlScheme) {
-      processIntentOnMWeb(intentUrl);
-      throw new Error('App Specific URL not found falling back to original');
-    }
-    processIntentOnMWeb(`${appUrlScheme}?${queryParams}`);
   }
+  const [, queryParams] = intentUrl.split('?');
+
+  let appUrlScheme = '';
+  /**
+   * handleDeeplinkAction directly depends on the url-scheme provided as a part of
+   * enableUPITiles feature config, if feature is absent, app specific url trigger not required.
+   */
+  const upiTileFeature = enableUPITiles();
+
+  let apps: UPI.AppConfiguration[] = [];
+  if (upiTileFeature.status && upiTileFeature.config) {
+    apps = upiTileFeature.config.apps;
+  }
+
+  const { url_schema } =
+    apps?.find(({ shortcode }) => shortcode === app?.shortcode) || {};
+
+  if (typeof url_schema === 'object') {
+    const platform = definePlatform('mWebAndroid')
+      ? 'android'
+      : definePlatform('mWebiOS')
+      ? 'ios'
+      : undefined;
+    appUrlScheme = platform ? url_schema[platform] : '';
+  } else {
+    appUrlScheme = String(url_schema);
+  }
+
+  if (!appUrlScheme) {
+    processIntentOnMWeb(intentUrl);
+    throw new Error('App Specific URL not found falling back to original');
+  }
+  processIntentOnMWeb(`${appUrlScheme}?${queryParams}`);
 }
 
 function adoptSessionUI(

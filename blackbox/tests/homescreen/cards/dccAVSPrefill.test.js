@@ -6,7 +6,7 @@ const AVS_PREFILL_DATA = {
   'billing_address[postal_code]': 'SW1P 2NA',
   'billing_address[city]': 'London',
   'billing_address[country]': 'GB',
-  'billing_address[state]': 'Greater London',
+  'billing_address[state]': 'England',
 };
 
 createCardsTest({

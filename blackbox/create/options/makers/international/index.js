@@ -32,6 +32,20 @@ function makePreferences(features, preferences) {
     app.trustly = 1;
   }
 
+  if (features.dcc) {
+    preferences = {
+      ...preferences,
+      features: {
+        ...preferences.features,
+        dcc: true,
+      },
+    };
+  }
+
+  if (features.feeBearer) {
+    preferences.fee_bearer = true;
+  }
+
   preferences.methods = {
     ...preferences.methods,
     wallet: {

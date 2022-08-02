@@ -2,13 +2,17 @@ const { delay, innerText, visible } = require('../util');
 const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 const { sendSiftJS } = require('./siftjs');
+const {
+  expectCountriesAPI,
+  expectStatesAPI,
+} = require('./avs-countries-states');
 
 const AVS_DATA = {
   line1: '21A Vincent Square',
   line2: '',
   postal_code: 'SW1P 2NA',
   city: 'London',
-  state: 'Greater London',
+  state: 'England',
   country: 'GB',
 };
 
@@ -28,15 +32,39 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
   });
 }
 
-async function fillAVSForm(context) {
+async function fillAVSForm({
+  context,
+  isNameRequired,
+  countryCode = AVS_DATA.country,
+}) {
   // fill avs data
-  await context.page.evaluate((data) => {
-    const keys = Object.keys(data);
-    keys.forEach((id) => {
-      document.getElementById(`billing-address-verification-${id}`).value =
-        data[id];
-    });
-  }, AVS_DATA);
+  await expectCountriesAPI(context);
+  if (isNameRequired) {
+    await context.page.type('#billing-address-verification-first_name', 'test');
+    await context.page.type('#billing-address-verification-last_name', 'user');
+  }
+
+  await context.page.type(
+    '#billing-address-verification-line1',
+    AVS_DATA.line1
+  );
+  await context.page.type('#billing-address-verification-city', AVS_DATA.city);
+  await context.page.type(
+    '#billing-address-verification-postal_code',
+    AVS_DATA.postal_code
+  );
+  await context.page.click('#billing-address-verification-country');
+  await delay(200);
+  await context.page.click(
+    `#billing-address-verification-location-country_${countryCode}_0_search_all`
+  ); // Select United Kingdom(GB) or countryCode
+  await expectStatesAPI(context);
+  await delay(200);
+  await context.page.click('#billing-address-verification-state');
+  await delay(200);
+  await context.page.click(
+    '#billing-address-verification-location-state_search_results .list-data'
+  ); // Select England
 }
 
 async function assertAVSFormData(context) {

@@ -16,7 +16,7 @@
   import AutoCompleteInput from 'one_click_checkout/address/ui/components/AutoCompleteInput.svelte';
   import CountryField from 'one_click_checkout/address/ui/elements/CountryField.svelte';
   import StateSearchField from 'one_click_checkout/address/ui/elements/StateSearchField.svelte';
-  import LandmarkField from 'one_click_checkout/address/ui/components/LandmarkField.svelte'
+  import LandmarkField from 'one_click_checkout/address/ui/components/LandmarkField.svelte';
 
   // analytics imports
   import { Events } from 'analytics';

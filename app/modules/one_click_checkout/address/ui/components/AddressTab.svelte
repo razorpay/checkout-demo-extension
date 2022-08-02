@@ -261,7 +261,8 @@
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
-    class:capture-billing-disabled={!captureBillingAddr && currentView === addressViews.SAVED_ADDRESSES}
+    class:capture-billing-disabled={!captureBillingAddr &&
+      currentView === addressViews.SAVED_ADDRESSES}
     bind:this={addressWrapperEle}
   >
     <div class="address-section">

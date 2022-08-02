@@ -209,8 +209,7 @@ module.exports = function (testFeatures) {
             await submit(context);
             if (!avsPrefillFromSavedCard) {
               // skip filling of data
-              await fillAVSForm(context);
-              await expectCountriesAPI(context);
+              await fillAVSForm({ context });
             } else {
               // assert data from saved card
               await expectCountriesAPI(context);
@@ -236,12 +235,12 @@ module.exports = function (testFeatures) {
          * if AVS feature flag is enabled without DCC flag
          */
         if (!dcc && avs && !domesticSavedCard) {
-          await expectCountriesAPI(context);
           if (!avsPrefillFromSavedCard) {
             // skip filling of data
-            await fillAVSForm(context);
+            await fillAVSForm({ context });
           } else {
             // assert data from saved card
+            await expectCountriesAPI(context);
             await expectStatesAPI(context);
             await assertAVSFormData(context);
           }

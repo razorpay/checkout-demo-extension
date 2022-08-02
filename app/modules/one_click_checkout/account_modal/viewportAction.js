@@ -1,28 +1,28 @@
 let intersectionObserver;
-  
-function ensureIntersectionObserver() {
-	if (intersectionObserver) return;
 
-  intersectionObserver = new IntersectionObserver(
-		(entries) => {
-			entries.forEach(entry => {
-				const eventName = entry.isIntersecting ? 'enterViewport' : 'exitViewport';
-				entry.target.dispatchEvent(new CustomEvent(eventName));
-			});
-		}
-	);
+function ensureIntersectionObserver() {
+  if (intersectionObserver) {
+    return;
+  }
+
+  intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const eventName = entry.isIntersecting ? 'enterViewport' : 'exitViewport';
+      entry.target.dispatchEvent(new CustomEvent(eventName));
+    });
+  });
 }
 
 export default function viewport(element) {
   if (typeof IntersectionObserver !== 'undefined') {
-	  ensureIntersectionObserver();
+    ensureIntersectionObserver();
 
-	  intersectionObserver.observe(element);
+    intersectionObserver.observe(element);
 
-	  return {
-	  	destroy() {
-	  		intersectionObserver.unobserve(element);
-	  	}
-	  }
+    return {
+      destroy() {
+        intersectionObserver.unobserve(element);
+      },
+    };
   }
 }

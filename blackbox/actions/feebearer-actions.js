@@ -149,8 +149,118 @@ function modifyPreferencesForDynamicFeeBearer() {
   };
   return order;
 }
+
+const calculateFee = ({ amount, currency, dcc }) => {
+  const razorpay_fee = +parseFloat(amount * dcc ? 0.08 : 0.02).toFixed(2);
+  const tax = +parseFloat(razorpay_fee * 0.18).toFixed(2);
+
+  return {
+    currency,
+    fees: razorpay_fee + tax,
+    originalAmount: amount,
+    original_amount: amount,
+    razorpay_fee,
+    tax: tax,
+    amount: amount + razorpay_fee + tax,
+  };
+};
+
+const expectFeeBearerRequest = async ({ context, dcc, isAVS }) => {
+  let req = await context.expectRequest();
+  expect(req.method).toEqual('POST');
+
+  const deserializeRequestBody = (body) => {
+    const data = body.split('&');
+    const obj = {};
+    data.forEach((item) => {
+      const [key, value] = item.split('=');
+      obj[decodeURIComponent(key)] = decodeURIComponent(value);
+    });
+    return obj;
+  };
+
+  const responseData = deserializeRequestBody(req.body);
+  const amount = parseInt(responseData.amount, 10);
+
+  // check for dcc payload
+  const dccCurrency = responseData.dcc_currency;
+
+  if (dcc) {
+    expect(typeof dccCurrency).toBe('string');
+    expect(typeof responseData.currency_request_id).toBe('string');
+  } else {
+    // strictly check DCC payload is not present
+    expect(dccCurrency).toBeUndefined();
+    expect(responseData.currency_request_id).toBeUndefined();
+  }
+
+  if (isAVS) {
+    expect(typeof responseData['billing_address[line1]']).toBe('string');
+    expect(responseData['billing_address[line2]']).toBeDefined();
+    expect(typeof responseData['billing_address[city]']).toBe('string');
+    expect(typeof responseData['billing_address[country]']).toBe('string');
+    expect(typeof responseData['billing_address[postal_code]']).toBe('string');
+    expect(typeof responseData['billing_address[state]']).toBe('string');
+  } else {
+    // strictly check AVS payload is not present
+    expect(responseData['billing_address[line1]']).toBeUndefined();
+    expect(responseData['billing_address[line2]']).toBeUndefined();
+    expect(responseData['billing_address[city]']).toBeUndefined();
+    expect(responseData['billing_address[country]']).toBeUndefined();
+    expect(responseData['billing_address[postal_code]']).toBeUndefined();
+    expect(responseData['billing_address[state]']).toBeUndefined();
+  }
+
+  const calculatedFee = calculateFee({
+    amount,
+    currency: dccCurrency || responseData.currency,
+    dcc: dccCurrency !== undefined,
+  });
+
+  await context.respondJSON({
+    input: responseData,
+    display: calculatedFee,
+  });
+
+  return calculatedFee;
+};
+
+const verifyFeeBearerAmountOnUI = async (
+  context,
+  feeBearerAmount = {},
+  symbol = '₹'
+) => {
+  const feeElement = await context.page.$$('.fee-amount');
+  feeAmount = feeElement[0];
+  let feeAmountText = await context.page.evaluate(
+    (feeAmount) => feeAmount.textContent,
+    feeAmount
+  );
+  expect(feeAmountText).toEqual(`${symbol} ${feeBearerAmount.original_amount}`);
+  feeAmount = feeElement[1];
+  feeAmountText = await context.page.evaluate(
+    (feeAmount) => feeAmount.textContent,
+    feeAmount
+  );
+  expect(feeAmountText).toEqual(`${symbol} ${feeBearerAmount.razorpay_fee}`);
+  feeAmount = feeElement[2];
+  feeAmountText = await context.page.evaluate(
+    (feeAmount) => feeAmount.textContent,
+    feeAmount
+  );
+  expect(feeAmountText).toEqual(`${symbol} ${feeBearerAmount.tax}`);
+  feeAmount = feeElement[3];
+  feeAmountText = await context.page.evaluate(
+    (feeAmount) => feeAmount.textContent,
+    feeAmount
+  );
+  expect(feeAmountText).toEqual(`${symbol} ${feeBearerAmount.amount}`);
+};
+
 module.exports = {
   handleFeeBearer,
+  expectFeeBearerRequest,
   assertDynamicFeeBearer,
+  verifyFeeBearerAmountOnUI,
   modifyPreferencesForDynamicFeeBearer,
 };

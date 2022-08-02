@@ -66,13 +66,13 @@ const getPixelData = (color) => {
 export const rgbToHsb = (r, g, b) => {
   (r /= 255), (g /= 255), (b /= 255);
 
-  var max = Math.max(r, g, b),
+  let max = Math.max(r, g, b),
     min = Math.min(r, g, b);
-  var h,
+  let h,
     s,
     v = max;
 
-  var d = max - min;
+  let d = max - min;
   s = max === 0 ? 0 : d / max;
 
   if (max === min) {
@@ -108,13 +108,13 @@ export const rgbToHsb = (r, g, b) => {
  * @return  Array           The RGB representation
  */
 function hsbToRgb(h, s, v) {
-  var r, g, b;
+  let r, g, b;
 
-  var i = Math.floor(h * 6);
-  var f = h * 6 - i;
-  var p = v * (1 - s);
-  var q = v * (1 - f * s);
-  var t = v * (1 - (1 - f) * s);
+  let i = Math.floor(h * 6);
+  let f = h * 6 - i;
+  let p = v * (1 - s);
+  let q = v * (1 - f * s);
+  let t = v * (1 - (1 - f) * s);
 
   switch (i % 6) {
     case 0:
@@ -250,7 +250,7 @@ export const getColorVariations = ((colorCache) => {
       return colorCache[color];
     }
 
-    var bgColorBrightness = 0,
+    let bgColorBrightness = 0,
       fgColorBrightness = 0,
       relativeLuminance = getRelativeLuminanceWithWhite(color);
 
@@ -291,7 +291,7 @@ export const getColorVariations = ((colorCache) => {
 })({});
 
 export function getColorDistance(color) {
-  var rgb = getColorProperties(color),
+  let rgb = getColorProperties(color),
     hsb = rgbToHsb(rgb.red, rgb.green, rgb.blue),
     saturation = hsb.saturation * 100,
     brightness = hsb.brightness * 100;
@@ -302,13 +302,13 @@ export function getColorDistance(color) {
 }
 
 export function getHighlightColor(color, defaultColor) {
-  var colorDistance = getColorDistance(color);
+  let colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return defaultColor;
   }
 
-  var hsb = getHSB(color),
+  let hsb = getHSB(color),
     saturation = hsb.saturation * 100,
     colorVariations = getColorVariations(color);
 
@@ -320,16 +320,16 @@ export function getHighlightColor(color, defaultColor) {
 }
 
 export function getHoverStateColor(color, variation, defaultColor) {
-  var colorDistance = getColorDistance(color);
+  let colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return transparentify(defaultColor, 3);
   }
 
-  var hsb = getHSB(color),
+  let hsb = getHSB(color),
     brightness = hsb.brightness * 100;
 
-  var opacity = 3;
+  let opacity = 3;
 
   if (brightness > 50) {
     opacity = 6;
@@ -339,16 +339,16 @@ export function getHoverStateColor(color, variation, defaultColor) {
 }
 
 export function getActiveStateColor(color, variation, defaultColor) {
-  var colorDistance = getColorDistance(color);
+  let colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return transparentify(defaultColor, 6);
   }
 
-  var hsb = getHSB(color),
+  let hsb = getHSB(color),
     brightness = hsb.brightness * 100;
 
-  var opacity = 6;
+  let opacity = 6;
 
   if (brightness > 50) {
     opacity = 9;

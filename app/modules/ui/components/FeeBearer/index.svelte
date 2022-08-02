@@ -11,7 +11,10 @@
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
   // Utils imports
-  import { formatAmountWithSymbol } from 'common/currency';
+  import {
+    formatAmountWithSymbol,
+    formatAmountWithSymbolRawHtml,
+  } from 'common/currency';
   import { getSession } from 'sessionmanager';
   import { isOneClickCheckout } from 'razorpay';
   import { popStack } from 'navstack';
@@ -30,6 +33,14 @@
     CLOSE_ACTION,
   } from 'ui/labels/fees';
 
+  // analytics
+  import {
+    trackShown,
+    trackContinueClick,
+    trackFeeError,
+    trackFeeSuccess,
+  } from './events';
+
   // Props
   export let loading = true;
   export let feeBreakup = null;
@@ -37,6 +48,12 @@
   export let paymentData;
   export let onContinue;
   export let navstack;
+
+  /**
+   * INR as default currency Symbol for Fees
+   * If DCC is applied then show DCC currency symbol
+   */
+  let currency = 'INR';
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
   const spaceAmountWithSymbol = !isOneClickCheckout();
@@ -54,6 +71,7 @@
 
   onMount(() => {
     fetchFees(paymentData);
+    trackShown();
   });
 
   export function onSuccess(response) {
@@ -64,17 +82,35 @@
       })
     );
 
+    if (feeBreakup?.currency) {
+      currency = feeBreakup?.currency;
+    }
+
     loading = false;
     bearer = response.input;
     $showFeeLabel = Boolean(isDynamicFeeBearer());
     const offer = session.getAppliedOffer();
     if (!offer || !offer.amount) {
-      session.updateAmountInHeader(feeBreakup.amount * 100, false);
+      if (feeBreakup.currency) {
+        session.setRawAmountInHeader(
+          formatAmountWithSymbolRawHtml(
+            feeBreakup.amount * 100,
+            feeBreakup.currency
+          )
+        );
+      } else {
+        session.updateAmountInHeader(feeBreakup.amount * 100, false);
+      }
       return;
     }
     if (offer) {
       session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
     }
+    trackFeeSuccess({
+      amount: feeBreakup.amount,
+      currency: feeBreakup.currency,
+      dcc_currency: bearer.dcc_currency,
+    });
   }
 
   export function onError(response) {
@@ -86,6 +122,12 @@
       popStack(); // @TODO future - replaceStack(ErrorScreen);
       session.showLoadError(errorMessage, response.error);
     }
+
+    trackFeeError({
+      error: response.error,
+      currency: paymentData.currency,
+      dcc_currency: paymentData.dcc_currency,
+    });
   }
 
   export function fetchFees(paymentData) {
@@ -107,6 +149,7 @@
       popStack();
     }
     onContinue?.(bearer);
+    trackContinueClick();
   }
 </script>
 
@@ -143,7 +186,7 @@
             <div class="fee-amount">
               {formatAmountWithSymbol(
                 amount * 100,
-                'INR',
+                currency || 'INR',
                 spaceAmountWithSymbol
               )}
             </div>

@@ -40,7 +40,6 @@
   const handleExitViewport = () => {
     showAccountTab = false;
   };
-
 </script>
 
 {#if isOneClickCheckout()}

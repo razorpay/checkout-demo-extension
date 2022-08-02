@@ -182,7 +182,11 @@ const assertNVSFormData = async (context) => {
   });
 };
 
-const assertNVSFormDataInRequest = async (context, currency = 'GBP') => {
+const assertNVSFormDataInRequest = async (
+  context,
+  currency = 'GBP',
+  country = NVS_DATA['nvs-country']
+) => {
   const request = await context.expectRequest();
   const body = querystring.parse(request.body);
   let check = {
@@ -191,7 +195,7 @@ const assertNVSFormDataInRequest = async (context, currency = 'GBP') => {
     'billing_address[first_name]': NVS_DATA['nvs-first_name'],
     'billing_address[last_name]': NVS_DATA['nvs-last_name'],
     'billing_address[line1]': NVS_DATA['nvs-line1'],
-    'billing_address[country]': NVS_DATA['nvs-country'],
+    'billing_address[country]': country,
     'billing_address[city]': NVS_DATA['nvs-city'],
     'billing_address[postal_code]': NVS_DATA['nvs-postal_code'],
   };

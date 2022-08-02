@@ -36,6 +36,11 @@ function validateData(data) {
 export const formatPayload = function (payload, params = {}) {
   let data = _Obj.clone(payload);
 
+  // won't affect origin payload. as it is cloned
+  if (data.default_dcc_currency) {
+    delete data.default_dcc_currency;
+  }
+
   // Set view for fees.
   if (params.feesRedirect) {
     data.view = 'html';

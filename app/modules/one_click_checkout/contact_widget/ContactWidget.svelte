@@ -11,7 +11,12 @@
   } from 'one_click_checkout/contact_widget/i18n/labels';
 
   // Store Imports
-  import { contact, isContactPresent, email, country } from 'checkoutstore/screens/home';
+  import {
+    contact,
+    isContactPresent,
+    email,
+    country,
+  } from 'checkoutstore/screens/home';
   import {
     isContactHidden,
     isEmailHidden,

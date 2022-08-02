@@ -66,7 +66,7 @@
 
   function handleOnFocus(event) {
     if (readonly) {
-      openStateModal(event)
+      openStateModal(event);
     }
   }
 </script>

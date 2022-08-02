@@ -421,13 +421,13 @@
   const setStateDisabledReadonly = ({ disabled, readonly = false }) => {
     INPUT_FORM[stateIndex][stateSubIndex].disabled = disabled;
     INPUT_FORM[stateIndex][stateSubIndex].readonly = readonly;
-  }
+  };
 
   const toggleStateField = (value) => {
     if ($selectedCountryISO === INDIA_COUNTRY_ISO_CODE.toLowerCase()) {
-      setStateDisabledReadonly(value)
+      setStateDisabledReadonly(value);
     }
-  }
+  };
 
   export function onUpdate(key, value, extra) {
     /**
@@ -540,20 +540,22 @@
       pinPattern.test(value) &&
       !isCityStateAutopopulateDisabled
     ) {
-      getCityState(value, $selectedCountryISO).then((response) => {
-        Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
-          is_prefilled: SOURCE.PREFILLED,
-        });
+      getCityState(value, $selectedCountryISO)
+        .then((response) => {
+          Events.TrackBehav(AddressEvents.INPUT_ENTERED_city_V2, {
+            is_prefilled: SOURCE.PREFILLED,
+          });
 
-        Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
-          is_prefilled: SOURCE.PREFILLED,
+          Events.TrackBehav(AddressEvents.INPUT_ENTERED_state_V2, {
+            is_prefilled: SOURCE.PREFILLED,
+          });
+          resetCityState(response);
+        })
+        .catch(() => {
+          toggleStateField({ disabled: false, readonly: true });
+          onUpdate('city', '');
+          onUpdate('state', '');
         });
-        resetCityState(response);
-      }).catch(() => {
-        toggleStateField({ disabled: false, readonly: true });
-        onUpdate('city', '');
-        onUpdate('state', '');
-      });
     }
 
     if (
@@ -614,7 +616,7 @@
     toggleStateField({ disabled: !!state, readonly });
     onUpdate('city', toTitleCase(city) || '');
     onUpdate('state', toTitleCase(state) || '');
-  }
+  };
 
   const updateTag = (tag) => {
     selectedTag = tag;
@@ -745,14 +747,12 @@
     Object.keys($formData).forEach((key) => {
       if ($formData[key]) {
         const field = findItem(INPUT_FORM, key);
-        const errorLabel = field && validateInputField(
-          $formData[key],
-          field,
-          $selectedCountryISO
-        );
+        const errorLabel =
+          field &&
+          validateInputField($formData[key], field, $selectedCountryISO);
         errors[key] = errorLabel ? $t(errorLabel) : null;
       }
-    })
+    });
   }
 
   onMount(() => {
@@ -788,7 +788,7 @@
       address_type,
       address_flow_experimentation_enabled: enabledOptimisedAddr,
     });
-    handleFormValidation()
+    handleFormValidation();
     merchantAnalytics({
       event: ACTIONS.ADDRESS_ENTERED,
       category: CATEGORIES.ADDRESS,
@@ -803,7 +803,6 @@
   onDestroy(() => {
     hideToast();
   });
-
 </script>
 
 <div>
