@@ -52,9 +52,9 @@ const METHOD_FILTERS = {
       return false;
     }
 
-    // For logged out users, show all possible card instruments
+    // Don't show cards for logged out users
     if (!logged) {
-      return true;
+      return false;
     }
 
     const tokens = _Obj.getSafely(customer, 'tokens.items', []);
