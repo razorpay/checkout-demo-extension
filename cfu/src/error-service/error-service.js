@@ -113,8 +113,8 @@ function errorHandler(event) {
   const error = event.error;
   if (
     error &&
-    error.stack &&
-    isUrlApplicableForErrorTracking(event.error.stack)
+    (event.filename || error.stack) &&
+    isUrlApplicableForErrorTracking(event.filename || event.error.stack)
   ) {
     const errorObj = {
       message: error.message,
