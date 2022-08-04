@@ -154,7 +154,7 @@ then
 # if code coverage is less than master
 elif [ $(echo "$DEV_CODE_COVERAGE < $MASTER_CODE_COVERAGE" | bc -l) == 1 ];
 then
-#  RESULT="fail"
+  RESULT="fail"
   echo "|Coverage|$MASTER_CODE_COVERAGE|$DEV_CODE_COVERAGE|⚠️ Don't worry! You can improve the coverage by adding test cases.|" >> report.md
 
 # if code coverage is equal to master
