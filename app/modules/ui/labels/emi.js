@@ -50,9 +50,3 @@ export const ICICI_DEBIT_DESCRIPTION_CONVENIENCE =
   'emi.icici_debit_description_convenience';
 export const KOTAK_CREDIT_DESCRIPTION_CONVENIENCE =
   'emi.kotak_credit_description_convenience';
-export const DEBIT_DESCRIPTION_CONVENIENCE =
-  'emi.debit_description_convenience';
-export const DEBIT_DESCRIPTION_MIN_BALANCE =
-  'emi.debit_description_min_balance';
-export const DEBIT_DESCRIPTION_INCLUDES_INTEREST =
-  'emi.debit_description_includes_interest';

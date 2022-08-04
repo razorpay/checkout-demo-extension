@@ -4,7 +4,7 @@ import { getView, setView, destroyView } from './';
 import { get } from 'svelte/store';
 
 import Razorpay from 'common/Razorpay';
-import { getBankFromCardCache, isDebitEMIBank } from 'common/bank';
+import { getBankFromCardCache } from 'common/bank';
 import { getCardType } from 'common/card';
 
 import {
@@ -137,9 +137,8 @@ export function getIssuerForEmiFromPayload(payload) {
         if (t.token === payload.token) {
           issuer = t.card.issuer;
 
-          // EMI code for debit card issuer
-          if (isDebitEMIBank(issuer, t.card.type)) {
-            issuer = `${issuer}_DC`;
+          if (issuer === 'HDFC' && t.card.type === 'debit') {
+            issuer = 'HDFC_DC';
           }
         }
       });
