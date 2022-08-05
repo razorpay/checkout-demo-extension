@@ -147,7 +147,7 @@
               </div>
             {/if}
             <div id="merchant-desc">
-              {getOption('description').trim()}
+              {getOption('description')?.trim()}
             </div>
             {#if getOption('amount')}
               <div id="amount">
