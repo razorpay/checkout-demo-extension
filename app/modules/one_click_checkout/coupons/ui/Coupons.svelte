@@ -18,6 +18,7 @@
     getConsentViewCount,
   } from 'razorpay';
   import {
+    checkServiceabilityStatus,
     selectedAddress,
     selectedAddressId,
   } from 'one_click_checkout/address/shipping_address/store';
@@ -37,6 +38,7 @@
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
+  import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
@@ -69,6 +71,7 @@
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
+  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
   import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
@@ -151,14 +154,18 @@
       count_coupons_available: $availableCoupons.length,
       pre_selected_saved_address_id: $selectedAddressId,
     });
+  }
 
-    Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
-      pre_selected_saved_address_id: $selectedAddressId,
-    });
-
-    Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
-      checked_billing_address_same_as_delivery_address:
-        $isBillingSameAsShipping,
+  function checkAddressServiceability() {
+    return new Promise((resolve, reject) => {
+      if (
+        $savedAddresses?.length &&
+        $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
+      ) {
+        loadAddressesWithServiceability().then(resolve).catch(reject);
+        return;
+      }
+      resolve();
     });
   }
 
@@ -166,11 +173,21 @@
     $consentViewCount = $consentViewCount || getConsentViewCount();
     toggleHeader(true);
     updateOrderWithCustomerDetails();
-    const promiseList = [];
+    const addressPromise = checkAddressServiceability();
+    const promiseList = [addressPromise];
     if (showCoupons && enableAutoFetchCoupons) {
       const couponsPromise = fetchCoupons();
       promiseList.push(couponsPromise);
     }
+    addressPromise.then(() => {
+      Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
+        pre_selected_saved_address_id: $selectedAddressId,
+      });
+      Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
+        checked_billing_address_same_as_delivery_address:
+          $isBillingSameAsShipping,
+      });
+    });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -208,7 +225,11 @@
 
     {#if $savedAddresses.length}
       <div class="widget-wrapper">
-        <AddressWidget on:headerCtaClick={onAddressHeaderClick} />
+        <AddressWidget
+          loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
+          address={$selectedAddress}
+          on:headerCtaClick={onAddressHeaderClick}
+        />
       </div>
       <div class="separator" />
     {/if}

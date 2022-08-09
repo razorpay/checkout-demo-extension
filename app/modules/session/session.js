@@ -5888,7 +5888,6 @@ Session.prototype = {
     let saved_customer = preferences.customer;
     if (saved_customer && saved_customer.addresses) {
       address.setSavedAddresses(saved_customer.addresses);
-      address.setDefaultSelectedAddress();
     }
     this.invoice = preferences.invoice;
     this.subscription = preferences.subscription;

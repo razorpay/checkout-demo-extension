@@ -137,7 +137,6 @@
     "svelte": "3.44.2",
     "svelte-check": "^2.2.10",
     "svelte-i18n": "^3.0.4",
-    "svelte-inline-compile": "^0.2.0",
     "svelte-jester": "^2.3.2",
     "svelte-preprocess": "4.9.4",
     "testdouble": "^3.16.1",
@@ -149,8 +148,8 @@
     "uglify-js": "^3.13.10"
   },
   "dependencies": {
-    "@playwright/test": "^1.22.2",
-    "node-sass": "^7.0.1"
+    "node-sass": "^7.0.1",
+    "@playwright/test": "^1.22.2"
   },
   "engines": {
     "node": ">=16.10.0"

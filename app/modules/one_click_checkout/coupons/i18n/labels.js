@@ -22,8 +22,3 @@ export const COUPON_DETAIL_LABEL = 'coupons.coupon_detail_label';
 export const COUPON_OTP_LABEL = 'coupons.coupon_otp_label';
 export const COUPON_LABEL = 'coupons.coupon_label';
 export const INVALID_EMAIL_LABEL = 'coupons.invalid_email_label';
-export const ADDRESS_WIDGET_LOADER_TEXT = 'coupons.address_widget_loader_text';
-export const ADDRESS_WIDGET_SERVICEABLE_TEXT =
-  'coupons.address_widget_serviceable_text';
-export const ADDRESS_WIDGET_UNSERVICEABLE_TEXT =
-  'coupons.address_widget_unserviceable_text';

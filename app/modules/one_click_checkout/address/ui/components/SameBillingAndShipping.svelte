@@ -16,7 +16,6 @@
   // utils imports
   import { isBillingAddressEnabled } from 'razorpay';
 
-  export let disabled = false;
   export let isFixed = false;
   export let shouldSaveAddress = false;
 
@@ -33,13 +32,8 @@
 </script>
 
 {#if isBillingAddressEnabled()}
-  <div
-    data-testid="same-billing-address-checkbox"
-    class="same-address-checkbox"
-    class:checkbox-sticky={isFixed}
-  >
+  <div class="same-address-checkbox" class:checkbox-sticky={isFixed}>
     <Checkbox
-      {disabled}
       on:change={onChange}
       checked={$isBillingSameAsShipping}
       id="same-address-checkbox"

@@ -38,11 +38,7 @@
 </script>
 
 {#if loading}
-  <div
-    data-testid="address-shimmer"
-    class="card shimmer-card"
-    class:card-border={withBorder}
-  >
+  <div class="card shimmer-card" class:card-border={withBorder}>
     <Shimmer height={20} width="40%" />
     <div class="spacing-14" />
     <Shimmer width="35%" />
@@ -57,7 +53,6 @@
   </div>
 {:else}
   <button
-    data-testid="address-box"
     id={`address-container${isSelected ? '-selected' : ''}`}
     class="card address-container"
     class:card-border={withBorder}
@@ -65,7 +60,7 @@
     on:click|preventDefault={() => dispatch('select')}
   >
     {#if isEditable}
-      <div class="edit-cta" data-testid="address-edit-cta">
+      <div class="edit-cta">
         <EditIcon
           on:click={() => dispatch('select')}
           on:editClick={() => dispatch('editClick', address)}
@@ -97,17 +92,15 @@
           </div>
         {/if}
       </div>
-      <slot>
-        {#if !isServiceable}
-          <div
-            data-testid="address-box-unserviceability"
-            data-test-id="address-box-unserviceability"
-            class="address-serviceability-error"
-          >
-            {$t(NON_SERVICEABLE_LABEL)}
-          </div>
-        {/if}
-      </slot>
+      <!-- address.serviceability will be null for unknown serviceability -->
+      {#if !isServiceable}
+        <div
+          data-test-id="address-box-unserviceability"
+          class="address-serviceability-error"
+        >
+          {$t(NON_SERVICEABLE_LABEL)}
+        </div>
+      {/if}
     </div>
   </button>
 {/if}

@@ -16,8 +16,7 @@
           {
             "proposal": "minimal"
           }
-        ],
-        "svelte-inline-compile"
+        ]
       ],
       "presets": [
         [
