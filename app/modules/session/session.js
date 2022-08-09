@@ -3746,6 +3746,11 @@ Session.prototype = {
           session.payload.amount = bearer.amount;
           session.payload.fee = bearer.fee;
 
+          // In case of MCC transaction, BE sends mcc request id, that we need to forward
+          if (bearer.mcc_request_id) {
+            session.payload.mcc_request_id = bearer.mcc_request_id;
+          }
+
           // Don't redirect to fees route now
           session.feesRedirect = false;
           session.submit();
