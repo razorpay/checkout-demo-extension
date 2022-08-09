@@ -107,6 +107,12 @@ function cardless_emi(instrument) {
     providers: [instrument.provider],
   };
 }
+function intl_bank_transfer(instrument) {
+  return {
+    method: 'intl_bank_transfer',
+    providers: [instrument.provider],
+  };
+}
 
 export default {
   upi,
@@ -117,4 +123,5 @@ export default {
   emi,
   app,
   cardless_emi,
+  intl_bank_transfer,
 };

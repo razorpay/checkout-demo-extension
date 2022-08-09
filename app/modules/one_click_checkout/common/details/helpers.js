@@ -35,12 +35,11 @@ export const handleDetailsNext = (prevContact) => {
       path: views.COUPONS,
     });
     return;
-  } else {
-    const isCurrentTabHome = navigator.isRedirectionFromMethods();
-    navigator.navigateBack();
-    if (isCurrentTabHome) {
-      redirectToMethods();
-    }
+  }
+  const isCurrentTabHome = navigator.isRedirectionFromMethods();
+  navigator.navigateBack();
+  if (isCurrentTabHome) {
+    redirectToMethods();
   }
 };
 

@@ -202,6 +202,35 @@ const assertNVSFormDataInRequest = async (
   expect(body).toMatchObject(check);
 };
 
+const assertVirtualAccountRequest = async ({
+  context,
+  currency,
+  errorResponse,
+}) => {
+  const request = await context.expectRequest();
+  expect(request.url).toContain(currency);
+  expect(request.params).toMatchObject({
+    currency,
+    amount: '200',
+  });
+  const response = errorResponse
+    ? { error: { description: 'Failed to fetch VA details' } }
+    : {
+        account: {
+          routing_code: 'routing_code',
+          routing_type: 'ACH',
+          account_number: '1234567889',
+          beneficiary_name: 'GemsGems',
+          va_currency: currency,
+        },
+        amount: 1030,
+        currency,
+        symbol: '$',
+      };
+  await context.respondJSON(response);
+  return response;
+};
+
 module.exports = {
   clickPaymentMethod,
   clickTrustly,
@@ -212,6 +241,7 @@ module.exports = {
   fillNVSForm,
   assertNVSFormData,
   assertNVSFormDataInRequest,
+  assertVirtualAccountRequest,
   respondCountries,
   respondStates,
   clickProvider,

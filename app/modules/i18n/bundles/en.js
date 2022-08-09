@@ -861,6 +861,7 @@ export default {
       cod_charge_removed: '{charge} cash on delivery charge removed',
       international: 'Trustly, Poli, Sofort & Giropay',
       offline_challan: 'Cash/Cheque/DD deposit via Bank branch',
+      intl_bank_transfer: 'Payment via US ACH',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -882,6 +883,7 @@ export default {
       wallet: 'Wallets',
       cod: 'COD',
       international: 'International',
+      intl_bank_transfer: 'Local Currency Bank Transfer',
     },
     titles: {
       bank_transfer: 'Bank Transfer',
@@ -909,6 +911,7 @@ export default {
       wallet: 'Wallet',
       cod: 'Cash On Delivery',
       international: 'Instant Bank Transfer',
+      intl_bank_transfer: 'Local Currency Bank Transfer',
     },
   },
   misc: {
@@ -1175,6 +1178,7 @@ export default {
     details: 'Back',
     billingAddress: 'Address',
     international: 'Instant Bank Transfer',
+    intl_bank_transfer: 'Local Currency Bank...',
   },
   upi: {
     cancel_reason_back_action: 'Back',
@@ -1359,4 +1363,34 @@ export default {
   cta_one_cc: ctaOneCC,
   misc_one_cc: miscOneCC,
   cart,
+  intl_bank_transfer: {
+    va_usd: {
+      title: 'USD Bank Account',
+      subtitle: 'ACH transfer',
+    },
+    va_eur: {
+      title: 'EUR Bank Account',
+      subtitle: 'SEPA transfer',
+    },
+    va_cad: {
+      title: 'CAD Bank Account',
+      subtitle: 'ACSS transfer',
+    },
+    va_gbp: {
+      title: 'GBP Bank Account',
+      subtitle: 'CHAPS transfer',
+    },
+    help_texts: {
+      title: 'Transfer money via',
+      loading: 'Getting account details...',
+      routing_code: 'Routing Code',
+      routing_type: 'Routing Type',
+      note: 'Note: It will take around 5-7 business days to reflect money in the beneficiary (seller) account. You may connect with the seller directly for any queries regarding the payment.',
+      heading: 'Add the account below as a beneficiary and transfer the given payment amount:',
+      content1:
+        'Alternatively, you may visit your nearest bank branch and request for a ACH transfer to the below account details.',
+      content2:
+        'Alternatively you may visit your nearest bank branch and request local ACH transfer to below account.',
+    },
+  },
 };

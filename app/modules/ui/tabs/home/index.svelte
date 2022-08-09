@@ -23,6 +23,7 @@
     TOAST_SCREEN,
   } from 'one_click_checkout/Toast';
   import * as _El from 'utils/DOM';
+  import { isIntlBankTransferMethod } from 'InternationalBankTransfer/helpers';
 
   import { HOME_VIEWS } from './constants';
 
@@ -1166,6 +1167,8 @@
       trackUpiIntentInstrumentSelected(instrument.vendor_vpa);
       $intentVpaPrefill = instrument.vendor_vpa;
       selectMethod(instrument.method, instrument.vendor_vpa);
+    } else if (isIntlBankTransferMethod(instrument)) {
+      attemptPayment();
     } else {
       // Bring instrument into view if it's not visible
       const domElement = querySelector(

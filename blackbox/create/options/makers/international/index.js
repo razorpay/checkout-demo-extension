@@ -53,6 +53,7 @@ function makePreferences(features, preferences) {
     },
     card: true,
     app,
+    intl_bank_transfer: features.testInternationalBankTransfer,
   };
 
   return preferences;

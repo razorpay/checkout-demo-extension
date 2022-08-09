@@ -23,6 +23,7 @@
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
   import { getUPIAppDataFromHandle } from 'common/upi';
+  import { getDetailsForIntlBankTransfer } from 'InternationalBankTransfer/helpers';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -229,6 +230,9 @@
 
       case 'international':
         return getDetailsForAppInstrument(instrument, locale);
+
+      case 'intl_bank_transfer':
+        return getDetailsForIntlBankTransfer(instrument, locale);
     }
   }
 

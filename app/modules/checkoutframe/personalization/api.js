@@ -258,6 +258,10 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     instrument.provider = instrument.instrument;
     delete instrument.instrument;
   },
+  intl_bank_transfer: (instrument) => {
+    instrument.provider = instrument.instrument;
+    delete instrument.instrument;
+  },
 };
 
 // EMI is the same as Card

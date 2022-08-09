@@ -26,10 +26,20 @@ export const getEventsName = (prefix, events) => {
 };
 
 /**
- * Iterate Through the analytics types and retuen an Object with tracking methods for each type
- * @returns {Object}
+ * Iterate Through the analytics types and return an Object with tracking methods for each type
+ * @returns {{
+ *  Track: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  TrackBehav: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  TrackRender: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  TrackMetric: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  TrackDebug: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  TrackIntegration: (eventName: string, data?: { [key in string]: unknown }): void,
+ *  removeMeta: (...args?: unknown[]): void,
+ *  setMeta: (...args?: unknown[]): void,
+ *  updateRequestIndex: (...args?: unknown[]): void,
+ *  setR: (...args?: unknown[]): void,
+ * }}
  */
-
 export const getTrackMethods = () => {
   const Events = {};
   Object.keys(TYPES).forEach((key) => {
@@ -52,8 +62,8 @@ export const getTrackMethods = () => {
 
 /**
  * Takes the evets Obj and analytics methods to it
- * @param {Object} events
- * @returns Object
+ * @param {Events} events
+ * @returns {Events}
  */
 export const addAnalyticsMethods = (events) => {
   return {

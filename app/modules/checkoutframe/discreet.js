@@ -73,6 +73,7 @@ import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as FeeLabel from 'checkoutframe/components/fee';
 import * as internationalTab from 'checkoutframe/components/international';
 import * as InternationalStores from 'checkoutstore/screens/international';
+import * as IntlBankTransferTab from 'InternationalBankTransfer';
 
 import showTimer from 'checkoutframe/timer';
 import * as es6components from 'checkoutframe/components';
@@ -239,6 +240,7 @@ export default {
   // international payment method
   internationalTab,
   InternationalStores,
+  IntlBankTransferTab,
 
   isInternationalInPreferredInstrument,
   merchantAnalytics,

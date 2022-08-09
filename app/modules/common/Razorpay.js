@@ -290,9 +290,8 @@ RazorProto.calculateFees = function (payload) {
       callback: function (response) {
         if (response.error) {
           return reject(response);
-        } else {
-          return resolve(response);
         }
+        return resolve(response);
       },
     });
   });
@@ -327,9 +326,8 @@ RazorProto.fetchVirtualAccount = function ({ customer_id, order_id, notes }) {
       callback: function (response) {
         if (response.error) {
           return reject(response);
-        } else {
-          return resolve(response);
         }
+        return resolve(response);
       },
     });
   });

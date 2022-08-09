@@ -11599,6 +11599,12 @@ const preferences = {
         trustly: 1,
         poli: 1,
       },
+      intl_bank_transfer: {
+        va_usd: 1,
+        va_eur: 1,
+        va_gbp: 1,
+        va_cad: 1,
+      },
     },
   },
   nonRecurringTest: {

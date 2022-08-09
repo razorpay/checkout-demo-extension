@@ -193,6 +193,8 @@ const DESCRIPTIONS = {
   international: (locale) => getRawMethodDescription('international', locale),
   offline_challan: (locale) =>
     getRawMethodDescription('offline_challan', locale),
+  intl_bank_transfer: (locale) =>
+    getRawMethodDescription('intl_bank_transfer', locale),
 };
 
 /**

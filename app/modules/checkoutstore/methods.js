@@ -76,6 +76,8 @@ import {
   isMerchantInternationalAppEnabled,
 } from 'common/international';
 
+import { isIntlBankTransferEnabled } from 'InternationalBankTransfer/helpers';
+
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
 }
@@ -310,6 +312,10 @@ const ALL_METHODS = {
 
   international() {
     return isMerchantInternationalMethodEnabled();
+  },
+
+  intl_bank_transfer() {
+    return getAmount() && isIntlBankTransferEnabled();
   },
 };
 

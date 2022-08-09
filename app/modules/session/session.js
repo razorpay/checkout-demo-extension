@@ -2694,6 +2694,13 @@ Session.prototype = {
       this.internationalTab = null;
     } else if (this.tab === 'offline_challan') {
       discreet.offlineChallanTab.destroy();
+    } else if (this.tab === discreet.IntlBankTransferTab.TAB_NAME) {
+      if (this.intlBankTransferTab && this.intlBankTransferTab.onBack()) {
+        return;
+      }
+      // destroy the international bank transfer view
+      discreet.IntlBankTransferTab.destroy();
+      this.intlBankTransferTab = null;
     } else if (!this.tab) {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
         discreet.ChargesHelper.removeCodCharges();
@@ -2977,6 +2984,10 @@ Session.prototype = {
 
     if (tab === 'offline_challan') {
       discreet.offlineChallanTab.render();
+    }
+
+    if (tab === discreet.IntlBankTransferTab.TAB_NAME) {
+      this.intlBankTransferTab = discreet.IntlBankTransferTab.render(payload);
     }
   },
 
@@ -4433,6 +4444,13 @@ Session.prototype = {
         this.switchTab('international', {
           directlyToNVS: NVSRequired,
         });
+      }
+
+      if (discreet.IntlBankTransferTab.preferredMethod(selectedInstrument)) {
+        this.switchTab(discreet.IntlBankTransferTab.TAB_NAME, {
+          directlyToDetails: true,
+        });
+        return;
       }
     } else if (data.method === 'paypal') {
       // Let method=paypal payments go through directly

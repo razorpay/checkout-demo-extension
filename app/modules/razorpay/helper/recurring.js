@@ -34,11 +34,10 @@ export function isASubscription(method = null) {
   // return true if no method is specified. This is a subscription session
   if (!method) {
     return true;
-  } else {
-    const preferences = getPreferences();
-    return (
-      preferences.subscription[method] &&
-      preferences.subscription[method] !== false
-    );
   }
+  const preferences = getPreferences();
+  return (
+    preferences.subscription[method] &&
+    preferences.subscription[method] !== false
+  );
 }

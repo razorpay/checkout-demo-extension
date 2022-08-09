@@ -33,6 +33,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   bank_transfer: [],
   paypal: [],
   app: ['providers'],
+  intl_bank_transfer: [],
 };
 
 const INSTRUMENT_CREATORS = {

@@ -36,9 +36,8 @@ export function parseStack(error: Error): StackFrame[] {
     return parseV8OrIE(error);
   } else if (error.stack) {
     return parseFFOrSafari(error);
-  } else {
-    throw new Error('Cannot parse given Error object');
   }
+  throw new Error('Cannot parse given Error object');
 }
 
 // Separate line and column numbers from a string of the form: (URI:Line:Column)
@@ -120,22 +119,21 @@ function parseFFOrSafari(error: Error): StackFrame[] {
       if (line.indexOf('@') === -1 && line.indexOf(':') === -1) {
         // Safari eval frames only have function names and nothing else
         return { function: line } as StackFrame;
-      } else {
-        const functionNameRegex = /((.*".+"[^@]*)?[^@]*)(?:@)/;
-        const matches = line.match(functionNameRegex);
-        const functionName = matches && matches[1] ? matches[1] : undefined;
-        const locationParts = extractLocation(
-          line.replace(functionNameRegex, '')
-        );
-
-        return {
-          function: functionName,
-          filename: locationParts[0],
-          lineno: Number(locationParts[1]),
-          colno: Number(locationParts[2]),
-          in_app: true,
-        } as StackFrame;
       }
+      const functionNameRegex = /((.*".+"[^@]*)?[^@]*)(?:@)/;
+      const matches = line.match(functionNameRegex);
+      const functionName = matches && matches[1] ? matches[1] : undefined;
+      const locationParts = extractLocation(
+        line.replace(functionNameRegex, '')
+      );
+
+      return {
+        function: functionName,
+        filename: locationParts[0],
+        lineno: Number(locationParts[1]),
+        colno: Number(locationParts[2]),
+        in_app: true,
+      } as StackFrame;
     }) || []
   );
 }
@@ -145,9 +143,8 @@ function parseOpera(e: Error): StackFrame[] {
     return parseOpera9(e);
   } else if (!e.stack) {
     return parseOpera10(e);
-  } else {
-    return parseOpera11(e);
   }
+  return parseOpera11(e);
 }
 
 function parseOpera9(e: Error): StackFrame[] {

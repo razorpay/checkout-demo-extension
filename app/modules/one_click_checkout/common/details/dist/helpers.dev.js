@@ -58,14 +58,13 @@ let handleDetailsNext = function handleDetailsNext(prevContact) {
     });
 
     return;
-  } else {
-    let isCurrentTabHome = _routing.navigator.isRedirectionFromMethods();
+  }
+  let isCurrentTabHome = _routing.navigator.isRedirectionFromMethods();
 
-    _routing.navigator.navigateBack();
+  _routing.navigator.navigateBack();
 
-    if (isCurrentTabHome) {
-      (0, _sessionInterface.redirectToMethods)();
-    }
+  if (isCurrentTabHome) {
+    (0, _sessionInterface.redirectToMethods)();
   }
 };
 

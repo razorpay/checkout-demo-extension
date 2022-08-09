@@ -94,6 +94,7 @@ export const AVAILABLE_METHODS = [
   'emandate',
   'cod',
   'international',
+  'intl_bank_transfer',
 ];
 
 /* VPA regex, copied from API */

@@ -1,5 +1,25 @@
 import { AVAILABLE_METHODS } from 'common/constants';
 
+const INTERNATIONAL_INSTRUMENT_CONFIG = {
+  properties: ['providers'],
+  payment: ['provider'],
+  groupedToIndividual: (grouped) => {
+    const base = _Obj.clone(grouped);
+    delete base.providers;
+
+    return (grouped.providers || []).map((provider) => {
+      return _Obj.extend(
+        {
+          provider,
+        },
+        base
+      );
+    });
+  },
+  isValid: (instrument) =>
+    Boolean(instrument.providers) && instrument.providers.length > 0,
+};
+
 /**
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument
@@ -428,25 +448,8 @@ const config = {
     isValid: (instrument) =>
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
-  international: {
-    properties: ['providers'],
-    payment: ['provider'],
-    groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
-      delete base.providers;
-
-      return (grouped.providers || []).map((provider) => {
-        return _Obj.extend(
-          {
-            provider,
-          },
-          base
-        );
-      });
-    },
-    isValid: (instrument) =>
-      Boolean(instrument.providers) && instrument.providers.length > 0,
-  },
+  international: INTERNATIONAL_INSTRUMENT_CONFIG,
+  intl_bank_transfer: INTERNATIONAL_INSTRUMENT_CONFIG,
   // TODO: Pending methods: emi
 };
 

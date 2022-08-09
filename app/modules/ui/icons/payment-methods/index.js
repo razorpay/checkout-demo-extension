@@ -26,6 +26,7 @@ import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
 import internationalIcon from './international';
+import intlBankTransferIcon from './intl_bank_transfer';
 import close from 'one_click_checkout/coupons/icons/close';
 import offers from 'one_click_checkout/coupons/icons/offers';
 import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
@@ -258,6 +259,9 @@ function getIconFn(iconName) {
 
     case 'consent_location':
       return consent_location;
+
+    case 'intl_bank_transfer':
+      return intlBankTransferIcon;
   }
 }
 
