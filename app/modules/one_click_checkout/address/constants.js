@@ -139,5 +139,10 @@ export const SOURCE = {
   OVERIDDEN: 'overidden', // 2
 };
 
-export const CITY_STATE_REGEX_PATTERN = "^((?![0-9$&+,:;=?@#|'<>.^*()%!-]).)*$";
+// validators test the input in the state and city fields against this regex.
+// it ensures that any accidental special characters don't seep inside the input
+// that is not supported and result in error in response form BE.
+// basically, only alphabets are allowed with a couple of exceptions.
+export const CITY_STATE_REGEX_PATTERN = "^((?![0-9$+,:;=?@#|'<>.^*()%!]).)*$";
+
 export const ENG_LANG_REGEX_PATTERN = "^[0-9a-zA-Z&+,:;@#'./*()\\s-]*$";

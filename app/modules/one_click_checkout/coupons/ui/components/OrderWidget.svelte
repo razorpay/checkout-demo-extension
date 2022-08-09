@@ -213,6 +213,10 @@
     color: #263a4a;
   }
 
+  .row:last-child {
+    margin-bottom: 2px;
+  }
+
   .color-green {
     color: #079f0d;
   }
