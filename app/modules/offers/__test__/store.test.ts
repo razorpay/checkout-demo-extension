@@ -33,6 +33,7 @@ jest.mock('checkoutstore', () => {
 jest.mock('sessionmanager', () => {
   return {
     getSession: jest.fn(() => ({
+      updateAmountInHeaderForOffer: jest.fn(),
       getDCCPayload: jest.fn(() => ({})),
       offer: undefined,
       get: jest.fn(),
@@ -126,6 +127,7 @@ describe('$computeOfferClass', () => {
   test('test get(computeOfferClass) with dccPayload', () => {
     (getSession as jest.Mock).mockImplementationOnce(() => ({
       getDCCPayload: () => ({ currency: 'USD', amount: 5000 }),
+      updateAmountInHeaderForOffer: jest.fn(),
     }));
     expect(get(computeOfferClass)).toMatchObject({
       hasFee: false,
@@ -149,6 +151,7 @@ describe('$computeOfferClass', () => {
     (getSession as jest.Mock).mockImplementationOnce(() => ({
       offers: jest.fn(),
       getDCCPayload: jest.fn(() => ({})),
+      updateAmountInHeaderForOffer: jest.fn(),
     }));
     expect(get(computeOfferClass)).toMatchObject({
       hasFee: false,

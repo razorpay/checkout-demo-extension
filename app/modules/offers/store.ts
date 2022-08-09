@@ -183,6 +183,15 @@ export const computeOfferClass = derived(
       hideOriginalAmount: Boolean(hasDiscount && isOneClickCheckout()),
     };
     setAppropriateCtaText();
+    /**
+     * TODO remove function updateAmountInHeaderForOffer for header update
+     * in 1.5 ideally this will be removed with header
+     */
+    session.updateAmountInHeaderForOffer(
+      returnObj.discountAmount,
+      returnObj.hasFee,
+      true
+    );
     updateAmountFontSize();
     return returnObj;
   }

@@ -29,6 +29,7 @@ import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
+import { setAppropriateCtaText } from 'checkoutstore/cta';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -710,11 +711,13 @@ Session.prototype = {
     }
     Header.updateAmountFontSize();
   },
-  updateAmountInHeaderForOffer: function (amount, fee) {
+  updateAmountInHeaderForOffer: function (amount, fee, withoutFormat = false) {
     if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
-    $('#amount .discount').rawHtml(formatAmountWithCurrency(amount));
+    $('#amount .discount').rawHtml(
+      withoutFormat ? amount : formatAmountWithCurrency(amount)
+    );
     //$('#amount .original-amount').hide();
     Header.updateAmountFontSize();
   },
@@ -5773,6 +5776,7 @@ Session.prototype = {
           applicableOffers: allOffers,
           setAppliedOffer: function (offer, shouldNavigate) {
             appliedOffer = offer;
+            setAppropriateCtaText();
             if (offer && shouldNavigate) {
               session.handleOfferSelection(offer);
             }
