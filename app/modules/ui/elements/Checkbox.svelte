@@ -4,10 +4,11 @@
   import Stack from 'ui/layouts/Stack.svelte';
 
   // Props
-  export let checked;
+  export let checked = false;
   export let id = `id_${Track.makeUid()}`; // Generate a random ID if one isn't provided
   export let required = false;
   export let helpText = '';
+  export let disabled = false;
 
   // `for` attrib for the label should be same as the ID
   const htmlFor = id;
@@ -28,6 +29,7 @@
   class="sv-checkbox"
   class:checked
   class:focused
+  class:disabled
   class:invalid={required && !checked}
 >
   <Stack inline horizontal>
