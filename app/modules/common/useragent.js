@@ -76,7 +76,7 @@ export const mobileQuery =
  * @returns {boolean}
  */
 export const isMobileByMediaQuery = () => {
-  return global.matchMedia(mobileQuery).matches;
+  return global.matchMedia(mobileQuery)?.matches;
 };
 
 /**
@@ -132,9 +132,8 @@ export const getOS = () => {
     return 'linux';
   } else if (macOS) {
     return 'macOS';
-  } else {
-    return 'other';
   }
+  return 'other';
 };
 
 export const getDevice = () => {
@@ -146,9 +145,8 @@ export const getDevice = () => {
     return 'android';
   } else if (isMobileByMediaQuery()) {
     return 'mobile';
-  } else {
-    return 'desktop';
   }
+  return 'desktop';
 };
 
 export const isDesktop = () => getDevice() === 'desktop';

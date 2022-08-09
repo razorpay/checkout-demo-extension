@@ -93,7 +93,7 @@ RazorpayDefaults.modal = {
   ondismiss: returnAsIs,
   onhidden: returnAsIs,
   escape: true,
-  animation: !global.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  animation: !global.matchMedia('(prefers-reduced-motion: reduce)')?.matches,
   backdropclose: false,
   handleback: true,
 };
