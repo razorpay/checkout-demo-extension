@@ -184,8 +184,8 @@
       var div = document.querySelector('div');
 
       params.handler = function (resp) {
-        document.querySelector('div#1').innerHTML = resp.razorpay_payment_id;
-        document.querySelector('div#2').innerHTML = resp.razorpay_signature;
+        document.getElementById('1').innerHTML = resp.razorpay_payment_id;
+        document.getElementById('2').innerHTML = resp.razorpay_signature;
       };
 
       loadCheckout(domain, function () {
