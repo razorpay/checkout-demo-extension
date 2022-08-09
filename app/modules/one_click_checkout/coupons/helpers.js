@@ -42,6 +42,8 @@ import {
   consentGiven,
 } from 'one_click_checkout/address/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
+import { isEnableAutoFetchCoupons } from 'razorpay';
+import { shouldShowCoupons } from 'one_click_checkout/store';
 
 // utils imports
 import { getCurrency, isMandatoryLoginEnabled } from 'razorpay';
@@ -81,6 +83,10 @@ export function nextView() {
 }
 
 export function fetchCoupons() {
+  if (!shouldShowCoupons() || !isEnableAutoFetchCoupons()) {
+    return;
+  }
+
   return getCoupons()
     .then((coupons) => {
       Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, coupons.length);

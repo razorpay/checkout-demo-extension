@@ -14,7 +14,6 @@
   import { contact, email, country } from 'checkoutstore/screens/home';
   import {
     getPrefilledCouponCode,
-    isEnableAutoFetchCoupons,
     getConsentViewCount,
   } from 'razorpay';
   import {
@@ -76,7 +75,6 @@
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
-  const enableAutoFetchCoupons = isEnableAutoFetchCoupons();
 
   let ctaDisabled = false;
   let orderWidget;
@@ -175,8 +173,8 @@
     updateOrderWithCustomerDetails();
     const addressPromise = checkAddressServiceability();
     const promiseList = [addressPromise];
-    if (showCoupons && enableAutoFetchCoupons) {
-      const couponsPromise = fetchCoupons();
+    const couponsPromise = fetchCoupons();
+    if (couponsPromise) {
       promiseList.push(couponsPromise);
     }
     addressPromise.then(() => {
