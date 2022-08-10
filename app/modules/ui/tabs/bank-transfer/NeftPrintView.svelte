@@ -15,18 +15,21 @@
     rupeeDataUrl,
     csdKey,
     csdDisclaimer,
+    CHALLAN_FIELDS,
   } from './challanConstants';
   import {
     isCustomChallan,
     getCustomFields,
     getCustomDisclaimers,
+    createChallanDetailTableData,
+    addCustomFields,
   } from './helper';
   import { getCheckoutBridge, getNewIosBridge } from 'bridge';
   import { getSDKMeta } from 'checkoutstore/native';
 
   const {
     HEADER,
-    ROW_HEADERS,
+    FIELD_PAIRS,
     OFFICE_USE,
     HDFC_DISCLAIMERS,
     NON_HDFC_DISCLAIMERS,
@@ -54,8 +57,11 @@
   const pdfTextPaddingTop = 5;
   const pdfTextBaddingBottom = 3;
   const pdfColumnSepX = 70;
+  const pdfColumnSepX2 = 120;
+  const pdfColumnSepX3 = 162;
   let top = 40;
   let doc;
+
   const key = getMerchantKey();
 
   const name = getOption('prefill.name');
@@ -65,8 +71,11 @@
   const hasCustomDisclaimers = isCustomChallan('challan.disclaimers');
   const hasCustomFields = isCustomChallan('challan.fields');
 
+  let isMinimalDesign = false;
+
   let org_logo = rzpLogo;
-  let tableDetails = {};
+  let tableDetails: { id: string; title: string; value?: string }[] = [];
+
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
@@ -80,22 +89,46 @@
     if (hasCustomDisclaimers) {
       disclaimers = [...disclaimers, ...getCustomDisclaimers()];
     }
-    if (!isHDFC) {
-      labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
+
+    // threshold value to switch to new design
+    const switchDesignThreshold = isHDFC ? 2 : 3;
+
+    if (hasCustomDisclaimers || hasCustomFields) {
+      const newFields = getCustomFields().filter((item) => !item.id) || [];
+      isMinimalDesign =
+        (newFields.length || 0) + (getCustomDisclaimers()?.length || 0) >=
+        switchDesignThreshold;
     }
-    tableDetails = {
-      [ROW_HEADERS.row1]: neftDetails.name,
-      [ROW_HEADERS.row2]: account_number,
-      [ROW_HEADERS.row3]: ifsc,
-      [ROW_HEADERS.row4]: bank_name,
-      [ROW_HEADERS.row5]: branch,
-      [ROW_HEADERS.row6]: `${amount}`,
-      [ROW_HEADERS.row7]: name.trim(),
-      [ROW_HEADERS.row8]: $email,
-      [ROW_HEADERS.row9]: $phone,
-      [ROW_HEADERS.row10]: isHDFC ? description : orderId,
-      [ROW_HEADERS.row11]: expiry,
-    };
+
+    if (!isHDFC) {
+      labels.ROW_HEADERS = labels.ROW_HEADERS.map((item) => {
+        if (item.id === CHALLAN_FIELDS.ORDER_ID) {
+          item = { ...item, title: 'Razorpay Order ID' };
+        }
+        return item;
+      });
+    }
+
+    const amountInString = amount.toString() || '';
+
+    tableDetails = createChallanDetailTableData(labels.ROW_HEADERS, {
+      [CHALLAN_FIELDS.BENEFICIARY_NAME]: neftDetails.name,
+      [CHALLAN_FIELDS.ACCOUNT_NO]: account_number,
+      [CHALLAN_FIELDS.IFSC_CODE]: ifsc,
+      [CHALLAN_FIELDS.BANK]: bank_name || '',
+      [CHALLAN_FIELDS.BRANCH]: branch || '',
+      [CHALLAN_FIELDS.AMOUNT]: amountInString,
+      [CHALLAN_FIELDS.CUSTOMER_NAME]: name.trim(),
+      [CHALLAN_FIELDS.CUSTOMER_EMAIL]: $email,
+      [CHALLAN_FIELDS.CUSTOMER_MOBILE]: $phone,
+      [CHALLAN_FIELDS.ORDER_ID]: isHDFC ? description : orderId,
+      [CHALLAN_FIELDS.EXPIRY]: expiry,
+    });
+
+    if (hasCustomFields) {
+      tableDetails = addCustomFields(tableDetails);
+    }
+
     printIfLoaded();
   });
 
@@ -158,7 +191,7 @@
   }
 
   // TODO: move it to utils or use any currently existing methods for formatting
-  function formatDate(d) {
+  function formatDate(d): string {
     return stripOffNonUTF8Chars(
       `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`
     );
@@ -168,27 +201,39 @@
     doc.line(pdfStartX, top, pdfEndX, top);
   }
 
-  function addVerticalLine(x, extraLinePadding) {
+  function addVerticalLine(x: number, extraLinePadding: number) {
     doc.line(x, top, x, top + pdfColumnHeight + extraLinePadding);
   }
 
-  function addRow(
-    column1,
-    column2,
-    middleLine,
+  function addRow({
+    column = [],
+    middleLine = false,
     extraLinePadding = 0,
     extraTextPadding = 0,
-    extraBottomPadding = 0
-  ) {
+    extraBottomPadding = 0,
+    middleLine2 = false,
+    middleLine3 = false,
+  }) {
     addVerticalLine(pdfStartX, extraLinePadding);
     addVerticalLine(pdfEndX, extraLinePadding);
-    const columnsLength = column1 && column2 ? 2 : column1 ? 1 : 0;
+    const columnsLength = column.length;
+
     if (middleLine) {
+      doc.setLineWidth(0.2);
       addVerticalLine(pdfColumnSepX, extraLinePadding);
+      doc.setLineWidth(0.5);
+    }
+    if (middleLine2) {
+      addVerticalLine(pdfColumnSepX2, extraLinePadding);
+    }
+    if (middleLine3) {
+      doc.setLineWidth(0.2);
+      addVerticalLine(pdfColumnSepX3, extraLinePadding);
+      doc.setLineWidth(0.5);
     }
     top += pdfTextPaddingTop + extraTextPadding;
     for (let i = 0; i < columnsLength; i++) {
-      let { text, bold, x, imgUrl } = arguments[i];
+      let { text, bold, x, imgUrl } = column[i];
       if (bold) {
         doc.setFontType('bold');
       }
@@ -228,76 +273,151 @@
       addHorizintalLine(doc);
       doc.setFontSize(10);
 
-      // adding headers
-      addRow({ text: HEADER, x: 80 });
-      // adding date
-      addRow({ text: `Date: ${formatDate(new Date())}`, x: 15 });
+      const date = `Date: ${formatDate(new Date()) || ''}`;
+      // adding headers and date
 
-      for (let key in tableDetails) {
-        if (!tableDetails[key]) {
-          continue;
+      addRow({
+        column: [
+          { text: HEADER, x: 15 },
+          { text: date, x: 150 },
+        ],
+      });
+
+      tableDetails?.forEach((item) => {
+        const pairLeftElements = Object.keys(FIELD_PAIRS);
+        const pairRightElements = Object.values(FIELD_PAIRS);
+
+        const title = item.title?.substring(0, 30) || '';
+        const value = item.value?.substring(0, 75) || '';
+        let imgUrl = '';
+
+        if (!value) {
+          return;
         }
-        if (key === 'Amount') {
-          addRow(
-            { text: key, bold: true, x: 15 },
-            {
-              text: tableDetails[key],
-              imgUrl: rupeeDataUrl,
-              bold: false,
-              x: 80,
-            },
-            true
-          );
+        if (item.id === CHALLAN_FIELDS.AMOUNT) {
+          imgUrl = rupeeDataUrl;
         } else {
-          addRow(
-            { text: key, bold: true, x: 15 },
-            { text: tableDetails[key], bold: false, x: 80 },
-            true
-          );
+          imgUrl = '';
         }
-      }
-      if (hasCustomFields) {
-        let fields = getCustomFields();
-        for (let field of fields) {
-          addRow(
-            { text: field.title, bold: true, x: 15 },
-            { text: field.value, bold: false, x: 80 },
-            true
-          );
-        }
-      }
-      addRow({ text: `${DISCLAIMER_LABEL}:`, bold: true, x: 15 });
-      if (!hasCustomFields && !hasCustomDisclaimers) {
-        addRow(null, null);
-      }
 
+        if (item.id === CHALLAN_FIELDS.BENEFICIARY_NAME) {
+          const text = doc.splitTextToSize(item.value, 115);
+          addRow({
+            column: [
+              { text: title, bold: true, x: 15 },
+              { text: text, bold: false, imgUrl, x: 73 },
+            ],
+            middleLine: true,
+            extraLinePadding: 16,
+            extraBottomPadding: text?.length > 1 ? text?.length * 2 : 0,
+          });
+        } else if (pairLeftElements.includes(item.id) && isMinimalDesign) {
+          const pairData = tableDetails.find(
+            (elem) => elem.id === FIELD_PAIRS[item.id]
+          );
+          const pairTitle = pairData?.title.substring(0, 30);
+
+          if (pairData) {
+            addRow({
+              column: [
+                { text: title, bold: true, x: 15 },
+                {
+                  text: value,
+                  imgUrl,
+                  bold: false,
+                  x: 73,
+                },
+                { text: pairTitle, bold: true, x: 123 },
+                { text: pairData.value, bold: false, x: 165 },
+              ],
+              middleLine: true,
+              middleLine2: true,
+              middleLine3: true,
+            });
+          } else {
+            addRow({
+              column: [
+                { text: title, bold: true, x: 15 },
+                {
+                  text: value,
+                  imgUrl,
+                  bold: false,
+                  x: 73,
+                },
+              ],
+              middleLine: true,
+            });
+          }
+        } else if (isMinimalDesign && pairRightElements.includes(item.id)) {
+          return;
+        } else {
+          addRow({
+            column: [
+              { text: title, bold: true, x: 15 },
+              { text: value, imgUrl, bold: false, x: 73 },
+            ],
+            middleLine: true,
+          });
+        }
+      });
+
+      addRow({ column: [{ text: `${DISCLAIMER_LABEL}:`, bold: true, x: 15 }] });
+      if (!hasCustomFields && !hasCustomDisclaimers) {
+        addRow({});
+      }
+      if (isMinimalDesign) {
+        doc.setFontSize(8);
+      }
       for (let i = 0; i < disclaimers.length; i++) {
         const dis = disclaimers[i];
         const text = doc.splitTextToSize(`${i + 1}.) ${dis.text}`, 180);
-        addRow({ text, bold: false, x: 15 }, null, false, 16, 0, dis.padding);
+        const bottomPadding = isMinimalDesign
+          ? text.length > 1
+            ? text.length * 2
+            : 0
+          : dis.padding;
+        addRow({
+          column: [{ text, bold: false, x: 15 }],
+          extraLinePadding: 16,
+          extraBottomPadding: bottomPadding,
+        });
+      }
+      if (isMinimalDesign) {
+        doc.setFontSize(10);
       }
       if (!hasCustomFields && !hasCustomDisclaimers) {
-        addRow(null, null, true);
+        addRow({ middleLine: true });
       }
-      addRow(
-        { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 154 },
-        null,
-        false,
-        12,
-        12
-      );
+      addRow({
+        column: [{ text: DIPOSITOR_SIGN_LABEL, bold: true, x: 154 }],
+        middleLine: false,
+        extraLinePadding: 12,
+        extraTextPadding: 12,
+      });
       if (!hasCustomFields && !hasCustomDisclaimers) {
-        addRow(null, null, true);
-      }
-      addRow({ text: OFFICE_USE.header, bold: false, x: 80 });
-
-      for (let i = 0; i < OFFICE_USE.list.length; i++) {
-        addRow({ text: OFFICE_USE.list[i], bold: true, x: 15 });
+        addRow({ middleLine: true });
       }
 
-      addRow({ text: AUTH_SIGN_LABEL, bold: true, x: 155 });
+      addRow({ column: [{ text: OFFICE_USE.header, bold: false, x: 80 }] });
 
-      addRow({ text: BRANCH_LABEL, bold: true, x: 167 });
+      if (isMinimalDesign) {
+        for (let i = 0; i < OFFICE_USE.list.length; i = i + 2) {
+          addRow({
+            column: [
+              { text: OFFICE_USE.list[i], bold: true, x: 15 },
+              { text: OFFICE_USE.list[i + 1], bold: true, x: 123 },
+            ],
+            middleLine2: i !== OFFICE_USE.list.length - 1,
+          });
+        }
+      } else {
+        for (let i = 0; i < OFFICE_USE.list.length; i++) {
+          addRow({ column: [{ text: OFFICE_USE.list[i], bold: true, x: 15 }] });
+        }
+      }
+
+      addRow({ column: [{ text: AUTH_SIGN_LABEL, bold: true, x: 155 }] });
+      addRow({ column: [{ text: BRANCH_LABEL, bold: true, x: 167 }] });
 
       const CheckoutBridge = getCheckoutBridge();
       const iosBridge = getNewIosBridge();
@@ -345,7 +465,9 @@
     toDataUrl(org_logo, pdfInit, 'image/png', 'orgLogo');
   }
   if (!neftDetails.branch) {
-    delete tableDetails.Branch;
+    tableDetails = tableDetails.filter(
+      (item) => item.id === CHALLAN_FIELDS.BRANCH
+    );
   }
 </script>
 

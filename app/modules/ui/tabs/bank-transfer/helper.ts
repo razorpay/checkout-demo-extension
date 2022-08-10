@@ -7,6 +7,12 @@ type CustomDisclaimersResult = {
   padding: number;
 };
 
+type RowHeader = {
+  id: string;
+  title: string;
+  value?: string;
+};
+
 /**
  *
  * @param {string} label
@@ -124,4 +130,48 @@ export function setCustomChallanMetaProp(): boolean {
     return true;
   }
   return false;
+}
+
+export function createChallanDetailTableData(
+  rowHeaders: Array<RowHeader>,
+  data: { [key: string]: string }
+) {
+  let formattedData: Array<RowHeader> = [];
+  // adding value to each object on table data
+  formattedData = rowHeaders.reduce((acc, item) => {
+    if (data[item.id]) {
+      acc.push({ ...item, value: data[item.id] });
+    }
+    return acc;
+  }, formattedData);
+  return formattedData;
+}
+
+export function addCustomFields(tableDetails: RowHeader[]) {
+  let finalFields = tableDetails;
+  let existingFieldMap: { [key: string]: number } = {};
+  // creating a map of existing fields with id and index to reduce complexity of comparing two arrays
+  existingFieldMap = tableDetails.reduce(
+    (acc, item, idx) => ({ ...acc, [item.id]: idx }),
+    existingFieldMap
+  );
+
+  const customFields: RowHeader[] = getCustomFields() || [];
+  // final fields logic with updated titles and new fields
+  finalFields = customFields.reduce((acc, item) => {
+    if (item.id && existingFieldMap[item.id] !== undefined) {
+      const index = existingFieldMap[item.id];
+      const value = item.value || acc[index].value;
+      acc[index] = {
+        title: item.title,
+        id: item.id,
+        value,
+      };
+    } else if (item.value) {
+      acc.push({ ...item, id: item.id || item.title });
+    }
+    return acc;
+  }, finalFields);
+
+  return finalFields;
 }

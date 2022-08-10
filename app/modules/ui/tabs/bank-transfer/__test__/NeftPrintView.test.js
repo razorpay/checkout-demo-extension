@@ -4,11 +4,14 @@ import {
   isCustomChallan,
   getCustomFields,
   getCustomDisclaimers,
+  createChallanDetailTableData,
+  addCustomFields,
 } from '../helper';
 import NeftPrintView from '../NeftPrintView.svelte';
 import { getSDKMeta } from 'checkoutstore/native';
 import { getCheckoutBridge, getNewIosBridge } from 'bridge';
 import { getSession } from 'sessionmanager';
+import { CHALLAN_FIELDS } from '../challanConstants';
 
 jest.mock('razorpay', () => ({
   getOrderId: jest.fn(),
@@ -27,6 +30,8 @@ jest.mock('../helper', () => ({
   isCustomChallan: jest.fn(),
   getCustomFields: jest.fn(),
   getCustomDisclaimers: jest.fn(),
+  createChallanDetailTableData: jest.fn(),
+  addCustomFields: jest.fn(),
 }));
 
 jest.mock('checkoutstore/native', () => ({
@@ -132,6 +137,101 @@ describe('Generate Challan Customised', () => {
       ];
     });
 
+    createChallanDetailTableData.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorel Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '7417688244',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+      ];
+    });
+
+    addCustomFields.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorem Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '9999999999',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+        {
+          title: 'dummy id',
+          value: 'dummy1234',
+          id: 'dummy id',
+        },
+      ];
+    });
+
     getSDKMeta.mockReturnValueOnce({
       platform: 'web',
     });
@@ -182,6 +282,101 @@ describe('Download & Save Challan on Android SDK', () => {
         },
       ];
     });
+
+    createChallanDetailTableData.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorel Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '7417688244',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+      ];
+    });
+
+    addCustomFields.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorem Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '9999999999',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+        {
+          title: 'dummy id',
+          value: 'dummy1234',
+          id: 'dummy id',
+        },
+      ];
+    });
     getSDKMeta.mockReturnValueOnce({
       platform: 'android',
     });
@@ -228,6 +423,101 @@ describe('Download & Save Challan on IOS SDK', () => {
       return [
         {
           text: 'Dummy disclaimer',
+        },
+      ];
+    });
+
+    createChallanDetailTableData.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorem Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '9999999999',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+      ];
+    });
+
+    addCustomFields.mockImplementation(() => {
+      return [
+        {
+          title: 'Beneficiary Name',
+          id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+          value: 'Baaalamurugan',
+        },
+        {
+          title: 'Virtual Account No',
+          id: CHALLAN_FIELDS.ACCOUNT_NO,
+          value: '1112221264829508',
+        },
+        {
+          title: 'IFSC Code',
+          id: CHALLAN_FIELDS.IFSC_CODE,
+          value: 'RAZR0000001',
+        },
+        {
+          title: 'Amount',
+          id: CHALLAN_FIELDS.AMOUNT,
+          value: '100',
+        },
+        {
+          title: 'Customer Name',
+          id: CHALLAN_FIELDS.CUSTOMER_NAME,
+          value: 'Lorem Ipsum',
+        },
+        {
+          title: 'Customer Email ID',
+          id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+          value: 'v@gmail.co',
+        },
+        {
+          title: 'Customer Mobile No',
+          id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+          value: '9999999999',
+        },
+        {
+          title: 'Razorpay Order ID',
+          id: CHALLAN_FIELDS.ORDER_ID,
+          value: 'order_JKksrJE9TdW1ya',
+        },
+        {
+          title: 'dummy id',
+          value: 'dummy1234',
+          id: 'dummy id',
         },
       ];
     });

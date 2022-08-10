@@ -1,18 +1,76 @@
+// @note:don't change existing CHALLAN_FIELDS values and ROW_HEADERS ids as we are exposing this ids to merchant so that they can customize default title according to their needs
+export const CHALLAN_FIELDS = {
+  BENEFICIARY_NAME: 'beneficiary_name',
+  ACCOUNT_NO: 'account_no',
+  IFSC_CODE: 'ifsc_code',
+  BANK: 'bank',
+  BRANCH: 'branch',
+  AMOUNT: 'amount',
+  CUSTOMER_NAME: 'customer_name',
+  CUSTOMER_EMAIL: 'customer_email',
+  CUSTOMER_MOBILE: 'customer_mobile',
+  ORDER_ID: 'order_id',
+  EXPIRY: 'expiry',
+  DISCLAIMER: 'disclaimers',
+};
 export const labels = {
   HEADER: 'For RTGS/NEFT/Funds Transfer',
-  ROW_HEADERS: {
-    row1: 'Beneficiary Name',
-    row2: 'Account No.',
-    row3: 'IFSC Code',
-    row4: 'Bank',
-    row5: 'Branch',
-    row6: 'Amount',
-    row7: 'Customer Name',
-    row8: 'Customer Email ID',
-    row9: 'Customer Mobile No',
-    row10: 'Merchant Order Id',
-    row11: 'Expiry time',
-    row12: 'Disclaimers',
+  ROW_HEADERS: [
+    {
+      title: 'Beneficiary Name',
+      id: CHALLAN_FIELDS.BENEFICIARY_NAME,
+    },
+    {
+      title: 'Account No.',
+      id: CHALLAN_FIELDS.ACCOUNT_NO,
+    },
+    {
+      title: 'IFSC Code',
+      id: CHALLAN_FIELDS.IFSC_CODE,
+    },
+    {
+      title: 'Bank',
+      id: CHALLAN_FIELDS.BANK,
+    },
+    {
+      title: 'Branch',
+      id: CHALLAN_FIELDS.BRANCH,
+    },
+    {
+      title: 'Amount',
+      id: CHALLAN_FIELDS.AMOUNT,
+    },
+    {
+      title: 'Customer Name',
+      id: CHALLAN_FIELDS.CUSTOMER_NAME,
+    },
+    {
+      title: 'Customer Email ID',
+      id: CHALLAN_FIELDS.CUSTOMER_EMAIL,
+    },
+    {
+      title: 'Customer Mobile No',
+      id: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+    },
+    {
+      title: 'Merchant Order Id',
+      id: CHALLAN_FIELDS.ORDER_ID,
+    },
+    {
+      title: 'Expiry Date',
+      id: CHALLAN_FIELDS.EXPIRY,
+    },
+    {
+      title: 'Disclaimers',
+      id: CHALLAN_FIELDS.DISCLAIMER,
+    },
+  ],
+
+  // @not:keep this as id of above data only , key will be show on left side of row and value on right side
+  FIELD_PAIRS: {
+    [CHALLAN_FIELDS.AMOUNT]: CHALLAN_FIELDS.CUSTOMER_MOBILE,
+    [CHALLAN_FIELDS.ACCOUNT_NO]: CHALLAN_FIELDS.IFSC_CODE,
+    [CHALLAN_FIELDS.ORDER_ID]: CHALLAN_FIELDS.EXPIRY,
   },
   OFFICE_USE: {
     header: '(FOR BANK USE ONLY)',
