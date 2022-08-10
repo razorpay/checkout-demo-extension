@@ -214,6 +214,7 @@ export const initUpiQrV2 = () => {
     const upiScreenQR =
       status &&
       upiQrOnL1.enabled() &&
+      !isOneClickCheckout() &&
       !hasFeature('disable_upiscreen_qr', false) &&
       (!orderMethod || orderMethod === 'upi');
 
