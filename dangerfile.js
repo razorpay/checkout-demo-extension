@@ -1,8 +1,6 @@
 // refer file: https://gist.github.com/kkemple/998aad9f2b25520c916b00891abb6543
 import { danger, fail, warn } from 'danger';
 
-const fs = require('fs');
-
 const modifiedFiles = danger.git.modified_files;
 const newFiles = danger.git.created_files;
 const changedFiles = [...modifiedFiles, ...newFiles];
@@ -59,7 +57,9 @@ if (requestedReviewersCount === 0 && reviewersCount === 0) {
  */
 const prTemplateSize = 300;
 if (pr.body.length <= prTemplateSize) {
-  warn(`Please include a description of your PR changes.`);
+  warn(
+    `Can you add more details in the PR description ?  This helps reviewers get quick context.`
+  );
 }
 
 /**
@@ -78,12 +78,13 @@ if (pr.labels.length < 1) {
  * Reason: There's always a way to avoid !important 🙂, try specificity !
  */
 for (let file of changedFiles) {
-  const fileContent = fs.readFileSync(file).toString();
   const fileUrl = danger.github.utils.fileLinks([file]);
 
-  if (fileContent.includes('!important')) {
-    warn(`**${fileUrl}**: Avoid !important in css, try specificity. 😉`);
-  }
+  danger.git.diffForFile(file).then((res) => {
+    if (res.added && res.added.includes('!important')) {
+      warn(`**${fileUrl}**: Avoid !important in css, try specificity. 😉`);
+    }
+  });
 }
 
 /**
@@ -104,7 +105,7 @@ for (let file of newFiles) {
 }
 
 /**
- * Rule: Svelte files should follow PascalCase naming
+ * Rule: Svelte files should follow PascalCase naming except for index.svelte
  * Reason: A general good practice for naming components.
  */
 const svelteFiles = changedFiles.filter((file) => file.includes('.svelte'));
@@ -113,7 +114,10 @@ for (let file of svelteFiles) {
   const fileUrl = danger.github.utils.fileLinks([file]);
 
   const fileName = file.split('/')[file.split('/').length - 1];
-  if (!fileName.split('.')[0].match('^[A-Z][a-z]+(?:[A-Z][a-z]+)*$')) {
+  if (
+    fileName !== 'index.svelte' &&
+    !fileName.split('.')[0].match('^[A-Z][a-z]+(?:[A-Z][a-z]+)*$')
+  ) {
     fail(`**${fileUrl}**: PascalCase here please ! 😬`);
   }
 }
