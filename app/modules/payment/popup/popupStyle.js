@@ -51,6 +51,12 @@ body {
   font-size: 14px;
   letter-spacing: -0.3px;
 }
+#ftr.with-custom-img {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
 #ldr {
   width: 100%;
   height: 3px;
@@ -172,6 +178,11 @@ p{
   }
   #name {
     margin-left: 8px;
+  }
+}
+@media (max-width: 420px) {
+  #ftr.with-custom-img {
+    padding: 16px;
   }
 }
 `;

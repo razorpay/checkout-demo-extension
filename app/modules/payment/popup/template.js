@@ -75,6 +75,22 @@ function popupTemplate(paymentInstance) {
     paymentInstance.message || t(WAIT_WHILE_WE_REDIRECT, { method })
   );
 
+  const currentTime = new Date().getTime();
+  const useCustomImg = currentTime < 1661020200000; // compare with time of Aug 21 2022
+  const footer = `<div id='ftr' class='${
+    useCustomImg ? 'with-custom-img' : ''
+  }'>
+  <div style="display:inline-block;">${t(SECURED_BY)}
+    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src=${logo}>
+  </div>
+  ${
+    useCustomImg
+      ? `<img src="https://cdn.razorpay.com/static/assets/15aug.png" style="vertical-align:middle;margin-bottom:5px;" height="34px" />`
+      : `<div style="display:inline-block;vertical-align:middle;height:100%"></div>`
+  }
+  
+</div>`;
+
   return `<!doctype html><html style="height:100%;width:100%;"><head>
 <title>${t(PROCESSING)}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -106,12 +122,7 @@ function popupTemplate(paymentInstance) {
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
-<div id='ftr'>
-  <div style="display:inline-block;">${t(SECURED_BY)}
-    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src=${logo}>
-  </div>
-  <div style="display:inline-block;vertical-align:middle;height:100%"></div>
-</div>
+${footer}
 </div>
 <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 <form></form>
