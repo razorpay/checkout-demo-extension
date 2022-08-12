@@ -61,7 +61,6 @@ let trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
   referer: location.href,
-  env: '',
 };
 
 function getCommonTrackingData(r) {
