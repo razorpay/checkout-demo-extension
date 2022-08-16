@@ -12,7 +12,8 @@
     AVSDccPayload,
   } from 'checkoutstore/screens/card';
 
-  import { amountAfterOffer, appliedOffer } from 'offers/store';
+  import { amountAfterOffer, appliedOffer, showOffers } from 'offers/store';
+  import { showOffersOnSelectedCurrncy } from 'offers/helper';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
@@ -129,6 +130,13 @@
     }
     // retrigger `computeOfferClass`
     appliedOffer.set($appliedOffer);
+    const currency = (session.dccPayload?.currency || '') as string;
+    if (showOffersOnSelectedCurrncy(currency)) {
+      showOffers.set(true);
+    } else {
+      showOffers.set(false);
+      appliedOffer.set(null);
+    }
   }
 
   $: allClasses = ['dcc-view'].concat(classes).join(' ');
@@ -431,9 +439,8 @@
           const indexOfA = topCurrencies.indexOf(a);
           const indexOfB = topCurrencies.indexOf(b);
           return indexOfA > indexOfB ? 1 : -1;
-        } else {
-          return -1;
         }
+        return -1;
       }
       return 0;
     });

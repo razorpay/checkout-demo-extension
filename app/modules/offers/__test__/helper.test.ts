@@ -2,14 +2,23 @@ import {
   getAppliedOffer,
   getDiscountedAmount,
   isOfferApplicableOnIssuer,
+  showOffersOnSelectedCurrncy,
 } from '../helper';
 import { appliedOffer } from 'offers/store';
 import { tick } from 'svelte';
-
 jest.mock('razorpay', () => ({
   __esModule: true,
   getAmount: () => 5000,
   isOneClickCheckout: () => false,
+}));
+
+jest.mock('checkoutframe/offers', () => ({
+  __esModule: true,
+  getAllOffers: jest
+    .fn()
+    .mockReturnValue([sampleOffer]) // rest of the calls will return default value
+    .mockReturnValueOnce([]) // first call will return []
+    .mockReturnValueOnce([]), // second call will return []
 }));
 
 const sampleOffer: Offers.OfferItem = {
@@ -64,5 +73,31 @@ describe('#getDiscountedAmount', () => {
   });
   test('test getDiscountedAmount when no offer', () => {
     expect(getDiscountedAmount()).toBe(5000);
+  });
+});
+
+describe('#showOffersOnSelectedCurrncy', () => {
+  beforeEach(() => {
+    appliedOffer.set(sampleOffer);
+  });
+  test('test showOffersOnSelectedCurrncy with currency as empty string with no offers', async () => {
+    await tick();
+    expect(showOffersOnSelectedCurrncy('')).toBeFalsy();
+  });
+  test('test showOffersOnSelectedCurrncy with currency as INR string with no offers', async () => {
+    await tick();
+    expect(showOffersOnSelectedCurrncy('INR')).toBeFalsy();
+  });
+  test('test showOffersOnSelectedCurrncy with currency INR', async () => {
+    await tick();
+    expect(showOffersOnSelectedCurrncy('INR')).toBeTruthy();
+  });
+  test('test showOffersOnSelectedCurrncy with currency USD', async () => {
+    await tick();
+    expect(showOffersOnSelectedCurrncy('USD')).toBeFalsy();
+  });
+  test('test showOffersOnSelectedCurrncy with currency as empty string with offers', async () => {
+    await tick();
+    expect(showOffersOnSelectedCurrncy('')).toBeTruthy();
   });
 });

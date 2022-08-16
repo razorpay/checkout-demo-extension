@@ -1,5 +1,6 @@
 import { appliedOffer } from 'offers/store';
 import { getAmount } from 'razorpay';
+import { getAllOffers } from 'checkoutframe/offers';
 import { get } from 'svelte/store';
 
 export function getAppliedOffer(): Offers.OfferItem | null {
@@ -42,3 +43,21 @@ export function getDiscountedAmount() {
   const appliedOffer = getAppliedOffer();
   return (appliedOffer && appliedOffer.amount) || getAmount();
 }
+
+export const showOffersOnSelectedCurrncy = (currency: string) => {
+  /*
+Intentionally kept currency && currency.toUpperCase() 
+instead of currency?.toUpperCase()
+Reason for this is by default currency is empty string, 
+and we assume it as INR, so if we keep later check 
+then we fail to load offers even though it is INR.
+  */
+  if (currency && currency.toUpperCase() !== 'INR') {
+    return false;
+  }
+  const allOffers = (getAllOffers() || []) as Array<Offers.OfferItem>;
+  if (allOffers?.length) {
+    return true;
+  }
+  return false;
+};
