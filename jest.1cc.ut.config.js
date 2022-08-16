@@ -2,11 +2,9 @@ const jestConfig = require('./jest.ut.config.js');
 
 module.exports = {
   ...jestConfig,
-  roots: ['<rootDir>/app/modules/one_click_checkout'],
-  modulePaths: ['<rootDir>/app/modules/one_click_checkout'],
+  roots: ['<rootDir>/app/modules'],
+  modulePaths: ['<rootDir>/app/modules'],
   moduleDirectories: ['node_modules', 'app/modules'],
-  collectCoverageFrom: [
-    '<rootDir>/app/modules/one_click_checkout/**/*.{js,ts}',
-  ],
+  collectCoverageFrom: ['<rootDir>/app/modules/one_click_checkout/**/*.*'],
   coverageDirectory: '<rootDir>/coverage/one_click_checkout/',
 };
