@@ -1,5 +1,6 @@
 # outputs
 /scripts/server/page.ljbc
+/scripts/feature-list/*.csv
 /app/dist
 /app/modules/generated
 /app/js/generated

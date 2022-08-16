@@ -22,6 +22,7 @@ export const Safari =
 export const firefox = check(/firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
+export const iosWebView = check(/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/);
 
 export const Instagram = check(/Instagram/);
 export const samsungBrowser = check(/SamsungBrowser/);

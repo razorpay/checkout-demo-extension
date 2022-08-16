@@ -95,6 +95,7 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "css-vars-ponyfill": "^2.4.7",
+    "csv": "^6.2.0",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.1.5",
@@ -148,8 +149,9 @@
     "uglify-js": "^3.13.10"
   },
   "dependencies": {
-    "node-sass": "^7.0.1",
-    "@playwright/test": "^1.22.2"
+    "@playwright/test": "^1.22.2",
+    "acorn": "^8.8.0",
+    "node-sass": "^7.0.1"
   },
   "engines": {
     "node": ">=16.10.0"

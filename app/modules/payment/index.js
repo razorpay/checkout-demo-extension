@@ -42,6 +42,7 @@ import * as docUtil from 'utils/doc';
 import { getOption, getOrderId } from 'razorpay';
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
+import { calculateFlow } from 'analytics/feature-track';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -156,11 +157,17 @@ function trackNewPayment(data, params, r) {
     delete data.default_dcc_currency;
   }
 
+  const flowCode = calculateFlow({
+    downtimeSeverity: params.downtimeSeverity,
+    ...data,
+  });
+
   Analytics.track('submit', {
     data: {
       data: trackingData,
       params: params,
       count: createdPaymentsCount,
+      flowCode,
     },
     r,
     immediately: true,
