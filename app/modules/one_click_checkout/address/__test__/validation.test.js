@@ -35,7 +35,14 @@ const cityStateInvalidValue = [
   '33456',
 ];
 
-const cityStateValidValue = ['Salem', 'Kerala', 'Bengaluru', 'Karnataka', 'Jammu & Kashmir', 'Saint-Gobaîn'];
+const cityStateValidValue = [
+  'Salem',
+  'Kerala',
+  'Bengaluru',
+  'Karnataka',
+  'Jammu & Kashmir',
+  'Saint-Gobaîn',
+];
 
 const cityFieldDataInvalid = [
   [

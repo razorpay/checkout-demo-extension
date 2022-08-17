@@ -1386,7 +1386,8 @@ export default {
       routing_code: 'Routing Code',
       routing_type: 'Routing Type',
       note: 'Note: It will take around 5-7 business days to reflect money in the beneficiary (seller) account. You may connect with the seller directly for any queries regarding the payment.',
-      heading: 'Add the account below as a beneficiary and transfer the given payment amount:',
+      heading:
+        'Add the account below as a beneficiary and transfer the given payment amount:',
       content1:
         'Alternatively, you may visit your nearest bank branch and request for a ACH transfer to the below account details.',
       content2:

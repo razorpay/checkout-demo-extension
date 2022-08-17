@@ -2744,7 +2744,7 @@ Session.prototype = {
     let cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
 
-    // for 1CC modal close handled on header/sessionInterface 
+    // for 1CC modal close handled on header/sessionInterface
     if (walletOtpPage || cardlessEmiOtpPage) {
       let resetOTPScreen = function () {
         discreet.OTPScreenStore.tabLogo.set('');
@@ -2753,7 +2753,7 @@ Session.prototype = {
         });
         beforeReturn();
       };
-  
+
       if (RazorpayHelper.isOneClickCheckout()) {
         resetOTPScreen();
       } else {
@@ -5923,6 +5923,7 @@ Session.prototype = {
     let saved_customer = preferences.customer;
     if (saved_customer && saved_customer.addresses) {
       address.setSavedAddresses(saved_customer.addresses);
+      address.setDefaultSelectedAddress();
     }
     this.invoice = preferences.invoice;
     this.subscription = preferences.subscription;

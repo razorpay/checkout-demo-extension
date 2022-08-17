@@ -91,20 +91,19 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
 
     // Credit/Debit, CRED, and Google Pay Cards
     return generateTextFromList(apps, locale, 4);
-  } else {
-    // Keep in order that we want to display
-    const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
-
-    // Get all networks from preferences.
-    const networksFromPrefs = getCardNetworks();
-
-    // Get the network names to show
-    const networks = NW_ORDER.filter((network) =>
-      Boolean(networksFromPrefs[network])
-    ).map((network) => getNetworkName(network, locale));
-
-    return generateTextFromList(networks, locale, 4);
   }
+  // Keep in order that we want to display
+  const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
+
+  // Get all networks from preferences.
+  const networksFromPrefs = getCardNetworks();
+
+  // Get the network names to show
+  const networks = NW_ORDER.filter((network) =>
+    Boolean(networksFromPrefs[network])
+  ).map((network) => getNetworkName(network, locale));
+
+  return generateTextFromList(networks, locale, 4);
 };
 
 /**
@@ -148,13 +147,12 @@ const DESCRIPTIONS = {
 
     if (cardEmi) {
       return text;
-    } else {
-      return formatTemplateWithLocale(
-        DESCRIPTION_CARDLESS_EMI, // LABEL: EMI via {text}
-        { text },
-        locale
-      );
     }
+    return formatTemplateWithLocale(
+      DESCRIPTION_CARDLESS_EMI, // LABEL: EMI via {text}
+      { text },
+      locale
+    );
   },
   credit_card: (locale) => CARD_DESCRIPTION(locale, 'credit'),
   debit_card: (locale) => CARD_DESCRIPTION(locale, 'debit'),

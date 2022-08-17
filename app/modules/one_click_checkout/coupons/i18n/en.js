@@ -22,4 +22,8 @@ export default {
   coupon_otp_label: 'verify your contact details with an OTP.',
   coupon_label: 'Coupons',
   invalid_email_label: 'Please enter a valid email to use this coupon.',
+  address_widget_loader_text: 'Checking delivery availability',
+  address_widget_serviceable_text: 'Delivery available at given address',
+  address_widget_unserviceable_text:
+    'Order cannot be delivered to this address. Add or change the address.',
 };

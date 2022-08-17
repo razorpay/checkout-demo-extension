@@ -1,17 +1,22 @@
 <script lang="ts">
   // svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   // ui imports
-  import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import AddressBox from 'one_click_checkout/address/ui/components/AddressBox.svelte';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+  import AddressStatusIndicator from 'one_click_checkout/coupons/ui/components/AddressStatusIndicator.svelte';
 
   //store imports
   import { savedAddresses } from 'one_click_checkout/address/store';
+  import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
 
   //session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
+
+  // constant imports
+  import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
 
   // i18n imports
   import {
@@ -26,8 +31,13 @@
   import { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
 
+  // helper imports
+  import { getServiceability } from 'one_click_checkout/address/controller';
+
   const { location } = getIcons();
   const dispatch = createEventDispatcher();
+
+  export let loading = false;
 
   const handleChangeAddress = () => {
     Events.TrackBehav(CouponEvents.SUMMARY_EDIT_ADDRESS_CLICKED);
@@ -38,42 +48,54 @@
     Events.TrackBehav(CouponEvents.SUMMARY_ADDRESS_SHIPPING_UNCHECKED);
   };
 
-  export let loading;
-  export let address;
+  function checkAddressServiceability(address) {
+    loading = true;
+    getServiceability(address).then(() => {
+      loading = false;
+    });
+  }
+
+  onMount(() => {
+    checkAddressServiceability($selectedAddress);
+  });
 </script>
 
-<div class="address-widget-container">
-  {#if !loading}
-    <div
-      class:mb-14={$savedAddresses.length <= 1}
-      class="flex-row col-center label-container"
-    >
-      <div class="flex-row col-center">
-        <Icon icon={location} />
-        <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
-      </div>
-      <button
-        data-test-id="manage-address-cta"
-        on:click={handleChangeAddress}
-        class="label-cta theme"
-      >
-        {$t(ADDRESS_CTA_LABEL)}
-      </button>
+<div class="address-widget-container" id={DELIVERY_ADDRESS_WIDGET_DOM_ID}>
+  <div
+    class:mb-14={$savedAddresses.length <= 1}
+    class="flex-row col-center label-container"
+  >
+    <div class="flex-row col-center">
+      <Icon icon={location} />
+      <span class="label-text">{$t(ADDRESS_SECTION_LABEL)}</span>
     </div>
-    {#if $savedAddresses.length > 1}
-      <p class="label-cta total-addresses">
-        ({formatTemplateWithLocale(
-          TOTAL_ADDRESSES_LABEL,
-          { count: $savedAddresses.length },
-          $locale
-        )})
-      </p>
-    {/if}
+    <button
+      data-test-id="manage-address-cta"
+      on:click={handleChangeAddress}
+      class="label-cta theme"
+    >
+      {$t(ADDRESS_CTA_LABEL)}
+    </button>
+  </div>
+  {#if $savedAddresses.length > 1}
+    <p class="label-cta total-addresses">
+      ({formatTemplateWithLocale(
+        TOTAL_ADDRESSES_LABEL,
+        { count: $savedAddresses.length },
+        $locale
+      )})
+    </p>
   {/if}
-  <AddressBox {address} {loading} withBorder={false} isEditable={false} />
-  {#if !loading && address.serviceability}
-    <SameBillingAndShipping on:toggle={handleToggle} />
-  {/if}
+  <AddressBox address={$selectedAddress} withBorder={false} isEditable={false}>
+    <SameBillingAndShipping
+      on:toggle={handleToggle}
+      disabled={loading || !$selectedAddress?.serviceability}
+    />
+    <AddressStatusIndicator
+      serviceable={$selectedAddress?.serviceability}
+      {loading}
+    />
+  </AddressBox>
 </div>
 
 <style>

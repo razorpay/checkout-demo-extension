@@ -12,12 +12,8 @@
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
+  import { getPrefilledCouponCode, getConsentViewCount } from 'razorpay';
   import {
-    getPrefilledCouponCode,
-    getConsentViewCount,
-  } from 'razorpay';
-  import {
-    checkServiceabilityStatus,
     selectedAddress,
     selectedAddressId,
   } from 'one_click_checkout/address/shipping_address/store';
@@ -38,7 +34,6 @@
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
-  import { loadAddressesWithServiceability } from 'one_click_checkout/address/sessionInterface';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 
   // analytics imports
@@ -57,6 +52,7 @@
     applyCouponCode,
     onSubmitLogoutUser,
   } from 'one_click_checkout/coupons/helpers';
+  import { getElementById } from 'utils/doc';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
@@ -72,7 +68,7 @@
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
-  import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+  import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
@@ -86,6 +82,14 @@
     !$isContactAndEmailValid;
 
   function onSubmitLoggedInUser() {
+    const addressWidget = getElementById(DELIVERY_ADDRESS_WIDGET_DOM_ID);
+    if (!$selectedAddress?.serviceability && addressWidget) {
+      addressWidget.scrollIntoView({
+        behavior: 'smooth',
+      });
+      return;
+    }
+
     if (!$savedAddresses.length) {
       navigator.navigateTo({ path: views.ADD_ADDRESS });
     } else {
@@ -152,18 +156,14 @@
       count_coupons_available: $availableCoupons.length,
       pre_selected_saved_address_id: $selectedAddressId,
     });
-  }
 
-  function checkAddressServiceability() {
-    return new Promise((resolve, reject) => {
-      if (
-        $savedAddresses?.length &&
-        $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
-      ) {
-        loadAddressesWithServiceability().then(resolve).catch(reject);
-        return;
-      }
-      resolve();
+    Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
+      pre_selected_saved_address_id: $selectedAddressId,
+    });
+
+    Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
+      checked_billing_address_same_as_delivery_address:
+        $isBillingSameAsShipping,
     });
   }
 
@@ -171,21 +171,11 @@
     $consentViewCount = $consentViewCount || getConsentViewCount();
     toggleHeader(true);
     updateOrderWithCustomerDetails();
-    const addressPromise = checkAddressServiceability();
-    const promiseList = [addressPromise];
+    const promiseList = [];
     const couponsPromise = fetchCoupons();
     if (couponsPromise) {
       promiseList.push(couponsPromise);
     }
-    addressPromise.then(() => {
-      Events.TrackRender(CouponEvents.SUMMARY_SELECTED_SAVED_ADDRESS, {
-        pre_selected_saved_address_id: $selectedAddressId,
-      });
-      Events.TrackRender(CouponEvents.SUMMARY_BILLING_SAME_AS_SHIPPING, {
-        checked_billing_address_same_as_delivery_address:
-          $isBillingSameAsShipping,
-      });
-    });
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -223,11 +213,7 @@
 
     {#if $savedAddresses.length}
       <div class="widget-wrapper">
-        <AddressWidget
-          loading={$checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
-          address={$selectedAddress}
-          on:headerCtaClick={onAddressHeaderClick}
-        />
+        <AddressWidget on:headerCtaClick={onAddressHeaderClick} />
       </div>
       <div class="separator" />
     {/if}

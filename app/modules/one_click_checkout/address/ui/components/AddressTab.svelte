@@ -51,6 +51,7 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
   import { views } from 'one_click_checkout/routing/constants';
+  import { SELECTED_ADDRESS_DOM_ID } from 'one_click_checkout/address/constants';
 
   export let error;
   export let onSubmitCallback;
@@ -161,6 +162,16 @@
     } else {
       if (!$selectedAddressId) {
         window.alert('Please Select the address');
+        return;
+      }
+
+      const selectedAddressBox = document.getElementById(
+        SELECTED_ADDRESS_DOM_ID
+      );
+      if (selectedAddressBox && !$selectedAddress.serviceability) {
+        selectedAddressBox.scrollIntoView({
+          behavior: 'smooth',
+        });
         return;
       }
     }

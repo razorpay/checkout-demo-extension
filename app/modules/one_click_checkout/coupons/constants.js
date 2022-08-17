@@ -21,3 +21,5 @@ export const OTP_LABELS = {
     textView: 'verifying_otp',
   },
 };
+
+export const DELIVERY_ADDRESS_WIDGET_DOM_ID = 'delivery-address-widget';

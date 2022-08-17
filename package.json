@@ -138,6 +138,7 @@
     "svelte": "3.44.2",
     "svelte-check": "^2.2.10",
     "svelte-i18n": "^3.0.4",
+    "svelte-inline-compile": "^0.2.0",
     "svelte-jester": "^2.3.2",
     "svelte-preprocess": "4.9.4",
     "testdouble": "^3.16.1",

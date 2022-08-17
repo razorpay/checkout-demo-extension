@@ -146,3 +146,5 @@ export const SOURCE = {
 export const CITY_STATE_REGEX_PATTERN = "^((?![0-9$+,:;=?@#|'<>.^*()%!]).)*$";
 
 export const ENG_LANG_REGEX_PATTERN = "^[0-9a-zA-Z&+,:;@#'./*()\\s-]*$";
+
+export const SELECTED_ADDRESS_DOM_ID = 'address-container-selected';

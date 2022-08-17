@@ -1,6 +1,9 @@
 const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
 const { selectQRScanner } = require('../../tests/homescreen/actions');
-const { respondToUPIAjax, responseWithQRImage } = require('../../actions/common');
+const {
+  respondToUPIAjax,
+  responseWithQRImage,
+} = require('../../actions/common');
 const {
   delay,
   assertVisible,

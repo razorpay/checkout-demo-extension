@@ -16,10 +16,7 @@ import {
 } from 'one_click_checkout/charges/store';
 
 // utils imports
-import {
-  formatApiAddress,
-  getLatestServiceableAddress,
-} from 'one_click_checkout/address/helpersExtra';
+import { formatApiAddress } from 'one_click_checkout/address/helpersExtra';
 import { getThemeMeta } from 'checkoutstore/theme';
 
 // analytics import
@@ -51,6 +48,10 @@ export const setSavedAddresses = (addresses) => {
   savedAddresses.set(formatAddresses(addresses));
 };
 
+export const setDefaultSelectedAddress = () => {
+  selectedShippingAddressId.set(get(savedAddresses)[0]?.id);
+};
+
 function formatAddresses(addresses) {
   if (!addresses) {
     return [];
@@ -78,7 +79,7 @@ export { showSavedAddressCta };
  * handle actions post selection of an address
  *
  */
-export function postAddressSelection(id, index) {
+export function postAddressSelection(id = null, index = null) {
   const selectedAddress = get(selectedShippingAddress);
   const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
   const shippingAmount = serviceability ? shipping_fee : 0;
@@ -113,16 +114,7 @@ export function loadAddressesWithServiceability(onSavedAddress) {
       .then((_addresses) => {
         resolve();
         savedAddresses.set(_addresses);
-
-        let latestAddress;
-        if (onSavedAddress) {
-          // to set first address as selected even if unserviceable
-          latestAddress = _addresses[0];
-        } else {
-          // to set last updated serviceable address as selected
-          latestAddress =
-            getLatestServiceableAddress(_addresses) || _addresses[0];
-        }
+        let latestAddress = _addresses[0];
         selectedShippingAddressId.set(latestAddress.id);
         postAddressSelection();
       })
