@@ -135,10 +135,7 @@ const responseTypes = {
     let content = request.content;
     let popup = this.popup;
 
-    if (
-      (this.data && this.data.wallet === 'amazonpay') ||
-      (this.data.method === 'app' && this.data.provider === 'trustly')
-    ) {
+    if (this.data.method === 'app' && this.data.provider === 'trustly') {
       request.content = {};
     }
     if (this.nativeotp) {
