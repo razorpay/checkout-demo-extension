@@ -24,6 +24,15 @@ jobs:
           entrypoint: scripts/deploy.sh
           args: ${{ github.event.deployment.payload.commit_id }} ${{ github.event.deployment.payload.canary }} ${{ github.event.deployment.payload.baseline }} ${{ github.event.deployment.payload.production }} ${{ github.event.deployment.payload.one_cc }}
 
+      - name: Create Sentry Release
+        env: 
+          COMMIT_ID: ${{ github.event.deployment.payload.commit_id }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_IO_AUTH_TOKEN }}
+          SENTRY_ORG: rzp
+          SENTRY_PROJECT: checkout
+          APP_ENV: production
+        run: sh scripts/create-sentry-release.sh
+
       - name: Mark Deployment Success on GitHub
         if: ${{ success() }}
         run: |

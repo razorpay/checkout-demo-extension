@@ -1,5 +1,9 @@
 import { setContext } from './context';
-import { SENTRY_RELEASE_VERSION, SENTRY_DSN } from './constants';
+import {
+  SENTRY_RELEASE_VERSION,
+  SENTRY_DSN,
+  SENTRY_ENVIRONMENT,
+} from './constants';
 
 export function injectSentry() {
   if (window.location.hostname !== 'api.razorpay.com') {
@@ -16,6 +20,7 @@ export function injectSentry() {
     window.Sentry.init({
       dsn: SENTRY_DSN,
       release: SENTRY_RELEASE_VERSION,
+      environment: SENTRY_ENVIRONMENT,
     });
     setContext();
   };
