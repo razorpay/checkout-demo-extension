@@ -55,6 +55,7 @@
     formatAmount,
     formatAmountWithSymbol,
     formatAmountWithSymbolRawHtml,
+    setCurrenciesRate,
   } from 'common/currency';
 
   // UI imports
@@ -220,6 +221,15 @@
           currencyPayload: currencyCache[entityWithAmount],
           entityWithAmount,
         });
+
+        /**
+         * When hitting the cache to get the response. We need to update Currencies Rate every time customer selects a payment method.
+         * Because each payment methods has different currencies rates and DCC markup in cache.
+         */
+        setCurrenciesRate(
+          currencyCache[entityWithAmount]?.all_currencies,
+          originalAmount
+        );
       }
     } else {
       currencies = null;
