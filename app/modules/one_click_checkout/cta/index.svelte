@@ -1,7 +1,4 @@
 <script lang="ts">
-  // svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // i18n imports
   import { t } from 'svelte-i18n';
   import { CTA_LABEL, VIEW_DETAILS_LABEL } from 'one_click_checkout/cta/i18n';
@@ -20,6 +17,9 @@
   // util imports
   import * as _El from 'utils/DOM';
 
+  // UI Imports
+  import CTAButton from 'one_click_checkout/cta/button.svelte';
+
   // Props
   export let hidden = false;
   export let disabled = false;
@@ -33,7 +33,6 @@
   };
 
   const currency = getCurrency();
-  const dispatch = createEventDispatcher();
 
   /**
    * Inserts CTA node inside #one-cc-footer. This is done to ensure we have consistent appearance and position.
@@ -66,46 +65,13 @@
         >
       </div>
     {/if}
-    <div class="one-cc-cta-wrapper" class:full-width={!showAmount}>
-      <button
-        disabled={handleDisable ? false : disabled}
-        class:disabled
-        id="one-cc-cta"
-        on:click|preventDefault={(e) => dispatch('click', e)}
-      >
-        <slot>{$t(CTA_LABEL)}</slot>
-      </button>
-    </div>
+    <CTAButton fullWidth={!showAmount} {disabled} {handleDisable} on:click>
+      <slot>{$t(CTA_LABEL)}</slot>
+    </CTAButton>
   </div>
 {/if}
 
 <style>
-  .one-cc-cta-wrapper {
-    width: 70%;
-    max-width: 70%;
-    margin-left: auto;
-    position: relative;
-  }
-
-  #one-cc-cta::after {
-    left: 0;
-    top: 0;
-    opacity: 1;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    content: '';
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(0, 0, 0, 0.1)
-    );
-  }
-
-  #one-cc-cta:hover::after {
-    opacity: 0;
-  }
-
   * {
     padding: 0;
     margin: 0;
@@ -114,10 +80,6 @@
 
   .cta-container.hidden {
     display: none;
-  }
-
-  #one-cc-cta.disabled {
-    background: #cdd2d6;
   }
 
   .price-label {
@@ -139,22 +101,6 @@
     padding: 14px 16px;
     align-items: center;
     box-shadow: 0px -4px 8px #6b6c6d20;
-  }
-
-  #one-cc-cta {
-    width: 100%;
-    padding: 18px;
-    font-size: 14px;
-    font-weight: 600;
-    border-radius: 6px;
-
-    color: var(--text-color);
-    background: var(--primary-color);
-  }
-
-  .one-cc-cta-wrapper.full-width {
-    width: 100%;
-    min-width: 100%;
   }
 
   .flex-column {

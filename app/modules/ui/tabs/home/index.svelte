@@ -189,6 +189,12 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getAllWebPaymentApps } from 'common/webPaymentsApi';
   import { definePlatform } from 'upi/helper';
+  import { validatePrefilledDetails } from 'one_click_checkout/helper';
+
+  setEmail(getPrefilledEmail());
+  setContact(getPrefilledContact());
+  validatePrefilledDetails();
+  validatePrefilledDetails();
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -219,9 +225,6 @@
   let expSourceSet = false;
 
   let dccView = 'home-screen';
-
-  setContact(getPrefilledContact());
-  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'

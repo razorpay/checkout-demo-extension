@@ -26,6 +26,7 @@
     prevContact,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
+  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -79,7 +80,7 @@
     PHONE_REGEX_INDIA,
   } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
-  import { isEmailValid } from 'one_click_checkout/common/validators/email';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
   import { getInputSource } from 'one_click_checkout/helper';
 
   // Props
@@ -104,10 +105,6 @@
   };
   let disabled = true;
   let validationText;
-  let validEmail = false;
-  let validContact = false;
-
-  $: valid = validEmail && validContact;
 
   function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
@@ -158,7 +155,7 @@
     Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
   }
 
-  $: disabled = !valid;
+  $: disabled = !$isContactAndEmailValid;
 
   onMount(() => {
     merchantAnalytics({
@@ -193,7 +190,7 @@
       return;
     }
 
-    isEmailValid($email).then((value) => {
+    validateEmail($email).then((value) => {
       if (value) {
         Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
           contact: $contact,
@@ -245,7 +242,6 @@
           on:countrySelect={handleCountrySelect}
           {showValidations}
           {validationText}
-          bind:valid={validContact}
         />
       </div>
     {/if}
@@ -255,7 +251,6 @@
           bind:value={$email}
           on:blur={trackEmailFilled}
           {showValidations}
-          bind:valid={validEmail}
         />
       </div>
     {/if}

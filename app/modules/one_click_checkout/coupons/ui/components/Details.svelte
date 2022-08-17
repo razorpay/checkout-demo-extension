@@ -4,6 +4,7 @@
 
   // UI Imports
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
+  import CTAButton from 'one_click_checkout/cta/button.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Session related imports
@@ -25,6 +26,7 @@
     errorCode,
     couponInputValue,
   } from 'one_click_checkout/coupons/store';
+  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
 
   // utils imports
   import { popStack } from 'navstack';
@@ -33,6 +35,7 @@
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
+  import { toggleHeader } from 'one_click_checkout/header/helper';
 
   const { close } = getIcons();
 
@@ -49,6 +52,7 @@
       return;
     }
     popStack();
+    toggleHeader(true);
     if (!isUserLoggedIn() && $isIndianCustomer) {
       askForOTP(otpReasons.verify_coupon);
     }
@@ -73,12 +77,9 @@
   <div class="details-fields-wrapper">
     <PaymentDetails />
   </div>
-  <button
-    class="button details-verify-button"
-    on:click|preventDefault={onSubmit}
-  >
+  <CTAButton fullWidth disabled={!$isContactAndEmailValid} on:click={onSubmit}>
     {$t(DETAILS_CTA_LABEL)}
-  </button>
+  </CTAButton>
 </div>
 
 <style>
@@ -109,16 +110,6 @@
     font-size: 14px;
     line-height: 16px;
     font-weight: 600;
-  }
-
-  .details-verify-button {
-    height: 45px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 19px;
   }
 
   .details-description {

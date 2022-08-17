@@ -1,16 +1,17 @@
 import {
   CONTACT_REGEX,
   EMAIL_REGEX,
-  PHONE_REGEX_INDIA,
+  INDIAN_CONTACT_REGEX,
 } from 'common/constants';
+
 import {
   isContactOptional,
   isEmailOptional,
   isContactEmailOptional,
 } from 'razorpay';
 
-import { country, phone, contact, email } from 'checkoutstore/screens/home';
 import { get } from 'svelte/store';
+import { country, contact, email } from 'checkoutstore/screens/home';
 
 /**
  * Determines if user contact and email is valid
@@ -40,7 +41,7 @@ export default function validateEmailAndContact() {
   if (!isContactEmailOptional()) {
     if (!isContactValid) {
       if (get(country) === '+91') {
-        isContactValid = PHONE_REGEX_INDIA.test(get(phone));
+        isContactValid = INDIAN_CONTACT_REGEX.test(get(contact));
       } else {
         isContactValid = CONTACT_REGEX.test(get(contact));
       }

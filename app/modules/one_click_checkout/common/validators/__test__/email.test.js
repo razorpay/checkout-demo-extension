@@ -2,7 +2,7 @@ const {
   isDomainWhitelisted,
   isEmailValidRegex,
   mxRecordsExist,
-  isEmailValid,
+  validateEmail,
 } = require('../email');
 
 jest.mock('../email', () => {
@@ -59,18 +59,18 @@ describe('domain mx records validator', () => {
 
 describe('email validator', () => {
   test('goutam.goutam.com resolves to false', () => {
-    expect(isEmailValid('goutam.goutam.com')).resolves.toBe(false);
+    expect(validateEmail('goutam.goutam.com')).resolves.toBe(false);
   });
   test('goutam@xyz.com resolved to false', () => {
-    expect(isEmailValid('goutam@xyz.com')).resolves.toBe(false);
+    expect(validateEmail('goutam@xyz.com')).resolves.toBe(false);
   });
   test('goutam@gmail.com resolves to true', () => {
-    expect(isEmailValid('goutam@gmail.com')).resolves.toBe(true);
+    expect(validateEmail('goutam@gmail.com')).resolves.toBe(true);
   });
   test('goutam@domain.com resolved to true', () => {
-    expect(isEmailValid('goutam@domain.com')).resolves.toBe(true);
+    expect(validateEmail('goutam@domain.com')).resolves.toBe(true);
   });
   test('goutam@networkfailed.com resolved to true', () => {
-    expect(isEmailValid('goutam@networkfailed.com')).resolves.toBe(true);
+    expect(validateEmail('goutam@networkfailed.com')).resolves.toBe(true);
   });
 });

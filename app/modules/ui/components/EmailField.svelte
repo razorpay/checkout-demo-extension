@@ -14,13 +14,17 @@
 
   import { t } from 'svelte-i18n';
 
+  // store
+  import { isEmailValid } from 'one_click_checkout/common/details/store';
+
   // Props
   export let value: string;
 
   // Utils
   import { isEmailOptional, isOneClickCheckout } from 'razorpay';
   import { isEmailReadOnly } from 'checkoutframe/customer';
-  import { isEmailValid } from 'one_click_checkout/common/validators/email';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
+
   import { debounce } from 'lib/utils';
 
   const isOptional = isEmailOptional();
@@ -31,13 +35,12 @@
 
   // Form Validation for email - specifically for 1cc
   let validationText;
-  export let valid = false;
   export let showValidations = false;
 
   const debouncedValidator = debounce((email) => {
-    isEmailValid(email).then((isValid) => {
+    validateEmail(email).then((isValid) => {
       validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
-      valid = isValid;
+      $isEmailValid = isValid;
     });
   }, 400);
 

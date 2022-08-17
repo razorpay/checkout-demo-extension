@@ -11,7 +11,7 @@
   // Store imports
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
-  import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
+  import { contact } from 'checkoutstore/screens/home';
   import { getMerchantOrder } from 'razorpay';
   import { savedAddresses } from 'one_click_checkout/address/store';
 
@@ -41,18 +41,10 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
-  import { querySelector } from 'utils/doc';
-  import {
-    getPrefilledContact,
-    getPrefilledEmail,
-  } from 'checkoutframe/customer';
 
   let topbar;
   let isBackEnabled;
   let handleBack;
-
-  setContact(getPrefilledContact());
-  setEmail(getPrefilledEmail());
 
   let theme = getTheme();
 

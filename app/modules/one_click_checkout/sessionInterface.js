@@ -27,11 +27,13 @@ import {
 } from 'one_click_checkout/address/billing_address/store';
 import { tabTitle } from 'one_click_checkout/topbar/store';
 import { couponListTimer } from 'one_click_checkout/coupons/store';
+
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import OneCCEvents from 'one_click_checkout/analytics';
+
 // service imports
 import {
   updateOrder,
@@ -52,9 +54,9 @@ import { format, formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
+import { getThemeMeta } from 'checkoutstore/theme';
 import { showSummaryModal } from 'one_click_checkout/summary_modal';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
-import { getThemeMeta } from 'checkoutstore/theme';
 
 import * as Confirm from 'checkoutframe/components/confirm';
 

@@ -32,14 +32,13 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { findCountryCode } from 'common/countrycodes';
-  import { isEmailValid } from 'one_click_checkout/common/validators/email';
-  import { getPhoneNumberRegex } from 'one_click_checkout/helper';
 
   // Constant Imports
   import { views } from 'one_click_checkout/routing/constants';
 
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
   let showUserDetailsStrip;
   let showEditUserDetails = false;
@@ -69,18 +68,7 @@
     navigator.navigateTo({ path: views.DETAILS });
   }
 
-  onMount(() => {
-    const phoneNumberRegex = getPhoneNumberRegex($country);
-    const isContactValid = phoneNumberRegex.test($contact);
-
-    isEmailValid($email).then((isEmailValid) => {
-      if (isEmailValid && isContactValid) {
-        showEditUserDetails = false;
-        return;
-      }
-      showEditUserDetails = true;
-    });
-  });
+  $: showEditUserDetails = !$isContactAndEmailValid || !isUserLoggedIn();
 </script>
 
 {#if showUserDetailsStrip || showEditUserDetails}
@@ -102,7 +90,7 @@
     </div>
     {#if showEditUserDetails}
       <div>
-        <PaymentDetails {showValidations} bind:valid={inputFieldsValid} />
+        <PaymentDetails {showValidations} />
       </div>
     {:else}
       <div class="contact-info">

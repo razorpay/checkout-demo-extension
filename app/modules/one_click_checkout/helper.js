@@ -1,11 +1,24 @@
+// store imports
+import { get } from 'svelte/store';
+import { email } from 'checkoutstore/screens/home';
+import {
+  isContactValid,
+  isEmailValid,
+} from 'one_click_checkout/common/details/store';
 import {
   getOption,
   getPreferences,
-  isMandatoryLoginEnabled,
   isOneClickCheckout,
+  isMandatoryLoginEnabled,
 } from 'razorpay';
-import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
+
+// Analytics imports
 import Analytics from 'analytics';
+import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
+
+// validators/utils imports
+import { validateEmail } from 'one_click_checkout/common/validators/email';
+import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import {
   CONTACT_REGEX,
   INDIA_COUNTRY_CODE,
@@ -82,6 +95,18 @@ export function init1CCMetaData() {
     OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
     isOneClickCheckout()
   );
+}
+
+export function validatePrefilledDetails() {
+  if (!isOneClickCheckout()) {
+    return;
+  }
+
+  const [emailRegexValid, contactRegexValid] = validateEmailAndContact();
+  validateEmail(get(email)).then((valid) => {
+    isEmailValid.set(valid && emailRegexValid);
+  });
+  isContactValid.set(contactRegexValid);
 }
 
 export function getPhoneNumberRegex(country) {

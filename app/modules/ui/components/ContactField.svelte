@@ -35,6 +35,7 @@
 
   import { isOneClickCheckout } from 'razorpay';
   import { isContactReadOnly } from 'checkoutframe/customer';
+  import { isContactValid } from 'one_click_checkout/common/details/store';
 
   // Refs
   let countryField;
@@ -44,7 +45,6 @@
   export let country;
   export let phone;
   export let isOptional;
-  export let valid = false;
   export let inAddress = false;
   export let validationText;
   export let showValidations = false;
@@ -146,7 +146,7 @@
   }
 
   $: validationText = validateContact(country, phone);
-  $: valid = !validationText;
+  $: $isContactValid = !validationText;
 </script>
 
 <div class="fields-container">

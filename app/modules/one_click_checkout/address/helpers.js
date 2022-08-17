@@ -218,7 +218,6 @@ export const saveAddress = () => {
         return res;
       });
     }
-
     let postPayload = { shipping_address };
     let putPayload = { billing_address };
     if (payload.shipping_address?.formView === addressViews.EDIT_ADDRESS) {

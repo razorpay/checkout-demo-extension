@@ -34,6 +34,7 @@
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore';
   import { shouldShowCoupons } from 'one_click_checkout/store';
+  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
@@ -60,6 +61,7 @@
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
   import { getPhoneNumberRegex } from 'one_click_checkout/helper';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
@@ -71,7 +73,6 @@
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
-  import { isEmailValid } from 'one_click_checkout/common/validators/email';
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
@@ -79,11 +80,10 @@
   let ctaDisabled = false;
   let orderWidget;
   let showValidations = $contact || $email;
-  let contactDetailsValid = false;
 
   $: ctaDisabled =
     ($savedAddresses.length && !$selectedAddress?.serviceability) ||
-    !contactDetailsValid;
+    !$isContactAndEmailValid;
 
   function onSubmitLoggedInUser() {
     if (!$savedAddresses.length) {
@@ -104,7 +104,7 @@
       return;
     }
 
-    isEmailValid($email).then((valid) => {
+    validateEmail($email).then((valid: boolean) => {
       if (valid) {
         Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
         Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
@@ -130,8 +130,8 @@
           },
         });
 
-        updateOrderWithCustomerDetails();
         if (!isUserLoggedIn() && $isIndianCustomer) {
+          updateOrderWithCustomerDetails();
           onSubmitLogoutUser();
         } else {
           onSubmitLoggedInUser();
@@ -217,7 +217,7 @@
 <Screen pad={false}>
   <div data-test-id="summary-screen" class="coupon-container">
     <div class="widget-wrapper contact-wrapper">
-      <ContactWidget {showValidations} bind:valid={contactDetailsValid} />
+      <ContactWidget {showValidations} />
     </div>
     <div class="separator" />
 

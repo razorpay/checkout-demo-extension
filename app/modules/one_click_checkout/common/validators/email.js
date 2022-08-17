@@ -48,7 +48,7 @@ export const isDomainWhitelisted = (domain = '') => {
  * @param {string} email - Email entered by user
  * @returns {Promise} boolean flag which represents if email is valid or not
  */
-export const isEmailValid = (email) => {
+export const validateEmail = (email) => {
   const regexValid = isEmailValidRegex(email);
 
   if (!regexValid) {
