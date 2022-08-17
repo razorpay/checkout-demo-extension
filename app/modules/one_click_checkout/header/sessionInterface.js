@@ -13,7 +13,6 @@ import {
 } from 'ui/labels/confirm';
 
 // Analytics imports
-import { CLOSE_MODAL_OPTIONS } from 'one_click_checkout/analytics/constants';
 import OneCCEvents from 'one_click_checkout/analytics';
 import { Events } from 'analytics';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
@@ -26,33 +25,27 @@ export const handleModalClose = () => {
     screen_name: getCurrentScreen(),
   });
 
-  Confirm.show({
-    heading: formatTemplateWithLocale(
-      session.tab === 'home-1cc'
-        ? CONFIRM_HEADING_ONE_CC
-        : CONFIRM_CANCEL_HEADING,
-      {},
-      locale
-    ),
-    message: formatTemplateWithLocale(
-      session.tab === 'home-1cc'
-        ? CONFIRM_MESSAGE_ONE_CC
-        : CONFIRM_CANCEL_MESSAGE,
-      {},
-      locale
-    ),
-    onPositiveClick: function () {
-      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
-        screen_name: getCurrentScreen(),
-        option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
-      });
-      session.closeModal();
-    },
-    onNegativeClick: function () {
-      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
-        screen_name: getCurrentScreen(),
-        option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
-      });
-    },
-  });
+  if (session.r?._payment) {
+    session.closeModal();
+  } else {
+    Confirm.show({
+      heading: formatTemplateWithLocale(
+        session.tab === 'home-1cc'
+          ? CONFIRM_HEADING_ONE_CC
+          : CONFIRM_CANCEL_HEADING,
+        {},
+        locale
+      ),
+      message: formatTemplateWithLocale(
+        session.tab === 'home-1cc'
+          ? CONFIRM_MESSAGE_ONE_CC
+          : CONFIRM_CANCEL_MESSAGE,
+        {},
+        locale
+      ),
+      onPositiveClick: function () {
+        session.closeModal();
+      },
+    });
+  }
 };

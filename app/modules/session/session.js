@@ -2741,16 +2741,25 @@ Session.prototype = {
     let cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
 
+    // for 1CC modal close handled on header/sessionInterface 
     if (walletOtpPage || cardlessEmiOtpPage) {
-      Confirm.confirmClose().then(function (close) {
-        if (close) {
-          discreet.OTPScreenStore.tabLogo.set('');
-          self.clearRequest({
-            '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
-          });
-          beforeReturn();
-        }
-      });
+      let resetOTPScreen = function () {
+        discreet.OTPScreenStore.tabLogo.set('');
+        self.clearRequest({
+          '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+        });
+        beforeReturn();
+      };
+  
+      if (RazorpayHelper.isOneClickCheckout()) {
+        resetOTPScreen();
+      } else {
+        Confirm.confirmClose().then(function (close) {
+          if (close) {
+            resetOTPScreen();
+          }
+        });
+      }
     } else {
       beforeReturn();
     }

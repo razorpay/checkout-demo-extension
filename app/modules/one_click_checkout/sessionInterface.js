@@ -41,10 +41,7 @@ import {
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
-import {
-  CLOSE_MODAL_OPTIONS,
-  SCREEN_LIST,
-} from 'one_click_checkout/analytics/constants';
+import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
 
 // i18n imports
 import {
@@ -104,17 +101,7 @@ export const handleBack = () => {
       heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
       message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
       onPositiveClick: function () {
-        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
-          screen_name: getCurrentScreen(),
-          option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
-        });
         session.closeModal();
-      },
-      onNegativeClick: function () {
-        Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
-          screen_name: getCurrentScreen(),
-          option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
-        });
       },
     });
     return;

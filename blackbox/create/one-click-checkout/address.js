@@ -103,6 +103,7 @@ module.exports = function (testFeatures) {
     }
     test(title, async () => {
       preferences.methods.cod = true;
+      preferences.methods.upi = true;
 
       const context = await openCheckoutWithNewHomeScreen({
         page,

@@ -8,8 +8,18 @@
     CONFIRM_CANCEL_NEGATIVE_TEXT,
   } from 'ui/labels/confirm';
 
+  // Svelte imports
   import { fly } from 'svelte/transition';
+
+  // Utils imports
   import { popStack } from 'navstack';
+  import { isOneClickCheckout } from 'razorpay';
+
+  // Analytics imports
+  import { CLOSE_MODAL_OPTIONS } from 'one_click_checkout/analytics/constants';
+  import OneCCEvents from 'one_click_checkout/analytics';
+  import { Events } from 'analytics';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
   // LABEL: Cancel payment?
   export let heading = $t(CONFIRM_CANCEL_HEADING);
@@ -22,15 +32,28 @@
   export let negativeText = $t(CONFIRM_CANCEL_NEGATIVE_TEXT);
   export let onPositiveClick = Boolean;
   export let onNegativeClick = Boolean;
+  const isOneCCEnabled = isOneClickCheckout();
 
   function clickedPositive() {
     popStack();
     onPositiveClick();
+    if (isOneCCEnabled) {
+      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+        screen_name: getCurrentScreen(),
+        option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,
+      });
+    }
   }
 
   function clickedNegative() {
     popStack();
     onNegativeClick();
+    if (isOneCCEnabled) {
+      Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
+        screen_name: getCurrentScreen(),
+        option_selected: CLOSE_MODAL_OPTIONS.NEGATIVE,
+      });
+    }
   }
 
   export function preventBack() {

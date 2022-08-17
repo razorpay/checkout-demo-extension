@@ -76,7 +76,12 @@
   <div id="topbar-new" class:topbar-header={!$headerVisible}>
     <div class="title-section">
       {#if isBackEnabled}
-        <span class="back" data-testid="back" on:click={handleBackClick}>
+        <span
+          class="back"
+          data-testid="back"
+          data-test-id="back"
+          on:click={handleBackClick}
+        >
           <Icon icon={back_arrow()} />
         </span>
       {/if}

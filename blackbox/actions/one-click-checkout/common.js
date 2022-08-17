@@ -1,4 +1,6 @@
 const { selectPaymentMethod } = require('../../tests/homescreen/homeActions');
+const { selectQRScanner } = require('../../tests/homescreen/actions');
+const { respondToUPIAjax, responseWithQRImage } = require('../../actions/common');
 const {
   delay,
   assertVisible,
@@ -330,6 +332,39 @@ async function login(context, options = {}) {
   await handleShippingInfo(context, options);
 }
 
+async function handleWalletModalClose(context, features) {
+  const { powerWalletModalClose } = features;
+  if (powerWalletModalClose) {
+    await selectPaymentMethod(context, 'wallet');
+    await context.page.click('#wallet-radio-mobikwik');
+    await proceedOneCC(context);
+    await context.page.click('.modal-close');
+    await delay(200);
+    await context.page.click('#positiveBtn');
+    await delay(400);
+    const backBtn = await getDataAttrSelector(context, 'back');
+    await backBtn.click();
+  }
+}
+
+async function handleQRModalClose(context, features) {
+  const { qrModalClose } = features;
+  if (qrModalClose) {
+    await selectPaymentMethod(context, 'upi');
+    await selectQRScanner(context);
+    await respondToUPIAjax(context, { method: 'qr' });
+    await responseWithQRImage(context);
+    await context.page.click('.modal-close');
+    await delay(200);
+    await context.page.click('#positiveBtn');
+    await delay(400);
+    await context.page.click('#fd-hide');
+    await delay(200);
+    const backBtn = await getDataAttrSelector(context, 'back');
+    await backBtn.click();
+  }
+}
+
 async function mockPaymentSteps(
   context,
   options,
@@ -342,6 +377,8 @@ async function mockPaymentSteps(
   await handleThirdWatchReq(context);
   await delay(200);
   await handleFeeSummary(context, features);
+  await handleWalletModalClose(context, features);
+  await handleQRModalClose(context, features);
   await selectPaymentMethod(context, 'netbanking');
   await selectBank(context, 'SBIN');
   await proceedOneCC(context);
