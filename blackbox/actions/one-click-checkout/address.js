@@ -93,6 +93,7 @@ async function fillUserAddress(
     isCODEligible = false,
     serviceable,
     codFee,
+    shippingFee,
     zipcode = '560001',
     isBillingAddress,
     addLandmark = false,
@@ -109,8 +110,13 @@ async function fillUserAddress(
       isCODEligible,
       serviceable,
       codFee,
+      shippingFee,
       zipcode,
     });
+    if (shippingFee) {
+      await delay(400);
+      await checkShippingToastVisible(context);
+    }
   } else {
     await handlePincodes(context);
     await delay(400);
@@ -259,6 +265,12 @@ async function handleBillingAddress(context, isAdd, addresses) {
 async function checkStateFieldDisabled(context) {
   expect(
     await context.page.$eval('#state', (element) => element.disabled)
+  ).toBeTruthy();
+}
+
+async function checkShippingToastVisible(context) {
+  expect(
+    await context.page.$eval('.toast-wrapper', (element) => !!element)
   ).toBeTruthy();
 }
 

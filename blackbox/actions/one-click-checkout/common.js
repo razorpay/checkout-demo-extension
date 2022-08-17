@@ -215,11 +215,16 @@ async function handleFeeSummary(context, features) {
     const { cartAmount, totalAmount, shippingAmount } = await getSummaryInfo(
       context
     );
-    if (!shippingFee) {
+    let totalAmtWithShipping;
+    if (shippingFee) {
+      totalAmtWithShipping = Number(shippingAmount.slice(1)) + amount / 100;
+    } else {
       expect('FREE').toEqual(shippingAmount);
     }
     expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-    expect(formatTextToNumber(totalAmount)).toEqual(amount / 100);
+    expect(formatTextToNumber(totalAmount)).toEqual(
+      totalAmtWithShipping || amount / 100
+    );
   }
   if (isSelectCOD) {
     await context.page.click('.summary-modal-cta');

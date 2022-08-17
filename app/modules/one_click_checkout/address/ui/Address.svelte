@@ -5,6 +5,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import {
     showToast,
+    hideToast,
     TOAST_SCREEN,
     TOAST_THEME,
   } from 'one_click_checkout/Toast';
@@ -141,6 +142,7 @@
 
   $: {
     if ($shippingCharge) {
+      hideToast();
       showToast({
         screen: TOAST_SCREEN.ONE_CC,
         theme: TOAST_THEME.INFO,

@@ -87,6 +87,7 @@ module.exports = function (testFeatures) {
     addresses = [],
     invalidAddress,
     mandatoryLogin,
+    shippingFee,
   } = features;
 
   describe.each(
@@ -135,6 +136,7 @@ module.exports = function (testFeatures) {
                 isCODEligible,
                 zipcode: '560002',
                 addLandmark,
+                shippingFee,
               },
               addresses
             );

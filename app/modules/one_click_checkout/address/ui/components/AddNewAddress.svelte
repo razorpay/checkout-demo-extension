@@ -456,7 +456,6 @@
     }
     // checks if pincode has been filled and autofills city, state for the same
     if (key === 'zipcode' && checkServiceability) {
-      hideToast();
       if (
         INPUT_FORM[pinIndex][pinSubIndex]?.unserviceableText &&
         !$formData.city
