@@ -30,6 +30,7 @@ import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
 import { setAppropriateCtaText } from 'checkoutstore/cta';
+import { getDeviceId } from 'fingerprint';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1047,6 +1048,8 @@ Session.prototype = {
     }
 
     Analytics.setMeta('is_mobile', discreet.UserAgent.isMobile());
+
+    Analytics.setMeta('device.id', getDeviceId());
 
     if (window && window.screen) {
       Analytics.setMeta('device.screen', {
