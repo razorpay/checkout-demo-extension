@@ -1,13 +1,23 @@
 name: Sonar Scanner
-on:
-  pull_request:
-    branches:
-      - master
-  push:
-    branches:
-      - master
 
+on: [push]
 jobs:
+  cancel:
+    runs-on: [ self-hosted ]
+    name: Cancel previous runs
+    steps:
+      - uses: styfle/cancel-workflow-action@0.10.0
+        if: github.ref != 'refs/heads/master'
+        name: cancel old workflows
+        id: cancel
+        with:
+          access_token: ${{ github.token }}
+      - if: github.ref == 'refs/heads/master'
+        name: Don't cancel old workflows
+        id: dont_cancel
+        run: |
+          echo "Don't cancel old workflow"
+
   sonar:
     name: Sonar Scanner
     runs-on: [self-hosted]
@@ -44,7 +54,6 @@ jobs:
           projectName: ${{ steps.set_sonar_project.outputs.sonar_project }}
           projectVersion: ${{ github.sha }}
       - name: Find PR Number
-        if: github.ref != 'refs/heads/master'
         uses: razorpay/gh-find-current-pr@v1
         id: findPr
       - name: Code Quality Analysis
