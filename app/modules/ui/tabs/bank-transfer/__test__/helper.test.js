@@ -1,5 +1,5 @@
 import { getOption } from 'razorpay';
-import { CHALLAN_FIELDS } from '../challanConstants';
+import { CHALLAN_FIELDS, labels } from '../challanConstants';
 import {
   isCustomChallan,
   getCustomDisclaimers,
@@ -7,6 +7,7 @@ import {
   getCustomExpiry,
   getTimeStamp,
   addCustomFields,
+  createChallanDetailTableData,
 } from '../helper';
 
 jest.mock('razorpay', () => ({
@@ -38,6 +39,28 @@ describe('#getCustomDisclaimers', () => {
     getOption.mockReturnValueOnce(data);
     let disclaimers = getCustomDisclaimers();
     expect(disclaimers).toHaveLength(2);
+    getOption.mockReturnValueOnce(undefined);
+    expect(getCustomDisclaimers()).toHaveLength(0);
+  });
+});
+
+describe('#getCustomDisclaimers setPadding check', () => {
+  const data = [
+    {
+      text: 'Dummy disclaimer 1',
+    },
+  ];
+  test('disclaimers', () => {
+    getOption.mockReturnValueOnce(data);
+    let disclaimers = getCustomDisclaimers();
+    expect(disclaimers).toHaveLength(1);
+    expect(disclaimers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'Dummy disclaimer 1' }),
+        expect.objectContaining({ padding: 4 }),
+      ])
+    );
+
     getOption.mockReturnValueOnce(undefined);
     expect(getCustomDisclaimers()).toHaveLength(0);
   });
@@ -144,6 +167,95 @@ describe('#addCustomFields', () => {
     expect(finalData).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ title: 'Internal Prod ID' }),
+      ])
+    );
+  });
+});
+
+describe('#addCustomFields without value and id', () => {
+  const customFields = [
+    {
+      title: 'Internal Prod ID',
+      value: '123456',
+    },
+    {
+      title: 'Internal Account No',
+    },
+  ];
+  const data = [
+    {
+      title: 'Account No.',
+      id: CHALLAN_FIELDS.ACCOUNT_NO,
+      value: '1112221264829508',
+    },
+    {
+      title: 'Expiry Date',
+      id: CHALLAN_FIELDS.EXPIRY,
+      value: '27th Jul, 2022',
+    },
+  ];
+  test('negative case of not adding value in custom field', () => {
+    getOption.mockReturnValueOnce(customFields);
+
+    const finalData = addCustomFields(data);
+    expect(finalData).toHaveLength(3);
+    expect(finalData).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({ title: 'Internal Account No' }),
+      ])
+    );
+  });
+});
+
+describe('Custom Fields without value and id that does not exit predefined', () => {
+  const customFields = [
+    {
+      title: 'Internal Prod ID',
+      value: '123456',
+    },
+    {
+      title: 'Valid Upto',
+      id: 'expiry_date',
+    },
+  ];
+  const data = [
+    {
+      title: 'Account No.',
+      id: CHALLAN_FIELDS.ACCOUNT_NO,
+      value: '1112221264829508',
+    },
+    {
+      title: 'Expiry Date',
+      id: CHALLAN_FIELDS.EXPIRY,
+      value: '27th Jul, 2022',
+    },
+  ];
+  test('negative case of not adding value with wrong id', () => {
+    getOption.mockReturnValueOnce(customFields);
+    const finalData = addCustomFields(data);
+    expect(finalData).toHaveLength(3);
+    expect(finalData).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({ title: 'Valid Upt' }),
+      ])
+    );
+  });
+});
+
+describe('#createChallanDetailTableData', () => {
+  const data = {
+    [CHALLAN_FIELDS.BENEFICIARY_NAME]: 'Lorem Ipsum',
+    [CHALLAN_FIELDS.ACCOUNT_NO]: '123456789',
+    [CHALLAN_FIELDS.IFSC_CODE]: 'RZA00001',
+    [CHALLAN_FIELDS.BANK]: 'Razorpay Bank',
+  };
+  test('only those values in final result which have value available in data', () => {
+    const finalData = createChallanDetailTableData(labels.ROW_HEADERS, data);
+    expect(finalData).toHaveLength(4);
+    expect(finalData).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ title: 'Beneficiary Name' }),
+        expect.objectContaining({ value: 'Lorem Ipsum' }),
       ])
     );
   });
