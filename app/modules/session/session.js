@@ -2939,7 +2939,13 @@ Session.prototype = {
     }
 
     if (tab === 'emandate') {
-      this.emandateView.onShown();
+      if (this.emandateView) {
+        this.emandateView.onShown();
+      } else {
+        Analytics.track('incorrect integration', {
+          message: 'Some entity is missing either order_id or order object.',
+        });
+      }
     }
 
     if (tab === '' && (this.screen === 'upi' || this.screen === 'upi_otm')) {
