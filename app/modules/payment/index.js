@@ -517,9 +517,7 @@ Payment.prototype = {
       getOption('callback_url')
     ) {
       const url = getOption('callback_url');
-      const doc = window?.parent?.document || window.document;
       submitForm({
-        doc,
         url,
         params: data,
         method: 'POST',
@@ -1216,7 +1214,7 @@ let CardCurrencyRequests = {};
 /**
  * Currency cache for synchronous retrieval
  */
-var CardCurrencyCache = {};
+let CardCurrencyCache = {};
 
 /**
  * [DEPRECATED]
