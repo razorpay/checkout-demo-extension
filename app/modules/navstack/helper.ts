@@ -2,6 +2,13 @@ import { get } from 'svelte/store';
 import { lastOf } from 'utils/array';
 import { elementRef, elements, overlays, overlaysRef } from './store';
 
+type backSubscriberData = { isOverlay: boolean; stackCount: number };
+
+function triggerPopStackSubscriber(data: backSubscriberData) {
+  backSubscriber.forEach((fn) => fn(data));
+}
+
+const backSubscriber: Array<(data: backSubscriberData) => void> = [];
 // IMPORTANT: this function should be used to create utilities around stack manipulation
 function updater(deleteCount: number, newElement?: NavStack.StackElement) {
   let elementsUpdated = false;
@@ -33,6 +40,10 @@ function updater(deleteCount: number, newElement?: NavStack.StackElement) {
 
   if (elementsUpdated) {
     elements.set(_elements);
+    triggerPopStackSubscriber({
+      isOverlay: false,
+      stackCount: _elements.length + _overlays.length,
+    });
     if (!_elements.length) {
       elementRef.set(null);
     }
@@ -41,6 +52,12 @@ function updater(deleteCount: number, newElement?: NavStack.StackElement) {
   if (overlaysUpdated) {
     overlaysRef.update((existing) => existing.slice(0, _overlays.length));
     overlays.set(_overlays);
+    if (!elementsUpdated) {
+      triggerPopStackSubscriber({
+        isOverlay: true,
+        stackCount: _elements.length + _overlays.length,
+      });
+    }
   }
 }
 
@@ -48,6 +65,11 @@ export function isStackPopulated() {
   const _elements = get(elements);
   const _overlays = get(overlays);
   return !!(_elements.length + _overlays.length);
+}
+
+export function isMainStackPopulated() {
+  const _elements = get(elements);
+  return !!_elements.length;
 }
 
 export function pushStack(stackElement: NavStack.StackElement) {
@@ -97,4 +119,14 @@ export function getPayload() {
   if (last && last.getPayload) {
     return last.getPayload();
   }
+}
+
+export function onPopStack(cb: (data: backSubscriberData) => void) {
+  const index = backSubscriber.push(cb);
+  return () => {
+    backSubscriber[index] = () => {
+      return;
+    };
+    return true;
+  };
 }

@@ -22,6 +22,7 @@ import { handleErrorModal } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
+import { isMainStackPopulated, popStack } from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
@@ -2542,6 +2543,10 @@ Session.prototype = {
       this.switchTab('emi');
     } else {
       this.switchTab('');
+      // TODO check for other methods
+      if (isMainStackPopulated()) {
+        popStack();
+      }
       if (
         offer &&
         offer.payment_method === 'card' &&

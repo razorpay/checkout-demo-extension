@@ -42,9 +42,9 @@ beforeAll(() => {
     if (
       message.startsWith('ReferenceError') ||
       message.startsWith('TypeError')
-      ) {
-        console.log('error', message);
-        // console error will not failed the test only close will trigger error
+    ) {
+      console.log('error', message);
+      // console error will not failed the test only close will trigger error
       page.close();
     }
   });

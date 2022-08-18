@@ -17,6 +17,7 @@
   import NavigationStack, {
     backPressed,
     isOverlayActive,
+    onPopStack,
     OverlayStack,
   } from 'navstack';
   import OneCCLoader from 'one_click_checkout/loader/Loader.svelte';
@@ -24,6 +25,7 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
+  import { getSession } from 'sessionmanager';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const cta = getStore();
@@ -64,6 +66,16 @@
     if (escape) {
       window.addEventListener('keyup', handleKeyInput);
     }
+
+    const unsub = onPopStack(({ isOverlay, stackCount }) => {
+      if (!isOverlay && stackCount === 0) {
+        // session.back responsible for clear data member + analytic events
+        // TODO remove session
+        const session = getSession();
+        session.back();
+      }
+    });
+    return () => unsub();
   });
 
   onDestroy(() => {
