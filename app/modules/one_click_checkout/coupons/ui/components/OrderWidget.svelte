@@ -1,4 +1,7 @@
 <script lang="ts">
+  // svelte imports
+  import { onMount } from 'svelte';
+
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
@@ -76,14 +79,10 @@
     }
   }
 
-  $: {
+  onMount(() => {
     showTotal = $isShippingAddedToAmount || $isCouponApplied;
-    if ($savedAddresses?.length && $shippingCharge) {
-      amount.set($cartAmount - $cartDiscount + $shippingCharge);
-    } else {
-      amount.set($cartAmount - $cartDiscount);
-    }
-  }
+    $isShippingAddedToAmount = $savedAddresses?.length && $shippingCharge;
+  });
 </script>
 
 <div class="header">
