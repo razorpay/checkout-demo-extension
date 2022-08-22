@@ -63,8 +63,8 @@
     "test": "npm run test:all",
     "vision": "./scripts/vision.sh",
     "vision:test": "npx playwright test",
-    "postinstall": "chmod -R +x ./git-hooks/ && git config core.hooksPath ./git-hooks",
-    "pretty-lint": "exec ./git-hooks/pre-commit"
+    "prepare": "node ./scripts/prepare.js",
+    "lint:staged": "lint-staged -c .lintstagedrc.json"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
@@ -107,7 +107,7 @@
     "gulp-stylus": "^2.7.1",
     "gulp-usemin": "^0.3.29",
     "http-proxy-middleware": "^2.0.1",
-    "husky": "^6.0.0",
+    "husky": "^8.0.1",
     "jest": "^28.1.0",
     "jest-circus": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
@@ -116,6 +116,7 @@
     "jsdom-global": "^3.0.2",
     "jshint": "^2.13.4",
     "jshint-stylish": "^2.2.1",
+    "lint-staged": "^13.0.3",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "prettier-plugin-svelte": "^2.3.1",
