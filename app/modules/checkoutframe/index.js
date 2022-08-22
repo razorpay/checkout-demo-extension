@@ -30,12 +30,7 @@ import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
 import { returnAsIs } from 'lib/utils';
 
-import {
-  cookieDisabled,
-  isIframe,
-  ownerWindow,
-  FRAME_CSS_URL,
-} from 'common/constants';
+import { cookieDisabled, isIframe, ownerWindow } from 'common/constants';
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { reward } from 'checkoutstore/rewards';
@@ -49,7 +44,7 @@ import {
 import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
-import { getElementById, loadCSS } from 'utils/doc';
+import { getElementById } from 'utils/doc';
 import { hasProp, isEmpty } from 'utils/object';
 import { setBraveBrowser } from 'common/useragent';
 import { appendLoader } from 'common/loader';
@@ -433,29 +428,16 @@ function getPrefsPromisified(session) {
   });
 }
 
-function isFrameCssAvailable() {
-  return Boolean(document.querySelector(`link[href$="${FRAME_CSS_URL}"]`));
-}
-
 function fetchPrefs(session) {
   if (session.isOpen) {
     return;
   }
   session.isOpen = true;
   performPrePrefsFetchOperations();
-  // We don't want to load CSS if it is already loaded
-  const frameCSSPromise = isFrameCssAvailable()
-    ? Promise.resolve()
-    : loadCSS(FRAME_CSS_URL);
 
-  // Loading CSS in parallel with Preferences. We are programatically loading CSS
-  // from here instead of directly adding a link tag because at the time of
-  // loading CSS we want to pass the commit id same as the current
-  // checkout-frame.js to avoid js and css mismatch because of
-  // env issues. Ex: Js loading from prod, CSS from canary
-  Promise.all([getPrefsPromisified(session), frameCSSPromise])
-    .then((values) => {
-      processPreferences(values[0], session);
+  getPrefsPromisified(session)
+    .then((preferences) => {
+      processPreferences(preferences, session);
     })
     .catch(() => {
       Razorpay.sendMessage({

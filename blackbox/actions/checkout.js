@@ -47,7 +47,7 @@ function checkoutRequestHandler(request) {
     return request.respond({ body: prefetchPrefsHtmlContent });
   } else if (url.endsWith('favicon.ico')) {
     return request.respond({ status: 204 });
-  } else if (url.endsWith('checkout.css')) {
+  } else if (url === checkoutCss) {
     return request.respond({ body: cssContent });
   } else if (url === checkoutFrameJs) {
     return request.respond({ body: jsContent });
@@ -108,8 +108,6 @@ function cdnRequestHandler(request) {
   const url = request.url();
   if (url.endsWith('favicon.ico')) {
     request.respond({ status: 204 });
-  } else if (url.endsWith('checkout.css')) {
-    return request.respond({ body: cssContent });
   } else if (url.startsWith('data')) {
     request.respond({ body: url });
   } else if (url.startsWith(lumberjackUrl)) {

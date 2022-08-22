@@ -282,7 +282,6 @@ module.exports = {
       const ignoredUrl =
         !interceptorEnabled ||
         url.endsWith('favicon.ico') ||
-        url.endsWith('checkout.css') ||
         url.startsWith('data') ||
         (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
