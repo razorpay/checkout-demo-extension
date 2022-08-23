@@ -4,7 +4,7 @@
 
   // i18n imports
   import { t } from 'svelte-i18n';
-  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { CTA_LABEL } from 'cta/i18n';
 
   const dispatch = createEventDispatcher();
 

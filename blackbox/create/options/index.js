@@ -67,7 +67,14 @@ function makeTestOptions({
  * @returns {Object}
  */
 function makeTestPreferences(
-  { partialPayment, feeBearer, optionalContact, optionalEmail, recurringOrder },
+  {
+    partialPayment,
+    feeBearer,
+    optionalContact,
+    optionalEmail,
+    recurringOrder,
+    hasMerchantPolicy,
+  },
   { method }
 ) {
   const preferences = {};
@@ -112,6 +119,13 @@ function makeTestPreferences(
   }
 
   preferences.feature_overrides = {};
+
+  if (hasMerchantPolicy) {
+    preferences.merchant_policy = {
+      url: 'https://sme.np.razorpay.in/compliance/K0obrWayUIqw40',
+      display_name: 'About Merchant',
+    };
+  }
 
   return preferences;
 }

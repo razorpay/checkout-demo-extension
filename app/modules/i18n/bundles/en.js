@@ -1,11 +1,12 @@
 import address from 'one_click_checkout/address/i18n/en';
 import coupons from 'one_click_checkout/coupons/i18n/en';
-import account from 'one_click_checkout/account_modal/i18n/en';
+import account from 'account_modal/i18n/en';
+import wallet from 'wallet/i18n/en';
 import contact from 'one_click_checkout/contact_widget/i18n/en';
 import miscOneCC from 'one_click_checkout/misc/i18n/en';
 import loader from 'one_click_checkout/loader/i18n/en';
-import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
-import ctaOneCC from 'one_click_checkout/cta/i18n/en';
+import summary_modal from 'summary_modal/i18n/en';
+import ctaOneCC from 'cta/i18n/en';
 import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import topbar from 'one_click_checkout/topbar/i18n/en';
@@ -61,6 +62,7 @@ export default {
     round_off_callout:
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     print_details: 'Print Details',
+    download_challan: 'Download Challan',
     fee_breakup: 'See Fee Breakup',
     wait_text: 'Please wait while we download the pdf',
   },
@@ -223,6 +225,7 @@ export default {
     downtime_callout_cards:
       'This payment might fail because {instrument} cards are facing technical difficulties',
     timer_callout: 'This page will timeout in {minutes} minutes',
+    callout_timer: 'This page will expire in',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -238,8 +241,10 @@ export default {
     card_number_help_recurring: 'Card does not support recurring payments.',
     card_number_help_unsupported: 'This card is not supported for the payment',
     card_number_label: 'Card Number',
+    card_expiry_help: 'Invalid expiry date',
     cards_saved_on_apps_label: 'Pay with card on other apps',
     cards_saved_on_rzp_label: 'YOUR SAVED CARDS',
+    cards_saved_on_rzp_label_redesign: 'Saved Cards',
     cards_saved_label_one_cc: 'All cards supported',
     checking_cred_eligibility: 'Checking you eligibility status on CRED',
     cvv_help: "It's a {length} digit code printed on the back of your card.",
@@ -635,7 +640,7 @@ export default {
     pay_conversion_fee: 'Pay currency conversion fee',
     pay_in: 'Pay in',
     merchant_of_record:
-      'By completing your order, you will checkout with Razorpay Inc. as the merchant of record and agree with the',
+      'By completing your order, you will checkout with Razorpay Inc. as the merchant of record and agree with the ',
     terms_and_conditions: 'terms and conditions',
   },
   debit_emi: {
@@ -766,6 +771,7 @@ export default {
     amount_label: 'Amount',
     breakup_title: 'Fees Breakup',
     continue_action: 'Continue',
+    confirm_and_pay: 'Continue and pay',
     close_action: 'Close',
     gateway_charges_label: 'Convenience Charges',
     gst_label: 'GST on {label}',
@@ -807,10 +813,12 @@ export default {
     partial_amount_help_invalid: 'Please enter a valid amount upto {amount}',
     partial_amount_help_lower: 'Minimum payable amount is {amount}',
     partial_amount_label: 'Make payment in parts',
+    partial_amount_label_v15: 'Part payment',
     partial_amount_placeholder: 'Enter amount',
     partial_amount_status_full: 'Paying full amount',
     partial_amount_status_partial: 'Paying in parts',
     partial_payment_title: 'Select a payment type',
+    partial_payment_title_v15: 'Payment Type',
     pincode_help: 'Enter 6 digit pincode',
     pincode_label: 'PIN Code',
     phone_number: 'Phone Number',
@@ -975,6 +983,7 @@ export default {
     search_all: 'All banks',
     search_placeholder: 'Search for bank',
     search_title: 'Select bank to pay',
+    select_bank: 'Select Bank',
     select_help: 'Please select a bank',
     select_label: 'Select a different bank',
     selection_radio_text: 'Complete Payment Using',
@@ -1215,6 +1224,7 @@ export default {
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
     omni_gpay_number: 'Google Pay phone number',
+    omni_gpay_subtitle: 'Instant payment using Google Pay App',
     omni_verifying_phone: 'Verifying mobile number with Google Pay..',
     qr_block_heading: 'Pay using QR Code',
     recommended: 'Recommended',
@@ -1348,6 +1358,7 @@ export default {
   address,
   coupons,
   contact,
+  wallet,
   loader,
   account,
   details_modal,
@@ -1360,7 +1371,7 @@ export default {
     nvs_first_name: 'First Name*',
     nvs_last_name: 'Last Name*',
   },
-  cta_one_cc: ctaOneCC,
+  cta_new: ctaOneCC,
   misc_one_cc: miscOneCC,
   cart,
   intl_bank_transfer: {

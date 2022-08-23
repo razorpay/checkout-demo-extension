@@ -16,11 +16,11 @@
   } from 'ui/labels/emi-details';
 
   // Util imports
-  import { getCurrency, getAmount, isOneClickCheckout } from 'razorpay';
+  import { getCurrency, getAmount, isRedesignV15 } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmountWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isRedesignV15();
 
   let plan;
   let duration;

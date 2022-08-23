@@ -2,7 +2,7 @@ import {
   getCustomerDetails,
   isUserLoggedIn,
 } from 'one_click_checkout/common/helpers/customer';
-import otpEvents from 'one_click_checkout/otp/analytics';
+import otpEvents from 'otp/analytics';
 import { Events } from 'analytics';
 import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
@@ -15,11 +15,7 @@ import { selectedAddressId as selectedShippingAddressId } from 'one_click_checko
 import { views } from 'one_click_checkout/routing/constants';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
-import {
-  RESEND_OTP_INTERVAL,
-  OTP_TEMPLATES,
-  otpReasons,
-} from 'one_click_checkout/otp/constants';
+import { RESEND_OTP_INTERVAL, OTP_TEMPLATES, otpReasons } from 'otp/constants';
 
 const hasSavedAddresses =
   (redirect, check_status = true) =>

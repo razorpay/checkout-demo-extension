@@ -5,8 +5,8 @@
     backdropVisible,
     backdropClick,
   } from 'checkoutstore/backdrop';
-  import { isCtaShown } from 'checkoutstore/cta';
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { isCtaShown } from 'cta';
+  import { showFeeLabel } from 'checkoutstore/fee';
 
   import { fade } from 'svelte/transition';
 

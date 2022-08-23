@@ -16,7 +16,7 @@ import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
-import otpEvents from 'one_click_checkout/otp/analytics';
+import otpEvents from 'otp/analytics';
 
 // i18n imports
 import { formatTemplateWithLocale } from 'i18n';
@@ -62,11 +62,7 @@ import { pushOverlay } from 'navstack';
 import { showAddressConsentModal } from 'one_click_checkout/address/consent';
 
 // constant imports
-import {
-  RESEND_OTP_INTERVAL,
-  OTP_TEMPLATES,
-  otpReasons,
-} from 'one_click_checkout/otp/constants';
+import { RESEND_OTP_INTERVAL, OTP_TEMPLATES, otpReasons } from 'otp/constants';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
 import { views } from 'one_click_checkout/routing/constants';

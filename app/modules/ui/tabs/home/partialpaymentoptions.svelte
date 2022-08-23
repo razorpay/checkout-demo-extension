@@ -15,6 +15,7 @@
   import { scrollIntoView } from 'lib/utils';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { isRedesignV15 } from 'razorpay';
 
   // i18n
   import {
@@ -23,6 +24,8 @@
     MIN_AMOUNT_LABEL,
     PARTIAL_AMOUNT_DESCRIPTION,
     PARTIAL_AMOUNT_LABEL,
+    // PARTIAL_AMOUNT_LABEL_V15,
+    PARTIAL_PAYMENT_TITLE_V15,
   } from 'ui/labels/home';
 
   import { t } from 'svelte-i18n';
@@ -47,6 +50,7 @@
   const partialDescription = session.get(
     'partial_payment.partial_amount_description'
   );
+  const isRedesignV15Enabled = isRedesignV15();
 
   // Only set the value in store if nothing has already been set
   if (!$partialPaymentOption) {
@@ -110,13 +114,17 @@
 </script>
 
 <!-- LABEL: Select a payment type -->
-<h3 class="title">{$t(PARTIAL_PAYMENT_TITLE)}</h3>
+<h3 class="title" class:redesign-v15={isRedesignV15Enabled}>
+  {isRedesignV15Enabled
+    ? $t(PARTIAL_PAYMENT_TITLE_V15)
+    : $t(PARTIAL_PAYMENT_TITLE)}
+</h3>
 <div class="border-list">
   <SlottedRadioOption
     name="payment_type"
     value="partial"
     selected={$partialPaymentOption === 'full'}
-    reverse
+    reverse={!isRedesignV15Enabled}
     on:click={(_) => handleRadioSelection('full')}
   >
     <div slot="title">{fullAmountLabel || $t(FULL_AMOUNT_LABEL)}</div>
@@ -125,12 +133,18 @@
     name="payment_type"
     value="full"
     align="top"
-    reverse
+    reverse={!isRedesignV15Enabled}
     overflow
     selected={$partialPaymentOption === 'partial'}
     on:click={(_) => handleRadioSelection('partial')}
   >
-    <div slot="title">{partialAmountLabel || $t(PARTIAL_AMOUNT_LABEL)}</div>
+    <div
+      slot="title"
+      class:slot-title-margin={$partialPaymentOption === 'partial' &&
+        isRedesignV15Enabled}
+    >
+      {$t(PARTIAL_AMOUNT_LABEL)}
+    </div>
     <div slot="subtitle" bind:this={partialPaymentRef}>
       {#if expanded}
         <PartialPaymentAmountField
@@ -150,7 +164,14 @@
 </div>
 
 <style>
+  .redesign-v15 {
+    margin-left: 0 !important;
+  }
+
   div[slot='subtitle']:not(:empty) {
     padding-bottom: 16px;
+  }
+  .slot-title-margin {
+    margin-bottom: 15px;
   }
 </style>

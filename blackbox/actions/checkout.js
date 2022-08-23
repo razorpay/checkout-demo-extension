@@ -53,7 +53,10 @@ function checkoutRequestHandler(request) {
     return request.respond({ body: jsContent });
   } else if (url === checkoutJs) {
     return request.respond({ body: checkoutJsContent });
-  } else if (url === checkoutFont) {
+  } else if (
+    url === checkoutFont ||
+    url.startsWith('https://fonts.googleapis.com/css2')
+  ) {
     return request.respond({
       body: fontContent,
       headers: { 'Access-Control-Allow-Origin': '*' },
@@ -110,7 +113,10 @@ function cdnRequestHandler(request) {
     request.respond({ status: 204 });
   } else if (url.startsWith('data')) {
     request.respond({ body: url });
-  } else if (url.startsWith(lumberjackUrl)) {
+  } else if (
+    url.startsWith(lumberjackUrl) ||
+    url.includes('https://browser.sentry-cdn.com/7.2.0/bundle.min.js')
+  ) {
     request.respond({ status: 204 });
   } else if (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) {
     const localPath = 'app/images/' + url.slice(cdnUrl.length);

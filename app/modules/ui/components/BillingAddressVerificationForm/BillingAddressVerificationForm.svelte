@@ -207,7 +207,7 @@
     }
   };
 
-  const checkFormErrors = () => handleFormSubmit();
+  export const checkFormErrors = () => handleFormSubmit();
 
   // lifecycle
   onMount(() => {
@@ -267,6 +267,7 @@
             name={`billing-address-verification-${subField.id}`}
             label={formValues[subField.id] ? subField.placeholder : ''}
             labelClasses={formValues[subField.id] ? 'input-label' : ''}
+            elemClasses={formErrors[subField.id] ? 'invalid' : 'filled'}
             icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(subField.id)
               ? ''
               : false}
@@ -303,6 +304,7 @@
           label={formValues[field.id] ? field.placeholder : ''}
           labelClasses={formValues[field.id] ? 'input-label' : ''}
           helpText={formErrors[field.id] ? $t(AVS_FORM_INPUT_REQUIRED) : ''}
+          elemClasses={formErrors[field.id] ? 'invalid' : 'filled'}
           on:click={() => handleSearchFieldClick(field)}
           on:focus={() => handleSearchFieldClick(field)}
           on:keydown={(evt) => handleSearchFieldDownArrow(evt, field)}
@@ -327,8 +329,20 @@
     margin-right: 12px;
   }
 
+  :global(.redesign)
+    .billing-address-form__field
+    > :global(div:nth-child(odd)) {
+    margin-right: 6px;
+  }
+
   .billing-address-form__field > :global(div:nth-child(even)) {
     margin-left: 12px;
+  }
+
+  :global(.redesign)
+    .billing-address-form__field
+    > :global(div:nth-child(even)) {
+    margin-left: 0;
   }
 
   .billing-address-form__field > :global(div:last-child) {
@@ -344,10 +358,29 @@
     transform: scale(0.86) translateY(-30px);
   }
 
+  :global(.redesign)
+    .billing-address-form
+    :global(.filled:not(.input-radio) label),
+  :global(.redesign) .billing-address-form :global(.input-label) {
+    transform: scale(0.86) translateY(4px);
+    line-height: 1;
+  }
+
   .billing-address-form :global(#billing-address-verification-country),
   .billing-address-form :global(#billing-address-verification-state) {
     text-overflow: ellipsis;
     width: calc(100% - 30px);
+    padding-right: 15px;
+  }
+
+  :global(.redesign)
+    .billing-address-form
+    :global(#billing-address-verification-country),
+  :global(.redesign)
+    .billing-address-form
+    :global(#billing-address-verification-state) {
+    text-overflow: ellipsis;
+    width: 100%;
     padding-right: 15px;
   }
 

@@ -5,7 +5,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import circleTick from 'card/icons/circle-tick';
   import shield from 'card/icons/shield';
-  import { isOneClickCheckout, isRecurring } from 'razorpay';
+  import { isRedesignV15, isRecurring } from 'razorpay';
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
   import { popStack } from 'navstack';
 
@@ -31,9 +31,9 @@
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1,
     SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2,
   } from 'ui/labels/card';
-  import { isIndianCustomer } from 'checkoutstore';
+  import { isIndianCustomer } from 'checkoutstore/screens/home';
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   export function preventBack() {
     cvvRef?.focus();
   }
@@ -47,12 +47,12 @@
 <div
   class="secure-card-know-more-overlay"
   transition:fly={{ duration: 200, y: 20 }}
-  class:secure-card-know-more-overlay-one-cc={isOneClickCheckoutEnabled}
+  class:secure-card-know-more-overlay-one-cc={isRedesignV15Enabled}
 >
   <div class="secure-card-know-more-header">
     <span
       class="secure-card-know-more-header-title"
-      class:secure-card-know-more-header-one-cc={isOneClickCheckoutEnabled}
+      class:secure-card-know-more-header-one-cc={isRedesignV15Enabled}
     >
       {#if modalType === 'add-new-card'}
         {$t(SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE)}
@@ -60,17 +60,17 @@
         {$t(SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE)}
       {/if}
     </span>
-    <span class="secure-card-know-more-header-close" on:click={onClose}
-      ><Icon icon={close()} /></span
-    >
+    <span class="secure-card-know-more-header-close" on:click={onClose}>
+      <Icon icon={close()} />
+    </span>
   </div>
-  {#if isOneClickCheckoutEnabled}
+  {#if isRedesignV15Enabled}
     <hr />
   {/if}
 
   <div
     class="secure-card-know-more-content"
-    class:secure-card-know-more-content-one-cc={isOneClickCheckoutEnabled}
+    class:secure-card-know-more-content-one-cc={isRedesignV15Enabled}
   >
     {#if modalType === 'add-new-card'}
       <!-- If recurring -->
@@ -107,7 +107,7 @@
         <li>
           <span class="know-more-modal-icon"
             ><Icon
-              icon={isOneClickCheckoutEnabled ? circle_check() : circleTick()}
+              icon={isRedesignV15Enabled ? circle_check() : circleTick()}
             /></span
           >
           <span>
@@ -117,7 +117,7 @@
         <li>
           <span class="know-more-modal-icon"
             ><Icon
-              icon={isOneClickCheckoutEnabled ? circle_check() : circleTick()}
+              icon={isRedesignV15Enabled ? circle_check() : circleTick()}
             /></span
           >
           <span>

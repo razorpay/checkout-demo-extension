@@ -53,7 +53,7 @@
   import { getBankLogo } from 'common/bank';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { hideCta, showCtaWithDefaultText } from 'cta';
   import { getAnimationOptions } from 'svelte-utils';
   import {
     getAuthType,

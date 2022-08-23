@@ -45,7 +45,7 @@ import * as Store from 'checkoutstore';
 import * as MethodStore from 'checkoutstore/methods';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
-import * as Cta from 'checkoutstore/cta';
+import * as Cta from 'cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
@@ -107,7 +107,7 @@ import * as ChargesStore from 'one_click_checkout/charges/store';
 import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
 import { Views as CardViews } from 'ui/tabs/card/constant';
-import { OTP_TEMPLATES } from 'one_click_checkout/otp/constants';
+import { OTP_TEMPLATES } from 'otp/constants';
 import * as OtpTemplatesHelper from 'checkoutframe/sms_template';
 import * as RTBHelper from 'rtb/helper';
 

@@ -23,8 +23,8 @@
     COUNTRY_LABEL,
     COUNTRY_HELP_TEXT,
     PHONE_NUMBER,
-    MOBILE_NUMBER,
-    MOBILE_NUMBER_OPTIONAL,
+    // MOBILE_NUMBER,
+    // MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
   import {
     CONTACT_ERROR_LABEL,
@@ -33,7 +33,7 @@
 
   import { t } from 'svelte-i18n';
 
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
   import { isContactReadOnly } from 'checkoutframe/customer';
   import { isContactValid } from 'one_click_checkout/common/details/store';
 
@@ -49,7 +49,7 @@
   export let validationText;
   export let showValidations = false;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   const dispatch = createEventDispatcher();
 
@@ -93,9 +93,9 @@
   }
 
   let label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
-  if (isOneClickCheckoutEnabled) {
-    label = isOptional ? MOBILE_NUMBER_OPTIONAL : MOBILE_NUMBER;
-  }
+  // if (isRedesignV15Enabled) {
+  //   label = isOptional ? MOBILE_NUMBER_OPTIONAL : MOBILE_NUMBER;
+  // }
 
   function closeSearch() {
     searchModalOpen = false;
@@ -167,16 +167,16 @@
     readonly={isContactReadOnly()}
     icon=""
     formatter={{ type: 'country_code' }}
-    label={isOneClickCheckoutEnabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
+    label={isRedesignV15Enabled ? $t(PHONE_NUMBER) : $t(COUNTRY_LABEL)}
     on:input={(e) => (country = e.target.value)}
     on:blur
     value={country}
     helpText={$t(COUNTRY_HELP_TEXT)}
     elemClasses={inAddress ? 'address-elem' : ''}
     labelClasses={`${inAddress && 'address-label'} ${
-      isOneClickCheckoutEnabled && 'hidden'
+      isRedesignV15Enabled && 'hidden'
     }`}
-    inputFieldClasses={isOneClickCheckoutEnabled
+    inputFieldClasses={isRedesignV15Enabled
       ? 'country-code-one-click-checkout'
       : ''}
     showDropDownIcon={true}
@@ -207,12 +207,12 @@
     value={phone}
     elemClasses={inAddress ? 'address-elem' : ''}
     labelClasses={`${inAddress && 'address-label'} ${
-      isOneClickCheckoutEnabled && 'contact-label'
+      isRedesignV15Enabled && 'contact-label'
     }`}
-    inputFieldClasses={isOneClickCheckoutEnabled
+    inputFieldClasses={isRedesignV15Enabled
       ? 'phone-field-one-click-checkout'
       : ''}
-    errorValidationClasses={isOneClickCheckoutEnabled
+    errorValidationClasses={isRedesignV15Enabled
       ? 'contact-validation-error'
       : ''}
     {validationText}

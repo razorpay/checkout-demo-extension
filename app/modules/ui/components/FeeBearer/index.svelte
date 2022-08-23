@@ -1,13 +1,15 @@
 <script lang="ts">
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import close from 'one_click_checkout/coupons/icons/close.js';
 
   // Store imports
-  import { isDynamicFeeBearer } from 'razorpay';
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { isCustomerFeeBearer, isDynamicFeeBearer } from 'razorpay';
+  import { showFeeLabel } from 'checkoutstore/fee';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
   // Utils imports
@@ -16,7 +18,7 @@
     formatAmountWithSymbolRawHtml,
   } from 'common/currency';
   import { getSession } from 'sessionmanager';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
   import { popStack } from 'navstack';
 
   // i18n
@@ -31,6 +33,7 @@
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
     CLOSE_ACTION,
+    CONFIRM_AND_PAY,
   } from 'ui/labels/fees';
 
   // analytics
@@ -40,6 +43,8 @@
     trackFeeError,
     trackFeeSuccess,
   } from './events';
+  import { hideCta, showCta } from 'cta';
+  import { cfbAmount } from 'checkoutstore/screens/upi';
 
   // Props
   export let loading = true;
@@ -56,7 +61,7 @@
   let currency = 'INR';
 
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmountWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isRedesignV15();
   const isOverlay = navstack?.isOverlay;
   const session = getSession();
   const fee_label = session.get('fee_label');
@@ -70,6 +75,7 @@
   const dynamic_fee_label = $dynamicFeeObject?.checkout_label || '';
 
   onMount(() => {
+    hideCta();
     fetchFees(paymentData);
     trackShown();
   });
@@ -88,23 +94,37 @@
 
     loading = false;
     bearer = response.input;
-    $showFeeLabel = Boolean(isDynamicFeeBearer());
-    const offer = session.getAppliedOffer();
-    if (!offer || !offer.amount) {
-      if (feeBreakup.currency) {
-        session.setRawAmountInHeader(
-          formatAmountWithSymbolRawHtml(
-            feeBreakup.amount * 100,
-            feeBreakup.currency
-          )
-        );
-      } else {
-        session.updateAmountInHeader(feeBreakup.amount * 100, false);
-      }
-      return;
+    if (isRedesignV15()) {
+      $showFeeLabel =
+        Boolean(isDynamicFeeBearer()) || Boolean(isCustomerFeeBearer());
+    } else {
+      $showFeeLabel = Boolean(isDynamicFeeBearer());
     }
-    if (offer) {
-      session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
+    if (!isRedesignV15()) {
+      const offer = session.getAppliedOffer();
+      if (!offer || !offer.amount) {
+        if (feeBreakup.currency) {
+          session.setRawAmountInHeader(
+            formatAmountWithSymbolRawHtml(
+              feeBreakup.amount * 100,
+              feeBreakup.currency
+            )
+          );
+        } else {
+          session.updateAmountInHeader(feeBreakup.amount * 100, false);
+        }
+        return;
+      }
+      if (offer) {
+        session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
+      }
+    } else {
+      cfbAmount.set(
+        formatAmountWithSymbolRawHtml(
+          feeBreakup.amount * 100,
+          feeBreakup.currency || 'INR'
+        )
+      );
     }
     trackFeeSuccess({
       amount: feeBreakup.amount,
@@ -112,6 +132,10 @@
       dcc_currency: bearer.dcc_currency,
     });
   }
+
+  onDestroy(() => {
+    showCta();
+  });
 
   export function onError(response) {
     const errorMessage = translateErrorDescription(
@@ -144,6 +168,10 @@
     session.r.calculateFees(paymentData).then(onSuccess).catch(onError);
   }
 
+  function onClose() {
+    popStack();
+  }
+
   function handleCTA() {
     if (isOverlay) {
       popStack();
@@ -151,9 +179,18 @@
     onContinue?.(bearer);
     trackContinueClick();
   }
+  const isRedesignV15Enabled = isRedesignV15();
+  const continueAction = isRedesignV15Enabled
+    ? CONFIRM_AND_PAY
+    : CONTINUE_ACTION;
 </script>
 
-<div class="fee-bearer">
+<div class="fee-bearer" class:checkout-redesign={isRedesignV15Enabled}>
+  {#if isRedesignV15Enabled && isOverlay}
+    <span class="fee-bearer-close" on:click={onClose}>
+      <Icon icon={close('#757575')} />
+    </span>
+  {/if}
   {#if loading}
     <AsyncLoading>
       <!-- LABEL: Loading fees breakup... -->
@@ -162,7 +199,7 @@
   {:else if feeBreakup}
     <!-- LABEL: Fees Breakup -->
     <b>{$t(BREAKUP_TITLE)}</b>
-    <br />
+
     <div class="fees-container">
       {#each Object.entries(feeBreakup) as [type, amount] (type)}
         {#if allowedKeys.includes(type)}
@@ -197,13 +234,80 @@
     <div class="btn" on:click={handleCTA}>
       <!-- LABEL: Continue -->
       <!-- LABEL: Close -->
-      {$t(onContinue ? CONTINUE_ACTION : CLOSE_ACTION)}
+      {$t(onContinue ? continueAction : CLOSE_ACTION)}
     </div>
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .fee-bearer {
     padding: 20px;
+    .fees-container {
+      margin: 0 auto;
+      margin-bottom: 16px;
+
+      .fee {
+        padding: 8px 0;
+        width: 100%;
+
+        &:last-of-type {
+          border-top: 1px solid #ebedf0;
+          font-weight: bold;
+          margin-top: 12px;
+          padding-top: 12px;
+        }
+
+        .fee-title {
+          display: inline-block;
+          text-align: left;
+          width: calc(50% - 2px);
+        }
+
+        .fee-amount {
+          display: inline-block;
+          text-align: right;
+          width: calc(50% - 2px);
+        }
+
+        // .fee-discount {
+        //   display: inline-block;
+        //   text-align: right;
+        //   width: calc(50% - 2px);
+        //   color: #079f0d;
+        // }
+      }
+    }
+  }
+  .checkout-redesign {
+    b {
+      color: #3f71d7;
+      display: flex;
+      font-size: 14px;
+    }
+    .fees-container {
+      margin-top: 15px;
+      font-size: 12px;
+      .fee {
+        color: #8d97a1;
+        &:last-child {
+          color: #000;
+        }
+      }
+    }
+    .btn {
+      line-height: 45px;
+      border-radius: 5px;
+      text-transform: none;
+    }
+
+    .fee-bearer-close {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      cursor: pointer;
+    }
+  }
+  :global(.irctc) .fee-bearer {
+    bottom: -30px !important; // irctc has special callout impacting height of checkout
   }
 </style>

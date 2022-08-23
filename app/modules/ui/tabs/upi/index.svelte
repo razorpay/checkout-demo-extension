@@ -10,7 +10,7 @@
     isPayout,
     getPrefilledVPA,
     hasFeature,
-    isOneClickCheckout,
+    isRedesignV15,
   } from 'razorpay';
   import {
     isMethodEnabled,
@@ -26,8 +26,8 @@
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
-  import { hideCta, showCta } from 'checkoutstore/cta';
   import { iOS } from 'common/useragent';
+  import CTA, { hideCta, showCta } from 'cta';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import {
     intentVpaPrefill,
@@ -51,7 +51,6 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   import updateScore from 'analytics/checkoutScore';
 
@@ -97,7 +96,7 @@
   import QRWrapper from 'upi/ui/components/QRWrapper/QRWrapper.svelte';
 
   // Constant imports
-  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { PAY_NOW_CTA_LABEL } from 'cta/i18n';
   import { filterTruthyKeys } from 'lib/utils';
   import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
   import { filterUPIIntentAppsForAutopayIntent } from './helpers';
@@ -119,19 +118,18 @@
   export let pspHandle;
   export let shouldShowQr;
 
-  let shouldShowCollect;
-  let shouldShowOmnichannel;
-  let vpaEntered;
+  let shouldShowCollect: boolean;
+  let shouldShowOmnichannel: boolean;
+  let vpaEntered: string;
   let rememberVpa = shouldRememberCustomer('upi');
   let omnichannelPhone = '';
 
   let tokens = [];
-  let selectedToken = null;
+  let selectedToken: string | null = null;
   let intentAppSelected = null;
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
   let upiIntent;
-  let renderCtaOneCC = false;
 
   let upiTiles = enableUPITiles();
   const showStaticIntentAppsForIos =
@@ -151,7 +149,8 @@
   let downtimeSeverity;
   let downtimeInstrument;
 
-  let helpTextToDisplay;
+  let helpTextToDisplay: string;
+  let CTADisabled = false;
 
   const banksThatSupportRecurring = [
     {
@@ -391,15 +390,32 @@
   }
 
   function determineCtaVisibility() {
+    let isRedesign = isRedesignV15();
     if (requiresBankSelection) {
-      hideCta();
+      if (isRedesign) {
+        CTADisabled = true;
+      } else {
+        hideCta();
+      }
       if (selectedBankForRecurring) {
-        showCta();
+        if (isRedesign) {
+          CTADisabled = false;
+        } else {
+          showCta();
+        }
       }
     } else if (selectedToken) {
-      showCta();
+      if (isRedesign) {
+        CTADisabled = false;
+      } else {
+        showCta();
+      }
     } else {
-      hideCta();
+      if (isRedesign) {
+        CTADisabled = true;
+      } else {
+        hideCta();
+      }
     }
   }
 
@@ -492,17 +508,12 @@
         qr: shouldShowQr,
       }),
     });
-    renderCtaOneCC = true;
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
     if (requiresBankSelection) {
       upiFlowStep = steps.preUpiPspBankSelection;
     }
-  }
-
-  export function onHide() {
-    renderCtaOneCC = false;
   }
 
   export function updateStep() {
@@ -809,8 +820,8 @@
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
-  <Screen pad={!isOneClickCheckout()}>
-    <div class="upi-container" class:screen-one-cc={isOneClickCheckout()}>
+  <Screen pad={!isRedesignV15()}>
+    <div class="upi-container" class:screen-one-cc={isRedesignV15()}>
       {#if upiFlowStep === steps.preUpiPspBankSelection}
         <BankSelection bind:value={selectedBankForRecurring} />
       {:else if upiFlowStep === steps.upi}
@@ -932,6 +943,7 @@
                 on:blur={trackVpaEntry}
                 selected={selectedToken === 'new'}
                 bind:value={vpaEntered}
+                bind:helpTextToDisplay
                 bind:rememberVpa
                 bind:this={vpaField}
               />
@@ -993,14 +1005,14 @@
         {recurringFrequency}
       />
     </div>
-    {#if renderCtaOneCC}
-      <CTAOneCC
-        disabled={Boolean(helpTextToDisplay) && selectedToken === 'new'}
-        on:click={() => session.preSubmit()}
-      >
-        {$t(PAY_NOW_CTA_LABEL)}
-      </CTAOneCC>
-    {/if}
+    <CTA
+      screen="upi"
+      tab="upi"
+      disabled={(Boolean(helpTextToDisplay) && selectedToken === 'new') ||
+        CTADisabled}
+      showAmount
+      label={PAY_NOW_CTA_LABEL}
+    />
   </Screen>
 </Tab>
 
@@ -1057,7 +1069,7 @@
     padding: 0px 12px 12px;
   }
   .screen-one-cc {
-    min-height: 120%;
+    min-height: 110%;
   }
 
   :global(#content.one-cc) .upi-container {

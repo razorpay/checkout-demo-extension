@@ -36,28 +36,28 @@ async function handleFeeBearer(context, pressContinue) {
   });
   const feeAmount11 = await context.page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
-  expectedAmount = '₹ 600';
+  expectedAmount = context.isRedesignV15Enabled ? '₹600' : '₹ 600';
   const feeAmount1 = await context.page.evaluate(
     (feeAmount) => feeAmount.textContent,
     feeAmount
   );
   expect(feeAmount1).toEqual(expectedAmount);
   feeAmount = feeAmount11[1];
-  expectedAmount = '₹ 17.40';
+  expectedAmount = context.isRedesignV15Enabled ? '₹17.40' : '₹ 17.40';
   const feeAmount2 = await context.page.evaluate(
     (feeAmount) => feeAmount.textContent,
     feeAmount
   );
   expect(feeAmount2).toEqual(expectedAmount);
   feeAmount = feeAmount11[2];
-  expectedAmount = '₹ 3.14';
+  expectedAmount = context.isRedesignV15Enabled ? '₹3.14' : '₹ 3.14';
   const feeAmount3 = await context.page.evaluate(
     (feeAmount) => feeAmount.textContent,
     feeAmount
   );
   expect(feeAmount3).toEqual(expectedAmount);
   feeAmount = feeAmount11[3];
-  expectedAmount = '₹ 620.54';
+  expectedAmount = context.isRedesignV15Enabled ? '₹620.54' : '₹ 620.54';
   const feeAmount4 = await context.page.evaluate(
     (feeAmount) => feeAmount.textContent,
     feeAmount
@@ -70,15 +70,16 @@ async function handleFeeBearer(context, pressContinue) {
 }
 
 async function assertDynamicFeeBearer(context, step, waitForClosure) {
-  expect(await context.page.$eval('#amount > span.fee > div', visible)).toEqual(
-    true
-  );
+  const containerId = context.isRedesignV15Enabled ? '#fee-wrapper' : '#amount';
+  expect(
+    await context.page.$eval(`${containerId} > span.fee > div`, visible)
+  ).toEqual(true);
   if (step === 1) {
     // Step 1 to check if the tooltip has been displayed
     //  intially with generic message and merchant custom message if any
     expect(
       await context.page.$eval(
-        '#amount > span.fee > div > span > div > div > p:nth-child(1)',
+        `${containerId} > span.fee > div > span > div > div > p:nth-child(1)`,
         visible
       )
     ).toEqual(true);
@@ -88,7 +89,7 @@ async function assertDynamicFeeBearer(context, step, waitForClosure) {
     // the tool tip
     expect(
       await context.page.$eval(
-        '#amount > span.fee > div > span > div > div > div.dynamic-fee-breakup-block',
+        `${containerId} > span.fee > div > span > div > div > div.dynamic-fee-breakup-block`,
         visible
       )
     ).toEqual(true);
@@ -99,12 +100,12 @@ async function assertDynamicFeeBearer(context, step, waitForClosure) {
   if (merchantMessage) {
     expect(
       await context.page.$eval(
-        '#amount > span.fee > div > span > div > div > p.dynamic-optional-message',
+        `${containerId} > span.fee > div > span > div > div > p.dynamic-optional-message`,
         visible
       )
     ).toEqual(true);
     let textDisplayedInUI = await context.page.$eval(
-      '#amount > span.fee > div > span > div > div > p.dynamic-optional-message',
+      `${containerId} > span.fee > div > span > div > div > p.dynamic-optional-message`,
       (el) => el.innerText
     );
     textDisplayedInUI = textDisplayedInUI.trim().toLowerCase();

@@ -28,9 +28,17 @@ import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
 import { processIntentOnMWeb } from 'upi/payment';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
+import {
+  showAmountInCta,
+  CTAHelper,
+  hideCta,
+  showCta,
+  setAppropriateCtaText,
+} from 'cta';
 import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
-import { setAppropriateCtaText } from 'checkoutstore/cta';
+import { backPressed, isStackPopulated } from 'navstack';
+import { screenStore, tabStore } from 'checkoutstore';
 import { getDeviceId } from 'fingerprint';
 
 let emo = {};
@@ -437,6 +445,7 @@ function askOTP(
   let session = thisSession;
   let paymentId = _Obj.getSafely(session, 'r._payment.payment_id');
   let paymentData = OtpService.getPaymentData(paymentId);
+  let isRedesignV15Enabled = RazorpayHelper.isRedesignV15();
 
   if (paymentId && !paymentData) {
     paymentData = {
@@ -452,11 +461,14 @@ function askOTP(
     }
     OtpService.setPaymentData(paymentId, paymentData);
   }
-
   let isWallet = session.payload && session.payload.method === 'wallet';
-
+  let isOTPIncorrect = false;
   // Track if OTP was invalid
   if (textView === 'incorrect_otp_retry') {
+    isOTPIncorrect = true;
+    textView = isRedesignV15Enabled
+      ? 'otp_sent_generic_one_cc'
+      : 'incorrect_otp_retry';
     Analytics.track('otp:invalid', {
       data: {
         wallet: isWallet,
@@ -484,8 +496,13 @@ function askOTP(
     digits: new Array(storeGetter(discreet.OTPScreenStore.maxlength)),
     otp: '',
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-    errorMessage: errorMessage,
+    errorMessage:
+      errorMessage || isOTPIncorrect
+        ? 'otp.title.incorrect_otp_retry_one_cc'
+        : '',
     isRazorpayOTP: !!isRazorpayOTP,
+    resendTimeout:
+      isRedesignV15Enabled && isRazorpayOTP ? Date.now() + 30 * 1000 : 0,
   };
 
   if (RazorpayHelper.isASubscription()) {
@@ -508,9 +525,8 @@ function askOTP(
 
   $('#body').addClass('sub');
 
-  let isOneCC = RazorpayHelper.isOneClickCheckout();
-
-  let isOneCCOtpScreen = isOneCC && isRazorpayOTP && thisSession.tab === 'card';
+  let isRedesignV15OtpScreen =
+    isRedesignV15Enabled && isRazorpayOTP && thisSession.tab === 'card';
 
   if (!textView) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
@@ -595,19 +611,21 @@ function askOTP(
         }
       } else {
         if (thisSession.payload) {
-          textView = isOneCC
+          textView = isRedesignV15Enabled
             ? 'otp_sent_save_card_one_cc'
             : 'otp_sent_save_card';
         } else {
-          textView = isOneCC
+          textView = isRedesignV15Enabled
             ? 'otp_sent_access_card_one_cc'
             : 'otp_sent_access_card';
         }
       }
     } else {
-      textView = isOneCC ? 'otp_sent_generic_one_cc' : 'otp_sent_generic';
+      textView = isRedesignV15Enabled
+        ? 'otp_sent_generic_one_cc'
+        : 'otp_sent_generic';
     }
-  } else if (isOneCCOtpScreen) {
+  } else if (isRedesignV15OtpScreen) {
     if (thisSession.payload) {
       textView = 'otp_sent_save_card_one_cc';
     } else {
@@ -616,7 +634,7 @@ function askOTP(
   }
 
   view.updateScreen({
-    headingText: headingText || isOneCCOtpScreen ? 'default_login' : '',
+    headingText: headingText || isRedesignV15OtpScreen ? 'default_login' : '',
   });
   view.setTextView(textView, templateData);
 }
@@ -660,6 +678,8 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
+  tabStore.set(this.tab);
+  tabStore.set(this.screen);
 
   UTILS.each(message, function (key, val) {
     if (key !== 'options') {
@@ -686,8 +706,9 @@ Session.prototype = {
 
   setFeeLabel: function () {
     if (
-      RazorpayHelper.isCustomerFeeBearer() ||
-      RazorpayHelper.isOneClickCheckout()
+      (RazorpayHelper.isCustomerFeeBearer() ||
+        RazorpayHelper.isOneClickCheckout()) &&
+      !RazorpayHelper.isRedesignV15()
     ) {
       FeeLabel.show();
     }
@@ -707,6 +728,7 @@ Session.prototype = {
       $('#amount .original-amount').hide();
     } else {
       $('#amount .original-amount').rawHtml(formatAmountWithCurrency(amount));
+      CTAHelper.setRawAmount(formatAmountWithCurrency(amount));
       if ($('#amount .original-amount')[0]) {
         $('#amount .original-amount')[0].removeAttribute('style');
       }
@@ -717,6 +739,9 @@ Session.prototype = {
     if (fee || RazorpayHelper.isOneClickCheckout()) {
       $('#amount .original-amount').hide();
     }
+    CTAHelper.setRawAmount(
+      withoutFormat ? amount : formatAmountWithCurrency(amount)
+    );
     $('#amount .discount').rawHtml(
       withoutFormat ? amount : formatAmountWithCurrency(amount)
     );
@@ -1008,8 +1033,10 @@ Session.prototype = {
     if (!RazorpayHelper.isPayout()) {
       this.fillData();
     }
-    if (RazorpayHelper.isOneClickCheckout()) {
+    if (RazorpayHelper.isRedesignV15()) {
       discreet.fonts.loadInterFont();
+    }
+    if (RazorpayHelper.isOneClickCheckout()) {
       this.switchTab('home-1cc');
     }
     this.setEMI();
@@ -1037,6 +1064,11 @@ Session.prototype = {
     );
 
     P13n.trackNumberOfP13nContacts();
+    Analytics.setMeta('isRedesignV15', RazorpayHelper.isRedesignV15());
+
+    // is FOH enabled
+    const isFOHEnabled = RazorpayHelper.hasMerchantPolicy();
+    Analytics.setMeta('FOH_enabled', isFOHEnabled);
 
     // Analytics related to orientation
     Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
@@ -1199,6 +1231,7 @@ Session.prototype = {
      */
     if (!this.tab) {
       this.tab = 'cardless_emi';
+      tabStore.set(this.tab);
     }
 
     $('#form-cardless_emi input[name=provider]').val(providerCode);
@@ -1294,7 +1327,7 @@ Session.prototype = {
   },
 
   setOneCCTabLogo: function (logo) {
-    if (RazorpayHelper.isOneClickCheckout()) {
+    if (RazorpayHelper.isRedesignV15()) {
       this.otpView.updateScreen({
         tabLogo: logo,
       });
@@ -1733,7 +1766,7 @@ Session.prototype = {
     }
 
     let self = this;
-    if (this.r._payment) {
+    if (this.r._payment && !RazorpayHelper.isRedesignV15()) {
       if (
         this.payload &&
         this.payload.method === 'upi' &&
@@ -1864,7 +1897,7 @@ Session.prototype = {
     let session = this;
 
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+      skipTextLabel: RazorpayHelper.isRedesignV15()
         ? 'skip_saving_card_one_cc'
         : 'skip_saving_card',
     });
@@ -2030,17 +2063,18 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
-  setAmount: function (amount) {
+  setAmount: function (amount, triggerShowAmountInCta) {
     const previousAmount = this.get().amount;
     this.get().amount = amount;
-
     let offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
+    let originalAmount = amount;
     if (offer && offer.amount) {
       if (RazorpayHelper.isOneClickCheckout()) {
         this.updateAmountInHeaderForOffer(amount);
       } else {
         this.updateAmountInHeaderForOffer(offer.amount);
+        originalAmount = offer.amount;
       }
     }
     if (previousAmount !== amount) {
@@ -2053,6 +2087,10 @@ Session.prototype = {
       isQRPaymentCancellable({}, true, true);
       initUpiQrV2();
     }
+    if (triggerShowAmountInCta) {
+      showAmountInCta();
+    }
+    CTAHelper.setAmount(originalAmount);
   },
 
   fixLandscapeBug: function () {
@@ -2180,6 +2218,9 @@ Session.prototype = {
     this.click(goto_payment, function () {
       if (this.payload && this.payload.method === 'upi') {
         if (this.payload['_[flow]'] === 'directpay') {
+          if (RazorpayHelper.isRedesignV15()) {
+            return this.hideErrorMessage();
+          }
           return cancel_upi(this);
         } else if (this.payload['_[flow]'] === 'intent') {
           if (Confirm.isVisible()) {
@@ -2363,6 +2404,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.screen', discreet.timer());
 
     this.screen = screen;
+    screenStore.set(this.screen);
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
     if (screen === 'home-1cc') {
@@ -2427,7 +2469,7 @@ Session.prototype = {
     } else if (screen === 'wallet' && this.walletTab) {
       this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
-      this.body.toggleClass('sub', showPaybtn);
+      showPaybtn ? showCta() : hideCta();
     } else {
       let instance = this.getCurrentTabInstance(screen);
       if (instance && instance.onShown) {
@@ -2595,6 +2637,10 @@ Session.prototype = {
     return { currency, amount };
   },
   back: function (confirmedCancel) {
+    if (isStackPopulated()) {
+      backPressed();
+      return;
+    }
     let tab = '';
     let payment = this.r._payment;
     let thisTab = this.tab;
@@ -2720,6 +2766,14 @@ Session.prototype = {
           $('#amount .original-amount')[0].removeAttribute('style');
         }
         return;
+      }
+      if (RazorpayHelper.isRedesignV15()) {
+        if (this.homeTab?.canGoBack()) {
+          this.homeTab.editUserDetails();
+        } else {
+          // close modal
+          this.closeModal();
+        }
       }
     } else {
       if (this.get('theme.close_method_back')) {
@@ -2957,6 +3011,7 @@ Session.prototype = {
 
     this.body.attr('tab', tab);
     this.tab = tab;
+    tabStore.set(this.tab);
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
@@ -3047,7 +3102,7 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+      skipTextLabel: RazorpayHelper.isRedesignV15()
         ? 'skip_saved_cards_one_cc'
         : 'skip_saved_cards',
     });
@@ -3075,7 +3130,7 @@ Session.prototype = {
 
     this.topBar.setTitleOverride('otp', 'text', 'card');
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isOneClickCheckout()
+      skipTextLabel: RazorpayHelper.isRedesignV15()
         ? 'skip_saved_cards_one_cc'
         : 'skip_saved_cards',
     });
@@ -3088,8 +3143,8 @@ Session.prototype = {
     if (smsHash) {
       params.sms_hash = smsHash;
     }
-    if (RazorpayHelper.isOneClickCheckout()) {
-      params.otp_reason = RazorpayHelper.isOneClickCheckout()
+    if (RazorpayHelper.isRedesignV15()) {
+      params.otp_reason = RazorpayHelper.isRedesignV15()
         ? discreet.OTP_TEMPLATES.access_card
         : '';
     }
@@ -3313,7 +3368,6 @@ Session.prototype = {
           EmiStore.selectedPlan.set(plan);
 
           let text = cardTab.getEmiText(amount, plan) || '';
-
           Analytics.track('emi:plan:select', {
             type: AnalyticsTypes.BEHAV,
             data: {
@@ -3321,7 +3375,6 @@ Session.prototype = {
               value: value,
             },
           });
-
           EmiStore.setEmiDurationForSavedCard(value);
           EmiStore.selectedPlanTextForSavedCard.set(text);
 
@@ -3462,7 +3515,8 @@ Session.prototype = {
       Form.shake();
       let invalidInput =
         $(invalids[0]).find('.input')[0] ||
-        $(invalids[0]).find('input[type=checkbox]')[0];
+        $(invalids[0]).find('.input-one-click-checkout')[0];
+      $(invalids[0]).find('input[type=checkbox]')[0];
       if (invalidInput) {
         invalidInput.focus();
       } else if ($(invalids[0]).hasClass('selector')) {
@@ -3561,7 +3615,7 @@ Session.prototype = {
       }
 
       // For a QR Payment in 1CC Flow, set the amount.
-      if (this.tab === 'qr' && RazorpayHelper.isOneClickCheckout()) {
+      if (this.tab === 'qr' && RazorpayHelper.isRedesignV15()) {
         let offer = this.getAppliedOffer();
         let hasDiscount = offer && offer.amount !== offer.original_amount;
 
@@ -4074,7 +4128,6 @@ Session.prototype = {
     if (this.tab === 'home-1cc') {
       return;
     }
-
     if (e instanceof Event) {
       e.preventDefault();
       e.stopPropagation();
@@ -5317,9 +5370,11 @@ Session.prototype = {
 
         this.headless = true;
         Analytics.track('native_otp:attempt');
-        session.tabs.card.onHide();
+        // session.tabs.card.onHide();
         this.setScreen('otp', params);
         this.r.on('payment.otp.required', (data) => {
+          // hide offers
+          discreet.OffersStore.showOffers.set(false);
           session.otpView.updateScreen({
             showCtaOneCC: true,
           });
@@ -5748,6 +5803,8 @@ Session.prototype = {
         this.mainModal.$destroy();
       }
       this.tab = this.screen = '';
+      tabStore.set(this.tab);
+      screenStore.set(this.screen);
       this.modal = this.emi = this.el = this.card = null;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;

@@ -33,7 +33,6 @@ export function backPressed(callback) {
       source: 'device',
     },
   });
-
   if (isOneClickCheckout()) {
     if (isStackPopulated()) {
       navBackPressed();

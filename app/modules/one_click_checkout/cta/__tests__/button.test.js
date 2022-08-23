@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
 
-import labels from 'one_click_checkout/cta/i18n/en';
+import labels from 'cta/i18n/en';
 import CtaButton from 'one_click_checkout/cta/button.svelte';
 
 describe('CTA Button tests', () => {

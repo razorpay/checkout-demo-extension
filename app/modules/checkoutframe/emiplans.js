@@ -204,7 +204,6 @@ emiPlansView.prototype = {
       this.view.showPlansView();
       return;
     }
-
     if (
       this.contactRequiredForEMI &&
       !INDIAN_CONTACT_REGEX.test(this.contact)

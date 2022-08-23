@@ -49,12 +49,8 @@ h3.title {
   margin: 28px 12px 12px;
 }
 
-#timeout {
-   i {
-    margin: 0 5px 0 12px;
-    font-size: 18px;
-    vertical-align: middle;
-  }
+.redesign h3.title {
+  margin: 20px 0 12px;
 }
 
 textarea {
@@ -617,6 +613,12 @@ i {
   }
 }
 
+.redesign.font-loaded {
+  #modal, #timeout, button, input, textarea, select {
+    font-family: "Inter", "lato", ubuntu, helvetica, sans-serif;
+  }
+}
+
 #modal {
   border-radius: 3px;
   box-sizing: border-box;
@@ -631,7 +633,7 @@ i {
   font-size: $size;
   width: 344px;
   font-family: $font;
-}
+} 
 
 .offers-fade {
   pointer-events: none;
@@ -678,23 +680,15 @@ i {
 }
 
 
-#container:not(.mobile) {
-  #content.one-cc {
-    #body {
-      min-height: 440px;
-      height: 440px;
-      flex-basis: 440px;
-    }
-  } 
-}
-  
-
-#content.one-cc {
+#content.one-click-checkout {
   #logo {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     line-height: 38px;
   }
+}
+#content.one-cc {
+  height: 100%;
 
   #merchant-name {
     font-size: 18px;
@@ -938,6 +932,10 @@ i {
     box-sizing: border-box;
   }
 
+}
+
+.redesign #powered-by {
+  font-family: "Inter", "lato", ubuntu, helvetica, sans-serif;
 }
 
 #body {
@@ -1515,13 +1513,22 @@ div.callout span{
   display: none;
 }
 
-#one-cc-footer {
+#redesign-v15-footer {
   background: white;
   z-index: 3;
   color: black;
   width: 100%;
 }
 
-#one-cc-footer:hover {
+#redesign-v15-footer:hover {
   cursor: pointer;
+}
+
+.redesign {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+      -webkit-box-shadow: 0 0 0 30px white inset !important;
+  }
 }

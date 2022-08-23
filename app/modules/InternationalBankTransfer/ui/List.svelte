@@ -15,7 +15,7 @@
   import RazorpayConfig from 'common/RazorpayConfig';
 
   // stores
-  import { hideCta } from 'checkoutstore/cta';
+  import { hideCta } from 'cta';
   import {
     selectedMethod,
     setSelectedMethod,

@@ -48,6 +48,38 @@
 
 <style>
   .customer-bank-details {
+    font-size: 13px;
     padding: 24px;
+    .bank-name {
+      margin-left: -24px;
+      margin-right: -24px;
+      padding: 15px 22px;
+      background-color: #fafafa;
+      border-bottom: 1px solid #f1f1f1;
+      color: #555;
+
+      > img {
+        width: 15px;
+        height: 15px;
+        float: right;
+        margin-top: 3px;
+      }
+    }
+
+    .account-details {
+      margin-top: 12px;
+
+      > div {
+        &:first-child {
+          float: left;
+          min-width: 110px;
+          margin-right: 5px;
+        }
+
+        &:last-child {
+          text-align: right;
+        }
+      }
+    }
   }
 </style>

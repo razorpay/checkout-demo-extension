@@ -7,7 +7,7 @@
     CANCEL_REASON_BACK_ACTION,
     CANCEL_REASON_SUBMIT_ACTION,
   } from 'ui/labels/upi';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   export let title = '';
   export let method = '';
@@ -24,13 +24,13 @@
 
   const prefixGenerator = (text) => `${method}-${text}`;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 </script>
 
 <div
   id={'cancel_' + method}
   class="cancel_modal"
-  class:modal_one_cc={isOneClickCheckoutEnabled}
+  class:modal_checkout_redesign={isRedesignV15Enabled}
 >
   <p>{$t(title)}</p>
 
@@ -58,7 +58,6 @@
     <!-- LABEL: Submit -->
     <button
       class="btn"
-      class:btn-one-cc={isOneClickCheckoutEnabled}
       on:click={() => {
         Analytics.track(method + ':cancel_reason_submit', {
           type: AnalyticsTypes.BEHAV,
@@ -120,20 +119,28 @@
     }
   }
 
-  /*  1CC Specific classes */
-  .btn-one-cc {
-    border-radius: 4px;
-    font-family: inherit;
-    text-transform: capitalize;
-  }
-
-  .modal_one_cc > p {
-    font-weight: 600;
-  }
-
-  .modal_one_cc > label {
-    color: #8d97a1;
-    font-size: 14px;
-    line-height: 20px;
+  /* Checkout RedesignV15 specific classes */
+  .modal_checkout_redesign {
+    height: 300px;
+    label {
+      color: #8d97a1;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    p {
+      color: #3f71d7;
+      font-weight: 600;
+      margin: 20px 20px 13px 20px;
+    }
+    .buttons {
+      margin: 10px 20px 0;
+      text-align: center;
+    }
+    .btn {
+      width: 100%;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 5px;
+    }
   }
 </style>

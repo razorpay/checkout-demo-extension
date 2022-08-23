@@ -1,17 +1,19 @@
 <script lang="ts">
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   export let type = 'button';
   export let disabled = false;
 
-  const isOneCC = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 </script>
 
 <button
   {type}
   {...$$props}
   on:click
-  class={isOneCC ? 'one-cc-btn theme theme-border' : 'standard-btn hc_border'}
+  class={isRedesignV15Enabled
+    ? 'one-cc-btn theme theme-border'
+    : 'standard-btn hc_border'}
   {disabled}
 >
   <slot />

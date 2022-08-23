@@ -1,0 +1,11 @@
+export const VIEW_DETAILS_LABEL = 'cta_new.view_details_label';
+export const CTA_LABEL = 'cta.continue';
+export const CTA_PROCEED = 'cta.proceed';
+export const PAY_NOW_CTA_LABEL = 'cta_new.pay_now';
+export const PLACE_ORDER_CTA_LABEL = 'cta_new.place_order';
+export const SELECT_EMI_PLAN_LABEL = 'cta.select_emi_plan';
+export const SAVE_LABEL = 'cta_new.save';
+export const VERIFY_LABEL = 'cta.verify';
+export const ENTER_CARD_DETAILS = 'cta_new.enter_card_details';
+export const AUTHENTICATE = 'cta.authenticate';
+export const UPLOAD_NACH_FORM = 'cta.upload_nach_form';

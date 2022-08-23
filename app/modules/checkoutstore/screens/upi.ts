@@ -1,6 +1,6 @@
-import { isCtaShown, showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
+import { isCtaShown, showCtaWithDefaultText, hideCta } from 'cta';
 import { tick } from 'svelte';
-import { writable, get } from 'svelte/store';
+import { Writable, writable } from 'svelte/store';
 import { selectedInstrumentId } from './home';
 export const intentVpaPrefill = writable('');
 export const intentVpaPrefilledFromPreferences = writable(false);
@@ -60,3 +60,5 @@ selectedUPIAppForPay.subscribe((data: UPI.UpiAppForPay) => {
     });
   }
 });
+
+export const cfbAmount: Writable<string> = writable();

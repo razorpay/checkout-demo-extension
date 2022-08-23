@@ -9,6 +9,7 @@ import { get } from 'utils/object';
 class RazorpayStore {
   instance = null;
   preferenceResponse = null;
+  isEmbedded = false; // when parent is provided
 
   constructor() {
     this._store = writable();

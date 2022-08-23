@@ -30,15 +30,22 @@
 
   // utils imports
   import { popStack } from 'navstack';
-  import { isIndianCustomer } from 'checkoutstore';
+  import {
+    isIndianCustomer,
+    resetContactToPrevious,
+  } from 'checkoutstore/screens/home';
   import { askForOTP } from 'one_click_checkout/common/otp';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
-  import { otpReasons } from 'one_click_checkout/otp/constants';
+  import { otpReasons } from 'otp/constants';
   import { toggleHeader } from 'one_click_checkout/header/helper';
 
   const { close } = getIcons();
 
+  export let fullScreen = false;
+  // TODO fix logout issue on number change
+
+  let ctaDisabled = false;
   onMount(() => {
     bindEvents('#details-container');
   });
@@ -51,6 +58,9 @@
       invalids[0].className += ' focused mature';
       return;
     }
+    if (ctaDisabled) {
+      return;
+    }
     popStack();
     toggleHeader(true);
     if (!isUserLoggedIn() && $isIndianCustomer) {
@@ -59,30 +69,64 @@
   }
 </script>
 
-<div class="details-container" id="details-container">
-  <div class="details-header-row">
-    <div class="details-signup-label">{$t(DETAILS_TITLE_LABEL)}</div>
-    <button on:click|preventDefault={() => popStack()}>
-      <Icon icon={close} />
-    </button>
-  </div>
-  <hr />
-  {#if $errorCode === ERROR_USER_NOT_LOGGED_IN}
-    <div class="details-description">
-      {$t(COUPON_DETAIL_LABEL)}
-      “<span class="coupon-text">{$couponInputValue}</span>”
-      {$t(COUPON_OTP_LABEL)}
+<div class="details-container" class:fullScreen id="details-container">
+  <div class="detail-container-content">
+    <div class="details-header-row">
+      <div class="details-signup-label">{$t(DETAILS_TITLE_LABEL)}</div>
+      <button
+        on:click|preventDefault={() => {
+          resetContactToPrevious();
+          popStack();
+        }}
+      >
+        <Icon icon={close} />
+      </button>
     </div>
-  {/if}
-  <div class="details-fields-wrapper">
-    <PaymentDetails />
+    <hr />
+    {#if $errorCode === ERROR_USER_NOT_LOGGED_IN}
+      <div class="details-description">
+        {$t(COUPON_DETAIL_LABEL)}
+        “<span class="coupon-text">{$couponInputValue}</span>”
+        {$t(COUPON_OTP_LABEL)}
+      </div>
+    {/if}
+    <div class="details-fields-wrapper">
+      <PaymentDetails bind:disabled={ctaDisabled} />
+    </div>
   </div>
-  <CTAButton fullWidth disabled={!$isContactAndEmailValid} on:click={onSubmit}>
+  <button
+    class="button details-verify-button"
+    disabled={ctaDisabled}
+    on:click|preventDefault={onSubmit}
+  >
     {$t(DETAILS_CTA_LABEL)}
-  </CTAButton>
+  </button>
 </div>
 
-<style>
+<style lang="scss">
+  .details-container.fullScreen {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .details-header-row {
+      padding: 16px;
+      margin: 0;
+      box-shadow: 10px 10px 30px #6b6c6d1a;
+    }
+
+    hr {
+      margin: 0;
+    }
+
+    .details-verify-button {
+      margin: 16px;
+      width: calc(100% - 32px);
+      border-radius: 4px;
+    }
+  }
   .details-container {
     text-align: start;
     white-space: initial;
@@ -112,6 +156,20 @@
     font-weight: 600;
   }
 
+  .details-verify-button {
+    height: 45px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-style: normal;
+    line-height: 19px;
+  }
+
+  .details-verify-button[disabled] {
+    background: #cdd2d6;
+  }
+
   .details-description {
     font-weight: normal;
     font-size: 14px;
@@ -121,6 +179,7 @@
   }
 
   hr {
+    margin-top: 0;
     margin-bottom: 16px;
     border: 1px solid #e0e0e0;
     border-bottom: none;

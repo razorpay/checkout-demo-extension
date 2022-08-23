@@ -648,7 +648,7 @@ async function handleAppPaymentStatus(context) {
 async function assertOTPElementsForBEPG(context) {
   await assertTrimmedInnerText(context, '#form-otp .card-box', /Card - 0001$/);
 
-  await assertTrimmedInnerText(context, '#otp-resend', /Resend OTP \(\d{2}\)/);
+  // await assertTrimmedInnerText(context, '#otp-resend', /Resend OTP \(\d{2}\)/);
 
   await assertTrimmedInnerText(
     context,

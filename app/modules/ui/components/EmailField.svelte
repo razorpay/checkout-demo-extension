@@ -34,15 +34,15 @@
   const label = isOptional ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
 
   // Form Validation for email - specifically for 1cc
-  let validationText;
+  let validationText: string | null;
   export let showValidations = false;
 
   const debouncedValidator = debounce((email) => {
     validateEmail(email).then((isValid) => {
-      validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
+      validationText = !isValid && email.length ? $t(EMAIL_HELP_TEXT) : null;
       $isEmailValid = isValid;
     });
-  }, 400);
+  }, 200);
 
   $: debouncedValidator(value);
 </script>

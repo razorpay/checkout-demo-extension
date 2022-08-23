@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { onMount, tick } from 'svelte';
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   // Utils imports
   import { getPayLaterProviders } from 'checkoutstore/methods';
   import { createProvider } from 'common/paylater';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -55,7 +56,7 @@
 
 <Tab method="paylater" pad={false}>
   <div class="paylater-container">
-    <div class="paylater-wrapper" class:screen-one-cc={isOneClickCheckout()}>
+    <div class="paylater-wrapper" class:screen-one-cc={isRedesignV15()}>
       <input type="hidden" name="provider" />
       <input type="hidden" name="ott" />
       <!-- LABEL: Select an Option -->
@@ -99,8 +100,8 @@
     overflow: auto;
   }
 
-  :global(#content.one-cc) .paylater-header {
-    margin: 26px 28px 14px;
+  :global(.redesign) .paylater-header {
+    margin: 16px 18px 14px;
     text-transform: capitalize;
     color: #263a4a;
     font-size: 14px;

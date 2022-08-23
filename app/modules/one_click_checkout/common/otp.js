@@ -8,24 +8,21 @@ import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
-import otpEvents from 'one_click_checkout/otp/analytics';
+import otpEvents from 'otp/analytics';
 import { Events, Track } from 'analytics';
 import {
   mergeObjOnKey,
   isNumericalString,
 } from 'one_click_checkout/common/utils';
 import { INVALID_OTP_LABEL } from 'ui/labels/otp';
-import {
-  OTP_TEMPLATES,
-  RESEND_OTP_INTERVAL,
-} from 'one_click_checkout/otp/constants';
+import { OTP_TEMPLATES, RESEND_OTP_INTERVAL } from 'otp/constants';
 import { getDefaultOtpTemplate } from 'checkoutframe/sms_template';
 import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 import {
   CATEGORIES,
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
-import { submitAttemptIndex } from 'one_click_checkout/otp/store';
+import { submitAttemptIndex } from 'otp/store';
 import { consentGiven } from 'one_click_checkout/address/store';
 import { getDeviceId } from 'fingerprint';
 

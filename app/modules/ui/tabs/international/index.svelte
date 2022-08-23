@@ -1,10 +1,15 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
 
   // Store
   import { getInternationalProviders } from 'checkoutstore/methods';
-  import { showCta, hideCta } from 'checkoutstore/cta';
+  import CTA, {
+    showCta,
+    hideCta,
+    showAmount,
+    showCtaWithDefaultText,
+  } from 'cta';
   import {
     selectedInternationalProvider,
     updateSelectedProvider,
@@ -13,7 +18,6 @@
     setNVSFormData,
   } from 'checkoutstore/screens/international';
   import { AVSDccPayload } from 'checkoutstore/screens/card';
-  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
   import { isPartialPayment, getAmount } from 'razorpay';
 
   // i18n
@@ -25,7 +29,7 @@
   import { Events } from 'analytics';
   import EVENTS from 'ui/tabs/international/events';
   import * as AnalyticsTypes from 'analytics-types';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   //UI Imports
   import Bottom from 'ui/layouts/Bottom.svelte';
@@ -38,7 +42,7 @@
     FORM_TYPE,
   } from 'ui/components/BillingAddressVerificationForm';
   import Info from 'ui/elements/Info.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   // Constants
   import { VIEWS_MAP, NVS_COUNTRY_MAP } from 'ui/tabs/international/constants';
@@ -51,6 +55,7 @@
   } from 'ui/labels/card';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { pushOverlay } from 'navstack';
+  import { CTA_PROCEED, PAY_NOW_CTA_LABEL } from 'cta/i18n';
 
   const session = getSession();
   const themeMeta = getThemeMeta();
@@ -60,7 +65,7 @@
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   export let directlyToNVS = false;
 
@@ -78,6 +83,19 @@
   let NVSInfo = [];
 
   let tabVisible = false;
+  let checkFormErrors: () => void;
+
+  let CTAState: {
+    show: boolean;
+    showAmount: boolean;
+    label: string;
+    onSubmit?: () => void;
+  } = {
+    show: true,
+    showAmount: false,
+    label: CTA_PROCEED,
+    onSubmit: undefined,
+  };
 
   const handleProviderSelect = (provider) => {
     directlyToNVS = false;
@@ -96,6 +114,7 @@
       updateSelectedProvider(providerCode);
       if (!directlyToNVS) {
         showCta();
+        CTAState.show = true;
       }
     }
 
@@ -111,6 +130,18 @@
   const setView = (view) => {
     lastView = currentView;
     currentView = view;
+    if (view === VIEWS_MAP.NVS_FORM) {
+      CTAState.label = PAY_NOW_CTA_LABEL;
+      CTAState.onSubmit = () => {
+        checkFormErrors();
+        tick().then(() => {
+          session.preSubmit();
+        });
+      };
+    } else {
+      CTAState.onSubmit = undefined;
+      CTAState.label = CTA_PROCEED;
+    }
     Events.Track(EVENTS.SWITCH_VIEW, {
       lastView,
       currentView,
@@ -188,15 +219,18 @@
     if ($selectedInternationalProvider) {
       tabVisible = true;
       showCta();
+      CTAState.show = true;
+      CTAState.showAmount = true;
     } else {
       hideCta();
+      CTAState.show = false;
     }
   }
 
   export function showNVSForm(direct) {
     tabVisible = false;
     const AVSData = get(AVSDccPayload);
-    if (AVSData) {
+    if (AVSData && !isRedesignV15Enabled) {
       if (AVSData.header) {
         session.setRawAmountInHeader(AVSData.header);
         showAmount(AVSData.cta);
@@ -254,10 +288,13 @@
 <Tab method="international" pad={false} overrideMethodCheck>
   <div
     class="international-wrapper"
-    class:international-one-cc={isOneCCEnabled}
+    class:international-one-cc={isRedesignV15Enabled}
   >
     {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
-      <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
+      <div
+        class="border-list collapsable"
+        class:screen-one-cc={isRedesignV15Enabled}
+      >
         {#each filteredProviders as provider, i (provider.code)}
           <SlottedRadioOption
             name={provider.code}
@@ -285,7 +322,7 @@
         {/each}
       </div>
     {:else if currentView === VIEWS_MAP.NVS_FORM}
-      <div id="nvsContainer" class:screen-one-cc={isOneCCEnabled}>
+      <div id="nvsContainer" class:screen-one-cc={isRedesignV15Enabled}>
         {#if selectedProvider}
           <div class="nvs-provider-info">
             <Icon icon={selectedProvider.logo} />
@@ -306,12 +343,21 @@
           {filterCountries}
           formType={FORM_TYPE.N_AVS}
           value={$NVSFormData}
+          bind:checkFormErrors
           on:input={handleAVSFormInput}
           on:blur={handleAVSFormInput}
         />
       </div>
     {/if}
     <AccountTab />
+    <CTA
+      screen="international"
+      tab="international"
+      disabled={tabVisible && !$selectedInternationalProvider}
+      show={CTAState.show}
+      label={CTAState.label}
+      onSubmit={CTAState.onSubmit}
+    />
     <Bottom tab="international">
       {#if $selectedInternationalProvider}
         <DynamicCurrencyView
@@ -340,6 +386,10 @@
 
   .subtitle {
     font-size: 10px;
+  }
+
+  .subtitle:empty {
+    display: none;
   }
 
   #nvsContainer {

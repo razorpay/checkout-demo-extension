@@ -20,13 +20,13 @@
     headingText,
     errorMessage,
     isRazorpayOTP,
-    showCtaOneCC,
     ctaOneCCDisabled,
+    disableCTA,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { showFeeLabel } from 'checkoutstore/index.js';
-  import { isRecurring, isOneClickCheckout } from 'razorpay';
+  import { showFeeLabel } from 'checkoutstore/fee';
+  import { isRecurring, isRedesignV15 } from 'razorpay';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -62,17 +62,18 @@
   import EmiDetails from 'ui/components/EmiDetails.svelte';
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
   import ResendButton from 'ui/elements/ResendButton.svelte';
-  import ResendButtonOneCC from 'one_click_checkout/otp/ui/components/ResendButton.svelte';
+  import ResendButtonOneCC from 'otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import OtpInput from 'one_click_checkout/otp/ui/OTPInput.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
+  import OtpInput from 'otp/ui/OTPInput.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 
   import { Safari } from 'common/useragent';
-  import { VERIFY_LABEL } from 'one_click_checkout/cta/i18n';
+  import { VERIFY_LABEL } from 'cta/i18n';
+  import CTA, { hideCta } from 'cta';
+  import { tabStore } from 'checkoutstore';
 
   // Props
   export let on = {};
@@ -84,6 +85,10 @@
   // Computed
   export let inputWidth;
   export let showInput;
+
+  // $: if (!$loading) {
+  //   $loading = true;
+  // }
 
   let otpPromptVisible;
   let compact;
@@ -137,10 +142,10 @@
   }
 
   let isRazorpayOTPAndOneCC;
-  $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isOneClickCheckout();
+  $: isRazorpayOTPAndOneCC = $isRazorpayOTP && isRedesignV15();
   let isNativeOTPAndOneCC;
-  $: isNativeOTPAndOneCC = !$isRazorpayOTP && isOneClickCheckout();
-  let isOneCC = isOneClickCheckout();
+  $: isNativeOTPAndOneCC = !$isRazorpayOTP && isRedesignV15();
+  let isOneCC = isRedesignV15();
 
   export function invoke(type, event) {
     const method = on[type];
@@ -150,7 +155,7 @@
     }
   }
 
-  export function trackInput(event) {
+  export function trackInput() {
     if (!$otp) {
       $showFeeLabel = false;
     }
@@ -172,7 +177,7 @@
     $resendTimeout = null;
     $ipAddress = '';
     $accessTime = '';
-    $showCtaOneCC = false;
+    hideCta();
   }
 
   function onResend(event) {
@@ -207,6 +212,7 @@
 
     <div
       class="otp-controls"
+      class:is-loading={$loading}
       class:otp-controls-one-cc={isOneCC}
       class:recurring-alignment={isRecurring() ? !allowSkipButton : false}
     >
@@ -307,6 +313,7 @@
             style="width: {isOneCC ? '100%' : inputWidth};"
             class:compact
             class={isOneCC ? 'theme-border-color' : 'border-bottom-grey'}
+            class:error-border={Boolean($errorMessage)}
             class:hidden={!showInput}
           >
             <div class="help">{$t(OTP_FIELD_HELP)}</div>
@@ -338,6 +345,8 @@
           class="otp-action-container"
           class:action-container-center={isRazorpayOTPAndOneCC}
           class:action-native-otp={isNativeOTPAndOneCC}
+          class:with-two-action={$allowResend &&
+            (allowSkipButton || $allowBack)}
         >
           {#if showInput}
             {#if $allowResend}
@@ -395,19 +404,18 @@
       </span>
     {/if}
   </div>
-  {#if $showCtaOneCC}
-    <CTAOneCC
-      showAmount={false}
-      disabled={$ctaOneCCDisabled}
-      on:click={() => session.preSubmit()}
-    >
-      {$t(VERIFY_LABEL)}
-    </CTAOneCC>
-  {/if}
   <AccountTab />
+  <CTA
+    screen="otp"
+    tab={$tabStore}
+    disabled={$ctaOneCCDisabled || $disableCTA}
+    show={!$loading && !$addFunds && !$action}
+    label={VERIFY_LABEL}
+    showAmount={false}
+  />
 </div>
 
-<style>
+<style lang="scss">
   .otp-title {
     margin: 0 40px;
     line-height: 150%;
@@ -429,6 +437,12 @@
     flex-grow: 1;
     padding-left: 24px;
     padding-right: 24px;
+  }
+
+  :global(.redesign) .otp-controls.is-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .otp-controls-one-cc {
@@ -477,8 +491,12 @@
   }
   .otp-action-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     flex: 1;
+  }
+
+  .with-two-action {
+    justify-content: space-between;
   }
 
   .action-container-center {
@@ -488,6 +506,10 @@
   }
 
   .action-native-otp :global(.one-cc-btn) {
+    font-size: 13px;
+  }
+
+  #form-otp :global(.one-cc-btn) {
     font-size: 14px;
   }
 
@@ -511,6 +533,7 @@
     color: #d64052;
     margin: 12px 0px;
     font-size: 12px;
+    text-align: center;
   }
 
   #otp-prompt.otp-header {
@@ -533,5 +556,21 @@
   .title-logo {
     height: 18px;
     margin-bottom: 18px;
+  }
+
+  :global(.redesign) {
+    :global(.otp-screen-contents .card-box:first-child .emboss) {
+      background-color: #fff;
+      border: 0;
+      justify-content: center;
+    }
+
+    .otp-title {
+      font-weight: 400;
+    }
+
+    .error-border {
+      border-color: #b21528 !important;
+    }
   }
 </style>

@@ -11,9 +11,11 @@ export const MOBILE_NUMBER = 'home.contact_label_mobile';
 export const MOBILE_NUMBER_OPTIONAL = 'home.contact_label_mobile_optional';
 
 export const PARTIAL_PAYMENT_TITLE = 'home.partial_payment_title';
+export const PARTIAL_PAYMENT_TITLE_V15 = 'home.partial_payment_title_v15';
 export const MIN_AMOUNT_LABEL = 'home.min_amount_label';
 export const FULL_AMOUNT_LABEL = 'home.full_amount_label';
 export const PARTIAL_AMOUNT_LABEL = 'home.partial_amount_label';
+export const PARTIAL_AMOUNT_LABEL_V15 = 'home.partial_amount_label_v15';
 export const PARTIAL_AMOUNT_DESCRIPTION = 'home.partial_amount_description';
 export const PARTIAL_AMOUNT_PLACEHOLDER = 'home.partial_amount_placeholder';
 export const PARTIAL_AMOUNT_HELP_INVALID = 'home.partial_amount_help_invalid';

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { isCtaShown } from 'checkoutstore/cta';
   import * as _El from 'utils/DOM';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   export let backPressed: () => void;
-  const long = !isOneClickCheckout() && isCtaShown();
+  const long = !isRedesignV15() && _El.hasClass(document.body, 'sub');
 
   // this function is invoked only within modal area
   // backdrop element inside MainModal will handle click outside the modal area

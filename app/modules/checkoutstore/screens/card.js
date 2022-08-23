@@ -1,6 +1,6 @@
 import { derived, writable } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
-import { isIndianCustomer } from 'checkoutstore';
+import { isIndianCustomer } from 'checkoutstore/screens/home';
 export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');

@@ -30,8 +30,10 @@
     showAuthTypeSelectionRadio,
   } from 'checkoutstore/screens/card';
 
-  import { methodInstrument } from 'checkoutstore/screens/home';
-  import { isIndianCustomer } from 'checkoutstore';
+  import {
+    methodInstrument,
+    isIndianCustomer,
+  } from 'checkoutstore/screens/home';
 
   import {
     getCardFeatures,
@@ -39,7 +41,7 @@
     isStrictlyRecurring,
     getRecurringMethods,
     isRecurring,
-    isOneClickCheckout,
+    isRedesignV15,
     isDynamicFeeBearer,
   } from 'razorpay';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
@@ -90,7 +92,7 @@
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   let showRememberCardCheck = shouldRememberCard($isIndianCustomer);
   let cvvLength = 3;
@@ -100,7 +102,7 @@
   let oneCCFieldProps = {};
 
   $: {
-    if (isOneClickCheckoutEnabled) {
+    if (isRedesignV15Enabled) {
       oneCCFieldProps = {
         elemClasses: 'add-card-fields-one-cc-wrapper',
         inputFieldClasses: 'add-card-fields-one-cc',
@@ -604,7 +606,7 @@
   {#if $showNoCvvCheckbox}
     <div
       class="row maestro-card-block"
-      class:maestro-card-block-one-cc={isOneClickCheckoutEnabled}
+      class:maestro-card-block-one-cc={isRedesignV15Enabled}
     >
       <label id="nocvv-check" for="nocvv">
         <input
@@ -626,7 +628,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .row {
     display: flex;
     margin-top: 12px;
@@ -675,6 +677,10 @@
     justify-content: space-between;
   }
 
+  :global(.redesign) .page-header {
+    margin-top: 20px;
+  }
+
   .emi-plans-label {
     font-weight: 500;
     font-size: 11px;
@@ -704,5 +710,15 @@
   :global(#content.one-cc) .card-title {
     font-weight: 600;
     color: #263a4a;
+  }
+
+  :global(.redesign) {
+    .remember-check {
+      margin-top: 14px;
+    }
+
+    .save_card_label_text {
+      margin-bottom: 1px;
+    }
   }
 </style>

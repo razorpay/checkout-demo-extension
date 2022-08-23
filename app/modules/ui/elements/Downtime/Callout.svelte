@@ -11,7 +11,7 @@
   import { Events, DowntimeEvents, MetaProperties } from 'analytics/index';
   import { sanitizeHTML } from 'utils/security';
   // helper imports
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   // Props
   export let severe;
@@ -38,7 +38,7 @@
 
 <div
   class={`downtime-callout downtime-${severe}`}
-  class:downtime-callout-one-cc={isOneClickCheckout()}
+  class:downtime-callout-one-cc={isRedesignV15()}
 >
   {#if showIcon}
     <div class="downtime-icon">
@@ -90,7 +90,7 @@
   }
 
   .downtime-callout-one-cc {
-    color: #f99d27;
+    color: #263238;
     background: #fef5e5;
     border-radius: 2px;
   }

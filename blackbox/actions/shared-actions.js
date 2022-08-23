@@ -75,8 +75,10 @@ async function validateHelpMessage(context, message) {
 
 async function submit(context, downtimeHigh) {
   // needed for wallet screen animation
-  await delay(300);
-  const clickPromise = context.page.click('#footer');
+  await delay(800);
+  const clickPromise = context.page.click(
+    context.isRedesignV15Enabled ? '#redesign-v15-cta' : '#footer'
+  );
   if (context.options.redirect && !downtimeHigh) {
     await delay(600);
   } else {

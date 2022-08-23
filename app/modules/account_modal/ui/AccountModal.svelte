@@ -1,0 +1,342 @@
+<script lang="ts">
+  // svelte imports
+  import { onDestroy, onMount, tick } from 'svelte';
+  import { get } from 'svelte/store';
+
+  // UI Imports
+  import Icon from 'ui/elements/Icon.svelte';
+  import arrow_left from 'account_modal/icons/arrow_left';
+  import Loader from 'account_modal/ui/Loader.svelte';
+  import close from 'one_click_checkout/coupons/icons/close';
+
+  // utils Imports
+  import { handleEditContact } from 'one_click_checkout/sessionInterface';
+  import { getSession } from 'sessionmanager';
+  import Razorpay from 'common/Razorpay';
+
+  // store imports
+  import { shouldUseVernacular } from 'checkoutstore/methods';
+  import { contact as contactStore } from 'checkoutstore/screens/home';
+
+  // i18n imports
+  import { t, locale, locales } from 'svelte-i18n';
+  import { getLocaleName } from 'i18n/init';
+  import {
+    LOGOUT_ACTION,
+    LOGOUT_ALL_DEVICES_ACTION,
+    EDIT_CONTACT_ACTION,
+  } from 'ui/labels/topbar';
+  import { ACCOUNT, CHANGE_LANGUAGE, BACK } from 'account_modal/i18n/labels';
+  import { logUserOut } from 'checkoutframe/customer';
+
+  // helper imports
+  import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+
+  // analytics imports
+  import { Events } from 'analytics';
+  import { ACCOUNT_VARIANT } from 'account_modal/constants';
+  import CouponEvents from 'one_click_checkout/coupons/analytics';
+  import AccountEvents from 'account_modal/analytics';
+  import { popStack, pushOverlay } from 'navstack';
+  import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
+  import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+
+  export let options;
+  let isLoggedIn;
+  let showLanguageList;
+
+  let variant = ACCOUNT_VARIANT.DEFAULT;
+
+  const showChangeLanguage = shouldUseVernacular();
+  const session = getSession();
+  let screen_name;
+
+  onDestroy(() => {
+    Events.TrackBehav(AccountEvents.SCREEN_DISMISSED, { screen_name });
+  });
+
+  function handleLogoutClick() {
+    Events.TrackBehav(AccountEvents.LOGOUT_CLICKED, { screen_name });
+    logUserOut(get(contactStore), false, handleEditContact.bind(null, true));
+    hideMethods();
+    popStack();
+  }
+
+  onMount(() => {
+    screen_name = getCurrentScreen();
+    const { variant: variantType } = options || {};
+    variant = variantType;
+    isLoggedIn = isUserLoggedIn();
+    showLanguageList = false;
+  });
+
+  function hideMethods() {
+    if (
+      !isOneClickCheckout() &&
+      !isRedesignV15() &&
+      session?.homeTab?.canGoBack()
+    ) {
+      session.homeTab?.hideMethods();
+    }
+  }
+
+  function handleLogoutAllDevicesClick() {
+    Events.TrackBehav(AccountEvents.LOGOUT_ALL_DEVICES_CLICKED, {
+      screen_name,
+    });
+    logUserOut(get(contactStore), true, handleEditContact.bind(null, true));
+    hideMethods();
+    popStack();
+  }
+
+  function handleChangeLanguage() {
+    showLanguageList = true;
+  }
+
+  function selectLanguage(code) {
+    if (variant === ACCOUNT_VARIANT.LANGUAGE_ONLY) {
+      Events.TrackBehav(CouponEvents.SUMMARY_LANGUAGE_CHANGED, {
+        new_language_selected: code,
+      });
+    }
+    Events.TrackBehav(AccountEvents.LANGUAGE_CLICKED, { screen_name });
+
+    // In order to insure the bottom sheet get closes...when different language is chosen
+    if ($locale !== code) {
+      popStack();
+    }
+    $locale = code;
+    showLanguageList = false;
+  }
+
+  function handleBack() {
+    showLanguageList = false;
+  }
+
+  function handleEdit() {
+    Events.TrackBehav(AccountEvents.EDIT_PERSONAL_DETAILS_CLICKED, {
+      screen_name,
+    });
+
+    if (isOneClickCheckout()) {
+      handleEditContact(false);
+      popStack();
+    } else {
+      popStack();
+      tick().then(() => {
+        pushOverlay({
+          component: Details,
+          props: {
+            fullScreen: true,
+          },
+        });
+      });
+
+      Razorpay.sendMessage({
+        event: 'event',
+        data: {
+          event: 'user_details.edit',
+        },
+      });
+      hideMethods();
+    }
+  }
+</script>
+
+<div
+  class="account-container"
+  class:only-language={variant === ACCOUNT_VARIANT.LANGUAGE_ONLY}
+>
+  {#if variant === ACCOUNT_VARIANT.LANGUAGE_ONLY}
+    <div class="account-heading-container">
+      <p class="account-heading">
+        {$t(CHANGE_LANGUAGE)}
+      </p>
+      <button class="account-toggle-icon" on:click={() => popStack()}>
+        <Icon icon={close('#212121')} />
+      </button>
+    </div>
+    <hr />
+    <ul class="language-container">
+      {#each $locales as locale}
+        <li class="list-item">
+          <button
+            class="account-menu"
+            data-test-id="lang-{getLocaleName(locale)}"
+            on:click={() => selectLanguage(locale)}
+          >
+            {getLocaleName(locale)}
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {:else}
+    <div class="account-heading-container">
+      <p class="account-heading">
+        {$t(ACCOUNT)}
+        {#if showLanguageList}
+          <span class="language-selection">{$t(CHANGE_LANGUAGE)}</span>
+        {/if}
+      </p>
+      <button class="account-toggle-icon" on:click={() => popStack()}>
+        <Icon icon={close('#212121')} />
+      </button>
+    </div>
+    <hr />
+    {#if showLanguageList}
+      <button class="back-btn-container" on:click={handleBack}>
+        <span class="back-btn-icon">
+          <Icon icon={arrow_left(11, 11, '#616161')} />
+        </span>
+        <span class="back-btn-text">{$t(BACK)}</span>
+      </button>
+      <ul class="language-container">
+        {#each $locales as locale}
+          <li class="list-item">
+            <button
+              class="account-menu"
+              data-test-id="lang-{getLocaleName(locale)}"
+              on:click={() => selectLanguage(locale)}
+            >
+              {getLocaleName(locale)}
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      {#if (isLoggedIn && isOneClickCheckout()) || !isOneClickCheckout()}
+        <p
+          data-test-id="edit-contact-account"
+          class="account-menu"
+          on:click={handleEdit}
+        >
+          {$t(EDIT_CONTACT_ACTION)}
+        </p>
+      {/if}
+      {#if showChangeLanguage}
+        <p
+          data-test-id="account-lang-cta"
+          class="account-menu"
+          on:click={handleChangeLanguage}
+        >
+          {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
+          <span class="language-btn">
+            <Icon icon={arrow_left(11, 11, '#616161')} />
+          </span>
+        </p>
+      {/if}
+      {#if isLoggedIn}
+        <hr class="account-separator" />
+        <p
+          data-test-id="account-logout-cta"
+          class="account-menu"
+          on:click={handleLogoutClick}
+        >
+          {$t(LOGOUT_ACTION)}
+        </p>
+        <p
+          data-test-id="account-logoutall-cta"
+          class="account-menu"
+          on:click={handleLogoutAllDevicesClick}
+        >
+          {$t(LOGOUT_ALL_DEVICES_ACTION)}
+        </p>
+      {/if}
+    {/if}
+  {/if}
+  <Loader />
+</div>
+
+<style lang="scss">
+  .account-container {
+    text-align: left;
+    padding: 16px 0px;
+  }
+
+  .account-menu {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+    padding: 0px 16px;
+  }
+
+  .account-heading {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 16px;
+  }
+  .account-heading-container {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 16px;
+  }
+  p {
+    margin-block-start: 0;
+    margin-block-end: 0;
+  }
+  hr {
+    border: 1px solid #e1e5ea;
+    border-bottom: none;
+    margin: 12px 16px;
+  }
+  .language-container {
+    overflow-y: scroll;
+    max-height: 140px;
+    list-style: none;
+    padding-inline-start: 0px;
+    margin: 0px;
+  }
+  .back-btn-container {
+    color: #616161;
+    font-size: 12px;
+    padding: 0px 24px 12px;
+    display: flex;
+    align-items: center;
+  }
+  .account-toggle-icon {
+    height: 14px;
+    transform: rotate(270deg);
+    cursor: pointer;
+  }
+  .back-btn-text {
+    padding-left: 10px;
+    padding-bottom: 2px;
+    cursor: pointer;
+  }
+  .back-btn-icon {
+    cursor: pointer;
+  }
+  .language-btn {
+    transform: rotate(180deg);
+    cursor: pointer;
+  }
+  :global(.mobile) .account-container {
+    bottom: 0;
+  }
+  .language-selection {
+    color: #616161;
+    font-size: 12px;
+    font-weight: 300;
+    padding-left: 10px;
+  }
+
+  .list-item .account-menu {
+    width: 100%;
+    border-radius: 0px;
+    color: #424242;
+    font-size: 14px;
+  }
+
+  .only-language {
+    height: 320px;
+
+    .language-container {
+      max-height: 250px;
+    }
+  }
+</style>

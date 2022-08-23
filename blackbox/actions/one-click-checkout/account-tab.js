@@ -5,6 +5,14 @@ async function openAccounTab(context) {
   await accountTabEle.click();
 }
 
+async function openMerchantPolicyTab(context) {
+  const aboutMerchantEle = await getDataAttrSelector(
+    context,
+    'merchant-policy-tab-btn'
+  );
+  await aboutMerchantEle.click();
+}
+
 async function openVernacularFromAccountTab(context) {
   const vernacularCta = await getDataAttrSelector(context, 'account-lang-cta');
   await vernacularCta.click();
@@ -28,4 +36,5 @@ module.exports = {
   openVernacularFromAccountTab,
   logoutFromAccountTab,
   openContactFromAccountTab,
+  openMerchantPolicyTab,
 };

@@ -3,6 +3,21 @@ import Analytics from 'analytics';
 import International from '../index.svelte';
 import { setupPreferences } from 'tests/setupPreferences';
 
+jest.mock('cta', () => ({
+  ...jest.requireActual('cta'),
+  __esModule: true,
+  isCtaShown: () => true,
+  setWithoutOffer: jest.fn(),
+  setAppropriateCtaText: jest.fn(),
+  showCta: jest.fn(),
+  hideCta: jest.fn(),
+  disableCTA: jest.fn(),
+  CTAHelper: {
+    setActiveCTAScreen: jest.fn(),
+  },
+  showCtaWithDefaultText: jest.fn(),
+}));
+
 const mockRzpPrototype = {
   key: 'key',
   amount: 100,

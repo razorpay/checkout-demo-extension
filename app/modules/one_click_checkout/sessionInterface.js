@@ -54,8 +54,8 @@ import { format, formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
+import { showSummaryModal } from 'summary_modal';
 import { getThemeMeta } from 'checkoutstore/theme';
-import { showSummaryModal } from 'one_click_checkout/summary_modal';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
 import * as Confirm from 'checkoutframe/components/confirm';

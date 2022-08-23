@@ -1,7 +1,7 @@
 <script lang="ts">
   import Field from 'ui/components/Field.svelte';
 
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -55,5 +55,5 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
-  validationText={isOneClickCheckout() && helpTextToDisplay}
+  validationText={isRedesignV15() && helpTextToDisplay}
 />

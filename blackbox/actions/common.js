@@ -53,11 +53,22 @@ module.exports = {
 };
 
 async function verifyAutoSelectBankTPV(context, bank) {
-  const autoSelectbank = await context.page.waitForSelector('.bank-name');
-  const autoSelectbankName = await context.page.evaluate(
-    (autoSelectbank) => autoSelectbank.textContent,
-    autoSelectbank
-  );
+  let autoSelectbank;
+  let autoSelectbankName;
+  if (context.isRedesignV15Enabled) {
+    autoSelectbank = await context.page.waitForSelector('.bank-details');
+    autoSelectbankName = await context.page.evaluate(
+      (autoSelectbank) =>
+        autoSelectbank.querySelector('img').getAttribute('alt'),
+      autoSelectbank
+    );
+  } else {
+    autoSelectbank = await context.page.waitForSelector('.bank-name');
+    autoSelectbankName = await context.page.evaluate(
+      (autoSelectbank) => autoSelectbank.textContent,
+      autoSelectbank
+    );
+  }
   expect(autoSelectbankName).toContain(bank);
   const accountDiv = await context.page.waitForSelector('.account-details');
   const accountNumber = await context.page.evaluate(

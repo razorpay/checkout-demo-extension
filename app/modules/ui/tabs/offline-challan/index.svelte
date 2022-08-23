@@ -3,9 +3,9 @@
   import { onDestroy, onMount } from 'svelte';
 
   // Store imports
-  import { showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore/fee';
 
-  import { getAmount, getOption, getOrderId } from 'razorpay';
+  import { getAmount, getOrderId, isRedesignV15 } from 'razorpay';
   import { Events, OfflineChallanEvents } from 'analytics';
 
   // Utils imports
@@ -17,7 +17,7 @@
   import Callout from 'ui/elements/Callout.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
+  import OldCTA from 'ui/elements/CTA.svelte';
   import ChallanPrintView from 'ui/tabs/offline-challan/ChallanPrintView.svelte';
 
   // i18n
@@ -48,6 +48,7 @@
     copyDetailsToClipboard,
   } from 'ui/tabs/offline-challan/helper';
   import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
+  import CTA from 'cta';
 
   // Props
   export let loading = true;
@@ -198,7 +199,18 @@
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
       <!-- LABEL: Print Details -->
-      <CTA on:click={handlePrint}>{$t(DOWNLOAD_CHALLAN)}</CTA>
+      {#if isRedesignV15()}
+        <CTA
+          screen="offline_challan"
+          tab="offline_challan"
+          disabled={false}
+          show
+          onSubmit={handlePrint}
+          label={DOWNLOAD_CHALLAN}
+        />
+      {:else}
+        <OldCTA on:click={handlePrint}>{$t(DOWNLOAD_CHALLAN)}</OldCTA>
+      {/if}
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>

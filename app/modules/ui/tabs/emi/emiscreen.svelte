@@ -24,6 +24,8 @@
 
   import { getPrefilledName, getPrefilledCardNumber } from 'razorpay';
   import { isNameReadOnly } from 'checkoutframe/customer';
+  import CTA from 'cta';
+  import { ENTER_CARD_DETAILS } from 'cta/i18n';
 
   // Props
   export let emiDuration = '';
@@ -170,6 +172,14 @@
       </div>
     </div>
   </div>
+  <CTA
+    screen="emi"
+    tab={'emi'}
+    disabled={false}
+    show
+    showAmount
+    label={ENTER_CARD_DETAILS}
+  />
 </div>
 
 <style>

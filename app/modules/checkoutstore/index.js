@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
-import { writable, derived } from 'svelte/store';
-import { contact, phone } from 'checkoutstore/screens/home';
+import { writable } from 'svelte/store';
+import { phone } from 'checkoutstore/screens/home';
 import hdfcVASDisplayConfig from 'constants/hdfcVASDisplayConfig';
 
 import RazorpayStore, {
@@ -9,12 +9,42 @@ import RazorpayStore, {
   isContactOptional,
   isHDFCVASMerchant,
   isRecurringOrPreferredPayment,
-} from 'razorpay/index';
+} from 'razorpay';
 import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
+import { activeRoute } from 'one_click_checkout/routing/store';
+import { CTAHelper } from 'cta';
 
 export const makeAuthUrl = (url) => _makeAuthUrl(RazorpayStore.get(), url);
 
-export const showFeeLabel = writable(true);
+/** required for CTA */
+export const screenStore = writable('');
+export const tabStore = writable('');
+
+function updateActiveScreen(screenStore, tabStore) {
+  if (!screenStore) {
+    screenStore = 'home';
+  }
+  if (!tabStore) {
+    tabStore = 'tab';
+  }
+  if (screenStore === 'home-1cc') {
+    tabStore = get(activeRoute).name;
+  }
+  CTAHelper.setActiveCTAScreen(`${screenStore}:${tabStore}`);
+}
+
+activeRoute.subscribe((route) => {
+  if (get(screenStore) === 'home-1cc') {
+    updateActiveScreen(get(screenStore), route);
+  }
+});
+
+screenStore.subscribe((screen) => {
+  updateActiveScreen(screen, get(tabStore));
+});
+tabStore.subscribe((tab) => {
+  updateActiveScreen(get(screenStore), tab);
+});
 
 // can't move inside razorpay/helper as it consuming store
 export function shouldRememberCustomer(method = 'card') {
@@ -127,7 +157,3 @@ export function getMerchantConfig() {
     },
   };
 }
-
-export const isIndianCustomer = derived([contact], ([$contact]) =>
-  $contact.startsWith('+91')
-);

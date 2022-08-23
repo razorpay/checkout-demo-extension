@@ -40,11 +40,7 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import {
-    isDynamicFeeBearer,
-    isRecurring,
-    isOneClickCheckout,
-  } from 'razorpay';
+  import { isDynamicFeeBearer, isRecurring, isRedesignV15 } from 'razorpay';
 
   // Props
   export let card;
@@ -66,7 +62,7 @@
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   // Refs
   let cvvInput;
@@ -176,7 +172,7 @@
         <DowntimeIcon severe={downtimeSeverity} />
       </div>
     {/if}
-    <div class="saved-cvv" class:saved-card-one-cc={isOneClickCheckoutEnabled}>
+    <div class="saved-cvv" class:saved-card-one-cc={isRedesignV15Enabled}>
       {#if showCvv}
         <CvvField
           bind:value={cvvValue}
@@ -184,12 +180,11 @@
           bind:this={cvvInput}
           length={cvvDigits}
           showHelp={false}
-          showPlaceholder={!isOneClickCheckoutEnabled}
-          elemClasses={isOneClickCheckoutEnabled && 'cvv-one-cc-wrapper'}
-          inputFieldClasses={isOneClickCheckoutEnabled && 'cvv-one-cc'}
-          labelClasses={isOneClickCheckoutEnabled && 'cvv-one-cc-label'}
-          labelUpperClasses={isOneClickCheckoutEnabled &&
-            'cvv-one-cc-label-upper'}
+          showPlaceholder={!isRedesignV15Enabled}
+          elemClasses={isRedesignV15Enabled && 'cvv-one-cc-wrapper'}
+          inputFieldClasses={isRedesignV15Enabled && 'cvv-one-cc'}
+          labelClasses={isRedesignV15Enabled && 'cvv-one-cc-label'}
+          labelUpperClasses={isRedesignV15Enabled && 'cvv-one-cc-label-upper'}
         />
       {/if}
     </div>
@@ -305,7 +300,13 @@
   {/if}
 </div>
 
-<style>
+<style lang="scss">
+  :global(.redesign) {
+    .saved-card.checked {
+      border-color: var(--highlight-color) !important;
+      background-color: var(--hover-state-color) !important;
+    }
+  }
   .downtime-saved-cards {
     margin-bottom: 8px;
   }
@@ -323,5 +324,12 @@
     font-size: 16px;
     font-weight: 500;
     margin-left: 2px;
+  }
+
+  :global(.redesign) {
+    :global(#saved-cards-container) .cardtype {
+      width: 34px;
+      height: 23px;
+    }
   }
 </style>

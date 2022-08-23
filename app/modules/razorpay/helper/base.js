@@ -128,3 +128,25 @@ export const getAmount = () => {
  * 2. getOption('key') - default scenario where merchant also passes the key
  */
 export const getKey = () => getPreferences('merchant_key') || getOption('key');
+
+export function hasMerchantPolicy() {
+  try {
+    const merchantPolicy = getPreferences('merchant_policy');
+    if (
+      merchantPolicy &&
+      Object.keys(merchantPolicy).length > 0 &&
+      merchantPolicy.url &&
+      merchantPolicy.display_name
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const getCheckoutConfig = () => getPreferences('checkout_config');
+export const getOrgDetails = () => getPreferences('org');
+
+export const isEmbedded = () => RazorpayStore.isEmbedded;

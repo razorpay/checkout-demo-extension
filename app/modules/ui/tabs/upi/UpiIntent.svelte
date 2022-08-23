@@ -251,6 +251,7 @@
     :global(.options) {
       overflow: initial;
       max-height: unset;
+      box-shadow: none;
     }
 
     :global(.options .option-icon) {

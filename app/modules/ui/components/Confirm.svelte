@@ -79,7 +79,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   #confirmation-dialog {
     top: 6px;
     z-index: 999;
@@ -118,6 +118,7 @@
   .confirm-buttons {
     display: flex;
     margin-top: 8px;
+    flex-wrap: nowrap;
   }
 
   .confirm-buttons.reverse {
@@ -146,18 +147,62 @@
     padding: 0 0 12px 0;
   }
 
-  :global(.one-cc) .confirm-message {
-    color: #8d97a1;
-  }
-
   :global(.one-cc) .confirm-buttons {
     margin-top: 16px;
   }
 
-  :global(.one-cc) .text-btn {
+  :global(.redesign) .text-btn {
     letter-spacing: normal;
     line-height: normal;
     text-transform: none;
     font-weight: 600;
   }
+  /** will need this when we migrate modal design */
+  // :global(.redesign) {
+  //   #confirmation-dialog {
+  //     top: 0;
+  //     top: unset;
+  //     left: 0;
+  //     width: 100%;
+  //     padding: 24px 20px;
+  //   }
+
+  //   .confirm-heading {
+  //     color: #3f71d7;
+  //     border-bottom: 0;
+  //     padding-bottom: 0;
+  //     letter-spacing: normal;
+  //     text-transform: none;
+  //     font-weight: 600;
+  //   }
+
+  //   .confirm-message {
+  //     color: #8d97a1;
+  //   }
+
+  //   .confirm-buttons {
+  //     flex-direction: row-reverse;
+  //     justify-content: space-between;
+  //   }
+  //   .text-btn {
+  //     letter-spacing: normal;
+  //     line-height: normal;
+  //     text-transform: none;
+  //     font-weight: 600;
+  //     width: calc(100% - 10px);
+  //     padding: 15px;
+  //     border-radius: 5px;
+  //     text-align: center;
+
+  //     &#positiveBtn {
+  //       background: var(--primary-color);
+  //       color: var(--text-color);
+  //     }
+
+  //     &#negativeBtn {
+  //       border: 1px solid var(--primary-color);
+  //       color: var(--primary-color);
+  //     }
+  //   }
+  // }
 </style>

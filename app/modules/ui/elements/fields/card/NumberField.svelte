@@ -20,8 +20,8 @@
   // Utils
   import { getIcon } from 'icons/network';
   import { formatMessageWithLocale } from 'i18n';
-  import { isOneClickCheckout } from 'razorpay';
-  import { isIndianCustomer } from 'checkoutstore';
+  import { isRedesignV15 } from 'razorpay';
+  import { isIndianCustomer } from 'checkoutstore/screens/home';
   import { isSIHubEnabledMerchant } from 'ui/tabs/card/utils';
 
   export let value = '';
@@ -43,7 +43,7 @@
 
   const dispatch = createEventDispatcher();
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   // Refs
   let field = null;
@@ -121,7 +121,7 @@
 
 <div class="field-container">
   {#if type}
-    <div class="icon" class:icon-1cc={isOneClickCheckoutEnabled}>
+    <div class="icon" class:icon-1cc={isRedesignV15Enabled}>
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
@@ -129,7 +129,7 @@
     {id}
     formatter={{ type: 'card' }}
     helpText={helpTextToDisplay}
-    validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+    validationText={isRedesignV15Enabled && helpTextToDisplay}
     name="card[number]"
     required={true}
     {value}

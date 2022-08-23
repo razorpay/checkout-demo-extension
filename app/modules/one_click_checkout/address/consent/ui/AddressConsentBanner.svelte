@@ -4,7 +4,7 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
-  import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
+  import back_arrow from 'icons/back_arrow';
 
   //i18n Imports
   import {

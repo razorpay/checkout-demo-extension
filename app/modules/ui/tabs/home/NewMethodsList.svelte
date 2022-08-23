@@ -9,7 +9,7 @@
   import RazorpayCluster from 'ui/tabs/home/RazorpayCluster.svelte';
 
   // Utils imports
-  import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
+  import { showCtaWithDefaultText, hideCta } from 'cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
@@ -35,6 +35,7 @@
   // helpers
   import { setDynamicFees } from './helpers';
   import QrWrapper from 'upi/ui/components/QRWrapper/QRWrapper.svelte';
+  import { isRedesignV15 } from 'razorpay';
 
   onDestroy(() => {
     deselectInstrument();
@@ -46,7 +47,7 @@
     if (session.screen === '') {
       if ($selectedInstrument) {
         showCtaWithDefaultText();
-      } else {
+      } else if (!isRedesignV15()) {
         hideCta();
       }
     }

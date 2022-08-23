@@ -7,9 +7,10 @@
   import Address from 'ui/elements/address.svelte';
   import MultiTpvOptions from 'ui/elements/MultiTpvOptions.svelte';
   import TpvBank from 'ui/elements/TpvBank.svelte';
+  import TpvBankNew from 'ui/elements/TpvBank.new.svelte';
+
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Store
@@ -26,7 +27,11 @@
     prevContact,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import {
+    isContactAndEmailValid,
+    isContactValid,
+    isEmailValid,
+  } from 'one_click_checkout/common/details/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -40,6 +45,7 @@
     getMerchantOrder,
     isContactEmailOptional,
     isContactOptional,
+    isRedesignV15,
     isEmailOptional,
     isOneClickCheckout,
   } from 'razorpay';
@@ -59,7 +65,6 @@
   // i18n imports
   import { t } from 'svelte-i18n';
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
-  import { CTA_LABEL } from 'one_click_checkout/cta/i18n';
   import {
     INDIA_CONTACT_ERROR_LABEL,
     CONTACT_ERROR_LABEL,
@@ -80,14 +85,16 @@
     PHONE_REGEX_INDIA,
   } from 'common/constants';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import { validateEmail } from 'one_click_checkout/common/validators/email';
   import { getInputSource } from 'one_click_checkout/helper';
+  import CTA from 'cta';
+  import { CTA_LABEL } from 'cta/i18n';
 
   // Props
   export let tpv;
-  export let newCta;
   export let onSubmit;
-  export let valid = false;
+  export let valid = true;
   export let showValidations = false;
 
   const order = getMerchantOrder();
@@ -95,16 +102,20 @@
   const icons = getThemeMeta().icons;
   const { user } = getIcons();
   const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
-  const isSummaryScreen = $activeRoute?.name === views.COUPONS;
   const userContact = $contact;
   $prevContact = {
     country: $country,
     phone: $phone,
     email: $email,
   };
-  let disabled = true;
+  export let disabled = !valid;
   let validationText;
+
+  $: valid =
+    ($isEmailValid || isEmailOptional()) &&
+    ($isContactValid || isContactOptional());
 
   function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
@@ -177,21 +188,21 @@
       });
     }
 
-    if (isOneCCEnabled && isEditDetailScreen) {
+    if (isRedesignV15Enabled && isEditDetailScreen) {
       toggleHeader(false);
     }
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();
 
-  function onSubmitClick() {
-    if (!CONTACT_REGEX.test($contact)) {
+  export function onSubmitClick() {
+    if (!CONTACT_REGEX.test($contact) && !isContactOptional()) {
       showValidations = true;
       return;
     }
 
     validateEmail($email).then((value) => {
-      if (value) {
+      if (value || isEmailOptional()) {
         Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
           contact: $contact,
           email: $email,
@@ -221,16 +232,18 @@
 
 <div
   data-test-id="payment-details-block"
-  class:details-wrapper={isOneCCEnabled && isEditDetailScreen}
+  class:details-wrapper={(isRedesignV15Enabled && !isOneClickCheckout()) ||
+    isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
-  {#if isOneCCEnabled && isEditDetailScreen}
+  {#if (isRedesignV15Enabled && !isOneClickCheckout()) || isEditDetailScreen}
     <div class="contact-title">
       <Icon icon={user} />
       <span class="contact-text">{$t(CONTACT_LABEL)}</span>
     </div>
   {/if}
-  <div class="details-block" class:p-1cc={isOneCCEnabled}>
+
+  <div class="details-block">
     {#if !isContactHidden()}
       <div class="contact-field">
         <ContactField
@@ -258,7 +271,7 @@
 
   {#if isPartialPayment()}
     <div class="partial-payment-block">
-      <PartialPaymentOptions {order} />
+      <PartialPaymentOptions {order} {showValidations} />
     </div>
   {/if}
 
@@ -275,9 +288,25 @@
 
   {#if tpv && !tpv.invalid}
     {#if tpv.method}
-      <div class="tpv-bank-block">
-        <TpvBank bank={tpv} {accountName} showIfsc={isContactEmailOptional()} />
-      </div>
+      {#if isRedesignV15Enabled}
+        <Bottom>
+          <div class="tpv-bank-block">
+            <TpvBankNew
+              bank={tpv}
+              {accountName}
+              showIfsc={isContactEmailOptional()}
+            />
+          </div>
+        </Bottom>
+      {:else}
+        <div class="tpv-bank-block">
+          <TpvBank
+            bank={tpv}
+            {accountName}
+            showIfsc={isContactEmailOptional()}
+          />
+        </div>
+      {/if}
     {:else}
       <div class="multi-tpv-block">
         <MultiTpvOptions
@@ -288,20 +317,26 @@
       </div>
     {/if}
   {/if}
-  {#if newCta}
-    <CTAOneCC on:click={onSubmitClick} {disabled} showAmount={false}>
-      {$t(CTA_LABEL)}
-    </CTAOneCC>
-  {/if}
+  <!-- for 1cc only (checkout CTA handle by home) -->
+  <CTA
+    screen="home-1cc"
+    tab={'details'}
+    {disabled}
+    show
+    label={CTA_LABEL}
+    showAmount={false}
+    onSubmit={onSubmitClick}
+  />
 </div>
 
-<style>
+<style lang="scss">
   .details-wrapper {
     padding: 28px 16px;
   }
   .details-block {
     padding: 0 24px;
   }
+
   .partial-payment-block {
     padding: 0 12px 12px 12px;
   }
@@ -310,15 +345,6 @@
   }
   .contact-field > :global(*) {
     margin-bottom: 16px;
-  }
-
-  .details-callout {
-    padding: 20px 24px 0;
-    font-weight: 700;
-  }
-
-  .p-1cc {
-    padding: 8px 0px 8px;
   }
 
   .contact-title {
@@ -331,5 +357,21 @@
     padding-left: 10px;
     font-weight: 600;
     font-size: 14px;
+  }
+
+  :global(.redesign) {
+    .details-wrapper {
+      padding: 20px;
+    }
+
+    .contact-text {
+      font-size: 13px;
+    }
+
+    .multi-tpv-block,
+    .partial-payment-block,
+    .details-block {
+      padding: 0;
+    }
   }
 </style>

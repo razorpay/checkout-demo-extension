@@ -10,14 +10,15 @@
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
   import { getMiscIcon } from 'checkoutframe/icons';
-  import { isOneClickCheckout } from 'razorpay';
 
   // Utils imports
   import { Track } from 'analytics';
   import { isElementCompletelyVisibleInContainer, returnAsIs } from 'lib/utils';
   import * as Search from 'checkoutframe/search';
   import { getAnimationOptions } from 'svelte-utils';
+  import { isRedesignV15 } from 'razorpay';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -60,7 +61,8 @@
   let inputRef: HTMLInputElement;
   let resultsContainerRef: HTMLDivElement;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
+  const closeIcon = close();
 
   function getResults(query, items) {
     if (query) {
@@ -77,9 +79,8 @@
         finalResult.sort(sortSearchResult);
       }
       return finalResult;
-    } else {
-      return [];
     }
+    return [];
   }
 
   $: items, query, keys, (results = getResults(query, items));
@@ -101,10 +102,9 @@
 
     if (index < results.length) {
       return `#${IDs.resultItem(results[index], index)}`;
-    } else {
-      index = index - results.length;
-      return `#${IDs.allItem(items[index], index)}`;
     }
+    index = index - results.length;
+    return `#${IDs.allItem(items[index], index)}`;
   }
 
   function bringItemAtIndexIntoView(index) {
@@ -182,14 +182,19 @@
     }
   }
 
+  function closeButtonClick() {
+    dispatchClose({
+      from: 'cross',
+    });
+  }
+
   function getNextIndexForUpKey(items, currentIndex) {
     if (!_.isNumber(currentIndex)) {
       return items.length - 1;
     } else if (currentIndex === 0) {
       return items.length - 1;
-    } else {
-      return currentIndex - 1;
     }
+    return currentIndex - 1;
   }
 
   function getNextIndexForDownKey(items, currentIndex) {
@@ -197,9 +202,8 @@
       return 0;
     } else if (currentIndex === items.length - 1) {
       return 0;
-    } else {
-      return focusedIndex + 1;
     }
+    return focusedIndex + 1;
   }
 
   function arrowKeysHandler(event) {
@@ -248,19 +252,26 @@
   class="search-box"
   in:fly={getAnimationOptions({ duration: 200, y: -100 })}
   out:fade={getAnimationOptions({ duration: 200 })}
+  class:search-box-checkout-redesign={isRedesignV15Enabled}
 >
   <Stack vertical>
+    {#if isRedesignV15Enabled}
+      <div class="search-header">
+        {#if all}
+          <span>{$t(all)}</span>
+        {/if}
+        <span class="search-modal-close" on:click={closeButtonClick}>
+          <Icon icon={closeIcon} />
+        </span>
+      </div>
+    {/if}
     <form
       on:submit|preventDefault={submitHandler}
       class="search-field"
-      class:search-field-1cc={isOneClickCheckoutEnabled}
+      class:search-field-checkout-redesign={isRedesignV15Enabled}
     >
       <div class="icon">
-        <Icon
-          icon={isOneClickCheckoutEnabled
-            ? getMiscIcon('search_one_cc')
-            : getMiscIcon('search')}
-        />
+        <Icon icon={getMiscIcon('search')} />
       </div>
       <input
         type="text"
@@ -286,7 +297,7 @@
       aria-label={$t('misc.search_results_label')}
       role="listbox"
       bind:this={resultsContainerRef}
-      class:search-dropdown-1cc={isOneClickCheckoutEnabled}
+      class:search-dropdown-checkout-redesign={isRedesignV15Enabled}
     >
       {#if query}
         {#if results.length}
@@ -295,7 +306,7 @@
             {#each results as item, index (IDs.resultItem(item, index))}
               <div
                 class="list-item"
-                class:list-item-1cc={isOneClickCheckoutEnabled}
+                class:list-item-checkout-redesign={isRedesignV15Enabled}
                 class:focused={index === focusedIndex}
                 id={IDs.resultItem(item, index)}
                 role="option"
@@ -317,25 +328,18 @@
           </div>
         {/if}
       {/if}
-      {#if all}
-        {#if isOneClickCheckoutEnabled}
-          <div class="list-header list-header-1cc">
-            <div class="divider" />
-            <div class="text">{$t(all)}</div>
-          </div>
-        {:else}
-          <div class="list-header">
-            <div class="text">{$t(all)}</div>
-            <div class="divider" />
-          </div>
-        {/if}
+      {#if all && !isRedesignV15Enabled}
+        <div class="list-header">
+          <div class="text">{$t(all)}</div>
+          <div class="divider" />
+        </div>
       {/if}
       <div class="list">
         {#each items as item, index (IDs.allItem(item, index))}
           <div
             class="list-item"
             class:focused={index + results.length === focusedIndex}
-            class:list-item-1cc={isOneClickCheckoutEnabled}
+            class:list-item-checkout-redesign={isRedesignV15Enabled}
             id={IDs.allItem(item, index)}
             role="option"
             aria-selected={index + results.length === focusedIndex}
@@ -361,6 +365,7 @@
     height: 90%;
     top: 5%;
     left: 5%;
+    z-index: 1;
   }
 
   .search-box > :global(.stack) {
@@ -475,45 +480,45 @@
     color: #888;
   }
 
-  .list-item-1cc {
-    border-bottom: none;
-    color: #263a4a;
+  .list-item-checkout-redesign {
+    color: #333;
   }
 
-  .list-header-1cc {
-    flex-direction: column;
-    margin-top: 0px;
-  }
-
-  .list-header-1cc .text {
-    width: 100%;
-    padding: 16px 16px 0px 16px;
-    box-sizing: border-box;
-    margin: 0px;
-    font-size: 14px;
-    line-height: 16px;
-    color: #757575;
-  }
-
-  .list-header-1cc .divider {
-    width: 100%;
-  }
-
-  .search-field-1cc {
+  .search-field-checkout-redesign {
+    margin-top: 16px;
+    border-bottom: 2px solid #e6e7e8;
     box-shadow: none;
-    border: 1px solid #e0e0e0;
-    box-sizing: border-box;
-    border-radius: 4px;
-    align-self: stretch;
-    margin: 20px 16px;
   }
 
-  .search-field-1cc .icon :global(svg) {
-    width: 14px;
-    height: 14px;
+  .search-field-checkout-redesign input::placeholder {
+    color: #c4c4c4;
   }
 
-  .search-field-1cc .icon {
+  .search-field-checkout-redesign .icon {
     margin-right: -6px;
+  }
+
+  .search-box-checkout-redesign {
+    position: relative;
+    background-color: white;
+    width: 100% !important;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+  .search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 16px 0 16px;
+    span {
+      font-size: 16px;
+    }
+    .search-modal-close {
+      display: flex;
+      width: 16px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
   }
 </style>

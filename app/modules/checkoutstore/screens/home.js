@@ -1,7 +1,6 @@
 import { derived, writable, get } from 'svelte/store';
 
 import { isContactOptional, isEmailOptional } from 'razorpay/index';
-
 import {
   CONTACT_REGEX,
   EMAIL_REGEX,
@@ -52,9 +51,8 @@ export const countryISOCode = writable('');
 export const contact = derived([country, phone], ([$country, $phone]) => {
   if ($phone) {
     return $country + $phone;
-  } else {
-    return '';
   }
+  return '';
 });
 
 export const prevContact = writable({});
@@ -65,9 +63,8 @@ export const proxyContact = derived(
   ([$proxyCountry, $proxyPhone]) => {
     if ($proxyPhone) {
       return $proxyCountry + $proxyPhone;
-    } else {
-      return '';
     }
+    return '';
   }
 );
 
@@ -181,3 +178,19 @@ export const isContactPresent = derived(
 export const upiIntentInstrumentsForAnalytics = writable([]);
 
 export const getCustomerCountryISOCode = () => get(countryISOCode);
+
+export const isIndianCustomer = derived([contact], ([$contact]) =>
+  $contact.startsWith('+91')
+);
+
+export function resetContactToPrevious() {
+  // Need to reset the previous Phone number & Email, if the user clicked back on Details screen
+  const {
+    country: prevContactCountry,
+    phone: prevContactPhone,
+    email: prevContactEmail,
+  } = get(prevContact) || {};
+  country.set(prevContactCountry);
+  phone.set(prevContactPhone);
+  email.set(prevContactEmail);
+}

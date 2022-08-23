@@ -26,7 +26,7 @@
     fetchCoupons,
   } from 'one_click_checkout/coupons/helpers';
   import { toggleHeader } from 'one_click_checkout/header/helper';
-  import { hideCta } from 'checkoutstore/cta';
+  import { hideCta } from 'cta';
   import { timer } from 'utils/timer';
 
   // analytics imports

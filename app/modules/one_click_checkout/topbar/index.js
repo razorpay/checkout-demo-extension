@@ -8,7 +8,7 @@ let topbar;
  */
 function create() {
   topbar = new Topbar({
-    target: document.querySelector('#topbar-onecc-wrap'),
+    target: document.querySelector('#topbar-redesign-v15-wrap'),
   });
 }
 

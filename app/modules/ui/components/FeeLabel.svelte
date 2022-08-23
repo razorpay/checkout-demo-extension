@@ -1,19 +1,54 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import DynamicFeeBearer from './DynamicFeeBearer.svelte';
 
   //Store imports
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { showFeeLabel } from 'checkoutstore/fee';
+  import { showFeeBearerToolTip } from 'store/feebearer';
 
-  import { isCustomerFeeBearer, isDynamicFeeBearer } from 'razorpay';
+  import {
+    isCustomerFeeBearer,
+    isDynamicFeeBearer,
+    isRedesignV15,
+  } from 'razorpay';
 
+  import { clickOutside } from 'one_click_checkout/helper';
+
+  const FEE_BEARER_VIEW_TIME = 6000;
   const isFeeBearer = isCustomerFeeBearer();
-
+  const isRedesignV15Enabled = isRedesignV15();
   let showFeeDetails = false;
-  function handleClick() {
-    showFeeDetails = !showFeeDetails;
+  let timeout;
+
+  export let visible = false;
+  function triggerToolTip() {
+    timeout ? clearTimeout(timeout) : null;
+    showFeeDetails = true;
+    timeout = setTimeout(() => {
+      showFeeDetails = false;
+    }, FEE_BEARER_VIEW_TIME);
   }
+
+  const handleHideTooltip = () => {
+    timeout ? clearTimeout(timeout) : null;
+    showFeeDetails = false;
+  };
+  onMount(() => {
+    if (
+      isFeeBearer &&
+      $showFeeLabel &&
+      isRedesignV15Enabled &&
+      !isDynamicFeeBearer() &&
+      !$showFeeBearerToolTip
+    ) {
+      triggerToolTip();
+    }
+  });
+
+  $: visible = isFeeBearer && $showFeeLabel;
 </script>
 
 {#if isFeeBearer}
@@ -21,12 +56,14 @@
     {#if isDynamicFeeBearer()}
       <DynamicFeeBearer />
     {:else}
-      <div class="label">
-        <span on:click={handleClick} class="fee-helper has-tooltip">
-          <span class="fee"><u>+Fee</u></span>
+      <div class="label" use:clickOutside on:click_outside={handleHideTooltip}>
+        <span on:click={triggerToolTip} class="fee-helper has-tooltip">
+          <span class="fee">+Fee</span>
           <Tooltip
-            className="fee-tooltip"
-            align={['bottom']}
+            className={`fee-tooltip ${
+              isRedesignV15Enabled ? 'checkout-redesign' : ''
+            }`}
+            align={isRedesignV15Enabled ? ['top', 'right'] : ['bottom']}
             shown={showFeeDetails}
           >
             A convenience fee will be charged depending on your choice of
@@ -45,6 +82,13 @@
 
   .fee {
     font-size: 0.6em;
+    text-decoration: underline;
+  }
+
+  :global(.redesign) .fee {
+    font-size: 10px;
+    color: #8d97a1;
+    text-decoration: none;
   }
   .fee-helper {
     cursor: pointer;
@@ -56,8 +100,27 @@
     white-space: normal;
     text-align: left;
     margin: 0;
-    transform: translateX(-50%) translateY(10px);
+    transform: translateX(-88%) translateY(10px);
     left: unset;
     right: unset;
+  }
+
+  :global(.checkout-redesign.tooltip.tooltip-top.tooltip-right) {
+    font-size: 11px;
+    position: absolute;
+    white-space: normal;
+    text-align: left;
+    margin: 0;
+    left: unset;
+    right: unset;
+    width: 225px;
+    background-color: #363636;
+    top: -30px;
+  }
+
+  :global(.redesign) {
+    .fee {
+      font-size: 10px;
+    }
   }
 </style>

@@ -1,4 +1,4 @@
-import { appliedOffer } from 'offers/store';
+import { appliedOffer } from 'offers/store/store';
 import { getAmount } from 'razorpay';
 import { getAllOffers } from 'checkoutframe/offers';
 import { get } from 'svelte/store';

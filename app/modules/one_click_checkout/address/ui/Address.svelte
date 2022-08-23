@@ -53,7 +53,7 @@
 
   import Resource from 'one_click_checkout/address/resource';
   import { views } from 'one_click_checkout/routing/constants';
-  import { otpReasons } from 'one_click_checkout/otp/constants';
+  import { otpReasons } from 'otp/constants';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'razorpay';

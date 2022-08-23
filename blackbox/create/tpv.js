@@ -141,7 +141,10 @@ module.exports = function (testFeatures) {
         await assertDynamicFeeBearer(context, 1);
       }
       if (partialPayment) {
-        await verifyPartialAmount(context, '₹ 100');
+        await verifyPartialAmount(
+          context,
+          `${context.isRedesignV15Enabled ? '₹100' : '₹ 100'}`
+        );
       }
 
       await submit(context);

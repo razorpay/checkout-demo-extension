@@ -3,10 +3,10 @@
   import { get } from 'svelte/store';
 
   // UI imports
-  import CTA from 'one_click_checkout/cta/index.svelte';
+  import CTA from 'cta';
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
   import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // i18n imports
@@ -51,6 +51,7 @@
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
   import { views } from 'one_click_checkout/routing/constants';
+  import { CTA_LABEL } from 'cta/i18n';
   import { SELECTED_ADDRESS_DOM_ID } from 'one_click_checkout/address/constants';
 
   export let error;
@@ -71,7 +72,7 @@
     }
   }
 
-  let disabled;
+  let disabled: boolean;
   let {
     title,
     store: {
@@ -316,7 +317,16 @@
     {/if}
   </div>
   <slot name="footer" />
-  <CTA on:click={onSubmit} handleDisable {disabled} />
+  <CTA
+    screen="home-1cc"
+    tab={$activeRoute?.name}
+    disabled={false}
+    show
+    label={CTA_LABEL}
+    variant={disabled ? 'disabled' : ''}
+    showAmount
+    {onSubmit}
+  />
 </div>
 
 <style>
@@ -370,10 +380,6 @@
   .address-section {
     /* TODO: to replace left/right padding with variable */
     padding: 0px 16px 16px;
-    min-height: 120%;
-  }
-
-  .address-scrollable {
     min-height: 120%;
   }
 

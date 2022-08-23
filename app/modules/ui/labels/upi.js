@@ -31,6 +31,8 @@ export const UPI_RECURRING_CAW_CALLOUT_AS_PRESENTED =
   'upi.recurring_caw_callout_as_presented';
 export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
+export const OMNI_GPAY = 'upi.gpay_web_api_title';
+export const OMNI_GPAY_SUBTITLE = 'upi.omni_gpay_subtitle';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';
 export const OMNI_ERROR = 'upi.omni_error';
 

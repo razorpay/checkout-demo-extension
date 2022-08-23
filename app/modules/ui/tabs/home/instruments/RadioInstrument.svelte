@@ -352,8 +352,12 @@
 {/if}
 
 <style>
-  .downtime-preferred-method {
+  .downtime-preferred-method:not(:empty) {
     margin-top: 8px;
+  }
+
+  .subtitle:empty {
+    display: none;
   }
 
   .subtitle {

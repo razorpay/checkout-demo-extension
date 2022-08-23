@@ -1,7 +1,7 @@
 <script lang="ts">
   // i18n imports
   import { t } from 'svelte-i18n';
-  import { CTA_LABEL, VIEW_DETAILS_LABEL } from 'one_click_checkout/cta/i18n';
+  import { CTA_LABEL, VIEW_DETAILS_LABEL } from 'cta/i18n';
 
   // helpers/store imports
   import { amount } from 'one_click_checkout/charges/store';
@@ -12,7 +12,7 @@
 
   // Analytics imports
   import { Events } from 'analytics';
-  import CTAEvents from 'one_click_checkout/cta/analytics';
+  import CTAEvents from 'cta/analytics';
 
   // util imports
   import * as _El from 'utils/DOM';

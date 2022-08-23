@@ -64,6 +64,7 @@ describe('Test <List />', () => {
 
     expect(get(selectedMethod)).toStrictEqual('va_eur');
   });
+
   test('should select GBP Bank Account', () => {
     const { getByText } = render(List);
 
@@ -87,6 +88,7 @@ describe('Test <List />', () => {
       expect(getByText('Getting account details...')).toBeInTheDocument()
     );
   });
+
   test('should remove details view on back press', async () => {
     const { getByText, component, debug } = render(List);
 

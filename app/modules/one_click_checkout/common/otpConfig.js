@@ -3,7 +3,7 @@ import {
   resendOTPHandle,
   handleBack,
 } from 'one_click_checkout/common/otp';
-import OTP from 'one_click_checkout/otp/ui/OTP.svelte';
+import OTP from 'otp/ui/OTP.svelte';
 import { views } from 'one_click_checkout/routing/constants';
 import { ADDRESS_LABEL } from 'one_click_checkout/topbar/i18n/label';
 

@@ -4,5 +4,6 @@ export const AMOUNT_LABEL = 'fees.amount_label';
 export const GATEWAY_CHARGES_LABEL = 'fees.gateway_charges_label';
 export const GST_LABEL = 'fees.gst_label';
 export const CONTINUE_ACTION = 'fees.continue_action';
+export const CONFIRM_AND_PAY = 'fees.confirm_and_pay';
 export const CLOSE_ACTION = 'fees.close_action';
 export const TOTAL_CHARGES_LABEL = 'fees.total_charges_label';

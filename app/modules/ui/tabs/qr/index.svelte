@@ -14,12 +14,10 @@
     getMerchantOrder,
     isCustomerFeeBearer,
     getOptionalObject,
-    isOneClickCheckout,
+    isRedesignV15,
     getCurrency,
   } from 'razorpay';
-  import { amount } from 'one_click_checkout/charges/store';
-  import { formatAmountWithSymbol } from 'common/currency';
-  import { showSummaryModal } from 'one_click_checkout/summary_modal';
+  import { showSummaryModal } from 'summary_modal';
 
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -38,6 +36,8 @@
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { isQRPaymentActive, isQRPaymentCancellable } from 'upi/helper';
+  import { getCTAAmount } from 'cta';
+  import { cfbAmount } from 'checkoutstore/screens/upi';
 
   // Props
   export let view = 'qr';
@@ -155,7 +155,7 @@
   }
 </script>
 
-<Tab method="qr">
+<Tab method="qr" pageCenter={loading || view === 'fee'}>
   {#if view === 'fee'}
     <FeeBearer {paymentData} onContinue={createPaymentWithFees} />
   {:else if view === 'qr'}
@@ -175,16 +175,19 @@
           <img alt="QR" src={qrImage} on:load={qrLoaded} />
         </div>
       {/if}
-      {#if isOneClickCheckout()}
+      {#if isRedesignV15()}
         <div class="active-bg-color qr-one-cc-cta">
           <span class="price-label"
-            >{formatAmountWithSymbol($amount, currency, false)}</span
+            >{@html isCustomerFeeBearer() ? $cfbAmount : getCTAAmount()}</span
           >
-          <button
-            class="cta-view-details"
-            on:click={() => showSummaryModal({ withCta: false })}
-            >{$t(VIEW_AMOUNT_DETAILS)}</button
-          >
+          {#if !isCustomerFeeBearer()}
+            <button
+              type="button"
+              class="cta-view-details"
+              on:click={() => showSummaryModal({ withCta: false })}
+              >{$t(VIEW_AMOUNT_DETAILS)}</button
+            >
+          {/if}
         </div>
       {/if}
     {/if}
@@ -198,10 +201,16 @@
   {/if}
 </Tab>
 
-<style>
+<style lang="scss">
   :global(#form-qr) {
     text-align: center;
     padding-top: 12px;
+  }
+
+  :global {
+    .redesign #form-qr .fee-bearer {
+      width: 80%;
+    }
   }
   .message {
     background: no-repeat center bottom;
@@ -278,8 +287,8 @@
     color: #8d97a1;
   }
 
-  :global(#content.one-cc #form-qr) {
-    padding-top: 26px;
+  :global(.redesign #form-qr) {
+    padding-top: 26px !important;
   }
 
   :global(#content.one-cc) .message {

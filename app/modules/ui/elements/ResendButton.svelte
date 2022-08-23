@@ -11,7 +11,7 @@
   import { resendTimeout } from 'checkoutstore/screens/otp';
 
   // utils imports
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
   import { formatToMMSS } from 'utils/date';
 
   const dispatch = createEventDispatcher();
@@ -28,7 +28,7 @@
   $: secondsLeftText = secondsLeft > 0 ? `(${secondsLeft})` : '';
 
   let disabled = false;
-  $: disabled = secondsLeft > 0 && isOneClickCheckout();
+  $: disabled = secondsLeft > 0;
 
   function invokeResend(event) {
     if (!disabled) {
@@ -39,7 +39,7 @@
   function startTimer() {
     interval = setInterval(function () {
       secondsLeft--;
-      if (secondsLeft > 0 && resendTimeout) {
+      if (secondsLeft > 0 && $resendTimeout) {
         secondsLeftText = ` (${secondsLeft})`;
       } else {
         disabled = false;

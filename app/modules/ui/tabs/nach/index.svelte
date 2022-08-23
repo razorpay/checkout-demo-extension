@@ -13,11 +13,7 @@
     uploadDocument,
   } from 'checkoutframe/nach';
 
-  import {
-    showUploadNachForm,
-    showAmountInCta,
-    showSubmit,
-  } from 'checkoutstore/cta';
+  import { showUploadNachForm, showAmountInCta, showSubmit } from 'cta';
 
   // UI imports
   import Attachment from 'ui/elements/Attachment.svelte';
@@ -41,6 +37,8 @@
   } from 'ui/labels/nach';
 
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import CTA from 'cta';
+  import { UPLOAD_NACH_FORM } from 'cta/i18n';
 
   let abortUploadRequest;
   let uploaded = false;
@@ -310,6 +308,7 @@
         </Note>
       {/if}
     </div>
+    <CTA showAmount={false} screen="nach" tab="nach" label={UPLOAD_NACH_FORM} />
   </Screen>
 </Tab>
 

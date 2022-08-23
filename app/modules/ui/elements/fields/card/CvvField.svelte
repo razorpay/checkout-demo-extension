@@ -5,7 +5,7 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import { CVV_LABEL, CVV_HELP } from 'ui/labels/card';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   export let ref = null;
 
@@ -30,7 +30,7 @@
   let label;
   let isInvalid;
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   const CVV_REGEX = new RegExp(cvvPattern);
 
   $: {
@@ -103,7 +103,7 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
-  validationText={isOneClickCheckoutEnabled && helpTextToDisplay}
+  validationText={isRedesignV15Enabled && helpTextToDisplay}
   {isInvalid}
 />
 

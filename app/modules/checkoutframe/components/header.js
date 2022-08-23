@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
+import { isCustomerFeeBearer, isRedesignV15 } from 'razorpay';
 import { querySelector } from 'utils/doc';
 import { formatAmountWithCurrency } from 'helper/currency';
 /**
@@ -15,7 +15,7 @@ export function getNormalizedAmountFontSize(
   hasOffer = false
 ) {
   const MIN_FONT_SIZE = 17;
-  const MAX_FONT_SIZE = isOneClickCheckout() ? 20 : 24;
+  const MAX_FONT_SIZE = isRedesignV15() ? 20 : 24;
   const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
 
   if (!amount) {

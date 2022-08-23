@@ -3,14 +3,14 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore/fee';
 
   import {
     getAmount,
     getOption,
     getOrderId,
     isCustomerFeeBearer,
-    isOneClickCheckout,
+    isRedesignV15,
   } from 'razorpay';
 
   // Utils imports
@@ -27,10 +27,10 @@
   import Callout from 'ui/elements/Callout.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
+  import OldCTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
   import showFeeBearer from 'ui/components/FeeBearer';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   // i18n
   import {
@@ -44,6 +44,7 @@
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
     PRINT_DETAILS,
+    DOWNLOAD_CHALLAN,
     FEE_BREAKUP,
     WAIT_TEXT,
   } from 'ui/labels/bank-transfer';
@@ -65,8 +66,9 @@
     BANK_TRANSFER_PDF_INIT_FAILURE,
   } from './events';
   import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
+  import CTA from 'cta';
 
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesign = isRedesignV15();
 
   // adding 3rd party script for printing, adding here to not increase unnecessary bundle size
   function addScript(url, content) {
@@ -150,7 +152,6 @@
       session.updateAmountInHeader(response.amount_expected);
       $showFeeLabel = false;
     }
-
     if (receivers && receivers.length !== 0) {
       data = {
         receiver: receivers[0],
@@ -229,8 +230,8 @@
   };
 </script>
 
-<Tab method="bank_transfer" shown={true} pad={!isOneCCEnabled}>
-  <div class="bank_transfer-container" class:one-cc={isOneCCEnabled}>
+<Tab method="bank_transfer" shown={true} pad={!isRedesign}>
+  <div class="bank_transfer-container" class:one-cc={isRedesign}>
     {#if loading}
       <!-- LABEL: Getting bank details... -->
       <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
@@ -288,7 +289,18 @@
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
       <!-- LABEL: Print Details -->
-      <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
+      {#if isRedesignV15()}
+        <CTA
+          screen="bank_transfer"
+          tab="bank_transfer"
+          disabled={false}
+          show
+          onSubmit={handlePrint}
+          label={DOWNLOAD_CHALLAN}
+        />
+      {:else}
+        <OldCTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</OldCTA>
+      {/if}
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>

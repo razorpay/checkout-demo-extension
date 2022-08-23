@@ -287,6 +287,7 @@ module.exports = {
         url.startsWith(lumberjackUrl) ||
         url.startsWith(lumerjackVajraURL) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
+        url.includes('https://browser.sentry-cdn.com/7.2.0/bundle.min.js') ||
         url.includes('html2pdf.bundle.js') ||
         url.includes('locations/autosuggest') ||
         url.includes('fonts.googleapis.com') ||

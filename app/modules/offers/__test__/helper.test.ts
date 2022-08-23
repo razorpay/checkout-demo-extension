@@ -4,11 +4,12 @@ import {
   isOfferApplicableOnIssuer,
   showOffersOnSelectedCurrncy,
 } from '../helper';
-import { appliedOffer } from 'offers/store';
+import { appliedOffer } from 'offers/store/store';
 import { tick } from 'svelte';
 jest.mock('razorpay', () => ({
   __esModule: true,
   getAmount: () => 5000,
+  getCurrency: () => 'INR',
   isOneClickCheckout: () => false,
 }));
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import RTBIcon from './RTBIcon.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import {
     RTB_HEADER,
@@ -18,6 +17,7 @@
   import { Events } from 'analytics';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
   import { RTBEvents } from 'rtb/events';
+  import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
 
   onMount(() => {
     Events.TrackRender(RTBEvents.OVERLAY_SHOW, getRTBAnalyticsPayload());
@@ -46,7 +46,7 @@
 <div transition:fly={{ duration: 200, y: 20 }} class="rtb-overlay">
   <div class="rtb-overlay-header" data-testid="rtb-overlay-header">
     <div class="rtb-overlay-title">
-      <RTBIcon width={50} height={52} />
+      <TrustedBadgeIcon width={50} height={52} />
       <div class="rtb-labels">
         <div class="rtb-merchant-name">{merchantName}</div>
         <div class="rtb-merchant-certification">

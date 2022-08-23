@@ -24,7 +24,7 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { isOneClickCheckout, getCurrency } from 'razorpay';
+  import { isRedesignV15, getCurrency } from 'razorpay';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
@@ -56,7 +56,7 @@
 
   const session = getSession();
   const dispatch = createEventDispatcher();
-  const isOneCC = isOneClickCheckout();
+  const isOneCC = isRedesignV15();
 
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
@@ -109,9 +109,8 @@
       `;
     } else if (method === 'upi' && upiTiles.variant === 'row') {
       return formatMessageWithLocale(PAY_WITH_INSTALLED_OR_OTHERS, locale);
-    } else {
-      return getMethodDescription(method, locale);
     }
+    return getMethodDescription(method, locale);
   }
 
   function getTitleForDisplay(locale) {
@@ -121,13 +120,11 @@
   function getIconForDisplay() {
     if (icon) {
       return icon;
-    } else {
-      if (/card$/.test(method)) {
-        return icons['card'];
-      } else {
-        return icons[method];
-      }
     }
+    if (/card$/.test(method)) {
+      return icons['card'];
+    }
+    return icons[method];
   }
 
   $: if (method === 'cod') {
@@ -226,10 +223,14 @@
   </div>
 </SlottedOption>
 
-<style>
+<style lang="scss">
   /* Container styles */
   :global(.new-method) {
     padding: 16px;
+  }
+
+  :global(.redesign .new-method) {
+    padding: 12px 16px;
   }
   /* Icon styles */
   i {
@@ -302,5 +303,10 @@
     font-weight: 400;
     font-size: 12px;
     color: #8d97a1;
+    width: 101%; /** ios wrapping issue */
+
+    &:empty {
+      display: none;
+    }
   }
 </style>

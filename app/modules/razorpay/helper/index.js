@@ -8,3 +8,4 @@ export * from './currency';
 export * from './order';
 export * from './fee';
 export * from './misc';
+export * from './redesign';

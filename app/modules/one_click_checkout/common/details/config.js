@@ -13,7 +13,7 @@ const details = {
   name: views.DETAILS,
   component: Details,
   props: {
-    newCta: true,
+    ctaV15: true,
     onSubmit: handleDetailsNext,
     handleBack,
   },

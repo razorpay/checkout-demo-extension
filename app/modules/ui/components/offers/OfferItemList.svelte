@@ -3,7 +3,7 @@
   import OfferItemMagicCheckout from 'one_click_checkout/offers/item.svelte';
   // util imports
   import { appliedOffer } from 'offers/store';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
   // i18n
   import { t } from 'svelte-i18n';
   import {
@@ -30,7 +30,7 @@
 
 <div role="list">
   {#each offers as offer, index (offer.id)}
-    {#if isOneClickCheckout()}
+    {#if isRedesignV15()}
       <OfferItemMagicCheckout
         {selected}
         {offers}

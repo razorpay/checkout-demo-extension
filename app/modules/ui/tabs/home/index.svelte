@@ -3,7 +3,6 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import { updateActionAreaContentAndCTA } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
@@ -47,19 +46,21 @@
     upiIntentInstrumentsForAnalytics,
     blocks,
     countryISOCode,
+    isIndianCustomer,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
   import {
+    isRedesignV15,
     isOneClickCheckout,
     isHDFCVASMerchant,
     getMerchantOption,
+    getAmount,
   } from 'razorpay';
   import {
     merchantAnalytics,
     merchantFBStandardAnalytics,
   } from 'one_click_checkout/merchant-analytics';
-  import { isIndianCustomer } from 'checkoutstore';
   import {
     isCodAddedToAmount,
     codChargeAmount,
@@ -71,7 +72,9 @@
 
   // i18n
   import {
+    FULL_AMOUNT_LABEL,
     PARTIAL_AMOUNT_EDIT_LABEL,
+    PARTIAL_AMOUNT_LABEL_V15,
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     TPV_METHODS_NOT_AVAILABLE,
@@ -81,7 +84,7 @@
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
-  import { getMerchantConfig } from 'checkoutstore';
+  import { getMerchantConfig, screenStore } from 'checkoutstore';
 
   import {
     isAddressEnabled,
@@ -111,13 +114,13 @@
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
 
-  import {
+  import CTA, {
     hideCta,
     showAuthenticate,
     showPayViaSingleMethod,
     showProceed,
     showNext,
-  } from 'checkoutstore/cta';
+  } from 'cta';
 
   import Analytics, {
     P13NEvents,
@@ -170,9 +173,12 @@
     CATEGORIES,
   } from 'one_click_checkout/merchant-analytics/constant';
   import {
+    AUTHENTICATE,
+    CTA_LABEL,
+    CTA_PROCEED,
     PAY_NOW_CTA_LABEL,
     PLACE_ORDER_CTA_LABEL,
-  } from 'one_click_checkout/cta/i18n';
+  } from 'cta/i18n';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { querySelector } from 'utils/doc';
   import { getPrefillBank } from 'netbanking/helper';
@@ -189,11 +195,13 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getAllWebPaymentApps } from 'common/webPaymentsApi';
   import { definePlatform } from 'upi/helper';
+  import { toggleHeaderExpansion } from 'header';
+  import { isRTBEnabled } from 'rtb/helper';
+  import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
-  validatePrefilledDetails();
   validatePrefilledDetails();
 
   const cardOffer = getCardOffer();
@@ -202,9 +210,9 @@
 
   let selectedMethod = '';
   let showHome = false;
-  let renderCtaOneCC = false;
-  let ctaOneCCDisabled = true;
+  let ctaV15Disabled = true;
   let preferredMethods;
+  let contentRef: HTMLDivElement;
   // TPV
   const tpv = getTPV();
 
@@ -221,6 +229,7 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
   const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   let expSourceSet = false;
 
@@ -230,8 +239,15 @@
   // Values: 'details', 'methods'
   let view = HOME_VIEWS.DETAILS;
   let showSecuredByMessage;
+
+  $: {
+    if (view && contentRef && typeof contentRef.scrollTo === 'function') {
+      contentRef.scrollTo(0, 0);
+    }
+  }
   $: showSecuredByMessage =
     view === HOME_VIEWS.DETAILS &&
+    !isRedesignV15() &&
     !showOffers &&
     !showRecurringCallout &&
     !tpv &&
@@ -309,13 +325,12 @@
 
     // Reset DCC component
     dccView = 'home-screen';
-
     setDetailsCta();
 
     Events.TrackBehav(HomeEvents.METHODS_HIDE);
   }
 
-  function editUserDetails() {
+  export function editUserDetails() {
     Razorpay.sendMessage({
       event: 'event',
       data: {
@@ -328,23 +343,27 @@
 
   export function setDetailsCta() {
     if (isPartialPayment) {
-      showNext('Next');
-
+      showNext();
       return;
     }
 
     if (!session.get('amount')) {
+      CTAState.label = AUTHENTICATE;
       showAuthenticate();
     } else if (singleMethod) {
-      showPayViaSingleMethod(
+      const { label, labelData } = showPayViaSingleMethod(
         getMethodNameForPaymentOption(singleMethod, $locale)
       );
+      CTAState.label = label;
+      CTAState.labelData = labelData;
     } else if (tpv) {
-      showPayViaSingleMethod(
+      const { label, labelData } = showPayViaSingleMethod(
         getMethodNameForPaymentOption(tpv.method || $multiTpvOption, $locale)
       );
+      CTAState.label = label;
+      CTAState.labelData = labelData;
     } else {
-      showProceed('Proceed');
+      showProceed();
     }
   }
 
@@ -808,7 +827,7 @@
 
   export function onShown() {
     $headerVisible = true;
-    renderCtaOneCC = true;
+
     if (!isOneCCEnabled) {
       showHome = true;
     }
@@ -821,7 +840,13 @@
         is_Custom_shown: sections.includes('custom'),
         is_Generic_shown: sections.includes('generic'),
       });
-      hideCta();
+      if (isRedesignV15() && !isOneClickCheckout()) {
+        CTAState.showAmount = true;
+        CTAState.disabled = true;
+        CTAState.label = PAY_NOW_CTA_LABEL;
+      } else {
+        hideCta();
+      }
     } else {
       setDetailsCta();
     }
@@ -1005,6 +1030,16 @@
     if (view === HOME_VIEWS.METHODS) {
       $customer = session.getCustomer($contact);
     }
+    if (
+      isRedesignV15() &&
+      !isOneClickCheckout() &&
+      isRTBEnabled($RTBExperiment)
+    ) {
+      // only in case of rtb we expand or shrink header
+      let expandedHeader =
+        $screenStore === '' ? showHome || view === HOME_VIEWS.DETAILS : false;
+      toggleHeaderExpansion(expandedHeader);
+    }
   }
 
   export function getCurrentView() {
@@ -1025,7 +1060,7 @@
   function deselectInstrument() {
     $selectedInstrumentId = null;
     dccView = 'home-screen';
-    ctaOneCCDisabled = true;
+    ctaV15Disabled = true;
   }
 
   function showSnackbar(isCodApplied) {
@@ -1085,10 +1120,6 @@
     });
   }
 
-  export function onHide() {
-    renderCtaOneCC = false;
-  }
-
   function showCODCharges(method) {
     if (method === 'cod') {
       if ($codChargeAmount) {
@@ -1137,12 +1168,12 @@
     showUserDetailsStrip =
       ($isContactPresent || $email) &&
       !isContactEmailHidden() &&
-      !isOneCCEnabled;
+      !isRedesignV15();
   }
 
   export function onSelectInstrument(event) {
-    ctaOneCCDisabled = false;
     const instrument = event.detail;
+    ctaV15Disabled = instrument._type === 'method';
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
       instrument,
     });
@@ -1193,13 +1224,71 @@
       }
     }
   }
+
+  let onPaymentDetailSubmit: () => void;
+  let paymentDetailInvalid = false;
+
+  let CTAState: {
+    disabled: boolean;
+    label: string;
+    onSubmit?: () => void;
+    showAmount: boolean;
+    labelData?: Record<string, string>;
+  } = {
+    disabled: true,
+    label: '',
+    onSubmit: undefined,
+    showAmount: true,
+  };
+
+  $: {
+    if (view !== HOME_VIEWS.DETAILS) {
+      CTAState.onSubmit = undefined;
+      CTAState.showAmount = true;
+      CTAState.disabled = isRedesignV15Enabled ? ctaV15Disabled : false;
+      if (selectedMethod === 'cod') {
+        CTAState.disabled = false;
+      }
+      CTAState.label =
+        selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
+    } else if (view === HOME_VIEWS.DETAILS) {
+      CTAState.showAmount = isPartialPayment ? true : false;
+      CTAState.onSubmit = onPaymentDetailSubmit;
+      if (singleMethod) {
+        const { label, labelData } = showPayViaSingleMethod(
+          getMethodNameForPaymentOption(singleMethod, $locale)
+        );
+        CTAState.label = label;
+        CTAState.labelData = labelData;
+      } else {
+        CTAState.label =
+          !isOneCCEnabled && !isPartialPayment ? CTA_PROCEED : CTA_LABEL;
+      }
+      CTAState.disabled = paymentDetailInvalid;
+    }
+    if (!getAmount()) {
+      CTAState.label = AUTHENTICATE;
+    }
+  }
+
+  function onPaymentDetailsSubmit() {
+    if (session.checkCommonValidAndTrackIfInvalid()) {
+      next();
+    }
+  }
 </script>
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
-  <Screen pad={false}>
-    <div class="screen-main" class:screen-one-cc={isOneCCEnabled}>
+  <Screen bind:contentRef pad={false}>
+    <div class="screen-main" class:screen-one-cc={isRedesignV15Enabled}>
       {#if view === HOME_VIEWS.DETAILS}
-        <PaymentDetails {tpv} />
+        <PaymentDetails
+          {tpv}
+          bind:onSubmitClick={onPaymentDetailSubmit}
+          bind:disabled={paymentDetailInvalid}
+          ctaV15={isRedesignV15Enabled}
+          onSubmit={onPaymentDetailsSubmit}
+        />
       {/if}
       {#if view === HOME_VIEWS.METHODS}
         <div
@@ -1208,7 +1297,7 @@
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
           <!-- We dont want it to show in 1cc flow-->
-          {#if !isOneCCEnabled}
+          {#if !isRedesignV15Enabled}
             <RTBBanner />
           {/if}
 
@@ -1216,41 +1305,61 @@
             <div
               use:touchfix
               class="details-container"
-              class:details-container-1cc={isOneCCEnabled}
+              class:details-container-1cc={isRedesignV15Enabled}
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}
             >
               {#if showUserDetailsStrip}
                 <UserDetailsStrip onEdit={editUserDetails} />
               {/if}
               {#if isPartialPayment}
-                <SlottedOption
-                  on:click={hideMethods}
-                  id="partial-payment-details"
-                >
-                  <div slot="title">
-                    <span>{formattedPartialAmount}</span>
-                    <span>
-                      {#if $partialPaymentOption === 'full'}
-                        <!-- LABEL: Paying full amount -->
-                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
-                      {:else}
-                        <!-- LABEL: Paying in parts -->
-                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                {#if isRedesignV15Enabled}
+                  <Bottom tab="common">
+                    <div class="partial-strip" on:click={hideMethods}>
+                      <span>
+                        {#if $partialPaymentOption === 'full'}
+                          <!-- LABEL: Paying full amount -->
+                          {$t(FULL_AMOUNT_LABEL)}
+                        {:else}
+                          <!-- LABEL: Paying in parts -->
+                          {$t(PARTIAL_AMOUNT_LABEL_V15)}
+                        {/if}
+                      </span>
+                      {#if !contactEmailReadonly}
+                        <!-- LABEL: Change amount -->
+                        <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
                       {/if}
-                    </span>
-                  </div>
-                  <div
-                    slot="extra"
-                    class="theme-highlight-color"
-                    aria-label={contactEmailReadonly ? '' : 'Edit'}
+                    </div>
+                  </Bottom>
+                {:else}
+                  <SlottedOption
+                    on:click={hideMethods}
+                    id="partial-payment-details"
                   >
-                    {#if !contactEmailReadonly}
-                      <!-- LABEL: Change amount -->
-                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
-                      <span>&#xe604;</span>
-                    {/if}
-                  </div>
-                </SlottedOption>
+                    <div slot="title">
+                      <span>{formattedPartialAmount}</span>
+                      <span>
+                        {#if $partialPaymentOption === 'full'}
+                          <!-- LABEL: Paying full amount -->
+                          {$t(PARTIAL_AMOUNT_STATUS_FULL)}
+                        {:else}
+                          <!-- LABEL: Paying in parts -->
+                          {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                        {/if}
+                      </span>
+                    </div>
+                    <div
+                      slot="extra"
+                      class="theme-highlight-color"
+                      aria-label={contactEmailReadonly ? '' : 'Edit'}
+                    >
+                      {#if !contactEmailReadonly}
+                        <!-- LABEL: Change amount -->
+                        <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
+                        <span>&#xe604;</span>
+                      {/if}
+                    </div>
+                  </SlottedOption>
+                {/if}
               {/if}
             </div>
           {/if}
@@ -1267,6 +1376,16 @@
         </div>
       {/if}
     </div>
+
+    <CTA
+      screen="home"
+      tab={'tab'}
+      disabled={CTAState.disabled}
+      label={CTAState.label}
+      labelData={CTAState.labelData}
+      show
+      showAmount={CTAState.showAmount}
+    />
     <Bottom tab="common">
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
@@ -1290,16 +1409,6 @@
         <SecuredMessage />
       {/if}
     </Bottom>
-    {#if renderCtaOneCC}
-      <CTAOneCC
-        disabled={ctaOneCCDisabled}
-        on:click={() => session.preSubmit()}
-      >
-        {selectedMethod === 'cod'
-          ? $t(PLACE_ORDER_CTA_LABEL)
-          : $t(PAY_NOW_CTA_LABEL)}
-      </CTAOneCC>
-    {/if}
   </Screen>
 </Tab>
 
@@ -1360,11 +1469,29 @@
   :global(#content.one-cc) .home-methods {
     padding-left: 16px;
     padding-right: 16px;
-    margin-bottom: 26px;
-    margin-top: 26px;
+    margin-bottom: 16px;
+    margin-top: 16px;
   }
 
   .screen-one-cc {
-    min-height: 120%;
+    min-height: 110%;
+  }
+  .partial-strip {
+    background: linear-gradient(
+      89.97deg,
+      rgba(213, 232, 254, 0.7) -1.19%,
+      rgba(237, 245, 255, 0.7) 99.97%
+    );
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    cursor: pointer;
+    span {
+      &:nth-child(2) {
+        color: var(--primary-color);
+        text-decoration: underline;
+      }
+    }
   }
 </style>

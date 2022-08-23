@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency, isOneClickCheckout } from 'razorpay';
+  import { getCurrency, isRedesignV15 } from 'razorpay';
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
@@ -40,14 +40,17 @@
     APPLY_OFFER_CTA,
   } from 'ui/labels/offers';
 
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
   import {
     selectedInstrument,
     methodInstrument,
   } from 'checkoutstore/screens/home';
-  import { appliedOffer, isCardValidForOffer, showOffers } from 'offers/store';
+  import {
+    appliedOffer,
+    isCardValidForOffer,
+    showOffers,
+  } from 'offers/store/store';
   import { querySelector } from 'utils/doc';
 
   export let applicableOffers; // eligible offers array
@@ -55,7 +58,7 @@
   export let onShown;
   export let onHide;
 
-  let listActive;
+  let listActive: boolean;
   let otherActive;
   let selected = null; // locally selected offer
   let error;
@@ -64,9 +67,13 @@
   let discount;
   let previousApplied = {};
   let currentTab;
-  let renderCtaOneCC = false;
 
-  const isOneCCEnabled = isOneClickCheckout();
+  let OfferCTAState = {
+    show: false,
+    disabled: true,
+  };
+
+  const isRedesignV15Enabled = isRedesignV15();
 
   $: {
     _El.keepClass(querySelector('#header'), 'offer-fade', listActive);
@@ -168,7 +175,6 @@
   function continueWithOffer() {
     hideError(true);
   }
-
   function showList() {
     listActive = true;
 
@@ -176,18 +182,14 @@
     if ($appliedOffer) {
       selected = $appliedOffer;
     }
-
-    if (isOneCCEnabled) {
+    if (isRedesignV15Enabled) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.add('offers-fade');
-
-      renderCtaOneCC = true;
     }
     onShown();
   }
 
   function hideList(shouldMountCta) {
-    renderCtaOneCC = false;
     listActive = false;
     selected = null;
 
@@ -195,7 +197,7 @@
     if (shouldMountCta) {
       onHide();
     }
-    if (isOneCCEnabled) {
+    if (isRedesignV15Enabled) {
       const headerMagicCheckout = document.querySelector('#header-1cc');
       headerMagicCheckout.classList.remove('offers-fade');
     }
@@ -253,9 +255,11 @@
     hideList(true);
   }
 
-  const ctaRef = document.getElementById('one-cc-footer');
-
-  $: error ? (ctaRef.style.display = 'none') : (ctaRef.style.display = 'block');
+  $: {
+    if (isRedesignV15Enabled && listActive) {
+      OfferCTAState.disabled = error || !selected;
+    }
+  }
 </script>
 
 {#if $showOffers}
@@ -264,13 +268,13 @@
     id="offers-container"
     hidden={applicableOffers.length + otherOffers.length === 0}
     class:has-error={error}
-    class:offers-container-one-cc={isOneCCEnabled}
+    class:offers-container-checkout-redesign={isRedesignV15Enabled}
   >
     <header
       on:click={showList}
       class:applied={$appliedOffer && $isCardValidForOffer}
     >
-      <span>
+      <span class:bold={isRedesignV15Enabled}>
         {#if $appliedOffer}
           {#if !$isCardValidForOffer}
             <!-- LABEL: Offer is not applicable on this card. -->
@@ -312,7 +316,10 @@
       </span>
     </header>
     {#if error}
-      <div class="error-container" class:one-cc={isOneCCEnabled}>
+      <div
+        class="error-container"
+        class:checout-redesign={isRedesignV15Enabled}
+      >
         <div class="error-desc">
           <!-- LABEL: The offer is not applicable on {error}. -->
           <b>
@@ -337,7 +344,7 @@
     {#if listActive}
       <main
         class="list"
-        class:main-one-cc={isOneCCEnabled}
+        class:main-checkout-redesign={isRedesignV15Enabled}
         transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
         <header class="close-offerlist" on:click={onCloseClick}>
@@ -348,11 +355,11 @@
         </header>
         <div
           class="offerlist-container"
-          class:offerlist-one-cc={isOneCCEnabled}
+          class:offerlist-checkout-redesign={isRedesignV15Enabled}
         >
           {#if applicableOffers.length}
             <!-- LABEL: Available Offers -->
-            <legend class:one-cc-label={isOneCCEnabled}
+            <legend class:checkout-redesign-label={isRedesignV15Enabled}
               >{$t(AVAILABLE_OFFERS_HEADER)}</legend
             >
             <OfferItemList
@@ -362,7 +369,7 @@
               {selectOffer}
             />
           {:else}
-            <legend class:one-cc-label={isOneCCEnabled}>
+            <legend class:checkout-redesign-label={isRedesignV15Enabled}>
               <!-- LABEL: No offers available for this method. Please look at other offers
               available below -->
               <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
@@ -372,7 +379,7 @@
             {#if otherActive || !applicableOffers.length}
               {#if otherActive}
                 <!-- LABEL: Other Offers -->
-                <legend class:one-cc-label={isOneCCEnabled}
+                <legend class:checkout-redesign-label={isRedesignV15Enabled}
                   >{$t(OTHER_OFFERS_HEADER)}</legend
                 >
               {/if}
@@ -383,7 +390,7 @@
                 {selectOffer}
               />
             {:else}
-              <legend class:one-cc-label={isOneCCEnabled}>
+              <legend class:checkout-redesign-label={isRedesignV15Enabled}>
                 <!-- LABEL: + OTHER OFFERS -->
                 <span
                   class="theme-highlight"
@@ -403,26 +410,31 @@
             {/if}
           {/if}
         </div>
+        {#if isRedesignV15Enabled}
+          <!-- offer related button (no need to use global cta) -->
+          <button
+            class="btn offer-cta"
+            disabled={OfferCTAState.disabled}
+            on:click|preventDefault={onSubmit}
+          >
+            {$t(APPLY_OFFER_CTA)}
+          </button>
+        {/if}
       </main>
     {/if}
   </div>
-  {#if renderCtaOneCC}
-    <CTAOneCC
-      disabled={error || !selected}
-      on:click={onSubmit}
-      showAmount={false}
-    >
-      {$t(APPLY_OFFER_CTA)}
-    </CTAOneCC>
+  {#if isRedesignV15Enabled}
+    <!-- do nothing -->
   {:else if error}
     <CTA show={false} />
   {:else if listActive}
-    <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA
-    >
+    <CTA on:click={onSubmit} show={Boolean(selected)}>
+      {$t(APPLY_OFFER_CTA)}
+    </CTA>
   {/if}
 {/if}
 
-<style>
+<style lang="scss">
   header {
     padding: 0 20px;
     cursor: pointer;
@@ -432,6 +444,7 @@
     display: flex;
     border-radius: 0 0 2px 2px;
   }
+
   header.applied {
     background: #effcf4;
   }
@@ -482,20 +495,20 @@
     display: flex;
     flex-direction: column;
   }
-  main.main-one-cc {
-    height: calc(100% - 104px);
-    top: inherit;
+  main.main-checkout-redesign {
+    height: calc(100% - 75px);
+    top: 75px;
   }
   .offerlist-container {
     overflow: auto;
     flex: 1;
     padding-bottom: 14px;
   }
-  .offerlist-one-cc {
+  .offerlist-checkout-redesign {
     background-color: #fff;
     padding-bottom: 130px;
   }
-  .one-cc-label {
+  .checkout-redesign-label {
     padding: 20px 16px 16px;
     text-transform: capitalize;
     font-size: 14px;
@@ -529,9 +542,9 @@
     left: 0;
   }
 
-  .one-cc.error-container {
+  /* .checkout-redesign.error-container {
     bottom: 0px;
-  }
+  } */
   .error-desc {
     padding: 16px 24px;
     border-bottom: 1px solid #ddd;
@@ -560,7 +573,49 @@
     cursor: pointer;
   }
 
-  .offers-container-one-cc {
+  .offers-container-checkout-redesign {
     z-index: 2;
+  }
+  .bold {
+    font-weight: 700;
+  }
+
+  .offer-cta {
+    width: 90%;
+    padding: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    position: relative;
+    top: -10px;
+    margin: auto;
+  }
+
+  .offer-cta[disabled] {
+    background-color: #cdd2d6;
+  }
+
+  :global(.redesign) {
+    header {
+      padding: 0 16px;
+      height: 36px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 36px;
+
+      &:before {
+        font-size: 16px;
+      }
+
+      &:after {
+        top: 2px;
+        position: relative;
+      }
+    }
+
+    .offer-action {
+      font-weight: 400;
+      font-size: 12px;
+    }
   }
 </style>

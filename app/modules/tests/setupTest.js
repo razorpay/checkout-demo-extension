@@ -22,6 +22,16 @@ global.beforeEach(() => {
   initI18n();
 });
 
+jest.mock('cta', () => ({
+  ...jest.requireActual('cta'),
+  __esModule: true,
+  CTAHelper: {
+    setActiveCTAScreen: jest.fn(),
+  },
+  setWithoutOffer: jest.fn(),
+  hideCta: jest.fn(),
+}));
+
 initThemeMock();
 mockCanvas();
 

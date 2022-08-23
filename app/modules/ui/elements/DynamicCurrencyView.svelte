@@ -12,7 +12,11 @@
     AVSDccPayload,
   } from 'checkoutstore/screens/card';
 
-  import { amountAfterOffer, appliedOffer, showOffers } from 'offers/store';
+  import {
+    amountAfterOffer,
+    appliedOffer,
+    showOffers,
+  } from 'offers/store/store';
   import { showOffersOnSelectedCurrncy } from 'offers/helper';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
@@ -25,7 +29,7 @@
     showAmount,
     showCtaWithDefaultText,
     setAppropriateCtaText,
-  } from 'checkoutstore/cta';
+  } from 'cta';
 
   import { updateNVSEntities } from 'checkoutstore/screens/international';
 
@@ -47,7 +51,7 @@
   import { getAmount } from 'razorpay';
   import { getCurrencies } from 'card/helper/dcc';
 
-  import { getCurrency, isPartialPayment, isOneClickCheckout } from 'razorpay';
+  import { getCurrency, isPartialPayment, isRedesignV15 } from 'razorpay';
 
   import { getIin } from 'common/card';
 
@@ -79,7 +83,7 @@
     AVS: 'avs-card',
   };
   // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmountWithSymbol = !isOneClickCheckout();
+  const spaceAmountWithSymbol = !isRedesignV15();
 
   let prop = null;
   let entity = null;
@@ -99,7 +103,7 @@
   const currencyCache = {};
   let forexRate;
   let fee;
-  let AVSRequired = false;
+  export let AVSRequired = false;
 
   /**
    * We call updateAmountInHeaderAndCTA function on component destroyed which show the Proceed CTA. To avoid such case we are using this isDestroyed fn.
@@ -124,7 +128,7 @@
    * @param {boolean} reset if true, replace existing value with new else override
    */
   function setDCCPayload(payload, reset) {
-    if (reset) {
+    if (reset && !isAVS) {
       session.dccPayload = payload;
     } else {
       session.dccPayload = Object.assign(session.dccPayload || {}, payload);
@@ -601,7 +605,7 @@
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .arrow {
     display: inline-block;
     font-size: 8px;
@@ -649,5 +653,20 @@
   .dcc-charges {
     font-size: 12px;
     margin-top: 6px;
+  }
+
+  :global(.redesign) {
+    .dcc-charges {
+      font-size: 10px;
+    }
+
+    #dcc-fee-accept-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .default-currencies {
+      font-size: 12px;
+    }
   }
 </style>

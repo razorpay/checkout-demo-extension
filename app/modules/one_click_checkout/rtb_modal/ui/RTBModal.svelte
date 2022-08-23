@@ -9,10 +9,10 @@
     RTB_HIGHLIGHT1,
     RTB_HIGHLIGHT2,
     RTB_HIGHLIGHT3,
-    RTB_CONTENT,
+    // RTB_CONTENT,
   } from 'rtb/i18n/labels';
-  import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { t } from 'svelte-i18n';
+  // import { formatTemplateWithLocale } from 'i18n';
 
   // Analytics imports
   import { Events } from 'analytics';
@@ -51,9 +51,9 @@
     </div>
   </div>
   <div class="rtb-content">
-    <div class="rtb-summary">
+    <!-- <div class="rtb-summary">
       {formatTemplateWithLocale(RTB_CONTENT, { merchantName }, $locale)}
-    </div>
+    </div> -->
     {#each listItems as listItem}
       <div class="rtb-list">
         <Icon icon={circle_check} />
@@ -89,11 +89,11 @@
     font-size: 12px;
     font-weight: 600;
   }
-  .rtb-summary {
+  /* .rtb-summary {
     font-size: 14px;
     line-height: 20px;
     padding-bottom: 20px;
-  }
+  } */
   .rtb-header {
     display: flex;
     align-items: flex-start;

@@ -199,6 +199,10 @@ export const handleMessage = function (message) {
     return;
   }
 
+  if (typeof message.embedded === 'boolean') {
+    RazorpayStore.isEmbedded = message.embedded;
+  }
+
   let id = message.id || Track.id;
   let session = SessionManager.getSession(id);
 

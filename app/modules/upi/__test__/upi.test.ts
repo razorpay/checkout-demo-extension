@@ -39,6 +39,7 @@ jest.mock('checkoutstore/native', () => ({
   getUPIIntentApps: jest.fn(),
 }));
 jest.mock('razorpay', () => ({
+  getCurrency: () => 'INR',
   getPreferences: jest.fn(),
   isRecurring: jest.fn(() => false),
   getOption: jest.fn(),
@@ -46,6 +47,7 @@ jest.mock('razorpay', () => ({
   getAmount: jest.fn(),
   getMerchantOrder: jest.fn(),
   getMerchantKey: jest.fn(() => 'rzp_live_ILgsfZCZoFIKMb'),
+  isOneClickCheckout: jest.fn(),
 }));
 jest.mock('common/useragent', () => ({
   android: true,

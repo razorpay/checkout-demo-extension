@@ -45,7 +45,7 @@ describe.each(
     await assertTextContent(
       context,
       '.partial-payment-block button:nth-child(2) [slot=title]',
-      'Be a Miser and Make Payment in Parts'
+      'Make payment in parts'
     );
     await assertTextContent(
       context,

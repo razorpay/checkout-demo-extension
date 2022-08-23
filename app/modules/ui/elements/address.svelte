@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   div.wrap {
     padding: 0 24px;
     margin-top: 24px;
@@ -32,5 +32,11 @@
 
   #elem-wrap-address {
     height: 52px;
+  }
+
+  :global(.redesign) {
+    .wrap {
+      padding: 0;
+    }
   }
 </style>

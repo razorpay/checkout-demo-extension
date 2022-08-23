@@ -22,7 +22,7 @@
 
   // Constant imports
   import { views } from 'one_click_checkout/routing/constants';
-  import { otpReasons } from 'one_click_checkout/otp/constants';
+  import { otpReasons } from 'otp/constants';
   import {
     ADDRESS_FORM_VIEWS,
     ADDRESS_TYPES,

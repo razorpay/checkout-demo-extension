@@ -1,7 +1,7 @@
 <script lang="ts">
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   import { getThemeColor, getThemeMeta } from 'checkoutstore/theme';
   import Icon from 'ui/elements/Icon.svelte';
@@ -13,7 +13,7 @@
     isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   // Store imports
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -45,7 +45,7 @@
     acc[section].push(current);
     return acc;
   }, {});
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   let sectionTitle = {
     default:
@@ -140,16 +140,16 @@
 <div
   class="tab-content showable screen collapsible"
   id="form-cardless_emi"
-  class:content-one-cc={isOneCCEnabled}
-  class:one-cc={isOneCCEnabled}
+  class:content-one-cc={isRedesignV15Enabled}
+  class:one-cc={isRedesignV15Enabled}
 >
-  <div class="cardless-emi-wrapper" class:screen-one-cc={isOneCCEnabled}>
+  <div class="cardless-emi-wrapper" class:screen-one-cc={isRedesignV15Enabled}>
     <input type="hidden" name="emi_duration" />
     <input type="hidden" name="provider" />
     <input type="hidden" name="ott" />
     {#each sections as providerSection (providerSection)}
       <!-- TITLE: Select an option | Recommended | Other Options -->
-      <h3 class="emi-header" class:one-cc={isOneCCEnabled}>
+      <h3 class="emi-header">
         {$t(sectionTitle[providerSection])}
       </h3>
       <div class="options emi-section">
@@ -245,9 +245,12 @@
     margin-top: 0;
   }
 
-  .emi-header.one-cc {
+  :global(.redesign) .emi-header {
     font-weight: 600;
     color: #263a4a;
     text-transform: none;
+    margin-top: 16px;
+    font-size: 14px;
+    margin-left: 18px;
   }
 </style>

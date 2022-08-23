@@ -189,7 +189,7 @@ async function handleCheckUnserviceable(context, addAddress) {
     await assertVisible('[data-test-id=address-box-unserviceability]');
   }
   expect(
-    await context.page.$eval('#one-cc-cta', (el) =>
+    await context.page.$eval('#redesign-v15-cta', (el) =>
       el.classList.contains('disabled')
     )
   ).toBe(true);
@@ -202,7 +202,7 @@ async function handleCheckUnserviceable(context, addAddress) {
 async function checkInvalidAddressForm(context) {
   await assertVisible('.error-field-one-click-checkout');
   expect(
-    await context.page.$eval('#one-cc-cta', (el) =>
+    await context.page.$eval('#redesign-v15-cta', (el) =>
       el.classList.contains('disabled')
     )
   ).toBe(true);

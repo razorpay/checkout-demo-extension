@@ -6,3 +6,4 @@ export const RECURRING_CARDS_LIMITED_SUPPORT =
 export const RECURRING_CARDS_VIEW_SUPPORTED_CARDS =
   'callouts.recurring.view_supported_cards';
 export const TIMER_CALLOUT = 'callouts.timer_callout';
+export const CALLOUT_TIMEOUT = 'callouts.callout_timer';

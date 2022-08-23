@@ -12,6 +12,9 @@ import {
 
 jest.mock('razorpay', () => ({
   getOption: jest.fn(),
+  getAmount: jest.fn(),
+  isOneClickCheckout: jest.fn(),
+  getCurrency: jest.fn(),
 }));
 
 describe('#isCustomChallan', () => {

@@ -17,7 +17,6 @@
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
 
   // Store
   import {
@@ -49,6 +48,7 @@
     blocks,
     phone,
     selectedInstrument,
+    isIndianCustomer,
   } from 'checkoutstore/screens/home';
 
   import { findCodeByNetworkName } from 'common/card';
@@ -59,15 +59,16 @@
     isRecurring,
     getCardFeatures,
     isDynamicFeeBearer,
-    isOneClickCheckout,
+    isRedesignV15,
     isPartialPayment,
     hasFeature,
     isInternational,
     isDCCEnabled,
     getPrefillMethod,
+    isOneClickCheckout,
   } from 'razorpay';
 
-  import { shouldRememberCustomer, isIndianCustomer } from 'checkoutstore';
+  import { shouldRememberCustomer, tabStore } from 'checkoutstore';
 
   import {
     isMethodEnabled,
@@ -78,7 +79,12 @@
     isApplicationEnabled,
   } from 'checkoutstore/methods';
 
-  import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
+  import {
+    newCardEmiDuration,
+    savedCardEmiDuration,
+    selectedPlanTextForNewCard,
+    selectedPlanTextForSavedCard,
+  } from 'checkoutstore/emi';
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
@@ -88,6 +94,7 @@
     USE_SAVED_CARDS_ON_RZP_BTN,
     CARDS_SAVED_ON_APPS_LABEL,
     CARDS_SAVED_ON_RZP_LABEL,
+    CARD_SAVED_ON_RZP_LABEL_REDESIGN,
     ADD_ANOTHER_CARD_BTN,
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
@@ -100,9 +107,10 @@
     CARDS_SAVED_LABEL_ONE_CC,
   } from 'ui/labels/card';
   import {
+    CTA_PROCEED,
     PAY_NOW_CTA_LABEL,
     SELECT_EMI_PLAN_LABEL,
-  } from 'one_click_checkout/cta/i18n';
+  } from 'cta/i18n';
 
   import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
 
@@ -131,7 +139,7 @@
   // Transitions
   import { fade } from 'svelte/transition';
   import { BillingAddressVerificationForm } from 'ui/components/BillingAddressVerificationForm';
-  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import CTA, { showAmount, showCta, showCtaWithDefaultText } from 'cta';
   import Icon from 'ui/elements/Icon.svelte';
   import Info from 'ui/elements/Info.svelte';
   import { Views, cardWithRecurringSupport, AVS_COUNTRIES } from './constant';
@@ -149,20 +157,53 @@
   import { getThemeMeta } from 'checkoutstore/theme';
   import { pushOverlay } from 'navstack';
 
-  let delayOTPExperiment;
-  let cardEle;
-  $: {
-    delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
-  }
+  let delayOTPExperiment: boolean;
+  let cardEle: Element;
+  let AVSRequired: boolean;
+  let ctaLabel = PAY_NOW_CTA_LABEL;
+  let checkFormErrors: () => void;
+  let onSubmit: any;
 
   const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   const session = getSession();
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
   let isSavedCardsEnabled = shouldRememberCustomer();
+
+  $: {
+    delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
+  }
+
+  $: {
+    /**
+     * handling DCC & AVS case
+     */
+    if (AVSRequired && currentView !== Views.AVS) {
+      ctaLabel = CTA_PROCEED;
+      onSubmit = undefined; // reset to default action
+    } else if (currentView === Views.AVS) {
+      onSubmit = () => {
+        checkFormErrors();
+        tick().then(() => {
+          session.preSubmit();
+        });
+      };
+      ctaLabel = PAY_NOW_CTA_LABEL;
+    } else {
+      onSubmit = undefined;
+      ctaLabel =
+        $tabStore === 'emi' &&
+        ((currentView !== Views.SAVED_CARDS &&
+          session.emiPlansForNewCard &&
+          !$selectedPlanTextForNewCard) ||
+          (currentView === Views.SAVED_CARDS && !$selectedPlanTextForSavedCard))
+          ? SELECT_EMI_PLAN_LABEL
+          : PAY_NOW_CTA_LABEL;
+    }
+  }
 
   $: {
     AVSInfo = [
@@ -202,7 +243,6 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
-  let renderCtaOneCC = false;
 
   $: showTnC = shouldShowTnc($defaultDCCCurrency, $cardCountry);
 
@@ -990,15 +1030,11 @@
     /**
      * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
      */
-    renderCtaOneCC = true;
     $selectedCard = null;
     //#endregion
     tab = session.tab;
     onCardInput();
-  }
-
-  export function onHide() {
-    renderCtaOneCC = false;
+    showCta();
   }
 
   function isDowntime(instrument, value) {
@@ -1048,7 +1084,7 @@
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div bind:this={cardEle} class:screen-one-cc={isOneCCEnabled}>
+    <div bind:this={cardEle} class:screen-one-cc={isRedesignV15Enabled}>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta && !delayOTPExperiment}
@@ -1160,6 +1196,7 @@
           </div>
           <BillingAddressVerificationForm
             {filterCountries}
+            bind:checkFormErrors
             value={$AVSBillingAddress}
             on:input={handleAVSFormInput}
             on:blur={handleAVSFormInput}
@@ -1174,12 +1211,14 @@
           {/if}
 
           <!-- LABEL: Your saved cards -->
-          <h3 class:saved-card-header={isOneCCEnabled} class="pad">
-            {$t(
-              isOneCCEnabled
-                ? CARDS_SAVED_LABEL_ONE_CC
-                : CARDS_SAVED_ON_RZP_LABEL
-            )}
+          <h3 class:saved-card-header={isRedesignV15Enabled} class="pad">
+            {#if isOneClickCheckout()}
+              {$t(CARDS_SAVED_LABEL_ONE_CC)}
+            {:else if isRedesignV15Enabled}
+              {$t(CARD_SAVED_ON_RZP_LABEL_REDESIGN)}
+            {:else}
+              {$t(CARDS_SAVED_ON_RZP_LABEL)}
+            {/if}
           </h3>
           <div id="saved-cards-container">
             <SavedCards
@@ -1237,6 +1276,7 @@
     <Bottom tab="card">
       {#if isDCCEnabled() && !isDynamicFeeBearer()}
         <DynamicCurrencyView
+          bind:AVSRequired
           {tabVisible}
           view={$selectedApp
             ? Views.CARD_APP
@@ -1263,17 +1303,19 @@
         </Callout>
       {/if}
     </Bottom>
-    {#if renderCtaOneCC}
-      <CTAOneCC on:click={() => session.preSubmit()}>
-        {session.emiPlansForNewCard && session.tab === 'emi'
-          ? $t(SELECT_EMI_PLAN_LABEL)
-          : $t(PAY_NOW_CTA_LABEL)}
-      </CTAOneCC>
-    {/if}
+    <CTA
+      screen="card"
+      tab={$tabStore}
+      disabled={false}
+      show
+      showAmount
+      {onSubmit}
+      label={ctaLabel}
+    />
   </Screen>
 </Tab>
 
-<style>
+<style lang="scss">
   #show-saved-cards {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -1285,6 +1327,10 @@
     line-height: 24px;
     margin-bottom: -12px;
     position: relative; /* This is needed because the stupid network icon has position: absolute */
+  }
+
+  :global(.redesign) #show-saved-cards {
+    padding-top: 20px;
   }
 
   .instrument-subtext-description {
@@ -1301,6 +1347,12 @@
     margin: 16px 24px 0;
     line-height: 1;
     display: flex;
+  }
+
+  :global(.redesign) {
+    .avs-title {
+      margin-bottom: 8px;
+    }
   }
 
   .avs-title :global(svg) {
@@ -1326,14 +1378,18 @@
     margin-top: 26px;
   }
   .screen-one-cc {
-    min-height: 120%;
+    min-height: 110%;
   }
 
   .saved-card-header {
-    font-weight: 400;
+    font-weight: 600;
     font-size: 14px;
     color: #263a4a;
     text-transform: none;
     margin-top: 26px;
+  }
+
+  :global(.redesign) .saved-card-header {
+    margin-top: 16px;
   }
 </style>

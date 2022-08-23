@@ -24,12 +24,12 @@
   import { popStack } from 'navstack';
 
   // helper imports
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   export let instrument;
 
   const session = getSession();
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
 
@@ -53,10 +53,10 @@
   });
 </script>
 
-<div id="downtime-wrap" class:container-one-cc={isOneCCEnabled}>
+<div id="downtime-wrap" class:container-one-cc={isRedesignV15Enabled}>
   <div class="container">
     <ul class="list">
-      <li class={isOneCCEnabled ? 'theme line1-one-cc' : 'line1'}>
+      <li class={isRedesignV15Enabled ? 'theme line1-one-cc' : 'line1'}>
         <div class="icon-wrapper">
           <DowntimeIcon severe="high" />
         </div>
@@ -93,13 +93,13 @@
     </ul>
     <div class="buttons">
       <button
-        class="back-button {isOneCCEnabled
+        class="back-button {isRedesignV15Enabled
           ? 'theme theme-border'
           : 'blue-back-btn'}"
-        on:click={handleBack}>Back</button
+        on:click={handleBack}>{isRedesignV15Enabled ? 'Cancel' : 'Back'}</button
       >
       <button
-        class="continue-button {isOneCCEnabled
+        class="continue-button {isRedesignV15Enabled
           ? 'theme-bg-color'
           : 'blue-continue-btn'}"
         on:click={handleContinue}>Continue</button

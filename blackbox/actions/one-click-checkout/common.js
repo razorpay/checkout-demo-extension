@@ -252,9 +252,9 @@ async function handleSkipOTP(context) {
 
 async function checkInvalidOTP(context) {
   await assertVisible('[data-test-id=otp-error-msg]');
-  expect(await context.page.$eval('#one-cc-cta', (el) => el.disabled)).toBe(
-    true
-  );
+  expect(
+    await context.page.$eval('#redesign-v15-cta', (el) => el.disabled)
+  ).toBe(true);
 }
 
 async function checkSkipOTPHidden() {
@@ -286,7 +286,7 @@ function formatTextToNumber(str) {
 }
 
 async function proceedOneCC(context) {
-  const cta = await context.page.waitForSelector('#one-cc-cta');
+  const cta = await context.page.waitForSelector('#redesign-v15-cta');
   await cta.click();
 }
 

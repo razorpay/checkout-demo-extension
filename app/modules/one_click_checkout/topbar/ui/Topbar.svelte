@@ -7,7 +7,7 @@
   import back_arrow from 'one_click_checkout/topbar/icons/back_arrow';
 
   // store imports
-  import { showFeeLabel } from 'checkoutstore';
+  import { showFeeLabel } from 'checkoutstore/fee';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import {
     breadcrumbItems,
@@ -135,8 +135,5 @@
     align-items: center;
     font-weight: 600;
     text-transform: capitalize;
-  }
-  .modal-close {
-    height: 20px;
   }
 </style>

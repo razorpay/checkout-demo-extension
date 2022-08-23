@@ -38,7 +38,7 @@
     AMOUNT_LABEL,
     SHIPPING_CHARGES_LABEL,
     FREE_LABEL,
-  } from 'one_click_checkout/summary_modal/i18n/labels';
+  } from 'summary_modal/i18n/labels';
 
   // session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';

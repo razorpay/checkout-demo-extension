@@ -1,5 +1,11 @@
 import { getNormalizedAmountFontSize } from 'checkoutframe/components/header';
 
+jest.mock('razorpay', () => ({
+  __esModule: true,
+  isRedesignV15: () => false,
+  isCustomerFeeBearer: () => false,
+}));
+
 describe('font size normalization', () => {
   let amountString = '₹604454987232343434239342';
 

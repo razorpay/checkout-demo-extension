@@ -4,7 +4,7 @@
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   // Icon Imports
   import Icon from 'ui/elements/Icon.svelte';
@@ -38,7 +38,7 @@
   export let handleBlur = false;
   export let handleInput = false;
   export let helpText = '';
-  export let maxlength = null;
+  export let maxlength: number | null = null;
   export let inputmode = null;
   export let min = null;
   export let max = null;
@@ -119,7 +119,7 @@
 
   const session = getSession();
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   export function getCaretPosition() {
     return formatterObj.caretPosition;
@@ -203,7 +203,7 @@
     readonlyValue = e.target.value;
     value = readonlyValue;
     getPrediction();
-    if (isOneClickCheckoutEnabled) {
+    if (isRedesignV15Enabled) {
       const { parentNode } = e.target || {};
       if (parentNode?.classList?.contains('filled')) {
         parentNode.classList.remove('filled');
@@ -218,7 +218,8 @@
 
   function handleInputBlur(event) {
     focused = false;
-    showValidations = true;
+    // showValidations if required field only
+    showValidations = required;
     setTimeout(() => {
       // prevent dropdown selection destroy before click
       dropDownSuggestion = [];
@@ -317,7 +318,7 @@
 </script>
 
 <!-- To Do: Refatoring Fields.js for 1cc post demo-->
-{#if isOneClickCheckoutEnabled}
+{#if isRedesignV15Enabled}
   <div
     bind:this={wrap}
     class={`elem elem-one-click-checkout ${elemClasses}`}
@@ -382,6 +383,7 @@
       class:no-validate={handleInput}
       class:cvv-input={type === 'cvv'}
     />
+    <!-- TODO prediction input -->
     {#if label}
       <label
         class={`${labelClasses} label-one-click-checkout ${
@@ -688,6 +690,11 @@
   .elem-one-click-checkout::after {
     border-bottom: none !important;
   }
+
+  .elem-one-click-checkout .input-loader {
+    right: 2px;
+    top: 25px;
+  }
   .country-code-one-click-checkout {
     border-right: none;
     border-top-right-radius: 0px;
@@ -812,6 +819,10 @@
     width: 48px;
   }
 
+  :global(.redesign) .cvv-one-cc-wrapper-prefered-block {
+    width: 50px;
+  }
+
   .cvv-one-cc-prefered-block {
     padding: 4px;
     margin: 0px;
@@ -896,5 +907,10 @@
     position: absolute;
     right: 14px;
     top: 22px;
+  }
+  .elem-one-click-checkout {
+    #amount-value {
+      padding-top: 15px !important;
+    }
   }
 </style>

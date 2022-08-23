@@ -33,4 +33,8 @@
     margin-top: 10px;
     padding: 12px 0 8px 12px;
   }
+
+  :global(.redesign) .legend {
+    margin-top: 4px;
+  }
 </style>

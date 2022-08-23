@@ -292,6 +292,10 @@
     text-transform: initial;
   }
 
+  :global(.redesign) .btn {
+    font-weight: 400;
+  }
+
   .btn[data-content='loading'] {
     display: flex;
     align-items: center;

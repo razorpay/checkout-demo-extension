@@ -5,8 +5,8 @@
   import { fly } from 'svelte/transition';
 
   // Store
-  import { showFeeLabel } from 'checkoutstore';
-  import { getAmount, isIRCTC, isOneClickCheckout } from 'razorpay';
+  import { showFeeLabel } from 'checkoutstore/fee';
+  import { getAmount, isIRCTC, isRedesignV15 } from 'razorpay';
   import {
     isContactPresent,
     contact as contactStore,
@@ -59,7 +59,7 @@
     userDropDown = {
       edit: {
         label: EDIT_CONTACT_ACTION,
-        isVisible: isOneClickCheckout(),
+        isVisible: isRedesignV15(),
         onClick: handleOneClickCheckoutEditContact.bind(null, false),
       },
       logout: {
@@ -122,11 +122,10 @@
 
     if (override.type === 'image') {
       return `<img src=${override.data} alt="">`;
-    } else {
-      const tabTitle = getTabTitle(override.data, locale);
-      setTitleResize(tabTitle);
-      return tabTitle;
     }
+    const tabTitle = getTabTitle(override.data, locale);
+    setTitleResize(tabTitle);
+    return tabTitle;
   }
 
   export function show() {
@@ -169,10 +168,7 @@
   }
 
   function handleUserDetailsClick() {
-    if (
-      logged ||
-      (isOneClickCheckout() && $activeRoute.name !== views.DETAILS)
-    ) {
+    if (logged || (isRedesignV15() && $activeRoute.name !== views.DETAILS)) {
       logoutDropdownShown = !logoutDropdownShown;
     }
   }
@@ -227,7 +223,7 @@
   });
 </script>
 
-{#if shown}
+{#if shown && !isRedesignV15()}
   <div
     class:topbar-sticky={isFixed}
     id="topbar"

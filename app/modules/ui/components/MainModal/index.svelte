@@ -3,8 +3,10 @@
   import { isMobile } from 'common/useragent';
   import RazorpayStore, {
     getOption,
-    isOneClickCheckout,
+    isRedesignV15,
     isIRCTC,
+    isOneClickCheckout,
+    isEmbedded,
   } from 'razorpay';
   import {
     isMethodEnabled,
@@ -13,7 +15,7 @@
   } from 'checkoutstore/methods';
   import { getAmount, disableAnimation, bringInputIntoView } from './helper';
   import { returnAsIs } from 'lib/utils';
-  import { getStore } from 'checkoutstore/cta';
+  import { getStore, MainCTA as CTA } from 'cta';
   import NavigationStack, {
     backPressed,
     isOverlayActive,
@@ -25,19 +27,30 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
+  import { expandedHeader } from 'header';
+  import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
-  const cta = getStore();
+  const ctaStore = getStore();
   const noanim = disableAnimation();
+  const isOneCC = isOneClickCheckout();
   const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   let mobileDevice = isMobile();
   const orderMethod = getSingleMethod();
   export let onClose: any = returnAsIs;
   export let escape = true;
 
   $: offerClasses = $computeOfferClass;
+
+  let headerExpanded = $expandedHeader;
+
+  $: {
+    setTimeout(() => {
+      headerExpanded = $expandedHeader;
+    });
+  }
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
@@ -54,9 +67,7 @@
 
   function handleOneCCScreenHeight() {
     return (
-      isOneClickCheckoutEnabled &&
-      mobileDevice &&
-      window.screen?.availHeight > 600
+      isRedesignV15Enabled && mobileDevice && window.screen?.availHeight > 600
     );
   }
 
@@ -105,7 +116,9 @@
 <div
   id="container"
   class="mfix"
+  class:redesign={isRedesignV15Enabled}
   class:mobile={mobileDevice}
+  class:irctc={isIRCTC()}
   class:test={!isLiveMode}
   class:notopbar={getOption('theme.hide_topbar')}
   class:noimage={!getOption('image')}
@@ -113,37 +126,49 @@
   class:one-method={orderMethod}
 >
   <div id="backdrop" on:click={() => preCloseCheck(handleBackdropClick)} />
-  <div id="modal" class="mchild" class:one-cc={isOneClickCheckoutEnabled}>
+  <!-- todo remove one-cc (migrate to .redesign) -->
+  <div
+    id="modal"
+    class="mchild"
+    class:full-height={!isEmbedded()}
+    class:one-cc={isRedesignV15Enabled}
+    class:one-click-checkout={isOneCC}
+  >
     <div id="modal-inner">
       <OverlayStack />
       <div id="error-message" class="overlay showable">
-        <div class="omnichannel">
-          <img
-            style="width:35px;"
-            src="https://cdn.razorpay.com/app/googlepay.svg"
-            alt=""
-          />
-          <div id="overlay-close" class="close">×</div>
+        <div class="error-message-content">
+          <div class="omnichannel">
+            <img
+              style="width:35px;"
+              src="https://cdn.razorpay.com/app/googlepay.svg"
+              alt=""
+            />
+            <div id="overlay-close" class="close">×</div>
+          </div>
+          <div id="fd-t" />
+          <div class="spin"><div /></div>
+          <div class="spin spin2"><div /></div>
+          <span class="link" />
+          <button id="fd-hide" class="btn">Retry</button>
+          <div id="cancel_upi" />
         </div>
-        <div id="fd-t" />
-        <div class="spin"><div /></div>
-        <div class="spin spin2"><div /></div>
-        <span class="link" />
-        <button id="fd-hide" class="btn">Retry</button>
-        <div id="cancel_upi" />
       </div>
 
       <div
         id="content"
         class:has-fee={offerClasses.hasFee}
         class:has-discount={offerClasses.hasDiscount}
-        class:one-cc={isOneClickCheckoutEnabled}
+        class:one-cc={isRedesignV15Enabled}
+        class:header-expanded={isOneCC ? $headerVisible : headerExpanded}
       >
-        <div id="header-1cc">
-          <div id="header-1cc-wrap" />
-          <div id="topbar-onecc-wrap" />
-        </div>
-        <div id="header" class:hidden={isOneClickCheckoutEnabled}>
+        {#if isRedesignV15Enabled}
+          <div id="header-1cc">
+            <div id="header-redesign-v15-wrap" />
+            <div id="topbar-redesign-v15-wrap" />
+          </div>
+        {/if}
+        <div id="header" class:hidden={isRedesignV15Enabled}>
           {#if getOption('theme.close_button')}
             <div id="modal-close" class="close">×</div>
           {/if}
@@ -201,22 +226,31 @@
             <NavigationStack />
             <div id="form-fields">
               {#if isMethodEnabled('emi') && emiBanks.BAJAJ}
-                <div class="tab-content showable screen" id="form-emi" />
+                <div
+                  class:tab-content={!isRedesignV15Enabled}
+                  class="showable screen"
+                  id="form-emi"
+                />
               {/if}
             </div>
             <div id="bottom" />
-            <div
-              id="footer"
-              role="button"
-              class="button"
-              class:hidden={isOneClickCheckoutEnabled}
-            >
-              <span id="footer-cta">{cta}</span>
-            </div>
-            {#if isOneClickCheckoutEnabled}
+
+            {#if isRedesignV15Enabled}
               <OneCCLoader />
             {/if}
-            <div id="one-cc-footer" />
+            {#if isRedesignV15Enabled}
+              <CTA />
+            {:else}
+              <div
+                id="footer"
+                role="button"
+                class="button"
+                class:hidden={isRedesignV15Enabled}
+              >
+                <span id="footer-cta">{ctaStore}</span>
+              </div>
+            {/if}
+            <div id="redesign-v15-footer" />
             <button type="submit" />
           </form>
         </div>
@@ -225,7 +259,7 @@
   </div>
 </div>
 
-<style lang="css">
+<style lang="scss">
   #logo.image-frame {
     background: none;
     box-shadow: none;
@@ -237,5 +271,26 @@
     min-height: 440px;
     height: 440px;
     flex-basis: 440px;
+  }
+
+  #header-1cc {
+    border-bottom: 1px solid #e1e5ea;
+  }
+
+  .redesign {
+    #error-message {
+      padding-top: 0;
+    }
+    #fd-t {
+      padding: 0 15px 10px;
+    }
+
+    .error-message-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
   }
 </style>

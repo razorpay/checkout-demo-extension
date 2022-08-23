@@ -25,7 +25,7 @@
   // Export statements
   export let checked;
   export let savedcard;
-  export let modalType;
+  export let modalType: string;
   export let name = 'save';
   export let cvvRef;
   export let network;
@@ -83,6 +83,7 @@
 
 <div
   class:secure-card-block={modalType !== 'add-new-card'}
+  class:p13n-block={modalType === 'p13n-existing-card'}
   class:secure-card-block-saved-cards={Boolean(savedcard)}
 >
   <!-- do not modify the id of label tag, this id has a multiple bug fixes in session -->
@@ -120,6 +121,7 @@
         </span>
       </div>
       <div
+        class="label-container"
         class:recurring-card-text={Boolean(isRecurring()) &&
           modalType === 'add-new-card'}
       >
@@ -127,8 +129,6 @@
         <span
           class="saved-card-text"
           class:saved-card-text-saved-card-screen={Boolean(savedcard)}
-          class:saved-card-text-for-add-card={modalType === 'add-new-card'}
-          class:saved-card-text-for-recurring={Boolean(isRecurring())}
         >
           {#if modalType === 'add-new-card'}
             {$t(SAVE_CARD_TEXT_NEW_CARD)}
@@ -157,7 +157,6 @@
     class="know-more-text"
     class:know-more-text-saved-cards={Boolean(savedcard)}
     class:know-more-text-add-card={modalType === 'add-new-card'}
-    class:know-more-text-recurring={Boolean(isRecurring())}
   >
     <span on:click={showSecureCardKnowMoreDialog} class="cusor-pointer">
       {$t(KNOW_MORE)}
@@ -166,7 +165,7 @@
   </span>
 </div>
 
-<style>
+<style lang="scss">
   .secure-card-block {
     margin-left: 5 px;
     margin-top: 10 px;
@@ -178,17 +177,8 @@
     color: #373737;
   }
 
-  .saved-card-text-for-add-card {
-    font-size: 14px;
-    line-height: 14px;
-  }
-
-  .saved-card-text-for-add-card.saved-card-text-for-recurring {
-    font-size: 12px;
-  }
-
   .saved-card-text-saved-card-screen {
-    margin-left: 5px;
+    margin-left: 8px;
   }
 
   .know-more-text {
@@ -202,17 +192,11 @@
   }
 
   .know-more-text-add-card {
-    font-size: 14px;
-    line-height: 14px;
     margin-left: 30px;
   }
 
-  .know-more-text-add-card.know-more-text-recurring {
-    font-size: 12px;
-  }
-
   .know-more-text-saved-cards {
-    top: -12px;
+    top: -8px;
     position: relative;
     margin-left: 30px;
   }
@@ -269,5 +253,38 @@
     width: auto;
     white-space: nowrap;
     line-height: 14px;
+  }
+
+  :global(.redesign) {
+    .save_card_label_text .checkbox {
+      position: relative;
+      top: 2px;
+    }
+    .saved-card-text {
+      color: #263a4a;
+    }
+
+    .know-more-text {
+      color: var(--primary-color);
+    }
+
+    .p13n-block {
+      margin-left: 2.5px;
+
+      .checkbox {
+        margin-right: 10px;
+      }
+
+      .know-more-text {
+        margin-left: 28px;
+      }
+    }
+
+    .secure-card-block-saved-cards {
+      .know-more-text-saved-cards {
+        margin-left: 32px;
+        top: -12px;
+      }
+    }
   }
 </style>

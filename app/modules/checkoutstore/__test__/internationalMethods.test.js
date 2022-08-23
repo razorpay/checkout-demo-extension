@@ -19,6 +19,9 @@ const method = 'international';
 jest.mock('razorpay', () => ({
   getMerchantMethods: () => merchantMethods,
   getOrderMethod: () => null,
+  getAmount: jest.fn(),
+  getCurrency: jest.fn(),
+  isOneClickCheckout: jest.fn(),
 }));
 
 describe('Test getInternationalProviders', () => {

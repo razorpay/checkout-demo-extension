@@ -1,11 +1,7 @@
 import { render } from '@testing-library/svelte';
 import { UPIAppStack } from '.';
 import { isUPIFlowEnabled } from 'checkoutstore/methods';
-import {
-  setWithoutOffer,
-  isCtaShown,
-  showCtaWithDefaultText,
-} from 'checkoutstore/cta';
+import { setWithoutOffer, isCtaShown, showCtaWithDefaultText } from 'cta';
 
 jest.mock('sessionmanager', () => ({
   getSession: () => ({
@@ -22,6 +18,7 @@ jest.mock('checkoutstore/methods', () => ({
 }));
 
 jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
   get: jest.fn(),
   isOneClickCheckout: () => false,
   isCustomerFeeBearer: () => false,
@@ -31,10 +28,15 @@ jest.mock('razorpay', () => ({
   getMerchantKey: () => '',
 }));
 
-jest.mock('checkoutstore/cta', () => ({
+jest.mock('cta', () => ({
+  __esModule: true,
+  ...jest.requireActual('cta'),
   setWithoutOffer: jest.fn(),
   isCtaShown: () => false,
   showCtaWithDefaultText: jest.fn(),
+  CTAHelper: {
+    setActiveCTAScreen: jest.fn(),
+  },
 }));
 
 describe('UPI App Stack Component', () => {

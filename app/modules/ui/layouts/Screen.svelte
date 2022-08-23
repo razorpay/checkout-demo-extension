@@ -2,15 +2,15 @@
   // Svelte imports
   import { onMount } from 'svelte';
 
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
-  import { isOneClickCheckout } from 'razorpay';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
+  import { isRedesignV15 } from 'razorpay';
 
   // Props
   export let pad = true;
   export let threshold = 16;
   export let removeAccountTab;
   // Refs
-  let contentRef;
+  export let contentRef: HTMLDivElement;
 
   let bottomShadow = false;
 
@@ -30,7 +30,7 @@
 
     const isContentOverflowing = scrollHeight > offsetHeight;
 
-    if (isContentOverflowing && !isOneClickCheckout()) {
+    if (isContentOverflowing && !isRedesignV15()) {
       if (scrollHeight - offsetHeight - scrollTop >= threshold) {
         // Content hidden on the bottom
         bottomShadow = true;
@@ -51,7 +51,7 @@
 
 <div
   class="screen screen-comp"
-  class:one-cc={isOneClickCheckout()}
+  class:one-cc={isRedesignV15()}
   class:bottomShadow
   class:pad
   bind:this={contentRef}

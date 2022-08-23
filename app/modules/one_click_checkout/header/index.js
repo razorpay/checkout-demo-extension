@@ -7,7 +7,7 @@ let header;
  */
 function create() {
   header = new Header({
-    target: document.querySelector('#header-1cc-wrap'),
+    target: document.querySelector('#header-redesign-v15-wrap'),
   });
 }
 

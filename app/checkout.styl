@@ -91,6 +91,16 @@ input[type='checkbox']:checked + .checkbox {
     border-color: var(--highlight-color);
 }
 
+.redesign {
+    .option.active,
+    :not(.saved-card).checked .checkbox,
+    input[type='checkbox']:checked + .checkbox {
+        color: #fff;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+}
+
 /* Svelte Checkbox */
 label.sv-checkbox.checked > .stack > input[type='checkbox']:checked::before {
     background: var(--highlight-color);

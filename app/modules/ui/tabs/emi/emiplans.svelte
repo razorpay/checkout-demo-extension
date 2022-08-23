@@ -2,20 +2,19 @@
   // UI imports
   import Callout from 'ui/elements/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import EmiPlanCards from 'ui/tabs/emi/emiplancards.svelte';
   import EmiContact from 'ui/tabs/emi/emicontact.svelte';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   // Store
   import { appliedOffer } from 'offers/store';
-  import {
+  import CTA, {
     showCta,
     hideCta,
     showContinue,
     showSelectEmiPlan,
     showCtaWithDefaultText,
-  } from 'checkoutstore/cta';
+  } from 'cta';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -27,7 +26,7 @@
     PLAN_LIST_CALLOUT_AGREEMENT,
     PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT,
   } from 'ui/labels/emi';
-  import { SELECT_EMI_PLAN_LABEL } from 'one_click_checkout/cta/i18n';
+  import { CTA_LABEL, SELECT_EMI_PLAN_LABEL } from 'cta/i18n';
 
   // Util imports
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
@@ -37,8 +36,8 @@
   // Utils imports
   import { isMethodUsable } from 'checkoutstore/methods';
   import { toggleHeader } from 'one_click_checkout/header/helper';
-  import { isOneClickCheckout } from 'razorpay';
-  import { getSession } from 'sessionmanager';
+  import { isRedesignV15 } from 'razorpay';
+  import { tabStore } from 'checkoutstore';
 
   // Props
   export let actions;
@@ -54,15 +53,19 @@
   // Computed
   export let showActions;
 
-  let ctaOneCCHidden = true;
-  let renderCtaOneCC = false;
+  let CTAState = {
+    show: true,
+    disabled: true,
+    showAmount: false,
+    label: SELECT_EMI_PLAN_LABEL,
+  };
 
   // Constants
   const Views = {
     PLANS: 'plans',
     CONTACT: 'contact',
   };
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   // Local variables
   let currentView = Views.PLANS;
 
@@ -99,6 +102,7 @@
       });
     } else if (currentView === Views.CONTACT) {
       showContinue();
+      CTAState.label = CTA_LABEL;
       Analytics.track('emi:contact', {
         type: AnalyticsTypes.RENDER,
       });
@@ -111,19 +115,15 @@
     currentView = view;
   }
 
-  function getView() {
-    return currentView;
-  }
-
   function setContact(contact) {
     const validContact = INDIAN_CONTACT_REGEX.test(contact);
     // Don't let the user continue if the contact is invalid.
     if (validContact) {
-      ctaOneCCHidden = false;
       showCta();
+      CTAState.show = true;
     } else {
-      ctaOneCCHidden = true;
       hideCta();
+      CTAState.show = false;
     }
     // However, invoke setContact everytime the value changes.
     invoke('setContact', contact);
@@ -140,13 +140,9 @@
   }
 
   export function onShown() {
-    renderCtaOneCC = true;
     toggleHeader(true);
     showPlansView();
-  }
-
-  export function onHide() {
-    renderCtaOneCC = false;
+    CTAState.disabled = expanded === -1;
   }
 
   export function showPlansView() {
@@ -160,6 +156,9 @@
 
   export function expand(plan) {
     expanded = plan.duration;
+    CTAState.disabled = false;
+    CTAState.show = true;
+    CTAState.label = '';
 
     invoke('select', {
       detail: plan,
@@ -168,6 +167,7 @@
 
   export function deselectAll() {
     expanded = -1;
+    CTAState.disabled = true;
   }
 
   export function invoke(type, event) {
@@ -175,16 +175,14 @@
       on[type](event);
     }
   }
-
-  $: ctaOneCCHidden = expanded === -1;
 </script>
 
 <div
   id="form-emiplans"
   class="tab-content showable screen pad vertical-pad"
-  class:one-cc={isOneCCEnabled}
+  class:one-cc={isRedesignV15Enabled}
 >
-  <div class:emiplans-one-cc={isOneCCEnabled}>
+  <div class:emiplans-one-cc={isRedesignV15Enabled}>
     {#if currentView === Views.PLANS}
       <!-- LABEL: Select an EMI Plan -->
       <EmiPlanCards
@@ -262,15 +260,15 @@
         isSavedCard={type === 'saved'}
       />
     {/if}
-    {#if renderCtaOneCC}
-      <CTAOneCC
-        hidden={ctaOneCCHidden}
-        on:click={() => getSession().preSubmit()}
-      >
-        {$t(SELECT_EMI_PLAN_LABEL)}
-      </CTAOneCC>
-    {/if}
   </div>
+  <CTA
+    screen="emiplans"
+    tab={$tabStore}
+    disabled={CTAState.disabled}
+    show={CTAState.show}
+    showAmount={CTAState.showAmount}
+    label={CTAState.label}
+  />
   <AccountTab />
 </div>
 
@@ -294,7 +292,7 @@
   }
 
   .emiplans-one-cc {
-    min-height: 120%;
-    padding: 0px 24px 56px;
+    min-height: 110%;
+    padding: 0px 18px 56px;
   }
 </style>

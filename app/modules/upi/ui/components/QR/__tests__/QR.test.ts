@@ -12,6 +12,8 @@ jest.mock('razorpay', () => ({
   isOfferForced: () => false,
   getPreferences: () => {},
   isRecurring: () => false,
+  getAmount: () => 100,
+  getCurrency: () => 'INR',
   getOptionalObject: jest.fn(),
   getOption: jest.fn(),
   razorpayInstance: {

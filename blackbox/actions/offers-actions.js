@@ -6,7 +6,9 @@ async function viewOffers(context) {
 
 async function selectOffer(context, offernumber) {
   await context.page.click('.offer-item:nth-of-type(' + offernumber + ')');
-  await context.page.click('#footer');
+  await context.page.click(
+    context.isRedesignV15Enabled ? '#redesign-v15-cta' : '#footer'
+  );
 }
 
 async function setPreferenceForOffer(preferences) {

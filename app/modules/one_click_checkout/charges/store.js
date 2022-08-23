@@ -1,6 +1,5 @@
 import { writable, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
-import { showAmountInCta } from 'checkoutstore/cta';
 
 // Store to keep track of shipping charge
 export const shippingCharge = writable(null);
@@ -10,8 +9,7 @@ export const offerAmount = writable(0);
 amount.subscribe((amount) => {
   if (amount) {
     const session = getSession();
-    session.setAmount(amount);
-    showAmountInCta();
+    session.setAmount(amount, true); // this will automatically set amount in cta
   }
 });
 

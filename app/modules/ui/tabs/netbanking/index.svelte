@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { createEventDispatcher, onDestroy } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { onMount } from 'svelte';
@@ -18,8 +18,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
-  import CTA from 'ui/elements/CTA.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
+  import CTAOld from 'ui/elements/CTA.svelte';
   import { truncateString } from 'utils/strings';
 
   import Icon from 'ui/elements/Icon.svelte';
@@ -35,7 +34,7 @@
     SELECTION_RADIO_TEXT,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
-    RECURRING_CALLOUT,
+    SELECT_BANK,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
@@ -63,7 +62,6 @@
 
   // Analytics imports
   import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
-  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
 
   // Props
   export let banks;
@@ -72,8 +70,9 @@
   export let bankOptions;
 
   // Other Imports
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
   import triggerSearchModal from 'components/SearchModal';
+  import CTA from 'cta';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -86,8 +85,6 @@
   let downtimeSeverity = false;
   let selectedBankName;
   let translatedBanksArr;
-
-  let renderCtaOneCC = false;
 
   $: {
     if ($selectedBank) {
@@ -111,7 +108,7 @@
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   export function getPayload() {
     return {
@@ -312,21 +309,11 @@
   onMount(() => {
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD_V2);
-    renderCtaOneCC = true;
-  });
-
-  onDestroy(() => {
-    renderCtaOneCC = false;
   });
 
   export function onShown() {
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
     Events.TrackRender(NETBANKING_EVENTS.SCREEN_LOAD_V2);
-    renderCtaOneCC = true;
-  }
-
-  export function onHide() {
-    renderCtaOneCC = false;
   }
 </script>
 
@@ -338,11 +325,14 @@
   hasMessage={!!downtimeSeverity}
 >
   <Screen pad={false}>
-    <div class:screen-one-cc={isOneClickCheckoutEnabled}>
+    <div class:screen-one-cc={isRedesignV15Enabled}>
+      {#if isRedesignV15Enabled}
+        <h3 class="header-title">{$t(SELECT_BANK)}</h3>
+      {/if}
       <div
         id="netb-banks"
         class="clear grid count-3"
-        class:netb-banks-one-cc={isOneClickCheckoutEnabled}
+        class:netb-banks-one-cc={isRedesignV15Enabled}
       >
         {#each netbanks as { name, code } (code)}
           <GridItem
@@ -359,9 +349,9 @@
           id="nb-elem"
           class="elem select"
           class:invalid
-          class:nb-one-cc-wrapper={isOneClickCheckoutEnabled}
+          class:nb-one-cc-wrapper={isRedesignV15Enabled}
         >
-          {#if !isOneClickCheckoutEnabled}
+          {#if !isRedesignV15Enabled}
             <i class="select-arrow"></i>
           {/if}
 
@@ -369,13 +359,13 @@
           <div class="help">
             {$t(NETBANKING_SELECT_HELP)}
           </div>
-          {#if $selectedBank && isOneClickCheckoutEnabled}
+          {#if $selectedBank && isRedesignV15Enabled}
             <span class="nb-select-bank-text"
               >{$t(NETBANKING_SELECT_LABEL)}</span
             >
           {/if}
 
-          {#if isOneClickCheckoutEnabled}
+          {#if isRedesignV15Enabled}
             <span class="drop-down-icon-wrapper">
               <Icon icon={solid_down_arrow} />
             </span>
@@ -388,7 +378,7 @@
                 : $t(NETBANKING_SELECT_LABEL)
             }`}
             class="input dropdown-like dropdown-bank"
-            class:nb-one-cc-button={isOneClickCheckoutEnabled}
+            class:nb-one-cc-button={isRedesignV15Enabled}
             type="button"
             id="bank-select"
             bind:this={bankSelect}
@@ -462,17 +452,10 @@
       {/if}
     </div>
 
-    {#if !recurring}
-      <CTA on:click={() => getSession().preSubmit()} />
+    {#if !recurring && !isRedesignV15Enabled}
+      <CTAOld on:click={() => getSession().preSubmit()} />
     {/if}
-    {#if renderCtaOneCC}
-      <CTAOneCC
-        disabled={!$selectedBank}
-        on:click={() => getSession().preSubmit()}
-      >
-        {$t(PAY_NOW_CTA_LABEL)}
-      </CTAOneCC>
-    {/if}
+    <CTA screen="netbanking" tab="netbanking" disabled={!$selectedBank} />
   </Screen>
 </Tab>
 
@@ -541,11 +524,10 @@
     padding: 0px 2px;
   }
   .screen-one-cc {
-    min-height: 120%;
+    min-height: 110%;
   }
 
   .netb-banks-one-cc {
-    margin-top: 26px;
     border-top: 1px solid #ebedf0;
   }
 
@@ -553,5 +535,13 @@
     position: absolute;
     right: 14px;
     top: 14px;
+  }
+
+  .header-title {
+    margin: 20px 18px 14px;
+    text-transform: capitalize;
+    color: #263a4a;
+    font-size: 14px;
+    font-weight: 600;
   }
 </style>

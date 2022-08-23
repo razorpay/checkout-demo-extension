@@ -17,7 +17,7 @@
   // utils imports
   import { getMerchantName } from 'razorpay';
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import LanguageSelection from 'one_click_checkout/header/components/LanguageSelection.svelte';
+  import LanguageSelection from 'topbar/ui/components/LanguageSelection.svelte';
   import { truncateString } from 'utils/strings';
 
   // Other Imports

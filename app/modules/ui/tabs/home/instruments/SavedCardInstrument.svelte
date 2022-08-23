@@ -39,7 +39,7 @@
   export let name = 'instrument';
 
   // Other Imports
-  import { isOneClickCheckout } from 'razorpay';
+  import { isRedesignV15 } from 'razorpay';
 
   let downtimeSeverity;
   let downtimeInstrument = '';
@@ -53,14 +53,13 @@
   const themeMeta = getThemeMeta();
   const isEmiInstrument = instrument.method === 'emi';
 
-  const isOneClickCheckoutEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
 
   function getIcon(card) {
     if (card && card.network && card.network !== 'unknown') {
       return getNetworkIcon(findCodeByNetworkName(card.network));
-    } else {
-      return themeMeta.icons.card;
     }
+    return themeMeta.icons.card;
   }
 
   let title;
@@ -160,7 +159,7 @@
     placeholder: 'CVV',
     label: '',
   };
-  if (isOneClickCheckoutEnabled) {
+  if (isRedesignV15Enabled) {
     additionalCvvProps = {
       placeholder: '',
       label: 'CVV',
@@ -241,6 +240,10 @@
     transform: rotate(180deg);
   }
 
+  :global(.redesign) i[slot='icon'] {
+    height: 27px;
+  }
+
   div[slot='extra'] :global(.elem .input) {
     padding: 0;
     width: 40px;
@@ -252,6 +255,8 @@
   }
   .downtime-saved-card-icon {
     margin-right: 8px;
+    display: flex;
+    align-items: center;
   }
   .slots-extra {
     display: flex;

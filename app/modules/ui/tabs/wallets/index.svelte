@@ -1,14 +1,11 @@
 <script lang="ts">
-  // Svelte Imports
-  import { onDestroy } from 'svelte';
-
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
-  import { showCta, hideCta } from 'checkoutstore/cta';
+  import CTA, { showCta, hideCta } from 'cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
   import { isDynamicWalletFlow } from 'wallet/helper';
-  import { isOneClickCheckout } from 'razorpay';
+  import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
 
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
@@ -25,29 +22,33 @@
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import CTAOneCC from 'one_click_checkout/cta/index.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { scrollIntoView } from 'lib/utils';
-  import AccountTab from 'one_click_checkout/account_modal/ui/AccountTab.svelte';
+  import AccountTab from 'account_modal/ui/AccountTab.svelte';
 
   // Transitions
   import { slide } from 'svelte/transition';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-
-  // Constant imports
-  import { PAY_NOW_CTA_LABEL } from 'one_click_checkout/cta/i18n';
+  import { SELECT_WALLET } from 'wallet/i18n/label';
 
   const session = getSession();
   const wallets = getWallets();
+
+  /**
+   * consumed by redesign CTA online
+   */
+  let CTAState = {
+    show: true,
+    disabled: true,
+  };
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
 
   let filteredWallets = wallets;
-  let renderCtaOneCC = false;
 
-  const isOneCCEnabled = isOneClickCheckout();
+  const isRedesignV15Enabled = isRedesignV15();
   $: {
     filteredWallets = filterWalletsAgainstInstrument(
       wallets,
@@ -115,7 +116,9 @@
 
     if (!offerError) {
       $selectedWallet = code;
-      showCta();
+      showCta(true);
+      CTAState.show = true;
+      CTAState.disabled = false;
     }
 
     if (ua_iPhone) {
@@ -137,22 +140,16 @@
     Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
     Events.TrackRender(WALLET_EVENTS.SCREEN_LOAD_V2);
     if ($selectedWallet) {
-      renderCtaOneCC = true;
-      showCta();
+      showCta(true);
+      CTAState.show = true;
+      CTAState.disabled = false;
       setTimeout(() => {
         scrollIntoView(walletReferences[$selectedWallet]);
       }, 200);
     } else {
-      renderCtaOneCC = false;
       hideCta();
     }
   }
-
-  export function onHide() {
-    renderCtaOneCC = false;
-  }
-
-  $: renderCtaOneCC = !!$selectedWallet;
 
   // Called when the user presses the pay button
   export function getPayload() {
@@ -174,20 +171,17 @@
       session.walletOffer
     );
   }
-
-  function onSubmit() {
-    session.preSubmit();
-    renderCtaOneCC = false;
-  }
-
-  onDestroy(() => {
-    renderCtaOneCC = false;
-  });
 </script>
 
 <Tab method="wallet" pad={false}>
-  <div class="wallet-wrapper" class:wallet-one-cc={isOneCCEnabled}>
-    <div class="border-list collapsable" class:screen-one-cc={isOneCCEnabled}>
+  <div class="wallet-wrapper" class:wallet-one-cc={isRedesignV15Enabled}>
+    {#if isRedesignV15Enabled}
+      <h3 class="header-title">{$t(SELECT_WALLET)}</h3>
+    {/if}
+    <div
+      class="border-list collapsable"
+      class:screen-one-cc={isRedesignV15Enabled}
+    >
       {#each filteredWallets as wallet, i (wallet.code)}
         <SlottedRadioOption
           name={wallet.code}
@@ -228,17 +222,18 @@
     </div>
     <AccountTab />
   </div>
+  <CTA
+    screen="wallet"
+    tab="wallet"
+    disabled={CTAState.disabled}
+    show={CTAState.show}
+  />
   <Bottom tab="wallet">
     <!-- skip dcc check as paypal 1cc doesn't depend upon dcc -->
-    {#if $selectedWallet === 'paypal' && !isOneCCEnabled}
+    {#if $selectedWallet === 'paypal' && !isOneClickCheckout()}
       <DynamicCurrencyView tabVisible view={$selectedWallet} />
     {/if}
   </Bottom>
-  {#if renderCtaOneCC}
-    <CTAOneCC on:click={onSubmit}>
-      {$t(PAY_NOW_CTA_LABEL)}
-    </CTAOneCC>
-  {/if}
 </Tab>
 
 <style>
@@ -259,6 +254,10 @@
     font-size: 10px;
   }
 
+  .subtitle:empty {
+    display: none;
+  }
+
   .wallet-wrapper {
     display: flex;
     flex-direction: column;
@@ -268,10 +267,18 @@
     overflow: auto;
   }
   .screen-one-cc {
-    min-height: 120%;
+    min-height: 110%;
   }
 
   :global(#content.one-cc) .border-list {
-    margin: 26px 16px 12px;
+    margin: 0px 16px 12px;
+  }
+
+  .header-title {
+    margin: 20px 18px 14px;
+    text-transform: capitalize;
+    color: #263a4a;
+    font-size: 14px;
+    font-weight: 600;
   }
 </style>

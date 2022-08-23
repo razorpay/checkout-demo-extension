@@ -7,12 +7,7 @@
   import Checkbox from 'ui/elements/Checkbox.svelte';
 
   // i18n
-  import {
-    PARTIAL_AMOUNT_PLACEHOLDER,
-    PARTIAL_AMOUNT_HELP_INVALID,
-    PARTIAL_AMOUNT_HELP_LOWER,
-    PARTIAL_AMOUNT_HELP_HIGHER,
-  } from 'ui/labels/home';
+  import { PARTIAL_AMOUNT_PLACEHOLDER } from 'ui/labels/home';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -22,7 +17,8 @@
   import { getSession } from 'sessionmanager';
   import { getCurrencyConfig } from 'common/currency';
   import { formatAmountWithCurrency } from 'helper/currency';
-  import { getOption } from 'razorpay';
+  import { getOption, isRedesignV15 } from 'razorpay';
+  import { getErrorTextData } from 'partialpayments/helper';
 
   // Props
   export let maxAmount = null;
@@ -34,6 +30,8 @@
 
   const session = getSession();
   const dispatch = createEventDispatcher();
+  const isRedesignV15Enabled = isRedesignV15();
+  let showValidations = false;
 
   // Refs
   let field;
@@ -96,20 +94,14 @@
   const max = getAmountInMajor(maxAmount);
   const min = getAmountInMajor(minAmount);
 
-  let helpTextLabel;
-  let helpTextAmount;
+  let errorTextLabel;
+  let errorTextAmount;
 
   $: {
-    if (!value) {
-      helpTextLabel = PARTIAL_AMOUNT_HELP_INVALID;
-      helpTextAmount = formatAmountWithCurrency(maxAmount);
-    } else if (valueInMinor < minAmount) {
-      helpTextLabel = PARTIAL_AMOUNT_HELP_LOWER;
-      helpTextAmount = formatAmountWithCurrency(minAmount);
-    } else if (valueInMinor > maxAmount) {
-      helpTextLabel = PARTIAL_AMOUNT_HELP_HIGHER;
-      helpTextAmount = formatAmountWithCurrency(maxAmount);
-    }
+    const errorTextData = getErrorTextData(valueInMinor, maxAmount, minAmount);
+    errorTextLabel = errorTextData?.errorTextLabel;
+    errorTextAmount = errorTextData?.errorTextAmount;
+    showValidations = errorTextData?.showValidations;
   }
 </script>
 
@@ -123,18 +115,29 @@
   required
   {max}
   {min}
-  placeholder={$t(PARTIAL_AMOUNT_PLACEHOLDER)}
+  placeholder={formatTemplateWithLocale(
+    errorTextLabel,
+    { amount: errorTextAmount },
+    $locale
+  )}
+  label={isRedesignV15Enabled && $t(PARTIAL_AMOUNT_PLACEHOLDER)}
   helpText={formatTemplateWithLocale(
-    helpTextLabel,
-    { amount: helpTextAmount },
+    errorTextLabel,
+    { amount: errorTextAmount },
     $locale
   )}
   formatter={{ type: 'amount' }}
   bind:this={field}
-  handleFocus={true}
+  handleFocus={!isRedesignV15Enabled}
   handleBlur={true}
   handleInput={true}
   on:input={handleInput}
+  showValidations={isRedesignV15Enabled && showValidations}
+  validationText={formatTemplateWithLocale(
+    errorTextLabel,
+    { amount: errorTextAmount },
+    $locale
+  )}
 />
 
 {#if showPartialAmountLabel}

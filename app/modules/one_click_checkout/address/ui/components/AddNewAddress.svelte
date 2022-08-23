@@ -81,7 +81,7 @@
   import { isIntlShippingEnabled } from 'razorpay';
 
   // other imports
-  import { isIndianCustomer } from 'checkoutstore';
+  import { isIndianCustomer } from 'checkoutstore/screens/home';
   import { savedAddresses } from 'one_click_checkout/address/store';
   import {
     findItem,

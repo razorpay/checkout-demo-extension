@@ -39,7 +39,7 @@ import { shouldRedirectZestMoney } from 'common/emi';
 import { assertPaymentSuccessMetadata, popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
-import { getOption, getOrderId } from 'razorpay';
+import { getOption, getOrderId, isRedesignV15 } from 'razorpay';
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
@@ -867,7 +867,8 @@ Payment.prototype = {
         Analytics.track(this.data.method + ':popup:closed');
         if (
           this.data.method === 'netbanking' &&
-          Track.props.library === 'checkoutjs'
+          Track.props.library === 'checkoutjs' &&
+          !isRedesignV15()
         ) {
           const modal = docUtil.querySelector('#error-message');
           _El.addClass(modal, 'cancel_netbanking');

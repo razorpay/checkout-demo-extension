@@ -12,6 +12,7 @@ export const RazorpayDefaults = {
   auth_link_id: '',
   payment_link_id: '',
   notes: null,
+  disable_redesign_v15: false,
   callback_url: '',
   redirect: false,
   description: '',

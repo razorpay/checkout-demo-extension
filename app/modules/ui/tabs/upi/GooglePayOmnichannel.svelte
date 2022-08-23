@@ -18,7 +18,10 @@
     OMNI_GPAY_NUMBER,
     OMNI_ENTER_NUMBER,
     OMNI_ERROR,
+    OMNI_GPAY,
+    OMNI_GPAY_SUBTITLE,
   } from 'ui/labels/upi';
+  import { isRedesignV15 } from 'razorpay';
 
   // Props
   export let selected = true;
@@ -33,6 +36,8 @@
 
   const dispatch = createEventDispatcher();
   const session = getSession();
+
+  const isRedesignV15Enabled = isRedesignV15();
 
   // Computed
   const onSelection = () => {
@@ -87,7 +92,12 @@
   {selected}
 >
   <!-- LABEL: Google Pay phone number -->
-  <div id="gpay-omnichannel" slot="title">{$t(OMNI_GPAY_NUMBER)}</div>
+  <div id="gpay-omnichannel" slot="title">
+    {$t(isRedesignV15Enabled ? OMNI_GPAY : OMNI_GPAY_NUMBER)}
+  </div>
+  <div id="gpay-omnichannel-subtitle" slot="subtitle">
+    {$t(OMNI_GPAY_SUBTITLE)}
+  </div>
   <i slot="icon" class="top">
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="" />
   </i>
@@ -109,6 +119,7 @@
           value={contact}
           bind:readonlyValue={value}
           placeholder={$t(OMNI_ENTER_NUMBER)}
+          label={isRedesignV15Enabled ? 'Enter Number' : ''}
         />
       </div>
     {/if}
@@ -135,5 +146,16 @@
   }
   [slot='icon'].top {
     align-self: flex-start;
+  }
+
+  :global(#gpay-omnichannel-subtitle) {
+    display: none;
+  }
+
+  :global(.redesign #gpay-omnichannel-subtitle) {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    margin-top: 2px;
   }
 </style>

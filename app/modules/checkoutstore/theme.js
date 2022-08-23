@@ -52,6 +52,10 @@ export function setThemeColor(color) {
   theme.secondaryHighlightColor = theme.hoverStateColor;
   theme.icons = _PaymentMethodIcons.getIcons(colorVariations);
   theme.highlightBorderColor = Color.transparentify(theme.color, 40);
+  theme.headerLogoBgColor = Color.transparentify(theme.color, 50);
+  theme.headerLogoTextColor = Color.isDark(theme.headerLogoBgColor)
+    ? TEXT_COLOR_WHITE
+    : TEXT_COLOR_BLACK;
 
   setRootCSSVariable({
     'primary-color': color,
@@ -61,5 +65,7 @@ export function setThemeColor(color) {
     'background-color': theme.backgroundColor,
     'secondary-highlight-color': theme.secondaryHighlightColor,
     'active-state-color': theme.activeStateColor,
+    'header-logo-bg-color': theme.headerLogoBgColor,
+    'header-logo-text-color': theme.headerLogoTextColor,
   });
 }

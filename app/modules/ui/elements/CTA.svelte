@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterUpdate, createEventDispatcher } from 'svelte';
-  import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
+  import { cta, isCtaShown, showCta, hideCta } from 'cta';
   import * as _El from 'utils/DOM';
   // if passed, creates an exclusive control on showing/hiding
   // of #footer for the lifecycle of <CTA>
@@ -26,7 +26,7 @@
    * and we're able to determine at any given time if #footer needs to be shown or not
    */
   function replaceNode(node) {
-    document.querySelector('#footer').appendChild(node);
+    document.querySelector('#footer')?.appendChild(node);
     const wasCtaShown = isCtaShown();
     if (!wasCtaShown && show) {
       showCta();

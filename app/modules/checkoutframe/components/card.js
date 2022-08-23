@@ -12,7 +12,7 @@ import {
   showSelectEmiPlan,
   showEnterCardDetails,
   setAppropriateCtaText,
-} from 'checkoutstore/cta';
+} from 'cta';
 import {
   getEmiDurationForSavedCard,
   getEmiDurationForNewCard,

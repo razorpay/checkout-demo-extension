@@ -6,7 +6,8 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { EXPIRY_LABEL } from 'ui/labels/card';
+  import { CARD_EXPIRY_HELP, EXPIRY_LABEL } from 'ui/labels/card';
+  import { isRedesignV15 } from 'razorpay';
 
   export let value;
   export let ref = null;
@@ -50,10 +51,10 @@
     }
   }
 
-  let expirayValidationError;
+  let expiryValidationError: boolean;
 
   export function isValid() {
-    expirayValidationError = !valid;
+    expiryValidationError = !valid;
     return valid;
   }
 </script>
@@ -65,6 +66,9 @@
   placeholder="MM / YY"
   label={$t(EXPIRY_LABEL)}
   required
+  validationText={isRedesignV15() && expiryValidationError
+    ? $t(CARD_EXPIRY_HELP)
+    : ''}
   {value}
   type="tel"
   autocomplete="cc-exp"
@@ -80,5 +84,5 @@
   {inputFieldClasses}
   {labelClasses}
   {labelUpperClasses}
-  isInvalid={expirayValidationError}
+  isInvalid={expiryValidationError}
 />

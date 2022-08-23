@@ -5,7 +5,7 @@ import topbarLabels from 'one_click_checkout/topbar/i18n/en';
 import { setAmount } from 'one_click_checkout/topbar/sessionInterface';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import { tabTitle } from 'one_click_checkout/topbar/store';
-import { showFeeLabel } from 'checkoutstore';
+import { showFeeLabel } from 'checkoutstore/fee';
 import {
   dynamicFeeObject,
   addCardView,

@@ -14,13 +14,16 @@ import { get } from 'svelte/store';
 import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
-import { getLanguageCode, getLanguageCodeFromPrefs } from 'razorpay';
+import {
+  getLanguageCode,
+  getLanguageCodeFromPrefs,
+  isRedesignV15,
+} from 'razorpay';
 import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { ignoreFirstCall } from 'svelte-utils';
 import BrowserStorage from 'browserstorage';
-import { showLoader } from 'one_click_checkout/account_modal/store';
-import { isOneClickCheckout } from 'razorpay';
+import { showLoader } from 'account_modal/store';
 import { querySelector } from 'utils/doc';
 
 const LOCALES = {
@@ -159,7 +162,7 @@ export function bindI18nEvents(retryErrorHandler = false, queryParams = {}) {
   // Show loader whenever language bundle is loading
   isLoading.subscribe((value) => {
     if (value) {
-      if (isOneClickCheckout()) {
+      if (isRedesignV15()) {
         showLoader.set(true);
       } else {
         session.showLoadError('Loading', false, true);
@@ -175,7 +178,7 @@ export function bindI18nEvents(retryErrorHandler = false, queryParams = {}) {
           session.errorHandler(queryParams);
           retryErrorHandler = false;
         } else {
-          if (isOneClickCheckout()) {
+          if (isRedesignV15()) {
             showLoader.set(false);
           } else {
             session.hideOverlayMessage();

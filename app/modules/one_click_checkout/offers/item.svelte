@@ -115,7 +115,7 @@
     color: #70c692;
     pointer-events: none;
     font-size: 10px;
-    margin: 0 8px;
+    margin-right: 10px;
     border-radius: 2px;
     font-weight: 600;
   }

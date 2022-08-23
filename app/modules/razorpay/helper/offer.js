@@ -18,6 +18,3 @@ export const getMerchantOffers = () => {
   return getPreferences('offers');
 };
 export const isOfferForced = () => getPreferences('force_offer');
-
-export const getCheckoutConfig = () => getPreferences('checkout_config');
-export const getOrgDetails = () => getPreferences('org');

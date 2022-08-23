@@ -31,13 +31,25 @@ async function handlePartialPayment(context, amount) {
     partial: true,
   });
 
-  await context.page.type('#amount-value', amount);
-  await delay(100);
-  await context.page.evaluate(() =>
-    document.querySelector('#amount-value').blur()
+  await context.page.type(
+    ` ${context.isRedesignV15Enabled ? '.price-label' : '#amount-value'} `,
+    amount
   );
   await delay(100);
-  await context.page.click('#footer');
+  if (context.isRedesignV15Enabled) {
+    await context.page.evaluate(() =>
+      document.querySelector('.price-label').blur()
+    );
+  } else {
+    await context.page.evaluate(() =>
+      document.querySelector('#amount-value').blur()
+    );
+  }
+
+  await delay(100);
+  await context.page.click(
+    context.isRedesignV15Enabled ? '#redesign-v15-cta' : '#footer'
+  );
 }
 
 /**

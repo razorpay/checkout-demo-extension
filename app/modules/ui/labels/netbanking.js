@@ -7,6 +7,7 @@ export const SEARCH_TITLE = 'netbanking.search_title';
 export const SEARCH_PLACEHOLDER = 'netbanking.search_placeholder';
 export const SEARCH_ALL = 'netbanking.search_all';
 export const RECURRING_CALLOUT = 'netbanking.recurring_callout';
+export const SELECT_BANK = 'netbanking.select_bank';
 
 export const CANCELLATION_MODAL_TITLE = 'netbanking.cancellation_modal_title';
 export const WRONG_BANK_SELECTED = 'netbanking.wrong_bank_selected';

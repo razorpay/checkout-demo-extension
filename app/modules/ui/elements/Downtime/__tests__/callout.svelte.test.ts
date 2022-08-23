@@ -3,6 +3,7 @@ import { Events, DowntimeEvents, MetaProperties } from 'analytics/index';
 import Callout from '../Callout.svelte';
 jest.mock('razorpay', () => ({
   get: jest.fn(),
+  isRedesignV15: () => false,
   isOneClickCheckout: () => false,
   isCustomerFeeBearer: () => false,
   isOfferForced: () => false,

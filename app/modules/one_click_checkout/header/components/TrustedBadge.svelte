@@ -26,8 +26,8 @@
 
   //Utils
   import rtbEvents from 'one_click_checkout/header/analytics';
-  import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
+  import RtbIcon from 'rtb/ui/component/RTBIcon.svelte';
 
   $: trustedBadgeHighlights = isRTBEnabled($RTBExperiment);
   onMount(() => {
@@ -50,7 +50,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadgeIcon />
+        <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-text">{$t(RTB_HEADER)}</div>
       <Icon icon={info('#263A4A')} />
@@ -58,7 +58,7 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
-        <TrustedBadgeIcon />
+        <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-down-arrow-wrapper">
         <Icon icon={arrow_down(10, 8)} />
@@ -69,15 +69,16 @@
 
 <style>
   .rtb-icon-wrapper {
-    height: 22px;
+    height: 20px;
   }
 
   /* Styles for expended RTB */
   .rtb-expanded-wrapper {
     background: #e7f7f1;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 2px 8px;
     cursor: pointer;
+    border-radius: 4px;
     display: flex;
     align-items: center;
   }
