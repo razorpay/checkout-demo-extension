@@ -14,10 +14,10 @@ export const shouldShowAddress = () =>
 
 /**
  * @returns boolean
- * Checks if 1CC enabled and show_coupons is true
+ * Checks if 1CC enabled and show_coupons is true and should not be payment link or payment page
  */
 export const shouldShowCoupons = () =>
-  isOneClickCheckout() && getOption('show_coupons');
+  isOneClickCheckout() && getOption('show_coupons') && !getOption('payment_link_id');
 
 /**
  * @returns boolean
