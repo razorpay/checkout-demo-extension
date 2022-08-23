@@ -87,15 +87,16 @@
     </p>
   {/if}
   <AddressBox address={$selectedAddress} withBorder={false} isEditable={false}>
-    <SameBillingAndShipping
-      on:toggle={handleToggle}
-      disabled={loading || !$selectedAddress?.serviceability}
-    />
-    <AddressStatusIndicator
-      serviceable={$selectedAddress?.serviceability}
-      {loading}
-    />
+    <span />
   </AddressBox>
+  <SameBillingAndShipping
+    on:toggle={handleToggle}
+    disabled={loading || !$selectedAddress?.serviceability}
+  />
+  <AddressStatusIndicator
+    serviceable={$selectedAddress?.serviceability}
+    {loading}
+  />
 </div>
 
 <style>
