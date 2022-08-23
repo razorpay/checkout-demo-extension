@@ -37,7 +37,7 @@
   import { IntentFlowsHeader } from 'upi/ui/components/IntentFlowHeader';
 
   // Props
-  export let apps;
+  export let apps = [];
   export let showAll = false;
   export let selected = null;
   export let showRecommendedUPIApp;
@@ -140,6 +140,8 @@
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
     Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
   });
+
+  $: isIntentFlowVisible = showableApps.length || payUsingApps;
 </script>
 
 <!-- LABEL: PAY USING APPS -->
@@ -147,7 +149,7 @@
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
     <IntentFlowsHeader
-      visible={showableApps.length || payUsingApps}
+      visible={isIntentFlowVisible}
       showRedirectV2message={showIntentListHeaderForIos}
     />
     {#if upiTiles.status === true}
