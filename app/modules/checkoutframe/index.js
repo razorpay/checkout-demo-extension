@@ -18,6 +18,7 @@ import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
+import { create1ccShopifyCheckout } from 'checkoutframe/1cc-shopify';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
@@ -52,6 +53,7 @@ import { appendLoader } from 'common/loader';
 let CheckoutBridge = window.CheckoutBridge;
 
 let isPrefetchPrefsFlowFor1cc = false;
+let is1ccShopifyFlow = false;
 
 const showModal = (session) => {
   Razorpay.sendMessage({ event: 'render' });
@@ -252,6 +254,12 @@ export const handleMessage = function (message) {
     SessionManager.setSession(session);
   }
 
+  if (message.event === '1cc_shopify_checkout_initiate') {
+    is1ccShopifyFlow = true;
+    createShopifyCheckout(message.extra, session);
+    return;
+  }
+
   if (message.event === 'prefetch') {
     isPrefetchPrefsFlowFor1cc = true;
     setParamsForDdosProtection(session);
@@ -272,7 +280,7 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'open' || options) {
-    if (isPrefetchPrefsFlowFor1cc) {
+    if (isPrefetchPrefsFlowFor1cc || is1ccShopifyFlow) {
       /**
        * In the prefetch flow, instance creation is the first step and at that point we don't have all the
        * options we need to pass to the frame. Some options are set into the razorpay instance
@@ -293,6 +301,15 @@ export const handleMessage = function (message) {
       const prefetchedPrefsObj = getPrefetchedPrefs();
       setPrefetchedPrefs({ ...prefetchedPrefsObj, order: message._order });
     }
+
+    if (!isEmpty(message._prefs)) {
+      /**
+       * _prefs is sent from the shopify script added to the rzp instance to be consumed here
+       * and prevent fetching the preferences using a network call again.
+       */
+      setPrefetchedPrefs(message._prefs);
+    }
+
     // NOTE: call this before making any XHR or jsonp call
     setParamsForDdosProtection(session);
 
@@ -405,6 +422,32 @@ function processPrefetchPrefs(preferences) {
   });
 }
 
+function createShopifyCheckout(body, session) {
+  create1ccShopifyCheckout(
+    getPreferencesParams(session),
+    body,
+    (response) => {
+      if (response.error || !response.preferences) {
+        Razorpay.sendMessage({
+          event: 'event',
+          data: {
+            event: 'shopify_failure',
+          },
+        });
+        return;
+      }
+      delete response.status_code;
+      Razorpay.sendMessage({
+        event: 'event',
+        data: {
+          event: 'shopify_success',
+          data: JSON.stringify(response),
+        },
+      });
+    }
+  );
+}
+
 function getPrefsPromisified(session) {
   return new Promise((resolve) => {
     let loader;
@@ -416,7 +459,7 @@ function getPrefsPromisified(session) {
       // e
     }
     session.prefCall = Razorpay.payment.getPrefs(
-      getPreferenecsParams(session.r),
+      getPreferencesParams(session.r),
       (preferences) => {
         resolve(preferences);
         if (loader) {
@@ -581,7 +624,7 @@ function markRelevantPreferencesPayload(prefData) {
   });
 }
 
-function getPreferenecsParams(razorpayInstance) {
+function getPreferencesParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
   prefData.personalisation = 1;
   if (cookieDisabled) {

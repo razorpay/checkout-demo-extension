@@ -272,6 +272,16 @@ RazorProto.initAndPrefetchPrefs = function () {
   return this;
 };
 
+RazorProto.createCheckoutAndFetchPrefs = function (reqbody) {
+  // for 1cc shopify
+  if (!preloadedFrame) {
+    // this event is used to determine whether to trigger standard open flow
+    this.emit('shopify_failure');
+    return;
+  }
+  preloadedFrame.makeCheckoutCallForShopify(this, reqbody);
+}
+
 RazorProto.open = needBody(function () {
   if (!this.metadata) {
     this.metadata = {

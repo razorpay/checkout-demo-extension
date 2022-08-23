@@ -164,7 +164,8 @@ export function initIframe() {
     parseMessage({ data: global.atob(qpmap.message) });
   }
 
-  Razorpay.sendMessage({ event: 'load' });
+  // adding origin as this event can now be triggered from captcha script also
+  Razorpay.sendMessage({ event: 'load', data: { origin: 'checkout-frame' } });
 
   const INIT_TIME = Date.now();
   Analytics.setMeta(

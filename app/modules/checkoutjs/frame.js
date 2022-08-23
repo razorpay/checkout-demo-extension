@@ -23,6 +23,7 @@ const { screen, scrollTo } = global;
 
 const ua_iPhone = iPhone;
 let doc, head, docStyle;
+let isCheckoutFrameLoaded = false;
 
 // there is no "position: fixed" in iphone
 let containerHeight = 460;
@@ -225,7 +226,7 @@ CheckoutFrame.prototype = {
     this.onload();
   },
 
-  makeMessage: function (eventName) {
+  makeMessage: function (eventName, responseExtras) {
     let rzp = this.rzp;
     let options = rzp.get();
 
@@ -248,8 +249,16 @@ CheckoutFrame.prototype = {
       response._order = rzp._order;
     }
 
+    if (rzp._prefs) {
+      response._prefs = rzp._prefs;
+    }
+
     if (rzp.metadata) {
       response.metadata = rzp.metadata;
+    }
+
+    if (responseExtras) {
+      response.extra = responseExtras;
     }
 
     _Obj.loop(rzp.modal.options, function (option, i) {
@@ -358,6 +367,24 @@ CheckoutFrame.prototype = {
     this.postMessage(this.makeMessage('prefetch'));
   },
 
+  makeCheckoutCallForShopify: function (rzp, body) {
+    if (rzp !== this.rzp) {
+      this.rzp = rzp;
+    }
+    if (!isCheckoutFrameLoaded) {
+      /**
+       * sometimes, Edge will not return checkout-frame.js due to the captcha changes.
+       * Emitting this event will let the merchant-side script know to fallback to
+       * the standard open flow.
+       */
+      this.onevent({
+        event: 'shopify_failure',
+      });
+      return;
+    }
+    this.postMessage(this.makeMessage('1cc_shopify_checkout_initiate', body));
+  },
+
   onmessage: function (e) {
     let data = parse(e.data);
     if (!data) {
@@ -388,7 +415,13 @@ CheckoutFrame.prototype = {
     }
   },
 
-  onload: function () {
+  onload: function (data) {
+    /**
+     * 'load' event is sent when checkout-frame is loaded and initialised
+     */
+    if (data && data.origin === 'checkout-frame') {
+      isCheckoutFrameLoaded = true;
+    }
     if (this.rzp) {
       this.postMessage(this.makeMessage());
     }
