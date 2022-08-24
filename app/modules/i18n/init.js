@@ -34,6 +34,7 @@ const LOCALES = {
   guj: 'ગુજરાતી',
   tam: 'தமிழ்',
   tel: 'తెలుగు',
+  kan: 'ಕನ್ನಡ',
 };
 
 const ALLOWED_LOCALES = Object.keys(LOCALES);
