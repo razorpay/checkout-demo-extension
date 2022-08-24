@@ -3,6 +3,9 @@
 
   import { isRedesignV15 } from 'razorpay';
 
+  // utils import
+  import { luhnCheck } from 'lib/utils';
+
   // i18n
   import { t } from 'svelte-i18n';
   import { NAME_LABEL, NAME_HELP } from 'ui/labels/card';
@@ -24,12 +27,35 @@
 
   function handleInput(event) {
     value = event.target.value;
+    const isValidField = isValid();
+    setValid(isValidField);
   }
 
   export function isValid() {
-    const result = Boolean(value !== '');
-    helpTextToDisplay = result ? undefined : $t(NAME_HELP);
-    return result;
+    try {
+      let result = Boolean(value !== '');
+      if (result) {
+        helpTextToDisplay = '';
+        const valueSansSpaces = value.split(' ').join('');
+        /**
+         * It was observed that users tend to input card number
+         * here also
+         */
+        if (luhnCheck(valueSansSpaces) || !isNaN(Number(valueSansSpaces))) {
+          result = false;
+          helpTextToDisplay = $t(NAME_HELP);
+        }
+      } else {
+        helpTextToDisplay = $t(NAME_HELP);
+      }
+      return result;
+    } catch {
+      return true;
+    }
+  }
+
+  export function setValid(isValid) {
+    ref?.setValid(isValid);
   }
 </script>
 

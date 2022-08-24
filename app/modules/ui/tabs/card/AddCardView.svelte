@@ -499,11 +499,11 @@
     });
   }
 
-  function trackNameFilled() {
+  function onNameFilled() {
     Analytics.track('card_name:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        valid: nameField.isValid(),
+        valid: nameField?.isValid(),
       },
     });
   }
@@ -565,7 +565,7 @@
         bind:value={$cardName}
         bind:this={nameField}
         on:focus
-        on:blur={trackNameFilled}
+        on:blur={onNameFilled}
         {...oneCCFieldProps}
       />
     </div>
