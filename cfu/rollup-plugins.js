@@ -122,6 +122,9 @@ const getPlugins = ({ src }) => {
 
     isProd &&
       terser({
+        format: {
+          comments: false,
+        },
         compress: {
           drop_console: true,
           drop_debugger: true,
