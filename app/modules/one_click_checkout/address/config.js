@@ -16,6 +16,7 @@ import {
   addressSaveOTPSkipHandler,
   mandatoryLoginSuccessHandler,
 } from 'one_click_checkout/address/helpers';
+import { removeShippingCharges } from 'one_click_checkout/address/shipping_address/controller';
 
 export const savedAddress = {
   name: views.SAVED_ADDRESSES,
@@ -54,7 +55,7 @@ export const addAddress = {
   parent: views.ADDRESS,
   component: Address,
   tabTitle: views.ADDRESS,
-  props: { currentView: views.ADD_ADDRESS },
+  props: { currentView: views.ADD_ADDRESS, handleBack: removeShippingCharges },
   isBackEnabled: true,
   otpLabels: ADD_ADDRESS_OTP_LABELS,
   otpProps: {
