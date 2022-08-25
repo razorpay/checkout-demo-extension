@@ -33,9 +33,8 @@ export const isRedesignV15 = (): boolean => {
     if (isFOHEnabled) {
       allow = true;
     }
-
-    if (disableRedesignFromOption) {
-      allow = false;
+    if (typeof disableRedesignFromOption === 'boolean') {
+      allow = !disableRedesignFromOption;
     }
 
     if (!isOrgRazorpay) {
