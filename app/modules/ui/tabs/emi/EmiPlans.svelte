@@ -2,7 +2,7 @@
   // UI imports
   import Callout from 'ui/elements/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import EmiPlanCards from 'ui/tabs/emi/emiplancards.svelte';
+  import EmiPlanCards from 'ui/tabs/emi/EmiPlanCards.svelte';
   import EmiContact from 'ui/tabs/emi/emicontact.svelte';
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
 

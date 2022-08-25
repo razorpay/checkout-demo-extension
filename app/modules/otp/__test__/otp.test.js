@@ -1,5 +1,5 @@
 import { render, fireEvent, waitFor } from '@testing-library/svelte';
-import OTP from '../ui/OTP.svelte';
+import OTP from 'otp/ui/OtpScreen.svelte';
 import Analytics from 'analytics';
 import { setupPreferences } from 'tests/setupPreferences';
 import {

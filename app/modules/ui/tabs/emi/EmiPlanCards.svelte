@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isRedesignV15 } from 'razorpay';
 
-  import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';
+  import EmiPlanCard from 'ui/tabs/emi/EmiPlanCard.svelte';
   export let plans;
   export let bank;
   export let expanded;

@@ -186,7 +186,7 @@ describe.each(
       await proceed(context);
       await selectPaymentMethod(context, 'cardless_emi');
       await checkEmiMethods(context, [
-        'EMI on Cards',
+        'EMI on Debit/Credit cards',
         'ZestMoney',
         'Cardless EMI by InstaCred',
       ]);

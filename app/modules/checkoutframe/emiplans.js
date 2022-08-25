@@ -1,5 +1,5 @@
 import { tick } from 'svelte';
-import EMIPlansView from 'ui/tabs/emi/emiplans.svelte';
+import EMIPlansView from 'ui/tabs/emi/EmiPlans.svelte';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';

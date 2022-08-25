@@ -6204,6 +6204,10 @@ const preferences = {
           min_amount: 500000,
           plans: { 9: 16, 18: 16, 3: 16, 12: 16, 6: 16 },
         },
+        KKBK_DC: {
+          min_amount: 500000,
+          plans: { 9: 16, 18: 16, 3: 16, 12: 16, 6: 16 },
+        },
         CITI: {
           min_amount: 250000,
           plans: { 3: 13, 6: 13, 9: 13, 12: 13, 18: 13, 24: 13 },
@@ -6265,6 +6269,43 @@ const preferences = {
           {
             duration: 3,
             interest: 16,
+            subvention: 'customer',
+            min_amount: 500000,
+            merchant_payback: '2.61',
+          },
+          {
+            duration: 6,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 500000,
+            merchant_payback: '4.51',
+          },
+          {
+            duration: 9,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 500000,
+            merchant_payback: '6.35',
+          },
+          {
+            duration: 12,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 500000,
+            merchant_payback: '8.15',
+          },
+          {
+            duration: 18,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 500000,
+            merchant_payback: '11.62',
+          },
+        ],
+        KKBK_DC: [
+          {
+            duration: 3,
+            interest: 9,
             subvention: 'customer',
             min_amount: 500000,
             merchant_payback: '2.61',

@@ -70,6 +70,7 @@
   import { handleEditContact } from 'one_click_checkout/sessionInterface';
   import CTA from 'cta';
   import { CTA_LABEL } from 'cta/i18n';
+  import { isDebitIssuer } from 'common/bank';
 
   const { edit_paper } = getIcons({ backgroundColor: getThemeColor() });
 
@@ -88,7 +89,7 @@
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.
   $: otpPromptVisible = !$action && !$loading;
-  $: compact = $mode === 'HDFC_DC' || ($ipAddress && $accessTime);
+  $: compact = isDebitIssuer($mode) || ($ipAddress && $accessTime);
   $: showInput = !($action || $loading);
   $: newCta = $renderCtaOneCC && newCta;
 
@@ -152,7 +153,7 @@
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
   <div class="otp-screen-contents" class:heading-1cc={isOneClickCheckout()}>
-    {#if otpPromptVisible && $mode === 'HDFC_DC'}
+    {#if otpPromptVisible && isDebitIssuer($mode)}
       <EmiDetails />
     {:else if otpPromptVisible && $ipAddress && $accessTime}
       <CardBox
