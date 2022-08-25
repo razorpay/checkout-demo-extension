@@ -1,4 +1,4 @@
-import { getMerchantKey, getOption, getOrderId } from 'razorpay';
+import { getMerchantKey, getOption, getOrderId, getOrgDetails } from 'razorpay';
 import { render } from '@testing-library/svelte';
 import {
   isCustomChallan,
@@ -17,6 +17,7 @@ jest.mock('razorpay', () => ({
   getOrderId: jest.fn(),
   getOption: jest.fn(),
   getMerchantKey: jest.fn(),
+  getOrgDetails: jest.fn(),
 }));
 
 jest.mock('sessionmanager', () => ({
@@ -52,6 +53,13 @@ const neftDetails = {
   branch: 'Bangalore',
   bank_name: 'MY BANK',
 };
+const neftDetailsHDFC = {
+  account_number: 7894561204,
+  ifsc: 'HDFC000123',
+  branch: 'Bangalore',
+  bank_name: 'HDFC BANK',
+};
+
 function MockJSPDF() {
   this.save = jest.fn();
   this.output = jest.fn();
@@ -71,6 +79,9 @@ beforeEach(() => {
     .mockReturnValueOnce('Dummy Name');
 
   getOrderId.mockReturnValue('dummyOrderId');
+  getOrgDetails.mockReturnValue({
+    checkout_logo_url: 'hdfc checkout logo',
+  });
 });
 
 describe('Generate Challan Standard', () => {
@@ -105,6 +116,40 @@ describe('Generate Challan Standard', () => {
     expect(spy).toBeCalled();
   });
 });
+
+describe('Generate HDFC Challan Standard', () => {
+  test('Should be generated', async () => {
+    let img = new window.Image();
+    let doc = new MockJSPDF();
+    img.onload = function () {};
+
+    window.Image = function () {
+      return img;
+    };
+    window.jsPDF = function () {
+      return doc;
+    };
+
+    const spy = jest.spyOn(window, 'close').mockReturnValue(true);
+
+    getSDKMeta.mockReturnValueOnce({
+      platform: 'web',
+    });
+
+    const result = render(NeftPrintView, {
+      props: {
+        neftDetails: neftDetailsHDFC,
+        expiry: 1644469342,
+        amount: 10000,
+      },
+    });
+    img.onload();
+    expect(result).toBeTruthy();
+    expect(doc.save).toBeCalledTimes(1);
+    expect(spy).toBeCalled();
+  });
+});
+
 describe('Generate Challan Customised', () => {
   test('Should be generated', async () => {
     let img = new window.Image();

@@ -15,6 +15,7 @@ export const CHALLAN_FIELDS = {
 };
 export const labels = {
   HEADER: 'For RTGS/NEFT/Funds Transfer',
+  HDFC_HEADER: 'For RTGS/NEFT/IMPS/Funds Transfer',
   ROW_HEADERS: [
     {
       title: 'Beneficiary Name',
@@ -78,15 +79,11 @@ export const labels = {
   },
   HDFC_DISCLAIMERS: [
     {
-      text: 'This challan can be used only for electronic funds transfer to provided account no. from HDFC Bank and Other Banks through intra bank Funds Transfer or RTGS / NEFT.',
+      text: 'This challan can be used only for electronic funds transfer to provided account no. from HDFC Bank and Other Banks through intra bank Funds Transfer or RTGS / NEFT / IMPS.',
       padding: 4,
     },
     {
-      text: "It is remitter's responsibility to remit the funds to correct account no. with correct amount as provided above. Incase of any mismatch in account no or amount, the transaction will be rejected and funds will be refunded back to remitter account by next working day.",
-      padding: 9,
-    },
-    {
-      text: 'IMPS transactions are not allowed into provided account no. Bank shall not be liable incaseof IMPS transactions are not updated successfully or not refunded back to remitter. (This isrequired as solution for refund of IMPS rejections is yet to be finalized)',
+      text: "It is remitter's responsibility to remit the funds to correct account no. with correct amount as provided above. Incase of any mismatch in account no or amount, the transaction will be rejected and funds will be refunded.",
       padding: 9,
     },
     {

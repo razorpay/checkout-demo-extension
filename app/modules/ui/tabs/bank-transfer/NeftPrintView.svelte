@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { getOption, getMerchantKey, getOrderId } from 'razorpay';
+  import {
+    getOption,
+    getMerchantKey,
+    getOrderId,
+    getOrgDetails,
+  } from 'razorpay';
   //store
   import { phone, email } from 'checkoutstore/screens/home';
 
@@ -37,6 +42,7 @@
     DIPOSITOR_SIGN_LABEL,
     AUTH_SIGN_LABEL,
     BRANCH_LABEL,
+    HDFC_HEADER,
   } = labels;
 
   let neftView;
@@ -75,11 +81,12 @@
 
   let org_logo = rzpLogo;
   let tableDetails: { id: string; title: string; value?: string }[] = [];
+  const { checkout_logo_url } = getOrgDetails() || {};
 
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
-      org_logo = hdfcLogo;
+      org_logo = checkout_logo_url || hdfcLogo;
       disclaimers = HDFC_DISCLAIMERS;
       orgName = 'HDFC';
     }
@@ -121,7 +128,7 @@
       [CHALLAN_FIELDS.CUSTOMER_NAME]: name.trim(),
       [CHALLAN_FIELDS.CUSTOMER_EMAIL]: $email,
       [CHALLAN_FIELDS.CUSTOMER_MOBILE]: $phone,
-      [CHALLAN_FIELDS.ORDER_ID]: isHDFC ? description : orderId,
+      [CHALLAN_FIELDS.ORDER_ID]: isHDFC ? orderId || description : orderId,
       [CHALLAN_FIELDS.EXPIRY]: expiry,
     });
 
@@ -266,7 +273,7 @@
 
       // org logo
       if (isHDFC) {
-        doc.addImage(orgLogoUrl, 'png', 180, 10, 20, 20);
+        doc.addImage(orgLogoUrl, 'png', 140, 10, 60, 20);
       } else {
         doc.addImage(orgLogoUrl, 'png', 145, 21, 55, 9);
       }
@@ -278,7 +285,7 @@
 
       addRow({
         column: [
-          { text: HEADER, x: 15 },
+          { text: isHDFC ? HDFC_HEADER : HEADER, x: 15 },
           { text: date, x: 150 },
         ],
       });
