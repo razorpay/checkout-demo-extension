@@ -73,6 +73,7 @@
 </script>
 
 <QrWrapper parent="homeScreen" />
+
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
     <RazorpayCluster {block} on:selectInstrument />

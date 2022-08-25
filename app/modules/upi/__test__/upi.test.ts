@@ -29,6 +29,9 @@ jest.mock('../experiments', () => ({
     enabled: () => true,
   },
 }));
+jest.mock('ui/tabs/home/instruments', () => ({
+  isBlockVisible: jest.fn(() => true),
+}));
 jest.mock('checkoutstore/methods', () => ({
   isUPIFlowEnabled: jest.fn(() => true),
 }));

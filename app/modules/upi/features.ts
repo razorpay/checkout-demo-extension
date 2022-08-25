@@ -38,6 +38,7 @@ import { getDowntimes } from 'checkoutframe/downtimes';
 import { getMethodDowntimes } from 'checkoutframe/downtimes/methodDowntimes';
 import { getUniqueValues } from 'utils/array';
 import { capture, SEVERITY_LEVELS } from 'error-service';
+import { isBlockVisible } from 'ui/tabs/home/instruments';
 
 //#region One Click UPI Intent
 export function oneClickUPIIntent() {
@@ -209,7 +210,8 @@ export const initUpiQrV2 = () => {
       !hasFeature('disable_homescreen_qr', false) &&
       Number(getAmount()) <= QR_HOMESCREEN_AMOUNT_LIMIT &&
       !orderMethod &&
-      !isOneClickCheckout();
+      !isOneClickCheckout() &&
+      isBlockVisible('upi');
 
     const upiScreenQR =
       status &&

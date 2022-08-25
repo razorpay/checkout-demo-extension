@@ -19,6 +19,8 @@ import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { getAppFromPackageName } from 'common/upi';
 import { getMaxPreferredMethods } from 'checkoutframe/personalization/index';
+import { getMerchantConfig } from 'checkoutstore';
+import { customer } from 'checkoutstore/customer';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -512,4 +514,24 @@ function addDowntimeToBlock(block) {
     block.downtimeInstrument = downtimeInstrument;
   }
   return block;
+}
+
+/**
+ * Tells whether a block is visible or not.
+ *
+ * @param {string} method
+ * @returns {boolean}
+ */
+
+export function isBlockVisible(method) {
+  try {
+    const merchantConfig = getMerchantConfig().config;
+    const parsedConfig = getBlockConfig(merchantConfig, storeGetter(customer));
+    const show_default_blocks =
+      parsedConfig.display.preferences?.show_default_blocks ?? true;
+    const parsedConfigMethods = parsedConfig.display.hide.methods;
+    return show_default_blocks && !parsedConfigMethods.includes(method);
+  } catch {
+    return true;
+  }
 }
