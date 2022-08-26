@@ -68,6 +68,7 @@ jest.mock('razorpay', () => ({
   isCustomerFeeBearer: jest.fn(() => false),
   getAmount: jest.fn(() => AMOUNT),
   getSubscription: jest.fn(() => ({ order_id: 'test_id' })),
+  getPreferences: jest.fn(),
 }));
 
 const sampleOffer: Offers.OfferItem = {

@@ -13,9 +13,10 @@ import {
 } from 'common/webPaymentsApi';
 
 import { getUPIIntentApps, setUpiApps } from 'checkoutstore/native';
-
+import { getPreferences } from 'razorpay';
 import UpiTab from 'ui/tabs/upi/index.svelte';
 import { querySelector } from 'utils/doc';
+import { definePlatform } from 'upi/helper';
 const UPI_KEY = 'upiTab';
 
 /**
@@ -36,20 +37,32 @@ export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
     .filter((app) => app.method === 'upi')
     .forEach((app) => {
-      checkWebPaymentsForApp(app.package_name)
-        .then((status) => {
-          if (status === false) {
-            return;
-          }
-          setUpiApps([
-            ...getUPIIntentApps().all,
-            {
-              package_name: app.package_name,
-            },
-          ]);
-          Analytics.setMeta('upi.intent_on_mweb', true);
-        })
-        .catch(returnAsIs);
+      if (
+        getPreferences('experiments.upi_ux') === 'variant_1' &&
+        definePlatform('mWebAndroid')
+      ) {
+        setUpiApps([
+          ...getUPIIntentApps().all,
+          {
+            package_name: app.package_name,
+          },
+        ]);
+      } else {
+        checkWebPaymentsForApp(app.package_name)
+          .then((status) => {
+            if (status === false) {
+              return;
+            }
+            setUpiApps([
+              ...getUPIIntentApps().all,
+              {
+                package_name: app.package_name,
+              },
+            ]);
+            Analytics.setMeta('upi.intent_on_mweb', true);
+          })
+          .catch(returnAsIs);
+      }
     });
 }
 

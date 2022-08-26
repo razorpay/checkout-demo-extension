@@ -78,6 +78,12 @@ export function enableUPITiles(
   ) {
     return response;
   }
+  if (
+    getPreferences('experiments.upi_ux') === 'variant_2' &&
+    definePlatform('mWebAndroid')
+  ) {
+    return response;
+  }
 
   if (
     isRecurring() ||

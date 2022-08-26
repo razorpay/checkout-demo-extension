@@ -22,6 +22,7 @@ jest.mock('razorpay', () => ({
   getAmount: jest.fn(),
   getCurrency: jest.fn(),
   isOneClickCheckout: jest.fn(),
+  getPreferences: jest.fn(),
 }));
 
 describe('Test getInternationalProviders', () => {

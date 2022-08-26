@@ -125,6 +125,7 @@ describe('enableUPITiles: feature test', () => {
     (getPreferences as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(feature_overrides.features);
     (isRecurring as jest.Mock).mockReturnValueOnce(false);
     const response = enableUPITiles();
@@ -136,6 +137,7 @@ describe('enableUPITiles: feature test', () => {
     (getPreferences as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(feature_overrides.features);
     const response = enableUPITiles();
     expect(response?.status).toBeTruthy();
@@ -145,6 +147,7 @@ describe('enableUPITiles: feature test', () => {
     (getPreferences as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(feature_overrides.features);
     (isDesktop as jest.Mock).mockReturnValue(false);
     const response = enableUPITiles();
