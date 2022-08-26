@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'dev') {
   plugins.push(
     livereload({
       watch: [
-        'dist/v1/',
+        'app/dist/v1/',
         'app/index.html',
         'app/checkout.html',
         'app/custom.html',
