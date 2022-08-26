@@ -39,7 +39,12 @@ import { shouldRedirectZestMoney } from 'common/emi';
 import { assertPaymentSuccessMetadata, popupIframeCheck } from './helper';
 import * as _El from 'utils/DOM';
 import * as docUtil from 'utils/doc';
-import { getOption, getOrderId, isRedesignV15 } from 'razorpay';
+import {
+  getOption,
+  getOrderId,
+  isRedesignV15,
+  isEmailOptional,
+} from 'razorpay';
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
@@ -669,7 +674,7 @@ Payment.prototype = {
 
     if (
       (data.method === 'wallet' || data.method === 'cardless_emi') &&
-      !(data.contact && data.email)
+      !(data.contact && (isEmailOptional() || data.email))
     ) {
       return;
     }
