@@ -83,6 +83,7 @@
   #header-1cc {
     position: sticky;
     z-index: 2;
+    color: var(--primary-text-color);
   }
   .header-title-wrapper {
     display: flex;
@@ -92,12 +93,12 @@
   }
 
   #header-1cc .header-title-wrapper-with-extra-padding {
-    padding: 18px 16px;
+    padding: 12px 16px 8px;
   }
 
   .header-title {
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-heading);
     line-height: 18px;
   }
 
@@ -109,7 +110,7 @@
   .header-body-wrapper {
     display: flex;
     justify-content: space-between;
-    padding: 8px 16px 18px;
+    padding: 8px 16px 12px;
   }
 
   .rtb-section {
@@ -136,7 +137,7 @@
   .header-wrapper {
     display: flex;
     flex-direction: column;
-    padding: 18px 16px 0px;
+    padding: 12px 16px 0px;
   }
 
   .title-section {
@@ -151,6 +152,6 @@
   }
 
   .header-when-no-rtb {
-    padding: 8px 16px 18px;
+    padding: 8px 16px 12px;
   }
 </style>

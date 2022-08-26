@@ -179,8 +179,8 @@
   }
   .order-summary-label {
     font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
     line-height: 16px;
     text-transform: capitalize;
     display: flex;
@@ -195,6 +195,7 @@
   .order-summary {
     padding: 16px 0px 0px;
     font-size: 14px;
+    margin-bottom: -2px;
   }
 
   .row {
@@ -210,20 +211,22 @@
   }
 
   .color-green {
-    color: #079f0d;
+    color: var(--positive-text-color);
   }
 
   .color-gray {
-    color: #8d97a1;
+    color: var(--secondary-text-color);
   }
 
   .split {
-    border: 1px dashed #e1e5ea;
+    border: 1px dashed var(--light-dark-color);
     border-bottom: none;
     margin: 16px 0px;
   }
   .total-label {
-    font-weight: 500;
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
   }
 
   .price-label {

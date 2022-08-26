@@ -26,17 +26,19 @@
   <span data-test-id="vernacular-text" class="selected-langauage"
     >{getLocaleName($locale)}</span
   >
-  <Icon icon={arrow_down(9, 9)} />
+  <Icon icon={arrow_down('10', '6')} />
 </div>
 
 <style>
   .wrapper {
     margin: auto 0px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
   }
   .selected-langauage {
     margin-right: 6px;
-    font-size: 12px;
-    font-weight: 400;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
   }
 </style>

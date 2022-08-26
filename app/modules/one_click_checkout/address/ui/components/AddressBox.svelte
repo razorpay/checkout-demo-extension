@@ -125,12 +125,12 @@
   }
 
   .address-landmark {
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
   .address-serviceability-error {
-    font-size: 11px;
+    font-size: var(--font-size-tiny);
     margin-top: 12px;
-    color: #eb001b;
+    color: var(--error-validation-color);
     background: #fff1f1;
     border-radius: 1px;
     padding: 6px 8px;
@@ -150,9 +150,9 @@
   }
 
   .card-border {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-dark-color);
     border-radius: 2px;
-    padding: 22px 16px 20px;
+    padding: 16px;
   }
 
   .box-header {
@@ -162,7 +162,7 @@
 
   .edit-cta {
     position: absolute;
-    top: 26px;
+    top: 18px;
     right: 16px;
     z-index: 1;
   }
@@ -172,27 +172,30 @@
   }
   .address-name {
     margin-right: 4px;
-    font-size: 14px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     text-transform: capitalize;
+    color: var(--secondary-text-color);
   }
   .address-tag {
-    font-size: 10px;
-    color: #263a4a;
-    background: #eef4f9;
+    font-size: var(--font-size-tiny);
+    color: var(--primary-text-color);
+    background: var(--background-color-magic);
     border-radius: 2px;
     padding: 2px 4px 3px;
     align-self: baseline;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     line-height: 14px;
   }
   .address-text {
-    font-size: 14px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-regular);
     line-height: 20px;
-    color: #8d97a1;
+    color: var(--secondary-text-color);
   }
 
   .selected-container {
-    border: 1px solid var(--highlight-color);
+    border: 1px solid var(--primary-color);
   }
   .shimmer-card {
     position: relative;
@@ -208,7 +211,9 @@
   }
 
   .address-phone-number {
-    font-size: 14px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-regular);
     line-height: 22px;
+    color: var(--secondary-text-color);
   }
 </style>

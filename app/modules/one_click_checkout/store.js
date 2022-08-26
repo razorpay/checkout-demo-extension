@@ -17,7 +17,9 @@ export const shouldShowAddress = () =>
  * Checks if 1CC enabled and show_coupons is true and should not be payment link or payment page
  */
 export const shouldShowCoupons = () =>
-  isOneClickCheckout() && getOption('show_coupons') && !getOption('payment_link_id');
+  isOneClickCheckout() &&
+  getOption('show_coupons') &&
+  !getOption('payment_link_id');
 
 /**
  * @returns boolean

@@ -87,10 +87,6 @@
   export let inputWidth;
   export let showInput;
 
-  // $: if (!$loading) {
-  //   $loading = true;
-  // }
-
   let otpPromptVisible;
   let compact;
   let allowSkipButton = $allowSkip;
@@ -409,8 +405,8 @@
   <CTA
     screen="otp"
     tab={$tabStore}
-    disabled={$ctaOneCCDisabled || $disableCTA}
-    show={!$loading && !$addFunds && !$action}
+    disabled={$ctaOneCCDisabled || $disableCTA || $loading}
+    show={!$addFunds && !$action}
     label={VERIFY_LABEL}
     showAmount={false}
   />
@@ -443,7 +439,7 @@
   :global(.redesign) .otp-controls.is-loading {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .otp-controls-one-cc {
@@ -521,9 +517,9 @@
   .otp-heading {
     margin-bottom: 26px;
     text-align: center;
-    color: #263a4a;
+    color: var(--primary-text-color);
     text-transform: capitalize;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   #form-otp .heading-1cc {

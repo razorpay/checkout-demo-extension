@@ -62,11 +62,12 @@
     margin: 8px 0px;
     color: var(--highlight-color);
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
   }
 
   .show-landmark-label .optional {
-    color: #79747e;
+    color: var(--tertiary-text-color);
+    font-weight: var(--font-weight-medium)
   }
 </style>

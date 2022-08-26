@@ -36,8 +36,8 @@
 
 <style>
   .one-cc {
-    font-weight: 600;
-    color: #263a4a;
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-text-color);
     text-transform: none;
     margin-left: 0;
   }

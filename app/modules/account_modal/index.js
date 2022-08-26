@@ -1,6 +1,6 @@
 import { pushOverlay } from 'navstack';
 import AccountModal from 'account_modal/ui/AccountModal.svelte';
-import MerchantIFrameSvelte from './ui/MerchantIFrame.svelte';
+import MerchantIFrameSvelte from 'account_modal/ui/MerchantIFrame.svelte';
 
 export function showAccountModal(options) {
   pushOverlay({

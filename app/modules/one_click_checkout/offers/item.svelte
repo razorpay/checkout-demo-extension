@@ -73,7 +73,7 @@
   .offer-item {
     margin: -1px 12px 0;
     background: #fff;
-    border: 1px solid #e6e7e8;
+    border: 1px solid var(--light-dark-color);
     padding: 14px 16px;
     cursor: pointer;
     line-height: 18px;
@@ -82,11 +82,11 @@
     border-color: #fff;
   }
   .list .offer-heading .inactive.checkbox:after {
-    border-color: #ddd;
+    border-color: var(--light-dark-color);
   }
   .inactive.checkbox {
     background: #fff;
-    border-color: #ddd !important;
+    border-color: var(--light-dark-color) !important;
   }
   .offer-item.selected {
     position: relative;
@@ -96,28 +96,28 @@
     align-items: center;
   }
   .offer-detail {
-    border-top: 1px solid #e6e7e8;
-    color: #666;
-    font-size: 14px;
+    border-top: 1px solid var(--light-dark-color);
+    color: var(--secondary-text-color);
+    font-size: var(--font-size-body);
     padding: 8px 0px;
   }
   .remove-offer {
     margin-top: 12px;
     text-transform: capitalize;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.5px;
     cursor: pointer;
   }
   .badge {
     padding: 2px 4px;
     background-color: #e5faed;
-    color: #70c692;
+    color: var(--positive-text-color);
     pointer-events: none;
-    font-size: 10px;
+    font-size: var(--font-size-tiny);
     margin-right: 10px;
     border-radius: 2px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
   .offer-heading {
     display: flex;
@@ -126,7 +126,7 @@
   }
   .heading-text {
     width: 64%;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);;
   }
   .first-item {
     border-top-left-radius: 4px;

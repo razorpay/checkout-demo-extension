@@ -261,7 +261,7 @@
       top: 2px;
     }
     .saved-card-text {
-      color: #263a4a;
+      color: var(--primary-text-color);
     }
 
     .know-more-text {

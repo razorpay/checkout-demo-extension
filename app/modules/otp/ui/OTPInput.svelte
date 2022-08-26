@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { digits, disableCTA } from 'checkoutstore/screens/otp';
+  import { digits, disableCTA, errorMessage, loading } from 'checkoutstore/screens/otp';
   import { showFeeLabel } from 'checkoutstore/fee';
 
   import Analytics from 'analytics';
@@ -48,6 +48,11 @@
    * @param index {number} index of input which fired the event
    */
   function onOtpDigitInput(e, index) {
+    // if invalid otp and user changes input
+    if ($errorMessage) {
+      $errorMessage = '';
+    }
+
     // If user is trying to override the existing value
     if (e?.target?.value && e?.data) {
       $digits[index] = e.data;
@@ -130,6 +135,8 @@
       otpContainer.children[0].focus();
       focused = true;
     }
+    
+    focused = !$loading;
   });
 </script>
 

@@ -63,6 +63,6 @@
     padding: 20px 0 32px;
   }
   .resend-label {
-    font-size: 14px;
+    font-size: var(--font-size-body);
   }
 </style>

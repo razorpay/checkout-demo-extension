@@ -86,8 +86,8 @@
   }
 
   :global(.redesign) .fee {
-    font-size: 10px;
-    color: #8d97a1;
+    font-size: var(--font-size-small);
+    color: var(--tertiary-text-color);
     text-decoration: none;
   }
   .fee-helper {

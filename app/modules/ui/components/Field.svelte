@@ -594,7 +594,7 @@
     font-family: 'rzpcvv' !important;
   }
   .successText {
-    color: #079f0d;
+    color: var(--positive-text-color);
   }
   .failureText {
     color: var(--error-validation-color);
@@ -611,6 +611,9 @@
       width: 100%;
       top: 0;
     }
+    &.elem-one-click-checkout .prediction-input {
+      color: var(--primary-text-color);
+    }
     input.main {
       background: transparent;
       color: black;
@@ -618,6 +621,10 @@
       width: 100%;
       position: relative;
     }
+  }
+
+  .elem-one-click-checkout.with-prediction input.main {
+    color: var(--primary-text-color);
   }
 
   .suggestion-dropdown {
@@ -678,13 +685,14 @@
   }
 
   .input-one-click-checkout {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     position: relative;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--light-dark-color);
     margin-top: 8px;
     padding: 15px 16px;
     border-radius: 4px;
     box-sizing: border-box;
+    color: var(--primary-text-color);
   }
 
   .elem-one-click-checkout::after {
@@ -710,7 +718,7 @@
   }
 
   .label-one-click-checkout {
-    color: #8d8d8d;
+    color: var(--tertiary-text-color);
     position: absolute;
     top: 24px;
     left: 15px;
@@ -722,16 +730,16 @@
   .label-upper {
     top: 0px;
     background-color: transparent;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     padding: 0px 4px;
     left: 9px;
-    color: var(--highlight-color);
+    color: var(--primary-color);
     transition: all ease-out 0.2s;
     background-color: #fff;
   }
 
   .label-upper {
-    color: #8d8d8d;
+    color: var(--tertiary-text-color);
   }
 
   .label-upper.error-label-one-click-checkout {
@@ -756,7 +764,7 @@
   }
 
   .input-one-click-checkout:focus {
-    border-color: var(--highlight-color);
+    border-color: var(--primary-color);
   }
 
   .error-field-one-click-checkout,
@@ -807,7 +815,7 @@
 
   .cvv-one-cc-label-upper {
     padding: 0px 2px;
-    font-size: 10px;
+    font-size: var(--font-size-tiny);
     line-height: 12px;
     left: 6px;
     top: 2px;
@@ -833,13 +841,13 @@
   .cvv-one-cc-label-prefered-block {
     top: 6px;
     left: 6px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
   .input-one-click-checkout:focus + .cvv-one-cc-label-prefered-block,
   .cvv-one-cc-label-upper-prefered-block {
     background-color: #fff;
     padding: 0px 2px;
-    font-size: 10px;
+    font-size: var(--font-size-tiny);
     left: 6px;
     top: -6px;
   }
@@ -849,7 +857,7 @@
   .add-card-fields-one-cc-wrapper {
     width: 100%;
     margin: 10px 0px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
 
   .add-card-fields-one-cc {
@@ -861,14 +869,14 @@
   .add-card-fields-label-one-cc {
     top: 18px;
     line-height: 14px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
   .input-one-click-checkout:focus + .add-card-fields-label-one-cc {
     top: 12px;
     background: #fff;
     padding: 0px 4px;
     left: 8px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 14px;
   }
 
@@ -877,7 +885,7 @@
     top: -6px;
     padding: 0px 4px;
     left: 8px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 14px;
   }
 

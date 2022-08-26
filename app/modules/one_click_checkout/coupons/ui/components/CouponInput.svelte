@@ -251,9 +251,8 @@
     display: flex;
     justify-content: space-between;
     position: relative;
-    border: 1px solid #dadce0;
+    border: 1px solid var(--light-dark-color);
     border-radius: 4px;
-    margin-bottom: 5px;
   }
 
   .input-area {
@@ -261,11 +260,11 @@
     padding: 12px;
     border-radius: 4px;
     font-size: 15px;
-    color: #263a4a;
+    color: var(--primary-text-color);
     width: 205px;
   }
   .label {
-    color: #8d8d8d;
+    color: var(--secondary-text-color);
     position: absolute;
     top: 12px;
     left: 15px;
@@ -280,8 +279,8 @@
   }
 
   .input-group.invalid {
-    border: 1px solid #b21528;
-    color: #b21528;
+    border: 1px solid var(--error-validation-color);
+    color: var(--error-validation-color);
   }
 
   .input-group .input-area:focus + .label {

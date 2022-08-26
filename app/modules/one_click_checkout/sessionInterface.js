@@ -42,7 +42,7 @@ import {
 
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
-import { INDIA_COUNTRY_CODE } from 'common/constants';
+import { INDIA_COUNTRY_CODE, constantCSSVars } from 'common/constants';
 import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
 
 // i18n imports
@@ -54,8 +54,8 @@ import { format, formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 
 // utils imports
 import { isOneClickCheckout } from 'razorpay';
-import { showSummaryModal } from 'summary_modal';
 import { getThemeMeta } from 'checkoutstore/theme';
+import { showSummaryModal } from 'summary_modal';
 import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
 
 import * as Confirm from 'checkoutframe/components/confirm';
@@ -158,6 +158,10 @@ export function getIcons() {
 export function getTheme() {
   const themeMeta = getThemeMeta();
   return themeMeta;
+}
+
+export function getMagicCSSVars() {
+  return constantCSSVars;
 }
 
 /**

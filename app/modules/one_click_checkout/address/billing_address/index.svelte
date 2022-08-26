@@ -118,3 +118,9 @@
     <SameBillingAndShipping on:toggle={onToggleSameBillingAndShippingAddress} />
   </div>
 </AddressTab>
+
+<style>
+  div[slot='inner-header'] {
+    margin-bottom: 16px;
+  }
+</style>

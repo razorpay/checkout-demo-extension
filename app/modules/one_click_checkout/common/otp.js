@@ -97,7 +97,7 @@ const postSubmit = (msg, data) => {
       event: ACTIONS.LOGIN_FAILED,
       category: CATEGORIES.LOGIN,
     });
-    updateOTPStore({ errorMessage: msg, ...otpParams.sent });
+    updateOTPStore({ errorMessage: msg, digits: new Array(6), ...otpParams.sent });
   } else {
     merchantAnalytics({
       event: ACTIONS.LOGIN_SUCCESS,
@@ -137,7 +137,7 @@ export const submitOTP = () => {
   const { otpReason } = routesConfig[views.OTP].props;
   const otp = get(OtpScreenStore.otp) || get(OtpScreenStore.digits).join('');
   if (!isValidOtp(otp)) {
-    updateOTPStore({ errorMessage: INVALID_OTP_LABEL });
+    updateOTPStore({ errorMessage: INVALID_OTP_LABEL, digits: new Array(6), otp: '' });
     return;
   }
   updateOTPStore({ errorMessage: '' });

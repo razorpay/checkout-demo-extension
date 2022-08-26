@@ -112,7 +112,7 @@
     }
   }
 
-  let cardNumberHelpText;
+  let cardNumberHelpText: string | undefined;
   $: {
     cardNumberHelpText =
       showCardUnsupported && $cardNumber.length > 6
@@ -678,7 +678,7 @@
   }
 
   :global(.redesign) .page-header {
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .emi-plans-label {
@@ -687,6 +687,10 @@
     line-height: 20px;
     text-decoration-line: underline;
     color: #3684d6;
+  }
+
+  :global(.screen-one-cc) .emi-plans-label {
+    color: var(--primary-color);
   }
 
   .maestro-card-block {
@@ -708,8 +712,11 @@
   }
 
   :global(#content.one-cc) .card-title {
-    font-weight: 600;
-    color: #263a4a;
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-text-color);
+  }
+  :global(#content.one-cc) #view-emi-plans {
+    color: var(--primary-color);
   }
 
   :global(.redesign) {
@@ -717,8 +724,15 @@
       margin-top: 14px;
     }
 
-    .save_card_label_text {
-      margin-bottom: 1px;
+    // hiding input error if app selected
+    .faded {
+      :global(.error-field-one-click-checkout) {
+        border-color: #e0e0e0;
+      }
+
+      :global(.validation-error-one-click-checkout) {
+        display: none;
+      }
     }
   }
 </style>

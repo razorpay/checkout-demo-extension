@@ -1,7 +1,7 @@
 <script>
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
-  import close from 'one_click_checkout/coupons/icons/close';
+  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
@@ -77,6 +77,7 @@
 
     img {
       border-radius: 4px;
+      vertical-align: initial;
     }
   }
 

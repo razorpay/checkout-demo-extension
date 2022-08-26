@@ -2,12 +2,10 @@
   import { t } from 'svelte-i18n';
   import { fly, fade } from 'svelte/transition';
   import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
-  import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
   import { onMount } from 'svelte';
   import { isMobile } from 'common/useragent';
 
-  const theme = getTheme();
   let resizeBackdrop = false;
   let isKeyboardOpen = false;
   let layoutHeight;
@@ -36,12 +34,12 @@
     class="loader-backdrop"
     class:resize-backdrop={resizeBackdrop && !isKeyboardOpen}
     in:fade={{ duration: 250 }}
-    out:fade={{ duration: 250 }}
+    out:fade={{ duration: 200 }}
   />
   <div
     class="card"
     class:card-absolute={isKeyboardOpen}
-    transition:fly|local={{ duration: 250, y: 50 }}
+    out:fly={{ duration: 200, y: 10 }}
   >
     <div class="wrapper">
       <div class="bar" />
@@ -58,7 +56,7 @@
     position: absolute;
   }
   .loader-backdrop.resize-backdrop {
-    height: calc(100% - 96px);
+    height: calc(100% - 65px);
   }
 
   .loader-backdrop {
@@ -69,26 +67,30 @@
     background-color: black;
     top: 0;
     right: 0;
-    z-index: 10000;
+    z-index: 5;
   }
   .card {
-    z-index: 10001;
     width: 100%;
-    height: 36px;
-    color: #757575;
+    height: 42px;
+    color: var(--primary-text-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.08);
     background-color: #fef5e5;
+    animation-name: slide-up;
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+    z-index: 5;
   }
 
   .content {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     width: 100%;
     justify-content: center;
     align-items: center;
@@ -107,11 +109,14 @@
     flex-direction: column;
   }
   .bar {
+    visibility: hidden;
     width: 50px;
     height: 5px;
     top: 0px;
     position: relative;
     animation-name: loader;
+    /** delay should be same as duration of .card animation duration */
+    animation-delay: 0.2s;
     animation-duration: 0.5s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
@@ -122,9 +127,22 @@
   @keyframes loader {
     0% {
       left: 0px;
+      visibility: hidden;
     }
     100% {
       left: calc(100% - 50px);
+      visibility: visible;
+    }
+  }
+
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 </style>

@@ -17,16 +17,16 @@
 </script>
 
 {#if !hide}
-  <span>
+  <span class="item">
     <span
-      class="breadcrumb-text"
+      class="text"
       class:theme={selected}
       class:text-bold={selected}
     >
       {$t(label)}
     </span>
     {#if showIcon}
-      <span class="breadcrumb-icon">
+      <span class="icon">
         <Icon icon={double_arrow} />
       </span>
     {/if}
@@ -34,19 +34,24 @@
 {/if}
 
 <style>
-  .breadcrumb-text {
+  .text {
     padding: 0px 2px;
   }
 
   .text-bold {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .hide {
     display: none;
   }
 
-  .breadcrumb-icon {
-    padding: 2px 8px 0px;
+  .icon {
+    padding: 2px 4px 0px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
   }
 </style>

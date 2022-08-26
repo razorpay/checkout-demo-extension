@@ -22,4 +22,8 @@
   :global(.screen-bottom .callout) {
     position: static; /* These don't need to be absolutely positioned in <BottomScreen /> */
   }
+  :global(#content.one-cc .callout) {
+    color: var(--primary-text-color);
+    padding: 16px;
+  }
 </style>

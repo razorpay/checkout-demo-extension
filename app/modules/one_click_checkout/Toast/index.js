@@ -22,6 +22,21 @@ export function showToast(options) {
   toast.show(options);
 }
 
+/**
+ * Method to show the Toast after a given delay duration.
+ * Use case: Loader destroy time and toast show-up time are overlapping.
+ * - Need to isolate the animations so that it looks smooth.
+ * @param {Object} options which has ttl, class, message for toast
+ * @returns
+ */
+export function showToastAfterDelay(options, delay) {
+  setTimeout(() => {
+    const { screen } = options || {};
+    create(screen);
+    toast.show(options);
+  }, delay);
+}
+
 export function hideToast() {
   if (!toast) {
     return;

@@ -69,9 +69,11 @@
   let upiTiles = enableUPITiles(upiUxV1dot1.enabled());
 
   let _subtitle;
+  const isMethodCOD = method === 'cod';
+
   $: {
     _subtitle = getSubtitleForDisplay($locale);
-    if (method === 'cod' && disabled) {
+    if (isMethodCOD && disabled) {
       _subtitle = '';
     }
     uninteractive =
@@ -83,7 +85,7 @@
 
   let _title;
   $: _title = getTitleForDisplay($locale);
-  $: codLoading = method === 'cod' && $showCodLoader;
+  $: codLoading = isMethodCOD && $showCodLoader;
 
   function getSubtitleForDisplay(locale) {
     const currency = getCurrency();
@@ -91,7 +93,7 @@
 
     if (subtitle) {
       return subtitle;
-    } else if (method === 'cod' && $codChargeAmount) {
+    } else if (isMethodCOD && $codChargeAmount) {
       return `
         <div class="highlight-text">
           ${formatTemplateWithLocale(
@@ -127,7 +129,7 @@
     return icons[method];
   }
 
-  $: if (method === 'cod') {
+  $: if (isMethodCOD) {
     disabled = !$isCodAvailable || $showCodLoader;
     errorLabel = COD_DISABLED_LABEL;
     error = $codReason;
@@ -142,7 +144,7 @@
       },
     });
 
-    if (method === 'cod') {
+    if (isMethodCOD) {
       Events.TrackBehav(HomeEvents.COD_METHOD_SELECTED);
     }
 
@@ -176,8 +178,8 @@
   {disabled}
   withRow={method === 'upi' && upiTiles?.status}
 >
-  <i slot="icon">
-    {#if method === 'cod'}
+  <i slot="icon" class:cod-icon={isMethodCOD}>
+    {#if isMethodCOD}
       <CodIcon {disabled} />
     {:else}
       <Icon icon={_icon} />
@@ -252,6 +254,11 @@
     width: auto;
   }
 
+  i.cod-icon :global(svg) {
+    height: 28px;
+    margin-top: 2px;
+  }
+
   /* Content styles */
   div[slot='title'] {
     margin: 0;
@@ -294,15 +301,15 @@
   }
 
   div[slot='title'].title-one-cc {
-    font-weight: 400;
-    color: #263a4a;
-    font-size: 14px;
+    font-weight: var(--font-weight-regular);
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
   }
 
   div[slot='subtitle'].subtitle-one-cc {
-    font-weight: 400;
-    font-size: 12px;
-    color: #8d97a1;
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-small);
+    color: var(--secondary-text-color);
     width: 101%; /** ios wrapping issue */
 
     &:empty {

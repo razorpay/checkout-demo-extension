@@ -113,6 +113,7 @@ export const COLORS = {
   RAZORPAY_HOVER_COLOR: '#626A74',
   TEXT_COLOR_BLACK: 'rgba(0, 0, 0, 0.85)',
   TEXT_COLOR_WHITE: '#FFFFFF',
+  MAGIC_BRAND_COLOR: '#005bf2',
 };
 
 export const INDIA_COUNTRY_ISO_CODE = 'IN';
@@ -159,3 +160,27 @@ export const STATIC_CDN_PREFIX = BUILD_NUMBER
 
 export const FRAME_CSS_URL = STATIC_CDN_PREFIX + '/css/checkout.css';
 export const FRAME_JS_URL = STATIC_CDN_PREFIX + '/checkout-frame.js';
+
+export const constantCSSVars = {
+  'brand-color': COLORS.MAGIC_BRAND_COLOR,
+  // font-weights
+  'font-weight-regular': 400, // default
+  'font-weight-medium': 500,
+  'font-weight-semibold': 600,
+  'font-weight-bold': 700,
+  // font-sizes
+  'font-size-body': '14px', // default
+  'font-size-heading': '16px',
+  'font-size-small': '12px',
+  'font-size-tiny': '10px',
+  // text-colors
+  'primary-text-color': '#171a1e', // default
+  'secondary-text-color': '#414449',
+  'tertiary-text-color': '#676a6d',
+  'positive-text-color': '#4ea376',
+  // errors
+  'error-validation-color': '#d12d2d',
+  // colors
+  'background-color-magic': '#f0f0f4',
+  'light-dark-color': '#d9dadb',
+};

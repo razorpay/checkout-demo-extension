@@ -5,7 +5,7 @@
 
   // helpers/store imports
   import { amount } from 'one_click_checkout/charges/store';
-  import { showSummaryModal } from 'one_click_checkout/summary_modal';
+  import { showSummaryModal } from 'summary_modal';
   import { getCurrency, isOneClickCheckout } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
@@ -83,24 +83,24 @@
   }
 
   .price-label {
-    color: #263a4a;
-    font-size: 16px;
-    font-weight: 600;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-semibold);
     line-height: 18px;
   }
 
   #cta-view-details {
-    font-size: 10px;
+    font-size: var(--font-size-tiny);
     text-align: left;
-    color: #8d97a1;
+    color: var(--tertiary-text-color);
   }
 
   .cta-container {
     gap: 8px;
     display: flex;
-    padding: 14px 16px;
+    padding: 10px 14px;
     align-items: center;
-    box-shadow: 0px -4px 8px #6b6c6d20;
+    box-shadow: 0px -10px 10px rgba(23, 26, 30, 0.15);
   }
 
   .flex-column {

@@ -384,23 +384,35 @@
       }
     }
 
+    // .option-icon {
+    //   left: 12px;
+    //   top: 20px;
+    // }
+
     .option-title {
       color: #0D2366;
       line-height: 16px;
 
       .desc {
         color: rgba(81, 89, 120, 0.7);
-        font-size: 11px;
+        font-size: 12px;
+        margin-top: 2px;
       }
     }
 
 #content.one-cc {
   .option {
     .option-title {
-      color: #263a4a;
+      color: var(--secondary-text-color);
 
       .desc {
-        color: #8D97A1;
+        color: var(--tertiary-text-color);
+      }
+    }
+
+    &.next-option {
+      &:after {
+        color: var(--primary-text-color);
       }
     }
   }

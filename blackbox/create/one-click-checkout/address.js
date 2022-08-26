@@ -105,6 +105,19 @@ module.exports = function (testFeatures) {
       preferences.methods.cod = true;
       preferences.methods.upi = true;
 
+      /**
+       * L1 QRv2 has to be disable, for old flow to work
+       */
+       let qrV2FeatureFlags = {
+        disable_homescreen_qr: true,
+        disable_upiscreen_qr: true,
+      };
+      if (preferences.features) {
+        preferences.features = { ...preferences.features, ...qrV2FeatureFlags };
+      } else {
+        preferences.features = qrV2FeatureFlags;
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,

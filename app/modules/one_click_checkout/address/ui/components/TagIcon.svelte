@@ -3,7 +3,7 @@
   import home from 'one_click_checkout/address/icons/home';
   import work from 'one_click_checkout/address/icons/work';
   import othersTag from 'one_click_checkout/address/icons/others_tag';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
+  import { getTheme, getMagicCSSVars } from 'one_click_checkout/sessionInterface';
   export let label;
   export let selected = false;
   const iconMap = {
@@ -11,12 +11,12 @@
     Office: work,
     Others: othersTag,
   };
-  const defaultForegroundColor = '#333333';
+  const defaultForegroundColor = getMagicCSSVars()['tertiary-text-color'];
   const backgroundColor = getTheme().backgroundColor;
   let icon;
   let foregroundColor = defaultForegroundColor;
   $: foregroundColor = selected
-    ? getTheme().highlightColor
+    ? getTheme().color
     : defaultForegroundColor;
   $: icon = iconMap[label](foregroundColor, backgroundColor);
 </script>

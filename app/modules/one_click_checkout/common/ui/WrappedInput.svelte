@@ -182,7 +182,7 @@
     font-weight: normal;
     font-size: 13px;
     line-height: 16px;
-    color: #000000;
+    color: var(--primary-text-color);
   }
 
   .description {
@@ -190,24 +190,24 @@
     font-weight: normal;
     font-size: 10px;
     line-height: 13px;
-    color: #7d7d7d;
+    color: var(--secondary-text-color);
   }
 
   .input-validation-error {
     color: var(--error-validation-color);
     margin-top: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
 
   .input {
     outline: none;
     padding: 12px;
     border-radius: 4px;
-    color: #263a4a;
+    color: var(--primary-text-color);
     margin-bottom: 0px;
   }
   .label {
-    color: #8d8d8d;
+    color: var(--tertiary-text-color);
     position: absolute;
     top: 22px;
     left: 16px;
@@ -225,7 +225,7 @@
   .input-group .input:focus + .label {
     top: 0px;
     padding: 0 4px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     left: 8px;
     color: var(--highlight-color);
     transition: all ease-out 0.2s;
@@ -234,14 +234,14 @@
   .input-group .input:valid + .label {
     top: -8px;
     padding: 0 4px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     left: 8px;
   }
 
   .label-upper {
     top: 0px;
     padding: 0 4px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     left: 8px;
     transition: all ease-out 0.2s;
   }
@@ -258,8 +258,8 @@
 
   .dropdown-one-cc .leading {
     font-family: 'Inter';
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-small);
     line-height: 16px;
     color: #263a4a;
   }
@@ -267,7 +267,7 @@
   .dropdown-one-cc .description {
     margin-top: 4px;
     font-family: 'Inter';
-    font-size: 12px;
+    font-size: var(--font-size-small);
     font-weight: 200;
     line-height: 16px;
     color: #8d97a1;

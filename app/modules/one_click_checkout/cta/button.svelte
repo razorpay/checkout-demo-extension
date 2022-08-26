@@ -57,14 +57,15 @@
   }
 
   #one-cc-cta.disabled {
-    background: #cdd2d6;
+    background: var(--light-dark-color);
+    color: var(--tertiary-text-color);
   }
 
   #one-cc-cta {
     width: 100%;
-    padding: 18px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 14px 18px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
     border-radius: 6px;
 
     color: var(--text-color);

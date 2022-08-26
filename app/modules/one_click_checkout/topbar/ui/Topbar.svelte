@@ -115,14 +115,14 @@
     top: 0;
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #e1e5ea;
-    border-bottom: 1px solid #e1e5ea;
-    padding: 10px 16px;
+    border-top: 1px solid var(--light-dark-color);
+    border-bottom: 1px solid var(--light-dark-color);
+    padding: 9px 14px;
     align-items: center;
     box-sizing: border-box;
     height: 44px;
     z-index: 2;
-    box-shadow: 10px 10px 30px rgba(107, 108, 109, 0.1);
+    box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
   }
   #topbar-new.topbar-header {
     height: 55px;

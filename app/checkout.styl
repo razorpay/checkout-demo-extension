@@ -140,14 +140,19 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .iframe-title,
-#topbar:before,
-.avs-card-info,
-.nvs-provider-info {
+#topbar:before {
     background-color: var(--secondary-highlight-color) !important;
 }
 
-.offers-container header {
+.offers-container header,
+.avs-card-info,
+.nvs-provider-info {
     background-color: var(--secondary-highlight-color);
+}
+
+.redesign .avs-card-info,
+.redesign .nvs-provider-info {
+    background: linear-gradient(90deg, var(--secondary-highlight-color) 0%, var(--hover-state-color) 100%);
 }
 
 .iframe-title,
@@ -204,6 +209,53 @@ label.sv-checkbox > .stack > input:focus::before {
 
 /** Start: Styles for borders for a vertical list of items */
 
+#content.one-cc {
+  .border-list > * {
+    border: 1px solid var(--light-dark-color);
+  }
+
+  .border-list > *:not(:last-child) {
+    border-bottom: none;
+  }
+
+  .border-list:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
+  .border-list > *:focus:not(.uninteractive),
+  .border-list > *:focus-within:not(.uninteractive),
+  .border-list > .selected {
+      border-color: var(--primary-color);
+  }
+
+  .border-list:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
+  .border-list > *:focus:not(.uninteractive) + *,
+  .border-list > *:focus-within:not(.uninteractive) + *,
+  .border-list > .selected + * {
+      border-top-color: var(--primary-color);
+  }
+
+  label.sv-checkbox.checked {
+    .stack > input[type='checkbox']:checked::before {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    &.disabled > .stack > input[type='checkbox']:checked::before {
+      background: #8D97A1;
+      border-color: #8D97A1;
+    }
+  }
+
+  .option.active,
+  :not(.saved-card).checked .checkbox,
+  input[type='checkbox']:checked + .checkbox {
+    color: #fff;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .checkbox {
+    border: 1px solid var(--light-dark-color);
+  }
+}
+
 .border-list > *:first-child {
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
@@ -227,7 +279,7 @@ label.sv-checkbox > .stack > input:focus::before {
 }
 
 .border-list > *:not(:last-child) {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .border-list:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
@@ -296,10 +348,6 @@ label.sv-checkbox > .stack > input:focus::before {
 
 .theme-border-color {
   border-color: var(--background-color);
-}
-
-.elem-one-click-checkout{
-  --error-validation-color: #B21528;
 }
 
 #content.one-cc .confirm-container {

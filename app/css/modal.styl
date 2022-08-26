@@ -633,7 +633,7 @@ i {
   font-size: $size;
   width: 344px;
   font-family: $font;
-} 
+}
 
 .offers-fade {
   pointer-events: none;
@@ -731,10 +731,21 @@ i {
 
   h3.title, .legend {
     text-transform: capitalize;
-    color: #263A4A;
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
     opacity: 1;
+    padding-left: 0;
+  }
+
+  h3.title {
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  .legend {
+    margin-top: 0;
+    padding: 16px 0 10px;
   }
 
   .text-btn {
@@ -744,11 +755,14 @@ i {
   input[type=checkbox]::before{
     border-radius: 2px;
   }
-}
 
-@media (min-width: 992px) {
-  #content.one-cc {
-   height: 100%;
+  .input-radio input[type='radio']:focus:not(:checked) + label .radio-display {
+    border-color: var(--primary-color);
+  }
+
+  .input-radio input[type='radio']:checked + label .radio-display {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
   }
 }
 
@@ -838,7 +852,6 @@ i {
   box-shadow: $bs;
 
   img {
-    vertical-align: middle;
     max-height: 100%;
     max-width: 100%;
   }
@@ -1526,8 +1539,8 @@ div.callout span{
 
 .redesign {
   input:-webkit-autofill,
-  input:-webkit-autofill:hover, 
-  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
   input:-webkit-autofill:active{
       -webkit-box-shadow: 0 0 0 30px white inset !important;
   }

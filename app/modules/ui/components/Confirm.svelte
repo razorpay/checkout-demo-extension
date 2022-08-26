@@ -141,10 +141,14 @@
   :global(.one-cc) .confirm-heading {
     letter-spacing: normal;
     text-transform: none;
-    color: #263a4a;
-    font-weight: 600;
+    color: var(--primary-text-color);
+    font-weight: var(--font-weight-semibold);
     border-bottom: 1px solid #e1e5ea;
     padding: 0 0 12px 0;
+  }
+
+  :global(.one-cc) .confirm-message {
+    color: var(--secondary-text-color);
   }
 
   :global(.one-cc) .confirm-buttons {
@@ -155,7 +159,7 @@
     letter-spacing: normal;
     line-height: normal;
     text-transform: none;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
   /** will need this when we migrate modal design */
   // :global(.redesign) {

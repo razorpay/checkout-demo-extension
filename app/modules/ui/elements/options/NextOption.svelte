@@ -40,3 +40,12 @@
     <div class="option-arrow-text theme-highlight">{arrowText}</div>
   {/if}
 </DeprecatedOption>
+
+<style>
+  .option-title {
+    min-height: 22px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+  }
+</style>

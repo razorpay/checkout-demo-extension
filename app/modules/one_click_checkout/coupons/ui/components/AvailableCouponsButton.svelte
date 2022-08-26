@@ -76,27 +76,27 @@
 <style>
   .coupon-remove-text {
     color: var(--primary-color);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
     margin-left: auto;
     cursor: pointer;
   }
   #coupons-available-container {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
   }
 
   .coupons-available-text {
     margin-left: 8px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .coupons-available-count {
     padding-left: 2px;
-    font-weight: 300;
-    color: rgba(51, 51, 51, 0.6);
+    font-weight: var(--font-weight-regular);
+    color: var(--secondary-text-color);
   }
   .coupon-arrow-next {
     margin-left: auto;

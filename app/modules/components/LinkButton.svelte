@@ -22,14 +22,14 @@
 <style>
   .standard-btn {
     padding: 3px 1px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     border-bottom: 1px solid;
   }
 
   .one-cc-btn {
     padding: 2px 1px;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
     border-bottom: 1px solid;
   }
   button:disabled {

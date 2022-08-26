@@ -178,10 +178,7 @@
     {#if isRedesignV15Enabled}
       <h3 class="header-title">{$t(SELECT_WALLET)}</h3>
     {/if}
-    <div
-      class="border-list collapsable"
-      class:screen-one-cc={isRedesignV15Enabled}
-    >
+    <div class="border-list collapsable">
       {#each filteredWallets as wallet, i (wallet.code)}
         <SlottedRadioOption
           name={wallet.code}
@@ -220,8 +217,8 @@
         </SlottedRadioOption>
       {/each}
     </div>
-    <AccountTab />
   </div>
+  <AccountTab />
   <CTA
     screen="wallet"
     tab="wallet"
@@ -254,6 +251,9 @@
     font-size: 10px;
   }
 
+  .wallet-one-cc .subtitle {
+    color: var(--tertiary-text-color);
+  }
   .subtitle:empty {
     display: none;
   }
@@ -264,10 +264,7 @@
     height: 100%;
   }
   .wallet-one-cc {
-    overflow: auto;
-  }
-  .screen-one-cc {
-    min-height: 110%;
+    min-height: 512px;
   }
 
   :global(#content.one-cc) .border-list {

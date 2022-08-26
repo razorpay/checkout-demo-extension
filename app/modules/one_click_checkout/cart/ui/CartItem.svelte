@@ -21,7 +21,7 @@
     <p class="text name shift-up">
       {name}
     </p>
-    <p class="text quantity">{$t(QUANTITY_LABEL)} {quantity}</p>
+    <p class="text quantity">{$t(QUANTITY_LABEL)}: {quantity}</p>
   </div>
   <p class="text price shift-up">
     {formatAmountWithSymbol(price, currency, false)}
@@ -55,9 +55,9 @@
   }
 
   .text {
-    font-size: 12px;
-    font-weight: 400;
-    color: #263a4a;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--secondary-text-color);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -67,7 +67,7 @@
   }
 
   .quantity {
-    color: #8d97a1;
+    font-weight: var(--font-weight-regular);
   }
 
   .price {

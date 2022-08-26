@@ -62,10 +62,10 @@
   #address-serviceable-text {
     font-family: 'Inter';
     font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-small);
     line-height: 150%;
-    color: #79747e;
+    color: var(--tertiary-text-color);
   }
 
   #address-serviceable-message {
@@ -76,7 +76,7 @@
   #address-serviceability-error {
     font-size: 11px;
     line-height: 150%;
-    color: #eb001b;
+    color: var(--error-validation-color);
     background: #fff1f1;
     border-radius: 1px;
     padding: 6px 8px;
@@ -90,28 +90,36 @@
   #loader-text {
     font-family: 'Inter';
     font-style: italic;
-    font-weight: 400;
-    font-size: 12px;
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-small);
     line-height: 150%;
-    color: #79747e;
+    color: var(--tertiary-text-color);
   }
 
   .out {
-    animation-duration: 250ms;
+    animation-duration: 500ms;
     animation-name: element-out;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     -webkit-animation-fill-mode: forwards;
     animation-timing-function: cubic-bezier(0.17, 0, 1, 1);
-    animation-delay: 2s;
+    animation-delay: 4s;
   }
 
   @keyframes element-out {
     0% {
       opacity: 1;
     }
+    40% {
+      margin-bottom: 5px;
+    }
+    50% {
+      margin-bottom: 5px;
+    }
+    75% {
+      margin-bottom: 5px;
+    }
     100% {
-      transform: translateY(0);
       opacity: 0;
       height: 0;
       margin: 0;

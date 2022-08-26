@@ -154,45 +154,50 @@
       </h3>
       <div class="options emi-section">
         {#each filteredProviders[providerSection] as provider (provider.data.code)}
-          <div class="cm-single-option">
-            <NextOption {...provider} on:select>
-              {getCardlessEmiProviderName(
-                getOverriddenProviderCode(provider.data.code),
+          <NextOption {...provider} on:select>
+            {getCardlessEmiProviderName(
+              getOverriddenProviderCode(provider.data.code),
+              $locale
+            )}
+            <span class="cm-side-label"
+              >{getCardlessEmiProviderData(
+                provider.data.code,
+                'sideLabel',
                 $locale
-              )}
-              <span class="cm-side-label"
-                >{getCardlessEmiProviderData(
-                  provider.data.code,
-                  'sideLabel',
-                  $locale
-                )}</span
-              >
-            </NextOption>
-            {#if Boolean(provider.highlightLabel)}
-              <div
-                class="cm-highlightLabel"
-                style={`background:${getThemeColor()}1a;`}
-              >
-                <Icon icon={icons.tick_flag} />
-                <span>{$t(provider.highlightLabel) || ''}</span>
-              </div>
-            {/if}
-          </div>
+              )}</span
+            >
+          </NextOption>
+          {#if Boolean(provider.highlightLabel)}
+            <div
+              class="cm-highlightLabel"
+              style={`background:${getThemeColor()}1a;`}
+            >
+              <Icon icon={icons.tick_flag} />
+              <span>{$t(provider.highlightLabel) || ''}</span>
+            </div>
+          {/if}
         {/each}
       </div>
     {/each}
-    <AccountTab />
   </div>
+  <AccountTab />
 </div>
 
-<style>
-  .cm-single-option {
+<style lang="scss">
+  .emi-section {
     position: relative;
+
+    :global(.option-title) {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: flex-start;
+    }
   }
 
   .cm-side-label {
     color: #828282;
     font-size: 10px;
+    margin-left: 2px;
     line-height: 16px;
   }
 
@@ -236,7 +241,7 @@
     overflow: unset;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
   .content-one-cc {
     margin-top: 0px;
@@ -245,12 +250,21 @@
     margin-top: 0;
   }
 
-  :global(.redesign) .emi-header {
-    font-weight: 600;
-    color: #263a4a;
-    text-transform: none;
-    margin-top: 16px;
-    font-size: 14px;
-    margin-left: 18px;
+  :global(.redesign) {
+    .cardless-emi-wrapper {
+      height: auto;
+    }
+    .emi-header {
+      font-weight: var(--font-weight-semibold);
+      color: var(--primary-text-color);
+      text-transform: none;
+      margin-top: 16px;
+      font-size: 14px;
+      margin-left: 18px;
+    }
+
+    .options {
+      max-height: initial;
+    }
   }
 </style>

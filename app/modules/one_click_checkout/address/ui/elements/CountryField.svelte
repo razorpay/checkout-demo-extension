@@ -137,7 +137,7 @@
 
 <style>
   .field-wrapper .successText {
-    color: #079f0d;
+    color: var(--positive-text-color);
   }
   .field-wrapper .failureText {
     color: var(--error-validation-color);

@@ -1341,17 +1341,21 @@
     height: 46px;
     display: flex;
     align-items: center;
-    padding: 0 22px;
+    padding: 0 1rem;
   }
   .avs-title {
-    margin: 16px 24px 0;
+    margin: 0.5rem 1rem;
     line-height: 1;
     display: flex;
   }
 
   :global(.redesign) {
     .avs-title {
-      margin-bottom: 8px;
+      margin: 1.5rem 1rem;
+    }
+
+    .avs-card-info {
+      margin-top: 1.5rem;
     }
   }
 
@@ -1378,13 +1382,13 @@
     margin-top: 26px;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
 
   .saved-card-header {
     font-weight: 600;
     font-size: 14px;
-    color: #263a4a;
+    color: var(--primary-text-color);
     text-transform: none;
     margin-top: 26px;
   }

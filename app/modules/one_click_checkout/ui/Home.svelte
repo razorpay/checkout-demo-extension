@@ -26,7 +26,6 @@
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
   // session imports
-  import { getTheme } from 'one_click_checkout/address/sessionInterface';
   import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
 
   // analytics imports
@@ -45,19 +44,6 @@
   let topbar;
   let isBackEnabled;
   let handleBack;
-
-  let theme = getTheme();
-
-  let styles = {
-    'highlight-color': theme.highlightColor,
-    'sec-highlight-color': theme.secondaryHighlightColor,
-    'background-color': theme.backgroundColor,
-    'error-validation-color': '#B21528',
-  };
-
-  $: cssVarStyles = Object.entries(styles)
-    .map(([key, value]) => `--${key}:${value}`)
-    .join(';');
 
   onMount(() => {
     setLineItems(getMerchantOrder().line_items || []);
@@ -135,7 +121,7 @@
   pad={false}
   resetMargin="true"
 >
-  <div style={cssVarStyles} class="container">
+  <div class="container">
     <Router {routes} />
   </div>
   {#if $activeRoute.name === views.COUPONS || $activeRoute.name === views.DETAILS}
@@ -154,5 +140,7 @@
   .container {
     height: inherit;
     overflow: auto;
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-body);
   }
 </style>

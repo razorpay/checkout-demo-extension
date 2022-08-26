@@ -1008,7 +1008,8 @@
     <CTA
       screen="upi"
       tab="upi"
-      disabled={(Boolean(helpTextToDisplay) && selectedToken === 'new') ||
+      disabled={((Boolean(helpTextToDisplay) || vpaEntered?.length === 0) &&
+        selectedToken === 'new') ||
         CTADisabled}
       showAmount
       label={PAY_NOW_CTA_LABEL}
@@ -1069,7 +1070,7 @@
     padding: 0px 12px 12px;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
 
   :global(#content.one-cc) .upi-container {

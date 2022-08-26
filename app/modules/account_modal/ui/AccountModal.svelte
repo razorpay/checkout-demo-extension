@@ -5,7 +5,7 @@
 
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
-  import arrow_left from 'account_modal/icons/arrow_left';
+  import arrow_up from 'account_modal/icons/arrow_up';
   import Loader from 'account_modal/ui/Loader.svelte';
   import close from 'one_click_checkout/coupons/icons/close';
 
@@ -17,6 +17,7 @@
   // store imports
   import { shouldUseVernacular } from 'checkoutstore/methods';
   import { contact as contactStore } from 'checkoutstore/screens/home';
+  import { constantCSSVars } from 'common/constants';
 
   // i18n imports
   import { t, locale, locales } from 'svelte-i18n';
@@ -92,6 +93,9 @@
 
   function handleChangeLanguage() {
     showLanguageList = true;
+    Events.TrackBehav(AccountEvents.CHANGE_LANGUAGE, {
+      current_language: getLocaleName($locale),
+    });
   }
 
   function selectLanguage(code) {
@@ -154,7 +158,7 @@
         {$t(CHANGE_LANGUAGE)}
       </p>
       <button class="account-toggle-icon" on:click={() => popStack()}>
-        <Icon icon={close('#212121')} />
+        <Icon icon={close(constantCSSVars['primary-text-color'])} />
       </button>
     </div>
     <hr />
@@ -180,14 +184,14 @@
         {/if}
       </p>
       <button class="account-toggle-icon" on:click={() => popStack()}>
-        <Icon icon={close('#212121')} />
+        <Icon icon={close(constantCSSVars['primary-text-color'])} />
       </button>
     </div>
     <hr />
     {#if showLanguageList}
       <button class="back-btn-container" on:click={handleBack}>
         <span class="back-btn-icon">
-          <Icon icon={arrow_left(11, 11, '#616161')} />
+          <Icon icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])} />
         </span>
         <span class="back-btn-text">{$t(BACK)}</span>
       </button>
@@ -222,7 +226,7 @@
         >
           {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
           <span class="language-btn">
-            <Icon icon={arrow_left(11, 11, '#616161')} />
+            <Icon icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])} />
           </span>
         </p>
       {/if}
@@ -264,8 +268,8 @@
   }
 
   .account-heading {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
     line-height: 16px;
   }
   .account-heading-container {
@@ -280,7 +284,7 @@
     margin-block-end: 0;
   }
   hr {
-    border: 1px solid #e1e5ea;
+    border: 1px solid var(--light-dark-color);
     border-bottom: none;
     margin: 12px 16px;
   }
@@ -292,16 +296,18 @@
     margin: 0px;
   }
   .back-btn-container {
-    color: #616161;
-    font-size: 12px;
+    color: var(--tertiary-text-color);
+    font-size: var(--font-size-small);
     padding: 0px 24px 12px;
     display: flex;
     align-items: center;
   }
   .account-toggle-icon {
     height: 14px;
-    transform: rotate(270deg);
+    transform: rotate(180deg);
     cursor: pointer;
+    display: flex;
+    align-items: center;
   }
   .back-btn-text {
     padding-left: 10px;
@@ -309,18 +315,19 @@
     cursor: pointer;
   }
   .back-btn-icon {
+    transform: rotate(270deg);
     cursor: pointer;
   }
   .language-btn {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
     cursor: pointer;
   }
   :global(.mobile) .account-container {
     bottom: 0;
   }
   .language-selection {
-    color: #616161;
-    font-size: 12px;
+    color: var(--tertiary-text-color);
+    font-size: var(--font-size-small);
     font-weight: 300;
     padding-left: 10px;
   }
@@ -328,8 +335,8 @@
   .list-item .account-menu {
     width: 100%;
     border-radius: 0px;
-    color: #424242;
-    font-size: 14px;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
   }
 
   .only-language {

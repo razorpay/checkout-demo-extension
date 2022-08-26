@@ -34,7 +34,7 @@
   export let applyCoupon;
   export let removeCoupon;
 
-  const { offers } = getIcons();
+  const { offers, no_coupons } = getIcons();
 
   onMount(() => {
     Events.TrackRender(CouponEvents.AVAILABLE_COUPONS_MODAL);
@@ -84,6 +84,11 @@
       {/each}
     </div>
   </div>
+{:else}
+  <div class="no-coupons">
+    <Icon icon={no_coupons} />
+    <span class="no-coupons-callout">No other coupons available</span>
+  </div>
 {/if}
 
 <style>
@@ -93,13 +98,13 @@
 
   .available-coupons-container {
     margin-bottom: 80px;
-    padding: 20px 16px 0px;
+    padding: 16px 16px 0;
   }
   .available-coupons-heading {
     display: flex;
     align-items: center;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
     line-height: 16px;
     text-transform: capitalize;
   }
@@ -120,5 +125,17 @@
   .coupon-inactive {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  .no-coupons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15%;
+    color: var(--tertiary-text-color);
+    gap: 4px;
+    background-color: var(--background-color-magic);
+    /** deducting height of padding and input container */
+    height: calc(85% - 53px);
   }
 </style>

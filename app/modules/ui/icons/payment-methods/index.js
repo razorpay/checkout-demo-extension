@@ -31,6 +31,7 @@ import close from 'one_click_checkout/coupons/icons/close';
 import offers from 'one_click_checkout/coupons/icons/offers';
 import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
 import circle_arrow_next from 'one_click_checkout/coupons/icons/circle_arrow_next';
+import no_coupons from 'one_click_checkout/coupons/icons/no_coupons';
 import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
 import order from 'one_click_checkout/coupons/icons/order';
 import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
@@ -45,6 +46,7 @@ import double_arrow from 'one_click_checkout/topbar/icons/double_arrow';
 import rzp_brand_logo from 'account_modal/icons/rzp_brand_logo';
 import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+import edit_pen from 'one_click_checkout/otp/icons/edit_pen';
 import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
 import caret_circle_right from 'one_click_checkout/address/icons/caret_circle_right';
@@ -85,8 +87,10 @@ const availIconNames = [...AVAILABLE_METHODS].concat([
   'circle_check',
   'rtb_close',
   'circle_arrow_next',
+  'no_coupons',
   'arrow_down',
   'order',
+  'edit_pen',
   'edit_paper',
   'location',
   'add_square',
@@ -197,6 +201,9 @@ function getIconFn(iconName) {
     case 'circle_arrow_next':
       return circle_arrow_next;
 
+    case 'no_coupons':
+      return no_coupons;
+
     case 'order':
       return order;
 
@@ -232,6 +239,9 @@ function getIconFn(iconName) {
 
     case 'rtb_close':
       return rtb_close;
+
+    case 'edit_pen':
+      return edit_pen;
 
     case 'edit_paper':
       return edit_paper;

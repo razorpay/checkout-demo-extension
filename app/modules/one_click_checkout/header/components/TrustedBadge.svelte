@@ -84,9 +84,9 @@
   }
 
   .rtb-text {
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 150%;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     margin: 0px 6px 0px 4px;
   }
 

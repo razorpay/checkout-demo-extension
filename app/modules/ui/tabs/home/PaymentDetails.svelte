@@ -27,11 +27,7 @@
     prevContact,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import {
-    isContactAndEmailValid,
-    isContactValid,
-    isEmailValid,
-  } from 'one_click_checkout/common/details/store';
+  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -94,7 +90,6 @@
   // Props
   export let tpv;
   export let onSubmit;
-  export let valid = true;
   export let showValidations = false;
 
   const order = getMerchantOrder();
@@ -110,12 +105,8 @@
     phone: $phone,
     email: $email,
   };
-  export let disabled = !valid;
-  let validationText;
-
-  $: valid =
-    ($isEmailValid || isEmailOptional()) &&
-    ($isContactValid || isContactOptional());
+  export let disabled = false;
+  let validationText: string;
 
   function trackContactFilled(e) {
     const valid = CONTACT_REGEX.test($contact);
@@ -331,7 +322,7 @@
 
 <style lang="scss">
   .details-wrapper {
-    padding: 28px 16px;
+    padding: 16px 16px 28px;
   }
   .details-block {
     padding: 0 24px;
@@ -350,13 +341,13 @@
   .contact-title {
     display: flex;
     align-items: center;
-    padding-bottom: 6px;
+    padding-bottom: 10px;
   }
 
   .contact-text {
     padding-left: 10px;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
   }
 
   :global(.redesign) {

@@ -66,10 +66,10 @@
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid #e1e5ea;
-    padding: 9px 16px;
+    padding: 8px 16px;
     align-items: center;
     box-sizing: border-box;
-    height: 44px;
+    height: 42px;
     z-index: 2;
     box-shadow: 10px 10px 30px rgba(107, 108, 109, 0.1);
   }
@@ -85,5 +85,8 @@
     text-transform: capitalize;
     flex: 1;
     justify-content: space-between;
+  }
+  :global(.redesign) #topbar-new {
+    box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
   }
 </style>

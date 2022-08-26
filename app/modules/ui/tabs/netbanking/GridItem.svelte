@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { isRedesignV15 } from 'razorpay';
+
   // Props
   export let disabled = false;
   export let code = '';
@@ -14,6 +16,7 @@
   class="netb-bank item radio-item has-tooltip"
   class:disabled
   class:has-tooltip={disabled}
+  class:netb-bank-one-cc={isRedesignV15()}
   down={disabled}
   id="bank-item-{code}"
 >
@@ -60,5 +63,10 @@
 
   .netb-bank.disabled .item-inner {
     opacity: 0.3;
+  }
+
+  .netb-bank-one-cc {
+    border-bottom: 1px solid var(--light-dark-color);
+    border-left: 1px solid var(--light-dark-color);
   }
 </style>

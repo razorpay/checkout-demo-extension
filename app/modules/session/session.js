@@ -1055,6 +1055,11 @@ Session.prototype = {
       discreet.fonts.loadInterFont();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
+      if (!RazorpayHelper.shouldOverrideBrandColor()) {
+        discreet.Theme.setThemeColor(
+          discreet.Constants.constantCSSVars['brand-color']
+        );
+      }
       this.switchTab('home-1cc');
     }
     this.setEMI();

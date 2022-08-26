@@ -72,7 +72,7 @@
   import { CTA_LABEL } from 'cta/i18n';
   import { isDebitIssuer } from 'common/bank';
 
-  const { edit_paper } = getIcons({ backgroundColor: getThemeColor() });
+  const { edit_pen } = getIcons({ backgroundColor: getThemeColor() });
 
   const { otpReason } = screensHistory.config[views.OTP].props;
 
@@ -108,6 +108,19 @@
     $ipAddress = '';
     $accessTime = '';
     errorMessage.set('');
+  }
+
+  $: {
+    if (!$loading && otpClasses.includes($textView)) {
+      setTimeout(() => {
+        const contactNumberEl = document.querySelector('.otp-title > strong'); // mobile number element
+        if (contactNumberEl) {
+          const classNames = ['theme', 'pointer'];
+          contactNumberEl.classList.add(...classNames);
+          contactNumberEl.addEventListener('click', () => handleEditContact());
+        }
+      });
+    }
   }
 
   function onSkip(event) {
@@ -186,7 +199,7 @@
                 class="edit-contact-btn"
                 on:click={() => handleEditContact()}
               >
-                <Icon icon={edit_paper} />
+                <Icon icon={edit_pen} />
               </span>
             {/if}
           </div>
@@ -318,7 +331,7 @@
 
 <style>
   .otp-title {
-    color: #263a4a;
+    color: var(--primary-text-color);
     text-align: center;
     padding: 0px 12px;
   }
@@ -353,16 +366,16 @@
     padding-bottom: 24px;
   }
   .error-message {
-    color: #d64052;
+    color: var(--error-validation-color);
     margin: 12px 0px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
   }
   .otp-heading {
     margin: 34px 0 22px;
     text-align: center;
-    color: #263a4a;
+    color: var(--primary-text-color);
     text-transform: capitalize;
-    font-weight: 600;
+    font-weight: var(--font-weight-bold);
   }
 
   #form-otp .heading-1cc {
@@ -387,7 +400,6 @@
     text-transform: initial;
   }
   .edit-contact-btn {
-    margin-left: 2px;
     position: relative;
     top: 1px;
     cursor: pointer;
@@ -409,6 +421,10 @@
   }
 
   :global(.tab-content-one-cc .otp-title .theme) {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  :global(.pointer) {
+    cursor: pointer;
   }
 </style>

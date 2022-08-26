@@ -19,7 +19,7 @@
 </script>
 
 <DropdownMenu triggerElement={dropdownTrigger} on:click>
-  <button data-test-id="edit-cta" bind:this={dropdownTrigger}>
+  <button class="dropdown-btn" data-test-id="edit-cta" bind:this={dropdownTrigger}>
     <Icon icon={kebab_menu} />
   </button>
   <div slot="dropdown_menu">
@@ -42,7 +42,11 @@
     box-sizing: border-box;
   }
   .dropdown-item {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     padding: 10px 20px;
+    color: var(--secondary-text-color);
+  }
+  .dropdown-btn {
+    padding: 0 8px;
   }
 </style>

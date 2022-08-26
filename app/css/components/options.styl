@@ -24,11 +24,16 @@
     transform: translate3d(0, 0, 0);
 
     .option-icon
+      margin: auto;
       position: absolute;
       left: 16px;
       text-align: center;
-      top: 48%;
-      margin-top: -10px;
+      width: 22px;
+      height: calc(100% - 12px);
+      display: flex;
+      align-items: flex-start;
+      top: 0;
+      margin-top: 12px;
 
       i
         font-size: 18px;
@@ -41,7 +46,7 @@
         vertical-align: middle;
 
       img
-        height: 20px;
+        height: 22px;
         width: auto;
 
     &:first-child
@@ -54,7 +59,7 @@
       border-bottom-right-radius: 2px;
 
     &.next-option
-      padding-left: 48px;
+      padding-left: 46px;
       padding-right: 32px;
 
       &:after
@@ -64,7 +69,7 @@
         right: 16px;
         top: 50%;
         transform: translateY(-50%) rotate(180deg);
-        margin-top: 0.2em;
+        // margin-top: 0.2em;
 
       &.up-arrow::after
         transform: translateY(-50%) rotate(90deg);

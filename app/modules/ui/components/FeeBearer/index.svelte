@@ -310,4 +310,7 @@
   :global(.irctc) .fee-bearer {
     bottom: -30px !important; // irctc has special callout impacting height of checkout
   }
+  :global(#modal.one-cc) .fee-bearer .btn {
+    text-transform: capitalize;
+  }
 </style>

@@ -205,4 +205,47 @@
     display: flex;
     flex-direction: column;
   }
+  :global(.redesign) {
+    .price-label {
+      color: var(--primary-text-color);
+      font-size: var(--font-size-heading);
+      font-weight: var(--font-weight-semibold);
+      line-height: 18px;
+    }
+    #cta-view-details {
+      font-size: var(--font-size-tiny);
+      text-align: left;
+      color: var(--tertiary-text-color);
+      margin-top: 2px;
+    }
+    .cta-container {
+      padding: 10px 14px;
+      box-shadow: 0px -10px 10px rgba(23, 26, 30, 0.15);
+    }
+    #redesign-v15-cta {
+      padding: 14px 18px;
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-color);
+      background: var(--primary-color);
+    }
+    #redesign-v15-cta::after {
+      left: 0;
+      top: 0;
+      opacity: 1;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      content: '';
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(0, 0, 0, 0.1)
+      );
+    }
+    #redesign-v15-cta.disabled {
+      background: var(--light-dark-color);
+      color: var(--tertiary-text-color);
+    }
+  }
 </style>

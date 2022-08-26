@@ -349,7 +349,6 @@
         />
       </div>
     {/if}
-    <AccountTab />
     <CTA
       screen="international"
       tab="international"
@@ -367,10 +366,11 @@
         />
       {/if}
     </Bottom>
-  </div></Tab
->
+  </div>
+  <AccountTab />
+</Tab>
 
-<style lang="css">
+<style lang="scss">
   .border-list {
     padding: 12px;
   }
@@ -402,12 +402,12 @@
     height: 46px;
     display: flex;
     align-items: center;
-    padding: 0 22px;
+    padding: 0 1rem;
     background-color: rgba(102, 174, 255, 0.06);
   }
 
   .nvs-title {
-    margin: 16px 24px 0;
+    margin: 1rem 1rem 0;
     line-height: 1;
     display: flex;
   }
@@ -430,10 +430,30 @@
     flex-direction: column;
     height: 100%;
   }
+
+  :global(.redesign) .international-wrapper {
+    min-height: 100%;
+    height: auto;
+  }
+
   .international-one-cc {
     overflow: auto;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
+  }
+
+  :global(.redesign) {
+    .nvs-title {
+      margin: 1.5rem 1rem;
+    }
+
+    .nvs-provider-info {
+      margin-top: 1.5rem;
+    }
+
+    .border-list {
+      padding: 1.5rem 1rem;
+    }
   }
 </style>

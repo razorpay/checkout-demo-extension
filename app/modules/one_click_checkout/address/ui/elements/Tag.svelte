@@ -43,10 +43,18 @@
     margin-left: 4px;
   }
 
+  .address-tag:first-child {
+    margin-left: 0;
+  }
+
+  .address-tag:last-child {
+    padding-left: 12px;
+  }
+
   .selected-tag {
-    color: var(--highlight-color);
-    border: 1px solid var(--highlight-color);
-    background: var(--sec-highlight-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    background: var(--secondary-highlight-color);
   }
 
   .inner-text {

@@ -51,23 +51,25 @@
   .container {
     display: flex;
     align-items: center;
+    height: 28px;
   }
   .logo-wrapper {
-    width: 32px;
+    width: 28px;
+    height: 28px;
     box-sizing: border-box;
     margin-right: 10px;
   }
   .bank-logo {
-    width: 100%;
-    border-radius: 50%;
+    width: 28px;
+    height: 28px;
     box-sizing: border-box;
   }
   .auto-generated {
     border-radius: 50%;
     background: #512da8;
     color: #fff;
-    height: 32px;
-    width: 32px;
+    height: 28px;
+    width: 28px;
     display: flex;
     align-items: center;
     justify-content: center;

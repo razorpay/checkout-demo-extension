@@ -188,18 +188,22 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    margin: 22px 0px 28px;
-    padding: 12px 16px;
-    border: 1px dashed #8d97a1;
+    margin: 16px 0px;
+    padding: 10px 16px;
+    border: 1px dashed var(--primary-text-color);
     border-radius: 4px;
   }
 
   .add-label {
-    color: #263a4a;
+    color: var(--primary-text-color);
     margin-left: 6px;
   }
 
   .address-box {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+  }
+
+  .address-box:last-child {
+    margin-bottom: 0;
   }
 </style>

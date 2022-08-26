@@ -13,7 +13,7 @@
   export let countdown = 30;
   export let width = 44;
   export let height = 44;
-  export let bgColor = getTheme().backgroundColor;
+  export let counterStroke = getTheme().color;
 
   let duration = 1000;
   let radius = 0.4 * width;
@@ -52,7 +52,7 @@
     <g fill="none" stroke="currentColor" stroke-width="3">
       <circle stroke="#E0E0E0" r={radius} />
       <path
-        stroke={bgColor}
+        stroke={counterStroke}
         d="M 0 -{radius} a {radius} {radius} 0 0 0 0 {radius *
           2} {radius} {radius} 0 0 0 0 -{radius * 2}"
         pathLength="1"
@@ -75,7 +75,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 12px;
-    color: rgba(38, 58, 74, 0.5);
+    font-size: var(--font-size-small);
+    color: var(--tertiary-text-color);
   }
 </style>

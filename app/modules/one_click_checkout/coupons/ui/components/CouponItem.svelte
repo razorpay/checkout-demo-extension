@@ -67,14 +67,14 @@
 
 <style>
   hr {
-    border: 1px solid #e6e7e8;
+    border: 1px solid var(--light-dark-color);
     margin: 12px 0;
     border-bottom-width: 0;
   }
 
   button {
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-body);
     line-height: 20px;
   }
 
@@ -94,26 +94,26 @@
 
   .coupon-item-description {
     font-style: normal;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 16px;
-    color: #8d97a1;
+    color: var(--secondary-text-color);
     text-transform: capitalize;
   }
 
   .coupon-item-summary {
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-small);
     line-height: 16px;
-    color: #263a4a;
+    color: var(--primary-text-color);
     margin-bottom: 6px;
     text-transform: capitalize;
   }
 
   .coupon-item {
     border-radius: 2px;
-    border: 1px solid #e6e7e8;
+    border: 1px solid var(--light-dark-color);
     padding: 16px;
-    margin-top: 20px;
+    margin-top: 16px;
     text-align: start;
     white-space: initial !important;
   }
@@ -135,18 +135,21 @@
   ul {
     padding-inline-start: 0px;
     margin-block-start: 0.5em;
-    margin-block-end: 0.5em;
+    margin-block-end: 0;
     font-weight: normal;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 24px;
-    color: #263a4a;
     list-style: none;
   }
 
   li {
     line-height: 16px;
     padding-bottom: 4px;
-    color: #8d97a1;
+    color: var(--secondary-text-color);
+  }
+
+  li:last-child {
+    padding-bottom: 0;
   }
 
   .terms-section {
@@ -154,15 +157,15 @@
   }
 
   .apply-button {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .coupon-item-code {
     padding: 4px 8px;
     background-color: var(--secondary-highlight-color);
     color: var(--highlight-color);
-    font-weight: 800;
-    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-body);
     line-height: 20px;
     border: 1px dashed var(--highlight-color);
     word-break: break-all;

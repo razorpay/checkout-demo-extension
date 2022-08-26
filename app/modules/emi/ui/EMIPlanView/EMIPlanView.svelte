@@ -121,7 +121,7 @@
 
 <div id="emi-inner">
   <div class="row em select">
-    <div class="col">
+    <div class="col select-bank">
       <!-- LABEL: Select Bank: -->
       {$t(SELECT_BANK_LABEL)}
     </div>
@@ -169,7 +169,7 @@
 
 <style lang="scss">
   #emi-inner {
-    width: 500px;
+    width: 530px;
     top: 50%;
     bottom: auto !important; /** override overlay style */
     transform: translate(-50%, -50%);
@@ -183,6 +183,8 @@
 
     &:not(:first-child) {
       height: 16px;
+      align-items: center;
+      display: flex;
       border-top: 1px solid #e9e9e9;
     }
   }
@@ -214,7 +216,7 @@
 
   i {
     position: relative;
-    top: -1px;
+    top: -3px;
     left: -18px;
     font-size: 22px;
   }
@@ -235,5 +237,23 @@
       font-size: 14px;
       margin-left: 10px;
     }
+
+    .close {
+      padding: 16px 12px 12px;
+    }
+  }
+
+  .close {
+    padding: 16px 12px 12px;
+    font-size: 28px;
+    line-height: 28px;
+  }
+
+  .select-bank {
+    font-size: 16px;
+  }
+
+  :global(.mobile) .select-bank {
+    font-size: 14px;
   }
 </style>

@@ -112,12 +112,12 @@
   }
   .contact-text {
     padding-left: 10px;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
   }
   .contact-edit {
-    font-weight: 600;
-    font-size: 12px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-small);
     cursor: pointer;
   }
   .contact-header {
@@ -126,13 +126,14 @@
     align-items: center;
   }
   .contact-info {
+    color: var(--secondary-text-color);
     padding: 14px 0px 0px;
   }
   .phone-text {
+    font-weight: var(--font-weight-medium);
     line-height: 20px;
   }
   .email-text {
-    color: #8d97a1;
     padding-top: 4px;
     line-height: 20px;
   }

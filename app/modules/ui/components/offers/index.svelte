@@ -499,6 +499,10 @@
     height: calc(100% - 75px);
     top: 75px;
   }
+
+  main.main-one-cc header span {
+    color: var(--primary-color);
+  }
   .offerlist-container {
     overflow: auto;
     flex: 1;
@@ -511,7 +515,8 @@
   .checkout-redesign-label {
     padding: 20px 16px 16px;
     text-transform: capitalize;
-    font-size: 14px;
+    font-size: var(--font-size-body);
+    color: var(--primary-text-color);
   }
   .close-offerlist {
     line-height: 44px;
@@ -549,6 +554,10 @@
     padding: 16px 24px;
     border-bottom: 1px solid #ddd;
     color: #414141;
+  }
+  .one-cc.error-container .error-desc {
+    border-bottom: 1px solid var(--light-dark-color);
+    color: var(--error-validation-color);
   }
   .error-btns {
     padding: 16px 0;
@@ -605,17 +614,26 @@
 
       &:before {
         font-size: 16px;
+        color: var(--primary-color);
       }
 
       &:after {
         top: 2px;
         position: relative;
       }
+
+      span {
+        color: var(--primary-text-color);
+      }
     }
 
     .offer-action {
       font-weight: 400;
       font-size: 12px;
+    }
+    .offer-cta[disabled] {
+      background-color: var(--light-dark-color);
+      color: var(--tertiary-text-color);
     }
   }
 </style>

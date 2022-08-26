@@ -1,16 +1,20 @@
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
-import { COLORS } from 'common/constants';
+import { COLORS, constantCSSVars } from 'common/constants';
 import { setRootCSSVariable } from 'utils/CSSVar';
+import { isOneClickCheckout, shouldOverrideBrandColor } from 'razorpay';
 
 const {
   RAZORPAY_COLOR,
   RAZORPAY_HOVER_COLOR,
   TEXT_COLOR_BLACK,
   TEXT_COLOR_WHITE,
+  MAGIC_BRAND_COLOR,
 } = COLORS;
 
 const theme = {};
+
+
 
 export function getThemeMeta() {
   return _Obj.clone(theme);
@@ -22,11 +26,24 @@ export function getThemeColor() {
 
 export function getColorVariations(fallback = false) {
   if (fallback && !theme.backgroundColor && !theme.foregroundColor) {
-    return Color.getColorVariations(RAZORPAY_COLOR);
+    return Color.getColorVariations(
+      isOneClickCheckout() ? MAGIC_BRAND_COLOR : RAZORPAY_COLOR
+    );
   }
   return {
     backgroundColor: theme.backgroundColor,
     foregroundColor: theme.foregroundColor,
+  };
+}
+
+function getMagicIconColorVariations() {
+  if (!isOneClickCheckout() || shouldOverrideBrandColor()) {
+    return {};
+  }
+
+  return {
+    backgroundColor: MAGIC_BRAND_COLOR,
+    foregroundColor: '#072654',
   };
 }
 
@@ -50,7 +67,10 @@ export function setThemeColor(color) {
   );
   theme.highlightColor = Color.getHighlightColor(color, RAZORPAY_COLOR);
   theme.secondaryHighlightColor = theme.hoverStateColor;
-  theme.icons = _PaymentMethodIcons.getIcons(colorVariations);
+  theme.icons = _PaymentMethodIcons.getIcons({
+    ...colorVariations,
+    ...getMagicIconColorVariations(),
+  });
   theme.highlightBorderColor = Color.transparentify(theme.color, 40);
   theme.headerLogoBgColor = Color.transparentify(theme.color, 50);
   theme.headerLogoTextColor = Color.isDark(theme.headerLogoBgColor)
@@ -67,5 +87,6 @@ export function setThemeColor(color) {
     'active-state-color': theme.activeStateColor,
     'header-logo-bg-color': theme.headerLogoBgColor,
     'header-logo-text-color': theme.headerLogoTextColor,
+    ...constantCSSVars,
   });
 }

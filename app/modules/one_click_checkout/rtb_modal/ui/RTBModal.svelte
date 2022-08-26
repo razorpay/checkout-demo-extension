@@ -20,13 +20,16 @@
 
   // utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  import { getMerchantName } from 'razorpay';
+  import { getMerchantName, getPreferences } from 'razorpay';
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { popStack } from 'navstack';
+  import { truncateString } from 'utils/strings';
 
   const { circle_check, rtb_close } = getIcons();
-  const merchantName = getMerchantName();
+  const name = getMerchantName() || getPreferences('merchant_name') || '';
+  const merchantName = truncateString(name, 20);
+
   let listItems = [RTB_HIGHLIGHT1, RTB_HIGHLIGHT2, RTB_HIGHLIGHT3];
 
   onDestroy(() => {
@@ -75,7 +78,7 @@
   }
   .rtb-content {
     background: #e7f7f1;
-    color: #616161;
+    color: var(--secondary-text-color);
     padding: 16px 16px 2px;
     border-radius: 4px;
   }
@@ -87,7 +90,7 @@
   .rtb-list-text {
     padding-left: 8px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 400;
   }
   /* .rtb-summary {
     font-size: 14px;
@@ -100,7 +103,7 @@
     padding-bottom: 6px;
   }
   .rtb-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
   }
   .rtb-header-section {
@@ -108,7 +111,7 @@
     padding-top: 4px;
   }
   .rtb-header-text {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     padding-bottom: 4px;
   }

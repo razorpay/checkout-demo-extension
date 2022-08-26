@@ -206,7 +206,7 @@
             style="right: 0;left: 0;border-radius:0 0 3px 3px"
           >
             <span>&#x2139;</span>
-            *Payment charges and taxes as applicable.
+            Payment charges and taxes are applicable.
           </div>
         {/if}
         <div
@@ -271,10 +271,6 @@
     min-height: 440px;
     height: 440px;
     flex-basis: 440px;
-  }
-
-  #header-1cc {
-    border-bottom: 1px solid #e1e5ea;
   }
 
   .redesign {

@@ -644,6 +644,14 @@
 
   .default-currencies {
     margin-bottom: 6px;
+
+    :global(label) {
+      display: flex;
+      :global(.label-content) {
+        padding: 0;
+        padding-left: 10px;
+      }
+    }
   }
 
   .dcc-other-currency {
@@ -663,6 +671,10 @@
     #dcc-fee-accept-label {
       font-size: 12px;
       font-weight: 500;
+    }
+
+    .dcc-view {
+      padding: 10px 16px;
     }
 
     .default-currencies {

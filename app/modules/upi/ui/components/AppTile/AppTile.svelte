@@ -63,6 +63,9 @@
     align-items: center;
     justify-content: center;
   }
+  :global(.one-cc) .app-tile {
+    border: 1px solid var(--light-dark-color);
+  }
   .square-tile {
     border-radius: 6px !important;
     padding: 8px;
@@ -105,5 +108,6 @@
 
   :global(.one-cc) .app-title {
     padding: 4px 0px;
+    color: var(--secondary-text-color);
   }
 </style>

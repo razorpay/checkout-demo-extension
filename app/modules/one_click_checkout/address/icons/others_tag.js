@@ -1,6 +1,6 @@
 export default (
   fillColor
-) => `<svg width="11" height="13" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M0.64975 5.4947C0.658754 2.84433 2.8146 0.703088 5.46497 0.712064C8.11533 0.721097 10.2566 2.87694 10.2476 5.52731V5.58166C10.215 7.30448 9.25301 8.89687 8.07366 10.1414C7.39919 10.8418 6.646 11.4619 5.8291 11.9893C5.61066 12.1782 5.28666 12.1782 5.06823 11.9893C3.85042 11.1966 2.78158 10.1958 1.91062 9.03274C1.13434 8.0185 0.693603 6.78747 0.64975 5.51101V5.4947Z" stroke="${fillColor}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5.4484 7.12508C6.29789 7.12508 6.98653 6.43644 6.98653 5.58695C6.98653 4.73747 6.29789 4.04883 5.4484 4.04883C4.59892 4.04883 3.91028 4.73747 3.91028 5.58695C3.91028 6.43644 4.59892 7.12508 5.4484 7.12508Z" stroke="${fillColor}" stroke-linecap="round" stroke-linejoin="round"/>
+) => `<svg width="15" height="15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M2.65 6.495a4.799 4.799 0 0 1 9.598.032v.055c-.033 1.722-.995 3.315-2.174 4.56-.675.7-1.428 1.32-2.245 1.847a.582.582 0 0 1-.76 0 12.387 12.387 0 0 1-3.158-2.956A6.141 6.141 0 0 1 2.65 6.51v-.016Z" stroke="${fillColor}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.448 8.125a1.538 1.538 0 1 0 0-3.076 1.538 1.538 0 0 0 0 3.076Z" stroke="${fillColor}" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;

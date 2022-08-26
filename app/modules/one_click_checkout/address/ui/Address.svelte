@@ -4,7 +4,7 @@
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import {
-    showToast,
+    showToastAfterDelay,
     hideToast,
     TOAST_SCREEN,
     TOAST_THEME,
@@ -56,12 +56,13 @@
   import { otpReasons } from 'otp/constants';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, isBillingAddressEnabled } from 'razorpay';
 
   // props
   export let currentView;
 
   let address;
+  let isSavedAddrView: boolean;
 
   const { caret_circle_right } = getIcons();
 
@@ -81,10 +82,12 @@
     postSubmit();
   }
 
+  $: isSavedAddrView = routeMap[currentView] === addressViews.SAVED_ADDRESSES;
+
   function postSubmit() {
     if (
       !$shouldSaveAddress ||
-      routeMap[currentView] === addressViews.SAVED_ADDRESSES
+      isSavedAddrView
     ) {
       redirectToPaymentMethods();
       return;
@@ -143,13 +146,13 @@
   $: {
     if ($shippingCharge) {
       hideToast();
-      showToast({
+      showToastAfterDelay({
         screen: TOAST_SCREEN.ONE_CC,
         theme: TOAST_THEME.INFO,
         message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
           charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
         }),
-      });
+      }, 150);
     }
   }
 </script>
@@ -159,6 +162,7 @@
   bind:this={address}
   onSubmitCallback={onSubmit}
   currentView={routeMap[currentView]}
+  showAccBottomSeparator={isSavedAddrView && isBillingAddressEnabled()}
 >
   <div slot="header">
     {#if $showSavedAddressCta && routeMap[currentView] === addressViews.ADD_ADDRESS}
@@ -174,11 +178,11 @@
     {/if}
   </div>
   <div slot="footer">
-    {#if routeMap[currentView] === addressViews.SAVED_ADDRESSES}
+    {#if isSavedAddrView}
       <SameBillingAndShipping
         shouldSaveAddress={false}
-        isFixed
         on:toggle={trackSameBillingAndShippingCheckbox}
+        isFixed
       />
     {/if}
   </div>
@@ -218,5 +222,11 @@
     display: inline-flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  div[slot="footer"] :global(.same-address-checkbox) {
+    z-index: 1;
+    border-top: 1px solid var(--background-color-magic);
+    padding-bottom: 10px;
   }
 </style>

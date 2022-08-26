@@ -27,12 +27,7 @@ import {
   isNativeIntentAvailable,
 } from './helper/upi';
 import { isUPIFlowEnabled } from 'checkoutstore/methods';
-import {
-  isInternational,
-  hasFeature,
-  getAmount,
-  isOneClickCheckout,
-} from 'razorpay';
+import { isInternational, hasFeature, getAmount } from 'razorpay';
 import { updateRenderQrState } from './ui/components/QRWrapper/store';
 import { getDowntimes } from 'checkoutframe/downtimes';
 import { getMethodDowntimes } from 'checkoutframe/downtimes/methodDowntimes';
@@ -216,13 +211,11 @@ export const initUpiQrV2 = () => {
       !hasFeature('disable_homescreen_qr', false) &&
       Number(getAmount()) <= QR_HOMESCREEN_AMOUNT_LIMIT &&
       !orderMethod &&
-      !isOneClickCheckout() &&
       isBlockVisible('upi');
 
     const upiScreenQR =
       status &&
       upiQrOnL1.enabled() &&
-      !isOneClickCheckout() &&
       !hasFeature('disable_upiscreen_qr', false) &&
       (!orderMethod || orderMethod === 'upi');
 

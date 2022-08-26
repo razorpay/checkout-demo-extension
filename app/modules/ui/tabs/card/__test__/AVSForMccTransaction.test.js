@@ -12,6 +12,15 @@ jest.mock('cta', () => ({
   },
 }));
 
+jest.mock('checkoutstore/theme', () => ({
+  ...jest.requireActual('checkoutstore/theme'),
+  getThemeMeta: jest.fn(() => ({
+    icons: {
+      user_protect: 'icon',
+    },
+  })),
+}));
+
 describe('Billing Address Collection for Saved Cards', () => {
   beforeEach(() => {
     setupPreferences();

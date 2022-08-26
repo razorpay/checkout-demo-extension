@@ -47,3 +47,6 @@ export const showOptimisedAddr = () =>
 
 export const allowLangEngOnly = () =>
   getPreferences('features.one_cc_input_english');
+
+export const shouldOverrideBrandColor = () =>
+  getPreferences('features.one_cc_override_theme') || false;

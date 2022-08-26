@@ -120,31 +120,41 @@
   }
 
   .label-text {
-    color: #263a4a;
-    font-size: 14px;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
     text-transform: capitalize;
     margin-left: 8px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .label-cta {
-    font-size: 12px;
+    font-size: var(--font-size-small);
     text-align: right;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
   .total-addresses {
     position: relative;
     top: -6px;
     margin-bottom: 2px;
-    color: #8d97a1;
-    font-weight: 300;
+    color: var(--secondary-text-color);
+    font-weight: var(--font-weight-regular);
   }
 
   .mb-14 {
     margin-bottom: 14px;
   }
-
+  .address-widget-container {
+    margin-bottom: -2px;
+  }
   .address-widget-container :global(.same-address-checkbox .checkbox-text) {
-    color: #8d97a1;
+    color: var(--primary-text-color);
+  }
+
+  .address-widget-container :global(.same-address-checkbox) {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+  .address-widget-container :global(#address-container) {
+    cursor: default;
   }
 </style>

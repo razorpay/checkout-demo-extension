@@ -77,6 +77,6 @@
   .tag-selector-container {
     display: flex;
     flex-direction: row;
-    padding: 8px 0;
+    padding: 8px 0 14px;
   }
 </style>

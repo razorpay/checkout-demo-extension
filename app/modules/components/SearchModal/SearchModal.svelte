@@ -480,8 +480,23 @@
     color: #888;
   }
 
+  /* .list-header-1cc {
+    flex-direction: column;
+    margin-top: 0px;
+  } */
+
+  /* .list-header-1cc .text {
+    width: 100%;
+    padding: 16px 16px 0px 16px;
+    box-sizing: border-box;
+    margin: 0px;
+    font-size: var(--font-size-body);
+    line-height: 16px;
+    color: var(--primary-text-color);
+  } */
   .list-item-checkout-redesign {
-    color: #333;
+    border-bottom: none;
+    color: var(--primary-text-color);
   }
 
   .search-field-checkout-redesign {

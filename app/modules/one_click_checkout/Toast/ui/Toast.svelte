@@ -30,7 +30,7 @@
   <div
     data-test-id="toast-{theme}"
     class={`toast-wrapper ${theme || ''}`}
-    transition:fly|local={{ y: 30, duration: 800 }}
+    transition:fly|local={{ y: 30, duration: 500 }}
   >
     {msg}
   </div>
@@ -40,7 +40,7 @@
   .toast-wrapper {
     font-size: 13px;
     padding: 12px 24px;
-    color: #79747e;
+    color: var(--primary-text-color);
     position: absolute;
     bottom: 0;
     z-index: 1;
@@ -49,17 +49,17 @@
   }
 
   .success {
-    background-color: #e5f6ea;
-    border-top: 2px solid #b9dfc2;
+    background-color: #e2faef;
+    box-shadow: inset 0px 2px 0px #a3eac9;
   }
 
   .error {
-    background-color: #fae8e3;
-    border-top: 2px solid #e7bbb4;
+    background-color: #fff4f6;
+    box-shadow: inset 0px 2px 0px #e19f94;
   }
 
   .info {
-    background-color: #e4f9ff;
-    border-top: 2px solid #b9d7df;
+    background-color: #e1eaf9;
+    box-shadow: inset 0px 2px 0px #a6c5ed;
   }
 </style>

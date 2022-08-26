@@ -4,6 +4,7 @@ import { trackAvailabilty } from './availability';
 import { hasProp } from 'utils/object';
 import fetch from 'utils/fetch';
 import { BUILD_NUMBER } from 'common/constants';
+import { getDeviceId } from 'fingerprint';
 
 const CHUNK_SIZE = 5;
 
@@ -67,6 +68,7 @@ let trackingProps = {
 function getCommonTrackingData(r) {
   let props = {
     checkout_id: r ? r.id : _uid,
+    'device.id': getDeviceId() ?? '',
   };
 
   [

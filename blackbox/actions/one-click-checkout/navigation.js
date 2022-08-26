@@ -19,7 +19,7 @@ async function assertModalClose(context) {
 async function assertAddressTab(context) {
   expect(
     await context.page.$eval('[data-test-id=breadcrumb-nav]', (ele) => {
-      const tabNodes = ele.querySelectorAll('.breadcrumb-text');
+      const tabNodes = ele.querySelectorAll('.text');
       return tabNodes[1].innerText.toLowerCase() === 'address';
     })
   ).toBe(true);

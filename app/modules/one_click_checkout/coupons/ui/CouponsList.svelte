@@ -75,10 +75,13 @@
 
 <style>
   .separator {
-    height: 10px;
-    background-color: #f8fafd;
+    height: 8px;
+    background-color: var(--background-color-magic);
   }
   .coupon-input-container {
-    padding: 24px 16px 22px;
+    padding: 16px;
+  }
+  .coupon-container {
+    height: 100%;
   }
 </style>

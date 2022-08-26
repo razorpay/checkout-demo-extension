@@ -340,8 +340,8 @@
   }
 
   .title-vpa-upi-one-cc {
-    color: #263a4a;
-    font-weight: 400;
+    color: var(--primary-text-color);
+    font-weight: var(--font-weight-regular);
   }
   .upi-field-container {
     border: 1px solid #e6e7e8;

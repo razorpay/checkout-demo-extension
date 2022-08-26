@@ -6,7 +6,7 @@ import {
   hasMerchantPolicy,
   getOrgDetails,
 } from './base';
-import { isInternational, isDCCEnabled } from './currency';
+import { isDCCEnabled, isInternational } from './currency';
 import { isRecurringOrPreferredPayment } from './recurring';
 
 /**
@@ -41,16 +41,17 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
+    if (isInternational() || isDCCEnabled()) {
+      // MCC flow - international
+      allow = false;
+    }
+
     // for internal app
     if (
       razorpayInternalApp &&
       (razorpayInternalApp === 'payment_links' ||
         razorpayInternalApp === 'payment_button')
     ) {
-      allow = false;
-    }
-    if (isInternational() || isDCCEnabled()) {
-      // MCC flow - international
       allow = false;
     }
     if (isRecurringOrPreferredPayment()) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from 'ui/elements/Icon.svelte';
   import cod from 'ui/icons/payment-methods/cod';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
+  import { getIconColorVariations } from 'one_click_checkout/utils';
   export let disabled;
   const defaultBackgroundColor = '#858585';
   const defaultForegroundColor = '#858585';
@@ -10,10 +10,10 @@
   let icon = cod(foregroundColor, backgroundColor);
   $: backgroundColor = disabled
     ? defaultBackgroundColor
-    : getTheme().backgroundColor;
+    : getIconColorVariations().backgroundColor;
   $: foregroundColor = disabled
     ? defaultForegroundColor
-    : getTheme().foregroundColor;
+    : getIconColorVariations().foregroundColor;
   $: icon = cod(foregroundColor, backgroundColor);
 </script>
 

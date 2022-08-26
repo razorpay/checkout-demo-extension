@@ -1242,32 +1242,34 @@
   };
 
   $: {
-    if (view !== HOME_VIEWS.DETAILS) {
-      CTAState.onSubmit = undefined;
-      CTAState.showAmount = true;
-      CTAState.disabled = isRedesignV15Enabled ? ctaV15Disabled : false;
-      if (selectedMethod === 'cod') {
-        CTAState.disabled = false;
-      }
-      CTAState.label =
-        selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
-    } else if (view === HOME_VIEWS.DETAILS) {
-      CTAState.showAmount = isPartialPayment ? true : false;
-      CTAState.onSubmit = onPaymentDetailSubmit;
-      if (singleMethod) {
-        const { label, labelData } = showPayViaSingleMethod(
-          getMethodNameForPaymentOption(singleMethod, $locale)
-        );
-        CTAState.label = label;
-        CTAState.labelData = labelData;
-      } else {
+    if (isRedesignV15Enabled) {
+      if (view !== HOME_VIEWS.DETAILS) {
+        CTAState.onSubmit = undefined;
+        CTAState.showAmount = true;
+        CTAState.disabled = isRedesignV15Enabled ? ctaV15Disabled : false;
+        if (selectedMethod === 'cod') {
+          CTAState.disabled = false;
+        }
         CTAState.label =
-          !isOneCCEnabled && !isPartialPayment ? CTA_PROCEED : CTA_LABEL;
+          selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
+      } else if (view === HOME_VIEWS.DETAILS) {
+        CTAState.showAmount = isPartialPayment ? true : false;
+        CTAState.onSubmit = onPaymentDetailSubmit;
+        if (singleMethod) {
+          const { label, labelData } = showPayViaSingleMethod(
+            getMethodNameForPaymentOption(singleMethod, $locale)
+          );
+          CTAState.label = label;
+          CTAState.labelData = labelData;
+        } else {
+          CTAState.label =
+            !isOneCCEnabled && !isPartialPayment ? CTA_PROCEED : CTA_LABEL;
+        }
+        CTAState.disabled = paymentDetailInvalid;
       }
-      CTAState.disabled = paymentDetailInvalid;
-    }
-    if (!getAmount()) {
-      CTAState.label = AUTHENTICATE;
+      if (!getAmount()) {
+        CTAState.label = AUTHENTICATE;
+      }
     }
   }
 
@@ -1469,12 +1471,12 @@
   :global(#content.one-cc) .home-methods {
     padding-left: 16px;
     padding-right: 16px;
-    margin-bottom: 16px;
-    margin-top: 16px;
+    margin-bottom: 26px;
+    margin-top: 20px;
   }
 
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
   .partial-strip {
     background: linear-gradient(

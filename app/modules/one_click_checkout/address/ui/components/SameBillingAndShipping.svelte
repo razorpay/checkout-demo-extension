@@ -52,17 +52,23 @@
   .same-address-checkbox {
     background: white;
     display: inline-flex;
-    margin-top: 12px;
-    font-size: 13px;
+    align-items: center;
+    margin-top: 16px;
+    font-size: var(--font-size-small);
+  }
+
+  .same-address-checkbox > :global(label) {
+    min-height: 0;
+    max-height: 16px;
   }
 
   .checkbox-text {
-    color: #263a4a;
+    color: var(--primary-text-color);
   }
   .checkbox-sticky {
     position: absolute;
     bottom: 0;
-    width: calc(100% - 24px);
+    width: calc(100% - 18px);
     padding: 12px 0 4px 16px;
   }
 </style>

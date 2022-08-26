@@ -214,9 +214,11 @@
   }
   .message {
     background: no-repeat center bottom;
-    background-size: 116px;
+    background-size: 124px;
     padding-bottom: 32px;
     line-height: 1.6;
+    background-position-y: 87%;
+    background-position-x: 48%;
   }
   .message + .qr-image {
     display: block;
@@ -275,9 +277,9 @@
   }
 
   .price-label {
-    color: #263a4a;
+    color: var(--primary-text-color);
     font-size: 22px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .cta-view-details {
@@ -287,8 +289,13 @@
     color: #8d97a1;
   }
 
-  :global(.redesign #form-qr) {
-    padding-top: 26px !important;
+  :global(.redesign #form-qr:not(.pageCenter)) {
+    padding-top: 20px !important;
+  }
+
+  :global(.redesign #form-qr.pageCenter) {
+    position: relative;
+    top: -20px;
   }
 
   :global(#content.one-cc) .message {

@@ -50,7 +50,6 @@
     ACTIONS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
-  import { views } from 'one_click_checkout/routing/constants';
   import { CTA_LABEL } from 'cta/i18n';
   import { SELECTED_ADDRESS_DOM_ID } from 'one_click_checkout/address/constants';
 
@@ -58,10 +57,11 @@
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
+  export let showAccBottomSeparator = false;
   let addNewAddressRef;
-
   let addressWrapperEle;
   let addresses;
+
   $: {
     if (addressType === ADDRESS_TYPES.SHIPPING_ADDRESS) {
       addresses = $savedAddresses;
@@ -264,17 +264,12 @@
   }
 </script>
 
-<div class="address-tab">
+<div class="address-tab" class:overflow-auto={showAccBottomSeparator}>
   <div
     class="address-wrapper"
-    class:shipping-address-wrapper={addressType ===
-      ADDRESS_TYPES.SHIPPING_ADDRESS &&
-      ADDRESS_FORM_VIEWS.includes(currentView)}
     class:billing-address-wrapper={Resource[addressType].classes[
       'billing-address-wrapper'
     ]}
-    class:capture-billing-disabled={!captureBillingAddr &&
-      currentView === addressViews.SAVED_ADDRESSES}
     bind:this={addressWrapperEle}
   >
     <div class="address-section">
@@ -311,12 +306,9 @@
         />
       {/if}
     </div>
-    <AccountTab />
-    {#if $activeRoute?.name === views.SAVED_ADDRESSES && captureBillingAddr}
-      <hr class="separator" />
-    {/if}
   </div>
   <slot name="footer" />
+  <AccountTab showBottomSeparator={showAccBottomSeparator} />
   <CTA
     screen="home-1cc"
     tab={$activeRoute?.name}
@@ -337,10 +329,9 @@
   }
 
   .address-wrapper {
-    padding-top: 26px;
+    padding-top: 16px;
     overflow: auto;
-    /* subtracting topbar and cta height from body's height for address-wrapper */
-    height: calc(100% - 55px);
+    min-height: 100%;
   }
 
   .address-tab {
@@ -353,28 +344,19 @@
   }
 
   .label-text {
-    color: #263a4a;
-    font-size: 14px;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
     text-transform: capitalize;
     margin-left: 8px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   .billing-address-wrapper {
-    padding: 8px 0px 12px;
-    /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
-    height: calc(
-      100% - 55px + 20px
-    ); /* 16 is because of the reduced vertical padding */
-  }
-
-  .shipping-address-wrapper {
-    height: calc(100% - 55px + 20px);
-    padding-bottom: 8px;
+    padding: 0;
   }
 
   :global(.address-label) {
-    font-size: 14px;
+    font-size: var(--font-size-body);
   }
 
   .address-section {
@@ -388,7 +370,11 @@
     margin-bottom: 12px;
   }
 
-  .capture-billing-disabled {
-    height: calc(100% - 30px);
+  .address-tab :global(.account-tab) {
+    margin-bottom: 38px;
+  }
+
+  .overflow-auto {
+    overflow: auto;
   }
 </style>

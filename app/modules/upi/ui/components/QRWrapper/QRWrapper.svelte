@@ -77,4 +77,9 @@
   .title {
     margin: 20px 12px 12px;
   }
+  :global(.redesign) {
+    .qr-v2-wrapper {
+      border: 1px solid var(--light-dark-color);
+    }
+  }
 </style>

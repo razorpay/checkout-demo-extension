@@ -1,7 +1,7 @@
 <script lang="ts">
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
-  import arrow_left from 'account_modal/icons/arrow_left';
+  import arrow_up from 'account_modal/icons/arrow_up';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -12,17 +12,18 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { showAccountModal, showMerchantFrame } from 'account_modal';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
-  import viewport from 'one_click_checkout/account_modal/viewportAction';
+  import { constantCSSVars } from 'common/constants';
 
   // analytics imports
   import { Events } from 'analytics';
   import AccountEvents from 'account_modal/analytics';
 
-  let showAccountTab = false;
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
 
   const { rzp_brand_logo } = getIcons();
+
+  export let showBottomSeparator = false;
 
   function handleAccountModal() {
     Events.TrackBehav(AccountEvents.ACCOUNT_CTA_CLICKED, {
@@ -30,15 +31,6 @@
     });
     showAccountModal();
   }
-
-  const handleEnterViewport = () => {
-    setTimeout(() => {
-      showAccountTab = true;
-    }, 1200);
-  };
-  const handleExitViewport = () => {
-    showAccountTab = false;
-  };
 
   function showMerchantDetails() {
     Events.TrackBehav(AccountEvents.ABOUT_MERCHANT_CLICKED, {
@@ -49,47 +41,54 @@
 </script>
 
 {#if isRedesignV15()}
-  <div
-    class="account-tab"
-    use:viewport
-    on:enterViewport={handleEnterViewport}
-    on:exitViewport={handleExitViewport}
-  >
-    {#if showAccountTab}
-      <div class="account-tab-container">
-        <div class="account-wrapper">
-          <div class="details-wrapper">
+  <div class="account-tab">
+    <div class="separator" />
+    <div class="account-tab-container">
+      <div class="account-wrapper">
+        <div class="details-wrapper">
+          <div
+            data-test-id="account-tab-btn"
+            class="account-section"
+            on:click={handleAccountModal}
+          >
+            {$t(ACCOUNT)}
+            <span class="account-toggle-icon">
+              <Icon
+                icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}
+              />
+            </span>
+          </div>
+          {#if showMerchantPolicyBtn}
+            <div class="divider" />
+
             <div
-              data-test-id="account-tab-btn"
+              data-test-id="merchant-policy-tab-btn"
               class="account-section"
-              on:click={handleAccountModal}
+              on:click={showMerchantDetails}
             >
-              {$t(ACCOUNT)}
-              <span class="account-toggle-icon">
-                <Icon icon={arrow_left(13, 13, '#212121')} />
+              {merchantPolicy.display_name}
+              <span class="merchant-toggle-icon">
+                <Icon
+                  icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}
+                />
               </span>
             </div>
-            {#if showMerchantPolicyBtn}
-              <div class="divider" />
-
-              <div
-                data-test-id="merchant-policy-tab-btn"
-                class="account-section"
-                on:click={showMerchantDetails}
-              >
-                {merchantPolicy.display_name}
-                <span class="merchant-toggle-icon">
-                  <Icon icon={arrow_left(13, 13, '#212121')} />
-                </span>
-              </div>
-            {/if}
-          </div>
-          <div class="rzp-icon-section">
-            <span class="brand-text">{$t(SECURED_BY)}</span>
-            <Icon icon={rzp_brand_logo} />
-          </div>
+          {/if}
+        </div>
+        <div
+          class="rzp-icon-section {showMerchantPolicyBtn
+            ? 'rzp-column'
+            : 'rzp-row'}"
+        >
+          <span class={showMerchantPolicyBtn ? 'brand-text' : 'brand-text-row'}
+            >{$t(SECURED_BY)}</span
+          >
+          <Icon icon={rzp_brand_logo} />
         </div>
       </div>
+    </div>
+    {#if showBottomSeparator}
+      <div class="separator" />
     {/if}
   </div>
 {/if}
@@ -104,9 +103,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 16px;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 40px;
+    height: 43px;
+    padding: 0px 16px;
+  }
+  .brand-text {
+    font-size: var(--font-size-tiny);
+    font-weight: var(--font-weight-regular);
+    color: var(--tertiary-text-color);
+    margin-right: 4px;
+  }
+  .account-section {
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
   }
 
   .details-wrapper {
@@ -120,35 +131,42 @@
     margin: 0px 10px;
     background-color: #e0e0e0;
   }
-  .brand-text {
-    font-size: 9px;
+
+  .brand-text-row {
+    font-size: 11px;
     font-weight: 400;
-    font-weight: normal;
-    color: #8d97a1;
+    color: var(--tertiary-text-color);
+    margin-right: 6px;
   }
-  .account-section {
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    display: flex;
-    align-items: baseline;
-  }
+
   .rzp-icon-section {
     display: flex;
+  }
+  .rzp-column {
     flex-direction: column;
     align-items: flex-end;
   }
+
+  .rzp-row {
+    flex-direction: row;
+    align-items: center;
+  }
   .account-toggle-icon {
     margin-left: 7px;
-    transform: rotate(90deg);
+    display: flex;
+    align-items: center;
   }
 
   .merchant-toggle-icon {
     margin-left: 5px;
-    transform: rotate(90deg);
   }
   .account-tab {
     display: flex;
     min-height: 20px;
+    flex-direction: column;
+  }
+  .separator {
+    height: 8px;
+    background-color: var(--background-color-magic);
   }
 </style>

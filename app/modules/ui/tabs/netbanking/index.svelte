@@ -23,7 +23,6 @@
 
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  const { solid_down_arrow } = getIcons();
 
   // i18n
   import {
@@ -68,6 +67,8 @@
   export let downtimes = getDowntimes();
   export let method;
   export let bankOptions;
+
+  const { solid_down_arrow } = getIcons();
 
   // Other Imports
   import { isRedesignV15 } from 'razorpay';
@@ -409,7 +410,7 @@
           transition:fade={getAnimationOptions({ duration: 100 })}
         >
           <!-- LABEL: Complete Payment Using -->
-          <label>{$t(SELECTION_RADIO_TEXT)}</label>
+          <label class="select-bank-type">{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">
             <input
               type="radio"
@@ -459,7 +460,7 @@
   </Screen>
 </Tab>
 
-<style>
+<style lang="scss">
   #netb-banks {
     overflow: hidden;
   }
@@ -467,6 +468,11 @@
   .ref-radiocontainer {
     margin-top: -6px;
     margin-bottom: 18px;
+  }
+
+  .select-bank-type {
+    font-weight: 600;
+    margin-bottom: 10px;
   }
 
   .input-radio:first-of-type {
@@ -496,13 +502,14 @@
   }
 
   .nb-one-cc-wrapper {
-    border: 1px solid rgba(38, 50, 56, 0.3);
+    border: 1px solid var(--light-dark-color);
     margin-top: 20px;
     border-radius: 4px;
     padding: 0px 12px;
     height: 48px;
     padding: 12px 16px;
     box-sizing: border-box;
+    color: var(--primary-text-color);
   }
 
   .nb-one-cc-button {
@@ -511,6 +518,7 @@
     height: 100%;
     display: flex;
     margin-top: 2px !important;
+    color: var(--tertiary-text-color);
   }
 
   .nb-one-cc-wrapper::after {
@@ -524,11 +532,11 @@
     padding: 0px 2px;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
 
   .netb-banks-one-cc {
-    border-top: 1px solid #ebedf0;
+    border-top: 1px solid var(--light-dark-color);
   }
 
   .drop-down-icon-wrapper {
@@ -540,8 +548,29 @@
   .header-title {
     margin: 20px 18px 14px;
     text-transform: capitalize;
-    color: #263a4a;
+    color: var(--primary-text-color);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  :global(.redesign) {
+    .ref-radiocontainer {
+      label {
+        display: flex;
+        align-items: center;
+      }
+
+      .radio-display {
+        position: static;
+
+        &:after {
+          top: 6px;
+        }
+      }
+
+      .label-content {
+        padding: 4px 0px 4px 14px;
+      }
+    }
   }
 </style>

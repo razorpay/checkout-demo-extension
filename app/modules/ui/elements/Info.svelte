@@ -33,6 +33,11 @@
     min-height: 150px;
     padding: 26px;
     text-align: left;
+    bottom: -55px !important;
+  }
+
+  :global(.redesign) .info {
+    bottom: 0 !important;
   }
 
   .title {

@@ -208,7 +208,7 @@
 
 <Screen pad={false}>
   <div data-test-id="summary-screen" class="coupon-container">
-    <div class="widget-wrapper contact-wrapper">
+    <div class="widget-wrapper">
       <ContactWidget {showValidations} />
     </div>
     <div class="separator" />
@@ -226,14 +226,9 @@
       </div>
       <div class="separator" />
     {/if}
-    <div
-      class="widget-wrapper order-summary-wrapper"
-      id="order-widget"
-      bind:this={orderWidget}
-    >
+    <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
       <OrderWidget />
     </div>
-    <div class="separator" />
   </div>
   <CTA
     screen="home-1cc"
@@ -250,23 +245,20 @@
 
 <style>
   .separator {
-    height: 10px;
-    background-color: #f8fafd;
+    height: 8px;
+    background-color: var(--background-color-magic);
   }
 
   .widget-wrapper {
-    padding: 20px 16px;
-  }
-
-  .contact-wrapper {
-    padding-top: 26px;
-  }
-
-  .order-summary-wrapper {
-    padding-bottom: 26px;
+    padding: 14px 16px;
+    background-color: #fff;
   }
 
   .coupon-container {
-    min-height: 120%;
+    min-height: 100%;
+  }
+
+  #order-widget {
+    padding-bottom: 14px;
   }
 </style>

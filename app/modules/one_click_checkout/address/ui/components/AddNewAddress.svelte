@@ -8,7 +8,7 @@
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import TagSelector from 'one_click_checkout/address/ui/components/TagSelector.svelte';
   import {
-    showToast,
+    showToastAfterDelay,
     hideToast,
     TOAST_THEME,
     TOAST_SCREEN,
@@ -142,9 +142,9 @@
     screen: TOAST_SCREEN.ONE_CC,
   };
 
-  const showPincodeToast = (pincode) => {
+  const showPincodeUnserviceableToast = (pincode) => {
     if (pincode) {
-      showToast(pincode_error_toast);
+      showToastAfterDelay(pincode_error_toast, 150);
     }
   };
 
@@ -383,14 +383,14 @@
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
 
-              showPincodeToast($formData.zipcode);
+              showPincodeUnserviceableToast($formData.zipcode);
             }
             $formData.cod = res[$selectedCountryISO]?.cod;
           })
           .catch(() => {
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
-            showPincodeToast($formData.zipcode);
+            showPincodeUnserviceableToast($formData.zipcode);
           });
       }
     } else {
@@ -499,7 +499,7 @@
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
               toggleStateField({ disabled: false });
-              showPincodeToast($formData.zipcode);
+              showPincodeUnserviceableToast($formData.zipcode);
             }
             $formData.cod = res[value]?.cod;
             if (isShippingAddress) {
@@ -522,7 +522,7 @@
               UNSERVICEABLE_LABEL;
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             toggleStateField({ disabled: false });
-            showPincodeToast($formData.zipcode);
+            showPincodeUnserviceableToast($formData.zipcode);
           })
           .finally(() => {
             hideLoaderView();
@@ -687,14 +687,14 @@
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               UNSERVICEABLE_LABEL;
             toggleStateField({ disabled: false });
-            showPincodeToast($formData.zipcode);
+            showPincodeUnserviceableToast($formData.zipcode);
           }
         })
         .catch(() => {
           INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
             UNSERVICEABLE_LABEL;
           toggleStateField({ disabled: false });
-          showPincodeToast($formData.zipcode);
+          showPincodeUnserviceableToast($formData.zipcode);
         });
     }
     if (id === 'line1') {
@@ -840,12 +840,12 @@
         </div>
       </div>
       <div
-        class="elem-wrap-save-address-tc"
+        class:elem-wrap-save-address-tc={showTooltip}
         use:clickOutside
         on:click_outside={handleHideTooltip}
       >
         {#if showTooltip}
-          <div class="save-address-tooltip">
+          <div class="save-address-tooltip" class:upper-tooltip={!$shouldSaveAddress}>
             {$t(SAVE_ADDRESS_CONSENT_TOOLTIP)}
             <a
               class="tc-text"
@@ -883,7 +883,8 @@
   .address-save-consent {
     display: flex;
     margin-top: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-small);
+    margin-bottom: 6px;
   }
   .save-address-wrapper {
     height: fit-content;
@@ -908,13 +909,14 @@
     position: absolute;
     line-height: 17px;
     padding: 12px;
-    font-size: 12px;
+    font-size: var(--font-size-small);
     background: #2d313a;
-    box-shadow: rgba(0, 0, 0, 0.05) 1px 1px 2px 0;
+    box-shadow: 0px 2px 16px 0px #00000033;
     z-index: 3;
     border-radius: 2px;
     bottom: -62px;
     letter-spacing: 0.125px;
+    opacity: 0.95;
   }
   .save-address-tooltip::after {
     content: '';
@@ -925,20 +927,33 @@
     border-style: solid;
     border-color: transparent transparent #2d313a;
     bottom: 100%;
-    left: 122px;
+    left: 120px;
     margin: 0 0 -1px -10px;
+  }
+
+  .save-address-tooltip.upper-tooltip {
+    bottom: 30px;
+  }
+  .save-address-tooltip.upper-tooltip::after {
+    bottom: -7px;
+    border-width: 8px 8px 0;
+    border-color: #2d313a transparent transparent;
   }
 
   .tc-text {
     cursor: pointer;
-    color: #3684d6;
+    color: #a6c5ed;
     text-decoration: underline;
   }
 
   .tags-heading {
-    font-weight: 400;
-    font-size: 14px;
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-body);
     margin: 8px 0px 6px;
+  }
+  .address-new :global(.same-address-checkbox) {
+    margin-top: 0;
+    margin-bottom: 6px;
   }
 
   @media (max-width: 340px) {

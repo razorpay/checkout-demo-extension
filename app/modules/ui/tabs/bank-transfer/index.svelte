@@ -55,7 +55,7 @@
 
   import { t, locale } from 'svelte-i18n';
 
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, getRawMethodTitle } from 'i18n';
   import { getBankTransferUrl, setCustomChallanMetaProp } from './helper';
   import {
     BANK_TRANSFER_CHALLAN_PRINT,
@@ -236,6 +236,9 @@
       <!-- LABEL: Getting bank details... -->
       <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
     {:else if data}
+      {#if isRedesign}
+        <span class="one-cc-title">{getRawMethodTitle('bank_transfer', $locale)}</span>
+      {/if}
       <!-- LABEL: To complete the transaction, make NEFT / RTGS / IMPS transfer to -->
       <div class="bank_transfer-message">{$t(HEADER)}</div>
       <div class="neft-details">
@@ -324,12 +327,20 @@
     color: rgba(81, 89, 120, 0.7);
     text-align: left;
   }
+  .one-cc .bank_transfer-message {
+    color: var(--primary-text-color);
+    margin-top: 16px;
+  }
   .neft-details {
     margin: 16px -12px 0 -12px;
     padding: 10px 5px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.01);
+  }
+  .one-cc .neft-details {
+    border-color: var(--light-dark-color);
+    margin: 16px 0 0;
   }
   .ct-tr {
     padding: 5px 10px;
@@ -346,6 +357,12 @@
     vertical-align: text-top;
     text-align: left;
     color: #424242;
+  }
+  .one-cc .ct-th {
+    color: var(--tertiary-text-color);
+  }
+  .one-cc .ct-td {
+    color: var(--secondary-text-color);
   }
   .ct-note {
     font-size: 12px;
@@ -365,15 +382,24 @@
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
   }
+  .one-cc .print {
+    color: var(--primary-color);
+  }
   .fee-breakup {
     margin-top: 6px;
     text-align: left;
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
   }
+  .one-cc .fee-breakup {
+    color: var(--primary-color);
+  }
   .one-cc {
     min-height: 110%;
     padding: 16px;
-    margin: 0px 14px;
+  }
+  .one-cc-title {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-body);
   }
 </style>

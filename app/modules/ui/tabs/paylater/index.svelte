@@ -93,7 +93,7 @@
     height: 100%;
   }
   .screen-one-cc {
-    min-height: 110%;
+    min-height: 100%;
   }
   .paylater-container {
     height: 100%;
@@ -103,9 +103,9 @@
   :global(.redesign) .paylater-header {
     margin: 16px 18px 14px;
     text-transform: capitalize;
-    color: #263a4a;
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--primary-text-color);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
   }
 
   :global(#content.one-cc) .paylater-section {

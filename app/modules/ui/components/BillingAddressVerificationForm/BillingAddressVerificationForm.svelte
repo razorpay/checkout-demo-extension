@@ -247,145 +247,150 @@
 
 <form class="billing-address-form" on:submit={handleFormSubmit}>
   {#each formFields as field, index (index)}
-    <div class="billing-address-form__field">
+    <div
+      class="billing-address-form--control"
+      class:cols={Array.isArray(field)}
+    >
       {#if Array.isArray(field)}
         {#each field as subField, subIndex (subIndex)}
+          <div class="billing-address-form--input">
+            <Field
+              dir=""
+              type="text"
+              maxlength={255}
+              forceStopDispatch={![
+                FORM_FIELDS.country,
+                FORM_FIELDS.state,
+              ].includes(subField.id)}
+              downtimeSeverity=""
+              xautocompletetype=""
+              required={subField.required}
+              placeholder={subField.placeholder}
+              autocomplete={subField.autocomplete}
+              id={`billing-address-verification-${subField.id}`}
+              name={`billing-address-verification-${subField.id}`}
+              label={formValues[subField.id] ? subField.placeholder : ''}
+              labelClasses={formValues[subField.id] ? 'input-label' : ''}
+              elemClasses={formErrors[subField.id] ? 'invalid' : 'filled'}
+              icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(subField.id)
+                ? ''
+                : null}
+              value={formValues[subField.id]}
+              leftImage={subField.id === FORM_FIELDS.country &&
+              formValues[FORM_FIELDS.countryCode]
+                ? `${countryFlagsUrl}${formValues[FORM_FIELDS.countryCode]}.svg`
+                : ''}
+              helpText={formErrors[subField.id]
+                ? $t(AVS_FORM_INPUT_REQUIRED)
+                : ''}
+              loader={subField.id === FORM_FIELDS.state && isStatesLoading}
+              showDropDownIcon={[
+                FORM_FIELDS.country,
+                FORM_FIELDS.state,
+              ].includes(subField.id)}
+              on:click={() => handleSearchFieldClick(subField)}
+              on:focus={() => handleSearchFieldClick(subField)}
+              on:keydown={(evt) => handleSearchFieldDownArrow(evt, subField)}
+              on:input={(e) => handleFieldInput(subField.id, e)}
+              on:blur={() => handleOnBlur(subField.id)}
+            />
+          </div>
+        {/each}
+      {:else}
+        <div class="billing-address-form--input">
           <Field
             dir=""
             type="text"
             maxlength={255}
-            forceStopDispatch={![
-              FORM_FIELDS.country,
-              FORM_FIELDS.state,
-            ].includes(subField.id)}
+            forceStopDispatch
             downtimeSeverity=""
             xautocompletetype=""
-            required={subField.required}
-            placeholder={subField.placeholder}
-            autocomplete={subField.autocomplete}
-            id={`billing-address-verification-${subField.id}`}
-            name={`billing-address-verification-${subField.id}`}
-            label={formValues[subField.id] ? subField.placeholder : ''}
-            labelClasses={formValues[subField.id] ? 'input-label' : ''}
-            elemClasses={formErrors[subField.id] ? 'invalid' : 'filled'}
-            icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(subField.id)
-              ? ''
-              : false}
-            value={formValues[subField.id]}
-            leftImage={subField.id === FORM_FIELDS.country &&
-            formValues[FORM_FIELDS.countryCode]
-              ? `${countryFlagsUrl}${formValues[FORM_FIELDS.countryCode]}.svg`
-              : ''}
-            helpText={formErrors[subField.id]
-              ? $t(AVS_FORM_INPUT_REQUIRED)
-              : ''}
-            loader={subField.id === FORM_FIELDS.state && isStatesLoading}
-            on:click={() => handleSearchFieldClick(subField)}
-            on:focus={() => handleSearchFieldClick(subField)}
-            on:keydown={(evt) => handleSearchFieldDownArrow(evt, subField)}
-            on:input={(e) => handleFieldInput(subField.id, e)}
-            on:blur={() => handleOnBlur(subField.id)}
+            required={field.required}
+            value={formValues[field.id]}
+            placeholder={field.placeholder}
+            autocomplete={field.autocomplete}
+            id={`billing-address-verification-${field.id}`}
+            name={`billing-address-verification-${field.id}`}
+            label={formValues[field.id] ? field.placeholder : ''}
+            labelClasses={formValues[field.id] ? 'input-label' : ''}
+            helpText={formErrors[field.id] ? $t(AVS_FORM_INPUT_REQUIRED) : ''}
+            elemClasses={formErrors[field.id] ? 'invalid' : 'filled'}
+            on:click={() => handleSearchFieldClick(field)}
+            on:focus={() => handleSearchFieldClick(field)}
+            on:keydown={(evt) => handleSearchFieldDownArrow(evt, field)}
+            on:input={(e) => handleFieldInput(field.id, e)}
+            on:blur={() => handleOnBlur(field.id)}
           />
-        {/each}
-      {:else}
-        <Field
-          dir=""
-          type="text"
-          maxlength={255}
-          forceStopDispatch
-          downtimeSeverity=""
-          xautocompletetype=""
-          required={field.required}
-          value={formValues[field.id]}
-          placeholder={field.placeholder}
-          autocomplete={field.autocomplete}
-          id={`billing-address-verification-${field.id}`}
-          name={`billing-address-verification-${field.id}`}
-          label={formValues[field.id] ? field.placeholder : ''}
-          labelClasses={formValues[field.id] ? 'input-label' : ''}
-          helpText={formErrors[field.id] ? $t(AVS_FORM_INPUT_REQUIRED) : ''}
-          elemClasses={formErrors[field.id] ? 'invalid' : 'filled'}
-          on:click={() => handleSearchFieldClick(field)}
-          on:focus={() => handleSearchFieldClick(field)}
-          on:keydown={(evt) => handleSearchFieldDownArrow(evt, field)}
-          on:input={(e) => handleFieldInput(field.id, e)}
-          on:blur={() => handleOnBlur(field.id)}
-        />
+        </div>
       {/if}
     </div>
   {/each}
 </form>
 
-<style lang="css">
-  .billing-address-form {
-    padding: 0 24px;
+<style lang="scss">
+  .billing-address-form--input {
+    flex: 0 0 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
-  .billing-address-form__field > :global(div) {
-    width: 100%;
-  }
-
-  .billing-address-form__field > :global(div:nth-child(odd)) {
-    margin-right: 12px;
-  }
-
-  :global(.redesign)
-    .billing-address-form__field
-    > :global(div:nth-child(odd)) {
-    margin-right: 6px;
-  }
-
-  .billing-address-form__field > :global(div:nth-child(even)) {
-    margin-left: 12px;
-  }
-
-  :global(.redesign)
-    .billing-address-form__field
-    > :global(div:nth-child(even)) {
-    margin-left: 0;
-  }
-
-  .billing-address-form__field > :global(div:last-child) {
-    margin-right: 0;
-  }
-
-  .billing-address-form__field {
+  .billing-address-form--control {
     display: flex;
-  }
-
-  .billing-address-form :global(.filled:not(.input-radio) label),
-  .billing-address-form :global(.input-label) {
-    transform: scale(0.86) translateY(-30px);
-  }
-
-  :global(.redesign)
-    .billing-address-form
-    :global(.filled:not(.input-radio) label),
-  :global(.redesign) .billing-address-form :global(.input-label) {
-    transform: scale(0.86) translateY(4px);
-    line-height: 1;
-  }
-
-  .billing-address-form :global(#billing-address-verification-country),
-  .billing-address-form :global(#billing-address-verification-state) {
-    text-overflow: ellipsis;
-    width: calc(100% - 30px);
-    padding-right: 15px;
-  }
-
-  :global(.redesign)
-    .billing-address-form
-    :global(#billing-address-verification-country),
-  :global(.redesign)
-    .billing-address-form
-    :global(#billing-address-verification-state) {
-    text-overflow: ellipsis;
     width: 100%;
-    padding-right: 15px;
+    margin: 0.5rem 0;
+    box-sizing: border-box;
+
+    &.cols {
+      .billing-address-form--input {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+
+      .billing-address-form--input:last-child {
+        padding-left: 0.5rem;
+      }
+
+      .billing-address-form--input:first-child {
+        padding-right: 0.5rem;
+      }
+    }
   }
 
-  .billing-address-form :global(.elem > i) {
-    transform: rotate(-90deg) scale(0.5);
-    top: 50%;
+  .billing-address-form {
+    padding: 0 1rem 1rem;
+
+    :global(.filled:not(.input-radio) label),
+    :global(.input-label) {
+      transform: scale(0.86) translateY(-30px);
+    }
+
+    :global(#billing-address-verification-country),
+    :global(#billing-address-verification-state) {
+      text-overflow: ellipsis;
+      width: 100%;
+      padding-right: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    :global(.elem > i) {
+      transform: rotate(-90deg) scale(0.5);
+      top: 50%;
+    }
+  }
+
+  :global(.redesign) {
+    .billing-address-form {
+      padding: 0 1rem;
+    }
+
+    .billing-address-form :global(.drop-down-icon-wrapper) {
+      top: 8px;
+    }
+
+    .billing-address-form :global(.filled:not(.input-radio) label),
+    .billing-address-form :global(.input-label) {
+      transform: scale(0.86) translateY(4px);
+      line-height: 1;
+    }
   }
 </style>

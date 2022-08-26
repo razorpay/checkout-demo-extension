@@ -3,6 +3,13 @@ import Analytics from 'analytics';
 import International from '../index.svelte';
 import { setupPreferences } from 'tests/setupPreferences';
 
+jest.mock('checkoutstore/theme', () => ({
+  ...jest.requireActual('checkoutstore/theme'),
+  getThemeMeta: () => ({
+    icons: {},
+  }),
+}));
+
 jest.mock('cta', () => ({
   ...jest.requireActual('cta'),
   __esModule: true,
