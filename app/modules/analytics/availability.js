@@ -69,7 +69,7 @@ function trackAvailabilty(event, severity) {
       key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
       data:
         trackingPayload
-        |> _Obj.stringify
+        |> JSON.stringify
         |> encodeURIComponent
         |> unescape
         |> btoa
@@ -89,7 +89,7 @@ function trackAvailabilty(event, severity) {
   ) {
     try {
       if (useBeacon) {
-        navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
+        navigator.sendBeacon(postData.url, JSON.stringify(postData.data));
       } else {
         fetch.post(postData);
       }

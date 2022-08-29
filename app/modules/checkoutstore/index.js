@@ -11,6 +11,7 @@ import RazorpayStore, {
   isRecurringOrPreferredPayment,
 } from 'razorpay';
 import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
+import * as ObjectUtils from 'utils/object';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import { CTAHelper } from 'cta';
 
@@ -98,9 +99,9 @@ export function getMerchantConfig() {
   const configFromPreferences = getCheckoutConfig();
   const isHDFCMerchant = isHDFCVASMerchant();
 
-  let displayFromOptions = _Obj.getSafely(configFromOptions, 'display');
+  let displayFromOptions = ObjectUtils.get(configFromOptions, 'display');
 
-  const displayFromPreferences = _Obj.getSafely(
+  const displayFromPreferences = ObjectUtils.get(
     configFromPreferences,
     'display'
   );
@@ -111,7 +112,7 @@ export function getMerchantConfig() {
 
   // Restrictions can only come from preferences
   const restrictions = {
-    config: _Obj.getSafely(configFromPreferences, 'restrictions'),
+    config: ObjectUtils.get(configFromPreferences, 'restrictions'),
     source: 'preferences',
   };
 

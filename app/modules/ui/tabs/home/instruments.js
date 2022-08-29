@@ -19,6 +19,7 @@ import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { getAppFromPackageName } from 'common/upi';
 import { getMaxPreferredMethods } from 'checkoutframe/personalization/index';
+import * as ObjectUtils from 'utils/object';
 import { getMerchantConfig } from 'checkoutstore';
 import { customer } from 'checkoutstore/customer';
 
@@ -206,7 +207,7 @@ function makeLoaderInstruments(howMany) {
   let instruments = [];
 
   for (let i = 0; i < howMany; i++) {
-    instruments.push(_Obj.clone(loaderInstrument));
+    instruments.push(ObjectUtils.clone(loaderInstrument));
   }
 
   return instruments;
@@ -235,7 +236,7 @@ export function setBlocks(
     .filter((instrument) => !isInstrumentForEntireMethod(instrument));
 
   // show_default_blocks defaults to true
-  const show_default_blocks = _Obj.getSafely(
+  const show_default_blocks = ObjectUtils.get(
     parsedConfig,
     'display.preferences.show_default_blocks',
     true

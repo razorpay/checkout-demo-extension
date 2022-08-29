@@ -108,7 +108,7 @@ module.exports = function (testFeatures) {
       /**
        * L1 QRv2 has to be disable, for old flow to work
        */
-       let qrV2FeatureFlags = {
+      let qrV2FeatureFlags = {
         disable_homescreen_qr: true,
         disable_upiscreen_qr: true,
       };

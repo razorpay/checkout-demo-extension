@@ -1,5 +1,6 @@
 import { getPreferences } from 'razorpay';
 import { hasProp } from 'utils/object';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Copy downtimes between methods if needed.
@@ -28,7 +29,7 @@ const DOWNTIME_METHOD_COPY_MAP = {
  * @return { Object<string, Array<Downtime.RawDowntime>>}
  */
 export function copyMethodsIfNeeded(downtimes) {
-  _Obj.loop(DOWNTIME_METHOD_COPY_MAP, (target, dest) => {
+  ObjectUtils.loop(DOWNTIME_METHOD_COPY_MAP, (target, dest) => {
     if (downtimes[target]) {
       downtimes[dest] = downtimes[target];
     }

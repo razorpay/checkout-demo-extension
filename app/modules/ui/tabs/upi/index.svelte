@@ -5,6 +5,7 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
+  import * as ObjectUtils from 'utils/object';
   import { shouldRememberCustomer } from 'checkoutstore';
   import {
     isPayout,
@@ -252,7 +253,7 @@
 
     if (instrument.flows) {
       // Disable all flows
-      _Obj.loop(availableFlows, (val, key) => {
+      ObjectUtils.loop(availableFlows, (val, key) => {
         availableFlows[key] = false;
       });
 
@@ -379,9 +380,9 @@
     // BE does not support saved vpa tokens for recurring payments
     // conditional support might be added later
     if (!isRecurring()) {
-      tokens = _Obj
-        .getSafely($customer, 'tokens.items', [])
-        .filter((token) => token.method === 'upi');
+      tokens = ObjectUtils.get($customer, 'tokens.items', []).filter(
+        (token) => token.method === 'upi'
+      );
       tokens = getAllowedPSPs[method](tokens);
       addDowntime();
 
@@ -572,9 +573,11 @@
       default:
         // `selectedToken` can be null if nothing is to be selected by default
         if (selectedToken) {
-          _token = _Obj
-            .getSafely(session.getCurrentCustomer(), 'tokens.items', [])
-            .find((token) => token.id === selectedToken);
+          _token = ObjectUtils.get(
+            session.getCurrentCustomer(),
+            'tokens.items',
+            []
+          ).find((token) => token.id === selectedToken);
           isTokenInstance = false;
 
           Analytics.track('upi:token:switch:default', {
@@ -724,7 +727,7 @@
   }
 
   export function shouldRememberVpa() {
-    return _Obj.getSafely($customer, 'logged') &&
+    return ObjectUtils.get($customer, 'logged') &&
       hasFeature('save_vpa') &&
       rememberVpa
       ? 1

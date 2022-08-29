@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 declare const __BUILD_NUMBER__: string;
-declare const _Obj: { [key: string]: (...args: any[]) => any };
 
 declare const _: any;
 interface Window {

@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import * as ObjectUtils from 'utils/object';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -91,16 +92,16 @@ const defaultConfig = {
   fee_bearer_customer: true, // Allow for `fee-bearer: true` merchants?
 };
 
-const providers = _Obj.map(config, (details, code) => {
-  return (
-    {}
-    |> _Obj.extend(defaultConfig)
-    |> _Obj.extend({
+const providers = ObjectUtils.map(config, (details, code) => {
+  return Object.assign(
+    {},
+    defaultConfig,
+    {
       code,
       logo: prefix + code + '.svg',
       sqLogo: sqPrefix + code + '.svg',
-    })
-    |> _Obj.extend(details)
+    },
+    details
   );
 });
 
@@ -118,7 +119,7 @@ export const extendConfig = (provider, updatedConfig) => {
     return;
   }
 
-  providers[provider] = _Obj.extend(providers[provider], updatedConfig);
+  providers[provider] = Object.assign(providers[provider], updatedConfig);
 
   return providers[provider];
 };
@@ -137,7 +138,7 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
     return eligible;
   }
 
-  _Obj.loop(enabledProviders, (enabled, provider) => {
+  ObjectUtils.loop(enabledProviders, (enabled, provider) => {
     if (
       enabledProviders[provider] &&
       providers[provider] &&

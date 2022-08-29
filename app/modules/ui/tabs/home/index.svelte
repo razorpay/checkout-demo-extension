@@ -84,6 +84,7 @@
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import * as ObjectUtils from 'utils/object';
   import { getMerchantConfig, screenStore } from 'checkoutstore';
 
   import {
@@ -712,7 +713,7 @@
   }
 
   $: {
-    const loggedIn = _Obj.getSafely($customer, 'logged');
+    const loggedIn = ObjectUtils.get($customer, 'logged');
     const topbarRight = querySelector('#topbar #top-right');
 
     if (topbarRight) {

@@ -19,7 +19,11 @@
 </script>
 
 <DropdownMenu triggerElement={dropdownTrigger} on:click>
-  <button class="dropdown-btn" data-test-id="edit-cta" bind:this={dropdownTrigger}>
+  <button
+    class="dropdown-btn"
+    data-test-id="edit-cta"
+    bind:this={dropdownTrigger}
+  >
     <Icon icon={kebab_menu} />
   </button>
   <div slot="dropdown_menu">

@@ -1,3 +1,4 @@
+import * as ObjectUtils from 'utils/object';
 /** helper related to EMIPlanView */
 
 import { isDebitEMIBank } from 'common/bank';
@@ -17,11 +18,11 @@ const bankOverrides: Partial<EMIPlanView.EMIPlanData> = {
  * @return {Object}
  */
 export function useBankOverrides(allBanks: EMIPlanView.EMIPlanData) {
-  const banks = _Obj.clone(allBanks);
+  const banks = ObjectUtils.clone(allBanks);
 
-  _Obj.loop(bankOverrides, (_: any, code: string) => {
+  ObjectUtils.loop(bankOverrides, (_: any, code: string) => {
     if (banks[code]) {
-      banks[code] = _Obj.extend(banks[code], bankOverrides[code]);
+      banks[code] = Object.assign(banks[code], bankOverrides[code]);
     }
   });
   return banks;

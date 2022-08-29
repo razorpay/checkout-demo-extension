@@ -237,7 +237,9 @@
       <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
     {:else if data}
       {#if isRedesign}
-        <span class="one-cc-title">{getRawMethodTitle('bank_transfer', $locale)}</span>
+        <span class="one-cc-title"
+          >{getRawMethodTitle('bank_transfer', $locale)}</span
+        >
       {/if}
       <!-- LABEL: To complete the transaction, make NEFT / RTGS / IMPS transfer to -->
       <div class="bank_transfer-message">{$t(HEADER)}</div>

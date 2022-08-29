@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-redeclare
-/* global _, _Obj */
+/* global _ */
 import * as RazorpayHelper from 'razorpay';
 import discreet from 'checkoutframe/discreet';
 import * as Confirm from 'checkoutframe/components/confirm';
@@ -22,6 +22,7 @@ import { handleErrorModal } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
+import * as ObjectUtils from 'utils/object';
 import { isMainStackPopulated, popStack } from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
@@ -444,7 +445,7 @@ function askOTP(
   let qpmap = _.getQueryParams();
   let thisSession = this;
   let session = thisSession;
-  let paymentId = _Obj.getSafely(session, 'r._payment.payment_id');
+  let paymentId = ObjectUtils.get(session, 'r._payment.payment_id');
   let paymentData = OtpService.getPaymentData(paymentId);
   let isRedesignV15Enabled = RazorpayHelper.isRedesignV15();
 
@@ -518,7 +519,7 @@ function askOTP(
   };
 
   if (RazorpayHelper.isASubscription()) {
-    _Obj.extend(otpProperties, {
+    Object.assign(otpProperties, {
       allowSkip: session.get('subscription_card_change') ? false : true,
     });
   }
@@ -583,7 +584,7 @@ function askOTP(
           }
 
           if (origText.mode === 'debit_emi') {
-            let next = _Obj.getSafely(origText, 'request.content.next');
+            let next = ObjectUtils.get(origText, 'request.content.next');
             // HDFC Debit EMI next array is same as wallet.
             // It's "resend_otp" not "otp_resend".
             if (!next || next.indexOf('resend_otp') === -1) {
@@ -1129,7 +1130,7 @@ Session.prototype = {
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
-      data: _Obj.extend(
+      data: Object.assign(
         {
           embedded: this.embedded,
           meta: { first_screen },
@@ -1814,11 +1815,10 @@ Session.prototype = {
       if (confirmedCancel === true) {
         return this.clearRequest();
       }
-
       if (
         this.payload &&
         this.payload.method === 'netbanking' &&
-        _Obj.getSafely(this.r, '_payment.popup.window.closed')
+        ObjectUtils.get(this.r, '_payment.popup.window.closed')
       ) {
         // Called when the popup for netbanking has been closed by the user
         // and the netbanking cancellation modal is open
@@ -2417,7 +2417,7 @@ Session.prototype = {
     //   Store.showFeeLabel.set(true);
     // }
     if (extraProps) {
-      trackingData = _Obj.extend(trackingData, extraProps);
+      trackingData = Object.assign(trackingData, extraProps);
     }
 
     Analytics.track('screen:switch', {
@@ -3610,7 +3610,7 @@ Session.prototype = {
       });
 
       if (this.screen === 'card') {
-        _Obj.extend(data, this.svelteCardTab.getPayload());
+        Object.assign(data, this.svelteCardTab.getPayload());
         if (tab === 'emi') {
           let emiDuration = EmiStore.getEmiDurationForNewCard();
           if (emiDuration) {
@@ -3657,16 +3657,16 @@ Session.prototype = {
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
         if (this.walletTab.isAnyWalletSelected()) {
-          _Obj.extend(data, this.walletTab.getPayload());
+          Object.assign(data, this.walletTab.getPayload());
         }
       }
 
       if (this.tab === 'emandate') {
-        _Obj.extend(data, this.emandateView.getPayload());
+        Object.assign(data, this.emandateView.getPayload());
       }
 
       if (this.tab === 'netbanking') {
-        _Obj.extend(
+        Object.assign(
           data,
           discreet.es6components.getView('netbankingTab').getPayload()
         );
@@ -3837,7 +3837,7 @@ Session.prototype = {
      * Otherwise, show the fee breakup.
      */
     if (isFeeMissing) {
-      let paymentData = _Obj.clone(this.payload);
+      let paymentData = ObjectUtils.clone(this.payload);
       // Create fees route in API doesn't like this.
       delete paymentData.upi_app;
 
@@ -4000,7 +4000,7 @@ Session.prototype = {
       if (this.tab === 'cardless_emi' || isCardlessEmi) {
         const providerCode = CardlessEmiStore.providerCode;
 
-        submitPayload = _Obj.extend(submitPayload, {
+        submitPayload = Object.assign(submitPayload, {
           provider: providerCode,
           method: 'cardless_emi',
           payment_id: this.r._payment.payment_id,
@@ -4136,7 +4136,7 @@ Session.prototype = {
       return;
     }
 
-    _Obj.loop(CardlessEmiStore, function (value) {
+    ObjectUtils.loop(CardlessEmiStore, function (value) {
       delete value[provider];
     });
   },
@@ -4639,7 +4639,7 @@ Session.prototype = {
         }, 200);
       })
       .catch(function (vpaValidationError) {
-        let errorDescription = _Obj.getSafely(
+        let errorDescription = ObjectUtils.get(
           vpaValidationError,
           'error.description'
         );
@@ -4873,7 +4873,7 @@ Session.prototype = {
           'instrumentMeta',
           discreet.getInstrumentMeta(selectedInstrument)
         );
-        if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
+        if (ObjectUtils.get(selectedInstrument, 'meta.preferred')) {
           /**
            * P13N is on home
 
@@ -4936,7 +4936,7 @@ Session.prototype = {
           case 'app': {
             // TODO: Check if it's possible to move this to instruments-config
             if (selectedInstrument._ungrouped[0].provider === 'cred') {
-              _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+              Object.assign(this.payload, MethodStore.getPayloadForCRED());
 
               if (RazorpayHelper.isContactOptional()) {
                 // For contact optional case, we ask for contact separately
@@ -5017,7 +5017,7 @@ Session.prototype = {
       data.wallet = 'paypal';
     }
     if (RazorpayHelper.isAddressEnabled()) {
-      let notes = (data.notes = _Obj.clone(this.get('notes')) || {});
+      let notes = (data.notes = ObjectUtils.clone(this.get('notes')) || {});
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);

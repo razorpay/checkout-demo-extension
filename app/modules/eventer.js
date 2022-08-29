@@ -1,4 +1,5 @@
 import { returnAsIs } from 'lib/utils';
+import * as ObjectUtils from 'utils/object';
 export default function Eventer() {
   // constructor is also called for resetting
   this._evts = {};
@@ -18,7 +19,7 @@ Eventer.prototype = {
 
   on: function (event, callback) {
     if (_.isString(event) && _.isFunction(callback)) {
-      var events = this._evts;
+      let events = this._evts;
       if (!events[event]) {
         events[event] = [];
       }
@@ -30,8 +31,8 @@ Eventer.prototype = {
   },
 
   once: function (event, callback) {
-    var everCallback = callback;
-    var self = this;
+    let everCallback = callback;
+    let self = this;
     let onceCallback = function () {
       everCallback.apply(self, arguments);
       self.off(event, onceCallback);
@@ -41,15 +42,15 @@ Eventer.prototype = {
   },
 
   off: function (event, callback) {
-    var argLen = arguments.length;
+    let argLen = arguments.length;
     if (!argLen) {
       return Eventer.call(this);
     }
 
-    var events = this._evts;
+    let events = this._evts;
 
     if (argLen === 2) {
-      var listeners = events[event];
+      let listeners = events[event];
       if (_.isFunction(callback) && _.isArray(listeners)) {
         listeners.splice(listeners.indexOf(callback), 1);
         if (listeners.length) {
@@ -65,7 +66,7 @@ Eventer.prototype = {
     } else {
       // its a namespace
       event += '.';
-      _Obj.loop(events, function (val, eventKey) {
+      ObjectUtils.loop(events, function (val, eventKey) {
         if (!eventKey.indexOf(event)) {
           delete events[eventKey];
         }

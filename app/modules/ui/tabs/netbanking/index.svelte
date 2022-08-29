@@ -23,6 +23,7 @@
 
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
+  import * as ObjectUtils from 'utils/object';
 
   // i18n
   import {
@@ -201,7 +202,7 @@
   }
 
   function filterHiddenBanksUsingConfig(banks, hiddenBanks) {
-    banks = _Obj.clone(banks);
+    banks = ObjectUtils.clone(banks);
     hiddenBanks.forEach((hiddenBank) => {
       delete banks[hiddenBank];
     });

@@ -5,6 +5,7 @@ import { getCustomerCountryISOCode } from 'checkoutstore/screens/home';
 import fetch from 'utils/fetch';
 import { getAmount } from 'razorpay';
 import { setRTBVariant } from 'rtb/helper';
+import * as ObjectUtils from 'utils/object';
 
 import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';
@@ -290,7 +291,7 @@ export function trackP13nMeta(data) {
     return;
   }
   const eventData = [];
-  _Obj.loop(
+  ObjectUtils.loop(
     data,
     (
       {

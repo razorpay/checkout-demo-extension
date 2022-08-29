@@ -3,6 +3,7 @@ import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
 import { preventEvent } from 'utils/doc';
+import * as ObjectUtils from 'utils/object';
 
 const alphanumericRaw = function (value) {
   let returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -25,7 +26,7 @@ export const Formatter = function (el, handlers, noBind) {
   if (!handlers || !_.isElement(el)) {
     return false;
   } else {
-    _Obj.loop(handlers, (val, key) => {
+    ObjectUtils.loop(handlers, (val, key) => {
       this[key] = handlers[key];
     });
   }
@@ -461,7 +462,7 @@ export const FormatDelegator = function (el) {
   EvtHandler.call(this, el);
   this.bits = [];
 
-  _Obj.loop(Formatter.events, (fn, evt) => {
+  ObjectUtils.loop(Formatter.events, (fn, evt) => {
     this.on(
       evt,
       (e) => {

@@ -6,7 +6,7 @@ const RazorpayConfig = {
 };
 
 try {
-  _Obj.extend(RazorpayConfig, global.Razorpay.config);
+  Object.assign(RazorpayConfig, global.Razorpay.config);
 } catch (e) {}
 
 export default RazorpayConfig;

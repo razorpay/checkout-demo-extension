@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import * as ObjectUtils from 'utils/object';
 import * as Bridge from 'bridge';
 
 const cdnUrl = RazorpayConfig.cdn;
@@ -70,7 +71,7 @@ export function getSortedWallets(wallets) {
 
 const powerWallets = ['mobikwik', 'freecharge', 'payumoney'];
 
-export const wallets = _Obj.map(list, (details, code) => ({
+export const wallets = ObjectUtils.map(list, (details, code) => ({
   power: powerWallets.indexOf(code) !== -1,
   name: details[0],
   h: details[1],

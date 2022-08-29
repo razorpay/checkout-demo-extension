@@ -165,7 +165,6 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
   if (!config) {
     return payment;
   }
-
   return config.getPaymentPayload(
     getExtendedSingleInstrument(instrument),
     payment,
@@ -180,7 +179,7 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
  * @returns {Instrument}
  */
 export function getExtendedSingleInstrument(instrument) {
-  return _Obj.extend(_Obj.extend({}, instrument), instrument._ungrouped[0]);
+  return Object.assign({}, instrument, instrument._ungrouped[0]);
 }
 
 /**

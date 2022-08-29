@@ -1,5 +1,6 @@
 import Config, { FLOWS } from 'config';
 import { get } from 'svelte/store';
+import * as ObjectUtils from 'utils/object';
 
 import {
   isPayout,
@@ -205,7 +206,7 @@ const ALL_METHODS = {
 
   app() {
     let areAppsEnabled = false;
-    _Obj.loop(getMerchantMethods().app, (val) => {
+    ObjectUtils.loop(getMerchantMethods().app, (val) => {
       if (val) {
         areAppsEnabled = true;
       }
@@ -729,7 +730,7 @@ export function getAppsForCards() {
 }
 
 export function getCardNetworks() {
-  return _Obj.getSafely(getMerchantMethods(), 'card_networks', {});
+  return ObjectUtils.get(getMerchantMethods(), 'card_networks', {});
 }
 
 export function getNetbankingBanks() {
@@ -962,16 +963,18 @@ export function getEMIBanks(amount) {
   if (isEmpty(emiOptions)) {
     return {};
   }
+  let banks = getEligibleBanksBasedOnMinAmount(
+    amount || getAmount(),
+    emiOptions
+  );
 
-  const banks =
-    getEligibleBanksBasedOnMinAmount(amount || getAmount(), emiOptions)
-    |> _Obj.map((plans, bankCode) => {
-      return {
-        ...getEMIBank(bankCode),
-        plans,
-        min_amount: getMinimumAmountFromPlans(plans),
-      };
-    });
+  banks = ObjectUtils.map(banks, (plans, bankCode) => {
+    return {
+      ...getEMIBank(bankCode),
+      plans,
+      min_amount: getMinimumAmountFromPlans(plans),
+    };
+  });
 
   // Minimum amount for BAJAJ is sent from API
   if (banks.BAJAJ) {
@@ -999,7 +1002,7 @@ export function getPayLaterProviders() {
  */
 export function getAppProviders() {
   const merchantMethods = getMerchantMethods();
-  const apps = _Obj.clone(merchantMethods.app || {});
+  const apps = ObjectUtils.clone(merchantMethods.app || {});
   if (isGpayMergedFlowEnabled()) {
     // Right now, we are checking on gpay method in preferences
     // and updating in the app if it is enabled. When it starts
@@ -1109,15 +1112,15 @@ export function getWallets() {
 }
 
 function addExternalWallets(enabledWallets) {
-  getOption('external.wallets')
-    |> _Obj.loop((externalWallet) => {
-      if (wallets[externalWallet]) {
-        wallets[externalWallet].custom = true;
-        if (!enabledWallets.includes(externalWallet)) {
-          enabledWallets.unshift(externalWallet);
-        }
+  const externalWallets = getOption('external.wallets');
+  ObjectUtils.loop(externalWallets, (externalWallet) => {
+    if (wallets[externalWallet]) {
+      wallets[externalWallet].custom = true;
+      if (!enabledWallets.includes(externalWallet)) {
+        enabledWallets.unshift(externalWallet);
       }
-    });
+    }
+  });
 }
 
 /**

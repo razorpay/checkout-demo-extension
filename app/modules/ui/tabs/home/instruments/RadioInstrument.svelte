@@ -23,6 +23,7 @@
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
   import { getUPIAppDataFromHandle } from 'common/upi';
+  import * as ObjectUtils from 'utils/object';
   import { getDetailsForIntlBankTransfer } from 'InternationalBankTransfer/helpers';
 
   // Store
@@ -79,7 +80,7 @@
       return vpa;
     }
 
-    const tokens = _Obj.getSafely($customer, 'tokens.items', []);
+    const tokens = ObjectUtils.get($customer, 'tokens.items', []);
     const vpaToken = tokens.find((item) => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;

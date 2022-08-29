@@ -226,7 +226,9 @@
         >
           {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
           <span class="language-btn">
-            <Icon icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])} />
+            <Icon
+              icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}
+            />
           </span>
         </p>
       {/if}

@@ -26,6 +26,7 @@ import CardTab from 'ui/tabs/card/index.svelte';
 import { getSession } from 'sessionmanager';
 import { METHODS } from 'checkoutframe/constants';
 import { querySelector } from 'utils/doc';
+import * as ObjectUtils from 'utils/object';
 
 const CARD_KEY = 'svelteCardTab';
 
@@ -145,7 +146,7 @@ export function getIssuerForEmiFromPayload(payload) {
       });
     }
   } else {
-    issuer = _Obj.getSafely(
+    issuer = ObjectUtils.get(
       getBankFromCardCache(payload['card[number]']),
       'code',
       ''

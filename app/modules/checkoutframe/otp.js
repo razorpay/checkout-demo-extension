@@ -1,6 +1,6 @@
 import OTPScreen from 'ui/tabs/otp/index.svelte';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
-
+import * as ObjectUtils from 'utils/object';
 export default function otpView({ target, props }) {
   this.render(target, props);
 }
@@ -37,7 +37,7 @@ otpView.prototype = {
   },
 
   updateScreen(props) {
-    _Obj.loop(props, (val, prop) => {
+    ObjectUtils.loop(props, (val, prop) => {
       if (OtpScreenStore[prop]) {
         OtpScreenStore[prop].set(val);
       }

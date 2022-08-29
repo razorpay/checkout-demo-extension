@@ -1,5 +1,6 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import * as ErrorService from 'error-service';
+import * as ObjectUtils from 'utils/object';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -49,16 +50,16 @@ const defaultConfig = {
   min_amount: 300000,
 };
 
-const providers = _Obj.map(config, (details, code) => {
-  return (
-    {}
-    |> _Obj.extend(defaultConfig)
-    |> _Obj.extend({
+const providers = ObjectUtils.map(config, (details, code) => {
+  return Object.assign(
+    {},
+    defaultConfig,
+    {
       code,
       logo: prefix + code + '.svg',
       sqLogo: sqPrefix + code + '.svg',
-    })
-    |> _Obj.extend(details)
+    },
+    details
   );
 });
 
@@ -76,7 +77,7 @@ export const extendConfig = (provider, updatedConfig) => {
     return;
   }
 
-  providers[provider] = _Obj.extend(providers[provider], updatedConfig);
+  providers[provider] = Object.assign(providers[provider], updatedConfig);
 
   return providers[provider];
 };

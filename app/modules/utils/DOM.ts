@@ -1,3 +1,5 @@
+import * as ObjectUtils from 'utils/object';
+
 type styleProps = keyof HTMLElement['style'];
 export const ElementConstructor = global.Element;
 
@@ -271,7 +273,7 @@ export const setStyle = _.curry3(
  */
 export const setAttributes = _.curry2(
   elementObject((el: Element, attributes: { [x: string]: string }) => {
-    _Obj.loop(attributes, (val: string, key: string) =>
+    ObjectUtils.loop(attributes, (val: string, key: string) =>
       setAttribute(el, key, val)
     );
     return el;
@@ -287,7 +289,9 @@ export const setAttributes = _.curry2(
  */
 export const setStyles = _.curry2(
   elementObject((el: Element, styles: { [K in styleProps]: string }) => {
-    _Obj.loop(styles, (val: string, key: styleProps) => setStyle(el, key, val));
+    ObjectUtils.loop(styles, (val: string, key: styleProps) =>
+      setStyle(el, key, val)
+    );
     return el;
   })
 );

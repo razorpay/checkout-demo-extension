@@ -17,6 +17,7 @@ import {
   redirectTo,
 } from 'utils/doc';
 import { submitForm } from 'common/form';
+import * as ObjectUtils from 'utils/object';
 import { appendLoader } from 'common/loader';
 
 const { screen, scrollTo } = global;
@@ -261,7 +262,7 @@ CheckoutFrame.prototype = {
       response.extra = responseExtras;
     }
 
-    _Obj.loop(rzp.modal.options, function (option, i) {
+    ObjectUtils.loop(rzp.modal.options, function (option, i) {
       options['modal.' + i] = option;
     });
 
@@ -303,7 +304,7 @@ CheckoutFrame.prototype = {
         }
       }
 
-      _Obj.loop(eventPairs, (listener, event) => {
+      ObjectUtils.loop(eventPairs, (listener, event) => {
         this.listeners.push(window |> _El.on(event, listener.bind(this)));
       });
     }
@@ -356,7 +357,7 @@ CheckoutFrame.prototype = {
       // TODO roll
     }
     response.id = this.rzp.id;
-    response = _Obj.stringify(response);
+    response = JSON.stringify(response);
     this.el?.contentWindow?.postMessage(response, '*');
   },
 

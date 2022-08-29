@@ -17,6 +17,7 @@
   import { getPrefilledName, hasFeature, isRedesignV15 } from 'razorpay';
   import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
   import { getAnimationOptions } from 'svelte-utils';
+  import * as ObjectUtils from 'utils/object';
 
   import {
     UPI_COLLECT_NEW_VPA_HELP,
@@ -138,7 +139,7 @@
   }
   const canSaveVpa = hasFeature('save_vpa') && shouldRememberCustomer('upi');
   let logged;
-  $: logged = _Obj.getSafely(customer, 'logged');
+  $: logged = ObjectUtils.get(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
 

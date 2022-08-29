@@ -15,6 +15,7 @@ import {
 
 import { getRecurringMethods, isIRCTC, isRecurring } from 'razorpay';
 import { generateTextFromList } from 'i18n/text-utils';
+import * as ObjectUtils from 'utils/object';
 
 import {
   getMethodPrefix,
@@ -119,7 +120,7 @@ const DESCRIPTIONS = {
 
     const cardEmi = isMethodUsable('emi');
     let providerNames = [];
-    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
+    ObjectUtils.loop(getCardlessEMIProviders(), (providerObj) => {
       let providerCode = providerObj.code;
       if (providerCode === 'cards' && isDebitEMIEnabled()) {
         providerCode = 'credit_debit_cards';

@@ -11,7 +11,7 @@ export function get() {
     details = {};
   }
 
-  return _Obj.extend(
+  return Object.assign(
     {
       contact: '',
       email: '',

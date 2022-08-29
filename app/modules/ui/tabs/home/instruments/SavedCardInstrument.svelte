@@ -17,6 +17,7 @@
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { isCardTokenized } from 'ui/tabs/card/utils.js';
+  import * as ObjectUtils from 'utils/object';
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { userConsentForTokenization } from 'checkoutstore/screens/card';
@@ -69,7 +70,7 @@
   let cvvLength = 3;
   let cardKnown = false;
 
-  const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
+  const savedCards = ObjectUtils.get($customer, 'tokens.items', []);
   const savedCard = savedCards.find(
     (card) => card.id === individualInstrument.token_id
   );

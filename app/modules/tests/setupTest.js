@@ -1,5 +1,4 @@
 import * as _ from '../../../cfu/src/fe/implicit/_.js';
-import * as _Obj from '../../../cfu/src/fe/implicit/_Obj.js';
 
 import initI18n from './init-i18n';
 import mockCanvas from './__mocks__/mock-canvas';
@@ -13,7 +12,6 @@ global.matchMedia = jest.fn(() => ({ matches: false }));
  * Presuming they are pure functions, it would be okay to use them as-is.
  */
 global._ = _;
-global._Obj = _Obj;
 global.__BUILD_NUMBER__ = '123456789';
 global.__TRAFFIC_ENV__ = '123456789';
 global.__GIT_COMMIT_HASH__ = '123456789';

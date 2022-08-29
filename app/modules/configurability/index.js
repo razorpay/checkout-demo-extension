@@ -5,6 +5,7 @@ import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
 import { isInstrumentForEntireMethod } from './instruments';
 import { getUPIIntentApps } from 'checkoutstore/native';
+import * as ObjectUtils from 'utils/object';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -63,7 +64,7 @@ function getAvailableDefaultMethods() {
  * @returns {Object|null}
  */
 function removeNonApplicableInstrumentFlows(instrument) {
-  instrument = _Obj.clone(instrument);
+  instrument = ObjectUtils.clone(instrument);
 
   if (!isMethodEnabled(instrument.method)) {
     return null;
@@ -80,7 +81,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasNetworks) {
         let availableNetworks = [];
 
-        _Obj.loop(getCardNetworks(), (val, key) => {
+        ObjectUtils.loop(getCardNetworks(), (val, key) => {
           if (val) {
             availableNetworks.push(CardNetworks[API_NETWORK_CODES_MAP[key]]);
           }
@@ -233,7 +234,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
  * @returns {*}
  */
 function removeDisabledInstrumentsFromBlock(block) {
-  block = _Obj.clone(block);
+  block = ObjectUtils.clone(block);
   block.instruments = block.instruments
     .map(removeNonApplicableInstrumentFlows)
     .filter(Boolean)

@@ -126,7 +126,7 @@
   }
   .heading-text {
     width: 64%;
-    font-weight: var(--font-weight-semibold);;
+    font-weight: var(--font-weight-semibold);
   }
   .first-item {
     border-top-left-radius: 4px;

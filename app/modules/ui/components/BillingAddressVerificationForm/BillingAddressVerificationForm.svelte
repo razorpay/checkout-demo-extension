@@ -272,7 +272,9 @@
               label={formValues[subField.id] ? subField.placeholder : ''}
               labelClasses={formValues[subField.id] ? 'input-label' : ''}
               elemClasses={formErrors[subField.id] ? 'invalid' : 'filled'}
-              icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(subField.id)
+              icon={[FORM_FIELDS.country, FORM_FIELDS.state].includes(
+                subField.id
+              )
                 ? ''
                 : null}
               value={formValues[subField.id]}

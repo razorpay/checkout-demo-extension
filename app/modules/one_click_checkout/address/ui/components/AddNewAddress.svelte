@@ -845,7 +845,10 @@
         on:click_outside={handleHideTooltip}
       >
         {#if showTooltip}
-          <div class="save-address-tooltip" class:upper-tooltip={!$shouldSaveAddress}>
+          <div
+            class="save-address-tooltip"
+            class:upper-tooltip={!$shouldSaveAddress}
+          >
             {$t(SAVE_ADDRESS_CONSENT_TOOLTIP)}
             <a
               class="tc-text"

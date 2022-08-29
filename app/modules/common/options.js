@@ -1,4 +1,5 @@
 import { shouldRedirect } from 'common/useragent';
+import * as ObjectUtils from 'utils/object';
 
 export const RazorpayDefaults = {
   key: '',
@@ -80,7 +81,7 @@ function base_set(flatObj, defObj, objKey, objVal) {
 }
 
 export function flattenProp(obj, prop, type) {
-  _Obj.loop(obj[prop], function (val, key) {
+  ObjectUtils.loop(obj[prop], function (val, key) {
     let valType = typeof val;
     if (valType === 'string' || valType === 'number' || valType === 'boolean') {
       key = prop + type[0] + key;
@@ -95,9 +96,9 @@ export function flattenProp(obj, prop, type) {
 
 export function flatten(obj, defObj) {
   let flatObj = {};
-  _Obj.loop(obj, function (objVal, objKey) {
+  ObjectUtils.loop(obj, function (objVal, objKey) {
     if (objKey in flatKeys) {
-      _Obj.loop(objVal, function (objSubVal, objSubKey) {
+      ObjectUtils.loop(objVal, function (objSubVal, objSubKey) {
         base_set(flatObj, defObj, objKey + '.' + objSubKey, objSubVal);
       });
     } else {
@@ -124,10 +125,10 @@ function normalizeOption(options) {
 const flatKeys = {};
 export default function Options(options) {
   options = normalizeOption(options);
-  _Obj.loop(RazorpayDefaults, function (val, key) {
+  ObjectUtils.loop(RazorpayDefaults, function (val, key) {
     if (_.isNonNullObject(val) && !_.isEmptyObject(val)) {
       flatKeys[key] = true;
-      _Obj.loop(val, function (subVal, subKey) {
+      ObjectUtils.loop(val, function (subVal, subKey) {
         RazorpayDefaults[key + '.' + subKey] = subVal;
       });
       delete RazorpayDefaults[key];

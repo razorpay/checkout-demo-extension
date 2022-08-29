@@ -1,7 +1,7 @@
 import { getExperimentsFromStorage } from 'experiments';
 import { getOrderId } from 'razorpay';
 import { trackAvailabilty } from './availability';
-import { hasProp } from 'utils/object';
+import * as ObjectUtils from 'utils/object';
 import fetch from 'utils/fetch';
 import { BUILD_NUMBER } from 'common/constants';
 import { getDeviceId } from 'fingerprint';
@@ -123,7 +123,7 @@ const flushEvents = (mode) => {
   });
 
   // Use sendBeacon if supported.
-  const useBeacon = hasProp(navigator, 'sendBeacon');
+  const useBeacon = ObjectUtils.hasProp(navigator, 'sendBeacon');
 
   const trackingPayload = {
     context: EVT_CTX,
@@ -148,7 +148,7 @@ const flushEvents = (mode) => {
       // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
       data:
         trackingPayload
-        |> _Obj.stringify
+        |> JSON.stringify
         |> encodeURIComponent
         |> unescape
         |> btoa
@@ -165,7 +165,7 @@ const flushEvents = (mode) => {
     if (useBeacon) {
       isQueuedSuccessfully = navigator.sendBeacon(
         postData.url,
-        _Obj.stringify(postData.data)
+        JSON.stringify(postData.data)
       );
     }
 
@@ -221,7 +221,7 @@ export default function Track(r, event, data, immediately) {
       properties.data = data;
     }
 
-    options = _Obj.extend(options, _Obj.unflatten(r.get()));
+    options = Object.assign(options, ObjectUtils.unflatten(r.get()));
 
     let handler = r.get('handler');
     if (typeof handler === 'function') {
@@ -233,9 +233,9 @@ export default function Track(r, event, data, immediately) {
     }
 
     // Mask prefilled card details
-    if (hasProp(options, 'prefill')) {
+    if (ObjectUtils.hasProp(options, 'prefill')) {
       ['card'].forEach((key) => {
-        if (hasProp(options.prefill, key)) {
+        if (ObjectUtils.hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }
       });
@@ -298,10 +298,9 @@ Track.parseAnalyticsData = (data) => {
     return;
   }
 
-  data
-    |> _Obj.loop((key, val) => {
-      trackingProps[key] = val;
-    });
+  ObjectUtils.loop(data, (val, key) => {
+    trackingProps[key] = val;
+  });
 };
 
 Track.makeUid = makeUid;

@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-// @ts-check
+import * as ObjectUtils from 'utils/object';
 
 export const COUNTRY_TO_CODE_MAP = {
   AD: '376',
@@ -408,7 +408,7 @@ function getCountryCodeFromNumber(number) {
 
   let codesByLength = [];
 
-  _Obj.loop(COUNTRY_TO_CODE_MAP, (/** @type {string} */ code) => {
+  ObjectUtils.loop(COUNTRY_TO_CODE_MAP, (code) => {
     const length = code.length;
 
     if (!codesByLength[length]) {

@@ -85,10 +85,7 @@
   $: isSavedAddrView = routeMap[currentView] === addressViews.SAVED_ADDRESSES;
 
   function postSubmit() {
-    if (
-      !$shouldSaveAddress ||
-      isSavedAddrView
-    ) {
+    if (!$shouldSaveAddress || isSavedAddrView) {
       redirectToPaymentMethods();
       return;
     }
@@ -146,13 +143,16 @@
   $: {
     if ($shippingCharge) {
       hideToast();
-      showToastAfterDelay({
-        screen: TOAST_SCREEN.ONE_CC,
-        theme: TOAST_THEME.INFO,
-        message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
-          charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
-        }),
-      }, 150);
+      showToastAfterDelay(
+        {
+          screen: TOAST_SCREEN.ONE_CC,
+          theme: TOAST_THEME.INFO,
+          message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
+            charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
+          }),
+        },
+        150
+      );
     }
   }
 </script>
@@ -224,7 +224,7 @@
     align-items: center;
   }
 
-  div[slot="footer"] :global(.same-address-checkbox) {
+  div[slot='footer'] :global(.same-address-checkbox) {
     z-index: 1;
     border-top: 1px solid var(--background-color-magic);
     padding-bottom: 10px;

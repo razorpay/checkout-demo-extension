@@ -18,6 +18,7 @@ import {
   MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION,
 } from './constants';
 import { isInternational } from 'razorpay';
+import * as ObjectUtils from 'utils/object';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -106,7 +107,7 @@ function getExtractedDetails(payment, customer) {
    */
   if (payment.method === 'upi') {
     if (payment.token && customer) {
-      let tokens = _Obj.getSafely(customer, 'tokens.items', []);
+      let tokens = ObjectUtils.get(customer, 'tokens.items', []);
       let token = tokens.find((token) => token.token === details.token);
 
       if (!token) {
@@ -144,7 +145,7 @@ function getExtractedDetails(payment, customer) {
  */
 function createInstrumentFromExtracted(extracted) {
   // Extend with defaults and return
-  return _Obj.extend(
+  return Object.assign(
     {
       frequency: 0,
       id: Track.makeUid(),
@@ -207,7 +208,7 @@ const MAPPERS = {
     return instruments.find((instrument) => {
       let same = true;
 
-      _Obj.loop(extracted, (val, key) => {
+      ObjectUtils.loop(extracted, (val, key) => {
         if (instrument[key] !== val) {
           same = false;
         }
@@ -482,7 +483,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
 
   // Add token to saved card and saved vpa instrument
   if (['card', 'upi'].includes(payment.method)) {
-    const tokens = customer && _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens = customer && ObjectUtils.get(customer, 'tokens.items', []);
 
     const token = tokens.find((token) => token.id === instrument.token_id);
 

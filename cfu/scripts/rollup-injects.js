@@ -13,7 +13,6 @@ let injects = {
 
   // injects
   _: ['fe/implicit/_', '*'],
-  _Obj: ['fe/implicit/_Obj', '*'],
 };
 
 globalInjects.forEach((g) => {

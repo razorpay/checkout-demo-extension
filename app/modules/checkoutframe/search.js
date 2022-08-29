@@ -1,3 +1,4 @@
+import * as ObjectUtils from 'utils/object';
 /**
  * Source: https://github.com/umanghome/fuzzysort
  */
@@ -163,7 +164,7 @@ function getValue(obj, prop) {
 
   let i = -1;
   while (obj && ++i < len) {
-    obj = _Obj.getOwnProp(obj, segs[i]);
+    obj = ObjectUtils.getOwnProp(obj, segs[i]);
   }
 
   return obj;

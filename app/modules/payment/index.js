@@ -8,6 +8,7 @@ import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 import { returnAsIs } from 'lib/utils';
 import { submitForm } from 'common/form';
+import * as ObjectUtils from 'utils/object';
 
 import { Track } from 'analytics';
 import { writePopup, updatePopup } from 'payment/popup/template';
@@ -416,9 +417,9 @@ Payment.prototype = {
 
   generate: function (data) {
     // Append `data` to `this.data`
-    this.data = _Obj.extend(
-      _Obj.clone(this.data || {}),
-      _Obj.clone(data || {})
+    this.data = Object.assign(
+      ObjectUtils.clone(this.data || {}),
+      ObjectUtils.clone(data || {})
     );
 
     if (this.gpay || this.tez) {
@@ -539,7 +540,7 @@ Payment.prototype = {
       // Track
       Analytics.track('oncomplete', {
         r: this.r,
-        data: _Obj.clone(data),
+        data: ObjectUtils.clone(data),
       });
       updateLatestPaymentStatus('success', data);
       this.emit('success', data);
@@ -733,7 +734,7 @@ Payment.prototype = {
       let data = payment.data;
 
       // fix long notes
-      _Obj.loop(data, (val, key) => {
+      ObjectUtils.loop(data, (val, key) => {
         if (/^notes/.test(key) && _.lengthOf(val) > 200) {
           data[key] = val.replace(/\n/g, ' ');
         }
@@ -1028,7 +1029,7 @@ razorpayProto.verifyVpa = function (vpa = '', timeout = 0) {
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
-    const cachedEventData = _Obj.extend(
+    const cachedEventData = Object.assign(
       {
         cache: true,
       },

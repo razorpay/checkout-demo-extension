@@ -13,6 +13,7 @@
     isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
+  import * as ObjectUtils from 'utils/object';
   import { isRedesignV15 } from 'razorpay';
 
   // Store imports
@@ -67,7 +68,7 @@
       providers = [createProvider('cards')];
     }
 
-    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
+    ObjectUtils.loop(getCardlessEMIProviders(), (providerObj) => {
       if (providerObj.pushToFirst) {
         // higher priority then cardemi
         providers.unshift(createProvider(providerObj.code, providerObj));

@@ -1,4 +1,5 @@
 import ConfigExtractors from './extractors';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Extracts display config from instrument
@@ -25,7 +26,7 @@ function extractConfigData(instrument) {
  * @return {Object}
  */
 function addMetaProperties(config) {
-  config = _Obj.clone(config);
+  config = ObjectUtils.clone(config);
   config.meta = {
     preferred: true,
   };
@@ -54,7 +55,7 @@ export function translateInstrumentToConfig(instrument) {
  * @return {Object}
  */
 function addTokenData(config, instrument) {
-  config = _Obj.clone(config);
+  config = ObjectUtils.clone(config);
   config.id = instrument.id;
   if (instrument.token_id) {
     config.token_id = instrument.token_id;

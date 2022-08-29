@@ -463,7 +463,7 @@
       const currency = _currency[0];
       const rest = _currency[1];
 
-      return _Obj.extend(
+      return Object.assign(
         {
           currency,
           _key: currency,

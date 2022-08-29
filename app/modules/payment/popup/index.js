@@ -1,5 +1,5 @@
 import * as _El from 'utils/DOM';
-
+import * as ObjectUtils from 'utils/object';
 /**
  * Simple wrapper component around `window.open()`.
  * https://github.com/component/popup
@@ -55,7 +55,7 @@ export default function Popup(src, name) {
 
   // turn the "opts" object into a window.open()-compatible String
   let optsStr = [];
-  _Obj.loop(opts, function (val, key) {
+  ObjectUtils.loop(opts, function (val, key) {
     optsStr.push(key + '=' + val);
   });
   optsStr = optsStr.join(',');

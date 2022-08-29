@@ -12,6 +12,7 @@ import {
   isCardLessEmiProviderEnabled,
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
+import * as ObjectUtils from 'utils/object';
 
 import { highlightUPIIntentOnDesktop } from 'upi/experiments';
 import { get } from 'svelte/store';
@@ -33,7 +34,7 @@ const METHOD_FILTERS = {
       return false;
     }
 
-    const logged = _Obj.getSafely(customer, 'logged');
+    const logged = ObjectUtils.get(customer, 'logged');
 
     const allowedTypes = {
       credit: isCreditCardEnabled(),
@@ -57,7 +58,7 @@ const METHOD_FILTERS = {
       return false;
     }
 
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens = ObjectUtils.get(customer, 'tokens.items', []);
 
     // Allow this instrument only if a token for this exists on the customer
     return tokens.some((token) => instrument.token_id === token.id);
@@ -103,7 +104,7 @@ const METHOD_FILTERS = {
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
         // We want to show only saved VPAs
-        const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+        const tokens = ObjectUtils.get(customer, 'tokens.items', []);
         const tokenVpas = tokens
           .filter((token) => token.vpa)
           .map((token) => `${token.vpa.username}@${token.vpa.handle}`);

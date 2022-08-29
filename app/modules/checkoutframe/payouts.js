@@ -1,5 +1,7 @@
 import { makeAuthUrl } from 'checkoutstore';
 import fetch from 'utils/fetch';
+import * as ObjectUtils from 'utils/object';
+
 const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };
@@ -56,7 +58,7 @@ export function createFundAccount(fundAccount) {
  * @param account
  */
 export function makeTrackingDataFromAccount(account) {
-  const copy = _Obj.clone(account);
+  const copy = ObjectUtils.clone(account);
   if (copy.bank_account) {
     const { account_number } = copy.bank_account;
     copy.bank_account.account_number = maskAccountNumber(account_number);

@@ -1,5 +1,6 @@
 import { hasFeature } from 'razorpay';
 import { emiBanks } from 'common/bank';
+import * as ObjectUtils from 'utils/object';
 
 // convert emiBanks array to map keyed by bank-code
 const bankMap = (emiBanks || []).reduce((banks, bankObj) => {
@@ -21,7 +22,7 @@ export function getEMIBank(code) {
 export function getEligibleBanksBasedOnMinAmount(amount, banks) {
   const eligible = {};
 
-  _Obj.loop(banks, (plans, bank) => {
+  ObjectUtils.loop(banks, (plans, bank) => {
     if (getEMIBank(bank)) {
       const eligiblePlans = plans.filter((plan) => plan.min_amount <= amount);
 
@@ -46,7 +47,7 @@ export function getEligibleBanksBasedOnMinAmount(amount, banks) {
 export function getMinimumAmountFromPlans(plans = {}) {
   let minimum = Infinity;
 
-  _Obj.loop(plans, (plan) => {
+  ObjectUtils.loop(plans, (plan) => {
     if (plan.min_amount < minimum) {
       minimum = plan.min_amount;
     }

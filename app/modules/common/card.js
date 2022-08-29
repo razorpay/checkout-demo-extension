@@ -6,6 +6,7 @@ import { checkDowntime } from 'checkoutframe/downtimes';
 import loadScript from 'common/loadScript';
 import fetch from 'utils/fetch';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
+import * as ObjectUtils from 'utils/object';
 import { CYBER_SOURCE_RZP_ORG_ID, SIFT_BEACON_KEY } from 'common/constants';
 
 export const API_NETWORK_CODES_MAP = {
@@ -79,7 +80,7 @@ export const getCardEntityFromPayload = (payload) => {
 export const findCodeByNetworkName = (name) => {
   let code;
 
-  _Obj.loop(networks, (val, key) => {
+  ObjectUtils.loop(networks, (val, key) => {
     if (name === val || name === key) {
       code = key;
     }
@@ -314,17 +315,17 @@ export function updateCardTokenMetadata(token, data = {}) {
 export function getCardMetadata(entity) {
   const isToken = /^token_/.test(entity);
   if (isToken) {
-    return _Obj.clone(CardMetadata.token[entity] || {});
+    return ObjectUtils.clone(CardMetadata.token[entity] || {});
   }
   const isIIN = /^\d{6}$/.test(entity);
   if (isIIN) {
-    return _Obj.clone(CardMetadata.iin[entity] || {});
+    return ObjectUtils.clone(CardMetadata.iin[entity] || {});
   }
   const iin = getIin(entity);
   // If entity is a card number then we can send last 4 digits in metadata.
   const data = { last4: getCardDigits(entity).slice(-4) };
   // Merge { last4 } with other cached details and return.
-  return _Obj.extend(data, CardMetadata.iin[iin] || {});
+  return Object.assign(data, CardMetadata.iin[iin] || {});
 }
 
 const CardFeatureCache = {

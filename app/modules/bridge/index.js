@@ -93,7 +93,7 @@ export const notifyBridge = (message) => {
           return method.call(CheckoutBridge);
         }
       }
-      data = _Obj.stringify(data);
+      data = JSON.stringify(data);
     }
 
     try {

@@ -8,6 +8,7 @@ import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 import { isOneClickCheckout, isPayout, isRedesignV15 } from 'razorpay';
 import { querySelector } from 'utils/doc';
+import * as ObjectUtils from 'utils/object';
 import { showTopbar } from 'topbar';
 import { showHeader } from 'header';
 
@@ -45,7 +46,7 @@ export function render() {
 }
 
 export function destroyAll() {
-  componentsMap |> _Obj.loop(destroy);
+  ObjectUtils.loop(componentsMap, destroy);
   componentsMap = {};
   getSession().topBar = null;
 }

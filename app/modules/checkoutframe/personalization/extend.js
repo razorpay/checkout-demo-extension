@@ -1,8 +1,10 @@
+import * as ObjectUtils from 'utils/object';
+
 const EXTENDERS = {
   default: (instrument) => instrument,
 
   upi: (instrument, { customer }) => {
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens = ObjectUtils.get(customer, 'tokens.items', []);
     const { vpa } = instrument;
 
     // We'll modify only if there's a VPA present.

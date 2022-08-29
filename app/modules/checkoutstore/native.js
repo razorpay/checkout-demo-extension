@@ -4,6 +4,7 @@ import {
   getCardApps as getSortedCardApps,
   getAppsForMethod,
 } from 'common/apps';
+import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 
 let message;
@@ -51,7 +52,7 @@ export function setUpiApps(apps) {
  * @returns {{library: (string), version: (string), platform: (string)}}
  */
 export function getSDKMeta() {
-  const iOSPlatform = _Obj.getSafely(
+  const iOSPlatform = ObjectUtils.get(
     window,
     'webkit.messageHandlers.CheckoutBridge'
   );
@@ -76,15 +77,9 @@ export function getCardApps() {
   return cardApps;
 }
 
-export function processNativeMessage(_message) {
-  message = {};
-  messageTransformers |> _Obj.loop((fn) => fn(message, _message));
-  return message;
-}
-
 const messageTransformers = {
   addOptions: (transfomed, message) => {
-    transfomed.options = _Obj.clone(message.options);
+    transfomed.options = ObjectUtils.clone(message.options);
   },
 
   addFeatures: (transfomed, message) => {
@@ -96,7 +91,7 @@ const messageTransformers = {
     ];
     const options = message.options;
 
-    _Obj.loop(features, (feature) => {
+    ObjectUtils.loop(features, (feature) => {
       if (!(message[feature] |> _.isUndefined)) {
         transfomed[feature] = message[feature];
       }
@@ -183,10 +178,16 @@ const messageTransformers = {
   useTrackingProps: (transfomed, message) => {
     let props = ['referer', 'integration'];
 
-    _Obj.loop(props, (prop) => {
+    ObjectUtils.loop(props, (prop) => {
       if (!(message[prop] |> _.isUndefined)) {
         Track.props[prop] = message[prop];
       }
     });
   },
 };
+
+export function processNativeMessage(_message) {
+  message = {};
+  ObjectUtils.loop(messageTransformers, (fn) => fn(message, _message));
+  return message;
+}

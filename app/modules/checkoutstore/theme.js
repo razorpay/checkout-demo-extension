@@ -1,5 +1,6 @@
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
+import * as ObjectUtils from 'utils/object';
 import { COLORS, constantCSSVars } from 'common/constants';
 import { setRootCSSVariable } from 'utils/CSSVar';
 import { isOneClickCheckout, shouldOverrideBrandColor } from 'razorpay';
@@ -14,10 +15,8 @@ const {
 
 const theme = {};
 
-
-
 export function getThemeMeta() {
-  return _Obj.clone(theme);
+  return ObjectUtils.clone(theme);
 }
 
 export function getThemeColor() {

@@ -8,6 +8,7 @@ import { querySelectorAll, form2obj } from 'utils/doc';
 import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
 import { isBraveBrowser } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
+import * as ObjectUtils from 'utils/object';
 import Interface from 'common/interface';
 
 const RazorProto = _.prototypeOf(Razorpay);
@@ -55,7 +56,7 @@ let addAutoCheckoutButton = function (rzp) {
   const parent = _El.parent(currentScript);
   const appendNode = _El.append(
     parent,
-    _Obj.extend(_El.create('input'), {
+    Object.assign(_El.create('input'), {
       type: 'submit',
       value: rzp.get('buttontext'),
       className: 'razorpay-payment-button',
@@ -82,9 +83,9 @@ let addAutoCheckoutButton = function (rzp) {
 
       try {
         let data = btoa(
-          _Obj.stringify({
+          JSON.stringify({
             request,
-            options: _Obj.stringify(options),
+            options: JSON.stringify(options),
             back: location.href,
           })
         );
@@ -106,7 +107,7 @@ let addAutoCheckoutButton = function (rzp) {
  */
 function initAutomaticCheckout() {
   let opts = {};
-  _Obj.loop(currentScript.attributes, function (attr) {
+  ObjectUtils.loop(currentScript.attributes, function (attr) {
     let name = attr.name.toLowerCase();
     if (/^data-/.test(name)) {
       let rootObj = opts;
@@ -280,7 +281,7 @@ RazorProto.createCheckoutAndFetchPrefs = function (reqbody) {
     return;
   }
   preloadedFrame.makeCheckoutCallForShopify(this, reqbody);
-}
+};
 
 RazorProto.open = needBody(function () {
   if (!this.metadata) {

@@ -15,6 +15,7 @@
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
   import { filterBanksAgainstInstrument, useBankOverrides } from './helper';
+  import * as ObjectUtils from 'utils/object';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -71,11 +72,10 @@
   }
 
   // Sort the list by bank names
-  $: banksList = _Obj
-    .values(banks || {})
-    .sort((a: EMIPlanView.EMIPlan, b: EMIPlanView.EMIPlan) =>
+  $: banksList = Object.values(banks || {}).sort(
+    (a: EMIPlanView.EMIPlan, b: EMIPlanView.EMIPlan) =>
       a.name.localeCompare(b.name)
-    );
+  );
 
   $: filteredBankList = filterBanksAgainstInstrument(
     banksList,
@@ -85,7 +85,7 @@
   $: {
     if (banks && selected) {
       let _plans = (banks[selected] || {}).plans || {};
-      _plans = _Obj.map(
+      _plans = ObjectUtils.map(
         _plans,
         (plan: EMIPlanView.EMIPlanDurationData, duration: number) => {
           let { installment, total } = Razorpay.emi.calculatePlan(

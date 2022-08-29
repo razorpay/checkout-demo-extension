@@ -14,6 +14,7 @@ import { shouldRedirect } from 'common/useragent';
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
+import * as ObjectUtils from 'utils/object';
 import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
@@ -71,7 +72,7 @@ const showModal = (session) => {
     getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
   }
 
-  const qpmap = _Obj.unflatten(_.getQueryParams());
+  const qpmap = ObjectUtils.unflatten(_.getQueryParams());
   if (qpmap.error) {
     session.errorHandler(qpmap);
   }
@@ -100,7 +101,7 @@ Razorpay.sendMessage = function (message) {
     message.source = 'frame';
     message.id = Track.id;
     if (_.isNonNullObject(message)) {
-      message = _Obj.stringify(message);
+      message = JSON.stringify(message);
     }
     ownerWindow.postMessage(message, '*');
   }
@@ -363,7 +364,7 @@ function syncOptionsAndSessionInstance(session, options) {
 function setParamsForDdosProtection(session) {
   fetch.setKeylessHeader(session.r.get('keyless_header'));
 
-  const qpmap = _.getQueryParams() |> _Obj.unflatten;
+  const qpmap = ObjectUtils.unflatten(_.getQueryParams());
 
   if (isStandardCheckout() && qpmap?.captcha_id) {
     Analytics.setMeta('captcha_id', qpmap.captcha_id);
@@ -427,29 +428,25 @@ function processPrefetchPrefs(preferences) {
 }
 
 function createShopifyCheckout(body, session) {
-  create1ccShopifyCheckout(
-    getPreferencesParams(session),
-    body,
-    (response) => {
-      if (response.error || !response.preferences) {
-        Razorpay.sendMessage({
-          event: 'event',
-          data: {
-            event: 'shopify_failure',
-          },
-        });
-        return;
-      }
-      delete response.status_code;
+  create1ccShopifyCheckout(getPreferencesParams(session), body, (response) => {
+    if (response.error || !response.preferences) {
       Razorpay.sendMessage({
         event: 'event',
         data: {
-          event: 'shopify_success',
-          data: JSON.stringify(response),
+          event: 'shopify_failure',
         },
       });
+      return;
     }
-  );
+    delete response.status_code;
+    Razorpay.sendMessage({
+      event: 'event',
+      data: {
+        event: 'shopify_success',
+        data: JSON.stringify(response),
+      },
+    });
+  });
 }
 
 function getPrefsPromisified(session) {
@@ -567,7 +564,7 @@ function setSessionPreferences(session, preferences) {
     JSON.stringify(preferences.options)
   );
 
-  const qpmap = _.getQueryParams() |> _Obj.unflatten;
+  const qpmap = ObjectUtils.unflatten(_.getQueryParams());
   const methods = getEnabledMethods();
   if (!methods.length) {
     let message = 'No appropriate payment method found.';
@@ -712,7 +709,7 @@ function updatePreferredMethods(preferences) {
   const isLogged = (contact) => contact !== 'default';
 
   if (preferred_methods) {
-    _Obj.loop(preferred_methods, ({ instruments }, contact) => {
+    ObjectUtils.loop(preferred_methods, ({ instruments }, contact) => {
       if (instruments) {
         setInstrumentsForCustomer(
           {

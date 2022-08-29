@@ -1,6 +1,7 @@
 import InstrumentsConfig, {
   genericGroupedToIndividual,
 } from './instruments-config';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Returns individual instruments from an instrument that might contain a group.
@@ -23,7 +24,7 @@ export function getIndividualInstruments(instrument, customer) {
     individuals = genericGroupedToIndividual(instrument, customer);
   }
 
-  return _Obj.extend(
+  return Object.assign(
     {
       _ungrouped: individuals,
     },
@@ -48,7 +49,7 @@ export function ungroupInstruments(block, customer) {
     ungrouped.push(individuals);
   });
 
-  return _Obj.extend(_Obj.clone(block), {
+  return Object.assign(ObjectUtils.clone(block), {
     instruments: ungrouped,
   });
 }

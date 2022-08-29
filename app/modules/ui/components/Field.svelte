@@ -11,6 +11,7 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   const { circle_check, solid_down_arrow } = getIcons();
 
+  import * as ObjectUtils from 'utils/object';
   import * as _El from 'utils/DOM';
   // Actions
   import {
@@ -139,7 +140,7 @@
     const delegator = session.delegator;
     formatterObj = delegator.add(data.type, node);
 
-    _Obj.loop(data.on, (callback, event) => {
+    ObjectUtils.loop(data.on, (callback, event) => {
       formatterObj.on(event, callback);
     });
   }

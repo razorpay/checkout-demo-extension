@@ -4,6 +4,7 @@ import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
 import { getOption, getOrderId } from 'razorpay';
+import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 
 export const formatPayment = function (payment) {
@@ -34,7 +35,7 @@ function validateData(data) {
 }
 
 export const formatPayload = function (payload, params = {}) {
-  let data = _Obj.clone(payload);
+  let data = ObjectUtils.clone(payload);
 
   // won't affect origin payload. as it is cloned
   if (data.default_dcc_currency) {

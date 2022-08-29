@@ -15,7 +15,7 @@ import {
 import { getAgentPayload } from 'checkoutstore/methods';
 import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
-import { isEmpty, isNonNullObject } from 'utils/object';
+import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from './constants';
 
 let prefetchedPrefs;
@@ -54,7 +54,7 @@ export default function Razorpay(overrides) {
   } catch (e) {
     let message = e.message;
     if (!this.get || !this.isLiveMode()) {
-      if (isNonNullObject(overrides) && !overrides.parent) {
+      if (ObjectUtils.isNonNullObject(overrides) && !overrides.parent) {
         global.alert(message);
       }
     }
@@ -181,11 +181,14 @@ Razorpay.payment = {
       type: AnalyticsTypes.METRIC,
     });
 
-    if (isNonNullObject(data)) {
+    if (ObjectUtils.isNonNullObject(data)) {
       data['_[request_index]'] = Analytics.updateRequestIndex('preferences');
     }
 
-    if (!isEmpty(prefetchedPrefs) && !isEmpty(prefetchedPrefs.order)) {
+    if (
+      !ObjectUtils.isEmpty(prefetchedPrefs) &&
+      !ObjectUtils.isEmpty(prefetchedPrefs.order)
+    ) {
       Analytics.track('prefs:end', {
         type: AnalyticsTypes.METRIC,
         data: { time: prefsApiTimer() },
@@ -242,7 +245,7 @@ function base_configure(overrides) {
 }
 
 export function setNotes(notes) {
-  _Obj.loop(notes, function (val, key) {
+  ObjectUtils.loop(notes, function (val, key) {
     if (_.isString(val)) {
       if (val.length > 254) {
         notes[key] = val.slice(0, 254);
@@ -436,7 +439,10 @@ var discreet = {
 
 export const optionValidations = {
   notes: function (notes) {
-    if (isNonNullObject(notes) && _.lengthOf(Object.keys(notes)) > 15) {
+    if (
+      ObjectUtils.isNonNullObject(notes) &&
+      _.lengthOf(Object.keys(notes)) > 15
+    ) {
       return 'At most 15 notes are allowed';
     }
   },
@@ -506,7 +512,7 @@ export function validateOverrides(options, skip = []) {
 
   options = options.get();
 
-  _Obj.loop(optionValidations, function (validation, key) {
+  ObjectUtils.loop(optionValidations, function (validation, key) {
     if (skip.includes(key)) {
       return;
     }
@@ -524,7 +530,7 @@ export function validateOverrides(options, skip = []) {
 }
 
 Razorpay.configure = function (overrides, extra = {}) {
-  _Obj.loop(flatten(overrides, RazorpayDefaults), function (val, key) {
+  ObjectUtils.loop(flatten(overrides, RazorpayDefaults), function (val, key) {
     let defaultValue = RazorpayDefaults[key];
     if (typeof defaultValue === typeof val) {
       RazorpayDefaults[key] = val;

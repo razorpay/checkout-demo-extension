@@ -55,7 +55,7 @@
   });
 
   function init() {
-    paymentData = _Obj.extend(paymentData, {
+    paymentData = Object.assign(paymentData, {
       method: 'upi',
       '_[flow]': 'intent',
       '_[upiqr]': '1',

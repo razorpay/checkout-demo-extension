@@ -18,11 +18,7 @@
 
 {#if !hide}
   <span class="item">
-    <span
-      class="text"
-      class:theme={selected}
-      class:text-bold={selected}
-    >
+    <span class="text" class:theme={selected} class:text-bold={selected}>
       {$t(label)}
     </span>
     {#if showIcon}

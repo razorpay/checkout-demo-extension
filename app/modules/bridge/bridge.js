@@ -70,7 +70,7 @@ Bridge.prototype = {
    **/
   callAndroid: function (methodName, ...params) {
     params = params.map((arg) =>
-      typeof arg === 'object' ? _Obj.stringify(arg) : arg
+      typeof arg === 'object' ? JSON.stringify(arg) : arg
     );
 
     const method = this.get(methodName);

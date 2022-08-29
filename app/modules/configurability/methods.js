@@ -10,7 +10,7 @@ import { ungroupInstruments } from './ungroup';
 export function createMethodBlock(method) {
   let block = createBlock(method);
 
-  block = _Obj.extend(block, {
+  block = Object.assign(block, {
     method,
     _type: 'rzp_method',
   });

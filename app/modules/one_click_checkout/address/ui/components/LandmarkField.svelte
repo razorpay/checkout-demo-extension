@@ -68,6 +68,6 @@
 
   .show-landmark-label .optional {
     color: var(--tertiary-text-color);
-    font-weight: var(--font-weight-medium)
+    font-weight: var(--font-weight-medium);
   }
 </style>

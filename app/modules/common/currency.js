@@ -3,6 +3,7 @@
  * Using hard-coded list of currencies for min_value
  */
 import currenciesList from './currenciesList';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Remove decimals from the amount if decimals are zeroes.
@@ -1165,11 +1166,12 @@ export const displayCurrencies = {
  * @param displayCurrencies
  */
 const updateCurrencyConfig = (displayCurrencies) => {
-  _Obj.loop(displayCurrencies, (symbol, currency) => {
-    currenciesConfig[currency] =
-      {}
-      |> _Obj.extend(currenciesConfig.default)
-      |> _Obj.extend(currenciesConfig[currency] || {});
+  ObjectUtils.loop(displayCurrencies, (symbol, currency) => {
+    currenciesConfig[currency] = Object.assign(
+      {},
+      currenciesConfig.default,
+      currenciesConfig[currency] || {}
+    );
 
     currenciesConfig[currency].code = currency;
 
@@ -1190,7 +1192,7 @@ export const updateCurrencies = (list) => {
    * REMOVE THIS AFTER INTEGRATING API
    * Adding min_value, symbol from hard-coded list of currencies
    */
-  _Obj.loop(list, (val, currency) => {
+  ObjectUtils.loop(list, (val, currency) => {
     currenciesList[currency] = val;
 
     // If there's an existing hardcoded config, then use that,
@@ -1213,7 +1215,7 @@ export const updateCurrencies = (list) => {
   });
 
   // Add the newer currency symbols to display currencies
-  _Obj.extend(displayCurrencies, displayCurrenciesToAdd);
+  Object.assign(displayCurrencies, displayCurrenciesToAdd);
 
   // Finally, extend the default config for the newer currencies
   updateCurrencyConfig(displayCurrenciesToAdd);
@@ -1226,7 +1228,7 @@ export const updateCurrencies = (list) => {
  */
 export const setCurrenciesRate = (list, amount) => {
   const rates = {};
-  _Obj.loop(list, (val, currency) => {
+  ObjectUtils.loop(list, (val, currency) => {
     rates[currency] = val.amount;
   });
   currenciesRate[amount] = rates;

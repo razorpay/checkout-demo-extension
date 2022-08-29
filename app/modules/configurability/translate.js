@@ -1,5 +1,6 @@
 import { createInstrument, isInstrumentForEntireMethod } from './instruments';
 import { validateAndCreateBlock } from './blocks';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Translates the options
@@ -14,7 +15,7 @@ import { validateAndCreateBlock } from './blocks';
  *      @prop {Array<string>} methods Hidden methods
  */
 function _translate(options = {}, external) {
-  options = _Obj.clone(options);
+  options = ObjectUtils.clone(options);
 
   const { display = {}, restrictions = [] } = options;
   const {
@@ -30,7 +31,7 @@ function _translate(options = {}, external) {
    */
   let includedBlocks = [];
 
-  _Obj.loop(blocks, (value, code) => {
+  ObjectUtils.loop(blocks, (value, code) => {
     if (external) {
       code = `block.${code}`;
     }

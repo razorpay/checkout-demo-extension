@@ -1,5 +1,6 @@
 import { createMethodBlock } from './methods';
 import { getUniqueValues } from 'utils/array';
+import * as ObjectUtils from 'utils/object';
 
 /**
  * Transforms the list of blocks into the order defined in the
@@ -45,7 +46,7 @@ export function getSequencedBlocks(params) {
   sequence = getUniqueValues(sequence);
 
   // Copy the sequence
-  const exhaustiveSequence = _Obj.clone(sequence);
+  const exhaustiveSequence = ObjectUtils.clone(sequence);
 
   /**
    * Cardless EMI and EMI are the same payment option in the UI.

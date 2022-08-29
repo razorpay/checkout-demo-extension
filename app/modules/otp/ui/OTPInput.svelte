@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { digits, disableCTA, errorMessage, loading } from 'checkoutstore/screens/otp';
+  import {
+    digits,
+    disableCTA,
+    errorMessage,
+    loading,
+  } from 'checkoutstore/screens/otp';
   import { showFeeLabel } from 'checkoutstore/fee';
 
   import Analytics from 'analytics';
@@ -135,7 +140,7 @@
       otpContainer.children[0].focus();
       focused = true;
     }
-    
+
     focused = !$loading;
   });
 </script>

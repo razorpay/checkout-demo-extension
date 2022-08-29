@@ -142,7 +142,7 @@
 <style lang="scss">
   :global(.redesign) {
     :global(.theme-highlight) {
-      color: var(--primary-color)
+      color: var(--primary-color);
     }
   }
 </style>

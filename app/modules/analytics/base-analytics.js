@@ -1,5 +1,5 @@
 import Track from './tracker';
-import { hasProp } from 'utils/object';
+import * as ObjectUtils from 'utils/object';
 
 const META = {};
 const REQUEST_INDEX = {};
@@ -12,9 +12,9 @@ let rInstance;
  * @return {Object} m
  */
 const calculateMeta = (_m) => {
-  const meta = _Obj.flatten(_m);
+  const meta = ObjectUtils.flatten(_m);
 
-  _Obj.loop(meta, (val, key) => {
+  ObjectUtils.loop(meta, (val, key) => {
     if (_.isFunction(val)) {
       meta[key] = val.call();
     }
@@ -26,7 +26,7 @@ const calculateMeta = (_m) => {
 const sanitizeEventData = (data) => {
   const keysToMask = ['token'];
 
-  const _data = _Obj.clone(data || {});
+  const _data = ObjectUtils.clone(data || {});
 
   keysToMask.forEach((key) => {
     if (_data[key]) {
@@ -78,7 +78,7 @@ const Analytics = () => ({
       let calculatedMeta = calculateMeta(META);
       data = sanitizeEventData(data);
       if (_.isNonNullObject(data)) {
-        data = _Obj.clone(data);
+        data = ObjectUtils.clone(data);
       } else {
         data = {
           data,
@@ -87,7 +87,7 @@ const Analytics = () => ({
 
       // If data.meta exists, add it to calculatedMeta.
       if (data.meta && _.isNonNullObject(data.meta)) {
-        calculatedMeta = _Obj.extend(calculatedMeta, data.meta);
+        calculatedMeta = Object.assign(calculatedMeta, data.meta);
       }
 
       data.meta = calculatedMeta;
@@ -122,7 +122,7 @@ const Analytics = () => ({
    * @return {Object}
    */
   getMeta: function () {
-    return _Obj.unflatten(META);
+    return ObjectUtils.unflatten(META);
   },
 
   /**
@@ -135,12 +135,12 @@ const Analytics = () => ({
       return 0;
     }
 
-    if (!hasProp(REQUEST_INDEX, rInstance.id)) {
+    if (!ObjectUtils.hasProp(REQUEST_INDEX, rInstance.id)) {
       REQUEST_INDEX[rInstance.id] = {};
     }
 
     const requestIndex = REQUEST_INDEX[rInstance.id];
-    if (!hasProp(requestIndex, name)) {
+    if (!ObjectUtils.hasProp(requestIndex, name)) {
       requestIndex[name] = -1;
     }
 

@@ -4,6 +4,7 @@ import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 export * from 'upi/helper/common';
 export * from 'upi/constants';
 import { UPI_APPS } from 'upi/constants';
+import * as ObjectUtils from 'utils/object';
 /**
  * Returns the package name corresponding to the app shortcode.
  * @param {string} shortcode
@@ -81,7 +82,7 @@ const getAllApps = () => {
  * @return {Array}
  */
 export const getSortedApps = (allApps) => {
-  allApps = _Obj.clone(allApps);
+  allApps = ObjectUtils.clone(allApps);
 
   const isAppInstalled = (package_name) =>
     allApps.some((app) => app.package_name === package_name);
@@ -100,7 +101,7 @@ export const getSortedApps = (allApps) => {
     });
 
     if (appConfig) {
-      allApps[i] = _Obj.extend(allApps[i], appConfig);
+      allApps[i] = Object.assign(allApps[i], appConfig);
     }
   });
 
@@ -179,7 +180,7 @@ export const getNumberOfAppsByCategory = (allApps) => {
   const count = {};
   const existingPackages = allApps.map((app) => app.package_name);
 
-  _Obj.loop(UPI_APPS, (apps, key) => {
+  ObjectUtils.loop(UPI_APPS, (apps, key) => {
     count[key] = apps.filter(
       (app) => existingPackages.indexOf(app.package_name) >= 0
     ).length;

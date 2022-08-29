@@ -55,7 +55,11 @@ import {
 } from 'one_click_checkout/common/otpHelpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
-import { showToastAfterDelay, TOAST_THEME, TOAST_SCREEN } from 'one_click_checkout/Toast';
+import {
+  showToastAfterDelay,
+  TOAST_THEME,
+  TOAST_SCREEN,
+} from 'one_click_checkout/Toast';
 import { formatAmountWithSymbol } from 'common/currency';
 import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import { pushOverlay } from 'navstack';
@@ -138,22 +142,25 @@ export function applyCouponCode(code) {
           is_coupon_valid: true,
         });
         navigator.navigateTo({ path: views.COUPONS });
-        showToastAfterDelay({
-          delay: 5000,
-          message: formatTemplateWithLocale(
-            COUPON_TOAST_MESSAGE,
-            {
-              amount: formatAmountWithSymbol(
-                get(cartDiscount),
-                getCurrency(),
-                false
-              ),
-            },
-            get(locale)
-          ),
-          theme: TOAST_THEME.SUCCESS,
-          screen: TOAST_SCREEN.ONE_CC,
-        }, 150);
+        showToastAfterDelay(
+          {
+            delay: 5000,
+            message: formatTemplateWithLocale(
+              COUPON_TOAST_MESSAGE,
+              {
+                amount: formatAmountWithSymbol(
+                  get(cartDiscount),
+                  getCurrency(),
+                  false
+                ),
+              },
+              get(locale)
+            ),
+            theme: TOAST_THEME.SUCCESS,
+            screen: TOAST_SCREEN.ONE_CC,
+          },
+          150
+        );
       },
       onInvalid: (error) => {
         Analytics.setMeta('is_coupon_valid', false);

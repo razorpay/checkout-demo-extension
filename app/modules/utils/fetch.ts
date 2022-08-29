@@ -1,3 +1,5 @@
+import * as ObjectUtils from 'utils/object';
+
 // TODO make it class
 /** Fetch Types */
 export type FetchPrototype = {
@@ -323,7 +325,9 @@ const fetchPrototype: FetchPrototype = {
       headers[trackIdHeader] = trackId;
     }
 
-    _Obj.loop(headers, (v: string, k: string) => xhr.setRequestHeader(k, v));
+    ObjectUtils.loop(headers, (v: string, k: string) =>
+      xhr.setRequestHeader(k, v)
+    );
 
     xhr.send(data as string);
   },
@@ -478,7 +482,7 @@ function jsonp(options: options): FetchPrototype {
       })
     );
     const script = _El.create('script');
-    _Obj.extend(script, {
+    Object.assign(script, {
       src,
       async: true,
       onerror: () => cb(networkError),

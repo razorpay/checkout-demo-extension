@@ -36,7 +36,7 @@ export function hashFnv32a(str = '', asString = true, seed = 0xdeadc0de) {
  */
 export function set(data) {
   try {
-    global.localStorage.setItem(PREFERRED_INSTRUMENTS, _Obj.stringify(data));
+    global.localStorage.setItem(PREFERRED_INSTRUMENTS, JSON.stringify(data));
   } catch (e) {}
 }
 

@@ -223,7 +223,7 @@ export function generateSubtextForRecurring({
   const { debit, credit } = types;
   const { mastercard, visa, amex } = networks;
 
-  const debitCardIssuers = generateTextFromList(_Obj.values(issuers), locale);
+  const debitCardIssuers = generateTextFromList(Object.values(issuers), locale);
   const creditCardsNetworks = generateTextForCardNetwork(
     {
       mastercard,

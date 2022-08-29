@@ -1,14 +1,15 @@
 import { AVAILABLE_METHODS } from 'common/constants';
+import * as ObjectUtils from 'utils/object';
 
 const INTERNATIONAL_INSTRUMENT_CONFIG = {
   properties: ['providers'],
   payment: ['provider'],
   groupedToIndividual: (grouped) => {
-    const base = _Obj.clone(grouped);
+    const base = ObjectUtils.clone(grouped);
     delete base.providers;
 
     return (grouped.providers || []).map((provider) => {
-      return _Obj.extend(
+      return ObjectUtils.extend(
         {
           provider,
         },
@@ -29,7 +30,7 @@ const INTERNATIONAL_INSTRUMENT_CONFIG = {
  * @returns {Object} Payment payload
  */
 function genericPaymentPayloadGetter(instrument, payment, customer) {
-  payment = _Obj.clone(payment);
+  payment = ObjectUtils.clone(payment);
 
   const method = instrument.method;
   const paymentKeys = config[method].payment;
@@ -46,9 +47,9 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   // Add a token
   if (instrument.token_id && customer) {
-    const token = _Obj
-      .getSafely(customer, 'tokens.items', [])
-      .find((token) => token.id === instrument.token_id);
+    const token = ObjectUtils.get(customer, 'tokens.items', []).find(
+      (token) => token.id === instrument.token_id
+    );
 
     if (token) {
       payment.token = token.token;
@@ -95,7 +96,7 @@ function createCombinations(instrument, sequence = []) {
       // Things have already been pushed so far, extend existing objects
       const _soFar = values.flatMap((value) => {
         return soFar.map((s) =>
-          _Obj.extend(
+          Object.assign(
             {
               [singularKey]: value,
             },
@@ -118,8 +119,8 @@ const config = {
     properties: cardProperties,
     payment: ['token'],
     groupedToIndividual: (grouped, customer) => {
-      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      const base = _Obj.clone(grouped);
+      const tokens = ObjectUtils.get(customer, 'tokens.items', []);
+      const base = ObjectUtils.clone(grouped);
 
       // Remove all extra properties
       cardProperties.forEach((key) => {
@@ -132,7 +133,7 @@ const config = {
 
         if (token) {
           let instrumentFromToken = [
-            _Obj.extend(
+            Object.assign(
               {
                 token_id,
                 type: token.card.type,
@@ -154,7 +155,9 @@ const config = {
         'iins',
       ]);
 
-      return combinations.map((combination) => _Obj.extend(combination, base));
+      return combinations.map((combination) =>
+        Object.assign(combination, base)
+      );
     },
     isValid: (instrument) => {
       if (instrument.token_id) {
@@ -184,11 +187,11 @@ const config = {
     properties: ['banks'],
     payment: ['bank'],
     groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
+      const base = ObjectUtils.clone(grouped);
       delete base.banks;
 
       return (grouped.banks || []).map((bank) => {
-        return _Obj.extend(
+        return Object.assign(
           {
             bank,
           },
@@ -204,11 +207,11 @@ const config = {
     properties: ['wallets'],
     payment: ['wallet'],
     groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
+      const base = ObjectUtils.clone(grouped);
       delete base.wallets;
 
       return (grouped.wallets || []).map((wallet) => {
-        return _Obj.extend(
+        return Object.assign(
           {
             wallet,
           },
@@ -237,8 +240,8 @@ const config = {
 
       let ungrouped = [];
 
-      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      const base = _Obj.clone(grouped);
+      const tokens = ObjectUtils.get(customer, 'tokens.items', []);
+      const base = ObjectUtils.clone(grouped);
 
       // Remove all extra properties
       upiProperties.forEach((key) => {
@@ -260,7 +263,7 @@ const config = {
       if (flows.includes('collect')) {
         if (vpas.length) {
           let individualInstruments = vpas.map((vpa) => {
-            let individual = _Obj.extend(
+            let individual = Object.assign(
               {
                 vpa,
                 flow: 'collect',
@@ -288,7 +291,7 @@ const config = {
       if (flows.includes('intent')) {
         if (apps.length) {
           let individualInstruments = apps.map((app) =>
-            _Obj.extend(
+            Object.assign(
               {
                 app,
                 flow: 'intent',
@@ -304,7 +307,7 @@ const config = {
       if (flows.length > 0) {
         let individualInstruments = flows
           .map((flow) => {
-            let individual = _Obj.extend(
+            let individual = Object.assign(
               {
                 flow,
               },
@@ -393,11 +396,11 @@ const config = {
     properties: ['providers'],
     payment: ['provider'],
     groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
+      const base = ObjectUtils.clone(grouped);
       delete base.providers;
 
       return (grouped.providers || []).map((provider) => {
-        return _Obj.extend(
+        return Object.assign(
           {
             provider,
           },
@@ -413,11 +416,11 @@ const config = {
     properties: ['providers'],
     payment: ['provider'],
     groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
+      const base = ObjectUtils.clone(grouped);
       delete base.providers;
 
       return (grouped.providers || []).map((provider) => {
-        return _Obj.extend(
+        return Object.assign(
           {
             provider,
           },
@@ -433,11 +436,11 @@ const config = {
     properties: ['providers'],
     payment: ['provider'],
     groupedToIndividual: (grouped) => {
-      const base = _Obj.clone(grouped);
+      const base = ObjectUtils.clone(grouped);
       delete base.providers;
 
       return (grouped.providers || []).map((provider) => {
-        return _Obj.extend(
+        return Object.assign(
           {
             provider,
           },
@@ -473,8 +476,8 @@ AVAILABLE_METHODS.forEach((method) => {
   }
 });
 
-_Obj.loop(config, (val, method) => {
-  config[method] = _Obj.extend(
+ObjectUtils.loop(config, (val, method) => {
+  config[method] = Object.assign(
     {
       getPaymentPayload: genericPaymentPayloadGetter,
       groupedToIndividual: genericGroupedToIndividual,
