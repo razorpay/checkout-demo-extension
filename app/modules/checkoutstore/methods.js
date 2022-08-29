@@ -69,7 +69,6 @@ import {
 } from 'checkoutstore/screens/home';
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
-import { isNonNullObject, isEmpty } from 'utils/object';
 import { getUniqueValues } from 'utils/array';
 
 import {
@@ -167,7 +166,7 @@ const ALL_METHODS = {
     return (
       getOrderMethod() === 'emandate' &&
       !isInternational() &&
-      !isEmpty(getRecurringMethods()?.emandate)
+      !ObjectUtils.isEmpty(getRecurringMethods()?.emandate)
     );
   },
 
@@ -186,7 +185,7 @@ const ALL_METHODS = {
       getMerchantMethods().card &&
       !isInternational() &&
       !isRecurring() &&
-      !isEmpty(getEMIBanks())
+      !ObjectUtils.isEmpty(getEMIBanks())
     );
   },
 
@@ -228,7 +227,7 @@ const ALL_METHODS = {
     const providers = getCardlessEMIProviders();
     const enabled =
       getOption('method.cardless_emi') !== false || providers.bajaj;
-    return enabled && !isEmpty(providers);
+    return enabled && !ObjectUtils.isEmpty(providers);
   },
 
   paylater() {
@@ -242,7 +241,7 @@ const ALL_METHODS = {
       getAmount() &&
       !isRecurring() &&
       !isInternational() &&
-      !isEmpty(getMerchantMethods().paylater)
+      !ObjectUtils.isEmpty(getMerchantMethods().paylater)
     );
   },
 
@@ -601,7 +600,10 @@ export function isUPIFlowEnabled(method) {
   // unless method.upi or method.upi.{sub-method} is passed as false by merchant
   // it should be considered enabled from merchant side
   const merchantOption = getOption('method.upi');
-  if (isNonNullObject(merchantOption) && merchantOption[method] === false) {
+  if (
+    ObjectUtils.isNonNullObject(merchantOption) &&
+    merchantOption[method] === false
+  ) {
     return false;
   }
   return isUPIBaseEnabled() && UPI_METHODS[method]();
@@ -610,7 +612,7 @@ export function isUPIFlowEnabled(method) {
 function intentEnabledInOption() {
   const merchantUpiOption = getOption('method.upi');
   if (
-    isNonNullObject(merchantUpiOption) &&
+    ObjectUtils.isNonNullObject(merchantUpiOption) &&
     merchantUpiOption.intent === false
   ) {
     return false;
@@ -622,7 +624,10 @@ export function isUPIOtmFlowEnabled(method) {
   // unless method.upi_otm is passed as false by merchant
   // it should be considered enabled from merchant side
   const merchantOption = getOption('method.upi_otm');
-  if (isNonNullObject(merchantOption) && merchantOption[method] === false) {
+  if (
+    ObjectUtils.isNonNullObject(merchantOption) &&
+    merchantOption[method] === false
+  ) {
     return false;
   }
   return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
@@ -735,7 +740,7 @@ export function getCardNetworks() {
 
 export function getNetbankingBanks() {
   const banks = getMerchantMethods().netbanking;
-  if (isEmpty(banks)) {
+  if (ObjectUtils.isEmpty(banks)) {
     return {};
   }
   return banks;
@@ -960,7 +965,7 @@ export function getEligiblePlansBasedOnMinAmount(plans) {
 export function getEMIBanks(amount) {
   const emiOptions = getMerchantMethods().emi_options;
 
-  if (isEmpty(emiOptions)) {
+  if (ObjectUtils.isEmpty(emiOptions)) {
     return {};
   }
   let banks = getEligibleBanksBasedOnMinAmount(
@@ -991,7 +996,7 @@ export function getEMIBanks(amount) {
  */
 export function getPayLaterProviders() {
   const paylater = getMerchantMethods().paylater || {};
-  if (isEmpty(paylater)) {
+  if (ObjectUtils.isEmpty(paylater)) {
     return [];
   }
   return Object.keys(paylater).map(getProvider).filter(Boolean);
@@ -1010,7 +1015,7 @@ export function getAppProviders() {
     // explicitly setting of `google_pay`.
     apps.google_pay = true;
   }
-  if (isEmpty(apps)) {
+  if (ObjectUtils.isEmpty(apps)) {
     return [];
   }
   return Object.keys(apps)
@@ -1036,7 +1041,7 @@ export function getCardlessEMIProviders() {
     ...emiMethod,
     ...getMerchantMethods().cardless_emi,
   };
-  if (isEmpty(emiMethod)) {
+  if (ObjectUtils.isEmpty(emiMethod)) {
     emiMethod = {};
   }
 

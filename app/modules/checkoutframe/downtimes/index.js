@@ -1,5 +1,4 @@
 import { getPreferences } from 'razorpay';
-import { hasProp } from 'utils/object';
 import * as ObjectUtils from 'utils/object';
 
 /**
@@ -51,7 +50,7 @@ export function groupDowntimesByMethod(allDowntimes) {
   allDowntimes.forEach((downtime) => {
     const { method } = downtime || {};
 
-    if (!hasProp(downtimes, method)) {
+    if (!ObjectUtils.hasProp(downtimes, method)) {
       downtimes[method] = [];
     }
 

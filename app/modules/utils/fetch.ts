@@ -1,4 +1,5 @@
 import * as ObjectUtils from 'utils/object';
+import * as _El from './DOM';
 
 // TODO make it class
 /** Fetch Types */
@@ -29,8 +30,7 @@ type options = FetchPrototype['options'];
 const sessionIdHeader = 'X-Razorpay-SessionId';
 const trackIdHeader = 'X-Razorpay-TrackId';
 const Xhr = XMLHttpRequest;
-import * as _El from './DOM';
-import { parse } from 'utils/object';
+
 const networkError = _.rzpError('Network error');
 let jsonp_cb = 0;
 let sessionId: string, trackId: string, keylessHeader: string;
@@ -262,7 +262,7 @@ const fetchPrototype: FetchPrototype = {
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
-        let json = parse(xhr.responseText) as {
+        let json = ObjectUtils.parse(xhr.responseText) as {
           xhr: any;
           error: boolean;
           status_code: number;

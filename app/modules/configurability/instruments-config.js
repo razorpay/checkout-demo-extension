@@ -9,7 +9,7 @@ const INTERNATIONAL_INSTRUMENT_CONFIG = {
     delete base.providers;
 
     return (grouped.providers || []).map((provider) => {
-      return ObjectUtils.extend(
+      return Object.assign(
         {
           provider,
         },

@@ -47,7 +47,6 @@ import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
-import { hasProp, isEmpty } from 'utils/object';
 import { setBraveBrowser } from 'common/useragent';
 import { appendLoader } from 'common/loader';
 
@@ -127,7 +126,10 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set language-related properties.
    */
-  if (hasProp(navigator, 'language') || hasProp(navigator, 'userLanguage')) {
+  if (
+    ObjectUtils.hasProp(navigator, 'language') ||
+    ObjectUtils.hasProp(navigator, 'userLanguage')
+  ) {
     Events.setMeta(
       MetaProperties.NAVIGATOR_LANGUAGE,
       navigator.language || navigator.userLanguage
@@ -137,7 +139,7 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set network-related properties.
    */
-  if (hasProp(navigator, 'connection')) {
+  if (ObjectUtils.hasProp(navigator, 'connection')) {
     const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
@@ -301,13 +303,13 @@ export const handleMessage = function (message) {
       Track(session.r, MiscEvents.OPEN);
     }
 
-    if (!isEmpty(message._order)) {
+    if (!ObjectUtils.isEmpty(message._order)) {
       // for prefetch prefs flow as there order object will need to be passed separately
       const prefetchedPrefsObj = getPrefetchedPrefs();
       setPrefetchedPrefs({ ...prefetchedPrefsObj, order: message._order });
     }
 
-    if (!isEmpty(message._prefs)) {
+    if (!ObjectUtils.isEmpty(message._prefs)) {
       /**
        * _prefs is sent from the shopify script added to the rzp instance to be consumed here
        * and prevent fetching the preferences using a network call again.
