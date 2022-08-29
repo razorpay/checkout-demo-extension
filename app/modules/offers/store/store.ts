@@ -85,23 +85,29 @@ export const isCardValidForOffer: Readable<boolean> = derived(
       return;
     }
     if ($appliedOffer.emi_subvention) {
-      getCardFeatures($cardIin).then(() => {
-        // IIN changed, abort
-        if (get(cardIin) !== $cardIin) {
-          return;
-        }
-
-        const bank = getBankFromCardCache($cardIin);
-        if (!bank) {
-          set(false);
-        } else {
-          const issuer =
-            $appliedOffer[bank.code === 'AMEX' ? 'payment_network' : 'issuer'];
-          if (!bank || issuer !== bank.code) {
-            set(false);
+      getCardFeatures($cardIin)
+        .then(() => {
+          // IIN changed, abort
+          if (get(cardIin) !== $cardIin) {
+            return;
           }
-        }
-      });
+
+          const bank = getBankFromCardCache($cardIin);
+          if (!bank) {
+            set(false);
+          } else {
+            const issuer =
+              $appliedOffer[
+                bank.code === 'AMEX' ? 'payment_network' : 'issuer'
+              ];
+            if (!bank || issuer !== bank.code) {
+              set(false);
+            }
+          }
+        })
+        .catch(() => {
+          console.error('Unable to fetch card features/meta');
+        });
       return;
     }
 

@@ -894,57 +894,61 @@
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
     isDowntime('network', cardType);
     if (sixDigits) {
-      getCardFeatures(_cardNumber).then((features) => {
-        if (iin !== getIin($cardNumber)) {
-          // $cardNumber's IIN has changed since we started the n/w request, do nothing
-          return;
-        }
-
-        if (features.country) {
-          $cardCountry = features.country;
-        }
-
-        if (features?.issuer) {
-          isDowntime('issuer', features.issuer);
-        }
-
-        let emiObj;
-
-        const hasEmi = (features.flows || {}).emi;
-
-        if (hasEmi) {
-          let issuer = features.issuer;
-
-          // Handle AMEX
-          if (amexCard) {
-            issuer = 'AMEX';
+      getCardFeatures(_cardNumber)
+        .then((features) => {
+          if (iin !== getIin($cardNumber)) {
+            // $cardNumber's IIN has changed since we started the n/w request, do nothing
+            return;
           }
 
-          // Handle debit cards
-          const type = features.type;
-
-          if (type === 'debit') {
-            issuer += '_DC';
+          if (features.country) {
+            $cardCountry = features.country;
           }
 
-          emiObj = (getEMIBanks() || {})[issuer];
-        }
+          if (features?.issuer) {
+            isDowntime('issuer', features.issuer);
+          }
 
-        session.emiPlansForNewCard = emiObj;
+          let emiObj;
 
-        // No EMI plans available. Unset duration.
-        if (!emiObj) {
-          $newCardEmiDuration = '';
-        }
+          const hasEmi = (features.flows || {}).emi;
 
-        showAppropriateEmiDetailsForNewCard(
-          session.tab,
-          emiObj,
-          trimmedVal.length
-        );
+          if (hasEmi) {
+            let issuer = features.issuer;
 
-        isCardSupportedForRecurring = checkCardSupportForRecurring(features);
-      });
+            // Handle AMEX
+            if (amexCard) {
+              issuer = 'AMEX';
+            }
+
+            // Handle debit cards
+            const type = features.type;
+
+            if (type === 'debit') {
+              issuer += '_DC';
+            }
+
+            emiObj = (getEMIBanks() || {})[issuer];
+          }
+
+          session.emiPlansForNewCard = emiObj;
+
+          // No EMI plans available. Unset duration.
+          if (!emiObj) {
+            $newCardEmiDuration = '';
+          }
+
+          showAppropriateEmiDetailsForNewCard(
+            session.tab,
+            emiObj,
+            trimmedVal.length
+          );
+
+          isCardSupportedForRecurring = checkCardSupportForRecurring(features);
+        })
+        .catch(() => {
+          console.error('Unable to fetch card features/meta');
+        });
     } else {
       // Need six digits for EMI. Unset things.
       session.emiPlansForNewCard = undefined;

@@ -174,17 +174,21 @@
     if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
       lastIin = getIin($cardNumber);
       if (lastIin) {
-        getCardFeatures($cardNumber).then((data) => {
-          const { emi } = data.flows || {};
-          if (!emi) {
-            Analytics.track('card:emi:invalid', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                iin: $cardIin,
-              },
-            });
-          }
-        });
+        getCardFeatures($cardNumber)
+          .then((data) => {
+            const { emi } = data.flows || {};
+            if (!emi) {
+              Analytics.track('card:emi:invalid', {
+                type: AnalyticsTypes.BEHAV,
+                data: {
+                  iin: $cardIin,
+                },
+              });
+            }
+          })
+          .catch(() => {
+            console.error('Unable to fetch card features/meta');
+          });
       }
     }
   }
