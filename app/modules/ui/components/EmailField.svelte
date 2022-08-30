@@ -39,7 +39,7 @@
 
   const debouncedValidator = debounce((email) => {
     validateEmail(email).then((isValid) => {
-      validationText = !isValid && email.length ? $t(EMAIL_HELP_TEXT) : null;
+      validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
       $isEmailValid = isValid;
     });
   }, 200);
