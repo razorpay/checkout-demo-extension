@@ -2,7 +2,10 @@
 import { get } from 'svelte/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
-import { setSavedAddresses } from 'one_click_checkout/address/sessionInterface';
+import {
+  setSavedAddresses,
+  setDefaultSelectedAddress,
+} from 'one_click_checkout/address/sessionInterface';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
@@ -110,6 +113,7 @@ const postSubmit = (msg, data) => {
     });
     if (data && data.addresses) {
       setSavedAddresses(data.addresses);
+      setDefaultSelectedAddress();
     }
     updateOTPStore({ renderCtaOneCC: false });
     screensHistory.config.otp.props.successHandler(data);
