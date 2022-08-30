@@ -53,7 +53,6 @@ class Experiment {
    */
   static getExperimentsFromStorage(): Common.Object {
     let data;
-
     try {
       data = JSON.parse(BrowserStorage.getItem(STORAGE_KEY) as string);
     } catch (err) {

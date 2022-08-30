@@ -41,6 +41,7 @@ import updateScore from 'analytics/checkoutScore';
 import {
   appsThatSupportWebPayments,
   checkWebPaymentsForApp,
+  additionalSupportedPaymentApps,
 } from 'common/webPaymentsApi';
 
 import { isStandardCheckout } from 'common/helper';
@@ -575,6 +576,13 @@ function setSessionPreferences(session, preferences) {
     }
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
+
+  try {
+    if (preferences?.experiments?.upi_ux === 'variant_1') {
+      additionalSupportedPaymentApps();
+      checkForPossibleWebPayments();
+    }
+  } catch (error) {}
 
   initI18n().then(() => {
     session.render();

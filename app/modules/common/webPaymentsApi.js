@@ -7,25 +7,16 @@ import {
   BHIM_UPI_PACKAGE_NAME,
   PAYTM_PACKAGE_NAME,
 } from 'common/upi';
-import RazorpayStore, { getPreferences } from 'razorpay';
+import RazorpayStore from 'razorpay';
 
 export const appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
   { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
   { package_name: CRED_PACKAGE_NAME, method: 'app' },
-  ...additionalSupportedPaymentApps(),
 ];
 
-function additionalSupportedPaymentApps() {
-  let supportedApps = [];
-
-  if (getPreferences('experiments.upi_ux') === 'variant_1') {
-    supportedApps = [
-      { package_name: BHIM_UPI_PACKAGE_NAME, method: 'upi' },
-      { package_name: PAYTM_PACKAGE_NAME, method: 'upi' },
-    ];
-  }
-  return supportedApps;
+export function additionalSupportedPaymentApps() {
+  appsThatSupportWebPayments.push({ package_name: BHIM_UPI_PACKAGE_NAME, method: 'upi' }, { package_name: PAYTM_PACKAGE_NAME, method: 'upi' })
 }
 
 const webPaymentsApps = {};

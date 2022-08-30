@@ -1,10 +1,11 @@
 import { getExperimentsFromStorage } from 'experiments';
-import { getOrderId } from 'razorpay';
+import { getOrderId, getPreferences } from 'razorpay';
 import { trackAvailabilty } from './availability';
 import * as ObjectUtils from 'utils/object';
 import fetch from 'utils/fetch';
 import { BUILD_NUMBER } from 'common/constants';
 import { getDeviceId } from 'fingerprint';
+import { isNonNullObject } from 'utils/object';
 
 const CHUNK_SIZE = 5;
 
@@ -268,6 +269,16 @@ export default function Track(r, event, data, immediately) {
     // Add canary_percentage
     // Add current experiments
     properties.experiments = getExperimentsFromStorage();
+
+    // experiment from backend
+    const experimentFromBackend = getPreferences('experiments');
+    try {
+      if (isNonNullObject(experimentFromBackend)) {
+        properties.backendExperiments = {
+          ...experimentFromBackend,
+        };
+      }
+    } catch (error) {}
 
     pushToEventQ({
       event,
