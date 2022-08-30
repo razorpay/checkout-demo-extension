@@ -34,7 +34,7 @@ import {
   couponInputSource,
   couponAppliedIndex,
 } from 'one_click_checkout/coupons/store';
-import { cartDiscount } from 'one_click_checkout/charges/store';
+import { cartDiscount, resetCharges } from 'one_click_checkout/charges/store';
 import { getRoute } from 'one_click_checkout/routing/store';
 import {
   showBanner,
@@ -64,6 +64,7 @@ import { formatAmountWithSymbol } from 'common/currency';
 import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import { pushOverlay } from 'navstack';
 import { showAddressConsentModal } from 'one_click_checkout/address/consent';
+import { resetAddresses } from 'one_click_checkout/address/derived';
 
 // constant imports
 import { RESEND_OTP_INTERVAL, OTP_TEMPLATES, otpReasons } from 'otp/constants';
@@ -263,6 +264,8 @@ export function onSubmitLogoutUser() {
   const customer = getCustomerDetails();
   const sms_hash = customer.r.get('sms_hash');
   const params = { skip_otp: true };
+  resetCharges();
+  resetAddresses();
   if (sms_hash) {
     params.sms_hash = sms_hash;
   }
