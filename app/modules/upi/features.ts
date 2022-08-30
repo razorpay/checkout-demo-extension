@@ -12,7 +12,7 @@ import {
   isDynamicFeeBearer,
   isRecurring,
 } from 'razorpay';
-import { iOS, isBrave, isDesktop } from 'common/useragent';
+import { internetExplorer, iOS, isBrave, isDesktop } from 'common/useragent';
 import {
   googlePayUpiConfig,
   OTHER_INTENT_APPS,
@@ -203,7 +203,8 @@ export const initUpiQrV2 = () => {
       !isDynamicFeeBearer() &&
       !isInternational() &&
       !upiHighDowntime &&
-      !top3AppsDown;
+      !top3AppsDown &&
+      !internetExplorer;
 
     const homeScreenQR =
       status &&
