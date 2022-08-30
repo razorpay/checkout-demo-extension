@@ -373,6 +373,7 @@
       on:autocomplete
       on:paste
       on:click
+      on:copy
       on:keydown={onKeyDown}
       on:keydown
       on:scroll={(e) => {
@@ -490,6 +491,7 @@
       on:input
       on:autocomplete
       on:paste
+      on:copy
       on:click
       on:keydown={onKeyDown}
       on:keydown

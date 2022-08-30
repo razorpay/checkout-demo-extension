@@ -96,6 +96,10 @@
   on:input
   on:blur
   on:focus
+  on:copy={(e) => {
+    e.preventDefault();
+    return false;
+  }}
   handleBlur
   handleFocus
   handleInput
