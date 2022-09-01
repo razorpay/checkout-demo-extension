@@ -22,12 +22,16 @@ import {
   removeCoupon,
   validateCoupon,
 } from 'one_click_checkout/coupons/service';
+import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
 import { setOption, getPrefilledCouponCode } from 'razorpay';
 
 // i18n imports
 import { formatMessageWithLocale } from 'i18n';
 import { APPLY_COUPON } from 'one_click_checkout/loader/i18n/labels';
 import { INVALID_EMAIL_LABEL } from 'one_click_checkout/coupons/i18n/labels';
+
+// constants imports
+import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
 import { ERROR_INPUT_VALIDATION_FAILED } from 'one_click_checkout/coupons/constants';
 
 /**
@@ -49,6 +53,9 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
   showLoaderView(APPLY_COUPON);
   validateCoupon(code, source)
     .then((response) => {
+      emitMagicFunnelEvent(MAGIC_FUNNEL.COUPON_APPLIED, {
+        coupon: code,
+      });
       applyCouponInStore(code, response);
       if (onValid) {
         onValid();

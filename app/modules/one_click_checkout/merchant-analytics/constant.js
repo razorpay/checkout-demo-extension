@@ -26,3 +26,7 @@ export const CATEGORIES = {
   PAYMENT_METHODS: 'rzp_payments',
   MAGIC_CHECKOUT: 'rzp_magic_checkout',
 };
+
+export const MAGIC_FUNNEL = {
+  COUPON_APPLIED: 'magic_funnel.coupon_applied',
+};
