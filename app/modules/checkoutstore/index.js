@@ -99,7 +99,7 @@ export function getMerchantConfig() {
   const configFromPreferences = getCheckoutConfig();
   const isHDFCMerchant = isHDFCVASMerchant();
 
-  let displayFromOptions = ObjectUtils.get(configFromOptions, 'display');
+  let displayFromOptions = configFromOptions?.display;
 
   const displayFromPreferences = ObjectUtils.get(
     configFromPreferences,

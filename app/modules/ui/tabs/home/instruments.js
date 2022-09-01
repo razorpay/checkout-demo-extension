@@ -524,15 +524,39 @@ function addDowntimeToBlock(block) {
  * @returns {boolean}
  */
 
-export function isBlockVisible(method) {
+export function isInstrumentHidden(instrument) {
   try {
+    if (!instrument?.method) {
+      return false;
+    }
+
     const merchantConfig = getMerchantConfig().config;
     const parsedConfig = getBlockConfig(merchantConfig, storeGetter(customer));
     const show_default_blocks =
       parsedConfig.display.preferences?.show_default_blocks ?? true;
-    const parsedConfigMethods = parsedConfig.display.hide.methods;
-    return show_default_blocks && !parsedConfigMethods.includes(method);
-  } catch {
-    return true;
+
+    if (show_default_blocks === false) {
+      return true;
+    }
+    const methodsToHide = parsedConfig.display.hide.methods;
+
+    if (methodsToHide.includes(instrument.method)) {
+      return true;
+    }
+
+    const instrumentsToHide = parsedConfig.display.hide.instruments;
+
+    switch (instrument.method) {
+      case 'upi': {
+        if (instrument.flow && instrumentsToHide?.length > 0) {
+          return instrumentsToHide.some((i) => i.flow === instrument.flow);
+        }
+        break;
+      }
+    }
+
+    return false;
+  } catch (e) {
+    return false;
   }
 }

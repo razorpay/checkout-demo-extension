@@ -30,7 +30,7 @@ jest.mock('../experiments', () => ({
   },
 }));
 jest.mock('ui/tabs/home/instruments', () => ({
-  isBlockVisible: jest.fn(() => true),
+  isInstrumentHidden: jest.fn(() => false),
 }));
 jest.mock('checkoutstore/methods', () => ({
   isUPIFlowEnabled: jest.fn(() => true),

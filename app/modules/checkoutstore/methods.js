@@ -138,11 +138,12 @@ const ALL_METHODS = {
   netbanking() {
     return _.lengthOf(
       Object.keys(
-        getAmount() &&
+        (getAmount() &&
           !isRecurring() &&
           !isInternational() &&
           getOption('method.netbanking') !== false &&
-          getNetbankingBanks()
+          getNetbankingBanks()) ||
+          {}
       )
     );
   },

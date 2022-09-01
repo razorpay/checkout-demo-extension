@@ -1,381 +1,119 @@
-import { isBlockVisible } from '../instruments';
-import { getBlockConfig } from 'configurability';
-import { getMerchantConfig } from 'checkoutstore';
+import { isInstrumentHidden } from '../instruments';
+import { getCheckoutConfig } from 'razorpay';
 
-jest.mock('configurability', () => ({
-  getBlockConfig: jest.fn(),
-}));
-jest.mock('checkoutstore', () => ({
-  getMerchantConfig: jest.fn(),
+jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
+  getCheckoutConfig: jest.fn(),
 }));
 
-describe('Check if show_default_blocks is false', () => {
-  getMerchantConfig.mockImplementationOnce(() => {
-    return {
-      config: {
-        display: {
-          blocks: {
-            hdfc: {
-              name: 'Pay using HDFC Bank',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['HDFC'],
+describe('isInstrumentHidden', () => {
+  describe('UPI QR v2', () => {
+    describe('shown_default_blocks', () => {
+      test('UPI QR v2 should be hidden if show_default_blocks is set to false', () => {
+        getCheckoutConfig.mockImplementationOnce(() => {
+          return {
+            display: {
+              blocks: {
+                hdfc: {
+                  name: 'Pay using HDFC Bank',
+                  instruments: [
+                    {
+                      method: 'card',
+                      issuers: ['HDFC'],
+                    },
+                    {
+                      method: 'netbanking',
+                      banks: ['HDFC'],
+                    },
+                  ],
                 },
-                {
-                  method: 'netbanking',
-                  banks: ['HDFC'],
-                },
-              ],
+              },
+              sequence: ['block.hdfc'],
+              preferences: {
+                show_default_blocks: false,
+              },
             },
-            other: {
-              name: 'Other Payment modes',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['ICIC'],
-                },
-                {
-                  method: 'netbanking',
-                },
-              ],
-            },
-          },
-          sequence: ['block.hdfc', 'block.other'],
-          preferences: {
-            show_default_blocks: false,
-          },
-        },
-      },
-    };
-  });
+          };
+        });
 
-  getBlockConfig.mockImplementationOnce(() => {
-    return {
-      display: {
-        sequence: ['block.hdfc', 'block.other'],
-        blocks: [
-          {
-            code: 'block.hdfc',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'HDFC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['HDFC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-            ],
-            title: 'Pay using HDFC Bank',
-          },
-          {
-            code: 'block.other',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'ICIC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['ICIC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-              {
-                _ungrouped: [
-                  {
-                    method: 'netbanking',
-                    _type: 'method',
-                  },
-                ],
-                method: 'netbanking',
-                _type: 'method',
-              },
-            ],
-            title: 'Other Payment modes',
-          },
-        ],
-        hide: {
-          instruments: [],
-          methods: [],
-        },
-        preferences: {
-          show_default_blocks: false,
-        },
-      },
-      restrictions: {
-        allow: {
-          code: 'rzp.restrict_allow',
-          _type: 'block',
-          instruments: [],
-        },
-      },
-      _meta: {
-        hasCustomizations: true,
-        hasRestrictedInstruments: false,
-      },
-    };
-  });
-  it('Should return false', () => {
-    const value = isBlockVisible('upi');
-    expect(value).toBeFalsy();
-  });
-});
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(true);
+      });
 
-describe('Check if upi is add in hide configurability', () => {
-  getMerchantConfig.mockImplementationOnce(() => {
-    return {
-      config: {
-        display: {
-          blocks: {
-            hdfc: {
-              name: 'Pay using HDFC Bank',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['HDFC'],
+      test('UPI QR v2 should be shown if show_default_blocks is set to true', () => {
+        getCheckoutConfig.mockImplementationOnce(() => {
+          return {
+            display: {
+              blocks: {
+                hdfc: {
+                  name: 'Pay using HDFC Bank',
+                  instruments: [
+                    {
+                      method: 'card',
+                      issuers: ['HDFC'],
+                    },
+                    {
+                      method: 'netbanking',
+                      banks: ['HDFC'],
+                    },
+                  ],
                 },
-                {
-                  method: 'netbanking',
-                  banks: ['HDFC'],
-                },
-              ],
+              },
+              sequence: ['block.hdfc'],
+              preferences: {
+                show_default_blocks: true,
+              },
             },
-            other: {
-              name: 'Other Payment modes',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['ICIC'],
-                },
-                {
-                  method: 'netbanking',
-                },
-              ],
-            },
-          },
-          hide: [
-            {
-              method: 'upi',
-            },
-          ],
-          sequence: ['block.hdfc', 'block.other'],
-          preferences: {
-            show_default_blocks: true,
-          },
-        },
-      },
-    };
-  });
+          };
+        });
 
-  getBlockConfig.mockImplementationOnce(() => {
-    return {
-      display: {
-        sequence: ['block.hdfc', 'block.other'],
-        blocks: [
-          {
-            code: 'block.hdfc',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'HDFC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['HDFC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-            ],
-            title: 'Pay using HDFC Bank',
-          },
-          {
-            code: 'block.other',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'ICIC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['ICIC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-              {
-                _ungrouped: [
-                  {
-                    method: 'netbanking',
-                    _type: 'method',
-                  },
-                ],
-                method: 'netbanking',
-                _type: 'method',
-              },
-            ],
-            title: 'Other Payment modes',
-          },
-        ],
-        hide: {
-          instruments: [],
-          methods: ['upi'],
-        },
-        preferences: {
-          show_default_blocks: true,
-        },
-      },
-      restrictions: {
-        allow: {
-          code: 'rzp.restrict_allow',
-          _type: 'block',
-          instruments: [],
-        },
-      },
-      _meta: {
-        hasCustomizations: true,
-        hasRestrictedInstruments: false,
-      },
-    };
-  });
-  it('Should return false', () => {
-    const value = isBlockVisible('upi');
-    expect(value).toBeFalsy();
-  });
-});
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(false);
+      });
 
-describe('Check if show_default_blocks is true', () => {
-  getMerchantConfig.mockImplementationOnce(() => {
-    return {
-      config: {
-        display: {
-          blocks: {
-            hdfc: {
-              name: 'Pay using HDFC Bank',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['HDFC'],
-                },
-                {
-                  method: 'netbanking',
-                  banks: ['HDFC'],
-                },
-              ],
+      test('UPI QR v2 should be shown if show_default_blocks is not set', () => {
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(false);
+      });
+    });
+    describe('UPI method hidden', () => {
+      test('UPI QR v2 should be hidden if upi method is hidden', () => {
+        getCheckoutConfig.mockImplementationOnce(() => {
+          return {
+            display: {
+              hide: [{ method: 'upi' }],
             },
-            other: {
-              name: 'Other Payment modes',
-              instruments: [
-                {
-                  method: 'card',
-                  issuers: ['ICIC'],
-                },
-                {
-                  method: 'netbanking',
-                },
-              ],
-            },
-          },
-          sequence: ['block.hdfc', 'block.other'],
-          preferences: {
-            show_default_blocks: true,
-          },
-        },
-      },
-    };
-  });
+          };
+        });
 
-  getBlockConfig.mockImplementationOnce(() => {
-    return {
-      display: {
-        sequence: ['block.hdfc', 'block.other'],
-        blocks: [
-          {
-            code: 'block.hdfc',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'HDFC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['HDFC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-            ],
-            title: 'Pay using HDFC Bank',
-          },
-          {
-            code: 'block.other',
-            _type: 'block',
-            instruments: [
-              {
-                _ungrouped: [
-                  {
-                    issuer: 'ICIC',
-                    method: 'card',
-                    _type: 'instrument',
-                  },
-                ],
-                issuers: ['ICIC'],
-                method: 'card',
-                _type: 'instrument',
-              },
-              {
-                _ungrouped: [
-                  {
-                    method: 'netbanking',
-                    _type: 'method',
-                  },
-                ],
-                method: 'netbanking',
-                _type: 'method',
-              },
-            ],
-            title: 'Other Payment modes',
-          },
-        ],
-        hide: {
-          instruments: [],
-          methods: [],
-        },
-        preferences: {
-          show_default_blocks: true,
-        },
-      },
-      restrictions: {
-        allow: {
-          code: 'rzp.restrict_allow',
-          _type: 'block',
-          instruments: [],
-        },
-      },
-      _meta: {
-        hasCustomizations: true,
-        hasRestrictedInstruments: false,
-      },
-    };
-  });
-  it('Should return true', () => {
-    const value = isBlockVisible('upi');
-    expect(value).toBeTruthy();
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(true);
+      });
+
+      test('UPI QR v2 should be shown if upi method is not hidden', () => {
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(false);
+      });
+    });
+
+    describe('UPI flow hidden', () => {
+      test('UPI QR v2 should be hidden if upi main_qr flow is hidden', () => {
+        getCheckoutConfig.mockImplementationOnce(() => {
+          return {
+            display: {
+              hide: [{ method: 'upi', flow: 'main_qr' }],
+            },
+          };
+        });
+
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
+        expect(hidden).toBe(true);
+      });
+
+      test('UPI QR v2 should be shown if some other upi flow is hidden', () => {
+        const hidden = isInstrumentHidden({ method: 'upi', flow: 'collect' });
+        expect(hidden).toBe(false);
+      });
+    });
   });
 });
