@@ -18,6 +18,7 @@ import {
 import { submitForm } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import { appendLoader } from 'common/loader';
+import { sendToAll } from 'checkoutjs/analytics';
 
 const { screen, scrollTo } = global;
 
@@ -456,14 +457,16 @@ CheckoutFrame.prototype = {
         event_category: category,
         ...params,
       });
-    } else if (window?.ga && typeof window.ga === 'function') {
+    }
+
+    if (window?.ga && typeof window.ga === 'function') {
       if (event === ACTIONS.PAGE_VIEW) {
-        window.ga('send', {
+        sendToAll('send', {
           hitType: 'pageview',
           title: category,
         });
       } else {
-        window.ga('send', {
+        sendToAll('send', {
           hitType: 'event',
           eventCategory: category,
           eventAction: event,
