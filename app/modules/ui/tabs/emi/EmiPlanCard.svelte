@@ -78,6 +78,7 @@
   const SBIN_BANK_CODE = 'SBIN';
   const KOTAK_BANK_CODE = 'KKBK';
   const ICICI_BANK_CODE = 'ICIC';
+  const RBL_BANK_CODE = 'RATN';
 
   $: {
     zestMoneyForcedEmiOffer = provider === 'zestmoney' && plan.duration === 3;
@@ -249,7 +250,7 @@
             $locale
           )}
         {/if}
-        {#if bank === HDFC_BANK_CODE || isDebitIssuer(bank)}
+        {#if bank === RBL_BANK_CODE || bank === HDFC_BANK_CODE || isDebitIssuer(bank)}
           <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on {bank} Cards. -->
           {formatTemplateWithLocale(
             DEBIT_DESCRIPTION_CONVENIENCE,

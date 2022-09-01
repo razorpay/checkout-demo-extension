@@ -191,6 +191,7 @@ export default {
       YESB: 'Yes',
       HSBC: 'HSBC',
       KKBK_DC: 'Kotak',
+      RATN: 'RBL',
     },
   },
   callouts: {
