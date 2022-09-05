@@ -2435,7 +2435,7 @@ Session.prototype = {
     } else {
       discreet.OffersStore.showOffers.set(true);
       if (screen) {
-        this.topBar.show();
+        this.topBar?.show();
       } else if (!RazorpayHelper.isOneClickCheckout()) {
         this.topBar.hide();
       }
@@ -2755,7 +2755,7 @@ Session.prototype = {
     } else if (this.tab === 'bank_transfer') {
       es6components.bankTransferTab.destroy();
     } else if (this.tab === 'emandate') {
-      if (this.emandateView.onBack()) {
+      if (this.emandateView?.onBack()) {
         return;
       }
     } else if (this.tab === 'international') {
@@ -3845,11 +3845,11 @@ Session.prototype = {
         paymentData: paymentData,
         onContinue: function (bearer) {
           // Set the updated amount & fee
-          session.payload = {
-            ...session.payload,
-            amount: bearer.amount,
-            fee: bearer.fee,
-          };
+          if (!session.payload) {
+            session.payload = {};
+          }
+          session.payload.amount = bearer.amount;
+          session.payload.fee = bearer.fee;
 
           // In case of MCC transaction, BE sends mcc request id, that we need to forward
           if (bearer.mcc_request_id) {
@@ -4675,8 +4675,10 @@ Session.prototype = {
     let vpaVerified = props.vpaVerified;
     let data = this.payload;
     // deleting downtimeSeverity & downtimeInstrument from data & saving downtimeSeverity for analytics
-    delete data.downtimeSeverity;
-    delete data.downtimeInstrument;
+    if (data) {
+      delete data.downtimeSeverity;
+      delete data.downtimeInstrument;
+    }
 
     let goto_payment = '#error-message .link';
     let redirectableMethods = ['card', 'netbanking', 'wallet'];

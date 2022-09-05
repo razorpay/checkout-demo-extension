@@ -9,8 +9,8 @@ export const VALID_URL_REGEX = new RegExp(VALID_URL_PATTERN, 'i');
 
 export function mergeObjOnKey(obj1, obj2, key) {
   return {
-    ...obj1[key],
-    ...obj2[key],
+    ...(obj1 ? obj1[key] : {}),
+    ...(obj2 ? obj2[key] : {}),
   };
 }
 

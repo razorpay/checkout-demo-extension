@@ -77,7 +77,7 @@ export const mobileQuery =
  * @returns {boolean}
  */
 export const isMobileByMediaQuery = () => {
-  return global.matchMedia(mobileQuery)?.matches;
+  return global.matchMedia ? global.matchMedia(mobileQuery)?.matches : true;
 };
 
 /**
