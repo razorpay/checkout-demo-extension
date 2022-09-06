@@ -1,5 +1,6 @@
 import Topbar from 'topbar/ui/Topbar.svelte';
 import { setTopbarBack } from 'topbar/sessionInterface';
+import { getOption } from 'razorpay';
 
 let topbar;
 
@@ -14,9 +15,11 @@ function create() {
 
 export function showTopbar() {
   destroyTopbar();
-  create();
-  setTopbarBack(topbar);
-  topbar.show();
+  if (!isTopBarHidden()) {
+    create();
+    setTopbarBack(topbar);
+    topbar.show();
+  }
 }
 
 export function hideTopbar() {
@@ -36,4 +39,8 @@ export function destroyTopbar() {
   }
   topbar.$destroy();
   topbar = null;
+}
+
+export function isTopBarHidden() {
+  return getOption('theme.hide_topbar');
 }

@@ -2,6 +2,7 @@
   // Utils imports
   import { isMethodEnabled } from 'checkoutstore/methods';
   import { isRedesignV15 } from 'razorpay';
+  import { isTopBarHidden } from 'topbar';
 
   // Props
   export let method;
@@ -28,6 +29,7 @@
     class:hasMessage
     class:resetMargin
     class:tab-content-one-cc={isRedesignV15()}
+    class:no-top-bar={isTopBarHidden()}
   >
     <slot />
   </div>
@@ -40,6 +42,10 @@
 
   .tab-content-one-cc {
     margin-top: 0px;
+  }
+
+  .no-top-bar{
+    padding-top: 0px !important;
   }
 
   .pageCenter {

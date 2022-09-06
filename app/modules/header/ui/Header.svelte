@@ -2,6 +2,7 @@
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+  import { isTopBarHidden } from 'topbar';
 
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
@@ -24,7 +25,7 @@
   const closeIcon = close('#B0B8C2');
 </script>
 
-<div id="header-wrapper" class:expanded={$expandedHeader}>
+<div id="header-wrapper" class:expanded={$expandedHeader} class:no-top-bar={isTopBarHidden()}>
   <div class:with-rtb={isRTBEnabled}>
     <div class="header-container">
       {#if getOption('image') || merchantName}
@@ -181,5 +182,13 @@
     position: relative;
     align-self: center;
     left: 2px;
+  }
+
+  #header-wrapper.no-top-bar{
+    box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
+
+    & > div:first-child, .header-container {
+      border-bottom: 0;
+    }
   }
 </style>
