@@ -1,4 +1,4 @@
-export function sendToAll(payload) {
+export function sendToAll(event, payload) {
   if (!window?.ga) {
     return;
   }
@@ -7,7 +7,7 @@ export function sendToAll(payload) {
   const trackers = ga.getAll() || [];
 
   for (let i = 0; i < trackers.length; i++) {
-    const tracker = trackers[i].get('name') + '.send';
+    const tracker = trackers[i].get('name') + `.${event}`;
     ga(tracker, payload);
   }
 }
