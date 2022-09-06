@@ -29,6 +29,7 @@
   // utils
   import { getSession } from 'sessionmanager';
   import { copyToClipboard } from 'common/clipboard';
+  import { formatAmountWithSymbol } from 'common/currency';
   import { getOption } from 'razorpay';
 
   // helpers
@@ -88,7 +89,7 @@
           trackFetchDetailsError(method, params);
         } else {
           data = response;
-          setAmountInHeader(`${data.symbol} ${data.amount}`);
+          setAmountInHeader(formatAmountWithSymbol(data.amount, data.currency));
           trackFetchDetailsSuccess(method);
         }
       })
@@ -148,8 +149,7 @@
             {$t(AMOUNT_LABEL)}:
           </div>
           <div class="intl-bt-detail__col text-heavy">
-            {data.symbol}
-            {data.amount}
+            {formatAmountWithSymbol(data.amount, data.currency)}
           </div>
         </div>
       </div>

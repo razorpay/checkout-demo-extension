@@ -89,7 +89,7 @@ describe('Test <Details />', () => {
     expect(getByText('routing_code')).toBeInTheDocument();
     expect(getByText('GemsGems')).toBeInTheDocument();
     expect(getByText('ACH')).toBeInTheDocument();
-    expect(getByText('$ 1030')).toBeInTheDocument();
+    expect(getByText('$ 10.30')).toBeInTheDocument();
   });
   test('should show retry button on api failure', async () => {
     fetchMock.mockImplementation(({ callback }) => callback(errorResponse));
