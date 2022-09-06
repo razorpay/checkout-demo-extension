@@ -41,7 +41,7 @@ async function removeOffer(context, offernumber) {
 async function verifyOfferNotApplied(context) {
   expect(
     await context.page.$eval('.offer-action', (el) => el.innerText)
-  ).toEqual('Select');
+  ).toEqual('Select Offer');
 }
 
 module.exports = {

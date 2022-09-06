@@ -28,7 +28,7 @@
   }
 </script>
 
-<div role="list">
+<div role="list" class="offers-list">
   {#each offers as offer, index (offer.id)}
     {#if isRedesignV15()}
       <OfferItemMagicCheckout

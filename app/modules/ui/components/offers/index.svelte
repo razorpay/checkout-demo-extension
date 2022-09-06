@@ -411,14 +411,16 @@
           {/if}
         </div>
         {#if isRedesignV15Enabled}
-          <!-- offer related button (no need to use global cta) -->
-          <button
-            class="btn offer-cta"
-            disabled={OfferCTAState.disabled}
-            on:click|preventDefault={onSubmit}
-          >
-            {$t(APPLY_OFFER_CTA)}
-          </button>
+          <div class="btn-container">
+            <!-- offer related button (no need to use global cta) -->
+            <button
+              class="btn offer-cta"
+              disabled={OfferCTAState.disabled}
+              on:click|preventDefault={onSubmit}
+            >
+              {$t(APPLY_OFFER_CTA)}
+            </button>
+          </div>
         {/if}
       </main>
     {/if}
@@ -477,10 +479,14 @@
     transform: rotate(180deg);
     margin-left: auto;
     font-size: 20px;
+    color: #3F71D7;
   }
-  .offer-action {
+  .offers-container .offer-action {
     float: right;
     margin-right: 4px;
+    color: #3F71D7;
+    font-weight: 500;
+    font-size: 12px;
   }
   main {
     position: absolute;
@@ -534,7 +540,8 @@
     margin-right: 8px;
   }
   .close-offerlist:after {
-    margin-top: -2px;
+    top: 0px !important;
+    margin-top: -2.5px;
     transform: none;
   }
   .error-container {
@@ -587,17 +594,38 @@
   }
   .bold {
     font-weight: 700;
+    font-size: 13px;
   }
 
   .offer-cta {
-    width: 90%;
-    padding: 3px;
+    width: calc(100% - 32px);
+    padding: 2.5px;
     font-size: 14px;
     font-weight: 600;
     border-radius: 6px;
-    position: relative;
-    top: -10px;
     margin: auto;
+    text-transform: capitalize;
+    position: relative;
+  }
+
+  .offer-cta::after{
+    opacity: 1;
+    top: 1px;
+    left: 0px;
+    position: absolute;
+    border-radius: 6px;
+    width: 100%;
+    height: 45px;
+    content: '';
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(0, 0, 0, 0.1)
+      );
+  }
+
+  .offer-cta:hover::after {
+    opacity: 0;
   }
 
   .offer-cta[disabled] {
@@ -608,9 +636,11 @@
     header {
       padding: 0 16px;
       height: 36px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       line-height: 36px;
+      display: flex;
+      align-items: center;
 
       &:before {
         font-size: 16px;
@@ -618,15 +648,32 @@
       }
 
       &:after {
-        top: 2px;
+        top: 0;
         position: relative;
       }
 
       span {
         color: var(--primary-text-color);
+        font-weight: 600;
       }
     }
 
+    .offers-container {
+      box-shadow: 0px -2px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .offers-container header:after {
+      top: 3px;
+    }
+
+    .btn-container {
+      height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      box-shadow: 0px -4px 8px rgba(107, 108, 109, 0.15);
+    }
     .offer-action {
       font-weight: 400;
       font-size: 12px;
