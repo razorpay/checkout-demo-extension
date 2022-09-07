@@ -67,12 +67,20 @@
         </span>
       {/if}
       <span class="price-label">
-        {@html $store.rawAmount ||
-          formatAmountWithSymbol(
-            $store.amount || getAmount(),
+        {#if offerAmount > 0}
+          {formatAmountWithSymbol(
+            $appliedOffer?.amount || getAmount(),
             $store.currency || getCurrency(),
             true
           )}
+        {:else}
+          {@html $store.rawAmount ||
+            formatAmountWithSymbol(
+              $store.amount || getAmount(),
+              $store.currency || getCurrency(),
+              true
+            )}
+        {/if}
       </span>
       {#if isCustomerFeeBearer()}
         <span id="fee-wrapper">

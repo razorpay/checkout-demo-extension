@@ -264,7 +264,7 @@
     height: 100%;
   }
   .wallet-one-cc {
-    min-height: 512px;
+    height: auto;
   }
 
   :global(#content.one-cc) .border-list {

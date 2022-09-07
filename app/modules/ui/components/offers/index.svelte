@@ -479,12 +479,12 @@
     transform: rotate(180deg);
     margin-left: auto;
     font-size: 20px;
-    color: #3F71D7;
+    color: #3f71d7;
   }
   .offers-container .offer-action {
     float: right;
     margin-right: 4px;
-    color: #3F71D7;
+    color: #3f71d7;
     font-weight: 500;
     font-size: 12px;
   }
@@ -608,7 +608,7 @@
     position: relative;
   }
 
-  .offer-cta::after{
+  .offer-cta::after {
     opacity: 1;
     top: 1px;
     left: 0px;
@@ -618,10 +618,10 @@
     height: 45px;
     content: '';
     background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.1),
-        rgba(0, 0, 0, 0.1)
-      );
+      180deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(0, 0, 0, 0.1)
+    );
   }
 
   .offer-cta:hover::after {
@@ -639,8 +639,6 @@
       font-size: 14px;
       font-weight: 700;
       line-height: 36px;
-      display: flex;
-      align-items: center;
 
       &:before {
         font-size: 16px;
