@@ -312,6 +312,6 @@ export function getI18nForTag(tag) {
       return OTHERS;
 
     default:
-      return HOME;
+      return OTHERS;
   }
 }

@@ -85,7 +85,6 @@
   } = Resource[addressType];
   let isFormComplete = false;
   const { location } = getIcons();
-  const captureBillingAddr = isBillingAddressEnabled();
 
   export function handleAddAddressClick() {
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
@@ -96,15 +95,15 @@
     });
   }
 
-  function handleEditAddressClick({ detail: _address }) {
+  function handleEditAddressClick({ detail: address }) {
     Events.TrackBehav(AddressEvents.EDIT_SAVED_ADDRESS_CLICKED);
-    selectedAddressId.set(_address.id);
-    if (_address.country) {
-      selectedShippingCountryISO.set(_address.country);
+    selectedAddressId.set(address.id);
+    if (address.country) {
+      selectedShippingCountryISO.set(address.country);
     }
     newUserAddress.update((addr) => ({
       ...addr,
-      ...formatAddressToFormData(_address),
+      ...formatAddressToFormData(address),
     }));
     currentView = addressViews.EDIT_ADDRESS;
     navigator.navigateTo({
