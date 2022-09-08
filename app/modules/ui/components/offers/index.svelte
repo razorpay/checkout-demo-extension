@@ -46,6 +46,7 @@
     selectedInstrument,
     methodInstrument,
   } from 'checkoutstore/screens/home';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import {
     appliedOffer,
     isCardValidForOffer,
@@ -224,6 +225,7 @@
     hideList(shouldMountCta);
     // let other view updation take place after offers hide
     // to maintain CTA lifo stack
+    $shouldOverrideVisibleState = false;
     tick().then(() => setAppliedOffer(offer, true));
   }
 

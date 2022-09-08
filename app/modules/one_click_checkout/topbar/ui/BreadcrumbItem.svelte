@@ -43,7 +43,7 @@
   }
 
   .icon {
-    padding: 2px 4px 0px;
+    padding: 2px 2px 0px;
   }
 
   .item {

@@ -8,6 +8,7 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
+  import CTA from 'cta';
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
@@ -30,6 +31,7 @@
   import { isIndianCustomer } from 'checkoutstore/screens/home';
   import { shouldShowCoupons } from 'one_click_checkout/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
@@ -67,7 +69,6 @@
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
-  import CTA from 'cta';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { CTA_LABEL } from 'cta/i18n';
   import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
@@ -142,6 +143,7 @@
         } else {
           onSubmitLoggedInUser();
         }
+        $shouldOverrideVisibleState = false;
         return;
       }
       showValidations = true;

@@ -40,6 +40,7 @@ import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
 import { backPressed, isStackPopulated } from 'navstack';
 import { screenStore, tabStore } from 'checkoutstore';
+import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 import { getDeviceId } from 'fingerprint';
 import { isDebitIssuer } from 'common/bank';
 
@@ -1058,7 +1059,7 @@ Session.prototype = {
     if (RazorpayHelper.isOneClickCheckout()) {
       if (!RazorpayHelper.shouldOverrideBrandColor()) {
         discreet.Theme.setThemeColor(
-          discreet.Constants.constantCSSVars['brand-color']
+          discreet.Constants.COLORS.MAGIC_BRAND_COLOR
         );
       }
       this.switchTab('home-1cc');
@@ -2671,6 +2672,7 @@ Session.prototype = {
 
     if (RazorpayHelper.isOneClickCheckout()) {
       TopbarMagicCheckoutStore.tabTitle.set('');
+      shouldOverrideVisibleState.set(false);
     }
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,

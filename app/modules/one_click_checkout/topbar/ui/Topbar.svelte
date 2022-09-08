@@ -78,7 +78,7 @@
 </script>
 
 {#if shown}
-  <div id="topbar-new" class:topbar-header={!$headerVisible}>
+  <div id="topbar-new">
     <div class="title-section">
       {#if isBackEnabled}
         <span
@@ -117,15 +117,12 @@
     justify-content: space-between;
     border-top: 1px solid var(--light-dark-color);
     border-bottom: 1px solid var(--light-dark-color);
-    padding: 9px 14px;
+    padding: 8px 16px;
     align-items: center;
     box-sizing: border-box;
     height: 44px;
     z-index: 2;
     box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
-  }
-  #topbar-new.topbar-header {
-    height: 55px;
   }
   .back {
     cursor: pointer;

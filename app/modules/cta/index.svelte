@@ -115,7 +115,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .redesign-v15-cta-wrapper {
     width: 100%;
     max-width: 100%;

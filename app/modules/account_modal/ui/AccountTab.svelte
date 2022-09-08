@@ -44,7 +44,7 @@
   <div class="account-tab">
     <div class="separator" />
     <div class="account-tab-container">
-      <div class="account-wrapper">
+      <div class="account-wrapper" class:no-foh={!showMerchantPolicyBtn}>
         <div class="details-wrapper">
           <div
             data-test-id="account-tab-btn"
@@ -88,7 +88,7 @@
       </div>
     </div>
     {#if showBottomSeparator}
-      <div class="separator" />
+      <div class="separator bottom" />
     {/if}
   </div>
 {/if}
@@ -105,6 +105,10 @@
     justify-content: space-between;
     height: 43px;
     padding: 0px 16px;
+  }
+  .account-wrapper.no-foh {
+    height: unset;
+    padding: 10px 16px;
   }
   .brand-text {
     font-size: var(--font-size-tiny);

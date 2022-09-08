@@ -4,6 +4,7 @@
 
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import { isRedesignV15 } from 'razorpay';
+  import { onScrollToggleHeader } from 'one_click_checkout/header/helper';
 
   // Props
   export let pad = true;
@@ -42,6 +43,8 @@
       // Content doesn't overflow, no need for shadows
       bottomShadow = false;
     }
+
+    onScrollToggleHeader(contentRef);
   }
 
   onMount(() => {
@@ -96,11 +99,6 @@
 
   .shadow-top {
     top: 0;
-    /* background: linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(0, 0, 0, 0.2) 100%
-    ); */
     background: linear-gradient(
       0deg,
       rgba(255, 255, 255, 0) 0%,
@@ -117,10 +115,18 @@
       rgba(0, 0, 0, 0.2) 0%,
       rgba(255, 255, 255, 0) 100%
     );
-    /* background: linear-gradient(0deg, rgba(255,255,255,0.8477766106442577) 0%, rgba(255,255,255,0.8309698879551821) 51%, rgba(255,255,255,0.43881302521008403) 82%, rgba(255,255,255,0) 100%); */
   }
 
   .bottomShadow ~ .shadow-bottom {
     max-height: 24px;
+  }
+  .screen.screen-comp {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+
+  .screen.screen-comp::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
   }
 </style>

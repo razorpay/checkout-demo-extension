@@ -22,6 +22,7 @@
   // Helpers import
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
   import { destroyHeader } from 'one_click_checkout/header';
+  import { onScrollToggleHeader } from 'one_click_checkout/header/helper';
   import { destroyTopbar } from 'one_click_checkout/topbar';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
@@ -44,6 +45,7 @@
   let topbar;
   let isBackEnabled;
   let handleBack;
+  let contentRef: HTMLDivElement;
 
   onMount(() => {
     setLineItems(getMerchantOrder().line_items || []);
@@ -105,6 +107,14 @@
     });
   }
 
+  function onScroll() {
+    if (!contentRef) {
+      return;
+    }
+
+    onScrollToggleHeader(contentRef);
+  }
+
   afterUpdate(updateTopBar);
 
   onDestroy(() => {
@@ -121,7 +131,7 @@
   pad={false}
   resetMargin="true"
 >
-  <div class="container">
+  <div class="container" on:scroll={onScroll} bind:this={contentRef}>
     <Router {routes} />
   </div>
   {#if $activeRoute.name === views.COUPONS || $activeRoute.name === views.DETAILS}
@@ -142,5 +152,11 @@
     overflow: auto;
     font-weight: var(--font-weight-regular);
     font-size: var(--font-size-body);
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  .container::-webkit-scrollbar { /* WebKit */
+    width: 0;
+    height: 0;
   }
 </style>

@@ -29,6 +29,7 @@
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { showLoader } from 'one_click_checkout/loader/store';
   import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -106,6 +107,7 @@
       ...formatAddressToFormData(address),
     }));
     currentView = addressViews.EDIT_ADDRESS;
+    $shouldOverrideVisibleState = false;
     navigator.navigateTo({
       path: Resource[addressType].routes[addressViews.EDIT_ADDRESS],
     });
@@ -217,6 +219,7 @@
         '1cc_category_of_saved_address': $selectedAddress?.tag,
       });
     }
+    $shouldOverrideVisibleState = false;
     onSubmitCallback(addressCompleted);
   }
 
@@ -263,7 +266,7 @@
   }
 </script>
 
-<div class="address-tab" class:overflow-auto={showAccBottomSeparator}>
+<div class="address-tab">
   <div
     class="address-wrapper"
     class:billing-address-wrapper={Resource[addressType].classes[
@@ -306,8 +309,8 @@
       {/if}
     </div>
   </div>
-  <slot name="footer" />
   <AccountTab showBottomSeparator={showAccBottomSeparator} />
+  <slot name="footer" />
   <CTA
     screen="home-1cc"
     tab={$activeRoute?.name}
@@ -329,7 +332,6 @@
 
   .address-wrapper {
     padding-top: 16px;
-    overflow: auto;
     min-height: 100%;
   }
 
@@ -369,11 +371,7 @@
     margin-bottom: 12px;
   }
 
-  .address-tab :global(.account-tab) {
+  .address-tab :global(.account-tab .bottom) {
     margin-bottom: 38px;
-  }
-
-  .overflow-auto {
-    overflow: auto;
   }
 </style>

@@ -19,6 +19,7 @@
   // Props Import
   export let expanded;
   export let sendAnalytics = true;
+  export let iconColor: string;
 
   // Analytics imports
   import { Events } from 'analytics';
@@ -53,7 +54,7 @@
         <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-text">{$t(RTB_HEADER)}</div>
-      <Icon icon={info('#263A4A')} />
+      <Icon icon={info(iconColor ?? '#263A4A')} />
     </div>
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={handleRTBClick}>
@@ -61,13 +62,13 @@
         <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-down-arrow-wrapper">
-        <Icon icon={arrow_down(10, 8)} />
+        <Icon icon={arrow_down(14, 14, iconColor)} />
       </div>
     </div>
   {/if}
 {/if}
 
-<style>
+<style lang="scss">
   .rtb-icon-wrapper {
     height: 20px;
   }
@@ -76,7 +77,7 @@
   .rtb-expanded-wrapper {
     background: #e7f7f1;
     border-radius: 4px;
-    padding: 2px 8px;
+    padding: 4px;
     cursor: pointer;
     border-radius: 4px;
     display: flex;
@@ -84,10 +85,10 @@
   }
 
   .rtb-text {
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-tiny);
     line-height: 150%;
     font-weight: var(--font-weight-semibold);
-    margin: 0px 6px 0px 4px;
+    margin: 0 4px;
   }
 
   /* Styles for collapsed RTB */
@@ -96,8 +97,10 @@
     display: flex;
     align-items: center;
   }
-
-  .rtb-down-arrow-wrapper {
-    margin-left: 5px;
+  :global(.one-click-checkout) {
+    .rtb-expanded-wrapper {
+      background: #0f69ff;
+      padding: 4px 8px;
+    }
   }
 </style>

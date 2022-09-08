@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { slide } from "svelte/transition";
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
   // store imports
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import { headerVisible } from 'one_click_checkout/header/store';
+  import { headerVisible, headerHiddenOnScroll } from 'one_click_checkout/header/store';
 
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
@@ -22,16 +23,17 @@
 
   // Other Imports
   import { views } from 'one_click_checkout/routing/constants';
+  import { HEADER_ELEMENTS_COLOR } from 'one_click_checkout/header/constants';
 
   const isRTBEnabled = RTBEnabled($RTBExperiment);
   const merchantName = truncateString(getMerchantName(), 20);
-  const closeIcon = close();
+  const closeIcon = close(HEADER_ELEMENTS_COLOR);
 
   $: routeName = $activeRoute?.name;
 </script>
 
-{#if $headerVisible}
-  <div id="header-1cc">
+{#if $headerVisible && !$headerHiddenOnScroll}
+  <div id="header-1cc" in:slide out:slide={{ duration: 150 }}>
     {#if routeName === views.COUPONS}
       <div class="header-wrapper" class:header-when-no-rtb={!isRTBEnabled}>
         {#if !isRTBEnabled}
@@ -51,14 +53,14 @@
             {/if}
           </div>
           {#if !isRTBEnabled}
-            <LanguageSelection />
+            <LanguageSelection color={HEADER_ELEMENTS_COLOR} />
           {/if}
         </div>
       </div>
       {#if isRTBEnabled}
         <div class="header-body-wrapper">
-          <TrustedBadge expanded />
-          <LanguageSelection />
+          <TrustedBadge expanded iconColor={HEADER_ELEMENTS_COLOR} />
+          <LanguageSelection color={HEADER_ELEMENTS_COLOR} />
         </div>
       {/if}
     {:else}
@@ -68,7 +70,7 @@
             {merchantName}
           </p>
           <div class="rtb-section">
-            <TrustedBadge />
+            <TrustedBadge iconColor={HEADER_ELEMENTS_COLOR} />
           </div>
         </div>
         <button class="modal-close" on:click={handleModalClose}>
@@ -83,7 +85,8 @@
   #header-1cc {
     position: sticky;
     z-index: 2;
-    color: var(--primary-text-color);
+    color: #fff;
+    background-color: var(--magic-brand-color);
   }
   .header-title-wrapper {
     display: flex;

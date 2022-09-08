@@ -42,6 +42,7 @@
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatAmountWithSymbol } from 'common/currency';
   import { upiUxV1dot1 } from 'upi/experiments';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // Props
   export let method = null; // Name of the method
@@ -147,7 +148,7 @@
     if (isMethodCOD) {
       Events.TrackBehav(HomeEvents.COD_METHOD_SELECTED);
     }
-
+    $shouldOverrideVisibleState = false;
     dispatch('select');
   }
 

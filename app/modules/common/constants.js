@@ -162,7 +162,7 @@ export const FRAME_CSS_URL = STATIC_CDN_PREFIX + '/css/checkout.css';
 export const FRAME_JS_URL = STATIC_CDN_PREFIX + '/checkout-frame.js';
 
 export const constantCSSVars = {
-  'brand-color': COLORS.MAGIC_BRAND_COLOR,
+  'magic-brand-color': COLORS.MAGIC_BRAND_COLOR,
   // font-weights
   'font-weight-regular': 400, // default
   'font-weight-medium': 500,

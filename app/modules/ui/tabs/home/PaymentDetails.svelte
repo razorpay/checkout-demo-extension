@@ -28,6 +28,7 @@
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -198,6 +199,7 @@
           contact: $contact,
           email: $email,
         });
+        $shouldOverrideVisibleState = false;
         onSubmit(userContact);
         return;
       }

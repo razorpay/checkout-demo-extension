@@ -26,6 +26,7 @@
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { resendAttemptIndex } from 'otp/store';
+  import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -150,6 +151,13 @@
       otp_reason: otpReason,
     });
   };
+
+  const onOTPSubmit = () => {
+    $shouldOverrideVisibleState = false;
+    if (onSubmit && typeof onSubmit === 'function') {
+      onSubmit();
+    }
+  }
 </script>
 
 <!-- // TODO: showable logic -->
@@ -325,7 +333,7 @@
     show={!$loading}
     label={CTA_LABEL}
     showAmount={false}
-    {onSubmit}
+    onSubmit={onOTPSubmit}
   />
 </div>
 
