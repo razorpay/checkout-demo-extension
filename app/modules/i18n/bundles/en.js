@@ -936,7 +936,7 @@ export default {
     cancel_action: 'Cancel Payment',
     checking_payment_status: 'Checking the payment status...',
     complete_payment_on_app: 'Please complete the payment on the {app}',
-    confirm_cancel_heading: 'Cancel payment?',
+    confirm_cancel_heading: 'Cancel payment',
     confirm_cancel_message:
       'Your payment is ongoing. Are you sure you want to cancel the payment?',
     confirm_cancel_positive_text: 'Yes, cancel',

@@ -361,7 +361,12 @@ async function handleQRModalClose(context, features) {
     await delay(200);
     await context.page.click('#positiveBtn');
     await delay(400);
-    await context.page.click('#fd-hide');
+    if (features.addresses?.length > 0) {
+      // for 1cc/redesign we don't have fd-hide using new errormodal
+      await context.page.click('.primary-cta');
+    } else {
+      await context.page.click('#fd-hide');
+    }
     await delay(200);
     const backBtn = await getDataAttrSelector(context, 'back');
     await backBtn.click();

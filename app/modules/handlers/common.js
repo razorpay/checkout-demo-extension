@@ -1,8 +1,15 @@
-import { getMerchantMethods } from 'razorpay';
+import { getMerchantMethods, isRedesignV15 } from 'razorpay';
 import { setBackdropClick } from 'checkoutstore/backdrop';
 import { wallets } from 'common/wallet';
 import Analytics, { Events } from 'analytics';
 import CardEvents from 'analytics/card';
+import {
+  updatePrimaryCTA,
+  setContent,
+  isVisible as ErrorDialogVisible,
+  setHeading,
+  setSecondaryLoadedCTA,
+} from 'components/ErrorModal';
 
 /**
  * Add subtext to passed in parent
@@ -81,6 +88,30 @@ export function updateActionAreaContentAndCTA(
   avoidBackdropClick,
   onClick
 ) {
+  const onButtonClick = () => {
+    // irrespective of the next action, revert the disabled actions on backdrop(if any)
+    if (avoidBackdropClick) {
+      setBackdropClick(true);
+    }
+    if (!onClick) {
+      session.hide();
+    } else {
+      onClick();
+    }
+  };
+
+  if (isRedesignV15()) {
+    if (!ErrorDialogVisible()) {
+      return;
+    }
+    // disable the backdrop clicks to leak the flow.
+    if (avoidBackdropClick) {
+      setBackdropClick(false);
+    }
+    setContent(subText);
+    updatePrimaryCTA(buttonLabel, onButtonClick);
+    return;
+  }
   const errorMessageContainer = document.querySelector('#error-message');
   if (!errorMessageContainer) {
     return;
@@ -92,15 +123,6 @@ export function updateActionAreaContentAndCTA(
   }
   addSubtextToActionArea(subText, errorMessageContainer);
 
-  const onButtonClick = () => {
-    // irrespective of the next action, revert the disabled actions on backdrop(if any)
-    if (avoidBackdropClick) {
-      setBackdropClick(true);
-    }
-    if (!onClick) {
-      session.hide();
-    }
-  };
   updateButton(errorMessageContainer, buttonLabel, onButtonClick);
 }
 
@@ -148,6 +170,72 @@ export function hasPaypalOptionInErrorMetadata(errorMetadata) {
  * @param {object} errorMetadata
  */
 export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
+  const that = this;
+  function handlePaypalClick() {
+    that.hideErrorMessage();
+    if (that.screen !== 'wallet') {
+      // switch to wallet tab and select paypal
+      if (that.svelteCardTab) {
+        that.svelteCardTab.setTabVisible(false);
+      }
+      that.switchTab('wallet');
+      if (that.walletTab) {
+        that.walletTab.onWalletSelection(wallets.paypal.code);
+      }
+    }
+
+    Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK, {
+      data: {
+        currentScreen: this.screen,
+      },
+      immediately: true,
+    });
+  }
+
+  /**
+   * v1.5 error dialog
+   */
+  if (isRedesignV15()) {
+    if (
+      !ErrorDialogVisible() ||
+      !hasPaypalOptionInErrorMetadata(errorMetadata)
+    ) {
+      return;
+    }
+    setHeading('Payment declined');
+
+    updateActionAreaContentAndCTA(
+      this,
+      'Pay With PayPal',
+      '',
+      true,
+      handlePaypalClick
+    );
+
+    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN, {
+      data: {
+        errorMetadata,
+      },
+      immediately: true,
+    });
+
+    setSecondaryLoadedCTA('Cancel', () => {
+      Events.Track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK, {
+        currentScreen: that.screen,
+      });
+      this.hideErrorMessage.call(this);
+    });
+
+    // Track paypal button visible on UI
+    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN, {
+      data: {
+        errorMetadata,
+      },
+      immediately: true,
+    });
+
+    return;
+  }
   let errorMessageContainer = document.querySelector('#error-message');
   if (!errorMessageContainer) {
     return;
@@ -185,28 +273,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     paypalBtn.textContent = 'Pay With PayPal';
     paypalContainer.appendChild(paypalBtn);
 
-    let that = this;
-
-    paypalBtn.addEventListener('click', function () {
-      that.hideErrorMessage();
-      if (that.screen !== 'wallet') {
-        // switch to wallet tab and select paypal
-        if (that.svelteCardTab) {
-          that.svelteCardTab.setTabVisible(false);
-        }
-        that.switchTab('wallet');
-        if (that.walletTab) {
-          that.walletTab.onWalletSelection(wallets.paypal.code);
-        }
-      }
-
-      Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK, {
-        data: {
-          currentScreen: this.screen,
-        },
-        immediately: true,
-      });
-    });
+    paypalBtn.addEventListener('click', handlePaypalClick);
 
     // create cancel button
     let cancelBtn = document.createElement('button');

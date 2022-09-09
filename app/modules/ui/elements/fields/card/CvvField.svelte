@@ -31,7 +31,7 @@
   let isInvalid;
 
   const isRedesignV15Enabled = isRedesignV15();
-  const CVV_REGEX = new RegExp(cvvPattern);
+  let CVV_REGEX = new RegExp(cvvPattern);
 
   $: {
     if (showHelp) {
@@ -55,6 +55,7 @@
 
   $: {
     cvvPattern = `[0-9]{${length}}`;
+    CVV_REGEX = new RegExp(cvvPattern);
   }
 
   export function focus() {

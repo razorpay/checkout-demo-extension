@@ -43,6 +43,10 @@ import { screenStore, tabStore } from 'checkoutstore';
 import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 import { getDeviceId } from 'fingerprint';
 import { isDebitIssuer } from 'common/bank';
+import triggerErrorModal, {
+  closeErrorModal,
+  updateLoadingCTA,
+} from 'components/ErrorModal';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -205,7 +209,7 @@ function hideOverlayMessage() {
       return;
     }
   }
-
+  closeErrorModal(); // this will impact only v1.5
   hideOverlay($('#error-message'));
 }
 
@@ -3709,7 +3713,12 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function (text, error, preventDismissal) {
+  showLoadError: function (
+    text,
+    error,
+    preventDismissal,
+    heading = 'Payment failed'
+  ) {
     this.preventErrorDismissal = preventDismissal;
     if (this.headless && this.screen === 'card') {
       return;
@@ -3753,9 +3762,19 @@ Session.prototype = {
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 
+    const isRedesign = RazorpayHelper.isRedesignV15();
+    // let content = ''; // for redesign dialog
+    if (isRedesign) {
+      triggerErrorModal({
+        loading: loadingState,
+        heading: loadingState ? text : heading,
+        content: loadingState ? '' : text,
+      });
+      return;
+    }
+
     // Break sentences into new lines
     let formattedText = UTILS.escapeHtml(text).replace(/\.\s/g, '.<br/>');
-
     $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
@@ -4657,7 +4676,7 @@ Session.prototype = {
             )
           : I18n.format('upi.invalid_vpa_default_message');
 
-        self.showLoadError(errorMessage, true);
+        self.showLoadError(errorMessage, true, false, 'Invalid VPA');
       });
   },
 
@@ -5508,7 +5527,6 @@ Session.prototype = {
     }
 
     this.attemptCount++;
-
     let sub_link = docUtil.querySelector('#error-message .link');
 
     let iosCheckoutBridgeNew = Bridge.getNewIosBridge();
@@ -5585,6 +5603,7 @@ Session.prototype = {
         }.bind(this)
       );
     } else if (data.method === 'upi') {
+      updateLoadingCTA(I18n.format('misc.cancel_action'));
       sub_link.textContent = I18n.format('misc.cancel_action');
 
       this.r.on('payment.upi.noapp', function () {
@@ -5636,6 +5655,7 @@ Session.prototype = {
 
       if (data.provider === 'trustly') {
         // Show goto payment popup link in loader
+        updateLoadingCTA(I18n.format('misc.go_to_payment'));
         sub_link.textContent = I18n.format('misc.go_to_payment');
       }
 
@@ -5687,6 +5707,7 @@ Session.prototype = {
       return that.showLoadError();
     } else {
       if (!this.headless) {
+        updateLoadingCTA(I18n.format('misc.go_to_payment'));
         sub_link.textContent = I18n.format('misc.go_to_payment');
         this.r.on('payment.cancel', function () {
           that.showLoadError(I18n.format('misc.payment_canceled'), true);

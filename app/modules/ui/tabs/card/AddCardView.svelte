@@ -79,6 +79,7 @@
   import { isNameReadOnly } from 'checkoutframe/customer';
   import { shouldRememberCard } from './utils';
 
+  export let isFormValid = false;
   const dispatch = createEventDispatcher();
 
   let numberField = null;
@@ -449,6 +450,7 @@
   function handleCardInput() {
     onCardNumberChange();
     dispatch('cardinput');
+    computeIsFormValid();
   }
 
   function getCvvDigits(type) {
@@ -462,6 +464,14 @@
         active: event.target.checked,
       },
     });
+  }
+
+  function computeIsFormValid() {
+    isFormValid =
+      numberField.isValid() &&
+      cvvField.isValid() &&
+      expiryField.isValid() &&
+      nameField.isValid();
   }
 
   function trackCardNumberFilled() {
@@ -507,7 +517,7 @@
     Analytics.track('card_name:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        valid: nameField?.isValid(),
+        valid: nameField.isValid(),
       },
     });
   }
@@ -553,6 +563,9 @@
           bind:value={$cardExpiry}
           bind:this={expiryField}
           on:focus
+          on:input={() => {
+            computeIsFormValid();
+          }}
           on:blur={trackExpiryFilled}
           on:filled={(_) => handleFilled('expiryField')}
           {...oneCCFieldProps}
@@ -568,6 +581,9 @@
         readonly={nameReadonly}
         bind:value={$cardName}
         bind:this={nameField}
+        on:input={() => {
+          computeIsFormValid();
+        }}
         on:focus
         on:blur={onNameFilled}
         {...oneCCFieldProps}
@@ -581,6 +597,9 @@
           bind:value={$cardCvv}
           bind:this={cvvField}
           on:focus
+          on:input={() => {
+            computeIsFormValid();
+          }}
           on:blur={trackCvvFilled}
           {...oneCCFieldProps}
         />

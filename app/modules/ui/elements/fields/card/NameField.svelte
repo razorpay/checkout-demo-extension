@@ -72,6 +72,7 @@
   on:input={handleInput}
   on:blur
   on:focus
+  on:input
   bind:this={ref}
   handleBlur
   handleFocus

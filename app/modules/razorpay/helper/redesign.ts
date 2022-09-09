@@ -25,7 +25,6 @@ export const isRedesignV15 = (): boolean => {
       return true;
     }
     const disableRedesignFromOption = getOption('disable_redesign_v15');
-    const razorpayInternalApp = getOption('_.integration');
     let allow = getPreferences('experiments.checkout_redesign_v1_5');
     const { isOrgRazorpay } = getOrgDetails() || {};
 
@@ -46,14 +45,6 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
-    // for internal app
-    if (
-      razorpayInternalApp &&
-      (razorpayInternalApp === 'payment_links' ||
-        razorpayInternalApp === 'payment_button')
-    ) {
-      allow = false;
-    }
     if (isRecurringOrPreferredPayment()) {
       // recurring or subscription payments
       allow = false;

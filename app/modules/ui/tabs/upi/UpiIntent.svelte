@@ -270,12 +270,18 @@
       height: 24px;
     }
 
-    :global(.input-radio) {
-      position: absolute;
-      float: clear;
-      top: 18px;
-      right: 12px;
-      transform: scale(0.9);
+    :global {
+      .input-radio {
+        position: absolute;
+        float: clear;
+        top: 18px;
+        right: 16px;
+        // transform: scale(0.9);
+
+        .radio-display::after {
+          top: 5px;
+        }
+      }
     }
 
     :global(.option-title) {

@@ -51,9 +51,11 @@
           </div>
         {/if}
       </div>
-      <button class="modal-close" on:click={handleModalClose}>
-        <Icon icon={closeIcon} />
-      </button>
+      {#if getOption('theme.close_button')}
+        <button class="modal-close" on:click={handleModalClose}>
+          <Icon icon={closeIcon} />
+        </button>
+      {/if}
     </div>
     {#if isRTBEnabled && $expandedHeader}
       <div

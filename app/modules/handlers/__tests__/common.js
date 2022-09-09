@@ -6,6 +6,13 @@ import {
   addRetryPaymentMethodOnErrorModal,
 } from '../common';
 
+jest.mock('razorpay', () => ({
+  __esModule: true,
+  ...jest.requireActual('razorpay'),
+  isRedesignV15: jest.fn(),
+  getMerchantMethods: jest.fn(() => ({ wallet: { paypal: true } })),
+}));
+
 const razorpayInstance = {
   id: 'id',
   key: 'rzp_test_key',

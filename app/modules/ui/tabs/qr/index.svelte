@@ -82,10 +82,6 @@
     session.r.emit('payment.upi.intent_success_response');
   }
 
-  function checkStatus() {
-    session.showLoadError($t(PAYMENT_CHECKING_STATUS));
-  }
-
   function onError(data) {
     Analytics.track(UPI_EVENTS.QR_GENERATION_FAIL, {
       reason: data.error.description,

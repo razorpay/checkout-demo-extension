@@ -11,7 +11,6 @@
   import { resendTimeout } from 'checkoutstore/screens/otp';
 
   // utils imports
-  import { isRedesignV15 } from 'razorpay';
   import { formatToMMSS } from 'utils/date';
 
   const dispatch = createEventDispatcher();

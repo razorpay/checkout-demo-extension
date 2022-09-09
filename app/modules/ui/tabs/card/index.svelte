@@ -10,7 +10,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
-  import SavedCards from 'ui/tabs/card/savedcards.svelte';
+  import SavedCards from 'ui/tabs/card/SavedCards.svelte';
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
@@ -161,6 +161,8 @@
   let cardEle: Element;
   let AVSRequired: boolean;
   let ctaLabel = PAY_NOW_CTA_LABEL;
+  let isAddNewCardFormValid = false;
+  let isSavedCardFormValid = false;
   let checkFormErrors: () => void;
   let onSubmit: any;
 
@@ -266,6 +268,7 @@
       currentView === Views.ADD_CARD
     ) {
       userWantsApps = false;
+      $selectedApp = null;
     } else {
       userWantsApps = true;
     }
@@ -1144,6 +1147,7 @@
 
           <AddCardView
             {tab}
+            bind:isFormValid={isAddNewCardFormValid}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput}
@@ -1228,6 +1232,7 @@
             <SavedCards
               {tab}
               cards={savedCards}
+              bind:isFormValid={isSavedCardFormValid}
               on:viewPlans={handleViewPlans}
             />
           </div>
@@ -1310,7 +1315,8 @@
     <CTA
       screen="card"
       tab={$tabStore}
-      disabled={false}
+      disabled={(currentView === Views.ADD_CARD && !isAddNewCardFormValid) ||
+        (currentView === Views.SAVED_CARDS && !isSavedCardFormValid)}
       show
       showAmount
       {onSubmit}
@@ -1335,6 +1341,8 @@
 
   :global(.redesign) #show-saved-cards {
     padding-top: 20px;
+    text-transform: capitalize;
+    font-size: 13px;
   }
 
   .instrument-subtext-description {
@@ -1397,7 +1405,22 @@
     margin-top: 26px;
   }
 
-  :global(.redesign) .saved-card-header {
-    margin-top: 16px;
+  :global(.redesign) {
+    #show-add-card {
+      text-transform: capitalize;
+      font-size: 13px;
+      font-weight: 500;
+
+      &::before {
+        background: #ffffff;
+        border: 1px solid #263a4a;
+        box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.04);
+        border-radius: 2px;
+      }
+    }
+
+    .saved-card-header {
+      margin-top: 16px;
+    }
   }
 </style>

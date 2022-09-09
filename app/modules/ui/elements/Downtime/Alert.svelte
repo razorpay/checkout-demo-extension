@@ -143,6 +143,7 @@
   .back-button {
     padding: 12px 32px;
     border: 1px solid;
+    width: calc(40% - 10px);
   }
 
   .blue-back-btn {
@@ -152,6 +153,7 @@
   .continue-button {
     padding: 12px 60px;
     color: #ffffff;
+    width: calc(60% - 10px);
   }
   .blue-continue-btn {
     background: linear-gradient(
@@ -173,6 +175,7 @@
     height: 250px;
     transition: 0.2s;
     padding-top: 20px;
+    bottom: -55px;
   }
   #downtime-wrap.container-one-cc {
     height: auto;
@@ -203,5 +206,9 @@
     justify-content: center;
     align-items: center;
     font-size: 16px;
+  }
+
+  :global(.redesign) #downtime-wrap {
+    bottom: 0;
   }
 </style>

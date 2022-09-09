@@ -4,6 +4,7 @@ import { enableUPITiles } from '../features';
 import { definePlatform } from '../helper/upi';
 import { tryOpeningIntentUrl } from '../helper/intent/resolver';
 import { trackTrace, trackIntentFailure, TRACES } from 'upi/events';
+import { updateLoadingCTA } from 'components/ErrorModal';
 
 const startUpiPaymentPolling = () => {
   // emit success response and trigger polling
@@ -79,8 +80,17 @@ function adoptSessionUI(
   session: any,
   config: UPI.PaymentProcessConfiguration
 ) {
+  /**
+   * TODO remove when 100% migrate to v1.5
+   */
   (document.querySelector('#error-message .link') as HTMLElement).textContent =
     format('misc.cancel_action');
+
+  /** v1.5 error dialog */
+  updateLoadingCTA(
+    format('misc.cancel_action'),
+    session.hideErrorMessage.bind(session)
+  );
   /**
    * Start a general loader with cancel action
    */
@@ -88,13 +98,13 @@ function adoptSessionUI(
     session.showLoadError();
   }
 
-  paymentInstance.on('payment.upi.noapp', function (data: any) {
+  paymentInstance.on('payment.upi.noapp', function () {
     session.showLoadError(format('upi.intent_no_apps_error'), true);
 
     session.body.addClass('upi-noapp');
   });
 
-  paymentInstance.on('payment.upi.selectapp', function (data: any) {
+  paymentInstance.on('payment.upi.selectapp', function () {
     session.showLoadError(format('upi.intent_select_app'), false);
   });
 

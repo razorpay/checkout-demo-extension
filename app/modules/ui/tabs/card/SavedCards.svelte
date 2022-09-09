@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import SavedCard from 'ui/tabs/card/savedcard.svelte';
+  import SavedCard from 'ui/tabs/card/SavedCard.svelte';
 
   // Store
   import { selectedTokenId } from 'checkoutstore/emi';
@@ -21,9 +21,14 @@
   import { getCardMetadata } from 'common/card';
 
   import { isCardTokenized } from './utils';
+  import { writable, Writable } from 'svelte/store';
   // Props
   export let cards = [];
   export let tab;
+
+  export let isFormValid = false;
+
+  let savedCardValidation: Writable<Record<string, boolean>> = writable({});
 
   $selectedCard = null; // Refresh selection when landing again
 
@@ -62,10 +67,15 @@
     $currentCvv = cvv;
     $currentAuthType = authType;
     $selectedCard = card;
+    isFormValid = $savedCardValidation[card.id] ?? true;
   }
 
   function handleCvvChange(event) {
     $currentCvv = event.detail.cvv;
+  }
+
+  $: {
+    isFormValid = $savedCardValidation[$selectedCard?.id] ?? true;
   }
 
   function handleAuthTypeChange(event) {
@@ -73,7 +83,7 @@
   }
 </script>
 
-{#each cards as card, index (card.id)}
+{#each cards as card (card.id)}
   <SavedCard
     card={card.card}
     isTokenised={isCardTokenized(card)}
@@ -82,6 +92,7 @@
     cvvDigits={card.cvvDigits}
     plans={card.plans}
     {tab}
+    bind:isFormValid={$savedCardValidation[card.id]}
     on:click={(event) => {
       handleClick(card, event.detail);
     }}

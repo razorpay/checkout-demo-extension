@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { createEventDispatcher, tick } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
 
   // Utils imports
   import Analytics from 'analytics';
@@ -51,12 +51,13 @@
   export let selected;
   export let tab;
   export let isTokenised;
+  export let isFormValid = true;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
   let attributes;
   let showOuter;
-  let showCvv;
+  let showCvv: boolean;
 
   let noCvvChecked = false;
   let cvvValue = '';
@@ -65,8 +66,7 @@
   const isRedesignV15Enabled = isRedesignV15();
 
   // Refs
-  let cvvInput;
-  let cvvInputFormatter;
+  let cvvInput: CvvField;
   let collectCardTokenisationConsent = false;
 
   const dispatch = createEventDispatcher();
@@ -96,6 +96,10 @@
   $: showOuter = card.networkCode === 'maestro' || debitPin || plans;
 
   $: showCvv = !noCvvChecked && selected;
+
+  onMount(() => {
+    isFormValid = !showCvv || (showCvv && cvvInput?.isValid());
+  });
 
   function handleAuthRadioChanged(event) {
     trackAtmRadio(event);
@@ -176,7 +180,10 @@
       {#if showCvv}
         <CvvField
           bind:value={cvvValue}
-          on:input={(_) => dispatch('cvvchange', { cvv: cvvValue })}
+          on:input={(_) => {
+            dispatch('cvvchange', { cvv: cvvValue });
+            isFormValid = showCvv && cvvInput?.isValid();
+          }}
           bind:this={cvvInput}
           length={cvvDigits}
           showHelp={false}
@@ -330,6 +337,10 @@
     :global(#saved-cards-container) .cardtype {
       width: 34px;
       height: 23px;
+    }
+
+    .saved-inner {
+      font-size: 13px;
     }
   }
 </style>

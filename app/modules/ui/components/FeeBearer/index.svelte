@@ -60,8 +60,6 @@
    */
   let currency = 'INR';
 
-  // Remove the space between Amount and symbol on Magic Checkout Flow
-  const spaceAmountWithSymbol = !isRedesignV15();
   const isOverlay = navstack?.isOverlay;
   const session = getSession();
   const fee_label = session.get('fee_label');
@@ -221,11 +219,7 @@
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
-              {formatAmountWithSymbol(
-                amount * 100,
-                currency || 'INR',
-                spaceAmountWithSymbol
-              )}
+              {formatAmountWithSymbol(amount * 100, currency || 'INR', true)}
             </div>
           </div>
         {/if}
@@ -267,6 +261,7 @@
           display: inline-block;
           text-align: right;
           width: calc(50% - 2px);
+          vertical-align: top;
         }
 
         // .fee-discount {
@@ -306,9 +301,6 @@
       top: 20px;
       cursor: pointer;
     }
-  }
-  :global(.irctc) .fee-bearer {
-    bottom: -30px !important; // irctc has special callout impacting height of checkout
   }
   :global(#modal.one-cc) .fee-bearer .btn {
     text-transform: capitalize;
