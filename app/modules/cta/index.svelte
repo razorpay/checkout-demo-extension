@@ -5,7 +5,7 @@
 
   // helpers/store imports
   import CTAStore from 'cta/store';
-  import { getAmount, getCurrency, isCustomerFeeBearer } from 'razorpay';
+  import { getAmount, getCurrency, isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
   import { appliedOffer } from 'offers/store/store';
 
@@ -16,6 +16,8 @@
   // Props
   export let showAmount = true;
   let offerAmount = 0;
+
+  let isOneCCEnabled = isOneClickCheckout();
 
   $: {
     if (
@@ -57,7 +59,7 @@
 >
   {#if state.showAmount}
     <div class="flex-column">
-      {#if offerAmount > 0}
+      {#if offerAmount > 0 && !isOneCCEnabled}
         <span class="offer-original-amount">
           {formatAmountWithSymbol(
             $appliedOffer?.original_amount || getAmount(),
@@ -67,7 +69,7 @@
         </span>
       {/if}
       <span class="price-label">
-        {#if offerAmount > 0}
+        {#if offerAmount > 0 && !isOneCCEnabled}
           {formatAmountWithSymbol(
             $appliedOffer?.amount || getAmount(),
             $store.currency || getCurrency(),
