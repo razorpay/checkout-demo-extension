@@ -29,7 +29,7 @@ const clickPaymentMethod = (context) => {
 
     var instrument = Array.from(instrumentList).find((btn) => {
       var textContent = btn.textContent.trim();
-      return textContent.includes('International Payments');
+      return textContent.includes('Instant Bank Transfer');
     });
 
     if (instrument) {
@@ -136,7 +136,8 @@ const isOnNVSScreen = (context) => {
   return context.page.evaluate(() => {
     return (
       document.getElementById('nvsContainer') !== null &&
-      document.getElementById('nvs-first_name') !== null
+      document.getElementById('billing-address-verification-first_name') !==
+        null
     );
   });
 };

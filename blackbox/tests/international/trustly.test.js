@@ -4,10 +4,7 @@ const {
   assertInternationalPage,
   assertMultiCurrenciesAndAmount,
   isOnNVSScreen,
-  fillNVSForm,
-  assertNVSFormData,
-  respondCountries,
-  respondStates,
+  assertNVSFormDataInRequest,
 } = require('../../actions/international');
 
 const {
@@ -15,7 +12,7 @@ const {
   selectPaymentMethod,
 } = require('../homescreen/homeActions');
 
-const { submit } = require('../../actions/common');
+const { submit, fillAVSForm } = require('../../actions/common');
 
 describe('Trustly under international payment method', () => {
   test('International payment method should not be render', async () => {
@@ -106,16 +103,11 @@ describe('Trustly under international payment method', () => {
       addressNameRequired: true,
     });
     await submit(context);
-    await respondCountries(context);
-    let nvsScreen = await isOnNVSScreen(context);
-    expect(nvsScreen).toStrictEqual(true);
 
+    const nvsScreen = await isOnNVSScreen(context);
+    expect(nvsScreen).toStrictEqual(true);
+    await fillAVSForm({ context, isNameRequired: true });
     await submit(context);
-    nvsScreen = await isOnNVSScreen(context);
-    expect(nvsScreen).toStrictEqual(true);
-    await fillNVSForm(context);
-    await respondStates(context);
-
-    await assertNVSFormData(context);
+    await assertNVSFormDataInRequest(context);
   });
 });

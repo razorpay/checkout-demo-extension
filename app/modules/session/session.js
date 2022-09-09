@@ -2575,7 +2575,7 @@ Session.prototype = {
             return app === offer.issuer;
           }) !== -1;
         if (isCardAppOffer && MethodStore.isApplicationEnabled(offer.issuer)) {
-          this.svelteCardTab.setSelectedApp(offer.issuer);
+          this.svelteCardTab?.setSelectedApp(offer.issuer);
         }
       }
     }
@@ -2743,7 +2743,7 @@ Session.prototype = {
     ) {
       tab = 'cardless_emi';
     } else if (this.tab === 'card') {
-      if (this.svelteCardTab.onBack()) {
+      if (this.svelteCardTab?.onBack()) {
         return;
       }
     } else if (this.tab === 'netbanking') {
@@ -2810,7 +2810,7 @@ Session.prototype = {
     // change view state to default from AVS
     // its required in case user select card from preferred block
     // we are using isOnAVSScreen logic in presubmit
-    if (this.screen === 'card' && this.svelteCardTab.isOnAVSScreen()) {
+    if (this.screen === 'card' && this.svelteCardTab?.isOnAVSScreen()) {
       this.svelteCardTab.onBack();
     }
 
@@ -3051,7 +3051,7 @@ Session.prototype = {
       // "EMI on Cards"), the customer might have changed.
       if (this.screen === '' || this.screen === 'cardless_emi') {
         this.updateCustomerInStore();
-        this.svelteCardTab.showLandingView();
+        this.svelteCardTab?.showLandingView();
       }
       this.showCardTab();
       cardTab.setEmiPlansCta(this.screen, tab);
@@ -3105,7 +3105,7 @@ Session.prototype = {
         Object.keys(storeGetter(EmiStore.emiDurations)).length
       )
     ) {
-      this.svelteCardTab.onShown();
+      this.svelteCardTab?.onShown();
     }
 
     let self = this;
@@ -3612,7 +3612,9 @@ Session.prototype = {
       });
 
       if (this.screen === 'card') {
-        Object.assign(data, this.svelteCardTab.getPayload());
+        if (this.svelteCardTab) {
+          Object.assign(data, this.svelteCardTab.getPayload());
+        }
         if (tab === 'emi') {
           let emiDuration = EmiStore.getEmiDurationForNewCard();
           if (emiDuration) {
@@ -4244,7 +4246,7 @@ Session.prototype = {
     let AVSRequiredForEntity = null;
     let AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
     let AVSData =
-      this.svelteCardTab.getAVSPayload(selectedInstrument || {}) || {};
+      this.svelteCardTab?.getAVSPayload?.(selectedInstrument || {}) || {};
     let isOnAVSScreen = AVSData.isOnAVSScreen;
     let isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
@@ -4780,7 +4782,7 @@ Session.prototype = {
     let selectedInstrument = this.getSelectedPaymentInstrument();
 
     let AVSData =
-      this.svelteCardTab.getAVSPayload(selectedInstrument || {}) || {};
+      this.svelteCardTab?.getAVSPayload?.(selectedInstrument || {}) || {};
     // if AVS is on then screen is set to card but for saved card from home screen requires processing like home screen
     let isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
