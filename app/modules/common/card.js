@@ -8,6 +8,7 @@ import fetch from 'utils/fetch';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
 import * as ObjectUtils from 'utils/object';
 import { CYBER_SOURCE_RZP_ORG_ID, SIFT_BEACON_KEY } from 'common/constants';
+import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import * as _ from 'utils/_';
 
 export const API_NETWORK_CODES_MAP = {
@@ -487,18 +488,12 @@ export function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
   _sift.push(['_setSessionId', sessionId]);
   _sift.push(['_trackPageview']);
 
-  return new Promise((resolve, reject) => {
-    let script = document.createElement('script');
-    script.src = 'https://siftjs.razorpay.com/s.js';
-    script.type = 'text/javascript';
-    script.onError = reject;
-    script.async = true;
-    script.id = '__sift_script';
-    script.onload = resolve;
-    script.addEventListener('error', reject);
-    script.addEventListener('load', resolve);
-    document.body.appendChild(script);
-  });
+  try {
+    loadScript('https://siftjs.razorpay.com/s.js', '__sift_script');
+  } catch (err) {
+    // capture exceptions
+    captureError(err, { severity: SEVERITY_LEVELS.S2 });
+  }
 }
 
 /**
@@ -511,6 +506,11 @@ export function injectCyberSourceScript(
   sessionId,
   orgId = CYBER_SOURCE_RZP_ORG_ID
 ) {
-  const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=razorpay${sessionId}`;
-  return loadScript(csUrl, 'cyberSourceScript');
+  try {
+    const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=razorpay${sessionId}`;
+    loadScript(csUrl, 'cyberSourceScript');
+  } catch (err) {
+    // capture exceptions
+    captureError(err, { severity: SEVERITY_LEVELS.S2 });
+  }
 }

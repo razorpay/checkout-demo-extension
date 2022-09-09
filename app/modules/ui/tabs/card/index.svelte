@@ -323,10 +323,6 @@
     return hasFeature('disable_sift_js', false) !== true;
   }
 
-  function isCyberSourceJsEnabled() {
-    return hasFeature('shield_cbs_rollout', false);
-  }
-
   const isNewEmiFlow = isEmiV2();
 
   onMount(() => {
@@ -349,17 +345,11 @@
     if (isInternational() && session.r.isLiveMode()) {
       if (isSiftJSEnabled()) {
         // load sift js
-        injectSiftScript(session.id).catch(() => {
-          // Do nothing
-        });
+        injectSiftScript(session.id);
       }
 
-      if (isCyberSourceJsEnabled()) {
-        // load cyber source js
-        injectCyberSourceScript(session.id).catch(() => {
-          // Do nothing
-        });
-      }
+      // load cyber source js
+      injectCyberSourceScript(session.id);
     }
 
     if (isNewEmiFlow && emiPayload) {
@@ -369,15 +359,9 @@
     const unbsubscribe = defaultDCCCurrency.subscribe((currency) => {
       if (currency && currency !== 'INR' && session.r.isLiveMode()) {
         if (isSiftJSEnabled()) {
-          injectSiftScript(session.id).catch(() => {
-            // Do nothing
-          });
+          injectSiftScript(session.id);
         }
-        if (isCyberSourceJsEnabled()) {
-          injectCyberSourceScript(session.id).catch(() => {
-            // Do nothing
-          });
-        }
+        injectCyberSourceScript(session.id);
       }
     });
 
