@@ -23,3 +23,4 @@ export const OTP_LABELS = {
 };
 
 export const DELIVERY_ADDRESS_WIDGET_DOM_ID = 'delivery-address-widget';
+export const MIN_REQ_AMOUNT = 100; // ₹1
