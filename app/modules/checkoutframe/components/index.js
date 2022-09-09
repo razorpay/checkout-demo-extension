@@ -7,10 +7,12 @@ import { showHeader as show1CCHeader } from 'one_click_checkout/header';
 import { getSession } from 'sessionmanager';
 import createPayoutsView from './payouts';
 import { isOneClickCheckout, isPayout, isRedesignV15 } from 'razorpay';
+import { backPressed, controlledViaSession, isStackPopulated } from 'navstack';
 import { querySelector } from 'utils/doc';
 import * as ObjectUtils from 'utils/object';
 import { showTopbar } from 'topbar';
 import { showHeader } from 'header';
+import { handleBackNavigation } from 'emiV2/helper/navigation';
 
 let componentsMap = {};
 
@@ -40,7 +42,13 @@ export function render() {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {
     topbar.$on('back', () => {
-      session.back();
+      // If navstack is in control use the navstack functions for back press event
+      if (isStackPopulated() && !controlledViaSession()) {
+        handleBackNavigation();
+        backPressed();
+      } else {
+        session.back();
+      }
     });
   }
 }

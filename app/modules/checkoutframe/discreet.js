@@ -62,7 +62,7 @@ import * as TopbarMagicCheckoutStore from 'one_click_checkout/topbar/store';
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
 import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
-import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
+import emiScreenView from 'ui/tabs/emi/EmiScreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
 import netbankingTab from 'checkoutframe/components/netbanking';

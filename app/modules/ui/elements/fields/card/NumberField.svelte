@@ -37,6 +37,7 @@
   export let inputFieldClasses;
   export let labelClasses;
   export let labelUpperClasses;
+  export let showValidations;
 
   // State
   let valid = false;
@@ -149,6 +150,7 @@
     {inputFieldClasses}
     {labelClasses}
     {labelUpperClasses}
+    {showValidations}
   />
 </div>
 

@@ -13,7 +13,7 @@ import {
   isDebitCardEnabled,
 } from 'checkoutstore/methods';
 
-import { getRecurringMethods, isIRCTC, isRecurring } from 'razorpay';
+import { getRecurringMethods, isEmiV2, isIRCTC, isRecurring } from 'razorpay';
 import { generateTextFromList } from 'i18n/text-utils';
 import * as ObjectUtils from 'utils/object';
 
@@ -146,7 +146,7 @@ const DESCRIPTIONS = {
 
     const text = generateTextFromList(providerNames, locale, 3);
 
-    if (cardEmi) {
+    if (cardEmi && !isEmiV2()) {
       return text;
     }
     return formatTemplateWithLocale(

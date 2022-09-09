@@ -336,3 +336,7 @@ export function translateErrorDescription(description, locale) {
     description
   );
 }
+
+export function translateEmiTabName(tab, locale) {
+  return formatMessageWithLocale(`emi.${tab}`, locale);
+}

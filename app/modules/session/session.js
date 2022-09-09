@@ -23,7 +23,14 @@ import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
-import { isMainStackPopulated, popStack } from 'navstack';
+import {
+  controlledViaSession,
+  pushStack,
+  backPressed,
+  isStackPopulated,
+  moveControlToSession,
+  popStack,
+} from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
@@ -36,17 +43,40 @@ import {
   showCta,
   setAppropriateCtaText,
 } from 'cta';
-import { injectSentry } from 'sentry';
-import { validateAndFetchPrefilledWallet } from 'wallet/helper';
-import { backPressed, isStackPopulated } from 'navstack';
-import { screenStore, tabStore } from 'checkoutstore';
 import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 import { getDeviceId } from 'fingerprint';
+import renderEmiOptions from 'emiV2';
+import { handleEmiPaymentV2 } from 'emiV2/payment';
+
+import { avoidSubmitViaSession, initiateEmiFlow } from 'emiV2/helper/emi';
+import {
+  emiMethod,
+  getSelectedEmiBank,
+  selectedBank,
+  emiViaCards,
+} from 'checkoutstore/screens/emi';
+import EmiTabsScreen from 'emiV2/ui/components/EmiTabsScreen/EmiTabsScreen.svelte';
+import { cardlessTabProviders, providersToAvoid } from 'emiV2/constants';
+import { injectSentry } from 'sentry';
+import { validateAndFetchPrefilledWallet } from 'wallet/helper';
+import { screenStore, tabStore } from 'checkoutstore';
 import { isDebitIssuer } from 'common/bank';
 import triggerErrorModal, {
   closeErrorModal,
   updateLoadingCTA,
 } from 'components/ErrorModal';
+import { handleBackNavigation } from 'emiV2/helper/navigation';
+import { getCardlessEMIProviders } from 'checkoutstore/methods';
+import { trackEmiFromCardScreen } from 'emiV2/events/tracker';
+import { isEmiV2 } from 'razorpay';
+import {
+  cardlessEmiCallBack,
+  fetchCardlessEmiPlans,
+  getEmiContact,
+} from 'emiV2/payment/cardlessEmi/cardlessEmi';
+import { getSelectedBankCode } from 'emiV2/helper/plans';
+import { selectedTab } from 'components/Tabs/tabStore';
+import { isCardlessTab } from 'emiV2/helper/tabs';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -413,7 +443,13 @@ function cancelHandler(response) {
       this.setScreen('emi');
       this.switchTab('emi');
     } else {
-      this.switchTab('card');
+      if (this.payload.method === 'emi' && isEmiV2()) {
+        // Just changing the tab hard coded way because
+        // navstack is already active
+        this.tab = 'emi';
+      } else {
+        this.switchTab('card');
+      }
     }
   }
 }
@@ -1072,7 +1108,9 @@ Session.prototype = {
     Cta.init();
     this.completePendingPayment();
     this.bindEvents();
-    this.setEmiScreen();
+    if (!RazorpayHelper.isEmiV2()) {
+      this.setEmiScreen();
+    }
     this.prefillPostRender();
     this.updateCustomerInStore();
     Header.updateAmountFontSize();
@@ -1921,9 +1959,13 @@ Session.prototype = {
    * - Sending OTP for user verification in case of save=1
    * - Note: Already existing functionality just moved out of submit method
    */
-  sendOTP: function () {
-    let session = this;
+  sendOTP: function (hide = false) {
+    // if any session screen is visible hide it
+    if (hide) {
+      makeHidden('.screen.' + shownClass);
+    }
 
+    let session = this;
     this.otpView.updateScreen({
       skipTextLabel: RazorpayHelper.isRedesignV15()
         ? 'skip_saving_card_one_cc'
@@ -2004,7 +2046,16 @@ Session.prototype = {
     }
 
     this.commenceOTP('otp_sending_generic', undefined, { phone: getPhone() });
-    if (this.tab === 'cardless_emi') {
+    if (
+      this.tab === 'emi' &&
+      isEmiV2() &&
+      this.payload &&
+      this.payload.method === 'cardless_emi'
+    ) {
+      fetchCardlessEmiPlans({
+        resend: true,
+      });
+    } else if (this.tab === 'cardless_emi') {
       this.fetchCardlessEmiPlans({
         resend: true,
       });
@@ -2060,8 +2111,15 @@ Session.prototype = {
     if (payload) {
       delete payload.save;
       delete payload.app_token;
-      this.submit();
-
+      // On otp skip action if it's new emi flow proceed with emi payment from seperate handler
+      if (RazorpayHelper.isEmiV2() && payload.method === 'emi') {
+        handleEmiPaymentV2({
+          payloadData: payload,
+          action: 'otp_skipped',
+        });
+      } else {
+        this.submit();
+      }
       if (!this.headless) {
         this.setScreen('card');
       }
@@ -2069,7 +2127,30 @@ Session.prototype = {
         this.commenceOTP('payment_processing');
       }
     } else {
-      this.showCardTab();
+      // If it's a new emi flow skipping otp takes us to emi options flow for emi tab
+      if (this.tab === 'emi' && RazorpayHelper.isEmiV2()) {
+        const screenToSet = 'emi';
+        Analytics.track('screen:switch', {
+          data: {
+            from: this.screen || '',
+            to: screenToSet || '',
+          },
+        });
+        Analytics.setMeta('screen', screenToSet);
+        Analytics.setMeta('timeSince.screen', discreet.timer());
+
+        this.screen = screenToSet;
+        screenStore.set(screenToSet);
+
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
+        // we need to hide the otp screen here
+        makeHidden('.screen.' + shownClass);
+        renderEmiOptions();
+      } else {
+        this.showCardTab();
+      }
     }
   },
 
@@ -2392,6 +2473,14 @@ Session.prototype = {
     }
 
     if (screen === this.screen) {
+      /** When switching from navstack card screen to session card screen
+       * Need to explicitly change the css classes for card screen to show
+       * Since screen and this.screen are same i.e card
+       */
+      if (screen === 'card' && controlledViaSession()) {
+        $('#body').attr('screen', screen);
+        makeVisible('#form-card');
+      }
       return;
     }
 
@@ -2446,7 +2535,38 @@ Session.prototype = {
       }
     }
     let screenEl = '#form-' + (screen || 'common');
-    makeVisible(screenEl);
+    if (
+      (screen === 'emi' || screen === 'cardless_emi') &&
+      RazorpayHelper.isEmiV2()
+    ) {
+      let skipOTPFlow = false;
+      /**
+       * tab is selected from p13n block which says 'EMI - Use your saved cards' ask otp always
+       */
+      if (this.switchTabPayload && this.switchTabPayload.preferred) {
+        skipOTPFlow = false;
+      }
+      let customer = this.getCurrentCustomer();
+      const selectedInstrument = this.getSelectedPaymentInstrument();
+      // if user has saved cards show otp screen
+      // and user is not coming from cardless_emi config block
+      if (
+        !skipOTPFlow &&
+        customer.haveSavedCard &&
+        !customer.logged &&
+        !this.wants_skip &&
+        this.screen !== 'card' &&
+        selectedInstrument &&
+        selectedInstrument.method !== 'cardless_emi'
+      ) {
+        this.askOTPForSavedCard();
+      } else {
+        // render new EMI screen
+        renderEmiOptions();
+      }
+    } else {
+      makeVisible(screenEl);
+    }
 
     /**
      * On the new homescreen,
@@ -2608,15 +2728,31 @@ Session.prototype = {
     }
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
+      // If selected instrumet is emi and user is applying offer
+      // on cardless emi method (user is on cardless tab)
+      // bring user to L1 EMI screen and remove provider selection
+      if (
+        storeGetter(selectedTab) &&
+        isCardlessTab() &&
+        this.tab === 'emi' &&
+        RazorpayHelper.isEmiV2()
+      ) {
+        popStack();
+        this.screen = 'emi';
+        screenStore.set('emi');
+        selectedTab.set(null);
+        selectedBank.set(null);
+      }
       // Do not switch tabs
     } else if (offer && offer.payment_method === 'emi') {
       this.switchTab('emi');
     } else {
-      this.switchTab('');
-      // TODO check for other methods
-      if (isMainStackPopulated()) {
-        popStack();
+      // Since for new emi flow we are using navstack
+      // therefore we need to give the control back to session when switching tabs
+      if (isStackPopulated()) {
+        moveControlToSession(true);
       }
+      this.switchTab('');
       if (
         offer &&
         offer.payment_method === 'card' &&
@@ -2665,10 +2801,27 @@ Session.prototype = {
     return { currency, amount };
   },
   back: function (confirmedCancel) {
-    if (isStackPopulated()) {
+    if (this.tab === 'emi' && isEmiV2()) {
+      // For EMI Screens we need to fallback to navstack back function
+      // And change screen using handleBackNavigation
+      // Can be improved
+      if (
+        (!controlledViaSession() ||
+          ['emi', 'emiPlans', 'cvv'].includes(this.screen)) &&
+        isStackPopulated()
+      ) {
+        handleBackNavigation();
+        backPressed();
+        return;
+      }
+    }
+
+    // Else if control is with navstack and not session js
+    if (isStackPopulated() && !controlledViaSession()) {
       backPressed();
       return;
     }
+
     let tab = '';
     let payment = this.r._payment;
     let thisTab = this.tab;
@@ -2690,6 +2843,30 @@ Session.prototype = {
       return;
     }
     if (
+      this.screen === 'otp' &&
+      thisTab === 'emi' &&
+      isEmiV2() &&
+      controlledViaSession()
+    ) {
+      // If  on new emi flow and native otp screen is rendered
+      // Clicking on back shows confirm payment cancel alert
+      if (this.headless && payment) {
+        if (confirmedCancel === true) {
+          tab = 'emi';
+          this.clearRequest();
+          this.otpView.onBack();
+        } else {
+          Confirm.confirmClose().then(function (close) {
+            if (close) {
+              self.back(true);
+              self.setOneCCTabLogo('');
+            }
+          });
+          return;
+        }
+      }
+      tab = 'emi';
+    } else if (
       this.screen === 'otp' &&
       thisTab !== 'card' &&
       thisTab !== 'upi' &&
@@ -2732,7 +2909,8 @@ Session.prototype = {
       if (this.emiPlansView.back()) {
         return;
       }
-    } else if (/^emi$/.test(this.screen)) {
+    } else if (/^emi$/.test(this.screen) && !RazorpayHelper.isEmiV2()) {
+      // In old emi flow base emi tab is cardless-emi
       tab = 'cardless_emi';
     } else if (
       /**
@@ -2745,7 +2923,11 @@ Session.prototype = {
       this.tab === 'emi' &&
       MethodStore.isMethodEnabled('cardless_emi')
     ) {
-      tab = 'cardless_emi';
+      if (RazorpayHelper.isEmiV2()) {
+        tab = 'emi';
+      } else {
+        tab = 'cardless_emi';
+      }
     } else if (this.tab === 'card') {
       if (this.svelteCardTab?.onBack()) {
         return;
@@ -2931,7 +3113,6 @@ Session.prototype = {
         return;
       }
     }
-
     Analytics.track('tab:switch', {
       data: {
         from: this.tab || '',
@@ -3050,7 +3231,10 @@ Session.prototype = {
       this.showInternationalTab();
     }
 
-    if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
+    if (
+      tab === 'card' ||
+      (tab === 'emi' && this.screen !== 'emi' && !RazorpayHelper.isEmiV2())
+    ) {
       // If we are switching from home tab or cardless emi tab (after choosing
       // "EMI on Cards"), the customer might have changed.
       if (this.screen === '' || this.screen === 'cardless_emi') {
@@ -3164,6 +3348,7 @@ Session.prototype = {
       skipTextLabel: RazorpayHelper.isRedesignV15()
         ? 'skip_saved_cards_one_cc'
         : 'skip_saved_cards',
+      showCtaOneCC: true,
     });
 
     self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
@@ -3195,7 +3380,28 @@ Session.prototype = {
           true
         );
       } else {
-        self.setScreen('card');
+        if (RazorpayHelper.isEmiV2() && self.tab === 'emi') {
+          // Need to set the current screen to emi manually
+          const screenToSet = 'emi';
+          Analytics.track('screen:switch', {
+            data: {
+              from: this.screen || '',
+              to: screenToSet || '',
+            },
+          });
+          Analytics.setMeta('screen', screenToSet);
+          Analytics.setMeta('timeSince.screen', discreet.timer());
+
+          self.screen = screenToSet;
+          screenStore.set(screenToSet);
+          self.otpView.updateScreen({
+            showCtaOneCC: false,
+          });
+          makeHidden('.screen.' + shownClass);
+          renderEmiOptions();
+        } else {
+          self.setScreen('card');
+        }
       }
     }, params);
   },
@@ -3225,6 +3431,63 @@ Session.prototype = {
     );
 
     bank = getBankEMICode(bank, cardType);
+
+    // If it's new emi flow we need to take the user to emi screen
+    // with respective bank selected along with appropriate payload to show tabs
+    const formattedBankCode = cardIssuer.toLowerCase();
+    if (RazorpayHelper.isEmiV2()) {
+      selectedBank.set({
+        code: cardIssuer,
+        creditEmi: cardType === 'credit',
+        debitEmi: cardType === 'debit',
+        isCardless: getCardlessEMIProviders(amount)[formattedBankCode],
+      });
+
+      const nextScreen = 'emiPlans';
+      const tab = 'emi';
+      // track tab switch explicitly
+      let diff = 0;
+      if (this.tabSwitchStart > 0) {
+        diff = (Date.now() - this.tabSwitchStart) / 1000;
+      }
+      Analytics.track('tab:switch', {
+        data: {
+          from: this.tab || '',
+          to: tab || '',
+          timeSpentInTab: diff > 0 ? diff : 'NA',
+        },
+      });
+      Analytics.setMeta('tab', tab);
+      Analytics.setMeta('timeSince.tab', discreet.timer());
+
+      Analytics.track('screen:switch', {
+        data: {
+          from: this.screen || '',
+          to: nextScreen || '',
+        },
+      });
+      Analytics.setMeta('screen', nextScreen);
+      Analytics.setMeta('timeSince.screen', discreet.timer());
+
+      emiViaCards.set(true);
+      emiMethod.set('bank');
+
+      self.screen = nextScreen;
+      screenStore.set(nextScreen);
+      tabStore.set(tab);
+      self.tab = tab;
+
+      // track emi clicked on card screen
+      const cardMeta = {
+        card_issuer: cardIssuer,
+        card_type: cardType,
+      };
+      trackEmiFromCardScreen(cardMeta);
+      pushStack({
+        component: EmiTabsScreen,
+      });
+      return;
+    }
 
     let contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
       bank,
@@ -3330,6 +3593,60 @@ Session.prototype = {
     };
 
     self.topBar.resetTitleOverride('emiplans');
+
+    // For new emi flow if user is coming from card screen
+    // we need to manually change the tab and screen value for session
+    // and push to navstack
+    if (RazorpayHelper.isEmiV2()) {
+      let selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+      selectedBank.set({
+        code: selectedCard.card.issuer,
+      });
+
+      const tab = 'emi';
+      const nextScreen = 'emiPlans';
+
+      // track tab switch explicitly
+      let diff = 0;
+      if (this.tabSwitchStart > 0) {
+        diff = (Date.now() - this.tabSwitchStart) / 1000;
+      }
+      Analytics.track('tab:switch', {
+        data: {
+          from: this.tab || '',
+          to: tab || '',
+          timeSpentInTab: diff > 0 ? diff : 'NA',
+        },
+      });
+      Analytics.setMeta('tab', tab);
+      Analytics.setMeta('timeSince.tab', discreet.timer());
+
+      Analytics.track('screen:switch', {
+        data: {
+          from: this.screen || '',
+          to: nextScreen || '',
+        },
+      });
+      Analytics.setMeta('screen', nextScreen);
+      Analytics.setMeta('timeSince.screen', discreet.timer());
+
+      trackEmiFromCardScreen({
+        card_issuer: selectedCard.card.issuer,
+        card_network: selectedCard.card.network,
+        card_type: selectedCard.card.type,
+      });
+
+      emiMethod.set('bank');
+      emiViaCards.set(true);
+      self.screen = nextScreen;
+      screenStore.set(nextScreen);
+      tabStore.set(tab);
+      self.tab = tab;
+      pushStack({
+        component: EmiTabsScreen,
+      });
+      return;
+    }
 
     let trigger = e.currentTarget;
     let $trigger = $(trigger);
@@ -3948,8 +4265,13 @@ Session.prototype = {
             if (this.getCurrentCustomer().logged) {
               // OTP verification successful
               OtpService.resetCount('razorpay');
-
-              this.submit();
+              if (RazorpayHelper.isEmiV2() && this.payload.method === 'emi') {
+                handleEmiPaymentV2({
+                  payloadData: this.payload,
+                });
+              } else {
+                this.submit();
+              }
               let isRedirect = this.get('redirect');
               if (!isRedirect) {
                 this.r.emit('payment.resume');
@@ -3989,9 +4311,27 @@ Session.prototype = {
               OtpService.resetCount('razorpay');
 
               self.updateCustomerInStore();
+              // if new emi flow redirect to emi page
+              if (RazorpayHelper.isEmiV2() && self.tab === 'emi') {
+                const screenToSet = 'emi';
+                Analytics.track('screen:switch', {
+                  data: {
+                    from: this.screen || '',
+                    to: screenToSet || '',
+                  },
+                });
+                Analytics.setMeta('screen', screenToSet);
+                Analytics.setMeta('timeSince.screen', discreet.timer());
 
-              if (this.isOpen) {
-                self.svelteCardTab?.showLandingView().then(function () {
+                this.screen = screenToSet;
+                screenStore.set(screenToSet);
+                this.otpView.updateScreen({
+                  showCtaOneCC: false,
+                });
+                makeHidden('.screen.' + shownClass);
+                renderEmiOptions();
+              } else if (this.isOpen) {
+                self.svelteCardTab.showLandingView().then(function () {
                   self.showCardTab();
                   /**
                    * In case p13n from storage we store token_id if we after otp verify select other card in presubmit it pick storage card data
@@ -4023,7 +4363,26 @@ Session.prototype = {
         email: getEmail(),
       };
 
-      if (this.tab === 'cardless_emi' || isCardlessEmi) {
+      // If new emi flow and tab is emi
+      // new flow will take over
+      const isEmiFlowForCardless =
+        this.payload &&
+        this.payload.method === 'cardless_emi' &&
+        this.tab === 'emi' &&
+        isEmiV2();
+      if (isEmiFlowForCardless) {
+        submitPayload = {
+          ...submitPayload,
+          provider: getSelectedBankCode(),
+          method: 'cardless_emi',
+          payment_id: this.r._payment.payment_id,
+        };
+        callback = cardlessEmiCallBack;
+
+        this.otpView.updateScreen({
+          showCtaOneCC: false,
+        });
+      } else if (this.tab === 'cardless_emi' || isCardlessEmi) {
         const providerCode = CardlessEmiStore.providerCode;
 
         submitPayload = Object.assign(submitPayload, {
@@ -4099,7 +4458,15 @@ Session.prototype = {
         };
         this.commenceOTP('verifying');
       }
-      this.getCurrentCustomer().submitOTP(
+
+      let phone = '';
+      // Since Contact number for emi can be changed
+      // we need to get the current emi contact in order to verify cardless otp
+      if (isEmiFlowForCardless) {
+        phone = getEmiContact();
+      }
+
+      this.getCurrentCustomer(phone).submitOTP(
         submitPayload,
         callback.bind(this),
         queryParams
@@ -4176,6 +4543,29 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function (e, payload) {
+    /**
+     * If pyament is controlled via navstack i.e for new EMI flow
+     * shift the control to handle EmiPayment
+     */
+    if (
+      !controlledViaSession() &&
+      this.tab === 'emi' &&
+      this.screen === 'card' &&
+      RazorpayHelper.isEmiV2()
+    ) {
+      const bank = getSelectedEmiBank();
+      // enable for dev-testing
+      // bank.downtimeConfig = {
+      //   severe: 'low',
+      //   downtimeInstrument: bank.code,
+      // };
+      initiateEmiFlow(bank, selectedBank.set.bind(selectedBank), () => {
+        handleEmiPaymentV2({
+          action: 'card',
+        });
+      });
+      return;
+    }
     if (this.tab === 'home-1cc') {
       return;
     }
@@ -4691,6 +5081,21 @@ Session.prototype = {
     if (avoidSessionSubmit()) {
       return;
     }
+
+    /**
+     * if emi-payment module has any downtime,
+     * it will set the data in respective handlers
+     * `avoidSessionSubmit` will return true in such cases, explaining that
+     * to avoid regular pre-submit and submit flows from sessionjs
+     * Required in both submit and pre-submit as someareas we directly call submit but presubmit in most cases
+     */
+    if (
+      RazorpayHelper.isEmiV2() &&
+      this.tab === 'emi' &&
+      avoidSubmitViaSession()
+    ) {
+      return;
+    }
     let locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
@@ -4946,9 +5351,48 @@ Session.prototype = {
           }
 
           case 'cardless_emi': {
-            session.selectCardlessEmiProvider(
-              selectedInstrument._ungrouped[0].provider
-            );
+            // If new emi flow is enabled and user has clicked on provider cardless config block
+            // if it's a bank cardless provider for eg. hdfc, kotak
+            // or if selected provider is cardless provider like early salary or hcin
+            // redirect the user to tabs screen to check eligibility and show plans
+            // else continue with payment
+            const selectedProvider = selectedInstrument._ungrouped[0].provider;
+            if (RazorpayHelper.isEmiV2()) {
+              // if the provider is bank cardless provider
+              // or if its native cardless provider
+              if (
+                !providersToAvoid.includes(selectedProvider) ||
+                cardlessTabProviders.includes(selectedProvider)
+              ) {
+                session.switchTab('emi');
+                screenStore.set('emiPlans');
+                session.screen = 'emiPlans';
+                selectedBank.set({
+                  code: selectedProvider,
+                  isCardless: true,
+                });
+
+                HomeScreenStore.selectedInstrumentId.set(selectedInstrument.id);
+
+                pushStack({
+                  component: EmiTabsScreen,
+                  props: {
+                    currentMethod: selectedInstrument,
+                  },
+                });
+                return;
+              }
+              // if the provider is redirect provider like zestmoney, walnut
+              // we need to initiate the payment
+              handleEmiPaymentV2({
+                action: 'cardless',
+                payloadData: {
+                  provider: selectedProvider,
+                },
+              });
+              return;
+            }
+            session.selectCardlessEmiProvider(selectedProvider);
 
             break;
           }

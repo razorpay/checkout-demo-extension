@@ -362,6 +362,81 @@ const ajax = {
     submit_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/submit',
     resend_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/resend',
   },
+  hdfc_cardless: {
+    type: 'respawn',
+    request: {
+      url: 'https://api.razorpay.com/v1/otp/verify?method=cardless_emi&provider=icic&payment_id=pay_JndaYiEzvigfR9&key_id=rzp_live_ILgsfZCZoFIKMb',
+      method: 'POST',
+      content: {
+        contact: '+919731881407',
+        email: 'qa.testing@razorpay.com',
+        method: 'cardless_emi',
+        provider: 'hdfc',
+        amount: '1000000',
+        reward_ids: ['reward_GfGhhZ129iXdJ3'],
+        currency: 'INR',
+        payment_id: 'pay_JndaYiEzvigfR9',
+      },
+    },
+    emi_plans: {
+      hdfc: [
+        {
+          entity: 'emi_plan',
+          duration: 3,
+          interest: '16.0',
+          currency: 'INR',
+          amount_per_month: 342300,
+          emi_plan_id: '1001156',
+        },
+        {
+          entity: 'emi_plan',
+          duration: 6,
+          interest: '16.0',
+          currency: 'INR',
+          amount_per_month: 174600,
+          emi_plan_id: '1001155',
+        },
+        {
+          entity: 'emi_plan',
+          duration: 9,
+          interest: '16.0',
+          currency: 'INR',
+          amount_per_month: 118700,
+          emi_plan_id: '1001157',
+        },
+        {
+          entity: 'emi_plan',
+          duration: 12,
+          interest: '16.0',
+          currency: 'INR',
+          amount_per_month: 90800,
+          emi_plan_id: '1001158',
+        },
+      ],
+    },
+    gateway:
+      'eyJpdiI6IjI1UXpwS0gyMFN0WEJGN3p2N2ZuQVE9PSIsInZhbHVlIjoiRXhNZFZvckZzS2E5ekI4WVR2RVc2cU1Yb0NqNnhOUERlK1lrdnFOQThyUVVKRkU0TDhaZnpIU2YzMVVKUlIwMyIsIm1hYyI6IjQxNTFmNGJlYjg5MmMyOGEwMWRlMmJmYTE4YjViODE3ZGM5YzVjMjRkYjYyM2Q4ZmRkODQyNDA4OWNiZTdjYmIifQ==',
+    image: null,
+    key_id: 'rzp_live_ILgsfZCZoFIKMb',
+    lender_branding_url: 'https://iccdn.in/lenders/icici-main-logo-v3.svg',
+    merchant: 'Razorpay Software Private Limited',
+    method: 'cardless_emi',
+    payment_create_url:
+      'https://api.razorpay.com/v1/payments?key_id=rzp_live_ILgsfZCZoFIKMb',
+    payment_id: 'pay_JndaYiEzvigfR9',
+    version: 1,
+  },
+  cardless_error: {
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description:
+        'Your payment was declined as you are not registered with the provider. To pay successfully try using another method.',
+      source: 'customer',
+      step: 'payment_eligibility check',
+      reason: 'user_not_eligible',
+      metadata: {},
+    },
+  },
 };
 
 const checkout = {
@@ -390,6 +465,12 @@ const getAjax = (body) => {
   }
   if (body.method === 'card') {
     return ajax.hdfc_otp;
+  }
+  if (body.method === 'cardless_emi') {
+    if (body.provider !== 'hdfc') {
+      return ajax.cardless_error;
+    }
+    return ajax.hdfc_cardless;
   }
   if (body.method === 'cod') {
     return ajax.cod;

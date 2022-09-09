@@ -28,6 +28,7 @@ export const AVSBillingAddress = writable(null);
 export const isAVSEnabledForEntity = writable(null); // to check avs is enabled or not value is set in presubmit flow only
 
 export const cardType = derived(cardNumber, getCardType);
+export const currentCardType = writable(null); // to check the current card type is debit, credit or prepaid
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.
 

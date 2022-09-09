@@ -18,4 +18,7 @@ export const CtaViews = {
   PAY: 'pay',
   PAY_SINGLE_METHOD: 'pay_single_method',
   UPLOAD_NACH_FORM: 'upload_nach_form',
+  PAY_FULL_AMOUNT: 'pay_full_amount',
+  PAY_VIA_EMI: 'pay_via_emi',
+  TRY_ANOTHER_EMI_OPTION: 'try_another_emi_option',
 };

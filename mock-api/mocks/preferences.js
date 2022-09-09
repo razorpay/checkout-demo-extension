@@ -6193,13 +6193,26 @@ const preferences = {
       },
       emi: true,
       upi: true,
-      cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
+      debit_emi_providers: {
+        HDFC: 0,
+      },
+      cardless_emi: {
+        earlysalary: true,
+        zestmoney: true,
+        walnut369: true,
+        hdfc: true,
+        icic: true,
+      },
       paylater: [],
       google_pay_cards: false,
       gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
+        BAJAJ: {
+          min_amount: 500000,
+          plans: { 9: 16, 18: 16, 3: 16, 12: 16, 6: 16 },
+        },
         HDFC_DC: {
           min_amount: 500000,
           plans: { 9: 16, 18: 16, 3: 16, 12: 16, 6: 16 },
@@ -6265,6 +6278,30 @@ const preferences = {
         },
       },
       emi_options: {
+        BAJAJ: [
+          {
+            duration: 3,
+            interest: 0,
+            subvention: 'merchant',
+            min_amount: 449900,
+            offer_id: 'offer_E2Pg1yiFRNHn2u',
+            merchant_payback: '0.00',
+          },
+          {
+            duration: 6,
+            interest: 7,
+            subvention: 'customer',
+            min_amount: 899900,
+            merchant_payback: '0.00',
+          },
+          {
+            duration: 9,
+            interest: 10,
+            subvention: 'customer',
+            min_amount: 1349900,
+            merchant_payback: '0.00',
+          },
+        ],
         HDFC_DC: [
           {
             duration: 3,
@@ -6614,9 +6651,10 @@ const preferences = {
           {
             duration: 3,
             interest: 15,
-            subvention: 'customer',
+            subvention: 'merchant',
             min_amount: 300000,
             merchant_payback: '2.45',
+            offer_id: 'offer_JT8WXFivNgzTqf',
           },
           {
             duration: 6,
@@ -6836,6 +6874,34 @@ const preferences = {
       recurring: { card: { credit: ['MasterCard', 'Visa'] }, nach: false },
       upi_intent: true,
     },
+    offers: [
+      {
+        id: 'offer_JT94YQIOx6O35U',
+        name: 'No Cost EMI - Bajaj Finserv',
+        payment_method: 'emi',
+        payment_network: 'BAJAJ',
+        display_text: 'No Cost EMI - Bajaj Finserv',
+        emi_subvention: true,
+        type: 'instant',
+      },
+      {
+        id: 'offer_JT8WXFivNgzTqf',
+        name: 'No Cost EMI - HDFC Bank',
+        payment_method: 'emi',
+        issuer: 'HDFC',
+        display_text: 'No Cost EMI - HDFC Bank',
+        emi_subvention: true,
+        type: 'instant',
+      },
+      {
+        id: 'offer_JT8WXFivNgzTsf',
+        name: '10% of on HDFC Bank Cards',
+        payment_method: 'card',
+        issuer: 'HDFC',
+        display_text: '10% of on HDFC Bank Cards',
+        type: 'instant',
+      },
+    ],
     global: true,
     downtime: {
       netbanking: [

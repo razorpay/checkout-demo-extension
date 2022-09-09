@@ -101,9 +101,8 @@ export function getOffersForTab(method) {
 export function getOffersForTabAndInstrument({ tab, instrument }) {
   if (instrument && instrument.method === tab) {
     return getOffersForInstrument(instrument);
-  } else {
-    return getOffersForTab(tab);
   }
+  return getOffersForTab(tab);
 }
 
 const instrumentKey = {
@@ -152,9 +151,8 @@ function isOfferEligibleOnInstrument(offer, instrument) {
     }
 
     return instrumentValues.includes(offerIssuer);
-  } else {
-    return true;
   }
+  return true;
 }
 
 /**
@@ -188,7 +186,11 @@ export function getOtherOffers(filteredOffers) {
       otherOffers.push(allOffers[i]);
     }
   }
-  return otherOffers;
+  let filteredNCEmiOffers = otherOffers;
+  if (otherOffers && otherOffers.length > 0) {
+    filteredNCEmiOffers = filterNoCostEmiOffers(otherOffers);
+  }
+  return filteredNCEmiOffers;
 }
 
 /**
@@ -199,9 +201,8 @@ export function getOtherOffers(filteredOffers) {
 export const getAllOffers = () => {
   if (isPartialPayment()) {
     return [];
-  } else {
-    return (getMerchantOffers() || []).filter(isOfferEligible);
   }
+  return (getMerchantOffers() || []).filter(isOfferEligible);
 };
 
 function _getAllInstrumentsForOffer(offer) {
@@ -280,4 +281,23 @@ export function getInstrumentToSelectForOffer(offer) {
     INSTRUMENT_TO_SELECT_HANDLERS.default;
 
   return handler(offer);
+}
+
+/**
+ * Returns filtered offers list with no cost emi offers filtered out
+ * @param  {Array} filteredOffers list of all offers available for current checkout session
+ * @return {Array} List of offers with no cost emi offers fultered out
+ */
+
+export function filterNoCostEmiOffers(offers) {
+  return offers.filter(isNoCostEmiOffer);
+}
+
+/**
+ * Returns if current offer is not no cost emi offer
+ * @return {Boolean} true if current offer is not No Cost
+ */
+
+export function isNoCostEmiOffer(offer) {
+  return !offer.emi_subvention;
 }

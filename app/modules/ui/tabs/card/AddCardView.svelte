@@ -28,6 +28,7 @@
     noCvvChecked,
     hideExpiryCvvFields,
     showAuthTypeSelectionRadio,
+    currentCardType,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -43,6 +44,7 @@
     isRecurring,
     isRedesignV15,
     isDynamicFeeBearer,
+    isEmiV2,
   } from 'razorpay';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
   import {
@@ -53,7 +55,7 @@
   } from 'checkoutstore/methods';
 
   // i18n
-  import { t } from 'svelte-i18n';
+  import { locale, t } from 'svelte-i18n';
 
   import {
     NOCVV_LABEL,
@@ -79,6 +81,34 @@
   import { isNameReadOnly } from 'checkoutframe/customer';
   import { shouldRememberCard } from './utils';
   import * as _ from 'utils/_';
+  import UseBankCardLabel from './UseBankCardLabel.svelte';
+  import type { addCardMeta, CardFeatures, EMIPayload } from 'emiV2/types';
+  import {
+    formatTemplateWithLocale,
+    getShortBankName,
+    translateEmiTabName,
+  } from 'i18n';
+  import {
+    EMI_NOT_SUPPORTED,
+    ENTER_BANK_CARD_TO_AVAIL_EMI,
+  } from 'ui/labels/card';
+  import {
+    setAppropriateCtaText,
+    showPayFullAmount,
+    showTryAnotherEmi,
+  } from 'cta';
+  import {
+    errorTypes,
+    isInstrumentValidForEMI,
+  } from 'configurability/validate/emi';
+  import { selectedTab } from 'components/Tabs/tabStore';
+  import PhoneNumber from 'emiV2/ui/components/EmiTabsScreen/PhoneNumber.svelte';
+  import {
+    isCurrentCardInvalidForEmi,
+    isCurrentCardProviderInvalid,
+    selectedPlan,
+  } from 'checkoutstore/emi';
+  import { trackAddCardDetails } from 'emiV2/events/tracker';
 
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
@@ -93,6 +123,7 @@
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
+  export let emiPayload: EMIPayload;
 
   const isRedesignV15Enabled = isRedesignV15();
 
@@ -116,11 +147,27 @@
 
   let cardNumberHelpText: string | undefined;
   $: {
+    let errorMessage =
+      cardValidationErrorType === errorTypes.BANK_INVALID
+        ? ENTER_BANK_CARD_TO_AVAIL_EMI
+        : EMI_NOT_SUPPORTED;
+
     cardNumberHelpText =
       showCardUnsupported && $cardNumber.length > 6
         ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-        : undefined;
+        : cardValidationErrorType && validateCardNumber()
+        ? formatTemplateWithLocale(
+            errorMessage,
+            {
+              bank: getShortBankName(emiPayload.bank.code, $locale),
+              type: translateEmiTabName(emiPayload.tab, $locale),
+            },
+            $locale
+          )
+        : '';
   }
+
+  let cardValidationErrorType: string;
 
   export let faded = false;
 
@@ -196,6 +243,10 @@
   }
 
   export let tab;
+  let prevTab;
+  $: {
+    prevTab = tab;
+  }
 
   function handleFilled(curField) {
     const { tab, getAppliedOffer } = getSession();
@@ -277,6 +328,7 @@
     return isValid;
   }
 
+  const isNewEmiFlow = isEmiV2();
   /**
    * Checks and performs actions related to card flows
    * and validate the card input.
@@ -295,6 +347,7 @@
     const flowChecker = ({ flows = {}, type, issuer } = {}) => {
       // recreating type as _type as we need to override while running cards-separation exeriment
       let _type = type;
+      $currentCardType = type;
       const _cardNumber = getCardDigits(value);
       const isIinSame = getIin(_cardNumber) === iin;
       let _validCardNumber = true;
@@ -353,7 +406,7 @@
     };
 
     getCardFeatures(iin)
-      .then((features) => {
+      .then((features: CardFeatures) => {
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
@@ -375,10 +428,27 @@
           validationPromises.push(Promise.resolve(true));
         }
 
+        // If selected card is valid for emi and belongs to the selected bank
+        if (isNewEmiFlow && prevTab === 'emi') {
+          validationPromises.push(
+            isInstrumentValidForEMI(features, emiPayload)
+          );
+        } else {
+          validationPromises.push('');
+          $isCurrentCardInvalidForEmi = false;
+          $isCurrentCardProviderInvalid = false;
+        }
+
         return Promise.all(validationPromises);
       })
       .then(
-        ([isFlowValid, isCardNumberValid, cardMetaData, isInstrumentValid]) => {
+        ([
+          isFlowValid,
+          isCardNumberValid,
+          cardMetaData,
+          isInstrumentValid,
+          isCardValidForEMI,
+        ]) => {
           /**
            * This variable tells whether the network of the current card
            * is enabled for the merchant.
@@ -410,6 +480,23 @@
           // Card is unsupported if validation on instrument fails or if network is disabled for merchant
           showCardUnsupported =
             !isInstrumentValid || !isCurrentCardsNetworkEnabledForMerchant;
+
+          cardValidationErrorType = isCardValidForEMI;
+
+          if (isNewEmiFlow) {
+            if (isCardValidForEMI) {
+              if (isCardValidForEMI === 'bank') {
+                showTryAnotherEmi();
+              } else {
+                showPayFullAmount();
+              }
+            } else {
+              setAppropriateCtaText();
+            }
+            dispatch('error', {
+              inValid: isCardValidForEMI,
+            });
+          }
 
           setCardNumberValidity(
             isCardNumberValid &&
@@ -485,6 +572,44 @@
         valid: numberField.isValid(),
       },
     });
+
+    // Track Add Card Event for new EMI flow
+    if (isNewEmiFlow && prevTab === 'emi') {
+      let errorDescription = !cardValidationErrorType
+        ? ''
+        : cardValidationErrorType === errorTypes.BANK_INVALID
+        ? ENTER_BANK_CARD_TO_AVAIL_EMI
+        : EMI_NOT_SUPPORTED;
+      const cardMetaData = getCardMetadata($cardNumber);
+      const trackMeta: addCardMeta = {
+        card_type: cardMetaData?.type || 'NA',
+        card_issuer: cardMetaData?.issuer || 'NA',
+        card_network: cardMetaData?.network || 'NA',
+        provider_name: emiPayload.bank?.name,
+        tab_name: emiPayload.tab,
+        emi_plan: {
+          nc_emi_tag: $selectedPlan.subvention === 'merchant',
+          tenure: $selectedPlan.duration,
+        },
+        pay_full_amount_cta: true,
+        error_type: !cardValidationErrorType
+          ? 'NA'
+          : cardValidationErrorType === errorTypes.BANK_INVALID
+          ? 'card_invalid'
+          : 'emi_not_supported_on_card',
+        error_description: errorDescription
+          ? formatTemplateWithLocale(
+              errorDescription,
+              {
+                bank: emiPayload.bank?.name,
+                type: emiPayload.tab,
+              },
+              'en'
+            )
+          : '',
+      };
+      trackAddCardDetails(trackMeta, errorDescription);
+    }
   }
 
   function trackCardNumberAutoFilled() {
@@ -525,10 +650,16 @@
 </script>
 
 <div class="pad" id="add-card-container" class:faded>
+  {#if isNewEmiFlow && prevTab === 'emi' && emiPayload}
+    <UseBankCardLabel
+      selectedBank={emiPayload.bank.code}
+      selectedTab={emiPayload.tab}
+    />
+  {/if}
   <div class="page-header">
     <span class="card-title">{$t(ADD_NEW_CARD)} </span>
     <span class="emi-plans-label">
-      {#if tab === 'emi'}
+      {#if prevTab === 'emi' && !isNewEmiFlow}
         <div id="view-emi-plans" on:click={viewAllEMIPlans}>
           <!-- LABEL: View all EMI Plans -->
           {$t(VIEW_ALL_EMI_PLANS)}
@@ -553,8 +684,12 @@
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled}
+        showValidations={Boolean(cardNumberHelpText)}
         {...oneCCFieldProps}
       />
+      {#if isNewEmiFlow && cardNumberHelpText && !isRedesignV15Enabled}
+        <p class="eligibility-error">{cardNumberHelpText}</p>
+      {/if}
     </div>
     {#if !$hideExpiryCvvFields}
       <div class="third">
@@ -648,6 +783,12 @@
   {#if $showAuthTypeSelectionRadio}
     <div class="row">
       <CardFlowSelectionRadio bind:value={$authType} />
+    </div>
+  {/if}
+  <!-- Showing the emi contact field for debit card emi -->
+  {#if isNewEmiFlow && $selectedTab === 'debit'}
+    <div class="add-contact-field">
+      <PhoneNumber />
     </div>
   {/if}
 </div>
@@ -758,5 +899,16 @@
         display: none;
       }
     }
+  }
+
+  .eligibility-error {
+    color: #b21528;
+    font-size: 10px;
+    margin: 0;
+    margin-top: 6px;
+  }
+
+  .add-contact-field {
+    margin-top: 20px;
   }
 </style>

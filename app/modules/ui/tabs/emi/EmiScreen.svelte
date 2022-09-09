@@ -7,14 +7,23 @@
   import { formatTemplateWithLocale } from 'i18n';
 
   import {
-    CARD_DETAILS_HEADER,
     CARD_NUMBER_LABEL,
     CARD_NUMBER_HELP,
     NAME_LABEL,
     NAME_HELP,
+    BAJAJ_ISSUED_CARD,
+    ADD_NEW_CARD_HEADER,
+    PAY_VIA_EMI,
+    CARD_DETAILS_HEADER,
+    CARD_NOT_SUPPORTED,
+    BAJAJ_FISNSEV_ISSUED_CARD,
   } from 'ui/labels/bajaj-emi';
 
-  import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';
+  import {
+    bajajTCAccepted,
+    bajajTCAcceptedConsent,
+    isCurrentCardProviderInvalid,
+  } from 'checkoutstore/emi';
 
   import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
 
@@ -22,10 +31,17 @@
   import { getSession } from 'sessionmanager';
   import { querySelector } from 'utils/doc';
 
-  import { getPrefilledName, getPrefilledCardNumber } from 'razorpay';
+  import {
+    getPrefilledName,
+    getPrefilledCardNumber,
+    isRedesignV15,
+    isEmiV2,
+  } from 'razorpay';
   import { isNameReadOnly } from 'checkoutframe/customer';
   import CTA from 'cta';
   import { ENTER_CARD_DETAILS } from 'cta/i18n';
+  import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
+  import { cardNumber } from 'checkoutstore/screens/card';
 
   // Props
   export let emiDuration = '';
@@ -41,8 +57,13 @@
     name: isNameReadOnly(),
   };
 
+  const isNewEmiFlow = isEmiV2();
+  let cardInvalid = false;
+
   onMount(() => {
-    const emi_el_card = querySelector('#form-emi input[name="card[number]"]');
+    const emi_el_card = querySelector('input[name="card[number]"]');
+
+    bajajTCAccepted.set(true);
 
     session.delegator
       .add('card', emi_el_card)
@@ -55,16 +76,20 @@
           .setAttribute('cardtype', type);
       })
       .on('change', function () {
+        cardInvalid = false;
         let isValid = this.isValid();
+
+        $isCurrentCardProviderInvalid = false;
 
         if (this.type !== 'bajaj') {
           isValid = false;
         }
-
         // set validity classes
         if (isValid) {
           _El.removeClass(this.el.parentNode, 'invalid');
         } else {
+          cardInvalid = true;
+          $isCurrentCardProviderInvalid = true;
           _El.addClass(this.el.parentNode, 'invalid');
         }
       });
@@ -82,9 +107,15 @@
       $bajajTCAcceptedConsent = false;
     }
   }
+
+  const isRedesignV15Enabled = isRedesignV15();
 </script>
 
-<div class="pad">
+<div
+  class:bajaj-emi-screen={isNewEmiFlow}
+  class:bajaj-emi-one-cc={isRedesignV15Enabled}
+  class="pad"
+>
   <div id="add-emi-container">
     <input type="hidden" name="emi_duration" bind:value={emiDuration} />
     <div class="clear" />
@@ -101,10 +132,15 @@
         </div>
       </div>
     </div>
-    <h3>{$t(CARD_DETAILS_HEADER)}</h3>
+    {#if isNewEmiFlow}
+      <h3 class="bajaj-screen-header">{$t(BAJAJ_ISSUED_CARD)}</h3>
+      <p class="add-bajaj-label">{$t(ADD_NEW_CARD_HEADER)}</p>
+    {:else}
+      <h3>{$t(CARD_DETAILS_HEADER)}</h3>
+    {/if}
     <div class="card-fields">
       <div class="elem-wrap">
-        <div class="elem elem-card">
+        <div class="elem elem-card filled">
           <div class="cardtype" />
           <!-- LABEL: Card Number -->
           <label>{$t(CARD_NUMBER_LABEL)}</label>
@@ -120,11 +156,19 @@
             autocomplete="off"
             maxlength="19"
             value={prefill['card[number]']}
+            on:blur={(e) => {
+              if (isNewEmiFlow) {
+                cardNumber.set(e.target.value);
+              }
+            }}
           />
         </div>
       </div>
+      {#if cardInvalid}
+        <p class="error-msg">{$t(CARD_NOT_SUPPORTED)}</p>
+      {/if}
       <div class="elem-wrap" class:readonly={readonly.name}>
-        <div class="elem elem-name">
+        <div class="elem elem-name filled">
           <!-- LABEL: Please enter name on your card -->
           <span class="help">{$t(NAME_HELP)}</span>
           <!-- LABEL: Card Holder's Name -->
@@ -166,23 +210,54 @@
       </div>
       <div class="elem-wrap elem-wrap-bajaj-tc mandatory-note-margin-bottom">
         <span class="mandatory-check">
-          <span class="mandatory-check-note"> Note: </span> You need to have a Bajaj
-          Finserv issued card to continue with this emi option
+          <span class:hide-note={isNewEmiFlow} class="mandatory-check-note">
+            Note:
+          </span>
+          {BAJAJ_FISNSEV_ISSUED_CARD}
         </span>
       </div>
     </div>
   </div>
   <CTA
-    screen="emi"
+    screen={isNewEmiFlow ? 'card' : 'emi'}
     tab={'emi'}
-    disabled={false}
+    disabled={cardInvalid && isNewEmiFlow ? false : !$bajajTCAccepted}
     show
     showAmount
-    label={ENTER_CARD_DETAILS}
+    label={!isNewEmiFlow
+      ? ENTER_CARD_DETAILS
+      : cardInvalid
+      ? TRY_ANOTHER_EMI_OPTION
+      : PAY_VIA_EMI}
   />
 </div>
 
 <style>
+  .bajaj-emi-screen {
+    margin-top: 47px;
+  }
+
+  .bajaj-emi-one-cc {
+    margin-top: 0px;
+  }
+
+  .emi-plans-info-container {
+    display: none;
+  }
+
+  .add-bajaj-label {
+    margin: 0;
+    margin-top: 24px;
+    color: #263a4a;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .bajaj-screen-header {
+    color: #263a4a;
+    font-size: 14px;
+    text-transform: none;
+  }
   .bajaj-tooltip {
     transition: 0.25s ease-in transform, 0.16s ease-in opacity;
     transform: translateY(-10px);
@@ -250,5 +325,15 @@
 
   .mandatory-note-margin-bottom {
     margin-bottom: 10px;
+    display: none;
+  }
+  .mandatory-note-margin-bottom.hide-note {
+    display: none;
+  }
+  .error-msg {
+    font-size: 10px;
+    color: #b21528;
+    margin: 0;
+    margin-top: 4px;
   }
 </style>

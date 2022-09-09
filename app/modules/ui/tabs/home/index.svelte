@@ -56,6 +56,7 @@
     isHDFCVASMerchant,
     getMerchantOption,
     getAmount,
+    isEmiV2,
   } from 'razorpay';
   import {
     merchantAnalytics,
@@ -200,6 +201,7 @@
   import { isRTBEnabled } from 'rtb/helper';
   import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
+  import { setNoCostAvailable } from 'checkoutstore/emi';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -231,6 +233,7 @@
   const contactEmailReadonly = isContactEmailReadOnly();
   const isOneCCEnabled = isOneClickCheckout();
   const isRedesignV15Enabled = isRedesignV15();
+  const isEmiV2Enabled = isEmiV2();
 
   let expSourceSet = false;
 
@@ -254,6 +257,12 @@
     !tpv &&
     !isPartialPayment &&
     !session.get('address');
+
+  // If is new emi flow we show the no cost avalilable label
+  // if any no cost emi plans exists
+  if (isEmiV2()) {
+    setNoCostAvailable();
+  }
 
   export function showMethods() {
     view = HOME_VIEWS.METHODS;
@@ -1111,6 +1120,16 @@
       // If bank is not prefilled, go to netbanking tab. Otherwise, go to the emandate tab directly.
       if (!prefilledBank || !isEMandateBankEnabled(prefilledBank)) {
         method = 'netbanking';
+      }
+    }
+
+    /**
+     * For new emi flow we would be  showing saved cards on L1 screen
+     * So we need to change the tab to 'emi' in order to make otp flow work without hassle
+     */
+    if (method === 'cardless_emi') {
+      if (isEmiV2Enabled) {
+        method = 'emi';
       }
     }
 

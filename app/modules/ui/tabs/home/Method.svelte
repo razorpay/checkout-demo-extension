@@ -16,7 +16,6 @@
   import CodIcon from 'ui/elements/CodIcon.svelte';
 
   // Utils imports
-  import { getSession } from 'sessionmanager';
   import {
     getMethodNameForPaymentOption,
     getMethodDescription,
@@ -24,7 +23,7 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
-  import { isRedesignV15, getCurrency } from 'razorpay';
+  import { isRedesignV15, getCurrency, isEmiV2 } from 'razorpay';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
 
   // Store imports
@@ -34,6 +33,7 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { isNoCostEmiAvailable } from 'checkoutstore/emi';
   import { enableUPITiles } from 'upi/features';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
@@ -43,9 +43,12 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { upiUxV1dot1 } from 'upi/experiments';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+  import NoCostLabel from 'components/NoCostLabel.svelte';
+  import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
+  import { renderNoCostEmiTag } from 'emiV2/events/tracker';
 
   // Props
-  export let method = null; // Name of the method
+  export let method: string = null; // Name of the method
   export let icon = null; // Override: icon. Picked from method if not overridden.
   export let title = null; // Override: title. Picked from method if not overridden.
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
@@ -55,7 +58,6 @@
   export let errorLabel = '';
   let uninteractive = false;
 
-  const session = getSession();
   const dispatch = createEventDispatcher();
   const isOneCC = isRedesignV15();
 
@@ -88,7 +90,11 @@
   $: _title = getTitleForDisplay($locale);
   $: codLoading = isMethodCOD && $showCodLoader;
 
-  function getSubtitleForDisplay(locale) {
+  let _showNoCostLabel = false;
+  $: _showNoCostLabel =
+    (method === 'cardless_emi' || method === 'emi') && $isNoCostEmiAvailable;
+
+  function getSubtitleForDisplay(locale: string) {
     const currency = getCurrency();
     const spaceAmountWithSymbol = false;
 
@@ -112,6 +118,10 @@
       `;
     } else if (method === 'upi' && upiTiles.variant === 'row') {
       return formatMessageWithLocale(PAY_WITH_INSTALLED_OR_OTHERS, locale);
+    } else if (method === 'emi' && isEmiV2()) {
+      // For new EMI flow taking the description of cardless_emi
+      // Since the L1 screen will contain both card and cardless emi option
+      return getMethodDescription('cardless_emi', locale);
     }
     return getMethodDescription(method, locale);
   }
@@ -149,6 +159,12 @@
       Events.TrackBehav(HomeEvents.COD_METHOD_SELECTED);
     }
     $shouldOverrideVisibleState = false;
+
+    if (method === 'emi') {
+      // Track No Cost EMI Label shown
+      renderNoCostEmiTag(_showNoCostLabel);
+    }
+
     dispatch('select');
   }
 
@@ -188,6 +204,11 @@
   </i>
   <div slot="title" class:cod-error={disabled} class:title-one-cc={isOneCC}>
     {_title}
+  </div>
+  <div slot="label" class="no-cost-label">
+    {#if _showNoCostLabel && isEmiV2()}
+      <NoCostLabel text={NO_COST_EMI_AVAILABLE} expanded={false} />
+    {/if}
   </div>
   <div slot="subtitle" class:subtitle-one-cc={isOneCC}>
     {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'subText'}
@@ -316,5 +337,9 @@
     &:empty {
       display: none;
     }
+  }
+
+  div[slot='label'].no-cost-label {
+    margin: 0 8px;
   }
 </style>

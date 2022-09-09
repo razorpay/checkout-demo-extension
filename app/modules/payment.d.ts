@@ -32,6 +32,9 @@ declare namespace Payment {
         metadata?: {
           payment_id?: string;
         };
+        reason?: string;
+        step?: string;
+        code?: string;
       };
     };
     errorReason: 'manual' | 'automatic';

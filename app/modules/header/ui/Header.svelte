@@ -25,7 +25,11 @@
   const closeIcon = close('#B0B8C2');
 </script>
 
-<div id="header-wrapper" class:expanded={$expandedHeader} class:no-top-bar={isTopBarHidden()}>
+<div
+  id="header-wrapper"
+  class:expanded={$expandedHeader}
+  class:no-top-bar={isTopBarHidden()}
+>
   <div class:with-rtb={isRTBEnabled}>
     <div class="header-container">
       {#if getOption('image') || merchantName}
@@ -186,10 +190,11 @@
     left: 2px;
   }
 
-  #header-wrapper.no-top-bar{
+  #header-wrapper.no-top-bar {
     box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
 
-    & > div:first-child, .header-container {
+    & > div:first-child,
+    .header-container {
       border-bottom: 0;
     }
   }

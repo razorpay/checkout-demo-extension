@@ -43,6 +43,7 @@ export const RazorpayDefaults = {
   enable_fb_analytics: false,
   // temporary option, provides the cart information for FB Analytics
   customer_cart: {},
+  disable_emi_ux: null,
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

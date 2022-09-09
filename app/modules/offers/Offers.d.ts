@@ -10,7 +10,7 @@ declare namespace Offers {
     international?: any;
     active?: boolean;
     emi_subvention?: boolean;
-    type: 'deferred' | 'instant' | 'additional_discount';
+    type: 'deferred' | 'instant' | 'additional_discount' | 'read_only';
     percent_rate?: number;
     min_amount?: number;
     max_cashback?: number;
@@ -23,6 +23,8 @@ declare namespace Offers {
     original_amount?: number;
     amount?: number;
   }
+
+  export type OffersList = OfferItem[];
 
   export type InstantDiscountOfferItem = OfferItem & {
     amount: number;

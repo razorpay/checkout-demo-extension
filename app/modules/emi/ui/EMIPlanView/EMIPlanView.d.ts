@@ -5,6 +5,7 @@ declare namespace EMIPlanView {
     merchant_payback: string;
     min_amount: number;
     subvention: string;
+    offer_id?: string;
   };
 
   export type EMIPlan = {
@@ -18,5 +19,9 @@ declare namespace EMIPlanView {
 
   export type EMIPlanData = {
     [x: string]: EMIPlan;
+  };
+
+  export type EMIPLANOBJECT = {
+    [x: number]: EMIPlanDurationData;
   };
 }

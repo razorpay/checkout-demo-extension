@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency, isRedesignV15 } from 'razorpay';
+  import { getCurrency, isEmiV2, isRedesignV15 } from 'razorpay';
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
   import { CredEvents, OfferEvents, Events } from 'analytics/index';
@@ -14,6 +14,7 @@
     getOffersForInstrument,
     getOtherOffers,
     getOffersForTabAndInstrument,
+    filterNoCostEmiOffers,
   } from 'checkoutframe/offers';
 
   // i18n
@@ -38,6 +39,7 @@
     SELECT_OFFER_HEADER,
     YOU_SAVE_MESSAGE,
     APPLY_OFFER_CTA,
+    YOU_APPLIED_NO_COST,
   } from 'ui/labels/offers';
 
   import CTA from 'ui/elements/CTA.svelte';
@@ -50,11 +52,13 @@
   import {
     appliedOffer,
     isCardValidForOffer,
+    offerWindowOpen,
     showOffers,
   } from 'offers/store/store';
   import { querySelector } from 'utils/doc';
+  import { getSession } from 'sessionmanager';
 
-  export let applicableOffers; // eligible offers array
+  export let applicableOffers: Offers.OffersList; // eligible offers array
   export let setAppliedOffer;
   export let onShown;
   export let onHide;
@@ -64,7 +68,7 @@
   let selected = null; // locally selected offer
   let error;
   let errorCb;
-  let otherOffers = [];
+  let otherOffers: Offers.OffersList = [];
   let discount;
   let previousApplied = {};
   let currentTab;
@@ -139,6 +143,11 @@
     if (invalidateOffer) {
       setAppliedOffer($appliedOffer);
     }
+
+    // filter out no cost emi offers if new emi flow is present
+    if (isEmiV2()) {
+      applicableOffers = filterNoCostEmiOffers(applicableOffers);
+    }
   }
 
   export function getAppliedOffer() {
@@ -177,7 +186,15 @@
     hideError(true);
   }
   function showList() {
+    // If applied offer is no cost emi offer
+    // And belongs to new emi flow we don't allow the click
+
+    if (isNoCostOfferApplied) {
+      return;
+    }
+
     listActive = true;
+    $offerWindowOpen = true;
 
     // select the applied offer
     if ($appliedOffer) {
@@ -192,6 +209,7 @@
 
   function hideList(shouldMountCta) {
     listActive = false;
+    $offerWindowOpen = false;
     selected = null;
 
     // onHide basically mounts the active screen's cta..don't do it in edge cases. (When going back from home screen)
@@ -262,19 +280,30 @@
       OfferCTAState.disabled = error || !selected;
     }
   }
+
+  let isNoCostOfferApplied = false;
+
+  $: {
+    isNoCostOfferApplied =
+      isEmiV2() && $appliedOffer && $appliedOffer.emi_subvention ? true : false;
+  }
+
+  const session = getSession();
 </script>
 
 {#if $showOffers}
   <div
     class="offers-container"
     id="offers-container"
-    hidden={applicableOffers.length + otherOffers.length === 0}
+    hidden={applicableOffers.length + otherOffers.length === 0 &&
+      !$appliedOffer}
     class:has-error={error}
     class:offers-container-checkout-redesign={isRedesignV15Enabled}
   >
     <header
       on:click={showList}
       class:applied={$appliedOffer && $isCardValidForOffer}
+      class:offer-nc-applied={isNoCostOfferApplied}
     >
       <span class:bold={isRedesignV15Enabled}>
         {#if $appliedOffer}
@@ -299,6 +328,11 @@
                   $locale
                 )}
               </small>
+            {:else if isNoCostOfferApplied}
+              <small class="theme-highlight">
+                <!-- LABEL: You applied no cost emi -->
+                {$t(YOU_APPLIED_NO_COST)}
+              </small>
             {/if}
           {/if}
         {:else if applicableOffers.length === 1}
@@ -311,10 +345,12 @@
             $locale
           )}
         {/if}
-        <span class="offer-action theme-highlight">
-          <!-- LABEL: Change / Select -->
-          {$appliedOffer ? $t(CHANGE_ACTION) : $t(SELECT_ACTION)}
-        </span>
+        {#if !isNoCostOfferApplied}
+          <span class="offer-action theme-highlight">
+            <!-- LABEL: Change / Select -->
+            {$appliedOffer ? $t(CHANGE_ACTION) : $t(SELECT_ACTION)}
+          </span>
+        {/if}
       </span>
     </header>
     {#if error}
@@ -347,6 +383,7 @@
       <main
         class="list"
         class:main-checkout-redesign={isRedesignV15Enabled}
+        class:main-checkout-emi={isEmiV2() && session.tab === 'emi'}
         transition:fly|local={getAnimationOptions({ y: 40, duration: 200 })}
       >
         <header class="close-offerlist" on:click={onCloseClick}>
@@ -483,6 +520,10 @@
     font-size: 20px;
     color: #3f71d7;
   }
+
+  header.offer-nc-applied:after {
+    content: '';
+  }
   .offers-container .offer-action {
     float: right;
     margin-right: 4px;
@@ -506,6 +547,11 @@
   main.main-checkout-redesign {
     height: calc(100% - 75px);
     top: 75px;
+  }
+
+  main.main-checkout-emi {
+    height: 100%;
+    top: unset;
   }
 
   main.main-one-cc header span {

@@ -66,6 +66,7 @@
     isDCCEnabled,
     getPrefillMethod,
     isOneClickCheckout,
+    isEmiV2,
   } from 'razorpay';
 
   import { shouldRememberCustomer, tabStore } from 'checkoutstore';
@@ -80,6 +81,8 @@
   } from 'checkoutstore/methods';
 
   import {
+    isCurrentCardInvalidForEmi,
+    isCurrentCardProviderInvalid,
     newCardEmiDuration,
     savedCardEmiDuration,
     selectedPlanTextForNewCard,
@@ -156,6 +159,11 @@
   import { addCardView } from 'checkoutstore/dynamicfee';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { pushOverlay } from 'navstack';
+  import type { EMIPayload } from 'emiV2/types';
+  import { PAY_FULL_AMOUNT, PAY_VIA_EMI } from 'ui/labels/bajaj-emi';
+  import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
+  import { isEmiContactValid } from 'checkoutstore/screens/emi';
+  import { selectedTab } from 'components/Tabs/tabStore';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -180,10 +188,20 @@
   }
 
   $: {
-    /**
-     * handling DCC & AVS case
-     */
-    if (AVSRequired && currentView !== Views.AVS) {
+    // CTA for new EMI flow
+    // If entered card is invalid for emi
+    if (isNewEmiFlow && session.tab === 'emi') {
+      if ($isCurrentCardInvalidForEmi) {
+        ctaLabel = PAY_FULL_AMOUNT;
+      } else if ($isCurrentCardProviderInvalid) {
+        ctaLabel = TRY_ANOTHER_EMI_OPTION;
+      } else {
+        ctaLabel = PAY_VIA_EMI;
+      }
+    } else if (AVSRequired && currentView !== Views.AVS) {
+      /**
+       * handling DCC & AVS case
+       */
       ctaLabel = CTA_PROCEED;
       onSubmit = undefined; // reset to default action
     } else if (currentView === Views.AVS) {
@@ -197,6 +215,7 @@
     } else {
       onSubmit = undefined;
       ctaLabel =
+        !isNewEmiFlow &&
         $tabStore === 'emi' &&
         ((currentView !== Views.SAVED_CARDS &&
           session.emiPlansForNewCard &&
@@ -274,7 +293,7 @@
     }
   }
 
-  let tab = '';
+  let tab = session.tab;
   $: $cardTab = tab;
 
   let showApps = false;
@@ -308,6 +327,8 @@
     return hasFeature('shield_cbs_rollout', false);
   }
 
+  const isNewEmiFlow = isEmiV2();
+
   onMount(() => {
     // Prefill
     $cardNumber = session.get('prefill.card[number]') || '';
@@ -339,6 +360,10 @@
           // Do nothing
         });
       }
+    }
+
+    if (isNewEmiFlow && emiPayload) {
+      showLandingView();
     }
 
     const unbsubscribe = defaultDCCCurrency.subscribe((currency) => {
@@ -444,7 +469,9 @@
       );
       return true;
     }
-    $selectedCard = null; // De-select saved card
+    if (!isNewEmiFlow) {
+      $selectedCard = null; // De-select saved card
+    }
     tabVisible = false;
     $newCardInputFocused = false;
     return false;
@@ -647,12 +674,16 @@
     return tokens.filter((token) => token.plans);
   }
 
-  export function showLandingView() {
+  export function showLandingView(source = '') {
     return tick()
       .then(() => {
         let viewToSet = Views.ADD_CARD;
-
-        if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
+        // if the add card screen is rendered from new emi flow
+        // or if user clicked on 'Pay Full Amount' in emi flow -> if source arguement is emi
+        // we need to change the view to add card
+        if ((isNewEmiFlow && tab === 'emi') || source === 'emi') {
+          viewToSet = Views.ADD_CARD;
+        } else if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
           viewToSet = Views.SAVED_CARDS;
         }
         setView(viewToSet);
@@ -961,6 +992,16 @@
     }
   }
 
+  // If entered card is not supported for EMI
+  // Change the CTA label
+  let isCardInvalid = false;
+  const onCardError = (e) => {
+    const { detail } = e;
+    if (isNewEmiFlow && session.tab === 'emi') {
+      isCardInvalid = detail.inValid;
+    }
+  };
+
   /**
    * Show appropriate EMI-details strip on the new card screen.
    */
@@ -989,7 +1030,7 @@
       } else {
         showEmiCta = false;
       }
-    } else if (tab === 'emi') {
+    } else if (tab === 'emi' && !isNewEmiFlow) {
       if ($newCardEmiDuration) {
         emiCtaView = 'plans-available';
       } else if (cardLength >= 6 && !hasPlans) {
@@ -1007,7 +1048,6 @@
     const eventData = {
       from: session.tab,
     };
-
     if (emiCtaView === 'available' && isMethodUsable('emi')) {
       session.showEmiPlansForNewCard(e);
       eventName = CardEvents.VIEW_EMI_PLANS;
@@ -1087,14 +1127,21 @@
       }
     }
   }
+
+  export let emiPayload: EMIPayload;
+  // using this prop if we are rendering card screen from navstack
+  export let isRenderedByNavstack = false;
+
+  let showCardTab = false;
+  $: showCardTab = isNewEmiFlow && tab === 'emi';
 </script>
 
-<Tab method="card" pad={false} overrideMethodCheck>
+<Tab method="card" pad={false} shown={isRenderedByNavstack} overrideMethodCheck>
   <Screen pad={false}>
     <div bind:this={cardEle} class:screen-one-cc={isRedesignV15Enabled}>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
-          {#if showSavedCardsCta && !delayOTPExperiment}
+          {#if showSavedCardsCta && !delayOTPExperiment && !showCardTab}
             <div
               id="show-saved-cards"
               on:click={showSavedCardsView}
@@ -1148,9 +1195,11 @@
           <AddCardView
             {tab}
             bind:isFormValid={isAddNewCardFormValid}
+            {emiPayload}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput}
+            on:error={onCardError}
             {downtimeVisible}
             {downtimeSeverity}
             {downtimeInstrument}
@@ -1316,7 +1365,14 @@
       screen="card"
       tab={$tabStore}
       disabled={(currentView === Views.ADD_CARD && !isAddNewCardFormValid) ||
-        (currentView === Views.SAVED_CARDS && !isSavedCardFormValid)}
+        (currentView === Views.SAVED_CARDS && !isSavedCardFormValid)
+        || (!$isEmiContactValid &&
+      $isCurrentCardInvalidForEmi &&
+      $isCurrentCardProviderInvalid &&
+      isNewEmiFlow &&
+      $selectedTab === 'debit'
+        ? true
+        : false)}
       show
       showAmount
       {onSubmit}

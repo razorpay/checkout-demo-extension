@@ -250,7 +250,7 @@
             $locale
           )}
         {/if}
-        {#if bank === RBL_BANK_CODE || bank === HDFC_BANK_CODE || isDebitIssuer(bank)}
+        {#if bank === HDFC_BANK_CODE || isDebitIssuer(bank) || bank === RBL_BANK_CODE}
           <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on {bank} Cards. -->
           {formatTemplateWithLocale(
             DEBIT_DESCRIPTION_CONVENIENCE,

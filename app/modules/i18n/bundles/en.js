@@ -49,6 +49,14 @@ export default {
     card_number_label: 'Card Number',
     name_help: 'Please enter name on your card',
     name_label: "Card Holder's Name",
+    bajaj_issued_card: 'Use a Bajaj Finserv issued card',
+    add_new_card_header: 'Add New Card',
+    pay_via_emi: 'Pay via EMI',
+    card_not_supported:
+      'Card not supported. Enter a Bajaj issued card only or try another EMI option',
+    pay_full_amount: 'Pay full amount',
+    bajaj_fisnsev_issued_card:
+      'You need to have a Bajaj Finserv issued card to continue with this emi option',
   },
   bank_transfer: {
     account_label: 'Account',
@@ -192,6 +200,9 @@ export default {
       HSBC: 'HSBC',
       KKBK_DC: 'Kotak',
       RATN: 'RBL',
+      AMEX: 'AMEX',
+      SCBL: 'Standard Chartered',
+      BARB: 'Bank of Baroda',
     },
   },
   callouts: {
@@ -227,7 +238,7 @@ export default {
     downtime_callout_cards:
       'This payment might fail because {instrument} cards are facing technical difficulties',
     timer_callout: 'This page will timeout in {minutes} minutes',
-    callout_timer: 'This page will expire in',
+    callout_timer: 'This page will timeout in',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -322,6 +333,14 @@ export default {
       'This is required to automatically charge your card for recurring payments.',
     save_card_compliant_with_guidelines:
       'All saved cards are compliant with the latest security guidelines',
+    enter_cvv: 'Enter CVV',
+    use_bank_card: 'Use {bank} bank {type} card only',
+    enter_bank_card_to_avail_emi:
+      'Enter a {bank} bank {type} card to avail EMI or try another EMI option.',
+    emi_not_supported:
+      'EMI not supported on this card. Try again with another {bank} {type} card or pay full amount.',
+    saved_cards: 'Saved Cards',
+    credit_debit_card: '{type} Card',
     ...cardLang,
   },
   card_subtext: {
@@ -363,6 +382,9 @@ export default {
     select_recommended_title: 'Recommended',
     other_options: 'Other Options',
     walnut_banner_text: 'Get No Cost EMI quickly with Axio',
+    bank_emi_options: 'Bank EMI',
+    other_emi_options: 'Other EMI options',
+    more_banks_label: 'More Banks',
   },
   countries: {
     AD: 'Andorra',
@@ -631,6 +653,12 @@ export default {
     verify: 'Verify',
     view_emi_plans: 'View EMI Plans',
     proceed_payment: 'Proceed to Payment',
+    confirm_and_pay: 'Confirm and Pay',
+    pay_full_amount: 'Pay full amount',
+    try_again: 'Try Again',
+    pay_in_full: 'Pay in full',
+    pay_via_emi: 'Pay via EMI',
+    try_another_emi_option: 'Try Another Emi Option',
   },
   dcc: {
     search_all: 'All currencies',
@@ -651,6 +679,21 @@ export default {
       'Enter the mobile number registered with your bank and Debit Card.',
     contact_help: 'Please enter a valid indian mobile number',
     contact_title: 'MOBILE NUMBER',
+    contact_label: 'Registered Mobile Number',
+    check_eligibility: 'Check Eligibility',
+    eligible_for_emi: 'Eligible for EMI',
+    add_mobile_number: 'Add Mobile Number',
+    eligibility_validation_error:
+      'This mobile number is not eligible. Try a different number or choose another EMI option.',
+    contact_tooltip: 'Mobile number is required to check your EMI eligibility.',
+    try_another_emi_option: 'Try another EMI option',
+    pan_card_required:
+      'Your PAN number will be required as identity proof to complete the payment.',
+    debit_card_required:
+      'Your Debit card number will be required to complete the payment.',
+    enter_digit_mobile_number: 'Enter 10-digit mobile number',
+    mobile_number_invalid:
+      'This mobile number is invalid. Please enter valid mobile number to proceed',
   },
   emandate: {
     account_number_help: 'Please enter a valid account number',
@@ -705,9 +748,13 @@ export default {
       'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
     debit_description_min_balance:
       'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
+    emi_min_balance:
+      'No minimum balance is required. There will be no amount blocked on your card. You will pay {amount}/mo',
     interest_charged_label: 'Interest charged by the bank',
     no_cost_discount_label: 'No Cost EMI offer discount',
     no_cost_explain_action: '+ How does it work?',
+    no_cost_explain: 'How does No Cost EMI work?',
+    no_interest_applicable: 'No Interest Applicable',
     no_cost_label: 'No Cost',
     pay_entire_amount_action: 'Pay entire amount',
     pay_entire_amount_count: '({count} cards available)',
@@ -719,6 +766,8 @@ export default {
     plan_list_title_without_offer: 'Plans without offer',
     plan_list_view_all_action: 'View all EMI Plans',
     plan_title: '{duration} months ({amount}/mo)',
+    plan_title_v2: '{amount} x {duration} months',
+    plan_interest: 'Total interest is {interest} @ {rate}% pa',
     saved_card_unavailable_help: 'EMI is not available on this card',
     unavailable_btn: 'EMI unavailable',
     unavailable_help:
@@ -734,6 +783,24 @@ export default {
       'A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on ICICI Bank Credit Card',
     kotak_credit_description_convenience:
       'A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on Kotak Bank Credit Card',
+    cta_label: 'Continue',
+    confirm_message: 'Confirm and pay full order amount',
+    confirm_heading: 'Confirm Payment',
+    full_amount_emi_message:
+      'Full amount of {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
+    convenience_fee_msg:
+      'Convenience Fee: ₹{fee} + GST on interest would be charged by the bank.',
+    axis_conveninence_fee:
+      'Convenience fee of 1% of transaction amount or ₹100 whichever is higher + GST on interest would be charged by the bank',
+    starting_from_label: 'Starting from {amount}%',
+    entered_number_ineligible: 'Entered number is ineligible',
+    ineligible_contact_message:
+      'The entered number is not eligible. Try again with another number or pay the amount in full.',
+    select_plan: 'Select Plan',
+    credit: 'Credit',
+    debit: 'Debit',
+    cardless: 'Cardless',
+    debit_and_cardless: 'Debit & Cardless',
   },
   emi_details: {
     effective_interest_info:
@@ -749,6 +816,10 @@ export default {
     tenure_label: 'Tenure',
     total_amount_label: 'Total Amount',
     you_save_info: 'You save {amount}',
+    no_cost_offer_description:
+      'No Cost EMI discount is applicable on your purchase worth {amount}',
+    no_cost_emi_description:
+      'EMI Discount will be applied to your purchase to cover the interest charged by the bank.',
   },
   emi_issuers: {
     AMEX: 'American Express',
@@ -1019,6 +1090,7 @@ export default {
     continue_without_offer_action: 'Continue without offer',
     hide_action: 'Hide',
     no_cost_emi: 'No Cost EMI',
+    no_cost_emi_available: 'No Cost EMI Available',
     no_offer_available_method_message:
       'No offers available for this method. Please look at other offers available below',
     not_applicable_card_message: 'Offer is not applicable on this card.',
@@ -1033,6 +1105,9 @@ export default {
     select_action: 'Select Offer',
     select_offer_header: 'Select an offer',
     you_save_message: 'You save {amount}',
+    offer_applied_already: 'You have already applied No Cost EMI Discount!',
+    offer_not_applicable: 'Offer not applicable',
+    you_applied_no_cost: 'You applied No Cost EMI',
   },
   otp: {
     add_funds_label: 'Add Funds',

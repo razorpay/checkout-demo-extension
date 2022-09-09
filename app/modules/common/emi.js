@@ -3,7 +3,7 @@ import { emiBanks } from 'common/bank';
 import * as ObjectUtils from 'utils/object';
 
 // convert emiBanks array to map keyed by bank-code
-const bankMap = (emiBanks || []).reduce((banks, bankObj) => {
+export const bankMap = (emiBanks || []).reduce((banks, bankObj) => {
   banks[bankObj.code] = bankObj;
   return banks;
 }, {});

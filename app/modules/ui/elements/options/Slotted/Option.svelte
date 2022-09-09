@@ -37,7 +37,10 @@
     <Stack horizontal>
       <slot name="icon" />
       <div class:grow={flexGrow}>
-        <slot name="title" />
+        <div class="title">
+          <slot name="title" />
+          <slot name="label" />
+        </div>
         <slot name="subtitle" />
         <slot name="error" />
       </div>
@@ -90,5 +93,9 @@
 
   .grow {
     flex-grow: 1;
+  }
+  .title {
+    display: flex;
+    align-items: center;
   }
 </style>

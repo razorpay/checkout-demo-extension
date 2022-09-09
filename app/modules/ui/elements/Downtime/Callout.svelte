@@ -48,7 +48,7 @@
   <div>
     {#if customMessage}
       {@html sanitizeHTML(customMessage)}
-    {:else if $selectedInstrument?.method === 'card'}
+    {:else if ['card', 'emi'].includes($selectedInstrument?.method)}
       <FormattedText
         text={formatTemplateWithLocale(
           DOWNTIME_CALLOUT_CARDS,

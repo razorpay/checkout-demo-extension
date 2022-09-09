@@ -28,6 +28,8 @@ const _commonBanks = {
   IDFB: 'IDFC',
   INDB: 'IndusInd',
   VIJB: 'Vijaya Bank',
+  BARB: 'BOB',
+  RATN: 'RBL',
 };
 
 /**
@@ -122,6 +124,14 @@ export const emiBanks = [
   {
     code: 'HSBC',
     name: 'HSBC Credit Cards',
+  },
+  {
+    code: 'FDRL',
+    name: 'Federal Bank',
+  },
+  {
+    code: 'IDFB',
+    name: 'IDFC First Bank',
   },
 ];
 

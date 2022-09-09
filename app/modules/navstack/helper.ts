@@ -1,6 +1,12 @@
 import { get } from 'svelte/store';
 import { lastOf } from 'utils/array';
-import { elementRef, elements, overlays, overlaysRef } from './store';
+import {
+  elementRef,
+  elements,
+  overlays,
+  overlaysRef,
+  isSessionControlled,
+} from './store';
 
 type backSubscriberData = { isOverlay: boolean; stackCount: number };
 
@@ -129,4 +135,15 @@ export function onPopStack(cb: (data: backSubscriberData) => void) {
     };
     return true;
   };
+}
+
+/**
+ * Helper function to take the render control to session.js
+ */
+export function moveControlToSession(shouldMove: boolean) {
+  isSessionControlled.set(shouldMove);
+}
+
+export function controlledViaSession() {
+  return get(isSessionControlled);
 }

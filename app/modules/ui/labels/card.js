@@ -88,3 +88,9 @@ export const SAVE_CARD_SUBTITLE_SUBSCRIPTION =
   'card.save_card_know_more_add_card_modal_subtitle_subscription';
 export const SAVE_CARD_SUBTITLE_SUBSCRIPTION_CAW =
   'card.save_card_know_more_add_card_modal_subtitle_caw';
+export const ENTER_CVV = 'card.enter_cvv';
+export const USE_BANK_CARD = 'card.use_bank_card';
+export const ENTER_BANK_CARD_TO_AVAIL_EMI = 'card.enter_bank_card_to_avail_emi';
+export const EMI_NOT_SUPPORTED = 'card.emi_not_supported';
+export const SAVED_CARDS = 'card.saved_cards';
+export const CREDIT_DEBIT_CARD = 'card.credit_debit_card';

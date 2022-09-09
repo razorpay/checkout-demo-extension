@@ -1,6 +1,7 @@
 import { createMethodBlock } from './methods';
 import { getUniqueValues } from 'utils/array';
 import * as ObjectUtils from 'utils/object';
+import { isEmiV2 } from 'razorpay';
 
 /**
  * Transforms the list of blocks into the order defined in the
@@ -63,8 +64,12 @@ export function getSequencedBlocks(params) {
   if (sequence.includes('cardless_emi') && sequence.includes('emi')) {
     let indexOfEmi = sequence.indexOf('emi');
     let indexOfCardlessEmi = sequence.indexOf('cardless_emi');
-
-    if (indexOfEmi < indexOfCardlessEmi) {
+    // For new EMI flow since everything is grouped under EMI
+    // Lets Just have a simngle block for 'emi'
+    // and remove 'cardless_emi' althogether
+    if (isEmiV2()) {
+      sequence = sequence.filter((item) => item !== 'cardless_emi');
+    } else if (indexOfEmi < indexOfCardlessEmi) {
       /**
        * If emi is present before cardless_emi
        * Remove old cardless_emi and put it in the place of emi

@@ -17,6 +17,8 @@ import fetch, { FetchPrototype } from 'utils/fetch';
 import * as _ from 'utils/_';
 
 export const appliedOffer: Writable<Offers.OfferItem | null> = writable();
+export const offerWindowOpen = writable(false);
+export const showOfferAppliedStrip = writable(false);
 
 /**
  * to remove circular dep migrate from 1cc

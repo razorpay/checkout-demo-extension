@@ -7,6 +7,7 @@ import {
   isOfferForced,
   getAmount,
   isRedesignV15,
+  isEmiV2,
 } from 'razorpay';
 import { CtaViews } from 'ui/labels/cta';
 
@@ -17,6 +18,7 @@ import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 import Analytics from 'analytics';
 import CTAHelper from './store';
+import { isCardValidForEMiPayment } from 'checkoutstore/emi';
 
 export const ctaInfo = writable({
   view: '',
@@ -147,6 +149,14 @@ export function showUploadNachForm() {
   setView(CtaViews.UPLOAD_NACH_FORM, true);
 }
 
+export function showPayFullAmount() {
+  setView(CtaViews.PAY_FULL_AMOUNT, true);
+}
+
+export function showTryAnotherEmi() {
+  setView(CtaViews.TRY_ANOTHER_EMI_OPTION, true);
+}
+
 /**
  * Shows amount in CTA.
  * If amount is 0, shows "Authenticate"
@@ -220,6 +230,15 @@ export function setAppropriateCtaText() {
         return;
       }
       setView(CtaViews.PAY_WITHOUT_OFFER);
+    } else if (tab === 'emi' && isEmiV2()) {
+      // If added card is not supported for emi
+      // Change the cta to 'Pay Full Amount'
+      // This happens in the case of new EMI flow
+      if (!isCardValidForEMiPayment()) {
+        setView(CtaViews.PAY_FULL_AMOUNT);
+      } else {
+        setView(CtaViews.PAY_VIA_EMI);
+      }
     } else {
       showAmountInCta();
     }

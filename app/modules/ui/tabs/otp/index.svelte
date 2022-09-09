@@ -26,7 +26,7 @@
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   import { showFeeLabel } from 'checkoutstore/fee';
-  import { isRecurring, isRedesignV15 } from 'razorpay';
+  import { isEmiV2, isRecurring, isRedesignV15 } from 'razorpay';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -75,6 +75,11 @@
   import CTA, { hideCta } from 'cta';
   import { tabStore } from 'checkoutstore';
   import { isDebitIssuer } from 'common/bank';
+  import { selectedTab } from 'components/Tabs/tabStore';
+  import {
+    trackDebitCardEligibilityChecked,
+    trackOtpEntered,
+  } from 'emiV2/events/tracker';
 
   // Props
   export let on = {};
@@ -87,7 +92,7 @@
   export let inputWidth;
   export let showInput;
 
-  let otpPromptVisible;
+  let otpPromptVisible: boolean;
   let compact;
   let allowSkipButton = $allowSkip;
   const session = getSession();
@@ -107,6 +112,15 @@
     Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_ON_OTP_SCREEN, {
       immediately: true,
     });
+  }
+
+  $: {
+    // Track DC EMI Eligibility check
+    // if the user has reached OTP Screen -> means DC EMI was eligible for user
+    // sending otp verfied as false since user has not verified OTP yet
+    if (isDebitIssuer($mode) && isEmiV2() && otpPromptVisible) {
+      trackDebitCardEligibilityChecked(true, false);
+    }
   }
 
   $: {
@@ -143,6 +157,7 @@
   let isNativeOTPAndOneCC;
   $: isNativeOTPAndOneCC = !$isRazorpayOTP && isRedesignV15();
   let isOneCC = isRedesignV15();
+  const isNewEmiFlow = isEmiV2();
 
   export function invoke(type, event) {
     const method = on[type];
@@ -166,6 +181,14 @@
           headless: session.headless,
         },
       });
+    }
+
+    if (isNewEmiFlow) {
+      if (otpPromptVisible && $selectedTab === 'debit') {
+        // track otp entered
+        const showTimer = document.querySelector('#timeout');
+        trackOtpEntered(!!showTimer);
+      }
     }
   }
 
@@ -511,7 +534,7 @@
   }
 
   .tab-content-one-cc {
-    margin-top: 0px;
+    margin-top: 12px;
   }
 
   .otp-heading {
