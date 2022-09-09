@@ -68,11 +68,6 @@
       addCardView.set('');
     });
 
-    const handler = $activeRoute.props?.handleBack;
-    if (handler) {
-      handler();
-    }
-
     dispatch('back');
   }
 </script>

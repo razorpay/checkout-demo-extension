@@ -13,6 +13,7 @@
     isCouponApplied,
     couponInputValue,
   } from 'one_click_checkout/coupons/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
   import {
     cartAmount,
     cartDiscount,
@@ -75,7 +76,14 @@
     }
   }
 
-  $: showTotal = $isShippingAddedToAmount || $isCouponApplied;
+  $: {
+    showTotal = $isShippingAddedToAmount || $isCouponApplied;
+    if ($savedAddresses?.length && $shippingCharge) {
+      amount.set($cartAmount - $cartDiscount + $shippingCharge);
+    } else {
+      amount.set($cartAmount - $cartDiscount);
+    }
+  }
 </script>
 
 <div class="header">
@@ -131,7 +139,7 @@
       </p>
     </div>
   {/if}
-  {#if $isShippingAddedToAmount}
+  {#if $isShippingAddedToAmount && $savedAddresses?.length}
     <div class="row justify-between color-gray">
       {#if $checkServiceabilityStatus === SERVICEABILITY_STATUS.LOADING}
         <Shimmer width="40%" />
