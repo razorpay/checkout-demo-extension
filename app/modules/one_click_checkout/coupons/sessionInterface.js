@@ -17,6 +17,7 @@ import {
   applyCouponInStore,
   couponRemovedIndex,
   couponInputSource,
+  availableCoupons,
 } from 'one_click_checkout/coupons/store';
 import {
   removeCoupon,
@@ -53,13 +54,11 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
   showLoaderView(APPLY_COUPON);
   validateCoupon(code, source)
     .then((response) => {
-      emitMagicFunnelEvent(MAGIC_FUNNEL.COUPON_APPLIED, {
-        coupon: code,
-      });
       applyCouponInStore(code, response);
       if (onValid) {
         onValid();
       }
+      return { success: true, response };
     })
     .catch((error) => {
       if (onInvalid) {
@@ -73,12 +72,22 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
             get(locale)
           ),
         });
-        return;
+        return { success: false, response: error };
       }
       // TODO: Check for failure_code and trigger login if required\
       updateFailureReasonInStore(error);
+      return { success: false, response: error };
     })
-    .finally(() => {
+    .then(({ success, response }) => {
+      emitMagicFunnelEvent(MAGIC_FUNNEL.COUPON_APPLIED, {
+        coupon: code,
+        description:
+          get(availableCoupons).find((coupon) => coupon.code === code)
+            ?.description || '',
+        discount: response.promotions?.[0]?.value || null,
+        currency: 'INR',
+        success,
+      });
       showLoader.set(false);
     });
 }
