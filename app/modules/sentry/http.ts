@@ -84,6 +84,10 @@ export function captureError(error: Error) {
 }
 
 export function startSentryMonitoring() {
+  if (window.location.hostname !== 'api.razorpay.com') {
+    return;
+  }
+
   // window.onerror vs addEventListener('error): https://stackoverflow.com/questions/37933733/is-assigning-a-function-to-window-onerror-preferable-to-window-addeventlistener
   window.addEventListener('error', function (this: Window, event: ErrorEvent) {
     const url = event.filename;
