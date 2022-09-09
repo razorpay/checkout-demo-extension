@@ -3132,7 +3132,7 @@ Session.prototype = {
     }
 
     if (tab === '') {
-      this.homeTab.onShown();
+      this.homeTab?.onShown();
     }
     if (tab) {
       if (tab === 'credit_card' || tab === 'debit_card') {
@@ -5421,7 +5421,7 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'wallet') {
+    if (data?.method === 'wallet') {
       /**
        * Wallets might need to go through intent flow too
        * TODO: Add a feature check here

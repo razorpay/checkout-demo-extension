@@ -28,7 +28,12 @@ import { getElementById } from 'utils/doc';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
-    if (node && !node.contains(event.target) && !event.defaultPrevented) {
+    if (
+      node &&
+      !node.contains(event.target) &&
+      !event.defaultPrevented &&
+      typeof node.dispatchEvent === 'function'
+    ) {
       node.dispatchEvent(new CustomEvent('click_outside', node));
     }
   };

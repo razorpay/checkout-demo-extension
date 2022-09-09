@@ -43,14 +43,13 @@ export function validateArgs(
         validators.every((v: any, i: number) => {
           if (v(args[i])) {
             return true;
-          } else {
-            console.error(`wrong ${i}th argtype`, args[i]);
-            global.dispatchEvent(
-              new (CustomEvent as any)('rzp_error', {
-                detail: new Error(`wrong ${i}th argtype ${args[i]}`),
-              })
-            );
           }
+          console.error(`wrong ${i}th argtype`, args[i]);
+          global.dispatchEvent(
+            new (CustomEvent as any)('rzp_error', {
+              detail: new Error(`wrong ${i}th argtype ${args[i]}`),
+            })
+          );
         })
       ) {
         return func.apply(null, [...args]);
@@ -360,7 +359,7 @@ export function appendParamsToUrl(
     updatedParams = obj2query(params as Common.Object<string>);
   }
   if (updatedParams) {
-    url += url.indexOf('?') > 0 ? '&' : '?';
+    url += url?.indexOf('?') > 0 ? '&' : '?';
     url += updatedParams;
   }
   return url;
