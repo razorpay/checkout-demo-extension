@@ -1,5 +1,7 @@
 import { returnAsIs } from 'lib/utils';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
+
 export default function Eventer() {
   // constructor is also called for resetting
   this._evts = {};

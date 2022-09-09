@@ -1,5 +1,6 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import { getInternationalAppsConfig } from 'common/international';
+import * as _ from 'utils/_';
 
 const cdnUrl = RazorpayConfig.cdn;
 

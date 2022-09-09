@@ -17,6 +17,7 @@ import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from './constants';
+import * as _ from 'utils/_';
 
 let prefetchedPrefs;
 

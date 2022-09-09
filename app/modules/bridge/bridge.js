@@ -1,3 +1,5 @@
+import * as _ from 'utils/_';
+
 /**
  * Generic Bridge interface for all the bridges and platforms.
  * Bridge interface is not to be used for legacy iOS SDKs

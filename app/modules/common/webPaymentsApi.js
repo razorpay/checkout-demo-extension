@@ -16,7 +16,10 @@ export const appsThatSupportWebPayments = [
 ];
 
 export function additionalSupportedPaymentApps() {
-  appsThatSupportWebPayments.push({ package_name: BHIM_UPI_PACKAGE_NAME, method: 'upi' }, { package_name: PAYTM_PACKAGE_NAME, method: 'upi' })
+  appsThatSupportWebPayments.push(
+    { package_name: BHIM_UPI_PACKAGE_NAME, method: 'upi' },
+    { package_name: PAYTM_PACKAGE_NAME, method: 'upi' }
+  );
 }
 
 const webPaymentsApps = {};

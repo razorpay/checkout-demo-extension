@@ -1,6 +1,6 @@
 {
     "**/*.{js,svelte,ts}": [
         "npx prettier --write",
-        "npx eslint --fix"
+        "npx eslint --fix --quiet"
       ]
   }

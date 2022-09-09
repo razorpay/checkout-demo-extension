@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 declare const __BUILD_NUMBER__: string;
 
-declare const _: any;
 interface Window {
   Razorpay: any;
   Event: any;

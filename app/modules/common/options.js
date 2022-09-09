@@ -1,5 +1,6 @@
 import { shouldRedirect } from 'common/useragent';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 export const RazorpayDefaults = {
   key: '',

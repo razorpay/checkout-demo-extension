@@ -24,6 +24,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import * as ObjectUtils from 'utils/object';
+  import * as _ from 'utils/_';
 
   // i18n
   import {

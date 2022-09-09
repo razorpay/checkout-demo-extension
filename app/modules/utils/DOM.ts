@@ -1,4 +1,5 @@
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 type styleProps = keyof HTMLElement['style'];
 export const ElementConstructor = global.Element;

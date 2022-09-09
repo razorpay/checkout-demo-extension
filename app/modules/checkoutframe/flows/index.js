@@ -1,4 +1,5 @@
 import { getCardFeaturesFromCache } from 'common/card';
+import * as _ from 'utils/_';
 
 const Flows = {
   PIN: 'pin',

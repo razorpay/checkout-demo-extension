@@ -1,4 +1,5 @@
 import { parse } from 'utils/object';
+import * as _ from 'utils/_';
 
 const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
 

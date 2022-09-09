@@ -1,17 +1,13 @@
-export function logError() {
-  console.error.apply(console, arguments);
-}
-
 /**
  * Returns the curried version of a function with two arguments
  * @param {Function} func
  *
  * @returns {Function}
  */
-export const curry2 = (func) =>
-  function (arg1, arg2) {
+export const curry2 = (func: (arg1: any, arg2?: any) => any) =>
+  function (arg1: any, arg2?: any) {
     if (arguments.length < 2) {
-      return (primArg) => func.call(null, primArg, arg1);
+      return (primArg: any) => func.call(null, primArg, arg1);
     }
     return func.call(null, arg1, arg2);
   };
@@ -22,10 +18,10 @@ export const curry2 = (func) =>
  *
  * @returns {Function}
  */
-export const curry3 = (func) =>
-  function (arg1, arg2, arg3) {
+export const curry3 = (func: (arg1: any, arg2: any, arg3?: any) => any) =>
+  function (arg1: any, arg2: any, arg3?: any) {
     if (arguments.length < 3) {
-      return (primArg) => func.call(null, primArg, arg1, arg2);
+      return (primArg: any) => func.call(null, primArg, arg1, arg2);
     }
     return func.call(null, arg1, arg2, arg3);
   };
@@ -38,25 +34,26 @@ export const curry3 = (func) =>
  *
  * @returns {*}
  */
-export function validateArgs(...validators) {
-  return (func) =>
-    function () {
-      let args = arguments;
+export function validateArgs(
+  ...validators: Array<(...validatorArgs: any) => boolean>
+) {
+  return (func: (...funcArg: any) => any) =>
+    function (...args: any) {
       if (
-        validators.every((v, i) => {
+        validators.every((v: any, i: number) => {
           if (v(args[i])) {
             return true;
           } else {
-            logError(`wrong ${i}th argtype`, args[i]);
+            console.error(`wrong ${i}th argtype`, args[i]);
             global.dispatchEvent(
-              CustomEvent('rzp_error', {
+              new (CustomEvent as any)('rzp_error', {
                 detail: new Error(`wrong ${i}th argtype ${args[i]}`),
               })
             );
           }
         })
       ) {
-        return func.apply(null, args);
+        return func.apply(null, [...args]);
       }
       return args[0];
     };
@@ -69,7 +66,7 @@ export function validateArgs(...validators) {
  *
  * @returns {boolean}
  */
-export const isType = ((x, type) => typeof x === type) |> curry2;
+export const isType = curry2((x, type) => typeof x === type);
 
 /**
  * Returns true or false if the argument passed is boolean or not
@@ -133,7 +130,7 @@ export const isUndefined = isType('undefined');
  *
  * @returns {Boolean}
  */
-export const isNull = (x) => x === null;
+export const isNull = (x: any) => x === null;
 
 /**
  * Tells whether something is of a primitive type
@@ -141,7 +138,7 @@ export const isNull = (x) => x === null;
  *
  * @returns {Boolean}
  */
-export const isPrimitive = (x) =>
+export const isPrimitive = (x: any) =>
   isString(x) || isNumber(x) || isBoolean(x) || isNull(x) || isUndefined(x);
 
 /**
@@ -150,7 +147,8 @@ export const isPrimitive = (x) =>
  *
  * @returns {boolean}
  */
-export const isElement = (o) => isNonNullObject(o) && o.nodeType === 1;
+export const isElement = (o: Common.Object | Element) =>
+  isNonNullObject(o) && o.nodeType === 1;
 
 /**
  * Checks if the given argument is truthy or not
@@ -166,7 +164,7 @@ export const isTruthy = Boolean;
  *
  * @returns {boolean}
  */
-export const isNonNullObject = (o) => !isNull(o) && isObject(o);
+export const isNonNullObject = (o: Common.Object) => !isNull(o) && isObject(o);
 
 /**
  * Checks if the given object is empty or not
@@ -174,7 +172,7 @@ export const isNonNullObject = (o) => !isNull(o) && isObject(o);
  *
  * @returns {boolean}
  */
-export const isEmptyObject = (x) => !lengthOf(Object.keys(x));
+export const isEmptyObject = (x: Common.Object) => !lengthOf(Object.keys(x));
 
 /**
  * Returns the given property of the provided object
@@ -202,15 +200,6 @@ export const lengthOf = prop('length');
 export const prototypeOf = prop('prototype');
 
 /**
- * Checks if the constructor of first parameter is same as second parameter constructor
- * @param {*} x
- * @param {class} y
- *
- * @returns {boolean}
- */
-export const isExact = curry2((x, y) => x && x.constructor === y);
-
-/**
  * Checks if the first parameter is an instance of second parameter class
  * @param {*} x
  * @param {class} y
@@ -226,30 +215,6 @@ export const random = Math.random;
 export const floor = Math.floor;
 
 /**
- * Calls a function after a given time and returns a function to clear the timeout
- * @param {Function} func
- * @param {number} delay
- *
- * @returns {Function}
- */
-export const timeout = (func, delay) => {
-  let timerId = setTimeout(func, delay || 0);
-  return () => clearTimeout(timerId);
-};
-
-/**
- * Calls a function at a set interval of time and returns a function to clear the interval.
- * @param {Function} func
- * @param {number} delay
- *
- * @returns {Function}
- */
-export const interval = (func, delay) => {
-  let timerId = setInterval(func, delay || 0);
-  return () => clearInterval(timerId);
-};
-
-/**
  * Returns a function that returns the time
  * that has passed since this function was
  * invoked.
@@ -257,7 +222,7 @@ export const interval = (func, delay) => {
  * @returns {function (): number}
  */
 export const timer = () => {
-  let then = now();
+  const then = now();
   return () => now() - then;
 };
 
@@ -268,8 +233,8 @@ export const timer = () => {
  *
  * @returns {Object}
  */
-export function rawError(description, field) {
-  let errorObj = {
+export function rawError(description: string, field = '') {
+  const errorObj: { description: string; field?: string } = {
     description: String(description),
   };
   if (field) {
@@ -285,7 +250,7 @@ export function rawError(description, field) {
  *
  * @returns {Object}
  */
-export function rzpError(description, field) {
+export function rzpError(description: string, field = '') {
   return { error: rawError(description, field) };
 }
 
@@ -295,7 +260,7 @@ export function rzpError(description, field) {
  *
  * @throws {Error}
  */
-export function throwMessage(message) {
+export function throwMessage(message: string) {
   throw new Error(message);
 }
 
@@ -305,7 +270,8 @@ export function throwMessage(message) {
  *
  * @returns {boolean}
  */
-export const isBase64Image = (src) => /data:image\/[^;]+;base64/.test(src);
+export const isBase64Image = (src: string) =>
+  /data:image\/[^;]+;base64/.test(src);
 
 /**
  * Gives a flattened object that can be used to generate query strings.
@@ -316,8 +282,8 @@ export const isBase64Image = (src) => /data:image\/[^;]+;base64/.test(src);
  *
  * @return {Object}
  */
-export function makeQueryObject(obj, prefix) {
-  const query = {};
+export function makeQueryObject(obj: Common.Object, prefix?: string) {
+  const query: Common.Object<string> = {};
 
   if (!isNonNullObject(obj)) {
     return query;
@@ -349,12 +315,13 @@ export function makeQueryObject(obj, prefix) {
  *
  * @returns {string}
  */
-export function obj2query(obj) {
-  const query = makeQueryObject(obj);
+export function obj2query(obj: Common.Object<any>) {
+  const query: Common.Object<string> = makeQueryObject(obj);
 
   return Object.keys(query)
     .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as any)}`
     )
     .join('&');
 }
@@ -365,10 +332,10 @@ export function obj2query(obj) {
  *
  * @returns {Object}
  */
-export function query2obj(string) {
+export function query2obj(string: string) {
   // TODO: Support objects and nested objects.
 
-  let obj = {};
+  const obj: Common.Object = {};
   string.split(/=|&/).forEach((param, index, array) => {
     if (index % 2) {
       obj[array[index - 1]] = decodeURIComponent(param);
@@ -384,34 +351,19 @@ export function query2obj(string) {
  *
  * @returns {string}
  */
-export function appendParamsToUrl(url, params) {
-  if (isNonNullObject(params)) {
-    params = obj2query(params);
+export function appendParamsToUrl(
+  url: string,
+  params: Common.Object<string | number> | string
+) {
+  let updatedParams = params;
+  if (isNonNullObject(params as Common.Object<string>)) {
+    updatedParams = obj2query(params as Common.Object<string>);
   }
-  if (params) {
+  if (updatedParams) {
     url += url.indexOf('?') > 0 ? '&' : '?';
-    url += params;
+    url += updatedParams;
   }
   return url;
-}
-
-/**
- * Returns rgba value for hex color code
- * @param {string} hex
- *
- * @returns {Object}
- */
-
-export function hex2rgb(hex) {
-  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        red: parseInt(result[1], 16),
-        green: parseInt(result[2], 16),
-        blue: parseInt(result[3], 16),
-        alpha: 1,
-      }
-    : null;
 }
 
 /**
@@ -420,11 +372,11 @@ export function hex2rgb(hex) {
  *
  * @returns {number}
  */
-export const getKeyFromEvent = (e) =>
+export const getKeyFromEvent = (e: KeyboardEvent) =>
   is(e, global.Event) && (e.which || e.charCode || e.keyCode);
 
-export const getCharFromEvent = (e) => {
-  let which = getKeyFromEvent(e);
+export const getCharFromEvent = (e: KeyboardEvent) => {
+  const which = getKeyFromEvent(e);
   return (
     (which &&
       !e.ctrlKey &&
@@ -443,7 +395,7 @@ export const getCharFromEvent = (e) => {
 export const getQueryParams = function (search = location.search) {
   // TODO: Support objects and nested objects.
   if (isString(search)) {
-    return search.slice(1) |> query2obj;
+    return query2obj(search.slice(1));
   }
 
   return {};
@@ -457,7 +409,7 @@ export const getQueryParams = function (search = location.search) {
  *
  * @returns {Event}
  */
-export function CustomEvent(event, params) {
+export function CustomEvent(event: string, params: Common.Object) {
   params = params || { bubbles: false, cancelable: false, detail: undefined };
 
   const evt = document.createEvent('CustomEvent');

@@ -8,6 +8,7 @@ import { Track } from 'analytics';
 import 'analytics/track-errors';
 import { resolveElement } from 'utils/doc';
 import { submitForm } from 'common/form';
+import * as _ from 'utils/_';
 
 Track.props.library = 'checkoutjs';
 

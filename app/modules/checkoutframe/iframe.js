@@ -8,6 +8,7 @@ import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
 import { parse } from 'utils/object';
 import * as _El from 'utils/DOM';
 import { body } from 'utils/doc';
+import * as _ from 'utils/_';
 import { captureSentryHttpFailure } from 'sentry/failure';
 
 /**

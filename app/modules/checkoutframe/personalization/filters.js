@@ -13,6 +13,7 @@ import {
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 import { highlightUPIIntentOnDesktop } from 'upi/experiments';
 import { get } from 'svelte/store';

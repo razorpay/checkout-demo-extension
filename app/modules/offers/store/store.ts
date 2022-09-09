@@ -14,6 +14,7 @@ import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
 import { BEHAV } from 'analytics-types';
 import fetch, { FetchPrototype } from 'utils/fetch';
+import * as _ from 'utils/_';
 
 export const appliedOffer: Writable<Offers.OfferItem | null> = writable();
 

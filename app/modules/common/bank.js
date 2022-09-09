@@ -1,5 +1,6 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import { getCardMetadata } from 'common/card';
+import * as _ from 'utils/_';
 
 // const cdnUrl = '';
 const cdnUrl = RazorpayConfig.cdn;

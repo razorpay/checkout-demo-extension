@@ -62,9 +62,9 @@ class Experiment {
     // Make sure we return an object
     if (data && typeof data === 'object' && !Array.isArray(data)) {
       return data;
-    } else {
+    } 
       return {};
-    }
+    
   }
 
   /**
@@ -162,9 +162,9 @@ class Experiment {
 
     if (typeof existing === 'undefined') {
       return this.setSegment(experiment, evaluatorArg, overrideFn);
-    } else {
+    } 
       return existing;
-    }
+    
   }
 
   /**

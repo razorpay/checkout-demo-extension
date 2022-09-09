@@ -1,5 +1,6 @@
 import { AVAILABLE_METHODS } from 'common/constants';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 const INTERNATIONAL_INSTRUMENT_CONFIG = {
   properties: ['providers'],

@@ -12,6 +12,7 @@ import RazorpayStore, {
 } from 'razorpay';
 import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import { CTAHelper } from 'cta';
 

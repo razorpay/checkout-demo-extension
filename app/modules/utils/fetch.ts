@@ -1,4 +1,5 @@
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 import * as _El from './DOM';
 
 // TODO make it class
@@ -22,6 +23,12 @@ export type FetchPrototype = {
     callback: (response: any) => void;
     data?: string | Common.Object<string | string[]>;
   };
+};
+
+type response = {
+  xhr?: any;
+  error?: { description: string; field?: string };
+  status_code?: number;
 };
 type options = FetchPrototype['options'];
 
@@ -128,13 +135,11 @@ function appendQueryParamToUrl(
   if (!paramName || !paramValue) {
     return url;
   }
+  const obj: Common.Object<string> = {
+    [paramName]: paramValue,
+  };
 
-  return _.appendParamsToUrl(
-    url,
-    _.obj2query({
-      [paramName]: paramValue,
-    })
-  );
+  return _.appendParamsToUrl(url, _.obj2query(obj));
 }
 
 /**
@@ -262,11 +267,7 @@ const fetchPrototype: FetchPrototype = {
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
-        let json = ObjectUtils.parse(xhr.responseText) as {
-          xhr: any;
-          error: boolean;
-          status_code: number;
-        };
+        let json = ObjectUtils.parse(xhr.responseText) as response;
         if (!json) {
           json = _.rzpError('Parsing error');
           json.xhr = {
@@ -296,7 +297,7 @@ const fetchPrototype: FetchPrototype = {
       }
     };
     xhr.onerror = function () {
-      const resp = networkError;
+      const resp: response = networkError;
       resp.xhr = {
         status: 0,
       };
@@ -354,8 +355,8 @@ function normalizeOptions(options: string | options): options {
     if (!callback) {
       updatedOptions.callback = (_) => _;
     }
-    if (_.isNonNullObject(data) && !_.is(data, FormData)) {
-      data = _.obj2query(data);
+    if (_.isNonNullObject(data as Common.Object) && !_.is(data, FormData)) {
+      data = _.obj2query(data as Common.Object);
     }
     updatedOptions.data = data;
 
@@ -468,7 +469,7 @@ function jsonp(options: options): FetchPrototype {
     this.setReq('jsonp', req);
 
     // Make the source URL
-    let src = _.appendParamsToUrl(options.url, options.data);
+    let src = _.appendParamsToUrl(options.url, options.data as Common.Object);
 
     //#region DDoS Protection
     src = appendKeylessHeaderParamToUrl(src, keylessHeader);

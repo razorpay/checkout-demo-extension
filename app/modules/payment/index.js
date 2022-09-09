@@ -9,7 +9,7 @@ import * as Color from 'lib/color';
 import { returnAsIs } from 'lib/utils';
 import { submitForm } from 'common/form';
 import * as ObjectUtils from 'utils/object';
-
+import * as _ from 'utils/_';
 import { Track } from 'analytics';
 import { writePopup, updatePopup } from 'payment/popup/template';
 import Popup from 'payment/popup';

@@ -1,6 +1,7 @@
 import { each, scrollIntoView } from 'lib/utils';
 import { setContents } from 'utils/DOM';
 import { isNonNullObject } from 'utils/object';
+import * as _ from 'utils/_';
 
 var $ = function (el) {
   if (_.isString(el)) {

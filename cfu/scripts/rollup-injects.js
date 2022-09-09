@@ -10,9 +10,6 @@ const globalInjects = globalContents
 let injects = {
   // this is rollup option, not an inject
   include: ['**/*.js', '**/*.ts', '**/*.svelte'],
-
-  // injects
-  _: ['fe/implicit/_', '*'],
 };
 
 globalInjects.forEach((g) => {

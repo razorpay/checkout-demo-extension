@@ -13,7 +13,7 @@
   let displayTime;
 
   const timerFn = () => {
-    const millisecLeft = expiry - _.now();
+    const millisecLeft = expiry - Date.now();
     if (millisecLeft <= 0) {
       clear();
       onExpire();

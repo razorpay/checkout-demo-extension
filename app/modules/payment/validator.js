@@ -6,7 +6,7 @@ import { luhnCheck } from 'lib/utils';
 import { getOption, getOrderId } from 'razorpay';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
-
+import * as _ from 'utils/_';
 export const formatPayment = function (payment) {
   let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
     (allParams, param) => {

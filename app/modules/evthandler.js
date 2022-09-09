@@ -1,3 +1,4 @@
+import * as _ from 'utils/_';
 export default function EvtHandler(el, thisArg) {
   this.thisArg = arguments.length > 1 ? thisArg : this;
   this.el = el;
@@ -40,7 +41,7 @@ EvtHandler.prototype = {
   on: function (event, callback, el, useCapture) {
     // event can be string or a map {event: callback}
     if (typeof event !== 'string') {
-      for (var eventName in event) {
+      for (let eventName in event) {
         this.on(eventName, event[eventName], callback, el);
       }
       return;

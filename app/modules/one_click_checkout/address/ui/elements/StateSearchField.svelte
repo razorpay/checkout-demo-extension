@@ -8,6 +8,8 @@
     STATE_SEARCH_ALL,
     STATE_SEARCH_PLACEHOLDER,
   } from 'one_click_checkout/address/i18n/labels';
+  import * as _ from 'utils/_';
+
   import triggerSearchModal from 'components/SearchModal';
 
   export let items = [];

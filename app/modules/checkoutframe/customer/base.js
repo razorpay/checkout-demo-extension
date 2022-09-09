@@ -21,6 +21,7 @@ import { timer } from 'utils/timer';
 import { get } from 'svelte/store';
 import { contact } from 'checkoutstore/screens/home';
 import { isLoggedIn } from 'checkoutstore/customer';
+import * as _ from 'utils/_';
 
 let customers = {};
 let qpmap = _.getQueryParams();

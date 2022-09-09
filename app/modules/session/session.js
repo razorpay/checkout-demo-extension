@@ -1,5 +1,4 @@
 // eslint-disable-next-line no-redeclare
-/* global _ */
 import * as RazorpayHelper from 'razorpay';
 import discreet from 'checkoutframe/discreet';
 import * as Confirm from 'checkoutframe/components/confirm';
@@ -23,6 +22,7 @@ import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 import { isMainStackPopulated, popStack } from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';

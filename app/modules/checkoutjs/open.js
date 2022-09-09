@@ -9,6 +9,7 @@ import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerpr
 import { isBraveBrowser } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 import Interface from 'common/interface';
 
 const RazorProto = _.prototypeOf(Razorpay);

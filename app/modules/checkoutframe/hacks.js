@@ -4,6 +4,7 @@ import * as UserAgent from 'common/useragent';
 import { compareSemver } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import { hasProp } from 'utils/object';
+import * as _ from 'utils/_';
 
 const Orientation = {
   LANDSCAPE: 'landscape',

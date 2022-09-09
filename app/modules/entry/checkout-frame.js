@@ -12,6 +12,7 @@ import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
 import { TRAFFIC_ENV } from 'common/constants';
+import * as _ from 'utils/_';
 import { startSentryMonitoring } from 'sentry/http';
 
 setSessionConstructor(Session);

@@ -6,6 +6,7 @@ import fetch from 'utils/fetch';
 import { getAmount } from 'razorpay';
 import { setRTBVariant } from 'rtb/helper';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 import { makeAuthUrl } from 'common/helper';
 import { getSession } from 'sessionmanager';

@@ -10,6 +10,7 @@ import { METHODS } from 'checkoutframe/constants';
 import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 import fetch from 'utils/fetch';
+import * as _ from 'utils/_';
 
 const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};

@@ -2,6 +2,7 @@ import { Track } from 'analytics';
 import Bridge from './bridge';
 import * as _El from 'utils/DOM';
 import { documentElement } from 'utils/doc';
+import * as _ from 'utils/_';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {

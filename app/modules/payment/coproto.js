@@ -7,7 +7,7 @@ import {
   parseUPIIntentResponse,
   upiBackCancel,
 } from 'common/upi';
-
+import * as _ from 'utils/_';
 import { getMerchantKey } from 'razorpay';
 
 import { androidBrowser } from 'common/useragent';

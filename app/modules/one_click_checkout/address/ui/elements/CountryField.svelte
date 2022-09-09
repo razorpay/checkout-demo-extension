@@ -18,7 +18,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { ADDRESS_TYPES } from 'one_click_checkout/address/constants';
 
-  import { truncateString } from 'utils/strings';
+  import * as _ from 'utils/_';
 
   export let onChange;
   export let extraLabel;

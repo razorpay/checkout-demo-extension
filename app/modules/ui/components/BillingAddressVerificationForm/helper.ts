@@ -15,7 +15,7 @@ import {
 } from 'ui/labels/avs-form';
 import { SPACIAL_CHAR_REGEX } from './constants';
 import fetch from 'utils/fetch';
-
+import * as _ from 'utils/_';
 // analytics
 import { Track } from 'analytics';
 

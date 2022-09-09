@@ -19,6 +19,7 @@ import {
 } from './constants';
 import { isInternational } from 'razorpay';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);

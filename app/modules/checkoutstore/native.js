@@ -6,6 +6,7 @@ import {
 } from 'common/apps';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
+import * as _ from 'utils/_';
 
 let message;
 let cardApps = { all: getAppsForMethod('card') };

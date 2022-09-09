@@ -1,5 +1,6 @@
 import { CHECK_ERROR } from 'common/constants';
 import { hasProp } from 'utils/object';
+import * as _ from 'utils/_';
 
 const PaymentRequest = global.PaymentRequest;
 

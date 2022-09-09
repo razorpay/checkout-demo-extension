@@ -4,6 +4,7 @@ import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
 import { preventEvent } from 'utils/doc';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 const alphanumericRaw = function (value) {
   let returnVal = value.replace(/[^a-zA-Z0-9]/g, '');

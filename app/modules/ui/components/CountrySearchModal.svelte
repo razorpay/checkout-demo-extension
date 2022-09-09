@@ -50,16 +50,16 @@
 
         if (indexA < indexB) {
           return -1; // a comes first
-        } else {
-          return 1; // b comes first
         }
-      } else if (hasA) {
-        return -1; // a comes first
-      } else if (hasB) {
         return 1; // b comes first
-      } else {
-        return 0; // leave unchanged
       }
+      if (hasA) {
+        return -1; // a comes first
+      }
+      if (hasB) {
+        return 1; // b comes first
+      }
+      return 0; // leave unchanged
     });
 
     return list;

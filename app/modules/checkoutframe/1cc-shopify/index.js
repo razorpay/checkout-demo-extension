@@ -2,6 +2,7 @@ import Analytics from 'analytics';
 import fetch from 'utils/fetch';
 import { isNonNullObject } from 'utils/object';
 import { makeUrl } from 'common/helper';
+import * as _ from 'utils/_';
 
 /**
  * Related to the 1cc shopify flow, where the /checkout call

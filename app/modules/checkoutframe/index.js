@@ -49,6 +49,7 @@ import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
 import { setBraveBrowser } from 'common/useragent';
+import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 
 let CheckoutBridge = window.CheckoutBridge;

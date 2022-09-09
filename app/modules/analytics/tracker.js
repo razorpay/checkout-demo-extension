@@ -4,6 +4,7 @@ import { trackAvailabilty } from './availability';
 import * as ObjectUtils from 'utils/object';
 import fetch from 'utils/fetch';
 import { BUILD_NUMBER } from 'common/constants';
+import * as _ from 'utils/_';
 import { getDeviceId } from 'fingerprint';
 import { isNonNullObject } from 'utils/object';
 

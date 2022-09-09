@@ -1,5 +1,6 @@
 import Track from './tracker';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 
 const META = {};
 const REQUEST_INDEX = {};

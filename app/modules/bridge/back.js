@@ -7,6 +7,7 @@ import { getCheckoutBridge, storage } from './index';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
 import { backPressed as navBackPressed, isStackPopulated } from 'navstack';
+import * as _ from 'utils/_';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is

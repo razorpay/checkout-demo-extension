@@ -17,6 +17,7 @@ import {
 } from 'utils/doc';
 import { submitForm } from 'common/form';
 import * as ObjectUtils from 'utils/object';
+import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import { sendToAll } from 'checkoutjs/analytics';
 

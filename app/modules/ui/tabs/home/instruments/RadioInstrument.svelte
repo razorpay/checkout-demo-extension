@@ -24,6 +24,7 @@
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
   import { getUPIAppDataFromHandle } from 'common/upi';
   import * as ObjectUtils from 'utils/object';
+  import * as _ from 'utils/_';
   import { getDetailsForIntlBankTransfer } from 'InternationalBankTransfer/helpers';
 
   // Store

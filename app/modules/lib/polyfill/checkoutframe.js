@@ -4,6 +4,7 @@ import './prototypes/object';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import getOwnPropertyDescriptor from './prototypes/getownpropertydescriptors';
+import * as _ from 'utils/_';
 
 // keeping till we convert this file to typescript
 // eslint-disable-next-line no-redeclare

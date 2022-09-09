@@ -18,6 +18,7 @@
   import { isElementCompletelyVisibleInContainer, returnAsIs } from 'lib/utils';
   import * as Search from 'checkoutframe/search';
   import { getAnimationOptions } from 'svelte-utils';
+  import * as _ from 'utils/_';
   import { isRedesignV15 } from 'razorpay';
 
   // i18n

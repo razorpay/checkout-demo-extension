@@ -8,6 +8,7 @@ import fetch from 'utils/fetch';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
 import * as ObjectUtils from 'utils/object';
 import { CYBER_SOURCE_RZP_ORG_ID, SIFT_BEACON_KEY } from 'common/constants';
+import * as _ from 'utils/_';
 
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
