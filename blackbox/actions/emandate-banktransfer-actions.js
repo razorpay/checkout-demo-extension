@@ -1,7 +1,7 @@
 const { unflatten, query2obj } = require('../util');
 
 const accountNum = '1112220014911928';
-const ifscCode = 'RAZR0000001';
+const ifscCode = 'HDFC0000001';
 const accountHolderName = 'Sakshi Jain';
 
 async function verifyEmandateBank(context) {

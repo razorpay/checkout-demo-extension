@@ -32,6 +32,10 @@ describe('Module: configurability', () => {
                   banks: ['HDFC'],
                 },
                 {
+                  method: 'emandate',
+                  banks: ['HDFC'],
+                },
+                {
                   method: 'wallet',
                   wallets: ['payzapp'],
                 },
@@ -99,6 +103,11 @@ describe('Module: configurability', () => {
                 },
                 {
                   method: 'netbanking',
+                  banks: ['HDFC'],
+                  _type: 'instrument',
+                },
+                {
+                  method: 'emandate',
                   banks: ['HDFC'],
                   _type: 'instrument',
                 },

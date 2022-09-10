@@ -57,6 +57,7 @@
     getMerchantOption,
     getAmount,
     isEmiV2,
+    isMethodRestrictionEnabledForMerchant,
   } from 'razorpay';
   import {
     merchantAnalytics,
@@ -303,6 +304,14 @@
     Events.TrackMetric(OrderEvents.INVALID_TPV, tpv);
     session.showLoadError($t(TPV_METHODS_NOT_AVAILABLE), true);
     updateActionAreaContentAndCTA(session, 'OK', null, true);
+  }
+
+  /**
+   * For recurring payment && controlled set of merchants
+   * Enabling payment Configuration
+   */
+  function isRecurringAndPaymentConfigEnabaled() {
+    return isRecurring() && isMethodRestrictionEnabledForMerchant();
   }
 
   // Same functionality has to reused at pre-submit,
@@ -953,7 +962,7 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (isRecurring()) {
+      if (!isRecurringAndPaymentConfigEnabaled()) {
         return DETAILS;
       }
       return METHODS;
@@ -1025,7 +1034,7 @@
         return;
       }
 
-      if (isRecurring()) {
+      if (!isRecurringAndPaymentConfigEnabaled()) {
         selectMethod(singleMethod);
         return;
       }

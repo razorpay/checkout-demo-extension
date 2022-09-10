@@ -29,6 +29,33 @@ describe('Module: configurability/validate', () => {
       ).resolves.toBe(false);
     });
 
+    test('method=emandate', async () => {
+      let payment;
+
+      payment = {
+        method: 'emandate',
+        bank: 'ICIC',
+      };
+
+      await expect(
+        Validate.isInstrumentValidForPayment({ method: 'emandate' }, payment)
+      ).resolves.toBe(true);
+
+      await expect(
+        Validate.isInstrumentValidForPayment(
+          { method: 'emandate', banks: ['HDFC', 'ICIC'] },
+          payment
+        )
+      ).resolves.toBe(true);
+
+      await expect(
+        Validate.isInstrumentValidForPayment(
+          { method: 'emandate', banks: ['HDFC', 'UTIB'] },
+          payment
+        )
+      ).resolves.toBe(false);
+    });
+
     test('method=wallet', async () => {
       let payment;
 

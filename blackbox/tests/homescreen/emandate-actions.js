@@ -1,5 +1,5 @@
 const accountNum = '1112220014911928';
-const ifscCode = 'RAZR0000001';
+const ifscCode = 'HDFC0000001';
 const accountHolderName = 'Sakshi Jain';
 
 /**
@@ -7,7 +7,7 @@ const accountHolderName = 'Sakshi Jain';
  */
 async function innerText(page, element) {
   try {
-    return await page.evaluate(element => element.textContent, element);
+    return await page.evaluate((element) => element.textContent, element);
   } catch (err) {
     return undefined;
   }

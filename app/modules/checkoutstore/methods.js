@@ -200,7 +200,7 @@ const ALL_METHODS = {
         isAnyUpiFlowEnabled
       );
     } else if (isRecurring()) {
-      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+      return getOrderMethod() === 'upi' && isAnyUpiFlowEnabled;
     }
     return isAnyUpiFlowEnabled;
   },

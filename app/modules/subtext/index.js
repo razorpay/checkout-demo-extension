@@ -1,12 +1,14 @@
 import { generateSubtextForCardInstrument } from './card';
 import { generateSubtextForWalletInstrument } from './wallet';
 import { generateSubtextForNetbankingInstrument } from './netbanking';
+import { generateSubtextForEmandateInstrument } from './emandate';
 
 const INSTRUMENT_SUBTEXT = {
   card: generateSubtextForCardInstrument,
   emi: generateSubtextForCardInstrument,
   netbanking: generateSubtextForNetbankingInstrument,
   wallet: generateSubtextForWalletInstrument,
+  emandate: generateSubtextForEmandateInstrument,
 };
 
 /**

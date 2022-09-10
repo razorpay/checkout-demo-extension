@@ -17,6 +17,7 @@ import {
   getCardlessEMIProviders,
   getCardNetworks,
   getAppProviders,
+  getEMandateBanks,
 } from 'checkoutstore/methods';
 
 import { getMerchantMethods, isRecurring, getOption } from 'razorpay';
@@ -118,11 +119,15 @@ function removeNonApplicableInstrumentFlows(instrument) {
       return instrument;
     }
 
+    case 'emandate':
     case 'netbanking': {
       const hasBanks = Boolean(instrument.banks);
 
       if (hasBanks) {
-        const enabledBanks = getNetbankingBanks();
+        const enabledBanks =
+          instrument.method === 'netbanking'
+            ? getNetbankingBanks()
+            : getEMandateBanks();
         const shownBanks = instrument.banks.filter(
           (bank) => enabledBanks[bank]
         );

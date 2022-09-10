@@ -66,6 +66,7 @@ const PAYMENT_VALIDATORS = {
 PAYMENT_VALIDATORS.paylater = PAYMENT_VALIDATORS.cardless_emi;
 PAYMENT_VALIDATORS.app = PAYMENT_VALIDATORS.cardless_emi;
 PAYMENT_VALIDATORS.emi = PAYMENT_VALIDATORS.card;
+PAYMENT_VALIDATORS.emandate = PAYMENT_VALIDATORS.netbanking;
 
 /**
  * Checks if the instrument is valid for the payment payload

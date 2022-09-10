@@ -711,6 +711,7 @@ export default {
     auth_type_aadhaar_description: 'via Bank Account and Aadhaar details',
     change_bank_btn: 'Change Bank',
     ifsc_help: 'Please enter a valid IFSC',
+    ifsc_custom_help: 'Please enter a {bankCode} IFSC',
     ifsc_label: 'IFSC',
     name_help: 'Please enter a valid Name as per your account',
     name_label: 'Account Holder Name',

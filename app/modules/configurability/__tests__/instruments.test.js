@@ -33,6 +33,25 @@ describe('Module: configurability/instruments', () => {
       expect(found).toEqual(expected);
     });
 
+    test('Creates instrument of type=instrument with instrument keys', () => {
+      let config, expected, found;
+
+      config = {
+        method: 'emandate',
+        banks: ['HDFC'],
+      };
+
+      expected = {
+        method: 'emandate',
+        banks: ['HDFC'],
+        _type: 'instrument',
+      };
+
+      found = Instruments.createInstrument(config);
+
+      expect(found).toEqual(expected);
+    });
+
     test('Creates instrument of type=method without instrument keys', () => {
       let config, expected, found;
 

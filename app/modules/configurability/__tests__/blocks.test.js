@@ -100,6 +100,23 @@ const testDataForDuplicateConfigValidation = [
     ],
     output: [{ method: 'emi', _type: 'method' }],
   },
+  {
+    input: [
+      {
+        method: 'emandate',
+        banks: ['HDFC'],
+      },
+      {
+        method: 'emandate',
+        banks: ['HDFC'],
+      },
+      {
+        method: 'emandate',
+        banks: ['HDFC'],
+      },
+    ],
+    output: [{ method: 'emandate', banks: ['HDFC'], _type: 'instrument' }],
+  },
 ];
 
 describe('Module: configurability/blocks', () => {
@@ -318,7 +335,6 @@ describe('Module: configurability/blocks', () => {
       };
 
       found = Blocks.validateAndCreateBlock(code, config);
-
       expect(found).toEqual(expected);
     });
   });

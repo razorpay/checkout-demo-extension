@@ -465,6 +465,9 @@ config.debit_card = config.card;
 // UPI OTM is the same as UPI for now.
 config.upi_otm = config.upi;
 
+// netbanking and emandate validators are same
+config.emandate = config.netbanking;
+
 /**
  * This will set config as {} for methods that
  * do not have a specific config.

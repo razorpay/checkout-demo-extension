@@ -1,4 +1,5 @@
-import { getOption, getPreferences } from './base';
+import { RECURRING_METHOD_RESTRICTION_KEYS } from 'razorpay/constant';
+import { getKey, getOption, getPreferences } from './base';
 import { getOrderMethod } from './preferences';
 
 /**
@@ -41,3 +42,7 @@ export function isASubscription(method = null) {
     preferences.subscription[method] !== false
   );
 }
+
+export const isMethodRestrictionEnabledForMerchant = () => {
+  return RECURRING_METHOD_RESTRICTION_KEYS.includes(getKey());
+};

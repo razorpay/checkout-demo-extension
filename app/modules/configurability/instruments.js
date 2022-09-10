@@ -26,6 +26,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   card: ['issuers', 'networks', 'types', 'iins'],
   emi: ['issuers', 'networks', 'types', 'iins', 'durations'],
   netbanking: ['banks'],
+  emandate: ['banks'],
   wallet: ['wallets'],
   upi: ['flows', 'apps'],
   cardless_emi: ['providers'],
@@ -211,6 +212,14 @@ export function isInstrumentGrouped(instrument) {
    */
   const isMethodWithToken = ['card', 'emi'].includes(instrument.method);
 
+  /**
+   *  For emandate instrument view will always be grouped
+   *  As in RadioInstrument view user will be redirected
+   *  new page, which we want to ignore(Due to IFSC validation)
+   */
+  if (instrument.method === 'emandate') {
+    return true;
+  }
   if (isMethodInstrument) {
     return true;
   }

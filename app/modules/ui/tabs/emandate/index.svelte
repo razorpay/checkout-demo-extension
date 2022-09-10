@@ -363,6 +363,7 @@
           <IfscField
             id="nb-acc-ifsc"
             name="bank_account[ifsc]"
+            bankCode={$selectedBank}
             readonly={Boolean(prefilledIfsc)}
             bind:value={$ifsc}
             {dir}
