@@ -311,7 +311,7 @@
    * Enabling payment Configuration
    */
   function isRecurringAndPaymentConfigEnabaled() {
-    return isRecurring() && isMethodRestrictionEnabledForMerchant();
+    return isRecurring() && !isMethodRestrictionEnabledForMerchant();
   }
 
   // Same functionality has to reused at pre-submit,
@@ -962,7 +962,7 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (!isRecurringAndPaymentConfigEnabaled()) {
+      if (isRecurringAndPaymentConfigEnabaled()) {
         return DETAILS;
       }
       return METHODS;
@@ -1034,7 +1034,7 @@
         return;
       }
 
-      if (!isRecurringAndPaymentConfigEnabaled()) {
+      if (isRecurringAndPaymentConfigEnabaled()) {
         selectMethod(singleMethod);
         return;
       }
