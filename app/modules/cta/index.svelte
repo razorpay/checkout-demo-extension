@@ -5,7 +5,12 @@
 
   // helpers/store imports
   import CTAStore from 'cta/store';
-  import { getAmount, getCurrency, isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
+  import {
+    getAmount,
+    getCurrency,
+    isCustomerFeeBearer,
+    isOneClickCheckout,
+  } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
   import { appliedOffer } from 'offers/store/store';
 
@@ -176,7 +181,7 @@
   }
 
   .cta-container {
-    z-index: 1;
+    z-index: 2;
     gap: 8px;
     display: flex;
     padding: 10px 16px;
