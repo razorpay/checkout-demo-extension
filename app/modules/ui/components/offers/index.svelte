@@ -298,7 +298,6 @@
     hidden={applicableOffers.length + otherOffers.length === 0 &&
       !$appliedOffer}
     class:has-error={error}
-    class:offers-container-checkout-redesign={isRedesignV15Enabled}
   >
     <header
       on:click={showList}
@@ -637,9 +636,6 @@
     cursor: pointer;
   }
 
-  .offers-container-checkout-redesign {
-    z-index: 2;
-  }
   .bold {
     font-weight: 700;
     font-size: 13px;
