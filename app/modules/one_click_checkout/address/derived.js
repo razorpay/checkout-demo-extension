@@ -1,4 +1,5 @@
 import { get, derived } from 'svelte/store';
+import { disableCODOnAppliedCoupon } from 'razorpay';
 import {
   savedAddresses,
   isBillingSameAsShipping,
@@ -16,10 +17,16 @@ import {
   shouldSaveAddress as shouldSaveBillingAddress,
   resetAddress as resetBillingAddress,
 } from 'one_click_checkout/address/billing_address/store';
+import { isCouponApplied } from 'one_click_checkout/coupons/store';
 
 export const isCodAvailable = derived(
-  [selectedShippingAddress],
-  ([$selectedShippingAddress]) => $selectedShippingAddress?.cod
+  [selectedShippingAddress, isCouponApplied],
+  ([$selectedShippingAddress, $isCouponApplied]) => {
+    if ($isCouponApplied && disableCODOnAppliedCoupon()) {
+      return false;
+    }
+    return $selectedShippingAddress?.cod;
+  }
 );
 
 export const resetAddresses = () => {

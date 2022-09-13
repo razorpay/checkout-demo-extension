@@ -50,3 +50,7 @@ export const allowLangEngOnly = () =>
 
 export const shouldOverrideBrandColor = () =>
   getPreferences('features.one_cc_override_theme') || false;
+
+export const disableCODOnAppliedCoupon = () =>
+  getPreferences('merchant_key') === 'rzp_live_doOidGOxQnkbe5'; // temp: GoNoise live keys
+  // getPreferences('features.one_cc_coupon_disable_cod') || false;
