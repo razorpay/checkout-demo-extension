@@ -578,6 +578,10 @@
     margin-bottom: 18px;
   }
 
+  #otp-prompt img[src*='freecharge.png'] {
+    height: 36px;
+  }
+
   :global(.redesign) {
     :global(.otp-screen-contents .card-box:first-child .emboss) {
       background-color: #fff;
