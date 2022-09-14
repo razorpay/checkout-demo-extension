@@ -4,7 +4,7 @@
   import CTA, { showCta, hideCta } from 'cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
-  import { isDynamicWalletFlow } from 'wallet/helper';
+  import { isDynamicWalletFlow, showPowerWallet } from 'wallet/helper';
   import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
 
   // i18n
@@ -71,6 +71,10 @@
     if (!$selectedWallet && filteredWallets.length === 1) {
       onWalletSelection(filteredWallets[0].code);
     }
+
+    filteredWallets = filteredWallets.filter((wallet) =>
+      showPowerWallet(String(wallet.code))
+    );
   }
 
   /**

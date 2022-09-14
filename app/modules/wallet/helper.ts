@@ -1,14 +1,16 @@
 import { getWallets } from 'checkoutstore/methods';
-import { hasFeature, getPreferences, getOption } from 'razorpay';
+import { ajaxRouteNotSupported } from 'common/useragent';
+import { getPreferences, getOption } from 'razorpay';
+import { isPowerWallet } from 'common/wallet';
 
 /*
- * Return true if `raas` feature flag and `dynamic_wallet_flow` flag is enabled in preferences.
+ * Return true `dynamic_wallet_flow` flag is enabled in preferences and ajax route is supported.
  *
  * @param {object} pref
  * @returns {boolean}
  */
 export function isDynamicWalletFlow(): boolean {
-  return hasFeature('raas') || getPreferences('dynamic_wallet_flow');
+  return !ajaxRouteNotSupported && getPreferences('dynamic_wallet_flow');
 }
 
 // check and return prefill wallet
@@ -30,4 +32,14 @@ export function validateAndFetchPrefilledWallet(): string {
   } catch {
     return '';
   }
+}
+
+/**
+ * For dynamic wallet flow where ajax route is not supported don't show prower wallets
+ * 
+ * @param code wallet code
+ * @returns boolean
+ */
+export function showPowerWallet(code: string): boolean {
+  return !(getPreferences('dynamic_wallet_flow') && ajaxRouteNotSupported && isPowerWallet(code));
 }

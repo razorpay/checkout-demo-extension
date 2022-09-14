@@ -1,5 +1,9 @@
-import { validateAndFetchPrefilledWallet } from 'wallet/helper';
+import {
+  validateAndFetchPrefilledWallet,
+  showPowerWallet,
+} from 'wallet/helper';
 import * as razorpay from 'razorpay';
+import * as walletMeta from 'common/wallet';
 
 const walletsEnabledForMerchant = [
   {
@@ -84,10 +88,31 @@ jest.mock('checkoutstore/methods', () => ({
 
 jest.mock('razorpay', () => ({
   getOption: jest.fn(),
+  getPreferences: jest.fn(),
+}));
+
+jest.mock('common/wallet', () => ({
+  isPowerWallet: jest.fn(),
+}));
+
+const mockAjaxRouteNotSupportedGetter = jest.fn();
+
+jest.mock('common/useragent', () => ({
+  get ajaxRouteNotSupported() {
+    return mockAjaxRouteNotSupportedGetter();
+  },
 }));
 
 const getOption = razorpay.getOption as jest.MockedFunction<
   typeof razorpay.getOption
+>;
+
+const getPreferences = razorpay.getPreferences as jest.MockedFunction<
+  typeof razorpay.getPreferences
+>;
+
+const isPowerWallet = walletMeta.isPowerWallet as jest.MockedFunction<
+  typeof walletMeta.isPowerWallet
 >;
 
 describe('verify prefill wallet value', () => {
@@ -107,5 +132,71 @@ describe('verify prefill wallet value', () => {
     getOption.mockReturnValue('olamoney Postpaid+');
     const finalPrefilledWallet = validateAndFetchPrefilledWallet();
     expect(finalPrefilledWallet).toEqual('');
+  });
+});
+
+describe('verify show power wallet value', () => {
+  test('Should NOT show power wallet when dynamic wallet flow enabled, ajax route not supported and wallet is power wallet', () => {
+    getPreferences.mockReturnValue(true);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(true);
+    isPowerWallet.mockReturnValue(true);
+    const isShowPowerWallet = showPowerWallet('freecharge');
+    expect(isShowPowerWallet).toEqual(false);
+  });
+
+  test('Should show power wallet when dynamic wallet flow enabled, ajax route not supported and wallet is not power wallet', () => {
+    getPreferences.mockReturnValue(true);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(true);
+    isPowerWallet.mockReturnValue(false);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow enabled, ajax route supported and wallet is power wallet', () => {
+    getPreferences.mockReturnValue(true);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(false);
+    isPowerWallet.mockReturnValue(true);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow enabled, ajax route supported and wallet is not power wallet', () => {
+    getPreferences.mockReturnValue(true);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(false);
+    isPowerWallet.mockReturnValue(false);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow disabled, ajax route not supported and wallet is power wallet', () => {
+    getPreferences.mockReturnValue(false);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(true);
+    isPowerWallet.mockReturnValue(true);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow disabled, ajax route not supported and wallet is not power wallet', () => {
+    getPreferences.mockReturnValue(false);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(true);
+    isPowerWallet.mockReturnValue(false);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow disabled, ajax route supported and wallet is power wallet', () => {
+    getPreferences.mockReturnValue(false);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(false);
+    isPowerWallet.mockReturnValue(true);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
+  });
+
+  test('Should show power wallet when dynamic wallet flow disabled, ajax route supported and wallet is not power wallet', () => {
+    getPreferences.mockReturnValue(false);
+    mockAjaxRouteNotSupportedGetter.mockReturnValue(false);
+    isPowerWallet.mockReturnValue(false);
+    const isShowPowerWallet = showPowerWallet('phonepe');
+    expect(isShowPowerWallet).toEqual(true);
   });
 });
