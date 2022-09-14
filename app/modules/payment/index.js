@@ -591,7 +591,13 @@ Payment.prototype = {
 
     try {
       // delete iframe if created for flows like capital flow
-      this.popup.window.destroy();
+      // For Optional contact flow this popup is null and
+      // iframe instance is present in 'forceIframeElement'
+      if (this.forceIframeElement) {
+        this.forceIframeElement.window.destroy();
+      } else {
+        this.popup.window.destroy();
+      }
     } catch (e) {}
 
     this.done = true;
