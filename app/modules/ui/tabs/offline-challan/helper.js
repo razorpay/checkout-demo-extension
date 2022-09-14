@@ -12,6 +12,7 @@ import { makeAuthUrl } from 'checkoutstore';
 import { copyToClipboard } from 'common/clipboard';
 import loadScript from 'common/loadScript';
 import fetch from 'utils/fetch';
+import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 
 // constants
 import { rupeeDataUrl, jsPdfUrl } from 'ui/tabs/bank-transfer/challanConstants';
@@ -53,8 +54,14 @@ export function copyDetailsToClipboard(elm, text) {
   });
 }
 
-export function loadJsPdf() {
-  return loadScript(jsPdfUrl);
+export async function loadJsPdf() {
+  try {
+    await loadScript(jsPdfUrl);
+  } catch (err) {
+    captureError(`Error loading JsPDF: ${err}`, {
+      severity: SEVERITY_LEVELS.S1,
+    });
+  }
 }
 
 export function loadImageToDataUrl(src, outputFormat) {

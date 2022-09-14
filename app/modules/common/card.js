@@ -476,23 +476,24 @@ export function addDowntimesToSavedCards(cards, downtimes) {
   return cardsWithDowntime;
 }
 
-export function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
+export async function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
   if (document.getElementById('__sift_script') || !sessionId || !beaconKey) {
     return Promise.resolve();
   }
 
-  let _sift = (window._sift = window._sift || []);
-  _sift.push(['_setAccount', beaconKey]);
-  _sift.push(['_setTrackerUrl', 'siftjs.razorpay.com']);
-  _sift.push(['_setUserId', '']);
-  _sift.push(['_setSessionId', sessionId]);
-  _sift.push(['_trackPageview']);
-
   try {
-    loadScript('https://siftjs.razorpay.com/s.js', '__sift_script');
+    let _sift = (window._sift = window._sift || []);
+    _sift.push(['_setAccount', beaconKey]);
+    _sift.push(['_setTrackerUrl', 'siftjs.razorpay.com']);
+    _sift.push(['_setUserId', '']);
+    _sift.push(['_setSessionId', sessionId]);
+    _sift.push(['_trackPageview']);
+    await loadScript('https://siftjs.razorpay.com/s.js', '__sift_script');
   } catch (err) {
     // capture exceptions
-    captureError(err, { severity: SEVERITY_LEVELS.S2 });
+    captureError(`Error loading sift script: ${err}`, {
+      severity: SEVERITY_LEVELS.S1,
+    });
   }
 }
 
@@ -502,15 +503,17 @@ export function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
  * @param {*} orgId
  * @returns Promise
  */
-export function injectCyberSourceScript(
+export async function injectCyberSourceScript(
   sessionId,
   orgId = CYBER_SOURCE_RZP_ORG_ID
 ) {
   try {
     const csUrl = `https://h.online-metrix.net/fp/tags.js?org_id=${orgId}&session_id=razorpay${sessionId}`;
-    loadScript(csUrl, 'cyberSourceScript');
+    await loadScript(csUrl, 'cyberSourceScript');
   } catch (err) {
     // capture exceptions
-    captureError(err, { severity: SEVERITY_LEVELS.S2 });
+    captureError(`Error loading cyber-source script: ${err}`, {
+      severity: SEVERITY_LEVELS.S1,
+    });
   }
 }

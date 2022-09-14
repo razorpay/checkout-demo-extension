@@ -10,7 +10,7 @@ export default function loadScript(url, id) {
     let script = document.createElement('script');
     script.src = url;
     script.type = 'text/javascript';
-    script.onError = reject;
+    script.onerror = reject;
     script.async = true;
     script.id = key;
     script.onload = resolve;
