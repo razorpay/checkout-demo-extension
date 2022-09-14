@@ -1348,15 +1348,19 @@
     <CTA
       screen="card"
       tab={$tabStore}
-      disabled={(currentView === Views.ADD_CARD && !isAddNewCardFormValid) ||
-        (currentView === Views.SAVED_CARDS && !isSavedCardFormValid)
-        || (!$isEmiContactValid &&
-      $isCurrentCardInvalidForEmi &&
-      $isCurrentCardProviderInvalid &&
-      isNewEmiFlow &&
-      $selectedTab === 'debit'
-        ? true
-        : false)}
+      disabled={(currentView === Views.ADD_CARD &&
+        !isAddNewCardFormValid &&
+        !$selectedApp) ||
+        (currentView === Views.SAVED_CARDS &&
+          !isSavedCardFormValid &&
+          !$selectedApp) ||
+        (!$isEmiContactValid &&
+        $isCurrentCardInvalidForEmi &&
+        $isCurrentCardProviderInvalid &&
+        isNewEmiFlow &&
+        $selectedTab === 'debit'
+          ? true
+          : false)}
       show
       showAmount
       {onSubmit}
