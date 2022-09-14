@@ -3,7 +3,7 @@
 import { get } from 'svelte/store';
 
 // Store imports
-import { newUserAddress } from 'one_click_checkout/address/shipping_address/store';
+import { newUserAddress, selectedAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 import { savedAddresses } from 'one_click_checkout/address/store';
 
@@ -167,6 +167,7 @@ export function addressSaveOTPSuccessHandler(service) {
   // Save address
   saveAddress(service).then((res) => {
     get(newUserAddress).id = res.shipping_address?.id;
+    selectedAddressId.set(res.shipping_address?.id);
     redirectToPaymentMethods();
   });
 }
