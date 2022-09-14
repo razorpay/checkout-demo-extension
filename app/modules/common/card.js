@@ -491,7 +491,11 @@ export async function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
     await loadScript('https://siftjs.razorpay.com/s.js', '__sift_script');
   } catch (err) {
     // capture exceptions
-    captureError(`Error loading sift script: ${err}`, {
+    captureError(err, {
+      analytics: {
+        event: 'sift_script_loading_failed',
+        data: {},
+      },
       severity: SEVERITY_LEVELS.S1,
     });
   }
@@ -512,7 +516,11 @@ export async function injectCyberSourceScript(
     await loadScript(csUrl, 'cyberSourceScript');
   } catch (err) {
     // capture exceptions
-    captureError(`Error loading cyber-source script: ${err}`, {
+    captureError(err, {
+      analytics: {
+        event: 'cybersource_script_loading_failed',
+        data: {},
+      },
       severity: SEVERITY_LEVELS.S1,
     });
   }

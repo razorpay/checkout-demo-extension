@@ -58,7 +58,11 @@ export async function loadJsPdf() {
   try {
     await loadScript(jsPdfUrl);
   } catch (err) {
-    captureError(`Error loading JsPDF: ${err}`, {
+    captureError(err, {
+      analytics: {
+        event: 'offline_jspdf_loading_failed',
+        data: {},
+      },
       severity: SEVERITY_LEVELS.S1,
     });
   }
