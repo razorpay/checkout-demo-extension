@@ -9,8 +9,13 @@ import 'analytics/track-errors';
 import { resolveElement } from 'utils/doc';
 import { submitForm } from 'common/form';
 import * as _ from 'utils/_';
+import { EventsV2, ContextProperties } from 'analytics-v2';
+import { COMMIT_HASH } from 'common/constants';
 
-Track.props.library = 'checkoutjs';
+const library = 'checkoutjs';
+Track.props.library = library;
+EventsV2.setContext(ContextProperties.LIBRARY, library);
+EventsV2.setContext(ContextProperties.VERSION, COMMIT_HASH);
 
 RazorpayDefaults.handler = function (data) {
   if (_.is(this, Razorpay)) {

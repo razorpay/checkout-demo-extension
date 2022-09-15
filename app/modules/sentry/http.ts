@@ -9,7 +9,7 @@ import {
   SENTRY_PROJECT_ID,
   SENTRY_BASE_URL,
 } from './constants';
-import { uuid4 } from './uuid';
+import { uuid4 } from 'common/uuid';
 import { getContext } from './context';
 import { exceptionFromError } from './parser';
 

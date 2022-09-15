@@ -17,6 +17,7 @@ import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from './constants';
+import { EventsV2, ContextProperties } from 'analytics-v2';
 import * as _ from 'utils/_';
 
 let prefetchedPrefs;
@@ -45,6 +46,7 @@ export default function Razorpay(overrides) {
   }
   Eventer.call(this);
   this.id = Track.makeUid();
+  EventsV2.setContext(ContextProperties.CHECKOUT_ID, this.id);
   Analytics.setR(this);
 
   let options;
@@ -539,9 +541,11 @@ Razorpay.configure = function (overrides, extra = {}) {
   });
   if (extra.library) {
     Track.props.library = extra.library;
+    EventsV2.setContext(ContextProperties.LIBRARY, extra.library);
   }
   if (extra.referer) {
     Track.props.referer = extra.referer;
+    EventsV2.setContext(ContextProperties.REFERRER, extra.referer);
   }
 };
 

@@ -68,7 +68,7 @@ import triggerErrorModal, {
 import { handleBackNavigation } from 'emiV2/helper/navigation';
 import { getCardlessEMIProviders } from 'checkoutstore/methods';
 import { trackEmiFromCardScreen } from 'emiV2/events/tracker';
-import { isEmiV2 } from 'razorpay';
+import { isContactHidden, isEmailHidden, isEmiV2 } from 'razorpay';
 import {
   cardlessEmiCallBack,
   fetchCardlessEmiPlans,
@@ -77,6 +77,8 @@ import {
 import { getSelectedBankCode } from 'emiV2/helper/plans';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { isCardlessTab } from 'emiV2/helper/tabs';
+import { EventsV2, ContextProperties } from 'analytics-v2';
+import { MiscTracker } from 'misc/analytics/events';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1170,6 +1172,19 @@ Session.prototype = {
     } else {
       first_screen = this.homeTab.getCurrentView();
     }
+
+    MiscTracker.OPEN({
+      user: {
+        contact: {
+          hidden: isContactHidden(),
+          value: getPrefilledContact(),
+        },
+        email: {
+          hidden: isEmailHidden(),
+          value: getPrefilledEmail(),
+        },
+      },
+    });
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
@@ -6514,6 +6529,7 @@ Session.prototype = {
       if (saved_customer.tokens || saved_customer.addresses) {
         isLoggedIn.set(true);
         customer.logged = true;
+        EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
         Analytics.setMeta('loggedIn', true);
       }
 

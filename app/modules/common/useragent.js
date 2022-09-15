@@ -150,4 +150,15 @@ export const getDevice = () => {
   return 'desktop';
 };
 
+/**
+ * @returns {string | undefined}
+ */
+export function getBrowserLocale() {
+  const { language, languages, userLanguage } = navigator;
+  if (userLanguage) {
+    return userLanguage;
+  } // IE only
+  return languages && languages.length ? languages[0] : language;
+}
+
 export const isDesktop = () => getDevice() === 'desktop';

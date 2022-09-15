@@ -6,8 +6,13 @@ import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { returnAsIs } from 'lib/utils';
 import { submitForm } from 'common/form';
+import { EventsV2, ContextProperties } from 'analytics-v2';
+import { COMMIT_HASH } from 'common/constants';
 
-Track.props.library = 'razorpayjs';
+const library = 'razorpayjs';
+Track.props.library = library;
+EventsV2.setContext(ContextProperties.LIBRARY, library);
+EventsV2.setContext(ContextProperties.VERSION, COMMIT_HASH);
 
 Razorpay.payment.authorize = function (options) {
   const r = Razorpay({ amount: options.data.amount }).createPayment(

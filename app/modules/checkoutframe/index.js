@@ -15,7 +15,7 @@ import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import * as ObjectUtils from 'utils/object';
-import RazorpayStore, { setOption } from 'razorpay';
+import RazorpayStore, { getOrderId, setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
@@ -51,6 +51,9 @@ import { getElementById } from 'utils/doc';
 import { setBraveBrowser } from 'common/useragent';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
+import { EventsV2, ContextProperties } from 'analytics-v2';
+import { getExperimentsFromStorage } from 'experiments';
+import { formatPrefExperiments } from 'misc/analytics/helper';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -156,9 +159,11 @@ const setAnalyticsMeta = (message) => {
    * Set SDK details.
    */
   if (qpmap.platform && ['android', 'ios'].includes(qpmap.platform)) {
+    EventsV2.setContext(ContextProperties.SDK_PLATFORM, qpmap.platform);
     Events.setMeta(MetaProperties.SDK_PLATFORM, qpmap.platform);
 
     if (qpmap.version) {
+      EventsV2.setContext(ContextProperties.SDK_VERSION, qpmap.version);
       Events.setMeta(MetaProperties.SDK_VERSION, qpmap.version);
     }
   }
@@ -189,9 +194,11 @@ const setAnalyticsMeta = (message) => {
  */
 const setTrackingProps = (message) => {
   if (message.library) {
+    EventsV2.setContext(ContextProperties.LIBRARY, message.library);
     Track.props.library = message.library;
   }
   if (message.referer) {
+    EventsV2.setContext(ContextProperties.REFERRER, message.referer);
     Track.props.referer = message.referer;
   }
 };
@@ -259,7 +266,7 @@ export const handleMessage = function (message) {
     session.id = id;
     session.r.id = id;
     Track.updateUid(id);
-
+    EventsV2.setContext(ContextProperties.CHECKOUT_ID, id);
     SessionManager.setSession(session);
   }
 
@@ -688,23 +695,48 @@ function updateOptions(preferences) {
 
 function updateAnalytics(preferences) {
   Events.setMeta(MetaProperties.FEATURES, preferences.features);
+  EventsV2.setContext(ContextProperties.FEATURES, preferences.features);
   if (preferences && preferences.merchant_id) {
     Events.setMeta(MetaProperties.MERCHANT_ID, preferences.merchant_id);
+    EventsV2.setContext(ContextProperties.MERCHANT_ID, preferences.merchant_id);
   }
   if (preferences && preferences.merchant_key) {
     Events.setMeta(MetaProperties.MERCHANT_KEY, preferences.merchant_key);
+    EventsV2.setContext(
+      ContextProperties.MERCHANT_KEY,
+      preferences.merchant_key
+    );
   }
+
+  if (preferences?.merchant_name) {
+    EventsV2.setContext(
+      ContextProperties.MERCHANT_NAME,
+      preferences.merchant_name
+    );
+  }
+
+  if (preferences?.mode) {
+    EventsV2.setContext(ContextProperties.MODE, preferences.mode);
+  }
+
+  if (getOrderId()) {
+    EventsV2.setContext(ContextProperties.ORDER_ID, getOrderId());
+  }
+
+  EventsV2.setContext(ContextProperties.EXPERIMENTS, {
+    ...getExperimentsFromStorage(),
+    ...formatPrefExperiments(preferences.experiments),
+  });
+
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (Array.isArray(optionalFields)) {
-    Events.setMeta(
-      MetaProperties.OPTIONAL_CONTACT,
-      optionalFields.includes('contact')
-    );
-    Events.setMeta(
-      MetaProperties.OPTIONAL_EMAIL,
-      optionalFields.includes('email')
-    );
+    const isContactOptional = optionalFields.includes('contact');
+    const isEmailOptional = optionalFields.includes('email');
+    Events.setMeta(MetaProperties.OPTIONAL_CONTACT, isContactOptional);
+    Events.setMeta(MetaProperties.OPTIONAL_EMAIL, isEmailOptional);
+    EventsV2.setContext(ContextProperties.OPTIONAL_CONTACT, isContactOptional);
+    EventsV2.setContext(ContextProperties.OPTIONAL_EMAIL, isEmailOptional);
   }
 }
 

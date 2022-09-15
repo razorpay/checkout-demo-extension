@@ -11,16 +11,23 @@ import 'payment';
 import 'analytics/track-errors';
 import { Track } from 'analytics';
 import { resolveUrl } from 'utils/doc';
-import { TRAFFIC_ENV } from 'common/constants';
+import { COMMIT_HASH, TRAFFIC_ENV } from 'common/constants';
 import * as _ from 'utils/_';
 import { startSentryMonitoring } from 'sentry/http';
+import { EventsV2, ContextProperties } from 'analytics-v2';
 
 setSessionConstructor(Session);
 
-Track.props.library = 'checkoutjs';
+const library = 'checkoutjs';
+Track.props.library = library;
+EventsV2.setContext(ContextProperties.LIBRARY, library);
+EventsV2.setContext(ContextProperties.VERSION, COMMIT_HASH);
 
 const params = _.getQueryParams();
-Track.props.env = params.traffic_env || TRAFFIC_ENV;
+const env = params.traffic_env || TRAFFIC_ENV;
+Track.props.env = env;
+EventsV2.setContext(ContextProperties.ENV, env);
+
 RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
 startSentryMonitoring();

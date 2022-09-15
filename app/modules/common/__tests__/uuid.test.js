@@ -1,4 +1,4 @@
-import { uuid4 } from 'sentry/uuid';
+import { uuid4 } from 'common/uuid';
 
 describe('uuidv4', () => {
   it('should generate unique uuid everytime', () => {
