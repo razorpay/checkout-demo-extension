@@ -29,14 +29,11 @@ class Interface {
       if (!Interface.source) {
         Interface.updateSource();
       }
-      let updatedData = data;
-      if (typeof updatedData !== 'object' || !updatedData) {
-        updatedData = {
-          data,
-        };
-      }
-      updatedData.source = Interface.source || 'reset';
-      updatedData.id = Interface.id;
+      const updatedData = {
+        data,
+        id: Interface.id,
+        source: Interface.source || 'reset',
+      };
       const finalMessage = JSON.stringify({
         data: updatedData,
         topic,
