@@ -21,7 +21,7 @@ export type FetchPrototype = {
     headers?: Common.Object<string>;
     method?: string;
     callback: (response: any) => void;
-    data?: string | Common.Object<string | string[]>;
+    data?: string | Record<string, any>;
   };
 };
 
