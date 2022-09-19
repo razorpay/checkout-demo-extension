@@ -10,7 +10,6 @@ import {
   getPreferences,
   isCustomerFeeBearer,
   isDynamicFeeBearer,
-  isOneClickCheckout,
   isRecurring,
 } from 'razorpay';
 import { internetExplorer, iOS, isBrave, isDesktop } from 'common/useragent';
@@ -213,7 +212,6 @@ export const initUpiQrV2 = () => {
       !hasFeature('disable_homescreen_qr', false) &&
       Number(getAmount()) <= QR_HOMESCREEN_AMOUNT_LIMIT &&
       !orderMethod &&
-      !isOneClickCheckout() &&
       !isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
 
     const upiScreenQR =
