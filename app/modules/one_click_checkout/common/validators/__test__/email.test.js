@@ -1,3 +1,4 @@
+const { isEmailOptional } = require('razorpay');
 const {
   isDomainWhitelisted,
   isEmailValidRegex,
@@ -16,6 +17,15 @@ jest.mock('../email', () => {
       if (domain === 'xyz.com') return Promise.resolve(false);
       if (domain === 'networkfailed.com') return Promise.resolve(true);
     }),
+  };
+});
+
+jest.mock('razorpay', () => {
+  const originalModule = jest.requireActual('razorpay');
+  return {
+    __esModule: true,
+    ...originalModule,
+    isEmailOptional: jest.fn(),
   };
 });
 
@@ -72,5 +82,25 @@ describe('email validator', () => {
   });
   test('goutam@networkfailed.com resolved to true', () => {
     expect(validateEmail('goutam@networkfailed.com')).resolves.toBe(true);
+  });
+});
+
+describe('optional email validation', () => {
+  test('should resolve to true if no email present', () => {
+    isEmailOptional.mockReturnValue(true);
+
+    expect(validateEmail('')).resolves.toBe(true);
+  });
+
+  test('should resolve to true if email present and valid', () => {
+    isEmailOptional.mockReturnValue(true);
+
+    expect(validateEmail('goutam@goutambseervi.tech')).resolves.toBe(true);
+  });
+
+  test('should resolve to false if email present and invalid', () => {
+    isEmailOptional.mockReturnValue(true);
+
+    expect(validateEmail('goutam')).resolves.toBe(false);
   });
 });

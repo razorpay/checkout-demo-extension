@@ -15,6 +15,7 @@ import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
 import { toggleHeader } from 'one_click_checkout/header/helper';
 import { handleContactFlow } from 'one_click_checkout/common/details/handleContactFlow';
+import { isEmailOptional } from 'razorpay';
 
 export const handleDetailsNext = (prevContact) => {
   let continueNext = true;
@@ -26,7 +27,10 @@ export const handleDetailsNext = (prevContact) => {
 
   if (continueNext) {
     // validations
-    if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email))) {
+    if (
+      !CONTACT_REGEX.test(get(contact)) ||
+      (!isEmailOptional() && !EMAIL_REGEX.test(get(email)))
+    ) {
       return;
     }
     updateOrderWithCustomerDetails();
