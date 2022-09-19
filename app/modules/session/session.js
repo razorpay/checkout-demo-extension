@@ -2996,7 +2996,7 @@ Session.prototype = {
       if (RazorpayHelper.isRedesignV15()) {
         if (this.homeTab?.canGoBack()) {
           this.homeTab.editUserDetails();
-        } else {
+        } else if (!RazorpayHelper.getOption('theme.close_button')) {
           // close modal
           this.closeModal();
         }
