@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterUpdate, onMount, onDestroy } from 'svelte';
   import {
     digits,
     disableCTA,
@@ -11,7 +12,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { isHeadless, isWalletPayment } from 'otp/sessionInterface';
   import { Safari } from 'common/useragent';
-  import { afterUpdate, onMount } from 'svelte';
 
   export let hidden;
   export let isError;
@@ -87,6 +87,10 @@
     if (!otp.length) {
       disableCTA.set(true);
     }
+  });
+
+  onDestroy(() => {
+    $disableCTA = false;
   });
 
   /**
