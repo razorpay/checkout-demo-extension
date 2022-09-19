@@ -1046,7 +1046,7 @@
   }
 
   $: {
-    if (view === HOME_VIEWS.METHODS) {
+    if (view === HOME_VIEWS.METHODS && !isOneCCEnabled) {
       $customer = session.getCustomer($contact);
     }
     if (
