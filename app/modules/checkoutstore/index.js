@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { writable } from 'svelte/store';
 import { phone } from 'checkoutstore/screens/home';
-import hdfcVASDisplayConfig from 'constants/hdfcVASDisplayConfig';
+import hdfcVASDisplayConfig from '../constants/hdfcVASDisplayConfig';
 
 import RazorpayStore, {
   getCheckoutConfig,

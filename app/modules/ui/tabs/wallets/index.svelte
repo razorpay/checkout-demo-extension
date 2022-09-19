@@ -10,6 +10,7 @@
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
   import { locale, t } from 'svelte-i18n';
+  import { testid } from 'tests/autogen';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -195,6 +196,7 @@
             slot="title"
             bind:this={walletReferences[wallet.code]}
             id={`wallet-radio-${wallet.code}`}
+            {...!i && testid('click', 'wallet', wallet.code)}
           >
             <span class="title">{getWalletName(wallet.code, $locale)}</span>
             <span class="subtitle"

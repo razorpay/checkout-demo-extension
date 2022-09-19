@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from 'svelte-i18n';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
@@ -66,6 +67,7 @@
   export let showServicableIcon = false;
   export let showDropDownIcon = false;
   export let isInvalid = false;
+  export let attributes = {};
 
   /**
    * To show prediction as dropdown
@@ -503,6 +505,7 @@
       class:no-blur={handleBlur}
       class:no-validate={handleInput}
       class:cvv-input={type === 'cvv'}
+      {...attributes}
     />
     {#if isPredictionEnable}
       <input

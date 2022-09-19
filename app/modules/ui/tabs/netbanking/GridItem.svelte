@@ -1,5 +1,6 @@
 <script lang="ts">
   import { isRedesignV15 } from 'razorpay';
+  import { testid } from 'tests/autogen';
 
   // Props
   export let disabled = false;
@@ -19,6 +20,7 @@
   class:netb-bank-one-cc={isRedesignV15()}
   down={disabled}
   id="bank-item-{code}"
+  {...testid('click', 'netbanking_bank', 'grid_item')}
 >
   <input
     {disabled}

@@ -30,6 +30,9 @@
       "email": "arshpreet.wadehra@razorpay.com"
     }
   ],
+  "imports": {
+    "#vision/*": "./vision/*"
+  },
   "name": "checkout-js",
   "description": "Internal package for the Razorpay Checkout JavaScript",
   "version": "1.0.0",
@@ -46,6 +49,7 @@
     "dark-start": "API_SERVER=https://api-dark.razorpay.com nodemon server & npm start",
     "qa-start": "API_SERVER=https://api-3.qa.razorpay.in nodemon server & npm start",
     "start:no-reload": "gulp watch",
+    "start:autogen": "AUTOTEST_ANNOTATE=include gulp watch",
     "copy-1cc-checkout": "./scripts/copy_1cc_checkout.sh",
     "build": "npm run clean && rollup -c --environment prod && gulp && npm run copy-1cc-checkout && ./scripts/legacy.sh",
     "lint": "eslint app/modules",
@@ -62,6 +66,8 @@
     "test:unit:1cc": "NODE_ENV=test && jest --config jest.1cc.ut.config.js",
     "test:unit:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.ut.config.js --coverage --outputFile test-results.json --json",
     "test:unit:1cc:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.1cc.ut.config.js --coverage --outputFile test-1cc-results.json --json 2>&1 | tee log-1cc.txt",
+    "test:autogen": "docker run --workdir=/c -v `pwd`:/c -u `id -u $USER` --rm -it mcr.microsoft.com/playwright:v1.25.0-focal node vision/autogen/index.mjs $@",
+    "test:autogen:headed": "node vision/autogen/index.mjs --headed $@",
     "test": "npm run test:all",
     "vision": "./scripts/vision.sh",
     "vision:test": "npx playwright test",
@@ -120,6 +126,8 @@
     "jshint-stylish": "^2.2.1",
     "lint-staged": "^13.0.3",
     "nodemon": "^2.0.12",
+    "odiff-bin": "^2.5.0",
+    "path-to-regexp": "^6.2.1",
     "prettier": "^2.3.2",
     "prettier-plugin-svelte": "^2.3.1",
     "pretty-quick": "^2.0.2",
@@ -153,9 +161,10 @@
     "uglify-js": "^3.13.10"
   },
   "dependencies": {
-    "@playwright/test": "^1.22.2",
+    "@playwright/test": "^1.25.0",
     "acorn": "^8.8.0",
-    "node-sass": "^7.0.1"
+    "node-sass": "^7.0.1",
+    "playwright-chromium": "^1.25.0"
   },
   "engines": {
     "node": ">=16.10.0"

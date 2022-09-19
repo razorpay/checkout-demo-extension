@@ -38,6 +38,8 @@
   import { isContactReadOnly } from 'checkoutframe/customer';
   import { isContactValid } from 'one_click_checkout/common/details/store';
 
+  import { testid } from 'tests/autogen';
+
   // Refs
   let countryField;
   let phoneField;
@@ -218,6 +220,7 @@
       : ''}
     {validationText}
     {showValidations}
+    attributes={{ ...testid('input', 'contact') }}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

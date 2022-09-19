@@ -3,6 +3,7 @@
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
   import { _ as t } from 'svelte-i18n';
+  import { testid } from 'tests/autogen';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -171,6 +172,7 @@
     {selected}
   >
     <div
+      {...testid('click', 'accordion', 'upi_new_vpa')}
       id={'new-vpa-field-' + paymentMethod}
       slot="title"
       class:title-vpa-upi-one-cc={isRedesignV15Enabled}
@@ -205,6 +207,7 @@
           <!-- LABEL: Please enter a valid VPA of the form username@bank -->
           <!-- LABEL: Enter your UPI ID -->
           <Field
+            attributes={testid('input', 'vpa', 'new_vpa')}
             formatter={{ type: 'vpa' }}
             {pattern}
             prediction={(currentVaue) => {

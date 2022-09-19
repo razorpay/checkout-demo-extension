@@ -17,6 +17,7 @@
   import { t, locale } from 'svelte-i18n';
   import { getPaylaterProviderName } from 'i18n';
   import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
+  import { testid } from 'tests/autogen';
 
   const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
@@ -62,9 +63,12 @@
       <!-- LABEL: Select an Option -->
       <h3 class="paylater-header">{$t(SELECT_OPTION_TITLE)}</h3>
       <div class="options paylater-section">
-        {#each filteredProviders as provider (provider.title)}
+        {#each filteredProviders as provider, index (provider.title)}
           <NextOption
-            attributes={{ 'data-paylater': provider.data.code }}
+            attributes={{
+              'data-paylater': provider.data.code,
+              ...(!index && testid('click', 'paylater_provider')),
+            }}
             tabindex={0}
             {...provider}
             on:select
