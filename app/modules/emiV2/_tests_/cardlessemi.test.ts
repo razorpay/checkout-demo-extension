@@ -1,4 +1,5 @@
-import { cardlessEmiStore, selectedBank } from 'checkoutstore/screens/emi';
+import { selectedBank } from 'emiV2/store';
+import { cardlessEmiStore } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { emiContact } from 'checkoutstore/screens/home';
 import { cardlessEmiPlansChecker } from 'emiV2/helper/eligibility';
 import { isCardlessPlanNoCost } from 'emiV2/helper/plans';

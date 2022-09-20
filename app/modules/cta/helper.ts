@@ -18,7 +18,7 @@ import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 import Analytics from 'analytics';
 import CTAHelper from './store';
-import { isCardValidForEMiPayment } from 'checkoutstore/emi';
+import { isCardValidForEMiPayment } from 'emiV2/store';
 
 export const ctaInfo = writable({
   view: '',

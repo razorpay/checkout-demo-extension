@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { emiMethod, selectedBank } from 'checkoutstore/screens/emi';
+  import { emiMethod, selectedBank } from 'emiV2/store';
   import { selectedCard } from 'checkoutstore/screens/card';
   import { createEventDispatcher, onMount } from 'svelte';
   import { t } from 'svelte-i18n';

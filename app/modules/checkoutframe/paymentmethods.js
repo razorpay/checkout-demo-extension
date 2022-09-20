@@ -146,6 +146,9 @@ const DESCRIPTIONS = {
 
     const text = generateTextFromList(providerNames, locale, 3);
 
+    // If both card and cardless emi exists and flow is not EMI V2
+    // Fallback to the original text for Cards
+    // Else for new EMIV2 text is => Emi via credit/debit cards, Axio, & More
     if (cardEmi && !isEmiV2()) {
       return text;
     }

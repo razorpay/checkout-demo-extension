@@ -7,8 +7,8 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import SecureCard from 'ui/tabs/card/SecureCard.svelte';
   import type { Card } from 'emiV2/types';
-  import NoCostLabel from 'components/NoCostLabel.svelte';
-  import StartingFromLabel from 'components/StartingFromLabel.svelte';
+  import NoCostLabel from 'components/Label/NoCostLabel.svelte';
+  import StartingFromLabel from 'components/Label/StartingFromLabel.svelte';
 
   export let card: Card = {};
   export let selected: boolean;

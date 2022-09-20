@@ -1034,7 +1034,7 @@ export function isCardLessEmiProviderEnabled(code) {
   return Boolean((getMerchantMethods()?.cardless_emi || {})[code]);
 }
 
-export function getCardlessEMIProviders(amount) {
+export function getCardlessEMIProviders() {
   let emiMethod = {};
   if (getEMIBanks().BAJAJ) {
     emiMethod.bajaj = true;
@@ -1047,10 +1047,7 @@ export function getCardlessEMIProviders(amount) {
     emiMethod = {};
   }
 
-  let providers = getEligibleProvidersBasedOnMinAmount(
-    amount || getAmount(),
-    emiMethod
-  );
+  let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
 
   if (isCustomerFeeBearer()) {
     providers = getEligibleProvidersForFeeBearerCustomer(providers);

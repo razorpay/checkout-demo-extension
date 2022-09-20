@@ -81,13 +81,15 @@
   } from 'checkoutstore/methods';
 
   import {
-    isCurrentCardInvalidForEmi,
-    isCurrentCardProviderInvalid,
     newCardEmiDuration,
     savedCardEmiDuration,
     selectedPlanTextForNewCard,
     selectedPlanTextForSavedCard,
   } from 'checkoutstore/emi';
+  import {
+    isCurrentCardInvalidForEmi,
+    isCurrentCardProviderInvalid,
+  } from 'emiV2/store';
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { fly } from 'svelte/transition';
@@ -162,7 +164,7 @@
   import type { EMIPayload } from 'emiV2/types';
   import { PAY_FULL_AMOUNT, PAY_VIA_EMI } from 'ui/labels/bajaj-emi';
   import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
-  import { isEmiContactValid } from 'checkoutstore/screens/emi';
+  import { isEmiContactValid } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { selectedTab } from 'components/Tabs/tabStore';
 
   let delayOTPExperiment: boolean;

@@ -1,4 +1,4 @@
-import { cardlessEmiStore } from 'checkoutstore/screens/emi';
+import { cardlessEmiStore } from 'emiV2/ui/components/EmiTabsScreen/store';
 import type { CardlessEMIStore } from 'emiV2/types';
 import { get } from 'svelte/store';
 

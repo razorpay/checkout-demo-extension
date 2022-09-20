@@ -1,8 +1,8 @@
-import { getMerchantMethods } from 'razorpay';
+import { getAmount, getMerchantMethods } from 'razorpay';
 import {
   getAllProviders,
   getBankEmiOptions,
-  isInstaCredEMIProvider,
+  isDebitEmiProvider,
 } from '../helper/emiOptions';
 
 const merchantMethods = {
@@ -78,19 +78,16 @@ const merchantMethods = {
 };
 
 jest.mock('razorpay', () => ({
-  getAmount: jest.fn(),
-  getCurrency: jest.fn(),
-  isOneClickCheckout: jest.fn(),
-  isCustomerFeeBearer: jest.fn(),
-  getPreferences: jest.fn(),
+  ...jest.requireActual('razorpay'),
   getMerchantMethods: jest.fn(),
-  getOrderMethod: () => null,
+  getAmount: jest.fn(),
 }));
 
 describe('Emi Options list test', () => {
   test('Should return bank emi options', () => {
     getMerchantMethods.mockReturnValue(merchantMethods);
     let amount = 1000000;
+    getAmount.mockReturnValue(amount);
     let expectedEmiBanks = [
       {
         code: 'HDFC',
@@ -137,6 +134,7 @@ describe('Emi Options list test', () => {
       JSON.stringify(expectedEmiBanks)
     );
     amount = 400000;
+    getAmount.mockReturnValue(amount);
     expectedEmiBanks = [
       {
         code: 'HDFC',
@@ -167,6 +165,7 @@ describe('Emi Options list test', () => {
       JSON.stringify(expectedEmiBanks)
     );
     amount = 100000;
+    getAmount.mockReturnValue(amount);
     expectedEmiBanks = [];
     expect(JSON.stringify(getBankEmiOptions(amount))).toBe(
       JSON.stringify(expectedEmiBanks)
@@ -174,6 +173,7 @@ describe('Emi Options list test', () => {
   });
   test('Should return Cardless EMI providers', () => {
     let amount = 1000000;
+    getAmount.mockReturnValue(amount);
     let expctedProviders = [
       {
         data: { code: 'walnut369' },
@@ -210,6 +210,7 @@ describe('Emi Options list test', () => {
       JSON.stringify(expctedProviders)
     );
     amount = 100000;
+    getAmount.mockReturnValue(amount);
     expctedProviders = [
       {
         data: { code: 'walnut369' },
@@ -248,10 +249,10 @@ describe('Emi Options list test', () => {
         provider: 'flexmoney',
       },
     };
-    let debitCardlessConfig = isInstaCredEMIProvider(selectedBank);
+    let debitCardlessConfig = isDebitEmiProvider(selectedBank);
     expect(JSON.stringify(debitCardlessConfig)).toBe(JSON.stringify(expected));
     selectedBank = 'ICIC';
-    debitCardlessConfig = isInstaCredEMIProvider(selectedBank);
+    debitCardlessConfig = isDebitEmiProvider(selectedBank);
     expect(JSON.stringify(debitCardlessConfig)).toBe('null');
   });
 
@@ -262,6 +263,7 @@ describe('Emi Options list test', () => {
       },
     };
     let amount = 1000000;
+    getAmount.mockReturnValue(amount);
     getMerchantMethods.mockReturnValue(mockMethods);
     let expected = JSON.stringify([
       {
@@ -283,6 +285,7 @@ describe('Emi Options list test', () => {
       },
     };
     let amount = 1000000;
+    getAmount.mockReturnValue(amount);
     getMerchantMethods.mockReturnValue(mockMethods);
     expect(JSON.stringify(getBankEmiOptions(amount))).toBe(JSON.stringify([]));
   });
@@ -292,7 +295,6 @@ describe('Emi Options list test', () => {
       hdfc: true,
       walnut369: true,
       zestmoney: true,
-      bajaj: true,
     },
     custom_providers: {
       debit_emi_providers: {
@@ -309,7 +311,9 @@ describe('Emi Options list test', () => {
     },
   };
   test('If no bank emi is available should return cardless providers', () => {
+    let amount = 1000000;
     getMerchantMethods.mockReturnValue(mockPrefs);
+    getAmount.mockReturnValue(amount);
     let expctedProviders = [
       {
         data: { code: 'walnut369' },
@@ -332,7 +336,7 @@ describe('Emi Options list test', () => {
         isNoCostEMI: false,
       },
     ];
-    expect(JSON.stringify(getAllProviders(10000))).toBe(
+    expect(JSON.stringify(getAllProviders(amount))).toBe(
       JSON.stringify(expctedProviders)
     );
   });

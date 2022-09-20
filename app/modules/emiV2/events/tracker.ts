@@ -2,11 +2,8 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { selectedPlan } from 'checkoutstore/emi';
 import { currentCardType, selectedCard } from 'checkoutstore/screens/card';
-import {
-  eligibilityInfoClicked,
-  emiViaCards,
-  selectedBank,
-} from 'checkoutstore/screens/emi';
+import { selectedBank, emiViaCards } from 'emiV2/store';
+import { eligibilityInfoClicked } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { contact as defaultContact } from 'checkoutstore/screens/home';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { getSelectedSavedCard } from 'emiV2/helper/card';

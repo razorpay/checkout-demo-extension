@@ -1,4 +1,4 @@
-import { setNoCostAvailable } from 'checkoutstore/emi';
+import { setNoCostAvailable } from 'emiV2/store';
 
 const merchantMethods = {
   emi_options: {

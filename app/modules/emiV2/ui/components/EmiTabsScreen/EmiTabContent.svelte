@@ -2,13 +2,13 @@
   import { onMount } from 'svelte';
   import Emiplans from 'emiV2/ui/components/EmiPlans/EmiPlanCards.svelte';
   import PhoneNumber from './PhoneNumber.svelte';
+  import { selectedBank } from 'emiV2/store';
   import {
     cardlessEligibilityError,
     selectedInstrumentCardlessEligible,
-    selectedBank,
-  } from 'checkoutstore/screens/emi';
+  } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { isRedesignV15 } from 'razorpay';
-  import { isSelectedBankBajaj } from 'emiV2/helper/emiOptions';
+  import { isSelectedBankBajaj } from 'emiV2/helper/helper';
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { tabLabels } from 'emiV2/constants';
   import { checkEligibility } from 'emiV2/helper/eligibility';

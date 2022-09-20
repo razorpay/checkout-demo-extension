@@ -1,4 +1,4 @@
-import { filterNoCostEmiOffers, isNoCostEmiOffer } from 'checkoutframe/offers';
+import { removeNoCostEmiOffers, isNoCostEmiOffer } from 'checkoutframe/offers';
 
 describe('Validate: isNoCostEmiOffer', () => {
   test('Should return true offer is no cost emi offer', () => {
@@ -11,7 +11,7 @@ describe('Validate: isNoCostEmiOffer', () => {
       payment_method: 'emi',
     };
 
-    expect(isNoCostEmiOffer(offer)).toBe(false);
+    expect(isNoCostEmiOffer(offer)).toBe(true);
   });
 
   test('Should return false offer is no cost emi offer', () => {
@@ -23,11 +23,11 @@ describe('Validate: isNoCostEmiOffer', () => {
       payment_method: 'emi',
     };
 
-    expect(isNoCostEmiOffer(offer)).toBe(true);
+    expect(isNoCostEmiOffer(offer)).toBe(false);
   });
 });
 
-describe('Validate: filterNoCostEmiOffers', () => {
+describe('Validate: removeNoCostEmiOffers', () => {
   let offers: Offers.OffersList = [
     {
       id: '1234',
@@ -57,7 +57,7 @@ describe('Validate: filterNoCostEmiOffers', () => {
       },
     ];
 
-    expect(JSON.stringify(filterNoCostEmiOffers(offers))).toBe(
+    expect(JSON.stringify(removeNoCostEmiOffers(offers))).toBe(
       JSON.stringify(expected)
     );
   });

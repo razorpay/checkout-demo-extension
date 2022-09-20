@@ -2,7 +2,7 @@
   import { formatTemplateWithLocale } from 'i18n';
   import { locale } from 'svelte-i18n';
   import { STARTING_FROM_LABEL } from 'ui/labels/emi';
-  import Label from './Label/Label.svelte';
+  import Label from './Label.svelte';
 
   export let startingAt = 10;
   export let expanded = false;

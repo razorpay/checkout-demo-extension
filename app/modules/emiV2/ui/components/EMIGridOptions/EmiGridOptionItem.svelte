@@ -5,8 +5,8 @@
   import { getCardlessEmiProviderName } from 'i18n';
   import { NO_COST_EMI } from 'ui/labels/offers';
   import { locale } from 'svelte-i18n';
-  import NoCostLabel from 'components/NoCostLabel.svelte';
-  import StartingFromLabel from 'components/StartingFromLabel.svelte';
+  import NoCostLabel from 'components/Label/NoCostLabel.svelte';
+  import StartingFromLabel from 'components/Label/StartingFromLabel.svelte';
   import type { EMIBANKS } from 'emiV2/types';
 
   export let emi: EMIBANKS;

@@ -32,7 +32,7 @@
     loadingEligibility,
     isEmiContactValid,
     eligibilityInfoClicked,
-  } from 'checkoutstore/screens/emi';
+  } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { selectedPlan } from 'checkoutstore/emi';
   import { MOBILE_NUMBER_INVALID } from 'ui/labels/emi';
 
@@ -213,7 +213,7 @@
       autocomplete="tel"
       required
       autocompletetype="phone-full"
-      labelClasses="add-card-fields-label-one-cc"
+      labelClasses="phone-number-label add-card-fields-label-one-cc"
       pattern={INDIAN_CONTACT_PATTERN}
       handleFocus={true}
       handleBlur={true}
@@ -265,7 +265,6 @@
     position: absolute;
     right: 10px;
     top: 8px;
-    z-index: 1;
   }
   .eligibility-span-redesigns {
     top: 30%;
@@ -279,6 +278,7 @@
     font-size: 14px;
     /* text-decoration: underline; */
     cursor: pointer;
+    z-index: 1;
   }
   .emi-eligible {
     background: rgba(85, 171, 104, 0.25);
@@ -344,5 +344,8 @@
   .async-load-1cc {
     top: 24%;
     right: 6px;
+  }
+  :global(.elem label.phone-number-label) {
+    z-index: 0;
   }
 </style>

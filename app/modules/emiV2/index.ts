@@ -1,8 +1,8 @@
 import EmiScreen from './ui/EmiScreen.svelte';
 import { pushStack } from 'navstack';
 import { isSessionControlled } from 'navstack/store';
-import { emiViaCards } from 'checkoutstore/screens/emi';
 import { cardTab } from 'checkoutstore/screens/card';
+import { emiViaCards } from './store';
 
 export default function renderEmiOptions() {
   isSessionControlled.set(false);

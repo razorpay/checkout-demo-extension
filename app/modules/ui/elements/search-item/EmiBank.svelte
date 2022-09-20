@@ -1,8 +1,8 @@
 <script lang="ts">
   import type * as EmiProviders from 'emiV2/types';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import NoCostLabel from 'components/NoCostLabel.svelte';
-  import StartingFromLabel from 'components/StartingFromLabel.svelte';
+  import NoCostLabel from 'components/Label/NoCostLabel.svelte';
+  import StartingFromLabel from 'components/Label/StartingFromLabel.svelte';
 
   export let item: EmiProviders.EMIBANKS;
 </script>

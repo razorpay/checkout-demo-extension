@@ -2,18 +2,15 @@ import { screenStore } from 'checkoutstore';
 import { selectedPlan } from 'checkoutstore/emi';
 import { currentCardType, selectedCard } from 'checkoutstore/screens/card';
 import cardTab from 'ui/tabs/card/index.svelte';
-import {
-  cardlessEligibilityError,
-  getSelectedEmiBank,
-  selectedBank,
-} from 'checkoutstore/screens/emi';
+import { getSelectedEmiBank, selectedBank } from 'emiV2/store';
+import { cardlessEligibilityError } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { handleEmiPaymentV2 } from 'emiV2/payment';
 import type { CardlessEMIStore } from 'emiV2/types';
 import { popStack, pushStack } from 'navstack';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
-import { isSelectedBankBajaj } from './emiOptions';
+import { isSelectedBankBajaj } from './helper';
 import { cardlessEmiPlansChecker } from './eligibility';
 import EmiScreenSvelte from 'ui/tabs/emi/EmiScreen.svelte';
 import { isCardlessTab } from './tabs';

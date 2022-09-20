@@ -1,12 +1,10 @@
-import {
-  selectedInstrumentCardlessEligible,
-  getSelectedEmiBank,
-} from 'checkoutstore/screens/emi';
+import { getSelectedEmiBank } from 'emiV2/store';
+import { selectedInstrumentCardlessEligible } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { get } from 'svelte/store';
 import { emiContact, contact } from 'checkoutstore/screens/home';
 import { handleEmiPaymentV2 } from 'emiV2/payment';
-import { getSession } from 'sessionmanager';
 import { getCardlessPlansForProvider } from '../payment/cardlessEmi/helper';
+import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
 
 export const getEmiContactValue = () => {
   // use global contact if not passed in param -> Case when we make the API call as soon as we land on the contact page
@@ -50,6 +48,15 @@ export const cardlessEmiPlansChecker = () => {
   return null;
 };
 
+/**
+ * Helper function to check for cardless emi eligibility for selected provider
+ * If the eligibility is already checked for the number and provider
+ * We retreive the emi plans from the store
+ * Else make an Ajax Request to check for eligibilty
+ * If the user has already checked eligiblity and has changed the contact now
+ * Clear the existing Ajax request
+ * @returns
+ */
 export const checkEligibility = () => {
   // Check whether the emi plan already exists for that contact and bank in the store
   if (cardlessEmiPlansChecker()) {
@@ -60,11 +67,7 @@ export const checkEligibility = () => {
   /** If a request for eligibility already exists but the user clicks on check eligiblity
    * Clear the existing payment request
    */
-  const session = getSession();
-  if (session.r._payment) {
-    session.r._payment.off();
-    session.r._payment.clear();
-  }
+  clearPaymentRequest();
 
   handleEmiPaymentV2({
     action: 'cardless',

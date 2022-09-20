@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { selectedBank } from 'checkoutstore/screens/emi';
+import { selectedBank } from 'emiV2/store';
 import { get, Writable } from 'svelte/store';
 import { showDowntimeAlert } from 'checkoutframe/downtimes/utils';
 import type { EMIBANKS } from 'emiV2/types';

@@ -14,7 +14,7 @@
     getOffersForInstrument,
     getOtherOffers,
     getOffersForTabAndInstrument,
-    filterNoCostEmiOffers,
+    removeNoCostEmiOffers,
   } from 'checkoutframe/offers';
 
   // i18n
@@ -146,7 +146,7 @@
 
     // filter out no cost emi offers if new emi flow is present
     if (isEmiV2()) {
-      applicableOffers = filterNoCostEmiOffers(applicableOffers);
+      applicableOffers = removeNoCostEmiOffers(applicableOffers);
     }
   }
 

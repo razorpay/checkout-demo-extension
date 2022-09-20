@@ -21,7 +21,7 @@ export function getEMIStartingAt(plans: EmiPlanObject | EmiPlans) {
   return Math.min(...startingAt);
 }
 
-const isNoCostPlan = (plan: EmiPlan): boolean => {
+export const isNoCostPlan = (plan: EmiPlan): boolean => {
   return plan.subvention === 'merchant';
 };
 

@@ -19,11 +19,8 @@
     BAJAJ_FISNSEV_ISSUED_CARD,
   } from 'ui/labels/bajaj-emi';
 
-  import {
-    bajajTCAccepted,
-    bajajTCAcceptedConsent,
-    isCurrentCardProviderInvalid,
-  } from 'checkoutstore/emi';
+  import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';
+  import { isCurrentCardProviderInvalid } from 'emiV2/store';
 
   import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
 

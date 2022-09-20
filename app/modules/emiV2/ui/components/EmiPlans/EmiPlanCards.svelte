@@ -7,7 +7,7 @@
   import info from 'ui/icons/payment-methods/info';
   import { clickOutside } from 'one_click_checkout/helper';
   import { DEBIT_CARD_REQUIRED, PAN_CARD_REQUIRED } from 'ui/labels/debit-emi';
-  import { emiViaCards, selectedBank } from 'checkoutstore/screens/emi';
+  import { emiViaCards, selectedBank } from 'emiV2/store';
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { getEmiPlans } from 'emiV2/helper/plans';
   import { handlePlanOffer } from 'emiV2/helper/offers';

@@ -54,7 +54,7 @@ import {
   getSelectedEmiBank,
   selectedBank,
   emiViaCards,
-} from 'checkoutstore/screens/emi';
+} from 'emiV2/store';
 import EmiTabsScreen from 'emiV2/ui/components/EmiTabsScreen/EmiTabsScreen.svelte';
 import { cardlessTabProviders, providersToAvoid } from 'emiV2/constants';
 import { injectSentry } from 'sentry';
@@ -3455,7 +3455,7 @@ Session.prototype = {
         code: cardIssuer,
         creditEmi: cardType === 'credit',
         debitEmi: cardType === 'debit',
-        isCardless: getCardlessEMIProviders(amount)[formattedBankCode],
+        isCardless: getCardlessEMIProviders()[formattedBankCode],
       });
 
       const nextScreen = 'emiPlans';

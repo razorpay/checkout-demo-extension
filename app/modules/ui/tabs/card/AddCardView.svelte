@@ -22,7 +22,7 @@
     cardNumber,
     remember,
     authType,
-    cardType,
+    cardNetwork,
     cardIin,
     showNoCvvCheckbox,
     noCvvChecked,
@@ -97,17 +97,14 @@
     showPayFullAmount,
     showTryAnotherEmi,
   } from 'cta';
-  import {
-    errorTypes,
-    isInstrumentValidForEMI,
-  } from 'configurability/validate/emi';
+  import { errorTypes, isInstrumentValidForEMI } from 'emiV2/helper/card';
   import { selectedTab } from 'components/Tabs/tabStore';
   import PhoneNumber from 'emiV2/ui/components/EmiTabsScreen/PhoneNumber.svelte';
+  import { selectedPlan } from 'checkoutstore/emi';
   import {
     isCurrentCardInvalidForEmi,
     isCurrentCardProviderInvalid,
-    selectedPlan,
-  } from 'checkoutstore/emi';
+  } from 'emiV2/store';
   import { trackAddCardDetails } from 'emiV2/events/tracker';
 
   export let isFormValid = false;
@@ -209,7 +206,7 @@
   }
 
   $: {
-    cvvLength = getCvvDigits($cardType);
+    cvvLength = getCvvDigits($cardNetwork);
   }
 
   $: {
@@ -301,10 +298,10 @@
 
     let isValid = Formatter.rules.card.isValid.call({
       value: cardNumberWithoutSpaces,
-      type: $cardType,
+      type: $cardNetwork,
     });
     //Track AMEX Card input for merchants who don't have AMEX enabled.
-    if (!isAMEXEnabled() && $cardType === 'amex') {
+    if (!isAMEXEnabled() && $cardNetwork === 'amex') {
       isValid = false;
       Analytics.track('card:amex:disabled', {
         type: AnalyticsTypes.BEHAV,
@@ -315,7 +312,7 @@
     }
 
     //Track Diners Card input for merchants who don't have Diners enabled.
-    if (!getCardNetworks().DICL && $cardType === 'diners') {
+    if (!getCardNetworks().DICL && $cardNetwork === 'diners') {
       isValid = false;
       Analytics.track('card:diners:disabled', {
         type: AnalyticsTypes.BEHAV,
@@ -384,7 +381,7 @@
                 : true;
             } else if (_type === 'credit' || _type === 'prepaid') {
               reccuringCardSecondaryCheck =
-                !!getCardNetworksForRecurring(_type)[$cardType];
+                !!getCardNetworksForRecurring(_type)[$cardNetwork];
             }
           }
         }
@@ -431,7 +428,7 @@
         // If selected card is valid for emi and belongs to the selected bank
         if (isNewEmiFlow && prevTab === 'emi') {
           validationPromises.push(
-            isInstrumentValidForEMI(features, emiPayload)
+            Promise.resolve(isInstrumentValidForEMI(features, emiPayload))
           );
         } else {
           validationPromises.push('');
@@ -677,7 +674,7 @@
         helpText={cardNumberHelpText}
         recurring={isRecurring()}
         {validCardForOffer}
-        type={$cardType}
+        type={$cardNetwork}
         {isCardSupportedForRecurring}
         on:focus
         on:filled={(_) => handleFilled('numberField')}

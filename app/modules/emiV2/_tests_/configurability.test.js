@@ -1,7 +1,7 @@
 import {
-  filterBanksAgainstInstrument,
-  filterCardlessAgainstInstrument,
-} from 'emiV2/helper/emiOptions';
+  filterCardlessProvidersAgainstCustomBlock,
+  filterEmiBanksAgainstCustomBlock,
+} from 'emiV2/helper/configurability';
 
 const emi_options = {
   HDFC: [
@@ -96,7 +96,7 @@ describe('Custom config instruments', () => {
       emiBanksProviders: emi_options,
       cardlessEmiProviders: cardlessProviders,
     };
-    expect(JSON.stringify(filterBanksAgainstInstrument(payload))).toBe(
+    expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
     );
     expected = [
@@ -111,7 +111,7 @@ describe('Custom config instruments', () => {
       issuers: ['HDFC'],
     };
     payload.instrument = instrument;
-    expect(JSON.stringify(filterBanksAgainstInstrument(payload))).toBe(
+    expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
     );
   });
@@ -133,7 +133,7 @@ describe('Custom config instruments', () => {
     };
     expect(
       JSON.stringify(
-        filterCardlessAgainstInstrument(CardlessOptions, instrument)
+        filterCardlessProvidersAgainstCustomBlock(CardlessOptions, instrument)
       )
     ).toBe(JSON.stringify(expected));
     expected = [
@@ -147,7 +147,7 @@ describe('Custom config instruments', () => {
     };
     expect(
       JSON.stringify(
-        filterCardlessAgainstInstrument(CardlessOptions, instrument)
+        filterCardlessProvidersAgainstCustomBlock(CardlessOptions, instrument)
       )
     ).toBe(JSON.stringify(expected));
     expected = [
@@ -170,7 +170,7 @@ describe('Custom config instruments', () => {
       instrument,
       emiBanksProviders: emi_options,
     };
-    expect(JSON.stringify(filterBanksAgainstInstrument(payload))).toBe(
+    expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
     );
     expected = [
@@ -189,7 +189,7 @@ describe('Custom config instruments', () => {
       instrument,
       emiBanksProviders: emi_options,
     };
-    expect(JSON.stringify(filterBanksAgainstInstrument(payload))).toBe(
+    expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
     );
   });

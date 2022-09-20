@@ -1,6 +1,6 @@
 <script lang="ts">
   import { NO_COST_EMI } from 'ui/labels/offers';
-  import Label from './Label/Label.svelte';
+  import Label from './Label.svelte';
   export let text = NO_COST_EMI;
   export let expanded = false;
 

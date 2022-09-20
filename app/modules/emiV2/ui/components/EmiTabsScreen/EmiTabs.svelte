@@ -6,12 +6,11 @@
     TabPanel,
   } from 'components/Tabs/index';
   import EmiTabContent from './EmiTabContent.svelte';
+  import { selectedBank } from 'emiV2/store';
   import {
-    cardlessEligibilityError,
-    selectedBank,
     selectedInstrumentCardlessEligible,
-  } from 'checkoutstore/screens/emi';
-  import { getSession } from 'sessionmanager';
+    cardlessEligibilityError,
+  } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { selectedPlan } from 'checkoutstore/emi';
   import { isRedesignV15 } from 'razorpay';
   import type { TabList } from 'emiV2/types';
@@ -24,6 +23,7 @@
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { t } from 'svelte-i18n';
+  import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
 
   export let tabs: TabList = [];
 
@@ -54,12 +54,7 @@
     removeAppliedOfferForMethod(isCardlessTab() ? 'cardless_emi' : 'emi');
     // if we switch from cardless to credt/debit tab
     // while a eligibility call has been made we need to cancel the existing request
-    const session = getSession();
-    let payment = session.r._payment;
-    if (payment) {
-      session.r._payment.off();
-      session.r._payment.clear();
-    }
+    clearPaymentRequest();
   };
 </script>
 

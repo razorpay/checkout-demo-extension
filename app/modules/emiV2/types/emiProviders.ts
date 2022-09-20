@@ -22,6 +22,11 @@ export type EMIBANKS = {
 
 export type EmiMethod = 'emi' | 'cardless_emi';
 
+/**
+ * While redirecting to instacred user may be asked to
+ * enter their PAN or debit card details for bank cardless emi
+ * The same flow is being returned from the API response under custom_providers
+ */
 export type CardlessFlow = 'pan' | 'debit_card';
 
 export type CardlessEmiCode = {

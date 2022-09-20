@@ -2,7 +2,8 @@ import Analytics from 'analytics';
 import { screenStore, tabStore } from 'checkoutstore';
 import { selectedPlan } from 'checkoutstore/emi';
 import { selectedCard } from 'checkoutstore/screens/card';
-import { selectedBank } from 'checkoutstore/screens/emi';
+import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
+import { selectedBank } from 'emiV2/store';
 import { moveControlToSession } from 'navstack';
 import { appliedOffer } from 'offers/store';
 import { isEmiV2 } from 'razorpay';
@@ -30,6 +31,11 @@ export const handleBackNavigation = () => {
       selectedPlan.set(null);
       if (get(appliedOffer)?.emi_subvention) {
         appliedOffer.set(null);
+      }
+      // If the eligiblity was checked but payment with any other bank method is made
+      // clear the request
+      if (session.r && session.r._payment) {
+        clearPaymentRequest();
       }
       screen = 'emi';
     }

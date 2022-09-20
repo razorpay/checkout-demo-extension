@@ -1,4 +1,5 @@
-import { getCurrentTab, getSelectedEmiBank } from 'checkoutstore/screens/emi';
+import { getSelectedEmiBank } from 'emiV2/store';
+import { getCurrentTab } from 'emiV2/ui/components/EmiTabsScreen/store';
 import type * as EmiTabs from '../types/emiTabs';
 import { get } from 'svelte/store';
 import { selectedTab } from 'components/Tabs/tabStore';

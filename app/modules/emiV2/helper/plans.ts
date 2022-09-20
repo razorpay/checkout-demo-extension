@@ -3,12 +3,12 @@
   @returns {Array<EmiPlans>}
 */
 
-import { getSelectedEmiBank } from 'checkoutstore/screens/emi';
+import { getSelectedEmiBank } from 'emiV2/store';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { get } from 'svelte/store';
 import { getEligiblePlansBasedOnMinAmount } from 'checkoutstore/methods';
 import { isCardlessTab } from 'emiV2/helper/tabs';
-import { isSelectedBankBajaj } from 'emiV2/helper/emiOptions';
+import { isSelectedBankBajaj } from 'emiV2/helper/helper';
 import { cardlessEmiPlansChecker } from 'emiV2/helper/eligibility';
 
 import type {

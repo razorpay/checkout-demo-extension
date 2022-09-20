@@ -1,10 +1,10 @@
 // import { getIssuerForEmiFromPayload } from "checkoutframe/components/card";
 import { customer } from 'checkoutstore/customer';
+import { selectedPlan } from 'checkoutstore/emi';
 import {
   isCurrentCardInvalidForEmi,
   isCurrentCardProviderInvalid,
-  selectedPlan,
-} from 'checkoutstore/emi';
+} from 'emiV2/store';
 import {
   contact as defaultContact,
   country,
@@ -13,11 +13,12 @@ import {
 import { getBankFromCardCache } from 'common/bank';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { moveControlToSession, popStack, pushOverlay } from 'navstack';
-import RazorpayStore, { isContactOptional } from 'razorpay';
+import RazorpayStore from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
 import ConfirmAndPay from 'ui/components/ConfirmAndPay.svelte';
 import {
+  clearPaymentRequest,
   createEMiPaymentV2,
   setCardInPayload,
 } from 'emiV2/payment/prePaymentHandler';
@@ -34,19 +35,15 @@ import type {
   paymentMeta,
   Tokens,
 } from 'emiV2/types';
+import { selectedBank, emiViaCards } from 'emiV2/store';
 import {
   cardlessEligibilityError,
   selectedInstrumentCardlessEligible,
   cardlessEmiStore,
   loadingEligibility,
-  selectedBank,
-  emiViaCards,
-} from 'checkoutstore/screens/emi';
+} from 'emiV2/ui/components/EmiTabsScreen/store';
 import { ELIGIBILITY_VALIDATION_ERROR } from 'ui/labels/debit-emi';
-import {
-  getSavedCardsForEMI,
-  isSelectedBankBajaj,
-} from 'emiV2/helper/emiOptions';
+import { isSelectedBankBajaj } from 'emiV2/helper/helper';
 import {
   cardName,
   cardNumber,
@@ -68,6 +65,7 @@ import { disableCTA } from 'checkoutstore/screens/otp';
 import { showOffers } from 'offers/store';
 import { showAuthOverlay } from 'card/helper';
 import Analytics from 'analytics';
+import { getSavedCardsForEMI } from 'emiV2/helper/card';
 
 const getIssuerForEmiFromPayload = (payload: EMIPayload) => {
   const currentCustomer = get(customer) as Customer;
@@ -413,8 +411,7 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
        * Note: If any QR payment is active, by this time, it was cancelled, hence no errors on other payments
        */
       if (paymentPayload.emi_duration) {
-        session.r._payment.off();
-        session.r._payment.clear();
+        clearPaymentRequest();
       }
     } else {
       return;

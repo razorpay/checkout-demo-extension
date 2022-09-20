@@ -1,7 +1,4 @@
-import {
-  errorTypes,
-  isInstrumentValidForEMI,
-} from 'configurability/validate/emi';
+import { errorTypes, isInstrumentValidForEMI } from 'emiV2/helper/card';
 
 describe('Validate: isInstrumentValidForEMI', () => {
   test('Selected Card is eligible for EMI', async () => {
@@ -21,9 +18,7 @@ describe('Validate: isInstrumentValidForEMI', () => {
       },
     };
 
-    await expect(isInstrumentValidForEMI(features, emiPayload)).resolves.toBe(
-      ''
-    );
+    await expect(isInstrumentValidForEMI(features, emiPayload)).toBe('');
   });
   test('Card enetered does not belong to the selected bank', async () => {
     let features = {
@@ -42,7 +37,7 @@ describe('Validate: isInstrumentValidForEMI', () => {
       },
     };
 
-    await expect(isInstrumentValidForEMI(features, emiPayload)).resolves.toBe(
+    await expect(isInstrumentValidForEMI(features, emiPayload)).toBe(
       errorTypes.BANK_INVALID
     );
   });
@@ -63,7 +58,7 @@ describe('Validate: isInstrumentValidForEMI', () => {
       },
     };
 
-    await expect(isInstrumentValidForEMI(features, emiPayload)).resolves.toBe(
+    await expect(isInstrumentValidForEMI(features, emiPayload)).toBe(
       errorTypes.EMI_NOT_SUPPORTED
     );
   });

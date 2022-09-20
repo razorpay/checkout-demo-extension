@@ -11,7 +11,7 @@
     box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     position: fixed;
-    z-index: 2;
+    z-index: 1;
     background: #fff;
     width: 100%;
   }

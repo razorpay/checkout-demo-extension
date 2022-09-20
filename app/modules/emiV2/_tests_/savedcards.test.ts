@@ -1,18 +1,11 @@
-import {
-  filterSavedCardsAgainstInstrument,
-  getSavedCardsForEMI,
-} from 'emiV2/helper/emiOptions';
 import { get } from 'svelte/store';
 import { customer } from 'checkoutstore/customer';
 import type { Customer, Instrument, Tokens } from 'emiV2/types';
+import { filterSavedCardsAgainstCustomBlock } from 'emiV2/helper/configurability';
+import { getSavedCardsForEMI } from 'emiV2/helper/card';
 
 jest.mock('razorpay', () => ({
-  getAmount: jest.fn(),
-  getCurrency: jest.fn(),
-  isOneClickCheckout: jest.fn(),
-  isCustomerFeeBearer: jest.fn(),
-  getPreferences: jest.fn(),
-  isRecurring: jest.fn(),
+  ...jest.requireActual('razorpay'),
   getOrderMethod: () => 'emi',
 }));
 
@@ -121,7 +114,7 @@ describe('validate SavedCards', () => {
     currentCustomer = get(customer) as Customer;
     tokens = getSavedCardsForEMI(currentCustomer);
 
-    filteredTokens = filterSavedCardsAgainstInstrument(tokens, instrument);
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
     expect(filteredTokens.length).toBe(0);
   });
 
@@ -134,7 +127,7 @@ describe('validate SavedCards', () => {
       section: 'custom',
     };
 
-    filteredTokens = filterSavedCardsAgainstInstrument(tokens, instrument);
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
     expect(filteredTokens.length).toBe(2);
 
     instrument = {
@@ -146,7 +139,7 @@ describe('validate SavedCards', () => {
       issuers: ['HDFC'],
     };
 
-    filteredTokens = filterSavedCardsAgainstInstrument(tokens, instrument);
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
     expect(filteredTokens.length).toBe(1);
 
     instrument = {
@@ -158,7 +151,7 @@ describe('validate SavedCards', () => {
       types: ['credit'],
     };
 
-    filteredTokens = filterSavedCardsAgainstInstrument(tokens, instrument);
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
     expect(filteredTokens.length).toBe(1);
   });
 });

@@ -188,7 +188,7 @@ export function getOtherOffers(filteredOffers) {
   }
   let filteredNCEmiOffers = otherOffers;
   if (otherOffers && otherOffers.length > 0) {
-    filteredNCEmiOffers = filterNoCostEmiOffers(otherOffers);
+    filteredNCEmiOffers = removeNoCostEmiOffers(otherOffers);
   }
   return filteredNCEmiOffers;
 }
@@ -289,8 +289,10 @@ export function getInstrumentToSelectForOffer(offer) {
  * @return {Array} List of offers with no cost emi offers fultered out
  */
 
-export function filterNoCostEmiOffers(offers) {
-  return offers.filter(isNoCostEmiOffer);
+export function removeNoCostEmiOffers(offers) {
+  return offers.filter((offer) => {
+    return !isNoCostEmiOffer(offer);
+  });
 }
 
 /**
@@ -299,5 +301,5 @@ export function filterNoCostEmiOffers(offers) {
  */
 
 export function isNoCostEmiOffer(offer) {
-  return !offer.emi_subvention;
+  return offer.emi_subvention === true;
 }

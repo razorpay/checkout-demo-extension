@@ -6,14 +6,14 @@
   import {
     cardlessEligibilityError,
     selectedInstrumentCardlessEligible,
-  } from 'checkoutstore/screens/emi';
+  } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { locale, t } from 'svelte-i18n';
   import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
   import { SELECT_PLAN } from 'ui/labels/emi';
   import { isRedesignV15 } from 'razorpay';
   import { getEmiTabs, isCardlessTab } from 'emiV2/helper/tabs';
   import { handleEmiProviderSelection } from 'emiV2/helper/emiTabs';
-  import { isSelectedBankBajaj } from 'emiV2/helper/emiOptions';
+  import { isSelectedBankBajaj } from 'emiV2/helper/helper';
   import { offerWindowOpen } from 'offers/store';
   import { onMount } from 'svelte';
   import type { Instrument, TabList } from 'emiV2/types';

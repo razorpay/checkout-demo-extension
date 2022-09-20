@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { emiMethod, selectedBank } from 'checkoutstore/screens/emi';
+  import { emiMethod, selectedBank } from 'emiV2/store';
   import { selectedCard } from 'checkoutstore/screens/card';
   import { isCardTokenized } from 'ui/tabs/card/utils';
   import SavedCard from './SavedCard.svelte';

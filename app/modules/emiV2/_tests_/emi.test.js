@@ -1,5 +1,5 @@
-import { selectedBank } from 'checkoutstore/screens/emi';
-import { isSelectedBankBajaj } from 'emiV2/helper/emiOptions';
+import { isSelectedBankBajaj } from 'emiV2/helper/helper';
+import { selectedBank } from 'emiV2/store';
 import { getEMIStartingAt, isNoCostEMI } from '../helper/label';
 import { filterTabsAgainstInstrument, getEmiTabs } from '../helper/tabs';
 
@@ -95,12 +95,8 @@ const merchantMethods = {
 };
 
 jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
   getMerchantMethods: () => merchantMethods,
-  getOrderMethod: () => null,
-  getAmount: jest.fn(),
-  getCurrency: jest.fn(),
-  isOneClickCheckout: jest.fn(),
-  getPreferences: jest.fn(),
 }));
 
 describe('EMI tiles test', () => {

@@ -12,7 +12,7 @@
   import SavedCard from './SavedCard.svelte';
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import { trackCVVEnteredForSavedCards } from 'emiV2/events/tracker';
-  import { selectedBank } from 'checkoutstore/screens/emi';
+  import { selectedBank } from 'emiV2/store';
   import { selectedTab } from 'components/Tabs/tabStore';
   import { selectedPlan } from 'checkoutstore/emi';
   import { offerWindowOpen } from 'offers/store';

@@ -1,17 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import {
-    selectedInstrumentCardlessEligible,
     selectedCardlessEmiProvider,
     emiMethod,
     selectedBank,
     getSelectedEmiBank,
-  } from 'checkoutstore/screens/emi';
-  import {
-    filterSavedCardsAgainstInstrument,
-    getBankAndOtherEMIOptions,
-    getSavedCardsForEMI,
-  } from 'emiV2/helper/emiOptions';
+  } from 'emiV2/store';
+  import { selectedInstrumentCardlessEligible } from 'emiV2/ui/components/EmiTabsScreen/store';
+  import { getBankAndOtherEMIOptions } from 'emiV2/helper/emiOptions';
   import {
     getEMIStartingAt,
     isNoCostAVailableForToken,
@@ -47,6 +43,9 @@
   import { timer } from 'utils/timer';
   import { offerWindowOpen } from 'offers/store';
   import { selectedTab } from 'components/Tabs/tabStore';
+  import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
+  import { filterSavedCardsAgainstCustomBlock } from 'emiV2/helper/configurability';
+  import { getSavedCardsForEMI } from 'emiV2/helper/card';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -105,7 +104,7 @@
 
   $: {
     let _savedCards: Tokens[] = filterSavedCardsForEmi(allSavedCards);
-    _savedCards = filterSavedCardsAgainstInstrument(
+    _savedCards = filterSavedCardsAgainstCustomBlock(
       _savedCards,
       currentInstrumentMethod
     );
@@ -178,11 +177,7 @@
       // Initiate the cardless payment
       selectedCardlessEmiProvider.set(selectedBankCode.code);
 
-      let payment = session.r._payment;
-      if (payment) {
-        session.r._payment.off();
-        session.r._payment.clear();
-      }
+      clearPaymentRequest();
 
       handleEmiPaymentV2({
         action: 'cardless',

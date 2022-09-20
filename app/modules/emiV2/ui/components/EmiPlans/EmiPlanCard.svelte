@@ -27,11 +27,11 @@
     handlePlanDescription,
     isCardlessPlanNoCost,
   } from 'emiV2/helper/plans';
-  import NoCostLabel from 'components/NoCostLabel.svelte';
+  import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI } from 'ui/labels/offers';
   import { trackEmiPlansSelected } from 'emiV2/events/tracker';
   import { selectedTab } from 'components/Tabs/tabStore';
-  import { emiViaCards, selectedBank } from 'checkoutstore/screens/emi';
+  import { emiViaCards, selectedBank } from 'emiV2/store';
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { getOption } from 'razorpay';
 

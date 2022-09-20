@@ -202,7 +202,7 @@
   import { isRTBEnabled } from 'rtb/helper';
   import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
-  import { setNoCostAvailable } from 'checkoutstore/emi';
+  import { setNoCostAvailable } from 'emiV2/store';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());

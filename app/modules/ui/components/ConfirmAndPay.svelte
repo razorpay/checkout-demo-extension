@@ -12,7 +12,7 @@
   import { payInFull } from 'emiV2/payment/prePaymentHandler';
   import { currentCardType } from 'checkoutstore/screens/card';
   import { trackPayFullAmount } from 'emiV2/events/tracker';
-  import { selectedBank } from 'checkoutstore/screens/emi';
+  import { selectedBank } from 'emiV2/store';
   import { selectedTab } from 'components/Tabs/tabStore';
   import { selectedPlan } from 'checkoutstore/emi';
   import { isRedesignV15 } from 'razorpay';

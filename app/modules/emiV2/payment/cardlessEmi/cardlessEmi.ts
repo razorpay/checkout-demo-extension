@@ -1,7 +1,5 @@
-import {
-  getSelectedEmiBank,
-  selectedInstrumentCardlessEligible,
-} from 'checkoutstore/screens/emi';
+import { getSelectedEmiBank } from 'emiV2/store';
+import { selectedInstrumentCardlessEligible } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { contact, emiContact } from 'checkoutstore/screens/home';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';

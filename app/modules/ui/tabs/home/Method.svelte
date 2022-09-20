@@ -34,7 +34,7 @@
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
-  import { isNoCostEmiAvailable } from 'checkoutstore/emi';
+  import { isNoCostEmiAvailable } from 'emiV2/store';
   import { enableUPITiles } from 'upi/features';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
@@ -44,7 +44,7 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { upiUxV1dot1 } from 'upi/experiments';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
-  import NoCostLabel from 'components/NoCostLabel.svelte';
+  import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
   import { renderNoCostEmiTag } from 'emiV2/events/tracker';
 

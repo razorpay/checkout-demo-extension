@@ -9,7 +9,7 @@ import {
   remember,
   selectedCard,
 } from 'checkoutstore/screens/card';
-import { selectedBank } from 'checkoutstore/screens/emi';
+import { selectedBank } from 'emiV2/store';
 import {
   getOption,
   getOptionalObject,
@@ -127,4 +127,18 @@ export const payInFull = () => {
     removeAppliedOfferForMethod('card');
     session.preSubmit();
   });
+};
+
+/**
+ * Helper function to clear existing payment request
+ * Use Cases: When different contact/provider is used for checking cardless eligibility
+ * When an eligibility call has been made, but the user switches tab
+ * If the user has checked eligibility but going ahead with a different option
+ */
+export const clearPaymentRequest = () => {
+  const session = getSession();
+  if (session.r._payment) {
+    session.r._payment.off();
+    session.r._payment.clear();
+  }
 };
