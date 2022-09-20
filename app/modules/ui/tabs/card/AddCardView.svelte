@@ -110,10 +110,10 @@
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
 
-  let numberField = null;
-  let expiryField = null;
-  let nameField = null;
-  let cvvField = null;
+  let numberField: NumberField;
+  let expiryField: ExpiryField;
+  let nameField: NameField;
+  let cvvField: CvvField;
   const nameReadonly = isNameReadOnly();
   export let downtimeVisible;
   export let downtimeSeverity;
@@ -201,6 +201,7 @@
     }
     if (numberField) {
       numberField.setValid(isValid);
+      computeIsFormValid();
       numberField.dispatchFilledIfValid();
     }
   }
@@ -494,7 +495,6 @@
               inValid: isCardValidForEMI,
             });
           }
-
           setCardNumberValidity(
             isCardNumberValid &&
               isFlowValid &&
