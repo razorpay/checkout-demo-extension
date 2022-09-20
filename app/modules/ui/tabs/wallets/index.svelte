@@ -15,7 +15,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Analytics, { Events } from 'analytics';
-  import WALLET_EVENTS from 'ui/tabs/wallets/events';
+  import WALLET_EVENTS, { trackPaypalRendered } from 'ui/tabs/wallets/events';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
   import { getAnimationOptions } from 'svelte-utils';
@@ -144,6 +144,7 @@
   export function onShown() {
     Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
     Events.TrackRender(WALLET_EVENTS.SCREEN_LOAD_V2);
+    trackPaypalRendered(filteredWallets);
     if ($selectedWallet) {
       showCta(true);
       CTAState.show = true;

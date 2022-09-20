@@ -15,6 +15,7 @@
   import {
     getAvailableMethods,
     getSectionsDisplayed,
+    trackPaypalRendered,
   } from 'ui/tabs/home/helpers';
   import {
     showToast,
@@ -678,6 +679,8 @@
         acc[`_${instrument.method}`] = true;
         return acc;
       }, {});
+
+      trackPaypalRendered(setPreferredInstruments);
 
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);

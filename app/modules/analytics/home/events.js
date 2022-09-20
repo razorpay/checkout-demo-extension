@@ -14,6 +14,7 @@ const homeScreen = {
   LANDING: 'landing',
   PROCEED: 'proceed',
   CONTACT_SCREEN_LOAD: 'complete:contact_details',
+  PAYPAL_RENDERED: 'paypal:render',
 };
 
 // All card related events

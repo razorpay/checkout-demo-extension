@@ -5,6 +5,9 @@ import { getBanks, isDynamicFeeBearer } from 'razorpay';
 
 import { creditCardConfig, debitCardConfig } from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
+import { getMaxPreferredMethods } from 'checkoutframe/personalization/index';
+
+import { Events, HomeEvents } from 'analytics';
 
 import { blocks } from 'checkoutstore/screens/home';
 
@@ -122,18 +125,17 @@ export function getBankText(card, loggedIn, isEmiInstrument, locale) {
       },
       locale
     );
-  } else {
-    return formatTemplateWithLocale(
-      isEmiInstrument
-        ? 'instruments.titles.emi_logged_out'
-        : 'instruments.titles.card_logged_out',
-      {
-        bank: bankText,
-        type: toTitleCase(cardType),
-      },
-      locale
-    );
   }
+  return formatTemplateWithLocale(
+    isEmiInstrument
+      ? 'instruments.titles.emi_logged_out'
+      : 'instruments.titles.card_logged_out',
+    {
+      bank: bankText,
+      type: toTitleCase(cardType),
+    },
+    locale
+  );
 }
 
 /**
@@ -146,4 +148,21 @@ export function getBankText(card, loggedIn, isEmiInstrument, locale) {
  */
 export const addConsentDetailsToInstrument = (instrument, card) => {
   instrument.consent_taken = card.consent_taken;
+};
+
+//this function tracks event when paypal is shown to the user under preferred methods,
+//function is being called in home/index.svelte
+export const trackPaypalRendered = (instruments) => {
+  try {
+    if (Array.isArray(instruments)) {
+      const isRendered = instruments.some(
+        (instrument, index) =>
+          instrument?.wallets?.includes('paypal') &&
+          index < getMaxPreferredMethods()
+      );
+      if (isRendered) {
+        Events.TrackRender(HomeEvents.PAYPAL_RENDERED);
+      }
+    }
+  } catch (e) {}
 };
