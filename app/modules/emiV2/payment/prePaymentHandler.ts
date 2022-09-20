@@ -75,6 +75,10 @@ export const createEMiPaymentV2 = (basePayload: Partial<EMIPayload>) => {
     }
   }
 
+  if (paymentParams?.feesRedirect && typeof paymentPayload?.fee === 'number') {
+    paymentParams.feesRedirect = false;
+  }
+
   delete paymentPayload.downtimeSeverity;
   delete paymentPayload.downtimeInstrument;
 

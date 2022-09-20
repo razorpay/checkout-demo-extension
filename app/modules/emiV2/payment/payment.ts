@@ -66,6 +66,7 @@ import { showOffers } from 'offers/store';
 import { showAuthOverlay } from 'card/helper';
 import Analytics from 'analytics';
 import { getSavedCardsForEMI } from 'emiV2/helper/card';
+import { handleFeeBearer } from 'emiV2/helper/fee-bearer';
 
 const getIssuerForEmiFromPayload = (payload: EMIPayload) => {
   const currentCustomer = get(customer) as Customer;
@@ -322,6 +323,33 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
   session.payload = paymentPayload;
 
+  if (plan && plan.duration) {
+    paymentPayload.emi_duration = plan.duration.toString();
+  }
+
+  if (paymentParams.feesRedirect) {
+    /**
+     * Here the fee redirect screen has to be controlled
+     *
+     */
+    handleFeeBearer(paymentPayload, ({ amount, fee }) => {
+      /**
+       * Once the fee bearer consent is taken , callback will be hit with fee and amount
+       * hence that amount and fee will be carry-forwarded with previously prepared payload
+       * with this there will not be any side effect.
+       */
+      handleEmiPaymentV2({
+        ...emiConfig,
+        payloadData: {
+          ...paymentPayload,
+          amount,
+          fee,
+        },
+      });
+    });
+    return;
+  }
+
   if (
     paymentPayload.save &&
     !session.getCurrentCustomer().logged &&
@@ -392,10 +420,6 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
       maxlength: 6,
       digits: new Array(6),
     });
-  }
-
-  if (plan && plan.duration) {
-    paymentPayload.emi_duration = plan.duration.toString();
   }
 
   if (session.r._payment) {
