@@ -1,17 +1,28 @@
-import type { Context, CustomObject } from 'analytics-v2/library/common/types';
 import type {
+  Context,
+  CustomObject,
+  PayloadOptions,
+} from 'analytics-v2/library/common/types';
+import {
   AnalyticsState,
   Config,
+  EventValues,
+  PLUGIN_CALLBACK_TYPES,
 } from 'analytics-v2/library/analytics-core/types';
 import {
   makeContext,
   createPluginsState,
 } from 'analytics-v2/library/analytics-core/utils';
 import { processEvent } from './utils/events';
-import { PLUGIN_CALLBACK_TYPES } from './constants';
+import { CORE_EVENTS } from './constants';
 import { flatten, unflatten } from 'utils/object';
 import BrowserStorage from 'browserstorage';
 import { uuid4 } from 'common/uuid';
+import {
+  createSubscriptionState,
+  registerSubscription,
+  triggerSubscriptions,
+} from './utils/subscription';
 
 export default class Analytics<
   ContextValues extends string | number | symbol = string
@@ -39,7 +50,7 @@ export default class Analytics<
 
     // create and set anonymous id if it doesn't exist
     if (!BrowserStorage.getItem(this.anonIdKey)) {
-      BrowserStorage.setItem(this.anonIdKey, uuid4());
+      this.setAnonymousId(uuid4());
     }
 
     this.state = {
@@ -48,7 +59,54 @@ export default class Analytics<
       userId: BrowserStorage.getItem(this.userIdKey) || '',
       context,
       plugins: createPluginsState(plugins),
+      subscriptions: createSubscriptionState(),
     };
+
+    processEvent({}, this.state, {}, PLUGIN_CALLBACK_TYPES.INITIALIZE);
+  }
+
+  /**
+   * sets anonymous id in storage and state
+   */
+  setAnonymousId(anonId: string) {
+    BrowserStorage.setItem(this.anonIdKey, anonId);
+    if (this.state) {
+      this.state.anonymousId = anonId;
+      triggerSubscriptions(
+        this.state.subscriptions,
+        CORE_EVENTS.ANON_ID_UPDATED,
+        anonId
+      );
+    }
+  }
+
+  /**
+   * sets user id in storage and state
+   */
+  setUserId(userId: string) {
+    BrowserStorage.setItem(this.userIdKey, userId);
+    if (this.state) {
+      this.state.userId = userId;
+      triggerSubscriptions(
+        this.state.subscriptions,
+        CORE_EVENTS.USER_ID_UPDATED,
+        userId
+      );
+    }
+  }
+
+  /**
+   * registers callback on event
+   * @param eventType event which is to be subscribed
+   * @param callback callback to be triggered when event is fired
+   */
+  on(eventType: EventValues, callback: (payload: unknown) => void): void {
+    if (!Object.values(CORE_EVENTS).includes(eventType)) {
+      // this event is not supported
+      return;
+    }
+
+    registerSubscription(this.state.subscriptions, eventType, callback);
   }
 
   /**
@@ -65,19 +123,51 @@ export default class Analytics<
    * @param {string} eventName name of the event
    * @param {any} properties custom properties to be sent along event
    */
-  track(eventName: string, properties?: any): void {
-    const context = unflatten(this.flattenedContext) as Context;
+  track(eventName: string, properties?: any, options?: PayloadOptions): void {
     processEvent(
       {
         event: eventName,
         properties,
         userId: this.state.userId,
         anonymousId: this.state.anonymousId,
-        context,
+        context: unflatten(this.flattenedContext) as Context,
       },
       this.state,
+      options,
       PLUGIN_CALLBACK_TYPES.TRACK
     );
+  }
+
+  /**
+   * calls identify api to link events with user
+   * @param userId unique user id to identify the events
+   * @param traits user associated traits
+   */
+  identify(
+    userId: string,
+    traits?: CustomObject<string, unknown>,
+    options?: PayloadOptions
+  ): void {
+    this.setUserId(userId);
+    processEvent(
+      {
+        anonymousId: this.state.anonymousId,
+        userId,
+        traits,
+      },
+      this.state,
+      options,
+      PLUGIN_CALLBACK_TYPES.IDENTIFY
+    );
+  }
+
+  /**
+   * - clears out existing user / anon ids from storage
+   * - creates a new anonymous id and saves it in state and storage
+   */
+  reset(): void {
+    this.setAnonymousId(uuid4());
+    this.setUserId('');
   }
 
   /**

@@ -19,8 +19,7 @@ export function createPluginsState(
     acc[curr.name as keyof typeof PLUGINS] = {
       enabled: curr.enabled,
       loaded: curr.loaded,
-      eventQ: [],
-      pendingQ: [],
+      pendingQ: null,
       config: curr,
     };
     return acc;

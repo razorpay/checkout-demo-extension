@@ -1,47 +1,81 @@
-// type imports
-import type { EventPayload } from 'analytics-v2/library/common/types';
 import type {
   AnalyticsState,
+  CallbackPayloadMap,
   PluginState,
 } from 'analytics-v2/library/analytics-core/types';
-
-// constant imports
-import type { PLUGIN_CALLBACK_TYPES } from 'analytics-v2/library/analytics-core/constants';
-
-// util imports
 import { fitlerDisabledPlugins } from 'analytics-v2/library/analytics-core/utils';
+import createQueue from 'analytics-v2/library/common/queue';
+import type { PayloadOptions } from 'analytics-v2/library/common/types';
+import { PENDING_QUEUE_INTERVAL } from '../constants';
+
+/**
+ * handles pending queue
+ * - pushes event in pendingQ of plugin
+ * - starts a queue
+ * - polls if plugin is loaded, if yes triggers plugin API else pushes back in queue
+ * @param {PluginState} plugin
+ * @param {any} payload
+ * @param {PayloadOptions} options
+ * @param {keyof CallbackPayloadMap} type
+ */
+function handlePendingEvents(
+  plugin: PluginState,
+  payload: any,
+  options: PayloadOptions,
+  type: keyof CallbackPayloadMap
+) {
+  const pluginCallback = plugin.config?.[type];
+  if (!plugin.pendingQ) {
+    // create a new queue for plugin and push events triggered before plugin loaded
+    plugin.pendingQ = createQueue(
+      (events: any[]) => {
+        events.forEach(({ type, payload }) => {
+          if (!plugin.loaded()) {
+            // plugin is still not loaded, push the event back in queue
+            plugin.pendingQ?.push({ payload, type });
+          } else if (pluginCallback) {
+            pluginCallback(payload, options);
+          }
+        });
+      },
+      {
+        interval: PENDING_QUEUE_INTERVAL,
+      }
+    );
+  }
+  plugin.pendingQ.push({ payload, type });
+}
 
 /**
  * processes event and sends it to plugin
  * - enriches payload
  * - discards disabled plugins
- * @param {Omit<EventPayload, 'sentAt' | 'originalTimestamp'>} eventData payload of event to sent to plugins
+ * @param eventData payload of event to sent to plugins
  * @param {AnalyticsState} state current state of analytics instance
  * @param {PLUGIN_CALLBACK_TYPES} type type of plugin callback (track/identify)
  *
- * TODO:
- * - push events to pending queue when plugin is not loaded
  */
-export function processEvent(
-  eventData: Omit<EventPayload, 'sentAt' | 'originalTimestamp'>,
+export function processEvent<K extends keyof CallbackPayloadMap>(
+  eventData: CallbackPayloadMap[K],
   state: AnalyticsState,
-  type: PLUGIN_CALLBACK_TYPES
+  options: PayloadOptions = { isImmediate: false },
+  type: K
 ) {
   const date = new Date(Date.now()).toISOString();
-
+  const payload: any = {
+    ...eventData,
+    originalTimestamp: date,
+  };
   const enabledPlugins = fitlerDisabledPlugins(state.plugins);
 
   enabledPlugins.forEach((plugin: PluginState) => {
     const pluginCallback = plugin.config?.[type];
     if (typeof pluginCallback === 'function') {
       if (plugin?.loaded()) {
-        pluginCallback({
-          ...eventData,
-          originalTimestamp: date,
-          sentAt: date,
-        });
+        // trigger plugin callback for the type
+        pluginCallback(payload, options);
       } else {
-        // TODO: push to pending queue
+        handlePendingEvents(plugin, state, options, type);
       }
     }
   });

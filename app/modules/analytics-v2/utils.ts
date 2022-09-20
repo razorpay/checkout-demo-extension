@@ -3,6 +3,7 @@ import { isIframe } from 'common/constants';
 import Interface from 'common/interface';
 import type { CustomObject } from 'types';
 import AnalyticsV2 from './init';
+import type { PayloadOptions } from './library/common/types';
 
 /**
  * sync context between checkoutjs and checkoutframe
@@ -49,23 +50,32 @@ export function setContext(
 function getTrackMethod<
   N,
   K extends Record<keyof N, string | { name: string; type: string }>
->(events: K, eventID: keyof K) {
+>(events: K, eventID: keyof K, skipEvents: boolean) {
   return function (
-    ...props: N[keyof N] extends undefined ? [undefined?] : [N[keyof N]]
+    ...props: N[keyof N] extends undefined
+      ? [undefined?, PayloadOptions?]
+      : [N[keyof N], PayloadOptions?]
   ) {
+    if (skipEvents) {
+      return;
+    }
+
     const event = events[eventID];
+    const payload = props[0];
+    const options = props[1];
+
     if (typeof event === 'string') {
-      AnalyticsV2.track(event, props[0]);
+      AnalyticsV2.track(event, payload, options);
     } else if (event.name) {
       let eventName = event.name;
       if (event.type) {
         eventName = `${event.type} ${eventName}`;
         LAST_EVENT[event.type] = {
           event: eventName,
-          properties: props[0],
+          properties: payload,
         };
       }
-      AnalyticsV2.track(eventName, props[0]);
+      AnalyticsV2.track(eventName, payload, options);
     }
   };
 }
@@ -79,7 +89,8 @@ export function createTrackMethodForModule<
   N,
   K extends Record<keyof N, string | { name: string; type: string }>
 >(
-  events: K
+  events: K,
+  { skipEvents } = { skipEvents: false }
 ): {
   [T in keyof N]: (
     ...props: N[T] extends undefined ? [undefined?] : [N[T]]
@@ -88,7 +99,7 @@ export function createTrackMethodForModule<
   const eventIDs = Object.keys(events) as (keyof K)[];
   const returnObj: any = {};
   eventIDs.forEach((eventID: keyof K) => {
-    returnObj[eventID] = getTrackMethod(events, eventID);
+    returnObj[eventID] = getTrackMethod(events, eventID, skipEvents);
   });
   return returnObj;
 }
@@ -110,5 +121,7 @@ const getState = (): CustomObject<unknown> => {
 export const EventsV2 = {
   setContext,
   getState,
+  Identify: AnalyticsV2.identify.bind(AnalyticsV2),
+  Reset: AnalyticsV2.reset.bind(AnalyticsV2),
   createTrackMethodForModule,
 };

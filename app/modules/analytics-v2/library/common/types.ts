@@ -27,24 +27,70 @@ export interface Context {
 }
 
 /**
- * Event payload passed to plugin API
+ * Event payload passed to plugin Track API
  */
-export interface EventPayload {
+export interface TrackPayload {
   event: string;
   context: Context;
   properties?: CustomObject<string, unknown>;
   userId?: string;
   anonymousId: string;
   originalTimestamp: string;
-  sentAt: string;
+}
+
+/**
+ * Event payload passed to plugin Identify API
+ */
+export interface IdentifyPayload {
+  userId: string;
+  anonymousId: string;
+  traits?: CustomObject<string, unknown>;
 }
 
 /**
  * Plugin APIs
  */
-export type Track = (payload: EventPayload) => Promise<unknown>;
-export type Identify = (payload: EventPayload) => Promise<unknown>;
+export type Track = (payload: TrackPayload, options: PayloadOptions) => void;
+export type Identify = (
+  payload: IdentifyPayload,
+  options: PayloadOptions
+) => void;
+export type Initialize = (
+  payload: CustomObject<string, unknown>,
+  options: PayloadOptions
+) => void;
 export type Loaded = () => boolean;
+
+export interface QueueType<K> {
+  flush: (flushAll?: boolean) => void;
+  push: (data: K) => void;
+  size: () => number;
+  pause: (toFlush: boolean) => void;
+  resume: () => void;
+}
+
+export interface QueueOptions<K> {
+  /**
+   * max limit for items in a batch
+   */
+  max?: number;
+  /**
+   * interval in ms for time period between queue flush
+   */
+  interval?: number;
+  /**
+   * initial queue array
+   */
+  initial?: K[];
+  /**
+   * callback triggered when queue is empty
+   */
+  onEmpty?: () => void;
+  /**
+   * callback triggered when queue is paused
+   */
+  onPause?: (queue: K[]) => void;
+}
 
 /**
  * Plugin config passed to analytics
@@ -54,9 +100,21 @@ export interface Plugin {
   loaded: Loaded;
   track?: Track;
   identify?: Identify;
+  initialize?: Initialize;
   enabled: boolean;
 }
 
+/**
+ * total set of available Plugins
+ */
 export enum PLUGINS {
   CONSOLE_PLUGIN = 'CONSOLE_PLUGIN',
+  RUDDERSTACK_PLUGIN = 'RUDDERSTACK_PLUGIN',
+}
+
+/**
+ * extra options sent along payload in every API (track, identify, initialize)
+ */
+export interface PayloadOptions {
+  isImmediate?: boolean;
 }

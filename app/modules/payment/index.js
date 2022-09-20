@@ -49,6 +49,9 @@ import {
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
+import { ContextProperties, EventsV2 } from 'analytics-v2';
+import { get } from 'svelte/store';
+import { checkoutInvokedTime } from 'checkoutstore/screens/home';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -167,6 +170,11 @@ function trackNewPayment(data, params, r) {
     downtimeSeverity: params.downtimeSeverity,
     ...data,
   });
+
+  EventsV2.setContext(
+    ContextProperties.RENDER_TO_SUBMIT,
+    Date.now() - get(checkoutInvokedTime)
+  );
 
   Analytics.track('submit', {
     data: {

@@ -38,6 +38,7 @@
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { views } from 'one_click_checkout/routing/constants';
   import { logUserOut } from 'checkoutframe/customer';
+  import { EventsV2 } from 'analytics-v2';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -184,6 +185,7 @@
     Events.Track(MiscEvents.LOGOUT_CLICKED, {
       current_screen,
     });
+    EventsV2.Reset();
     logoutDropdownShown = false;
   }
 

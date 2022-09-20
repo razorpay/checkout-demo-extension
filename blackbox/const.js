@@ -4,6 +4,7 @@ module.exports = {
   cdnUrl: 'https://cdn.razorpay.com/',
   bundleUrl: 'https://cdn.razorpay.com/bundles/',
   lumberjackUrl: 'https://lumberjack.razorpay.com',
+  rudderstackStageUrl: 'https://rudderstack.stage.razorpay.in',
   lumerjackVajraURL: 'https://lumberjack-metrics.razorpay.com',
   zestMoneyLoanAgreementUrl:
     'https://app.zestmoney.in/PaymentGateway//RazorPay/document/loanAgreement',

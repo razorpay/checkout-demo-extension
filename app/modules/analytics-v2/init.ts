@@ -1,27 +1,56 @@
 import Analytics from 'analytics-v2/library/analytics-core';
-import consolePlugin from 'analytics-v2/library/plugins/console-plugin';
 import Interface from 'common/interface';
 import type { ContextValues } from './types';
+import { ConsolePlugin, Rudderstack } from './library/plugins';
+import { RUDDERSTACK_KEY, RUDDERSTACK_URL } from './constants';
 
 const analytics = new Analytics<ContextValues>({
   app: 'rzp_checkout',
-  plugins: [consolePlugin()],
+  plugins: [
+    ConsolePlugin(),
+    {
+      ...Rudderstack({
+        domainUrl: RUDDERSTACK_URL,
+        key: RUDDERSTACK_KEY,
+      }),
+      enabled: !localStorage.getItem('disableV2'),
+    },
+  ],
 });
 
 /**
- * syncs context between checkoutjs and checkoutframe
+ * sets data in analytics.context received from syncContext event
  */
 Interface.subscribe('syncContext', (event) => {
   let key, value;
-  // TODO: to remove this check, interface is exporting inconsistent data from checkoutjs, checkoutframe
   if (event.data) {
     key = event.data.key;
     value = event.data.value;
-  } else {
-    key = event.key;
-    value = event.value;
   }
-  analytics.setContext(key, value);
+  if (key) {
+    analytics.setContext(key, value);
+  }
+});
+
+/**
+ * sets anonId in analytics state received from syncAnonymousId event
+ */
+Interface.subscribe(
+  'syncAnonymousId',
+  (event: { data: { anonymousId: string } }) => {
+    if (event.data?.anonymousId) {
+      analytics.setAnonymousId(event.data.anonymousId);
+    }
+  }
+);
+
+/**
+ * sets userId in analytics state received from syncUserId event
+ */
+Interface.subscribe('syncUserId', (event: { data: { userId: string } }) => {
+  if (event.data?.userId) {
+    analytics.setUserId(event.data.userId);
+  }
 });
 
 export default analytics;

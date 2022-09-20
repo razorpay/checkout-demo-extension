@@ -52,8 +52,12 @@ import { setBraveBrowser } from 'common/useragent';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import { EventsV2, ContextProperties } from 'analytics-v2';
-import { getExperimentsFromStorage } from 'experiments';
+import {
+  getExperimentsFromStorage,
+  getRegisteredExperiments,
+} from 'experiments';
 import { formatPrefExperiments } from 'misc/analytics/helper';
+import { checkoutInvokedTime } from 'checkoutstore/screens/home';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -126,6 +130,7 @@ const setAnalyticsMeta = (message) => {
       MetaProperties.TIME_SINCE_OPEN,
       () => _.now() - message.metadata.openedAt
     );
+    checkoutInvokedTime.set(message.metadata.openedAt);
   }
 
   /**
@@ -266,7 +271,8 @@ export const handleMessage = function (message) {
     session.id = id;
     session.r.id = id;
     Track.updateUid(id);
-    EventsV2.setContext(ContextProperties.CHECKOUT_ID, id);
+    EventsV2.setContext(ContextProperties.CHECKOUT_ID, id, false);
+
     SessionManager.setSession(session);
   }
 
@@ -727,6 +733,16 @@ function updateAnalytics(preferences) {
     ...getExperimentsFromStorage(),
     ...formatPrefExperiments(preferences.experiments),
   });
+
+  const registeredExperiments = getRegisteredExperiments();
+  const experimentConfigs = Object.keys(registeredExperiments).reduce(
+    (acc, expKey) => {
+      acc[expKey] = registeredExperiments[expKey].rolloutValue;
+      return acc;
+    },
+    {}
+  );
+  EventsV2.setContext(ContextProperties.EXP_CONFIGS, experimentConfigs);
 
   // Set optional fields in meta
   const optionalFields = preferences.optional;

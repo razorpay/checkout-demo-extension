@@ -1,6 +1,11 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
-const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
+const {
+  cdnUrl,
+  lumberjackUrl,
+  bundleUrl,
+  rudderstackStageUrl,
+} = require('../const');
 const { interceptor, delay } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml, getMockResponse } = require('./callback');
@@ -62,6 +67,8 @@ function checkoutRequestHandler(request) {
       headers: { 'Access-Control-Allow-Origin': '*' },
     });
   } else if (url.startsWith('https://lumberjack.razorpay.com')) {
+    return request.respond({ status: 200 });
+  } else if (url.startsWith(rudderstackStageUrl)) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;

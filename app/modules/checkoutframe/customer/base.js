@@ -12,6 +12,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
 import RazorpayStore, {
+  getPrefilledName,
   getRecurringMethods,
   isOneClickCheckout,
   isRecurring,
@@ -19,9 +20,10 @@ import RazorpayStore, {
 import { delayLoginOTPExperiment } from 'card/helper';
 import { timer } from 'utils/timer';
 import { get } from 'svelte/store';
-import { contact } from 'checkoutstore/screens/home';
+import { contact, email, phone } from 'checkoutstore/screens/home';
 import { isLoggedIn } from 'checkoutstore/customer';
 import * as _ from 'utils/_';
+import { ContextProperties, EventsV2 } from 'analytics-v2';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -129,6 +131,15 @@ Customer.prototype = {
     }
 
     Events.setMeta(MetaProperties.LOGGEDIN, true);
+    EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
+    const payload = {};
+    if (getPrefilledName()) {
+      payload.name = getPrefilledName();
+    }
+    if (get(email)) {
+      payload.email = get(email);
+    }
+    EventsV2.Identify(get(phone), payload);
   },
 
   // NOTE: status check api also sends otp if customer exist

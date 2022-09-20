@@ -10,6 +10,7 @@ jest.mock('checkoutframe/personalization/experiment', () => ({
 }));
 
 jest.mock('common/useragent', () => ({
+  ...jest.requireActual('common/useragent'),
   isDesktop: jest.fn(),
 }));
 

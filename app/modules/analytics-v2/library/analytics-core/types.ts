@@ -1,8 +1,12 @@
 import type {
   Context,
-  EventPayload,
+  CustomObject,
   Plugin,
+  IdentifyPayload,
+  TrackPayload,
+  QueueType,
 } from 'analytics-v2/library/common/types';
+import type { CORE_EVENTS } from './constants';
 
 export interface Config {
   /**
@@ -22,14 +26,17 @@ export interface PluginState {
    */
   enabled: boolean;
   /**
-   * queue responsible for sending events in a batch
-   */
-  eventQ: EventPayload[];
-  /**
    * queue responsible for sending events after plugin has loaded
    */
-  pendingQ: EventPayload[];
+  pendingQ: null | QueueType<{
+    type: PLUGIN_CALLBACK_TYPES;
+    payload: TrackPayload | IdentifyPayload | CustomObject<string, unknown>;
+  }>;
   config: Plugin;
+}
+
+export interface Subscriptions {
+  [key: string]: ((payload: unknown) => void)[];
 }
 
 export interface AnalyticsState {
@@ -38,4 +45,20 @@ export interface AnalyticsState {
   userId?: string;
   context: Context;
   plugins: { [key: string]: PluginState };
+  subscriptions: Subscriptions;
 }
+
+export const enum PLUGIN_CALLBACK_TYPES {
+  TRACK = 'track',
+  IDENTIFY = 'identify',
+  INITIALIZE = 'initialize',
+}
+
+export interface CallbackPayloadMap {
+  [PLUGIN_CALLBACK_TYPES.TRACK]: Omit<TrackPayload, 'originalTimestamp'>;
+  [PLUGIN_CALLBACK_TYPES.IDENTIFY]: Omit<IdentifyPayload, 'originalTimestamp'>;
+  [PLUGIN_CALLBACK_TYPES.INITIALIZE]: CustomObject<string, unknown>;
+}
+
+export type EventKeys = keyof typeof CORE_EVENTS;
+export type EventValues = typeof CORE_EVENTS[EventKeys];

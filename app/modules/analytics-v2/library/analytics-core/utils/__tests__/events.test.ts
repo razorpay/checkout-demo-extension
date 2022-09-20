@@ -1,5 +1,5 @@
 import AnalyticsV2 from 'analytics-v2/library/analytics-core';
-import { PLUGIN_CALLBACK_TYPES } from '../../constants';
+import { PLUGIN_CALLBACK_TYPES } from 'analytics-v2/library/analytics-core/types';
 import { processEvent } from '../events';
 import { makeContext } from '../misc';
 
@@ -63,6 +63,7 @@ describe('Events Utils', () => {
       processEvent(
         eventPayload,
         analytics.getState(),
+        {},
         PLUGIN_CALLBACK_TYPES.TRACK
       );
 
@@ -73,6 +74,7 @@ describe('Events Utils', () => {
       processEvent(
         eventPayload,
         analytics.getState(),
+        {},
         PLUGIN_CALLBACK_TYPES.TRACK
       );
 

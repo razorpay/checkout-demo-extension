@@ -8,6 +8,7 @@ const {
   lumberjackUrl,
   lumerjackVajraURL,
   zestMoneyLoanAgreementUrl,
+  rudderstackStageUrl,
 } = require('./const');
 
 const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -285,6 +286,7 @@ module.exports = {
         url.startsWith('data') ||
         (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
+        url.startsWith(rudderstackStageUrl) ||
         url.startsWith(lumerjackVajraURL) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes('https://browser.sentry-cdn.com/7.2.0/bundle.min.js') ||

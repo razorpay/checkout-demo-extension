@@ -79,6 +79,7 @@ import { selectedTab } from 'components/Tabs/tabStore';
 import { isCardlessTab } from 'emiV2/helper/tabs';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
+import { checkoutInvokedTime } from 'checkoutstore/screens/home';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1198,6 +1199,10 @@ Session.prototype = {
     });
     updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
+    EventsV2.setContext(
+      ContextProperties.INIT_TO_RENDER,
+      Date.now() - storeGetter(checkoutInvokedTime)
+    );
   },
   setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
@@ -6530,6 +6535,14 @@ Session.prototype = {
         isLoggedIn.set(true);
         customer.logged = true;
         EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
+        const traits = {};
+        if (saved_customer.name) {
+          traits.name = saved_customer.name;
+        }
+        if (saved_customer.email) {
+          traits.email = saved_customer.email;
+        }
+        EventsV2.Identify(saved_customer.contact, traits);
         Analytics.setMeta('loggedIn', true);
       }
 

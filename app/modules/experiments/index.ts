@@ -28,6 +28,10 @@ type SingleExperiment = {
    * Evaluator function which dev passed during creation of experiment.
    */
   evaluator?: Function;
+  /**
+   * Rollout percentage kept for the experiment at creation
+   */
+  rolloutValue?: number;
 };
 
 class Experiment {
@@ -62,9 +66,8 @@ class Experiment {
     // Make sure we return an object
     if (data && typeof data === 'object' && !Array.isArray(data)) {
       return data;
-    } 
-      return {};
-    
+    }
+    return {};
   }
 
   /**
@@ -86,6 +89,10 @@ class Experiment {
 
   getAllActiveExperimentsName = () => {
     return Object.keys(this.experiments);
+  };
+
+  getRegisteredExperiments = () => {
+    return this.experiments;
   };
 
   /**
@@ -162,9 +169,8 @@ class Experiment {
 
     if (typeof existing === 'undefined') {
       return this.setSegment(experiment, evaluatorArg, overrideFn);
-    } 
-      return existing;
-    
+    }
+    return existing;
   }
 
   /**
@@ -214,11 +220,15 @@ class Experiment {
       throw new Error('evaluatorFn must be a function or number');
     }
 
-    const singleExperiment = {
+    const singleExperiment: SingleExperiment = {
       name,
       enabled: checkEnabled.bind(this),
       evaluator: evaluatorFn,
     };
+
+    if (typeof evaluator === 'number') {
+      singleExperiment.rolloutValue = evaluator;
+    }
 
     this.register({ [name]: singleExperiment });
 
@@ -233,6 +243,12 @@ class Experiment {
 const experimentModule = new Experiment({});
 const createExperiment = experimentModule.create;
 const clearOldExperiments = experimentModule.clearOldExperiments;
+const getRegisteredExperiments = experimentModule.getRegisteredExperiments;
 const getExperimentsFromStorage = () => Experiment.getExperimentsFromStorage();
 
-export { createExperiment, getExperimentsFromStorage, clearOldExperiments };
+export {
+  createExperiment,
+  getExperimentsFromStorage,
+  clearOldExperiments,
+  getRegisteredExperiments,
+};

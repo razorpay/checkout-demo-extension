@@ -15,6 +15,7 @@ import { COMMIT_HASH, TRAFFIC_ENV } from 'common/constants';
 import * as _ from 'utils/_';
 import { startSentryMonitoring } from 'sentry/http';
 import { EventsV2, ContextProperties } from 'analytics-v2';
+import { startAnalyticsSyncing } from 'checkoutframe/analytics';
 
 setSessionConstructor(Session);
 
@@ -32,3 +33,4 @@ RazorpayConfig.api = resolveUrl(RazorpayConfig.frameApi);
 
 startSentryMonitoring();
 initIframe();
+startAnalyticsSyncing();

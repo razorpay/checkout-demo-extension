@@ -25,8 +25,7 @@ describe('Misc Utils', () => {
         [PLUGINS[0].name]: {
           enabled: PLUGINS[0].enabled,
           loaded: expect.any(Function),
-          eventQ: [],
-          pendingQ: [],
+          pendingQ: null,
           config: {
             name: PLUGINS[0].name,
             loaded: expect.any(Function),
@@ -36,8 +35,7 @@ describe('Misc Utils', () => {
         [PLUGINS[1].name]: {
           enabled: PLUGINS[1].enabled,
           loaded: expect.any(Function),
-          eventQ: [],
-          pendingQ: [],
+          pendingQ: null,
           config: {
             name: PLUGINS[1].name,
             loaded: expect.any(Function),

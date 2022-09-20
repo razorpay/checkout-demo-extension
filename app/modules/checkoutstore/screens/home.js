@@ -194,3 +194,5 @@ export function resetContactToPrevious() {
   phone.set(prevContactPhone);
   email.set(prevContactEmail);
 }
+
+export const checkoutInvokedTime = writable(null);
