@@ -25,6 +25,8 @@ export const HELP_TEXT_MAPPING = {
   content2: 'intl_bank_transfer.help_texts.content2',
   routingCode: 'intl_bank_transfer.help_texts.routing_code',
   routingType: 'intl_bank_transfer.help_texts.routing_type',
+  roundOffCallout: 'intl_bank_transfer.help_texts.round_off_callout',
+  noteLabel: 'intl_bank_transfer.help_texts.note_label',
 };
 
 export const VIEWS_MAP = {

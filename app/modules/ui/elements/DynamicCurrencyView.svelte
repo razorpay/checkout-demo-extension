@@ -64,7 +64,7 @@
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
-  import Radio from 'ui/elements/Radio.svelte';
+  import NativeRadio from './NativeRadio';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   import {
@@ -509,7 +509,7 @@
           <div class="default-currencies">
             <Stack horizonal>
               {#each displayCurrencies as { currency, amount } (currency)}
-                <Radio
+                <NativeRadio
                   name="dcc_currency"
                   label={explicitUI
                     ? `${currency} ${formatAmount(amount, currency)}`
@@ -519,7 +519,7 @@
                   on:change={() => onSelect(currency)}
                 >
                   {explicitUI ? `${$t(PAY_IN)} ${currency}` : amount}
-                </Radio>
+                </NativeRadio>
               {/each}
             </Stack>
           </div>
@@ -628,10 +628,6 @@
     justify-content: space-between;
   }
 
-  .dcc-view :global(.input-radio):not(:last-child) {
-    margin-right: 16px;
-  }
-
   .small-text {
     font-size: 12px;
   }
@@ -643,7 +639,7 @@
   }
 
   .default-currencies {
-    margin-bottom: 6px;
+    margin-bottom: 0.75rem;
 
     :global(label) {
       display: flex;

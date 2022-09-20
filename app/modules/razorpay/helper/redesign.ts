@@ -25,6 +25,7 @@ export const isRedesignV15 = (): boolean => {
       return true;
     }
     const disableRedesignFromOption = getOption('disable_redesign_v15');
+    const allowInternational = getPreferences('experiments.cb_redesign_v1_5');
     let allow = getPreferences('experiments.checkout_redesign_v1_5');
     const { isOrgRazorpay } = getOrgDetails() || {};
 
@@ -40,7 +41,7 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
-    if (isInternational() || isDCCEnabled()) {
+    if ((isInternational() || isDCCEnabled()) && !allowInternational) {
       // MCC flow - international
       allow = false;
     }

@@ -1304,7 +1304,7 @@
         </div>
       {/if}
       {#if showTnC}
-        <p class="pad">
+        <p class="pad tnc">
           {$t(MERCHANT_OF_RECORD)}
           <a
             class="theme-highlight"
@@ -1412,8 +1412,8 @@
       margin: 1.5rem 1rem;
     }
 
-    .avs-card-info {
-      margin-top: 1.5rem;
+    .tnc {
+      font-size: 12px;
     }
   }
 

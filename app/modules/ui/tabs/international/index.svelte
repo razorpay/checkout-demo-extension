@@ -448,10 +448,6 @@
       margin: 1.5rem 1rem;
     }
 
-    .nvs-provider-info {
-      margin-top: 1.5rem;
-    }
-
     .border-list {
       padding: 1.5rem 1rem;
     }

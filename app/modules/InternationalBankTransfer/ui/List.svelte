@@ -36,6 +36,7 @@
 
   // helpers
   import { getAllMethods } from '../helpers';
+  import { isRedesignV15 } from 'razorpay';
 
   // variables
   export let directlyToDetails = false;
@@ -43,6 +44,7 @@
   let currentView: string = directlyToDetails
     ? VIEWS_MAP.DETAILS
     : VIEWS_MAP.LIST;
+  const isRedesign = isRedesignV15();
 
   const allMethods = getAllMethods();
   const CDN_BASE = RazorpayConfig.cdn;
@@ -112,16 +114,23 @@
       </div>
     </div>
   {:else if $selectedMethod}
-    <div class="intl-bt__method-info">
-      {getMethodSubtitle($selectedMethod)}
-    </div>
+    {#if !isRedesign}
+      <div class="intl-bt__method-info">
+        {getMethodSubtitle($selectedMethod)}
+      </div>
+    {/if}
     <div class="intl-bt__wrapper">
+      {#if isRedesign}
+        <div class="intl-bt__method-info">
+          {getMethodSubtitle($selectedMethod)}
+        </div>
+      {/if}
       <Details method={$selectedMethod} />
     </div>
   {/if}
 </Tab>
 
-<style lang="css">
+<style lang="scss">
   .intl-bt__wrapper {
     padding-left: 16px;
     padding-right: 16px;
@@ -178,5 +187,23 @@
     right: 0;
     top: 1px;
     transform: translateY(-50%) rotate(180deg);
+  }
+
+  :global(.redesign) {
+    .intl-bt__title {
+      margin-top: 0;
+    }
+
+    .intl-bt__method-info, .intl-bt__title {
+      padding: 0;
+      margin-bottom: 1.25rem;
+      background: none;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-body);
+    }
+
+    .intl-bt__wrapper {
+      padding: 1.5rem 1rem;
+    }
   }
 </style>

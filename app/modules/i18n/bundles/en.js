@@ -1482,13 +1482,15 @@ export default {
       loading: 'Getting account details...',
       routing_code: 'Routing Code',
       routing_type: 'Routing Type',
-      note: 'Note: It will take around 5-7 business days to reflect money in the beneficiary (seller) account. You may connect with the seller directly for any queries regarding the payment.',
+      note_label: 'Note:',
+      note: 'It may take 5-7 business days for the payment to reflect in the seller\'s account. In case of any queries, reach out to them directly.',
       heading:
         'Add the account below as a beneficiary and transfer the given payment amount:',
       content1:
         'Alternatively, you may visit your nearest bank branch and request for a ACH transfer to the below account details.',
       content2:
         'Alternatively you may visit your nearest bank branch and request local ACH transfer to below account.',
+      round_off_callout: 'Do not round-off the amount as your payment may fail'
     },
   },
 };

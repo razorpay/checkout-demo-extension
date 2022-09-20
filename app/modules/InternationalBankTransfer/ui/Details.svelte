@@ -18,25 +18,25 @@
     AMOUNT_LABEL,
     BENEFICIARY_LABEL,
     RETRY_BUTTON_LABEL,
-    ROUND_OFF_CALLOUT,
   } from 'ui/labels/bank-transfer';
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
   // components
   import Callout from 'ui/elements/Callout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import CTA from 'cta';
 
   // utils
   import { getSession } from 'sessionmanager';
   import { copyToClipboard } from 'common/clipboard';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getOption } from 'razorpay';
+  import { getOption, isRedesignV15 } from 'razorpay';
 
   // helpers
   import { getVAs } from '../helpers';
 
   // constants
-  import { HELP_TEXT_MAPPING, MEHTOD_CURRENCY_MAPPING } from '../constants';
+  import { HELP_TEXT_MAPPING, MEHTOD_CURRENCY_MAPPING, TAB_NAME } from '../constants';
 
   // types
   import type { VA_RESPONSE_TYPE } from '../types';
@@ -46,6 +46,7 @@
   let loading = false;
   let data: VA_RESPONSE_TYPE | null = null;
   let error: string | null = null;
+  let isRedesign = isRedesignV15();
   const session = getSession();
 
   // refs
@@ -144,31 +145,46 @@
             {data.account?.beneficiary_name}
           </div>
         </div>
+        {#if !isRedesign}
+          <div class="intl-bt-detail__row">
+            <div class="intl-bt-detail__col text-light">
+              {$t(AMOUNT_LABEL)}:
+            </div>
+            <div class="intl-bt-detail__col text-heavy">
+              {formatAmountWithSymbol(data.amount, data.currency)}
+            </div>
+          </div>
+        {/if}
+      </div>
+      {#if !isRedesign}
         <div class="intl-bt-detail__row">
-          <div class="intl-bt-detail__col text-light">
-            {$t(AMOUNT_LABEL)}:
-          </div>
+          <div class="intl-bt-detail__col" />
           <div class="intl-bt-detail__col text-heavy">
-            {formatAmountWithSymbol(data.amount, data.currency)}
+            <button class="intl-bt-detail__copy" on:click={copyAccountDetails}
+              >{$t(copied ? COPIED : COPY_DETAILS)}</button
+            >
           </div>
         </div>
-      </div>
-      <div class="intl-bt-detail__row">
-        <div class="intl-bt-detail__col" />
-        <div class="intl-bt-detail__col text-heavy">
-          <button class="intl-bt-detail__copy" on:click={copyAccountDetails}
-            >{$t(copied ? COPIED : COPY_DETAILS)}</button
-          >
-        </div>
-      </div>
+      {/if}
       <Callout classes={['intl-bt-detail__callout']} allClasses="">
-        {$t(ROUND_OFF_CALLOUT)}
+        {$t(HELP_TEXT_MAPPING.roundOffCallout)}
       </Callout>
     </div>
 
-    <div class="intl-bt-detail__note">
-      {$t(HELP_TEXT_MAPPING.note)}
-    </div>
+    <p class="intl-bt-detail__note">
+      <strong>{$t(HELP_TEXT_MAPPING.noteLabel)}</strong> {$t(HELP_TEXT_MAPPING.note)}
+    </p>
+
+    {#if isRedesign}
+      <CTA
+        screen={TAB_NAME}
+        tab={TAB_NAME}
+        disabled={copied}
+        show
+        onSubmit={copyAccountDetails}
+        label={copied ? COPIED : COPY_DETAILS}
+      />
+    {/if}
   {:else}
     <div class="error">
       <div class="error-text">{error || 'Error'}</div>
@@ -178,11 +194,11 @@
   {/if}
 </div>
 
-<style lang="css">
+<style lang="scss">
   .intl-bt-detail__container {
     margin: 16px 0;
     border: 1px solid #e6e7e8;
-    font-size: 13px;
+    font-size: 12px;
     padding-top: 14px;
   }
 
@@ -234,7 +250,6 @@
   }
 
   .intl-bt-detail__note {
-    padding-bottom: 16px;
     color: #757575;
     font-size: 12px;
   }
@@ -253,5 +268,18 @@
     padding: 10px 12px;
     line-height: 1.2;
     margin-top: 16px;
+  }
+
+  :global(.redesign) {
+    .intl-bt-detail h5 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary-text-color);
+    }
+
+    .intl-bt-detail p, .intl-bt-detail__note {
+      font-size: 0.75rem;
+      color: var(--primary-text-color);
+    }
   }
 </style>

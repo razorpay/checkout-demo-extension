@@ -3,7 +3,10 @@
 import { get } from 'svelte/store';
 
 // Store imports
-import { newUserAddress, selectedAddressId } from 'one_click_checkout/address/shipping_address/store';
+import {
+  newUserAddress,
+  selectedAddressId,
+} from 'one_click_checkout/address/shipping_address/store';
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 import { savedAddresses } from 'one_click_checkout/address/store';
 

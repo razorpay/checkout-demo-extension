@@ -36,10 +36,14 @@ export function validateAndFetchPrefilledWallet(): string {
 
 /**
  * For dynamic wallet flow where ajax route is not supported don't show prower wallets
- * 
+ *
  * @param code wallet code
  * @returns boolean
  */
 export function showPowerWallet(code: string): boolean {
-  return !(getPreferences('dynamic_wallet_flow') && ajaxRouteNotSupported && isPowerWallet(code));
+  return !(
+    getPreferences('dynamic_wallet_flow') &&
+    ajaxRouteNotSupported &&
+    isPowerWallet(code)
+  );
 }
