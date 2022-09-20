@@ -1,6 +1,8 @@
 <script lang="ts">
   // svelte imports
   import { onMount } from 'svelte';
+  import { afterUpdate, onDestroy } from 'svelte/internal';
+  import { slide } from 'svelte/transition';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -13,19 +15,37 @@
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import WithEllipsis from 'one_click_checkout/common/ui/WithEllipsis.svelte';
-
-  // helper imports
-  import { getIcons } from 'one_click_checkout/sessionInterface';
-
-  const { circle_check } = getIcons();
+  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
   export let loading = false;
   export let serviceable = false;
+  let timer: number;
 
   let initialServiceability = false;
+  let showServiceableMessage = false;
+  let done = false;
+
+  afterUpdate(() => {
+    if (!done) {
+      showServiceableMessage = serviceable && !initialServiceability;
+    }
+  });
+
+  $: {
+    if (showServiceableMessage) {
+      timer = window.setTimeout(() => {
+        done = true;
+        showServiceableMessage = false;
+      }, 4000);
+    }
+  }
 
   onMount(() => {
     initialServiceability = serviceable;
+  });
+
+  onDestroy(() => {
+    clearTimeout(timer);
   });
 </script>
 
@@ -37,22 +57,24 @@
       </span>
     </WithEllipsis>
   </div>
-{:else if serviceable && !initialServiceability}
+{:else if showServiceableMessage}
   <div
     id="address-serviceable-message"
     data-testid="address-serviceable-message"
-    class="mt-8 out"
+    class="mt-8"
+    out:slide|local={{ duration: 500 }}
   >
     <span id="address-serviceable-text">
       {$t(ADDRESS_WIDGET_SERVICEABLE_TEXT)}
     </span>
-    <Icon icon={circle_check} />
+    <Icon icon={circle_check('16', '14')} />
   </div>
 {:else if !serviceable}
   <div
     data-test-id="address-box-unserviceability"
     id="address-serviceability-error"
     class="mt-8"
+    in:slide|local={{ duration: 300 }}
   >
     {$t(ADDRESS_WIDGET_UNSERVICEABLE_TEXT)}
   </div>
@@ -70,7 +92,8 @@
 
   #address-serviceable-message {
     display: flex;
-    gap: 6px;
+    gap: 4px;
+    align-items: center;
   }
 
   #address-serviceability-error {
@@ -81,6 +104,7 @@
     border-radius: 1px;
     padding: 6px 8px;
     opacity: 1;
+    font-weight: var(--font-weight-medium);
   }
 
   .mt-8 {
@@ -94,35 +118,5 @@
     font-size: var(--font-size-small);
     line-height: 150%;
     color: var(--tertiary-text-color);
-  }
-
-  .out {
-    animation-duration: 500ms;
-    animation-name: element-out;
-    animation-iteration-count: 1;
-    animation-fill-mode: forwards;
-    -webkit-animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0.17, 0, 1, 1);
-    animation-delay: 4s;
-  }
-
-  @keyframes element-out {
-    0% {
-      opacity: 1;
-    }
-    40% {
-      margin-bottom: 5px;
-    }
-    50% {
-      margin-bottom: 5px;
-    }
-    75% {
-      margin-bottom: 5px;
-    }
-    100% {
-      opacity: 0;
-      height: 0;
-      margin: 0;
-    }
   }
 </style>

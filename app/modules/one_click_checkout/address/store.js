@@ -14,6 +14,9 @@ export const showBanner = derived(
 
 export const consentGiven = writable(false);
 
-export const addressScrollable = writable(false);
+export const prefilledName = derived(
+  savedAddresses,
+  ($savedAddresses) => $savedAddresses?.[0]?.name
+);
 
 export const getSavedAddresses = () => get(savedAddresses);

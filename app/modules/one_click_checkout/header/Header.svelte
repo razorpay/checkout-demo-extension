@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { slide } from "svelte/transition";
+  import { slide } from 'svelte/transition';
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
 
   // store imports
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import { headerVisible, headerHiddenOnScroll } from 'one_click_checkout/header/store';
+  import {
+    headerVisible,
+    headerHiddenOnScroll,
+  } from 'one_click_checkout/header/store';
 
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
@@ -93,6 +96,7 @@
     justify-content: space-between;
     padding: 18px 16px 0px;
     align-items: center;
+    background: #00000014;
   }
 
   #header-1cc .header-title-wrapper-with-extra-padding {
@@ -141,6 +145,7 @@
     display: flex;
     flex-direction: column;
     padding: 12px 16px 0px;
+    background: #00000014;
   }
 
   .title-section {

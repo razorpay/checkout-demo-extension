@@ -12,6 +12,7 @@
   import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { showBanner } from 'one_click_checkout/address/store';
+  import { shippingCharge } from 'one_click_checkout/charges/store';
 
   // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
@@ -42,6 +43,7 @@
 
   // util imports
   import { screenScrollTop } from 'one_click_checkout/helper';
+  import { showShippingChargeAddedToast } from 'one_click_checkout/address/helpersExtra';
 
   export let addresses;
   export let checkServiceability = true;
@@ -87,8 +89,11 @@
     if (!checkServiceability) {
       return;
     }
-
+    const prevShippingCharge = $shippingCharge;
     postAddressSelection(id, index);
+    if ($shippingCharge && $shippingCharge !== prevShippingCharge) {
+      showShippingChargeAddedToast($shippingCharge);
+    }
   }
 
   onMount(() => {

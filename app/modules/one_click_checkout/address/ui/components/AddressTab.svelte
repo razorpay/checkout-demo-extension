@@ -30,14 +30,14 @@
   import { showLoader } from 'one_click_checkout/loader/store';
   import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+  import { shippingCharge } from 'one_click_checkout/charges/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-  import { formatAddressToFormData } from 'one_click_checkout/address/helpersExtra';
-  import { isBillingAddressEnabled } from 'razorpay';
+  import { formatAddressToFormData, showShippingChargeAddedToast } from 'one_click_checkout/address/helpersExtra';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
@@ -239,6 +239,14 @@
     }
   }
 
+  function onServiceabilityCheck({ detail: { newCharge } }) {
+    if (newCharge === $shippingCharge) {
+      return;
+    }
+    $shippingCharge = newCharge;
+    showShippingChargeAddedToast(newCharge);
+  }
+
   $: {
     if (currentView) {
       document.body.scroll({
@@ -295,6 +303,7 @@
       {:else if ADDRESS_FORM_VIEWS.includes(currentView)}
         <AddNewAddress
           on:formCompletion={onFormCompletion}
+          on:serviceabilityCheck={onServiceabilityCheck}
           id={Resource[addressType].formId}
           checkServiceability={Resource[addressType].checkServiceability}
           formData={newUserAddress}

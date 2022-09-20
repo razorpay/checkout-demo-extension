@@ -3,12 +3,6 @@
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
-  import {
-    showToastAfterDelay,
-    hideToast,
-    TOAST_SCREEN,
-    TOAST_THEME,
-  } from 'one_click_checkout/Toast';
   import AddressTab from 'one_click_checkout/address/ui/components/AddressTab.svelte';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
 
@@ -20,7 +14,6 @@
   } from 'one_click_checkout/address/shipping_address/store';
   import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
   import { contact } from 'checkoutstore/screens/home';
-  import { shippingCharge } from 'one_click_checkout/charges/store';
 
   // interface imports
   import {
@@ -35,10 +28,8 @@
 
   // i18n imports
   import { t } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
   import {
     SAVED_ADDRESS_CTA_LABEL,
-    SHIPPING_CHARGES_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
 
   // Analytics imports
@@ -55,8 +46,7 @@
   import { views } from 'one_click_checkout/routing/constants';
   import { otpReasons } from 'otp/constants';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
-  import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency, isBillingAddressEnabled } from 'razorpay';
+  import { isBillingAddressEnabled } from 'razorpay';
 
   // props
   export let currentView;
@@ -137,22 +127,6 @@
       Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_UNCHECKED, {
         address_screen: ADDRESS_TYPES.SHIPPING_ADDRESS,
       });
-    }
-  }
-
-  $: {
-    if ($shippingCharge) {
-      hideToast();
-      showToastAfterDelay(
-        {
-          screen: TOAST_SCREEN.ONE_CC,
-          theme: TOAST_THEME.INFO,
-          message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
-            charge: formatAmountWithSymbol($shippingCharge, getCurrency()),
-          }),
-        },
-        150
-      );
     }
   }
 </script>

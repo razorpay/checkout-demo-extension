@@ -10,8 +10,9 @@
   // Icon Imports
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  const { circle_check, solid_down_arrow } = getIcons();
-
+  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
+  const { solid_down_arrow } = getIcons();
+  
   import * as ObjectUtils from 'utils/object';
   import * as _El from 'utils/DOM';
   // Actions
@@ -330,7 +331,7 @@
   >
     {#if showServicableIcon}
       <span class="servicibility-icon-wrapper"
-        ><Icon icon={circle_check} /></span
+        ><Icon icon={circle_check()} /></span
       >
     {/if}
     {#if showDropDownIcon}

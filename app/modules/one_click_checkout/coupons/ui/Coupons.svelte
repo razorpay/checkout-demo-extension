@@ -89,6 +89,7 @@
     if (!$selectedAddress?.serviceability && addressWidget) {
       addressWidget.scrollIntoView({
         behavior: 'smooth',
+        block: 'center',
       });
       return;
     }

@@ -25,8 +25,9 @@
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { popStack } from 'navstack';
   import { truncateString } from 'utils/strings';
+  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
-  const { circle_check, rtb_close } = getIcons();
+  const { rtb_close } = getIcons();
   const name = getMerchantName() || getPreferences('merchant_name') || '';
   const merchantName = truncateString(name, 20);
 
@@ -59,7 +60,7 @@
     </div> -->
     {#each listItems as listItem}
       <div class="rtb-list">
-        <Icon icon={circle_check} />
+        <Icon icon={circle_check()} />
         <span class="rtb-list-text">{$t(listItem)}</span>
       </div>
     {/each}

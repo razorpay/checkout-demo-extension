@@ -374,9 +374,14 @@
         postServiceability(payload)
           .then((res) => {
             if (res && res[$selectedCountryISO]?.serviceability) {
-              codChargeAmount.set(res[$selectedCountryISO].cod_fee);
-              shippingCharge.set(res[$selectedCountryISO].shipping_fee);
-              stateCode = res[$selectedCountryISO]?.state_code;
+              const {
+                cod_fee: codFee,
+                shipping_fee: shippingFee,
+                state_code: selectedStateCode,
+              } = res[$selectedCountryISO];
+              codChargeAmount.set(codFee);
+              dispatch('serviceabilityCheck', { newCharge: shippingFee });
+              stateCode = selectedStateCode;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
             } else {
@@ -477,10 +482,15 @@
           .then((res) => {
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             if (res && res[value]?.serviceability) {
-              codChargeAmount.set(res[value].cod_fee);
-              shippingCharge.set(res[value].shipping_fee);
+              const {
+                cod_fee: codFee,
+                shipping_fee: shippingFee,
+                state_code: selectedStateCode,
+              } = res[value];
+              codChargeAmount.set(codFee);
+              dispatch('serviceabilityCheck', { newCharge: shippingFee });
               isShippingAddedToAmount.set(true);
-              stateCode = res[value].state_code;
+              stateCode = selectedStateCode;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
@@ -675,9 +685,14 @@
       postServiceability(payload)
         .then((res) => {
           if (res && res[zipcode]?.serviceability) {
-            codChargeAmount.set(res[zipcode].cod_fee);
-            shippingCharge.set(res[zipcode].shipping_fee);
-            stateCode = res[zipcode].state_code;
+            const {
+              cod_fee: codFee,
+              shipping_fee: shippingFee,
+              state_code: selectedStateCode,
+            } = res[zipcode];
+            codChargeAmount.set(codFee);
+            dispatch('serviceabilityCheck', { newCharge: shippingFee });
+            stateCode = selectedStateCode;
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               SERVICEABLE_LABEL;
             if (!isCityStateAutopopulateDisabled) {

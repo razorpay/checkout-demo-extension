@@ -6,7 +6,18 @@ import { getDeviceId } from 'fingerprint';
 import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 import { removeTrailingCommas } from 'one_click_checkout/common/utils';
 import { views as addressViews } from 'one_click_checkout/address/constants';
-import { HOME, OFFICE, OTHERS } from './i18n/labels';
+import { HOME, OFFICE, OTHERS } from 'one_click_checkout/address/i18n/labels';
+import {
+  showToastAfterDelay,
+  hideToast,
+  TOAST_SCREEN,
+  TOAST_THEME,
+} from 'one_click_checkout/Toast';
+import { getCurrency } from 'razorpay';
+import { SHIPPING_CHARGES_LABEL } from 'one_click_checkout/address/i18n/labels';
+import { formatTemplateWithLocale } from 'i18n';
+import { formatAmountWithSymbol } from 'common/currency';
+
 /**
  *
  * @param {Object} address Address object which is to be formatted
@@ -314,4 +325,21 @@ export function getI18nForTag(tag) {
     default:
       return OTHERS;
   }
+}
+
+export function showShippingChargeAddedToast(charge) {
+  if (!charge) {
+    return;
+  }
+  hideToast();
+  showToastAfterDelay(
+    {
+      screen: TOAST_SCREEN.ONE_CC,
+      theme: TOAST_THEME.INFO,
+      message: formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, {
+        charge: formatAmountWithSymbol(charge, getCurrency()),
+      }),
+    },
+    150
+  );
 }

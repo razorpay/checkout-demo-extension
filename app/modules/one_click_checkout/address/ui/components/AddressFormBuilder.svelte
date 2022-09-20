@@ -9,6 +9,7 @@
   } from 'one_click_checkout/address/i18n/labels';
 
   import { country, phone } from 'checkoutstore/screens/home';
+  import { prefilledName } from 'one_click_checkout/address/store';
 
   import Field from 'ui/components/Field.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
@@ -45,6 +46,8 @@
       handleInput('contact', { countryCode, phoneNum });
     }
   }
+
+  $: handleInput('name', $prefilledName ?? '');
 
   const dispatch = createEventDispatcher();
   const handleInput = (id, value) => {
