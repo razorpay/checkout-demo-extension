@@ -9,6 +9,13 @@ import {
 import { isDCCEnabled, isInternational } from './currency';
 import { isRecurringOrPreferredPayment } from './recurring';
 
+const demoMerchantKey = ['rzp_test_1DP5mmOlF5G5ag', 'rzp_live_ILgsfZCZoFIKMb'];
+
+function isDemoMerchant() {
+  const merchantKey = getOption('key') as string;
+  return demoMerchantKey.includes(merchantKey);
+}
+
 /**
  * Enable redesign for
  * MileStone #1 Core flow
@@ -41,7 +48,11 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
-    if ((isInternational() || isDCCEnabled()) && !allowInternational) {
+    if (
+      (isInternational() || isDCCEnabled()) &&
+      !allowInternational &&
+      !isDemoMerchant()
+    ) {
       // MCC flow - international
       allow = false;
     }
