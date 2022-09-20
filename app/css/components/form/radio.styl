@@ -21,7 +21,7 @@
       content: '';
       display: inline-block;
       vertical-align: middle;
-      position: static;
+      position: absolute;
       width: 16px;
       height: @width;
       cursor: pointer;
@@ -58,3 +58,8 @@
     label
       .radio-display
         top: 3px;
+
+.redesign
+  label
+    .radio-display
+      position: static;

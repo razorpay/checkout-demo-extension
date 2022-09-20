@@ -285,8 +285,7 @@
     align-items: center;
     width: 75px;
   }
-  :global(.input-radio label .radio-display) {
-    position: unset;
-    top: unset;
+  :global(.emi-tab-panel-container .input-radio label .radio-display) {
+    position: static;
   }
 </style>
