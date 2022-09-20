@@ -13,7 +13,7 @@ import {
 import { getBankFromCardCache } from 'common/bank';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { moveControlToSession, popStack, pushOverlay } from 'navstack';
-import RazorpayStore from 'razorpay';
+import RazorpayStore, { isRedesignV15 } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
 import ConfirmAndPay from 'ui/components/ConfirmAndPay.svelte';
@@ -213,7 +213,7 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
   const isCardInvalidForEmi = get(isCurrentCardInvalidForEmi);
   const isCardProviderInvalid = get(isCurrentCardProviderInvalid);
 
-  if (session.screen === 'card') {
+  if (['card', 'bajaj'].includes(session.screen)) {
     if (isCardProviderInvalid) {
       //Track Try Another Emi Option click
       trackPayFullAmount(
@@ -244,6 +244,18 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
     // Check for card form validations
     if (session.checkInvalid()) {
+      return;
+    }
+
+    // If selected bank is bajaj check for form validations
+    // for name and card number to be empty
+    // avoiding check invalid function call if v1.5 is enabled
+    // since CTA state is handled as disabled
+    if (
+      isSelectedBankBajaj() &&
+      session.checkInvalid('.bajaj-emi-screen') &&
+      !isRedesignV15()
+    ) {
       return;
     }
 

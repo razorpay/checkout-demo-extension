@@ -7,9 +7,7 @@
   import { formatTemplateWithLocale } from 'i18n';
 
   import {
-    CARD_NUMBER_LABEL,
     CARD_NUMBER_HELP,
-    NAME_LABEL,
     NAME_HELP,
     BAJAJ_ISSUED_CARD,
     ADD_NEW_CARD_HEADER,
@@ -36,9 +34,11 @@
   } from 'razorpay';
   import { isNameReadOnly } from 'checkoutframe/customer';
   import CTA from 'cta';
-  import { ENTER_CARD_DETAILS } from 'cta/i18n';
+  import CTAOld from 'ui/elements/CTA.svelte';
   import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
   import { cardNumber } from 'checkoutstore/screens/card';
+  import NumberField from 'ui/elements/fields/card/NumberField.svelte';
+  import NameField from 'ui/elements/fields/card/NameField.svelte';
 
   // Props
   export let emiDuration = '';
@@ -56,6 +56,12 @@
 
   const isNewEmiFlow = isEmiV2();
   let cardInvalid = false;
+  // variable to store whether card field is empty
+  let cardEmpty = true;
+  let numberField = null;
+  let cardHolderName = prefill.name;
+
+  let oneCCFieldProps = {};
 
   onMount(() => {
     const emi_el_card = querySelector('input[name="card[number]"]');
@@ -65,19 +71,21 @@
     session.delegator
       .add('card', emi_el_card)
       .on('network', function () {
-        const type = this.type;
+        const type: string = this.type;
 
         // card icon element
-        this.el.parentNode
-          .querySelector('.cardtype')
-          .setAttribute('cardtype', type);
+        const cardTypeIcon = document.querySelector('.cardtype');
+
+        if (cardTypeIcon) {
+          cardTypeIcon.setAttribute('cardtype', type);
+        }
       })
       .on('change', function () {
         cardInvalid = false;
         let isValid = this.isValid();
 
         $isCurrentCardProviderInvalid = false;
-
+        cardEmpty = !this.value;
         if (this.type !== 'bajaj') {
           isValid = false;
         }
@@ -86,7 +94,10 @@
           _El.removeClass(this.el.parentNode, 'invalid');
         } else {
           cardInvalid = true;
-          $isCurrentCardProviderInvalid = true;
+          // setting card provider invalid if only card number exists
+          if (this.value) {
+            $isCurrentCardProviderInvalid = true;
+          }
           _El.addClass(this.el.parentNode, 'invalid');
         }
       });
@@ -106,6 +117,26 @@
   }
 
   const isRedesignV15Enabled = isRedesignV15();
+
+  if (isRedesignV15Enabled) {
+    oneCCFieldProps = {
+      elemClasses: 'add-card-fields-one-cc-wrapper',
+      inputFieldClasses: 'add-card-fields-one-cc',
+      labelClasses: 'add-card-fields-label-one-cc',
+      labelUpperClasses: 'add-card-fields-label-upper-one-cc',
+    };
+  }
+
+  let showValidationError = false;
+  $: {
+    // showing input validation only when card number entered is not supported
+    // and the input field contains some values
+    showValidationError = cardInvalid && !cardEmpty && isNewEmiFlow;
+  }
+
+  const handleInput = (e) => {
+    cardHolderName = e.target.value;
+  };
 </script>
 
 <div
@@ -136,49 +167,54 @@
       <h3>{$t(CARD_DETAILS_HEADER)}</h3>
     {/if}
     <div class="card-fields">
-      <div class="elem-wrap">
-        <div class="elem elem-card filled">
-          <div class="cardtype" />
-          <!-- LABEL: Card Number -->
-          <label>{$t(CARD_NUMBER_LABEL)}</label>
-          <i>&#xe605;</i>
-          <span class="help">
-            <!-- LABEL: Please enter a valid Bajaj Finserv issued card number -->
-            {$t(CARD_NUMBER_HELP)}
-          </span>
-          <input
-            class="input"
-            type="tel"
-            name="card[number]"
-            autocomplete="off"
-            maxlength="19"
+      <div>
+        <div class="input-container">
+          <div
+            class:card-type-redesigned={isRedesignV15Enabled}
+            class="cardtype"
+          />
+          <NumberField
+            id="card_number"
             value={prefill['card[number]']}
+            bind:this={numberField}
+            on:focus
             on:blur={(e) => {
+              if (cardInvalid) {
+                numberField.setValid(false);
+              } else {
+                numberField.setValid(true);
+              }
               if (isNewEmiFlow) {
                 cardNumber.set(e.target.value);
               }
             }}
+            helpText={!cardInvalid
+              ? ''
+              : isNewEmiFlow
+              ? $t(CARD_NOT_SUPPORTED)
+              : $t(CARD_NUMBER_HELP)}
+            showValidations={showValidationError}
+            {...oneCCFieldProps}
           />
         </div>
       </div>
-      {#if cardInvalid}
-        <p class="error-msg">{$t(CARD_NOT_SUPPORTED)}</p>
+      <!-- Only show the card invalid message if entered card is invalid for old checkout design -->
+      {#if showValidationError && !isRedesignV15Enabled}
+        <p class="error-msg">
+          {$t(CARD_NOT_SUPPORTED)}
+        </p>
       {/if}
-      <div class="elem-wrap" class:readonly={readonly.name}>
-        <div class="elem elem-name filled">
-          <!-- LABEL: Please enter name on your card -->
-          <span class="help">{$t(NAME_HELP)}</span>
-          <!-- LABEL: Card Holder's Name -->
-          <label>{$t(NAME_LABEL)}</label>
-          <i>&#xe602;</i>
-          <input
-            class="input"
-            type="text"
+      <div class="name-input-container" class:readonly={readonly.name}>
+        <div>
+          <NameField
+            id="card_name"
             name="card[name]"
-            required
-            value={prefill.name}
-            pattern={"^[a-zA-Z. 0-9'-]{1,100}$"}
             readonly={readonly.name}
+            value={prefill.name}
+            helpText={$t(NAME_HELP)}
+            on:input={handleInput}
+            on:focus
+            {...oneCCFieldProps}
           />
         </div>
       </div>
@@ -215,18 +251,37 @@
       </div>
     </div>
   </div>
+  <!-- if card is invalid and emi flow is now and card is enetered
+  cta should be enabled since we show 'Try Another EMI option' CTA -->
   <CTA
-    screen={isNewEmiFlow ? 'card' : 'emi'}
+    screen={isNewEmiFlow ? 'bajaj' : 'emi'}
     tab={'emi'}
-    disabled={cardInvalid && isNewEmiFlow ? false : !$bajajTCAccepted}
+    disabled={cardInvalid && !cardEmpty && isNewEmiFlow
+      ? false
+      : Boolean(
+          cardEmpty || cardInvalid || !cardHolderName || !$bajajTCAccepted
+        )}
     show
     showAmount
-    label={!isNewEmiFlow
-      ? ENTER_CARD_DETAILS
-      : cardInvalid
-      ? TRY_ANOTHER_EMI_OPTION
-      : PAY_VIA_EMI}
+    onSubmit={() => {
+      session.preSubmit();
+    }}
+    label={showValidationError ? TRY_ANOTHER_EMI_OPTION : PAY_VIA_EMI}
   />
+  <!-- Showing old CTA for old checkout design
+    to handle cta disability and label states
+    (since for new emi flow navstack is used so handling cta label logic here)
+    on click of the cta calling the presubmit to take over the payment flow
+   -->
+  {#if !isRedesignV15Enabled && isNewEmiFlow}
+    <CTAOld
+      on:click={() => {
+        session.preSubmit();
+      }}
+    >
+      {showValidationError ? $t(TRY_ANOTHER_EMI_OPTION) : $t(PAY_VIA_EMI)}
+    </CTAOld>
+  {/if}
 </div>
 
 <style>
@@ -332,5 +387,22 @@
     color: #b21528;
     margin: 0;
     margin-top: 4px;
+  }
+
+  .input-container {
+    position: relative;
+  }
+
+  .name-input-container {
+    margin-top: 16px;
+  }
+  .cardtype {
+    position: absolute;
+    right: 0;
+    top: 26px;
+  }
+
+  .card-type-redesigned {
+    top: 16px;
   }
 </style>

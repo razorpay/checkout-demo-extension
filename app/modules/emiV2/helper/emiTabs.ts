@@ -30,7 +30,12 @@ export const handleEmiProviderSelection = () => {
    */
   let nextScreen = '';
   if (isSelectedBankBajaj()) {
-    nextScreen = 'card';
+    // when redirecting to bajaj card scree set the screen value as bajaj
+    // since new cta checks a combination of current screen and tab with store values
+    // screen=emi and tab=emi is already used by EMI l1 screen
+    // screen=card and tab=emi is used by add card screen for emi
+    // therefore a new screen value for proper CTA to load
+    nextScreen = 'bajaj';
     pushStack({
       component: EmiScreenSvelte,
     });

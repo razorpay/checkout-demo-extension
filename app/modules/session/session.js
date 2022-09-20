@@ -4565,7 +4565,7 @@ Session.prototype = {
     if (
       !controlledViaSession() &&
       this.tab === 'emi' &&
-      this.screen === 'card' &&
+      (this.screen === 'card' || this.screen === 'bajaj') &&
       RazorpayHelper.isEmiV2()
     ) {
       const bank = getSelectedEmiBank();

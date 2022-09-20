@@ -27,6 +27,8 @@ export const initiateEmiFlow = (
       setData(bank);
       showDowntimeAlert(bank.code);
     }
+  } else {
+    proceedForAction();
   }
 };
 

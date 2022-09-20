@@ -18,9 +18,9 @@ export const handleBackNavigation = () => {
   const session = getSession();
   if (isEmiV2() && session.tab === 'emi') {
     let screen: string = session.screen;
-    // current screen is card or cvv screen
+    // current screen is card / bajaj card screen or cvv screen
     // set the current screen explicitly to emi plans screen
-    if ((screen === 'card' || screen === 'cvv') && session.tab === 'emi') {
+    if (['card', 'cvv', 'bajaj'].includes(screen) && session.tab === 'emi') {
       selectedPlan.set(null);
       screen = 'emiPlans';
     }
