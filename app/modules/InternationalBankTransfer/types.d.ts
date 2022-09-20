@@ -15,6 +15,8 @@ export type VA_RESPONSE_TYPE = {
     routing_type: string;
     account_number: number;
     beneficiary_name: string;
+    bank_name: string;
+    bank_address: string;
     va_currency: string;
   };
   amount: number;

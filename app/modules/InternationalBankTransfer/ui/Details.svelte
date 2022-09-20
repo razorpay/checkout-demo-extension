@@ -18,6 +18,8 @@
     AMOUNT_LABEL,
     BENEFICIARY_LABEL,
     RETRY_BUTTON_LABEL,
+    BENEFICIARY_BANK_NAME_LABEL,
+    BENEFICIARY_BANK_ADDRESS_LABEL,
   } from 'ui/labels/bank-transfer';
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
@@ -85,14 +87,13 @@
 
     getVAs(params)
       .then((response) => {
-        if (response.error) {
-          error = response.error.description;
-          trackFetchDetailsError(method, params);
-        } else {
-          data = response;
-          setAmountInHeader(formatAmountWithSymbol(data.amount, data.currency));
-          trackFetchDetailsSuccess(method);
-        }
+        data = response;
+        setAmountInHeader(formatAmountWithSymbol(data.amount, data.currency));
+        trackFetchDetailsSuccess(method);
+      })
+      .catch((err: string) => {
+        error = err;
+        trackFetchDetailsError(method, params);
       })
       .finally(() => {
         loading = false;
@@ -145,6 +146,26 @@
             {data.account?.beneficiary_name}
           </div>
         </div>
+        {#if data.account?.bank_name}
+          <div class="intl-bt-detail__row">
+            <div class="intl-bt-detail__col text-light">
+              {$t(BENEFICIARY_BANK_NAME_LABEL)}:
+            </div>
+            <div class="intl-bt-detail__col text-heavy">
+              {data.account?.bank_name}
+            </div>
+          </div>
+        {/if}
+        {#if data.account?.bank_address}
+          <div class="intl-bt-detail__row">
+            <div class="intl-bt-detail__col text-light">
+              {$t(BENEFICIARY_BANK_ADDRESS_LABEL)}:
+            </div>
+            <div class="intl-bt-detail__col text-heavy">
+              {data.account?.bank_address}
+            </div>
+          </div>
+        {/if}
         {#if !isRedesign}
           <div class="intl-bt-detail__row">
             <div class="intl-bt-detail__col text-light">
@@ -172,7 +193,8 @@
     </div>
 
     <p class="intl-bt-detail__note">
-      <strong>{$t(HELP_TEXT_MAPPING.noteLabel)}</strong> {$t(HELP_TEXT_MAPPING.note)}
+      <strong>{$t(HELP_TEXT_MAPPING.noteLabel)}</strong>
+      {$t(HELP_TEXT_MAPPING.note)}
     </p>
 
     {#if isRedesign}

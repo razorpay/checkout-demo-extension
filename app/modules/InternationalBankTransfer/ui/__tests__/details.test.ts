@@ -26,6 +26,8 @@ const successResponse = {
     routing_type: 'ACH',
     account_number: '1234567889',
     beneficiary_name: 'GemsGems',
+    bank_name: 'Bank Name',
+    bank_address: 'Bank Address',
     va_currency: 'USD',
   },
   amount: 1030,
@@ -79,17 +81,15 @@ describe('Test <Details />', () => {
     expect(getByText('Getting account details...')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalled();
 
-    await waitFor(() =>
-      getByText(
-        'Add the account below as a beneficiary and transfer the given payment amount:'
-      )
-    );
+    await waitFor(() => getByText('To complete your payment:'));
 
     expect(getByText('1234567889')).toBeInTheDocument();
     expect(getByText('routing_code')).toBeInTheDocument();
     expect(getByText('GemsGems')).toBeInTheDocument();
     expect(getByText('ACH')).toBeInTheDocument();
     expect(getByText('$ 10.30')).toBeInTheDocument();
+    expect(getByText('Bank Name')).toBeInTheDocument();
+    expect(getByText('Bank Address')).toBeInTheDocument();
   });
   test('should show retry button on api failure', async () => {
     fetchMock.mockImplementation(({ callback }) => callback(errorResponse));
@@ -111,11 +111,7 @@ describe('Test <Details />', () => {
     expect(getByText('Getting account details...')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalled();
 
-    await waitFor(() =>
-      getByText(
-        'Add the account below as a beneficiary and transfer the given payment amount:'
-      )
-    );
+    await waitFor(() => getByText('To complete your payment:'));
 
     expect(getByText('Copy Details')).toBeInTheDocument();
     fireEvent.click(getByText('Copy Details'));

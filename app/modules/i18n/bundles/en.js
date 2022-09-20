@@ -62,6 +62,8 @@ export default {
     account_label: 'Account',
     amount_label: 'Amount Expected',
     beneficiary_label: 'Beneficiary Name',
+    beneficiary_bank_name: 'Bank Name',
+    beneficiary_bank_address: 'Beneficiary Address',
     due_date_note: 'Note: Please complete the transaction before {date}',
     header: 'To complete the transaction, make NEFT / RTGS / IMPS transfer to',
     ifsc_label: 'IFSC',
@@ -1485,9 +1487,9 @@ export default {
       note_label: 'Note:',
       note: 'It may take 5-7 business days for the payment to reflect in the seller\'s account. In case of any queries, reach out to them directly.',
       heading:
-        'Add the account below as a beneficiary and transfer the given payment amount:',
+        'To complete your payment:',
       content1:
-        'Alternatively, you may visit your nearest bank branch and request for a ACH transfer to the below account details.',
+        'Log in to your internet banking portal and add the below account as a beneficiary, or visit your nearest bank branch and request an ACH transfer to the below account',
       content2:
         'Alternatively you may visit your nearest bank branch and request local ACH transfer to below account.',
       round_off_callout: 'Do not round-off the amount as your payment may fail'

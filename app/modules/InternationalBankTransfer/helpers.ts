@@ -3,6 +3,7 @@ import { makeAuthUrl } from 'checkoutstore';
 import { getMerchantMethods } from 'razorpay';
 import fetch from 'utils/fetch';
 import { formatMessageWithLocale } from 'i18n';
+import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 
 // config
 import RazorpayConfig from 'common/RazorpayConfig';
@@ -22,20 +23,50 @@ import type {
  * @returns boolean
  */
 export const isIntlBankTransferEnabled = () => {
-  const methods: InstrumentMethods =
-    getMerchantMethods()?.intl_bank_transfer || {};
-  return METHOD_NAMES.some((method: string) => methods[method]);
+  const methods: InstrumentMethods = getMerchantMethods()?.intl_bank_transfer;
+
+  if (methods && typeof methods === 'object') {
+    return METHOD_NAMES.some((method: string) => methods[method]);
+  }
+  return false;
 };
 
 export const getAllMethods = () => {
   if (isIntlBankTransferEnabled()) {
-    const methods: InstrumentMethods =
-      getMerchantMethods()?.intl_bank_transfer || {};
-    return Object.keys(methods).map((method) => ({
-      id: method,
-    }));
+    const methods: InstrumentMethods = getMerchantMethods().intl_bank_transfer;
+
+    // extract only ACH supported methods
+    const supportedMethods: { id: string }[] = [];
+
+    METHOD_NAMES.forEach((method) => {
+      // consider only truth value
+      if (methods[method]) {
+        supportedMethods.push({
+          id: method,
+        });
+      }
+    });
+
+    return supportedMethods;
   }
   return [];
+};
+
+export const validateVirtualAccountResponse = (
+  response?: Partial<VA_RESPONSE_TYPE>
+) => {
+  // validate error case
+  if (typeof response === 'object' && typeof response.error === 'object') {
+    return false;
+  }
+
+  // validate success case
+  return (
+    typeof response === 'object' &&
+    typeof response.account === 'object' &&
+    response.amount !== undefined &&
+    response.currency !== undefined
+  );
 };
 
 export const getVAs = ({
@@ -50,10 +81,28 @@ export const getVAs = ({
   const url = makeAuthUrl(
     `international/virtual_account/${vaCurrency}?amount=${amount}&currency=${baseCurrency}`
   );
-  return new Promise((callback) => {
+  return new Promise((resolve, reject) => {
     fetch({
       url,
-      callback,
+      callback: (response: VA_RESPONSE_TYPE) => {
+        try {
+          if (validateVirtualAccountResponse(response)) {
+            resolve(response);
+          } else {
+            throw Error(
+              response?.error?.description || 'Failed to fetch account details.'
+            );
+          }
+        } catch (err) {
+          // capture exception
+          const error = err as Error;
+          reject(error.message);
+          captureError(error, {
+            severity: SEVERITY_LEVELS.S2,
+            unhandled: false,
+          });
+        }
+      },
     });
   });
 };
