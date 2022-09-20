@@ -10,23 +10,39 @@ const sqPrefix = cdnUrl + 'paylater-sq/';
 const config = {
   epaylater: {
     name: 'ePayLater',
+    display_name: 'ePayLater',
   },
   getsimpl: {
     name: 'Simpl',
+    display_name: 'Simpl',
   },
   icic: {
     name: 'ICICI Bank PayLater',
+    display_name: 'ICICI',
   },
   hdfc: {
     name: 'FlexiPay by HDFC Bank',
+    display_name: 'FlexiPay',
   },
   lazypay: {
     name: 'LazyPay',
+    display_name: 'LazyPay',
   },
   kkbk: {
     name: 'kkbk',
+    display_name: 'Kotak Mahindra Bank',
   },
 };
+
+// Order in which the paylater providers should come
+const PAYLATER_ORDER = [
+  'getsimpl',
+  'lazypay',
+  'icic',
+  'hdfc',
+  'epaylater',
+  'kkbk',
+];
 
 /**
  * Create an provider object for rendering on PayLater screen.
@@ -96,5 +112,25 @@ export const getImageUrl = (provider) => {
       severity: ErrorService.SEVERITY_LEVELS.S3,
     });
     return '';
+  }
+};
+
+/**
+ * Returns the Display name for Paylater providers
+ * Sorted by in the order of PAYLATER_ORDER
+ * @param {Array<string>} providers
+ * @returns {Array<string>}
+ */
+export const getPayLaterProvidersDisplayNames = (providers) => {
+  try {
+    return PAYLATER_ORDER.filter((provider) =>
+      providers.includes(provider)
+    ).map((provider) => getProvider(provider)?.display_name);
+  } catch (error) {
+    ErrorService.capture(error, {
+      severity: ErrorService.SEVERITY_LEVELS.S3,
+    });
+    const defaultProviders = providers.map((p) => getProvider(p)?.display_name);
+    return defaultProviders;
   }
 };

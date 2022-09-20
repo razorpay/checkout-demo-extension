@@ -21,7 +21,6 @@ import {
   getMethodPrefix,
   getRawMethodTitle,
   getNetworkName,
-  getPaylaterProviderName,
   getCardlessEmiProviderName,
   getRawMethodDescription,
   getWalletName,
@@ -33,6 +32,7 @@ import {
   DESCRIPTION_RECURRING_CARDS,
   DESCRIPTION_CARDLESS_EMI,
 } from 'ui/labels/methods';
+import { getPayLaterProvidersDisplayNames } from 'common/paylater';
 
 function getRecurringCardDescription(locale) {
   // TODO: fix this to return network codes instead of names
@@ -164,10 +164,10 @@ const DESCRIPTIONS = {
   emi: (locale) => getRawMethodDescription('emi', locale),
   netbanking: (locale) => getRawMethodDescription('netbanking', locale),
   paylater: (locale) => {
-    const providers = getPayLaterProviders().map((p) =>
-      getPaylaterProviderName(p.code, locale)
-    );
-    const text = generateTextFromList(providers, locale, 2);
+    const providers = getPayLaterProviders().map((p) => p.code);
+    // Get the providers names to show
+    const providerNames = getPayLaterProvidersDisplayNames(providers);
+    const text = generateTextFromList(providerNames, locale, 4);
     return formatTemplateWithLocale(
       'methods.descriptions.paylater',
       { providers: text },
