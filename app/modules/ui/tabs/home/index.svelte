@@ -15,6 +15,8 @@
   import {
     getAvailableMethods,
     getSectionsDisplayed,
+    getBlockTitle,
+    getInstrumentDetails,
     trackPaypalRendered,
   } from 'ui/tabs/home/helpers';
   import {
@@ -48,6 +50,7 @@
     blocks,
     countryISOCode,
     isIndianCustomer,
+    selectedBlock,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -145,7 +148,10 @@
 
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import { isInstrumentGrouped } from 'configurability/instruments';
+  import {
+    isInstrumentForEntireMethod,
+    isInstrumentGrouped,
+  } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import {
@@ -204,6 +210,7 @@
   import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
+  import { MiscTracker } from 'misc/analytics/events';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -1206,6 +1213,35 @@
   export function onSelectInstrument(event) {
     const instrument = event.detail;
     ctaV15Disabled = instrument._type === 'method';
+
+    if (instrument.section === 'generic' && instrument.block) {
+      instrument.block.title = getBlockTitle(
+        instrument.block.instruments,
+        $locale
+      );
+    }
+    selectedBlock.set({
+      category: instrument.section,
+      name: instrument.block?.title || '',
+    });
+
+    try {
+      MiscTracker.METHOD_SELECTED({
+        block: { category: instrument.section, name: instrument.block?.title },
+        method: { name: instrument.method },
+      });
+
+      if (!isInstrumentForEntireMethod(instrument)) {
+        MiscTracker.INSTRUMENT_SELECTED({
+          block: {
+            category: instrument.section,
+            name: instrument.block?.title,
+          },
+          method: { name: instrument.method },
+          instrument: getInstrumentDetails(instrument),
+        });
+      }
+    } catch {}
     Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
       instrument,
     });
@@ -1216,6 +1252,7 @@
       method: instrument.method,
       section: instrument.section,
     });
+
     updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;

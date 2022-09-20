@@ -34,7 +34,12 @@ import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 import { format } from 'i18n';
 import { translatePaymentPopup as t } from 'i18n/popup';
 import updateScore from 'analytics/checkoutScore';
-import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
+import {
+  checkValidFlow,
+  createIframe,
+  getInstrumentDataAfterSubmitClick,
+  isRazorpayFrame,
+} from './utils';
 import FLOWS from 'config/FLOWS';
 import { shouldRedirectZestMoney } from 'common/emi';
 import { assertPaymentSuccessMetadata, popupIframeCheck } from './helper';
@@ -50,8 +55,13 @@ import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
 import { ContextProperties, EventsV2 } from 'analytics-v2';
+import {
+  checkoutInvokedTime,
+  selecetedInstrumentForPayment,
+  selectedBlock,
+} from 'checkoutstore/screens/home';
 import { get } from 'svelte/store';
-import { checkoutInvokedTime } from 'checkoutstore/screens/home';
+import { PaymentTracker } from 'payment/analytics/events';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -186,6 +196,15 @@ function trackNewPayment(data, params, r) {
     r,
     immediately: true,
   });
+  try {
+    const instrumentData = getInstrumentDataAfterSubmitClick(data);
+    selecetedInstrumentForPayment.set(instrumentData);
+
+    PaymentTracker.SUBMIT({
+      block: { category: get(selectedBlock)?.title },
+      ...instrumentData,
+    });
+  } catch {}
 }
 
 export default function Payment(data, params = {}, r) {
@@ -550,6 +569,11 @@ Payment.prototype = {
         r: this.r,
         data: ObjectUtils.clone(data),
       });
+      try {
+        PaymentTracker.PAYMENT_SUCCESSFUL({
+          ...get(selecetedInstrumentForPayment),
+        });
+      } catch {}
       updateLatestPaymentStatus('success', data);
       this.emit('success', data);
     } else {
@@ -582,6 +606,12 @@ Payment.prototype = {
       if (data.xhr) {
         Analytics.track('ajax_error', data);
       }
+      try {
+        PaymentTracker.PAYMENT_FAILED({
+          ...get(selecetedInstrumentForPayment),
+        });
+      } catch {}
+
       updateLatestPaymentStatus('error', data);
       // silent cancel the payment without showing the error message in UI
       // currently use in UPI QR when amount changes
@@ -730,7 +760,11 @@ Payment.prototype = {
 
     // else make ajax request
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
-
+    try {
+      PaymentTracker.PAYMENT_INITIATED_SYSTEM({
+        ...get(selecetedInstrumentForPayment),
+      });
+    } catch {}
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,

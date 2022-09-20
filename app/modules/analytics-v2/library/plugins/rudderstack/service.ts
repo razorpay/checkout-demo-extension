@@ -21,23 +21,27 @@ function createRudderXHRRequest({
   key: string;
   data?: unknown;
 }): Promise<unknown> {
-  return new Promise((resolve, reject) => {
-    fetch({
-      method,
-      url,
-      data: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${btoa(`${key}:`)}`,
-      },
-      callback(response) {
-        if (response.status_code !== 200) {
-          reject(response);
-        }
-        resolve(response);
-      },
+  try {
+    return new Promise((resolve, reject) => {
+      fetch({
+        method,
+        url,
+        data: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${btoa(`${key}:`)}`,
+        },
+        callback(response) {
+          if (response.status_code !== 200) {
+            reject(response);
+          }
+          resolve(response);
+        },
+      });
     });
-  });
+  } catch {
+    return Promise.reject();
+  }
 }
 
 /**
@@ -57,14 +61,18 @@ function createRudderBeaconRequest({
   key: string;
   data: unknown;
 }): boolean {
-  const payload = JSON.stringify(data);
-  const blob = new Blob([payload], { type: 'text/plain' });
-  const isQueuedSuccessfully = navigator.sendBeacon(
-    `${url}?writeKey=${key}`,
-    blob
-  );
+  try {
+    const payload = JSON.stringify(data);
+    const blob = new Blob([payload], { type: 'text/plain' });
+    const isQueuedSuccessfully = navigator.sendBeacon(
+      `${url}?writeKey=${key}`,
+      blob
+    );
 
-  return isQueuedSuccessfully;
+    return isQueuedSuccessfully;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -87,23 +95,27 @@ export function batchRudderRequest({
   events: TrackPayload[];
   useBeacon: boolean;
 }): Promise<unknown> {
-  let isQueuedSuccessfully = false;
-  if (useBeacon) {
-    isQueuedSuccessfully = createRudderBeaconRequest({
-      url: `${url}/beacon/v1/batch`,
+  try {
+    let isQueuedSuccessfully = false;
+    if (useBeacon) {
+      isQueuedSuccessfully = createRudderBeaconRequest({
+        url: `${url}/beacon/v1/batch`,
+        key,
+        data: { batch: events },
+      });
+    }
+    if (isQueuedSuccessfully) {
+      return Promise.resolve();
+    }
+
+    return createRudderXHRRequest({
+      url: `${url}/v1/batch`,
       key,
       data: { batch: events },
     });
+  } catch {
+    return Promise.reject();
   }
-  if (isQueuedSuccessfully) {
-    return Promise.resolve();
-  }
-
-  return createRudderXHRRequest({
-    url: `${url}/v1/batch`,
-    key,
-    data: { batch: events },
-  });
 }
 
 export function identifyRudderRequest({

@@ -15,6 +15,12 @@ import { blocks } from 'checkoutstore/screens/home';
 import { getLongBankName, formatTemplateWithLocale } from 'i18n';
 // Dynamic Fee Bearer
 import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+import { getTranslatedMethodPrefix } from 'checkoutframe/paymentmethods';
+import { generateTextFromList } from 'i18n/text-utils';
+import { SINGLE_BLOCK_TITLE } from 'ui/labels/methods';
+
+import { getUPIAppDataFromHandle } from 'common/upi';
+import { isSavedCardInstrument } from 'configurability/instruments';
 
 function getSplitConfig() {
   const config = [];
@@ -150,6 +156,119 @@ export const addConsentDetailsToInstrument = (instrument, card) => {
   instrument.consent_taken = card.consent_taken;
 };
 
+/**
+ * @param  {array} instruments - array of methods present in a generic section
+ * @param  {string} locale
+ *
+ * returns the name of the block on the basis of intruments method preent in instruments
+ */
+export function getBlockTitle(instruments, locale) {
+  try {
+    const methods = instruments.map((instrument) => instrument.method);
+
+    const blockNames = methods.map((method) =>
+      getTranslatedMethodPrefix(method, locale)
+    );
+
+    /**
+     * For just one method, use SINGLE_BLOCK_TITLE
+     * For more, use generateTextFromList
+     */
+    if (blockNames.length === 1) {
+      return formatTemplateWithLocale(
+        SINGLE_BLOCK_TITLE, // LABEL: Pay via {method}
+        { method: blockNames[0] },
+        locale
+      );
+    }
+
+    return generateTextFromList(blockNames, locale, 3);
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * @param  {Object} instrument
+ * returns the name of upi instrument
+ */
+function getUpiName(instrument) {
+  switch (instrument.flows[0]) {
+    case 'collect': {
+      return (
+        getUPIAppDataFromHandle(instrument?.vpas?.[0]?.split('@')[1])
+          .app_name || ''
+      );
+    }
+
+    case 'intent': {
+      return (
+        getUPIAppDataFromHandle(instrument?.vendor_vpa?.split('@')[1])
+          .app_name || ''
+      );
+    }
+
+    case 'qr': {
+      return 'qr';
+    }
+  }
+}
+/**
+ * @param  {Object} instrument
+ * * returns instrument data for instrument:selected event
+ */
+export function getInstrumentDetails(instrument) {
+  try {
+    const personalisation = !!instrument.meta?.preferred;
+    switch (instrument.method) {
+      case 'netbanking': {
+        return {
+          name: instrument.banks?.[0],
+          saved: false,
+          personalisation,
+        };
+      }
+
+      case 'upi': {
+        const vpa = instrument?.vpas?.[0] || instrument?.vendor_vpa || '';
+        return {
+          name: getUpiName(instrument),
+          saved: !!instrument.vpas && !!instrument.vpas[0],
+          personalisation,
+          type: instrument.flows?.[0] || '',
+          vpa: vpa ? `@${vpa.split('@')[1]}` : '',
+        };
+      }
+
+      case 'wallet': {
+        return {
+          name: instrument.wallets?.[0],
+          saved: false,
+          personalisation,
+        };
+      }
+
+      case 'card': {
+        return {
+          issuer: instrument.issuers?.[0],
+          saved: !!isSavedCardInstrument(instrument),
+          personalisation,
+          type: instrument.types?.[0],
+          network: instrument.networks?.[0],
+        };
+      }
+
+      default: {
+        return {
+          saved: false,
+          personalisation,
+        };
+      }
+    }
+  } catch {
+    return { saved: false, personalisation: false };
+  }
+}
 //this function tracks event when paypal is shown to the user under preferred methods,
 //function is being called in home/index.svelte
 export const trackPaypalRendered = (instruments) => {

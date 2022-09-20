@@ -29,10 +29,11 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
-  import { phone } from 'checkoutstore/screens/home';
+  import { phone, selectedBlock } from 'checkoutstore/screens/home';
   import { suggestionVPA, suggestionVPAForRecurring } from 'common/upi';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { isVpaValid } from 'upi/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Props
   export let selected = false;
@@ -91,7 +92,25 @@
     }
   }
 
+  let instrumentSelectTracked = false;
   function handleVpaInput() {
+    if (vpa && !instrumentSelectTracked) {
+      instrumentSelectTracked = true;
+      try {
+        MiscTracker.INSTRUMENT_SELECTED({
+          block: {
+            category: $selectedBlock.category,
+            name: $selectedBlock.name,
+          },
+          method: { name: 'upi' },
+          instrument: {
+            name: 'upi',
+            saved: false,
+            personalisation: false,
+          },
+        });
+      } catch {}
+    }
     checkAndAddDowntime();
     const isValidVPA = isVpaValid(vpa);
     helpTextToDisplay = isValidVPA ? undefined : $t(UPI_COLLECT_NEW_VPA_HELP);

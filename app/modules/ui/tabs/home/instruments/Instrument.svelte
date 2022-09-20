@@ -35,6 +35,7 @@
   function dispatchSelect() {
     instrument.skipCTAClick = skipCTAClick;
     instrument.section = getSectionCategoryForBlock(block);
+    instrument['block'] = block;
     dispatch('selectInstrument', instrument);
   }
 </script>

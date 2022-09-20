@@ -87,6 +87,7 @@
   import { getInputSource } from 'one_click_checkout/helper';
   import CTA from 'cta';
   import { CTA_LABEL } from 'cta/i18n';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Props
   export let tpv;
@@ -123,6 +124,15 @@
       onContactBlur();
     }
     validationText = getValidationText();
+    try {
+      MiscTracker.CONTACT_NUMBER_FILLED({
+        user: {
+          contact: {
+            value: $contact,
+          },
+        },
+      });
+    } catch {}
   }
 
   function onContactBlur() {
@@ -156,6 +166,15 @@
       onEmailBlur();
     }
     Events.TrackBehav(ContactDetailsEvents.CONTACT_EMAIL_INPUT);
+    try {
+      MiscTracker.EMAIL_FILLED({
+        user: {
+          email: {
+            value: $email,
+          },
+        },
+      });
+    } catch {}
   }
 
   $: disabled = !$isContactAndEmailValid;
@@ -183,6 +202,9 @@
     if (isRedesignV15Enabled && isEditDetailScreen) {
       toggleHeader(false);
     }
+    try {
+      MiscTracker.CONTACT_DETAILS();
+    } catch {}
   });
 
   const showAddress = isAddressEnabled() && !isPartialPayment();

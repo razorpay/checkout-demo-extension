@@ -22,6 +22,10 @@
 
   import { isCardTokenized } from './utils';
   import { writable, Writable } from 'svelte/store';
+  import { selectedBlock } from 'checkoutstore/screens/home';
+  import { getSession } from 'sessionmanager';
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
   // Props
   export let cards = [];
   export let tab;
@@ -62,6 +66,24 @@
         card: getCardMetadata(card.id),
       },
     });
+    try {
+      MiscTracker.INSTRUMENT_SELECTED({
+        block: {
+          category: $selectedBlock.category,
+          name: $selectedBlock.name,
+        },
+        method: {
+          name: 'card',
+        },
+        instrument: {
+          issuer: getCardMetadata(card.id)?.issuer,
+          saved: true,
+          personalisation: false,
+          network: getCardMetadata(card.id)?.network,
+          type: getCardMetadata(card.id)?.type,
+        },
+      });
+    } catch {}
 
     dispatch('select', { token: card });
     $currentCvv = cvv;
@@ -80,6 +102,23 @@
 
   function handleAuthTypeChange(event) {
     $currentAuthType = event.detail.authType;
+  }
+
+  $: {
+    try {
+      if (getSession().screen === 'card') {
+        MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+          block: {
+            category: $selectedBlock.category,
+            name: $selectedBlock.name,
+          },
+          method: {
+            name: 'card',
+          },
+          instruments: getInstrumentsWithOrder(cards, 'cards'),
+        });
+      }
+    } catch {}
   }
 </script>
 

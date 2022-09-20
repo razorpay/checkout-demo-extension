@@ -25,6 +25,7 @@ import { ignoreFirstCall } from 'svelte-utils';
 import BrowserStorage from 'browserstorage';
 import { showLoader } from 'account_modal/store';
 import { querySelector } from 'utils/doc';
+import { ContextProperties, EventsV2 } from 'analytics-v2';
 
 const LOCALES = {
   en: 'English',
@@ -96,7 +97,7 @@ function fetchBundle(locale) {
   });
 }
 
-function getValidLocaleFromConfig() {
+export function getValidLocaleFromConfig() {
   let language = getLanguageCode();
 
   // If the language is set to "auto", we need to determine it from the browser.
@@ -116,7 +117,7 @@ function getValidLocaleFromConfig() {
   return null;
 }
 
-function getValidLocaleFromStorage() {
+export function getValidLocaleFromStorage() {
   try {
     const localeFromStorage = global.localStorage.getItem('locale');
     // If the locale from storage is not allowed, do not return it.
@@ -211,6 +212,7 @@ function handleLocaleChanged(value) {
   });
 
   Analytics.setMeta('locale.current', value);
+  EventsV2.setContext(ContextProperties.LOCALE, value);
   setLocaleInStorage(value);
   updateRetryBtnText();
 }
@@ -243,6 +245,7 @@ export function init() {
 
   Analytics.setMeta('locale.initial', initialLocale);
   Analytics.setMeta('locale.current', initialLocale);
+  EventsV2.setContext(ContextProperties.LOCALE, initialLocale);
   Analytics.setMeta('locale.previous', getValidLocaleFromStorage());
   Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
   Analytics.setMeta('count.i18n:bundle:fetch', fetchCount);

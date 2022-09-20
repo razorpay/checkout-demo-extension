@@ -11,6 +11,11 @@ import { appendFormInput, flatten } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import Interface from 'common/interface';
+import { ContextProperties, EventsV2 } from 'analytics-v2';
+import { shouldUseVernacular } from 'checkoutstore/methods';
+import { getValidLocaleFromConfig, getValidLocaleFromStorage } from 'i18n/init';
+import { MiscTracker } from 'misc/analytics/events';
+import { getOption } from 'razorpay';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -297,6 +302,22 @@ RazorProto.open = needBody(function () {
 
   let frame = (this.checkoutFrame = getPreloadedFrame(this));
   Track(this, 'open');
+  try {
+    MiscTracker.INVOKED({
+      prefill: {
+        contact: getOption('prefill.contact'),
+        email: getOption('prefill.email'),
+        method: getOption('prefll.method') || '',
+      },
+    });
+  } catch {}
+  const isVernacularEnabled = shouldUseVernacular();
+  let initialLocale;
+  if (isVernacularEnabled) {
+    initialLocale =
+      getValidLocaleFromStorage() || getValidLocaleFromConfig() || 'en';
+  }
+  EventsV2.setContext(ContextProperties.LOCALE, initialLocale);
 
   if (!frame.el.contentWindow) {
     frame.close();

@@ -24,6 +24,8 @@ import { contact, email, phone } from 'checkoutstore/screens/home';
 import { isLoggedIn } from 'checkoutstore/customer';
 import * as _ from 'utils/_';
 import { ContextProperties, EventsV2 } from 'analytics-v2';
+import { MiscTracker } from 'misc/analytics/events';
+import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -121,6 +123,12 @@ Customer.prototype = {
     let session = getSession();
     this.logged = true;
     isLoggedIn.set(true);
+    try {
+      MiscTracker.USER_LOGGED_IN({
+        loginSource: LOGIN_SOURCE_TYPES.USER_AUTHENTICATION,
+        loginScreen: session.screen,
+      });
+    } catch {}
 
     sanitizeTokens(data.tokens);
 
@@ -129,7 +137,7 @@ Customer.prototype = {
     if (!session.local && session.isOpen) {
       session.topBar.setLogged(true);
     }
-
+    EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
     Events.setMeta(MetaProperties.LOGGEDIN, true);
     EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
     const payload = {};

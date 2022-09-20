@@ -5,6 +5,8 @@ import {
   sequence,
   hiddenMethods,
   hiddenInstruments,
+  personalisationVersionId,
+  contact,
 } from 'checkoutstore/screens/home';
 import { getSession } from 'sessionmanager';
 import { updateBlocksForExperiments } from './helpers';
@@ -22,6 +24,12 @@ import { getMaxPreferredMethods } from 'checkoutframe/personalization/index';
 import * as ObjectUtils from 'utils/object';
 import { getMerchantConfig } from 'checkoutstore';
 import { customer } from 'checkoutstore/customer';
+import { getSectionCategoryForBlock } from './helpers';
+import { getBlockTitle } from 'ui/tabs/home/helpers';
+import { locale } from 'svelte-i18n';
+import { get } from 'svelte/store';
+import { MiscTracker } from 'misc/analytics/events';
+import { getPreferences } from 'razorpay';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -213,6 +221,59 @@ function makeLoaderInstruments(howMany) {
   return instruments;
 }
 
+/**
+ * returns an ordered data of instruments for a given block
+ * @param instruments Array of instruments in block
+ * @returns {
+ * [key:number]: {
+ *  order: number
+ *  method: string
+ * }}
+ */
+function getOrderedInstrumentData(instruments) {
+  return instruments.reduce((instrumentData, currentInstrument, index) => {
+    instrumentData[index + 1] = {
+      order: index + 1,
+      method: currentInstrument.method,
+    };
+    return instrumentData;
+  }, {});
+}
+
+/**
+ * returns an ordered data of blocks
+ * @param  allBlocks Array of all blocks
+ * @returns {
+ * [key:string]: {
+ *  order: number;
+ *  method: string;
+ *  name: string;
+ *  custom: boolean;
+ *  instruments: ReturnType<typeof getOrderedInstrumentData>
+ * }}
+ */
+function getOrderedBlockData(allBlocks) {
+  try {
+    return allBlocks.reduce((blockData, currentBlock, index) => {
+      const blockCategory = getSectionCategoryForBlock(currentBlock);
+
+      blockData[currentBlock.code] = {
+        order: index + 1,
+        category: blockCategory,
+        name:
+          blockCategory === 'generic'
+            ? getBlockTitle(currentBlock.instruments, get(locale))
+            : currentBlock.title,
+        custom: !!(blockCategory === 'custom'),
+        instruments: getOrderedInstrumentData(currentBlock.instruments),
+      };
+      return blockData;
+    }, {});
+  } catch {
+    return {};
+  }
+}
+
 export function setBlocks(
   {
     showPreferredLoader = false,
@@ -343,6 +404,32 @@ export function setBlocks(
       onMethodScreen,
     },
   });
+
+  let orderedBlockData = {};
+  try {
+    orderedBlockData = getOrderedBlockData(allBlocks);
+  } catch {}
+
+  let personalisation = {};
+  personalisation.shown = addPreferredInstrumentsBlock;
+  const personalizationVersionId = get(personalisationVersionId);
+
+  const preferencesVersionId =
+    getPreferences()?.preferred_methods?.[get(contact) || 'default']?.versionID;
+
+  //if personalizationVersionId is set the use that otherwise use preferencesVersionId
+  personalisation.version = personalizationVersionId || preferencesVersionId;
+
+  if (addPreferredInstrumentsBlock) {
+    personalisation['instruments'] =
+      orderedBlockData['rzp.preferred']?.instruments || {};
+  }
+  try {
+    MiscTracker.METHOD_SELECTION_SCREEN({
+      blocks: orderedBlockData,
+      personalisation: personalisation,
+    });
+  } catch {}
 
   hiddenMethods.set(parsedConfig.display.hide.methods);
   hiddenInstruments.set(parsedConfig.display.hide.instruments);

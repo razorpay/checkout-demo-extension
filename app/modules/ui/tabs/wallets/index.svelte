@@ -2,7 +2,11 @@
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import CTA, { showCta, hideCta } from 'cta';
-  import { methodInstrument } from 'checkoutstore/screens/home';
+  import {
+    methodInstrument,
+    selectedBlock,
+    selectedInstrument,
+  } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
   import { isDynamicWalletFlow, showPowerWallet } from 'wallet/helper';
   import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
@@ -32,6 +36,8 @@
   import { slide } from 'svelte/transition';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import { SELECT_WALLET } from 'wallet/i18n/label';
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   const session = getSession();
   const wallets = getWallets();
@@ -139,6 +145,20 @@
           : false,
       },
     });
+    try {
+      MiscTracker.INSTRUMENT_SELECTED({
+        block: {
+          category: $selectedBlock?.category,
+          name: $selectedBlock.name,
+        },
+        method: { name: 'wallet' },
+        instrument: {
+          name: $selectedWallet,
+          saved: false,
+          personalisation: !!$selectedInstrument?.meta?.preferred,
+        },
+      });
+    } catch {}
   }
 
   export function onShown() {
@@ -155,6 +175,18 @@
     } else {
       hideCta();
     }
+    try {
+      MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+        method: {
+          name: 'wallet',
+        },
+        block: {
+          category: $selectedBlock.category,
+          name: $selectedBlock.name,
+        },
+        instruments: getInstrumentsWithOrder(filteredWallets, 'wallet'),
+      });
+    } catch {}
   }
 
   // Called when the user presses the pay button

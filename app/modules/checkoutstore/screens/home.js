@@ -126,6 +126,7 @@ export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
+export const selectedBlock = writable({});
 export const instruments = derived(blocks, (allBlocks) => {
   const allInstruments = allBlocks.flatMap((block) => block.instruments);
 
@@ -143,6 +144,9 @@ export const selectedInstrument = derived(
     $instruments.find((instrument) => instrument.id === $selectedInstrumentId)
 );
 
+export const selecetedInstrumentForPayment = writable({});
+
+export const personalisationVersionId = writable('');
 /**
  * Stores the instrument for which method is opened
  */

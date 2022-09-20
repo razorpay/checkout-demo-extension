@@ -35,6 +35,8 @@
   import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { IntentFlowsHeader } from 'upi/ui/components/IntentFlowHeader';
+  import { selectedBlock } from 'checkoutstore/screens/home';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Props
   export let apps = [];
@@ -97,6 +99,17 @@
       app_name,
       index,
     });
+    try {
+      MiscTracker.INSTRUMENT_SELECTED({
+        block: { category: $selectedBlock.category, name: $selectedBlock.name },
+        method: { name: 'upi' },
+        instrument: {
+          name: app_name,
+          saved: false,
+          personalisation: false,
+        },
+      });
+    } catch {}
   }
 
   function onUpiAppSelect(packageName) {

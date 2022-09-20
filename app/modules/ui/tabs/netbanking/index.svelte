@@ -10,7 +10,11 @@
     selectedBank,
     hiddenBanksUsingConfig,
   } from 'checkoutstore/screens/netbanking';
-  import { methodInstrument } from 'checkoutstore/screens/home';
+  import {
+    methodInstrument,
+    selectedBlock,
+    selectedInstrument,
+  } from 'checkoutstore/screens/home';
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -76,6 +80,8 @@
   import { isRedesignV15 } from 'razorpay';
   import triggerSearchModal from 'components/SearchModal';
   import CTA from 'cta';
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -296,6 +302,20 @@
           bank: bankCode,
         },
       });
+      try {
+        MiscTracker.INSTRUMENT_SELECTED({
+          block: {
+            category: $selectedBlock?.category,
+            name: $selectedBlock.name,
+          },
+          method: { name: 'netbanking' },
+          instrument: {
+            name: bankCode,
+            saved: false,
+            personalisation: !!$selectedInstrument?.meta?.preferred,
+          },
+        });
+      } catch {}
 
       Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
         bank_selected: bankCode,
@@ -310,6 +330,19 @@
   }
 
   onMount(() => {
+    try {
+      MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+        block: {
+          category: $selectedBlock.category,
+          name: $selectedBlock.name,
+        },
+        method: {
+          name: 'netbanking',
+        },
+        instruments: getInstrumentsWithOrder(netbanks, 'netbanking'),
+      });
+    } catch {}
+
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD_V2);
   });

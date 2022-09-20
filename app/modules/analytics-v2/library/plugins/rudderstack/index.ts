@@ -43,17 +43,22 @@ export default function ({
     initialize: () => {
       eventQ = createQueue(
         (events: TrackPayload[]) => {
-          const date = new Date(Date.now()).toISOString();
-          events = events.map((evt: TrackPayload) => {
-            return { ...(typeof evt === 'object' ? evt : null), sentAt: date };
-          }) as TrackPayload[];
+          try {
+            const date = new Date(Date.now()).toISOString();
+            events = events.map((evt: TrackPayload) => {
+              return {
+                ...(typeof evt === 'object' ? evt : null),
+                sentAt: date,
+              };
+            }) as TrackPayload[];
 
-          batchRudderRequest({
-            url: domainUrl,
-            key,
-            events,
-            useBeacon: useBeacon && BEACON_SUPPORTED,
-          });
+            batchRudderRequest({
+              url: domainUrl,
+              key,
+              events,
+              useBeacon: useBeacon && BEACON_SUPPORTED,
+            });
+          } catch {}
         },
         {
           max: BATCH_SIZE,

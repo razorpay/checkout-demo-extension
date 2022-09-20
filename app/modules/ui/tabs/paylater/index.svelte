@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
@@ -11,12 +10,15 @@
   import { isRedesignV15 } from 'razorpay';
 
   // Store imports
-  import { methodInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument, selectedBlock } from 'checkoutstore/screens/home';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { getPaylaterProviderName } from 'i18n';
   import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
+  import { getSession } from 'sessionmanager';
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
   import { testid } from 'tests/autogen';
 
   const providers = getPayLaterProviders().map((providerObj) =>
@@ -53,6 +55,23 @@
     providers,
     $methodInstrument
   );
+
+  $: {
+    if (getSession().screen === 'paylater') {
+      try {
+        MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+          block: {
+            category: $selectedBlock.category,
+            name: $selectedBlock.name,
+          },
+          method: {
+            name: 'paylater',
+          },
+          instruments: getInstrumentsWithOrder(filteredProviders, 'paylater'),
+        });
+      } catch {}
+    }
+  }
 </script>
 
 <Tab method="paylater" pad={false}>

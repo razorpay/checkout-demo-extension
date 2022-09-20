@@ -2,6 +2,8 @@ import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
 import Analytics, { ErrorEvents, trackAvailabilty } from 'analytics/index';
 import Interface from 'common/interface';
+import { ErrorTracker } from './analytics/events';
+import { EventsV2 } from 'analytics-v2';
 
 /**
  * @param {String|Error|Object} error -
@@ -44,6 +46,11 @@ export const capture = (
        */
       immediately: Boolean(immediately),
       isError: true,
+    });
+
+    ErrorTracker.TRIGGERED({
+      error: constructErrorObject(error, { severity, unhandled }),
+      last: EventsV2.getState()?.last,
     });
   } catch (e) {
     // try/catch to ensure `captureError` does not contribute to more

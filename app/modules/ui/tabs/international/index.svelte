@@ -56,6 +56,9 @@
   import { getThemeMeta } from 'checkoutstore/theme';
   import { pushOverlay } from 'navstack';
   import { CTA_PROCEED, PAY_NOW_CTA_LABEL } from 'cta/i18n';
+  import { selectedBlock } from 'checkoutstore/screens/home';
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   const session = getSession();
   const themeMeta = getThemeMeta();
@@ -282,6 +285,21 @@
 
   onMount(() => {
     Events.Track(EVENTS.SCREEN_LOAD);
+    try {
+      MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+        block: {
+          category: $selectedBlock.category,
+          name: $selectedBlock.name,
+        },
+        method: {
+          name: 'international',
+        },
+        instruments: getInstrumentsWithOrder(
+          filteredProviders,
+          'international'
+        ),
+      });
+    } catch {}
   });
 </script>
 

@@ -80,6 +80,7 @@ import { isCardlessTab } from 'emiV2/helper/tabs';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { checkoutInvokedTime } from 'checkoutstore/screens/home';
+import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1173,19 +1174,20 @@ Session.prototype = {
     } else {
       first_screen = this.homeTab.getCurrentView();
     }
-
-    MiscTracker.OPEN({
-      user: {
-        contact: {
-          hidden: isContactHidden(),
-          value: getPrefilledContact(),
+    try {
+      MiscTracker.OPEN({
+        user: {
+          contact: {
+            hidden: isContactHidden(),
+            value: getPrefilledContact(),
+          },
+          email: {
+            hidden: isEmailHidden(),
+            value: getPrefilledEmail(),
+          },
         },
-        email: {
-          hidden: isEmailHidden(),
-          value: getPrefilledEmail(),
-        },
-      },
-    });
+      });
+    } catch {}
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
@@ -1363,6 +1365,24 @@ Session.prototype = {
         provider: providerCode,
       },
     });
+
+    try {
+      MiscTracker.INSTRUMENT_SELECTED({
+        block: {
+          category: storeGetter(HomeScreenStore.selectedBlock)?.category,
+          name: storeGetter(HomeScreenStore.selectedBlock)?.name,
+        },
+        method: {
+          name: storeGetter(HomeScreenStore.selectedInstrument)?.method,
+        },
+        instrument: {
+          name: providerCode,
+          saved: false,
+          personalisation: !!storeGetter(HomeScreenStore.selectedInstrument)
+            ?.meta?.preferred,
+        },
+      });
+    } catch {}
 
     $('#form-paylater input[name=ott]').val('');
     $('#form-paylater input[name=provider]').val(providerCode);
@@ -4627,6 +4647,7 @@ Session.prototype = {
           Analytics.track('contact_details:cta_click', {
             type: AnalyticsTypes.BEHAV,
           });
+          MiscTracker.CONTACT_DETAILS_PROCEED_CLICK();
           if (this.homeTab.shouldGoNext()) {
             this.homeTab.next();
             return discreet.CRED.checkCREDEligibilityForUpdatedContact();
@@ -6534,15 +6555,23 @@ Session.prototype = {
       if (saved_customer.tokens || saved_customer.addresses) {
         isLoggedIn.set(true);
         customer.logged = true;
-        EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
-        const traits = {};
-        if (saved_customer.name) {
-          traits.name = saved_customer.name;
-        }
-        if (saved_customer.email) {
-          traits.email = saved_customer.email;
-        }
-        EventsV2.Identify(saved_customer.contact, traits);
+        try {
+          EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
+          MiscTracker.USER_LOGGED_IN({
+            loginSource: RazorpayHelper.getOption('customer_id')
+              ? LOGIN_SOURCE_TYPES.MERCHANT_CUSTOMER_ID
+              : LOGIN_SOURCE_TYPES.USER_AUTHENTICATION,
+          });
+
+          const traits = {};
+          if (saved_customer.name) {
+            traits.name = saved_customer.name;
+          }
+          if (saved_customer.email) {
+            traits.email = saved_customer.email;
+          }
+          EventsV2.Identify(saved_customer.contact, traits);
+        } catch {}
         Analytics.setMeta('loggedIn', true);
       }
 

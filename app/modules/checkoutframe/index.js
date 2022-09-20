@@ -15,7 +15,7 @@ import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import * as ObjectUtils from 'utils/object';
-import RazorpayStore, { getOrderId, setOption } from 'razorpay';
+import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
@@ -52,12 +52,8 @@ import { setBraveBrowser } from 'common/useragent';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import { EventsV2, ContextProperties } from 'analytics-v2';
-import {
-  getExperimentsFromStorage,
-  getRegisteredExperiments,
-} from 'experiments';
-import { formatPrefExperiments } from 'misc/analytics/helper';
 import { checkoutInvokedTime } from 'checkoutstore/screens/home';
+import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -563,7 +559,7 @@ function setSessionPreferences(session, preferences) {
   RazorpayStore.updateInstance(razorpayInstance);
 
   updateOptions(preferences);
-  updateAnalytics(preferences);
+  updateAnalyticsFromPreferences(preferences);
   updatePreferredMethods(preferences);
 
   Razorpay.configure(preferences.options);
@@ -701,63 +697,6 @@ function updateOptions(preferences) {
     if (order.currency) {
       setOption('currency', order.currency);
     }
-  }
-}
-
-function updateAnalytics(preferences) {
-  Events.setMeta(MetaProperties.FEATURES, preferences.features);
-  EventsV2.setContext(ContextProperties.FEATURES, preferences.features);
-  if (preferences && preferences.merchant_id) {
-    Events.setMeta(MetaProperties.MERCHANT_ID, preferences.merchant_id);
-    EventsV2.setContext(ContextProperties.MERCHANT_ID, preferences.merchant_id);
-  }
-  if (preferences && preferences.merchant_key) {
-    Events.setMeta(MetaProperties.MERCHANT_KEY, preferences.merchant_key);
-    EventsV2.setContext(
-      ContextProperties.MERCHANT_KEY,
-      preferences.merchant_key
-    );
-  }
-
-  if (preferences?.merchant_name) {
-    EventsV2.setContext(
-      ContextProperties.MERCHANT_NAME,
-      preferences.merchant_name
-    );
-  }
-
-  if (preferences?.mode) {
-    EventsV2.setContext(ContextProperties.MODE, preferences.mode);
-  }
-
-  if (getOrderId()) {
-    EventsV2.setContext(ContextProperties.ORDER_ID, getOrderId());
-  }
-
-  EventsV2.setContext(ContextProperties.EXPERIMENTS, {
-    ...getExperimentsFromStorage(),
-    ...formatPrefExperiments(preferences.experiments),
-  });
-
-  const registeredExperiments = getRegisteredExperiments();
-  const experimentConfigs = Object.keys(registeredExperiments).reduce(
-    (acc, expKey) => {
-      acc[expKey] = registeredExperiments[expKey].rolloutValue;
-      return acc;
-    },
-    {}
-  );
-  EventsV2.setContext(ContextProperties.EXP_CONFIGS, experimentConfigs);
-
-  // Set optional fields in meta
-  const optionalFields = preferences.optional;
-  if (Array.isArray(optionalFields)) {
-    const isContactOptional = optionalFields.includes('contact');
-    const isEmailOptional = optionalFields.includes('email');
-    Events.setMeta(MetaProperties.OPTIONAL_CONTACT, isContactOptional);
-    Events.setMeta(MetaProperties.OPTIONAL_EMAIL, isEmailOptional);
-    EventsV2.setContext(ContextProperties.OPTIONAL_CONTACT, isContactOptional);
-    EventsV2.setContext(ContextProperties.OPTIONAL_EMAIL, isEmailOptional);
   }
 }
 

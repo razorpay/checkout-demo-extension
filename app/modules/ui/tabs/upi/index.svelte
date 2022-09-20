@@ -57,7 +57,7 @@
 
   // Store
   import { customer } from 'checkoutstore/customer';
-  import { methodInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument, selectedBlock } from 'checkoutstore/screens/home';
   import {
     resetSelectedUPIAppForPay,
     selectedUPIAppForPay,
@@ -101,6 +101,9 @@
   import { filterTruthyKeys } from 'lib/utils';
   import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
   import { filterUPIIntentAppsForAutopayIntent } from './helpers';
+
+  import { getInstrumentsWithOrder } from 'common/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Props
   export let selectedApp = undefined;
@@ -390,6 +393,23 @@
     }
   }
 
+  $: {
+    try {
+      if (getSession().screen === 'upi') {
+        MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+          block: {
+            category: $selectedBlock.category,
+            name: $selectedBlock.name,
+          },
+          method: {
+            name: 'upi',
+          },
+          instruments: getInstrumentsWithOrder(tokens, 'upi'),
+        });
+      }
+    } catch {}
+  }
+
   function determineCtaVisibility() {
     let isRedesign = isRedesignV15();
     if (requiresBankSelection) {
@@ -492,6 +512,12 @@
         ...getRTBAnalyticsPayload(),
       },
     });
+    try {
+      MiscTracker.METHOD_SELECTED({
+        block: { category: $selectedBlock.category, name: $selectedBlock.name },
+        method: { name: 'qr' },
+      });
+    } catch {}
 
     session.switchTab('qr');
   }
@@ -688,7 +714,24 @@
         value: getEventValueForFeature(id),
       },
     });
-
+    try {
+      if (event.detail.id !== 'new') {
+        MiscTracker.INSTRUMENT_SELECTED({
+          block: {
+            category: $selectedBlock.category,
+            name: $selectedBlock.name,
+          },
+          method: {
+            name: 'upi',
+          },
+          instrument: {
+            name: getUPIAppDataFromHandle(event.detail?.vpa?.handle)?.app_name,
+            saved: true,
+            personalisation: $selectedBlock.category === 'p13n',
+          },
+        });
+      }
+    } catch {}
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
 
@@ -909,6 +952,7 @@
                     const { downtimeSeverity, downtimeInstrument } = app;
                     onUpiAppSelection({
                       detail: {
+                        vpa: app.vpa,
                         id: app.id,
                         severity: downtimeSeverity,
                         instrument: downtimeInstrument,

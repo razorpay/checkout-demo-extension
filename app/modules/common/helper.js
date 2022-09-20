@@ -2,6 +2,7 @@ import RazorpayConfig from 'common/RazorpayConfig';
 import { appendParamsToUrl } from 'common/form';
 import { Track } from 'analytics';
 import { getOption } from 'razorpay';
+import { getUPIAppDataFromHandle } from './upi';
 
 export function isStandardCheckout() {
   return ['checkoutjs', 'hosted'].includes(Track.props.library);
@@ -83,4 +84,49 @@ export function makeAuthUrl(r, url) {
     }
   }
   return url;
+}
+
+/**
+ * @param  {Array} list of instrument data
+ * @param  {string} method - type of method
+ * function to return intrument list with their order
+ * sample output {1: {name: 'SBIN' , order: 1}}
+ */
+export function getInstrumentsWithOrder(list, method) {
+  try {
+    const keyMap = {
+      international: 'code',
+      paylater: 'title',
+      wallet: 'name',
+      netbanking: 'name',
+    };
+    return list.reduce((acc, item, index) => {
+      if (method === 'cards') {
+        if (item?.card?.issuer) {
+          acc = {
+            ...acc,
+            [index + 1]: { name: item.card.issuer, order: index + 1 },
+          };
+        }
+      } else if (method === 'upi') {
+        if (item?.vpa?.handle) {
+          acc = {
+            ...acc,
+            [index + 1]: {
+              name: getUPIAppDataFromHandle(item.vpa.handle)?.app_name,
+              order: index + 1,
+            },
+          };
+        }
+      } else {
+        const key = keyMap[method];
+        if (item[key]) {
+          acc = { ...acc, [index + 1]: { name: item[key], order: index + 1 } };
+        }
+      }
+      return acc;
+    }, {});
+  } catch {
+    return {};
+  }
 }

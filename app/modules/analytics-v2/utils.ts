@@ -72,7 +72,6 @@ function getTrackMethod<
         eventName = `${event.type} ${eventName}`;
         LAST_EVENT[event.type] = {
           event: eventName,
-          properties: payload,
         };
       }
       AnalyticsV2.track(eventName, payload, options);

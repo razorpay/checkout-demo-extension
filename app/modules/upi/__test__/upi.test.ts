@@ -53,6 +53,7 @@ jest.mock('razorpay', () => ({
   isOneClickCheckout: jest.fn(),
 }));
 jest.mock('common/useragent', () => ({
+  ...jest.requireActual('common/useragent'),
   android: true,
   iOS: false,
   isBrave: false,
