@@ -1,6 +1,6 @@
 import { selectedBank } from 'emiV2/store';
 import { cardlessEmiStore } from 'emiV2/ui/components/EmiTabsScreen/store';
-import { emiContact } from 'checkoutstore/screens/home';
+import { country, emiContact } from 'checkoutstore/screens/home';
 import { cardlessEmiPlansChecker } from 'emiV2/helper/eligibility';
 import { isCardlessPlanNoCost } from 'emiV2/helper/plans';
 import {
@@ -8,6 +8,7 @@ import {
   updateCardlessEmiStore,
 } from 'emiV2/payment/cardlessEmi/helper';
 import type { CardlessEMIStore, EmiPlan } from 'emiV2/types';
+import { checkContactValid } from 'emiV2/payment';
 
 describe('Validate: getCardlessPlansForProvider', () => {
   let provider: string = 'hdfc';
@@ -148,5 +149,15 @@ describe('Validate: cardlessEmiPlansChecker', () => {
 
       expect(isCardlessPlanNoCost(plan)).toBeFalsy();
     });
+  });
+});
+
+describe('validate: checkContactValid', () => {
+  test('Contact Valid', () => {
+    let contact = '1234567890';
+    country.set('+91');
+    expect(checkContactValid(contact)).toBe(true);
+    contact = '123456789';
+    expect(checkContactValid(contact)).toBe(false);
   });
 });

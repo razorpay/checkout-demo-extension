@@ -189,6 +189,11 @@ const setAnalyticsMeta = (message) => {
         message.metadata.affordability_widget_fid
       );
     }
+    // Setting meta property if widget is enabled for the user
+    Events.setMeta(
+      MetaProperties.IS_AFFORDABILITY_WIDGET_ENABLED,
+      Boolean(message.metadata.affordability_widget_fid)
+    );
     Events.setMeta(MetaProperties.BRAVE_BROWSER, message.metadata.isBrave);
   }
 };

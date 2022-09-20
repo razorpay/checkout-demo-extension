@@ -36,4 +36,6 @@ export default {
   NVS_FORM_DATA: 'nvsFormData',
   RTB_EXPERIMENT_VARIANT: 'rtb_experiment_variant',
   CUSTOM_CHALLAN: 'custom_challan',
+  /** does user has affordablility widget enabled - depends on whether affordability fingerprint id is there */
+  IS_AFFORDABILITY_WIDGET_ENABLED: 'is_affordability_widget_enabled',
 };

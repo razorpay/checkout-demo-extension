@@ -1,5 +1,5 @@
 const EMI_UX = {
-  NC_EMI_TAG: 'nc_emi_tag',
+  L0_EMI_CLICK: 'l0_emi_click',
   SELECT_DIFFERENT_BANK_CLICKED: 'select_different_bank_clicked',
   SAVED_CARDS: 'saved_cards',
   EMI_PROVIDERS: 'emi_providers',

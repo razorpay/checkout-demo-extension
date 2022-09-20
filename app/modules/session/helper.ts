@@ -26,7 +26,7 @@ export function handleErrorModal(this: Session, message: string) {
       (this.screen === 'otp' || this.screen === 'card')
     ) {
       // Track Debit eligibility check failure
-      trackDebitCardEligibilityChecked(false, false);
+      trackDebitCardEligibilityChecked(false);
       pushOverlay({
         component: IneleigibleModalSvelte,
       });

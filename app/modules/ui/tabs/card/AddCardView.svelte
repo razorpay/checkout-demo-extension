@@ -105,7 +105,10 @@
     isCurrentCardInvalidForEmi,
     isCurrentCardProviderInvalid,
   } from 'emiV2/store';
-  import { trackAddCardDetails } from 'emiV2/events/tracker';
+  import {
+    trackAddCardDetails,
+    trackAddCardDetailsError,
+  } from 'emiV2/events/tracker';
 
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
@@ -572,11 +575,6 @@
 
     // Track Add Card Event for new EMI flow
     if (isNewEmiFlow && prevTab === 'emi') {
-      let errorDescription = !cardValidationErrorType
-        ? ''
-        : cardValidationErrorType === errorTypes.BANK_INVALID
-        ? ENTER_BANK_CARD_TO_AVAIL_EMI
-        : EMI_NOT_SUPPORTED;
       const cardMetaData = getCardMetadata($cardNumber);
       const trackMeta: addCardMeta = {
         card_type: cardMetaData?.type || 'NA',
@@ -588,24 +586,15 @@
           nc_emi_tag: $selectedPlan.subvention === 'merchant',
           tenure: $selectedPlan.duration,
         },
-        pay_full_amount_cta: true,
-        error_type: !cardValidationErrorType
-          ? 'NA'
-          : cardValidationErrorType === errorTypes.BANK_INVALID
-          ? 'card_invalid'
-          : 'emi_not_supported_on_card',
-        error_description: errorDescription
-          ? formatTemplateWithLocale(
-              errorDescription,
-              {
-                bank: emiPayload.bank?.name,
-                type: emiPayload.tab,
-              },
-              'en'
-            )
-          : '',
       };
-      trackAddCardDetails(trackMeta, errorDescription);
+
+      // Track add card event
+      trackAddCardDetails(trackMeta);
+
+      // Track add card details error
+      if (cardValidationErrorType) {
+        trackAddCardDetailsError(trackMeta, cardValidationErrorType);
+      }
     }
   }
 

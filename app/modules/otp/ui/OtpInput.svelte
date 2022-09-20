@@ -12,6 +12,10 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { isHeadless, isWalletPayment } from 'otp/sessionInterface';
   import { Safari } from 'common/useragent';
+  import type { OtpType } from 'emiV2/types';
+  import { isEmiV2 } from 'razorpay';
+  import { trackOtpEntered } from 'emiV2/events/tracker';
+  import { getSession } from 'sessionmanager';
 
   export let hidden;
   export let isError;
@@ -25,12 +29,15 @@
     autoCompleteMethod = 'one-time-code';
   }
 
+  const isNewEmiFlow = isEmiV2();
+
   /**
    * Method is used to send track event when otp entering is complete
    * @param index {number} index of otp input field which fired the event
    */
   function trackInput(index) {
     const otp = $digits.join('');
+    const session = getSession();
 
     if (!otp) {
       $showFeeLabel = false;
@@ -44,6 +51,13 @@
           headless: isHeadless(),
         },
       });
+
+      // Track Razorpay otp entered for new emi flow
+      if (isNewEmiFlow && session.tab === 'emi') {
+        const otpType: OtpType = 'login';
+        const showTimer = document.querySelector('#timeout');
+        trackOtpEntered(!!showTimer, otpType);
+      }
     }
   }
 

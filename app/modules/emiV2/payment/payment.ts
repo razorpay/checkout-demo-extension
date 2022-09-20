@@ -136,11 +136,6 @@ function responseHandler(params: { status: PaymentStatus }) {
       savedToken
     );
 
-    if (status === 'success' && currentTab === 'debit') {
-      // Track Debit eligibility check success
-      trackDebitCardEligibilityChecked(true, true);
-    }
-
     if (status === 'error') {
       if (
         response.error &&

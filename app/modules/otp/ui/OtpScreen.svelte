@@ -55,7 +55,7 @@
   import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
   import ResendButton from 'otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
-  import OTPInput from 'otp/ui/OTPInput.svelte';
+  import OTPInput from 'otp/ui/OtpInput.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // analytics
@@ -157,7 +157,7 @@
     if (onSubmit && typeof onSubmit === 'function') {
       onSubmit();
     }
-  }
+  };
 </script>
 
 <!-- // TODO: showable logic -->

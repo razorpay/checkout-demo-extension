@@ -65,7 +65,7 @@
   import ResendButtonOneCC from 'otp/ui/components/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
-  import OtpInput from 'otp/ui/OTPInput.svelte';
+  import OtpInput from 'otp/ui/OtpInput.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
@@ -75,11 +75,11 @@
   import CTA, { hideCta } from 'cta';
   import { tabStore } from 'checkoutstore';
   import { isDebitIssuer } from 'common/bank';
-  import { selectedTab } from 'components/Tabs/tabStore';
   import {
     trackDebitCardEligibilityChecked,
     trackOtpEntered,
   } from 'emiV2/events/tracker';
+  import type { OtpType } from 'emiV2/types';
 
   // Props
   export let on = {};
@@ -119,7 +119,7 @@
     // if the user has reached OTP Screen -> means DC EMI was eligible for user
     // sending otp verfied as false since user has not verified OTP yet
     if (isDebitIssuer($mode) && isEmiV2() && otpPromptVisible) {
-      trackDebitCardEligibilityChecked(true, false);
+      trackDebitCardEligibilityChecked(true);
     }
   }
 
@@ -183,12 +183,21 @@
       });
     }
 
-    if (isNewEmiFlow) {
-      if (otpPromptVisible && $selectedTab === 'debit') {
-        // track otp entered
-        const showTimer = document.querySelector('#timeout');
-        trackOtpEntered(!!showTimer);
-      }
+    trackEmiOtpEntered();
+  }
+
+  function trackEmiOtpEntered() {
+    if (isNewEmiFlow && session.tab === 'emi') {
+      const isEmiPaymentflow =
+        session.payload &&
+        ['emi', 'cardless_emi'].includes(session.payload.method);
+      const showTimer = document.querySelector('#timeout');
+      // If a payment payload exists for emi method
+      // otp is of type native otp else it's a login otp (earlysalary asks otp before showing emi plans -> login otp)
+      // or if it's a razorpay otp it will be login otp
+      const otpType: OtpType =
+        $isRazorpayOTP || !isEmiPaymentflow ? 'login' : 'native';
+      trackOtpEntered(!!showTimer, otpType);
     }
   }
 

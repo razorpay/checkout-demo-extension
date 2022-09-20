@@ -17,8 +17,12 @@
     BAJAJ_FISNSEV_ISSUED_CARD,
   } from 'ui/labels/bajaj-emi';
 
-  import { bajajTCAccepted, bajajTCAcceptedConsent } from 'checkoutstore/emi';
-  import { isCurrentCardProviderInvalid } from 'emiV2/store';
+  import {
+    bajajTCAccepted,
+    bajajTCAcceptedConsent,
+    selectedPlan,
+  } from 'checkoutstore/emi';
+  import { isCurrentCardProviderInvalid, selectedBank } from 'emiV2/store';
 
   import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
 
@@ -39,6 +43,12 @@
   import { cardNumber } from 'checkoutstore/screens/card';
   import NumberField from 'ui/elements/fields/card/NumberField.svelte';
   import NameField from 'ui/elements/fields/card/NameField.svelte';
+  import type { addCardMeta } from 'emiV2/types';
+  import {
+    trackAddCardDetails,
+    trackAddCardDetailsError,
+  } from 'emiV2/events/tracker';
+  import { selectedTab } from 'components/Tabs/tabStore';
 
   // Props
   export let emiDuration = '';
@@ -60,6 +70,7 @@
   let cardEmpty = true;
   let numberField = null;
   let cardHolderName = prefill.name;
+  let cardType = '';
 
   let oneCCFieldProps = {};
 
@@ -86,6 +97,7 @@
 
         $isCurrentCardProviderInvalid = false;
         cardEmpty = !this.value;
+        cardType = this.type;
         if (this.type !== 'bajaj') {
           isValid = false;
         }
@@ -137,6 +149,28 @@
   const handleInput = (e) => {
     cardHolderName = e.target.value;
   };
+
+  const trackCardEntered = () => {
+    // Since Bajaj card dont have a type value (credit/debit)
+    // card issuer and network will be bajaj for this case
+    const trackMeta: addCardMeta = {
+      card_type: 'NA',
+      card_issuer: cardType,
+      card_network: cardType,
+      provider_name: $selectedBank?.code || 'NA',
+      tab_name: $selectedTab,
+      emi_plan: {
+        nc_emi_tag: $selectedPlan.subvention === 'merchant',
+        tenure: $selectedPlan.duration,
+      },
+    };
+
+    trackAddCardDetails(trackMeta);
+    // if card is invalid track card entered error event
+    if (cardInvalid) {
+      trackAddCardDetailsError(trackMeta, 'bank', $t(CARD_NOT_SUPPORTED));
+    }
+  };
 </script>
 
 <div
@@ -186,6 +220,7 @@
               }
               if (isNewEmiFlow) {
                 cardNumber.set(e.target.value);
+                trackCardEntered();
               }
             }}
             helpText={!cardInvalid

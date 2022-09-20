@@ -13,7 +13,6 @@
   import triggerSearchModal from 'components/SearchModal';
   import BankSearchItem from 'ui/elements/search-item/EmiBank.svelte';
   import { sortBankByName } from 'emiV2/helper/emiOptions';
-  import { isNoCostEMI } from 'emiV2/helper/label';
   import type { EMIOptionsMap, EMIBANKS, EMICategories } from 'emiV2/types';
   import {
     selectedDifferentBank,
@@ -88,7 +87,7 @@
         // Track selected bank
         trackDifferentBankSelected({
           name: data.name || 'NA',
-          nc_emi_tag: !!isNoCostEMI,
+          nc_emi_tag: !!data.isNoCostEMI,
           interest_rate_tag: !!data.startingFrom,
         });
         onEmiOptionSelect(data, 'bank');

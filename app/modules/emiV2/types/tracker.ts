@@ -73,6 +73,7 @@ export type addCardMeta = {
   pay_full_amount_cta?: boolean;
   error_type?: string;
   error_description?: string;
+  change_emi_option_cta?: boolean;
 };
 
 export type CVVMeta = {
@@ -92,7 +93,6 @@ export type DebitEligibilityChecked = {
   is_eligible: boolean;
   is_default_mobile_number: boolean;
   check_eligibility_info_clicked: boolean;
-  otp_verified: boolean;
 };
 
 export interface OtpMeta {
@@ -103,5 +103,8 @@ export interface OtpMeta {
   provider_name?: string;
   tab_name?: string;
   card_type?: string;
-  emi_plan: EmiPlanMeta;
+  emi_plan: EmiPlanMeta | string;
+  otp_type: OtpType;
 }
+
+export type OtpType = 'native' | 'login';

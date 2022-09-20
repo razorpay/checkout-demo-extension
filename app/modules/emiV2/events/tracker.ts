@@ -6,7 +6,7 @@ import { selectedBank, emiViaCards } from 'emiV2/store';
 import { eligibilityInfoClicked } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { contact as defaultContact } from 'checkoutstore/screens/home';
 import { selectedTab } from 'components/Tabs/tabStore';
-import { getSelectedSavedCard } from 'emiV2/helper/card';
+import { errorTypes, getSelectedSavedCard } from 'emiV2/helper/card';
 import type {
   EMIBANKS,
   SavedCardMeta,
@@ -22,15 +22,23 @@ import type {
   DebitEligibilityChecked,
   EmiPlan,
   OtpMeta,
+  OtpType,
 } from 'emiV2/types';
+import { formatTemplateWithLocale } from 'i18n';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
+import {
+  EMI_NOT_SUPPORTED,
+  ENTER_BANK_CARD_TO_AVAIL_EMI,
+} from 'ui/labels/card';
+import { clone } from 'utils/object';
 
 import { EVENTS } from './constants';
+import { capture, SEVERITY_LEVELS } from 'error-service';
 
-export const renderNoCostEmiTag = (labelShown: boolean) => {
-  Analytics.track(EVENTS.NC_EMI_TAG, {
-    type: AnalyticsTypes.RENDER,
+export const emiMethodClicked = (labelShown: boolean) => {
+  Analytics.track(EVENTS.L0_EMI_CLICK, {
+    type: AnalyticsTypes.BEHAV,
     data: {
       nc_emi_tag: labelShown,
     },
@@ -61,21 +69,25 @@ export const emiOptionsRendered = (emiOptionsMeta: {
   emiOptions: EMIBANKS[];
   savedCards: SavedCardMeta[];
 }) => {
-  // Slicing because we render only top 5 banks
-  const emiProvidersTrackMeta: EmiOptionsMeta[] = emiOptionsMeta.emiOptions
-    .map((providers: EMIBANKS) => ({
-      name: providers.name,
-      nc_emi_tag: !!providers.isNoCostEMI,
-      interest_rate_tag: !!providers.startingFrom,
-    }))
-    .slice(0, 5);
-  Analytics.track(EVENTS.EMI_OPTIONS_RENDERED, {
-    type: AnalyticsTypes.RENDER,
-    data: {
-      saved_cards: emiOptionsMeta.savedCards,
-      emi_providers: emiProvidersTrackMeta,
-    },
-  });
+  try {
+    // Slicing because we render only top 5 banks
+    const emiProvidersTrackMeta: EmiOptionsMeta[] = emiOptionsMeta.emiOptions
+      .map((providers: EMIBANKS) => ({
+        name: providers.name,
+        nc_emi_tag: !!providers.isNoCostEMI,
+        interest_rate_tag: !!providers.startingFrom,
+      }))
+      .slice(0, 5);
+    Analytics.track(EVENTS.EMI_OPTIONS_RENDERED, {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        saved_cards: emiOptionsMeta.savedCards,
+        emi_providers: emiProvidersTrackMeta,
+      },
+    });
+  } catch (e: any) {
+    capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
+  }
 };
 
 export const trackEmiTabChange = (tab: EmiTabMeta) => {
@@ -97,13 +109,19 @@ export const trackEmiPlansRendered = (
   plans: EmiPlansMeta,
   savedCard: Tokens | null
 ) => {
-  if (savedCard) {
-    plans.saved_card = getSavedCardMeta(savedCard);
+  try {
+    if (savedCard) {
+      plans.saved_card = getSavedCardMeta(savedCard);
+    } else {
+      plans.saved_card = 'NA';
+    }
+    Analytics.track(EVENTS.EMI_PLANS_RENDERED, {
+      type: AnalyticsTypes.RENDER,
+      data: plans,
+    });
+  } catch (e: any) {
+    capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
   }
-  Analytics.track(EVENTS.EMI_PLANS_RENDERED, {
-    type: AnalyticsTypes.RENDER,
-    data: plans,
-  });
 };
 
 export const trackEmiPlansSelected = (plan: EmiPlansMeta, trigger?: string) => {
@@ -149,14 +167,51 @@ export const trackCardlessEligibility = (data: paymentMeta) => {
   });
 };
 
-export const trackAddCardDetails = (data: addCardMeta, error?: string) => {
-  Analytics.track(
-    error ? EVENTS.ADD_CARD_DETAILS_ERROR : EVENTS.ADD_CARD_DETAILS,
-    {
+export const trackAddCardDetails = (data: addCardMeta) => {
+  Analytics.track(EVENTS.ADD_CARD_DETAILS, {
+    type: AnalyticsTypes.BEHAV,
+    data,
+  });
+};
+
+// if error message ispassed from the arguements use that (in case of bajaj form validations)
+// else compute error message depending on error type
+export const trackAddCardDetailsError = (
+  data: addCardMeta,
+  errorType: string,
+  errorString?: string
+) => {
+  try {
+    const trackPayload = clone(data);
+    const errorDescription =
+      errorType === errorTypes.BANK_INVALID
+        ? ENTER_BANK_CARD_TO_AVAIL_EMI
+        : EMI_NOT_SUPPORTED;
+    trackPayload.error_description =
+      errorString ||
+      formatTemplateWithLocale(
+        errorDescription,
+        {
+          bank: data.provider_name,
+          type: data.tab_name,
+        },
+        'en'
+      );
+    trackPayload.pay_full_amount_cta =
+      errorType === errorTypes.EMI_NOT_SUPPORTED;
+    trackPayload.change_emi_option_cta = errorType === errorTypes.BANK_INVALID;
+    trackPayload.error_type =
+      errorType === errorTypes.BANK_INVALID
+        ? 'card_invalid'
+        : 'emi_not_supported_on_card';
+
+    Analytics.track(EVENTS.ADD_CARD_DETAILS_ERROR, {
       type: AnalyticsTypes.BEHAV,
-      data,
-    }
-  );
+      data: trackPayload,
+    });
+  } catch (e: any) {
+    capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
+  }
 };
 
 export const trackPaymentAttempt = (
@@ -193,70 +248,80 @@ export const trackCVVEnteredForSavedCards = (data: CVVMeta) => {
   });
 };
 
-export const trackDebitCardEligibilityChecked = (
-  isEligible: boolean,
-  otpVerified: boolean
-) => {
-  const session = getSession();
-  const savedCards: Tokens | null = get(selectedCard);
-  const plan: EmiPlan = get(selectedPlan);
-  const contact: string = session.payload.contact;
-  const isDefaultContact: boolean = `+91${contact}` === get(defaultContact);
+export const trackDebitCardEligibilityChecked = (isEligible: boolean) => {
+  try {
+    const session = getSession();
+    const savedCards: Tokens | null = get(selectedCard);
+    const plan: EmiPlan = get(selectedPlan);
+    const contact: string = session.payload.contact;
+    const isDefaultContact: boolean = `+91${contact}` === get(defaultContact);
 
-  const payload: DebitEligibilityChecked = {
-    provider_name: get(selectedBank)?.name || 'NA',
-    tab_name: get(selectedTab),
-    emi_plan: {
-      nc_emi_tag: plan.subvention === 'merchant',
-      tenure: plan.duration,
-    },
-    is_eligible: isEligible,
-    mobile_number: contact || 'NA',
-    is_default_mobile_number: contact ? isDefaultContact : true,
-    check_eligibility_info_clicked: get(eligibilityInfoClicked),
-    otp_verified: otpVerified,
-  };
-  if (savedCards) {
-    payload.saved_card = getSavedCardMeta(savedCards);
-    payload.card_type = 'NA';
-  } else {
-    payload.card_type = get(currentCardType) || 'NA';
-    payload.saved_card = 'NA';
+    const payload: DebitEligibilityChecked = {
+      provider_name: get(selectedBank)?.name || 'NA',
+      tab_name: get(selectedTab),
+      emi_plan: {
+        nc_emi_tag: plan.subvention === 'merchant',
+        tenure: plan.duration,
+      },
+      is_eligible: isEligible,
+      mobile_number: contact || 'NA',
+      is_default_mobile_number: contact ? isDefaultContact : true,
+      check_eligibility_info_clicked: get(eligibilityInfoClicked),
+    };
+    if (savedCards) {
+      payload.saved_card = getSavedCardMeta(savedCards);
+      payload.card_type = 'NA';
+    } else {
+      payload.card_type = get(currentCardType) || 'NA';
+      payload.saved_card = 'NA';
+    }
+
+    Analytics.track(EVENTS.DC_ELIGIBILITY_CHECK, {
+      type: AnalyticsTypes.BEHAV,
+      data: payload,
+    });
+  } catch (e: any) {
+    capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
   }
-
-  Analytics.track(EVENTS.DC_ELIGIBILITY_CHECK, {
-    type: AnalyticsTypes.BEHAV,
-    data: payload,
-  });
 };
 
-export const trackOtpEntered = (otp_timer: boolean) => {
-  const plan: EmiPlan = get(selectedPlan);
-  const currentTab: string = get(selectedTab);
-  const savedCards: Tokens | null = get(selectedCard);
+export const trackOtpEntered = (otp_timer: boolean, otp_type: OtpType) => {
+  try {
+    const plan: EmiPlan = get(selectedPlan);
+    const currentTab: string = get(selectedTab);
+    const savedCards: Tokens | null = get(selectedCard);
 
-  const payload: OtpMeta = {
-    provider_name: get(selectedBank)?.name || 'NA',
-    tab_name: currentTab,
-    emi_plan: {
-      nc_emi_tag: plan.subvention === 'merchant',
-      tenure: plan.duration,
-    },
-    emi_via_cards_screen: get(emiViaCards),
-    emi_type: currentTab === 'debit_cardless' ? 'cardless' : currentTab,
-    otp_screen_time_out: otp_timer,
-  };
+    const payload: OtpMeta = {
+      provider_name: get(selectedBank)?.name || 'NA',
+      tab_name: currentTab,
+      emi_plan: 'NA',
+      emi_via_cards_screen: get(emiViaCards),
+      emi_type: currentTab === 'debit_cardless' ? 'cardless' : currentTab,
+      otp_screen_time_out: otp_timer,
+      otp_type,
+    };
 
-  if (savedCards) {
-    payload.saved_card = getSavedCardMeta(savedCards);
-    payload.card_type = 'NA';
-  } else {
-    payload.card_type = get(currentCardType) || 'NA';
-    payload.saved_card = 'NA';
+    // if emi plans are present add to payload
+    if (plan && plan.duration) {
+      payload.emi_plan = {
+        nc_emi_tag: plan.subvention === 'merchant',
+        tenure: plan.duration,
+      };
+    }
+
+    if (savedCards) {
+      payload.saved_card = getSavedCardMeta(savedCards);
+      payload.card_type = 'NA';
+    } else {
+      payload.card_type = get(currentCardType) || 'NA';
+      payload.saved_card = 'NA';
+    }
+
+    Analytics.track(EVENTS.OTP_ENTERED, {
+      type: AnalyticsTypes.BEHAV,
+      data: payload,
+    });
+  } catch (e: any) {
+    capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
   }
-
-  Analytics.track(EVENTS.OTP_ENTERED, {
-    type: AnalyticsTypes.BEHAV,
-    data: payload,
-  });
 };

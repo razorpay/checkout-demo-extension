@@ -46,7 +46,7 @@
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
-  import { renderNoCostEmiTag } from 'emiV2/events/tracker';
+  import { emiMethodClicked } from 'emiV2/events/tracker';
 
   // Props
   export let method: string = null; // Name of the method
@@ -161,9 +161,10 @@
     }
     $shouldOverrideVisibleState = false;
 
-    if (method === 'emi') {
-      // Track No Cost EMI Label shown
-      renderNoCostEmiTag(_showNoCostLabel);
+    if (method === 'emi' && isEmiV2()) {
+      // Track EMI method clicked on L0 screen
+      // passing whether the no cost label was shown or not
+      emiMethodClicked(_showNoCostLabel);
     }
 
     dispatch('select');
