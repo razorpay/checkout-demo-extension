@@ -46,9 +46,4 @@ export const DEFAULT_PHONEPE_P13N_V1_INSTRUMENT: Partial<Personalization.V1_Inst
     upi_app: PHONE_PE_PACKAGE_NAME,
   };
 
-/**
- * Customization here refers to the `custom_preferred_methods` experiment that is currently being deployed.
- * Post experiment success only one of the two constants below will be active.
- */
-export const MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION = 3;
-export const MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION = 2;
+export const MAX_PREFERRED_METHODS = 2;

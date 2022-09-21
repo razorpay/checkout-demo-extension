@@ -2,13 +2,6 @@ import { overrideStorageInstruments } from '../index';
 import * as UA from 'common/useragent';
 import type { Personalization } from '../personalization';
 
-// Disabling exp for test cases temporarily till we completely move to the new feature
-jest.mock('checkoutframe/personalization/experiment', () => ({
-  customPreferredMethodsExperiment: {
-    enabled: jest.fn(() => true),
-  },
-}));
-
 jest.mock('common/useragent', () => ({
   ...jest.requireActual('common/useragent'),
   isDesktop: jest.fn(),

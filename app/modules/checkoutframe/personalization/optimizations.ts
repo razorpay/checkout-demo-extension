@@ -8,7 +8,6 @@ import {
   ALLOWED_METHODS_BY_DEVICE,
   PIVOT_AMOUNT,
 } from './constants';
-import { customPreferredMethodsExperiment } from './experiment';
 import type { Personalization } from './personalization';
 
 function partition<T>(array: T[], isValid: (arg: T) => boolean): [T[], T[]] {
@@ -51,11 +50,7 @@ export const optimizeForAmount = (
   /**
    * Since we have a pivot amount, lets do this only for non-international payments.
    */
-  if (
-    !customPreferredMethodsExperiment.enabled() ||
-    isInternationalCustomer() ||
-    isInternational()
-  ) {
+  if (isInternationalCustomer() || isInternational()) {
     return instruments;
   }
   let ALLOWED_METHODS: Method[] = [];
@@ -81,11 +76,7 @@ export const optimizeForDevice = (
   /**
    * Since we have a pivot amount, lets do this only for non-international payments.
    */
-  if (
-    !customPreferredMethodsExperiment.enabled() ||
-    isInternationalCustomer() ||
-    isInternational()
-  ) {
+  if (isInternationalCustomer() || isInternational()) {
     return instruments;
   }
   const ALLOWED_METHODS = isDesktop()

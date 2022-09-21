@@ -2,13 +2,6 @@ import { overrideAPIInstruments } from '../api';
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from '../constants';
 import type { Personalization } from '../personalization';
 
-// Disabling exp for test cases temporarily till we completely move to the new feature
-jest.mock('checkoutframe/personalization/experiment', () => ({
-  customPreferredMethodsExperiment: {
-    enabled: jest.fn(() => true),
-  },
-}));
-
 const instruments: Personalization.V2_Instrument_Raw[] = [
   {
     method: 'netbanking',

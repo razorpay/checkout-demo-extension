@@ -6,18 +6,14 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
-import { customPreferredMethodsExperiment } from './experiment';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { optimizeInstruments } from 'checkoutframe/personalization/optimizations';
 import { isDesktop } from 'common/useragent';
-import { isInternationalCustomer } from 'common/international';
 import {
   DEFAULT_PHONEPE_P13N_V1_INSTRUMENT,
-  MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION,
-  MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION,
+  MAX_PREFERRED_METHODS,
 } from './constants';
-import { isInternational } from 'razorpay';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 
@@ -330,10 +326,6 @@ function updateInstrumentForCustomer(instrument, customer) {
 }
 
 export function overrideStorageInstruments(instruments) {
-  if (!customPreferredMethodsExperiment.enabled()) {
-    return instruments;
-  }
-
   return (Array.isArray(instruments) ? instruments : []).map((instrument) => {
     /**
      * Convert Wallet-PhonePe to UPI-PhonePe as UPI version offers better success metrics
@@ -522,8 +514,5 @@ export function trackNumberOfP13nContacts() {
 }
 
 export function getMaxPreferredMethods() {
-  return customPreferredMethodsExperiment.enabled() &&
-    !(isInternational() || isInternationalCustomer())
-    ? MAX_PREFERRED_METHODS_WITH_CUSTOMIZATION
-    : MAX_PREFERRED_METHODS_WITHOUT_CUSTOMIZATION;
+  return MAX_PREFERRED_METHODS;
 }

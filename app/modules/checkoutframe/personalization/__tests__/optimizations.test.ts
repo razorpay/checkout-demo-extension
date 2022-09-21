@@ -3,13 +3,6 @@ import * as UA from 'common/useragent';
 import { optimizeForDevice, optimizeForAmount } from '../optimizations';
 import type { Personalization } from '../personalization';
 
-// Disabling exp for test cases temporarily till we completely move to the new feature
-jest.mock('checkoutframe/personalization/experiment', () => ({
-  customPreferredMethodsExperiment: {
-    enabled: jest.fn(() => true),
-  },
-}));
-
 jest.mock('common/useragent', () => ({
   isDesktop: jest.fn(),
 }));

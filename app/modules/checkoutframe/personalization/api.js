@@ -22,7 +22,6 @@ import {
   getCustomerContactNumber,
 } from 'common/international';
 
-import { customPreferredMethodsExperiment } from './experiment';
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from './constants';
 
 /**
@@ -69,10 +68,6 @@ export const removeDuplicateApiInstruments = (instruments) => {
 };
 
 export const overrideAPIInstruments = (instruments) => {
-  if (!customPreferredMethodsExperiment.enabled()) {
-    return instruments;
-  }
-
   return instruments.map((instrument) => {
     if (
       instrument?.method === 'wallet' &&
