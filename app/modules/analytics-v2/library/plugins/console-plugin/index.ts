@@ -15,6 +15,9 @@ export default function () {
       console.log('🚀 ~ IDENTIFY ~ payload', payload);
     },
     loaded: () => true,
-    enabled: true,
+    /**
+     * enable in case of debugging events
+     */
+    enabled: false,
   };
 }
