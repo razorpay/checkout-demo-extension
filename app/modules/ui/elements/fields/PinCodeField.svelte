@@ -3,8 +3,10 @@
 
   import { PINCODE_HELP, PINCODE_LABEL } from 'ui/labels/home';
   import { t } from 'svelte-i18n';
+  import { isRedesignV15 } from 'razorpay';
 
-  export let value;
+  export let value: string;
+  export let isInvalid = false;
 
   const PINCODE_PATTERN = '^\\d{6}$';
 
@@ -16,6 +18,7 @@
 <!-- LABEL: PIN Code / Enter 6 digit pincode -->
 <Field
   name="pincode"
+  id="pincode"
   required={true}
   pattern={PINCODE_PATTERN}
   maxlength={6}
@@ -23,7 +26,12 @@
   label={$t(PINCODE_LABEL)}
   on:input={handleInput}
   {value}
-  handleFocus={true}
+  handleFocus={!isRedesignV15()}
   handleBlur={true}
   handleInput={true}
+  validationText={$t(PINCODE_HELP)}
+  on:blur={() => {
+    isInvalid = !value || !new RegExp(PINCODE_PATTERN).test(value);
+  }}
+  bind:showValidations={isInvalid}
 />

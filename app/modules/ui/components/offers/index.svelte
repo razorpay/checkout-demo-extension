@@ -682,7 +682,7 @@
       height: 36px;
       font-size: 14px;
       font-weight: 700;
-      line-height: 36px;
+      line-height: 45px;
 
       &:before {
         font-size: 16px;
