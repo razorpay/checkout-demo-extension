@@ -496,7 +496,7 @@ export async function injectSiftScript(sessionId, beaconKey = SIFT_BEACON_KEY) {
         event: 'sift_script_loading_failed',
         data: {},
       },
-      severity: SEVERITY_LEVELS.S1,
+      severity: SEVERITY_LEVELS.S2,
     });
   }
 }
@@ -521,7 +521,7 @@ export async function injectCyberSourceScript(
         event: 'cybersource_script_loading_failed',
         data: {},
       },
-      severity: SEVERITY_LEVELS.S1,
+      severity: SEVERITY_LEVELS.S2,
     });
   }
 }
