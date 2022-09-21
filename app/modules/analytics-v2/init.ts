@@ -13,7 +13,7 @@ const analytics = new Analytics<ContextValues>({
         domainUrl: RUDDERSTACK_URL,
         key: RUDDERSTACK_KEY,
       }),
-      enabled: !localStorage.getItem('disableV2'),
+      enabled: !!localStorage.getItem('enable-analytics-V2'),
     },
   ],
 });
