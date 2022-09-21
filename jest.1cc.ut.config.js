@@ -1,5 +1,7 @@
 const jestConfig = require('./jest.ut.config.js');
 
+delete jestConfig.coverageThreshold;
+
 module.exports = {
   ...jestConfig,
   roots: ['<rootDir>/app/modules'],

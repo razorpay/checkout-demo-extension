@@ -21,6 +21,14 @@ module.exports = {
     '**/__test__/*.[jt]s?(x)',
     '**/?(*.)+(spec|test).[jt]s?(x)',
   ],
+  coverageThreshold: {
+    global: {
+      statements: 32,
+      branches: 15,
+      functions: 26,
+      lines: 33,
+    },
+  },
   coverageDirectory: '<rootDir>/coverage/',
   coverageReporters: ['html', 'json', 'lcov', 'text-summary'],
   testResultsProcessor: 'jest-sonar-reporter',

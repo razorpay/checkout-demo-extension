@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 
 export START_TIME=$(date +%s)
 echo "start-time: ${START_TIME}"
