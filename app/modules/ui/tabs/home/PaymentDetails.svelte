@@ -365,7 +365,7 @@
   .contact-title {
     display: flex;
     align-items: center;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
   }
 
   .contact-text {

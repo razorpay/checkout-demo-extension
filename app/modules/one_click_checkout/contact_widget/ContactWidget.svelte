@@ -124,6 +124,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-bottom: 8px;
   }
   .contact-info {
     color: var(--secondary-text-color);
