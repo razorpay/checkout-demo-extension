@@ -4,7 +4,7 @@ export function sendToAll(event, payload) {
   }
 
   const ga = window.ga;
-  const trackers = ga.getAll() || [];
+  const trackers = typeof ga.getAll === 'function' ? ga.getAll() : [];
 
   for (let i = 0; i < trackers.length; i++) {
     const tracker = trackers[i].get('name') + `.${event}`;
