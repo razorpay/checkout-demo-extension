@@ -3,6 +3,7 @@ import Interface from 'common/interface';
 import type { ContextValues } from './types';
 import { ConsolePlugin, Rudderstack } from './library/plugins';
 import { RUDDERSTACK_KEY, RUDDERSTACK_URL } from './constants';
+import Browserstorage from 'browserstorage';
 
 const analytics = new Analytics<ContextValues>({
   app: 'rzp_checkout',
@@ -13,7 +14,7 @@ const analytics = new Analytics<ContextValues>({
         domainUrl: RUDDERSTACK_URL,
         key: RUDDERSTACK_KEY,
       }),
-      enabled: !!localStorage.getItem('enable-analytics-V2'),
+      enabled: !!Browserstorage.getItem('enable-analytics-V2'),
     },
   ],
 });
