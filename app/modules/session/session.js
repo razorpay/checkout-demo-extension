@@ -1080,6 +1080,38 @@ Session.prototype = {
       }
     }
 
+    /** setting meta before render */
+    Analytics.setMeta('isRedesignV15', RazorpayHelper.isRedesignV15());
+
+    // is FOH enabled
+    const isFOHEnabled = RazorpayHelper.hasMerchantPolicy();
+    Analytics.setMeta('FOH_enabled', isFOHEnabled);
+
+    // Analytics related to orientation
+    Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    window.addEventListener('orientationchange', function () {
+      Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
+    });
+
+    if (discreet.UserAgent.Safari) {
+      Analytics.setMeta('safari', true);
+    }
+
+    Analytics.setMeta('is_mobile', discreet.UserAgent.isMobile());
+
+    Analytics.setMeta('device.id', getDeviceId());
+
+    if (window && window.screen) {
+      Analytics.setMeta('device.screen', {
+        availHeight: window.screen.availHeight,
+        availWidth: window.screen.availWidth,
+        height: window.screen.height,
+        width: window.screen.width,
+        pixelDepth: window.screen.pixelDepth,
+      });
+    }
+    /** end of setting meta */
+
     this.isOpen = true;
     this.getEl();
     this.setFormatting();
@@ -1135,35 +1167,6 @@ Session.prototype = {
     );
 
     P13n.trackNumberOfP13nContacts();
-    Analytics.setMeta('isRedesignV15', RazorpayHelper.isRedesignV15());
-
-    // is FOH enabled
-    const isFOHEnabled = RazorpayHelper.hasMerchantPolicy();
-    Analytics.setMeta('FOH_enabled', isFOHEnabled);
-
-    // Analytics related to orientation
-    Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
-    window.addEventListener('orientationchange', function () {
-      Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
-    });
-
-    if (discreet.UserAgent.Safari) {
-      Analytics.setMeta('safari', true);
-    }
-
-    Analytics.setMeta('is_mobile', discreet.UserAgent.isMobile());
-
-    Analytics.setMeta('device.id', getDeviceId());
-
-    if (window && window.screen) {
-      Analytics.setMeta('device.screen', {
-        availHeight: window.screen.availHeight,
-        availWidth: window.screen.availWidth,
-        height: window.screen.height,
-        width: window.screen.width,
-        pixelDepth: window.screen.pixelDepth,
-      });
-    }
 
     let first_screen;
 
