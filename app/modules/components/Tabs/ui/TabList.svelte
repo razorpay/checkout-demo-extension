@@ -10,7 +10,7 @@
   .tab-list {
     box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    position: fixed;
+    position: absolute;
     z-index: 1;
     background: #fff;
     width: 100%;
