@@ -86,7 +86,7 @@ function getTrackMethod<
  */
 export function createTrackMethodForModule<
   N,
-  K extends Record<keyof N, string | { name: string; type: string }>
+  K extends object = Record<keyof N, string | { name: string; type: string }>
 >(
   events: K,
   { skipEvents } = { skipEvents: false }

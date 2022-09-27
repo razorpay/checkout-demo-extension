@@ -28,7 +28,5 @@ interface ErrorEventMap {
   };
 }
 
-export const ErrorTracker = createTrackMethodForModule<
-  ErrorEventMap,
-  typeof ErrorEvents
->(ErrorEvents);
+export const ErrorTracker =
+  createTrackMethodForModule<ErrorEventMap>(ErrorEvents);

@@ -133,7 +133,4 @@ interface MiscEventMap {
   };
 }
 
-export const MiscTracker = createTrackMethodForModule<
-  MiscEventMap,
-  typeof MiscEvents
->(MiscEvents);
+export const MiscTracker = createTrackMethodForModule<MiscEventMap>(MiscEvents);

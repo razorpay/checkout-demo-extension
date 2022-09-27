@@ -21,7 +21,7 @@ type HomeEventsMap = {
 - Create a Tracker for each module. For eg
 
 ```
-const HomeScreenTracker = createTrackMethodForModule<HomeEventsMap, typeof HomeScreenEvents>(HomeScreenEvents);
+const HomeScreenTracker = createTrackMethodForModule<HomeEventsMap>(HomeScreenEvents);
 ```
 
 - Use it for each event in module. For eg.

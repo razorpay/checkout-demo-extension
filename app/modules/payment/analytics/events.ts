@@ -45,7 +45,5 @@ interface PaymentEventMap {
   };
 }
 
-export const PaymentTracker = createTrackMethodForModule<
-  PaymentEventMap,
-  typeof PaymentEvents
->(PaymentEvents);
+export const PaymentTracker =
+  createTrackMethodForModule<PaymentEventMap>(PaymentEvents);
