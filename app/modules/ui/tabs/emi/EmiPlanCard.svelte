@@ -196,8 +196,14 @@
           <!-- LABEL: No minimum balance is required. There will be no amount blocked on your card. You will pay -->
           {$t(DEBIT_DESCRIPTION_MIN_BALANCE)}
           <span class="inline-block">{formattedAmountPerMonth}/mo</span>
-          <!-- LABEL: (includes interest). -->
-          {$t(DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
+          <!-- If the plan is a noCost emi PLAN_INTEREST, don't show interest applicable string -->
+          {#if !noCostEmi}
+            <!-- LABEL: (includes interest). -->
+            {$t(DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
+          {:else}
+            <!-- Adding full stop to end sentence -->
+            <span>.</span>
+          {/if}
         {:else if bank === CITI_BANK_CODE}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account. EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(
@@ -354,7 +360,7 @@
   .nocost {
     line-height: 20px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    margin: -10px 0 6px !important;
+    margin: 0 0 6px !important;
     padding-bottom: 6px;
   }
 
