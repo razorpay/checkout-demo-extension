@@ -5,6 +5,7 @@ import { views } from 'one_click_checkout/routing/constants';
 import { get } from 'svelte/store';
 import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import { setCustomerConsentStatus } from 'one_click_checkout/customer/controller';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -16,6 +17,7 @@ export const handleContactFlow = (prevContact) => {
   if (get(contact) === prevContact) {
     return false;
   }
+  setCustomerConsentStatus(0);
   resetOrder(true);
   navigator.navigateTo({ path: views.DETAILS, initialize: true });
   if (prevCustomer?.logged) {
@@ -26,7 +28,9 @@ export const handleContactFlow = (prevContact) => {
      * to trigger the reactive blocks in home/index.svelte that set the method blocks
      * based on customer details.
      */
-    prevCustomer.logout(false, () => customer.set(getCustomerByContact(get(contact))));
+    prevCustomer.logout(false, () =>
+      customer.set(getCustomerByContact(get(contact)))
+    );
   }
   return true;
 };

@@ -54,3 +54,11 @@ export const shouldOverrideBrandColor = () =>
 export const disableCODOnAppliedCoupon = () =>
   getPreferences('merchant_key') === 'rzp_live_doOidGOxQnkbe5'; // temp: GoNoise live keys
 // getPreferences('features.one_cc_coupon_disable_cod') || false;
+
+export const customerConsentDefaultAccept = () =>
+  getPreferences('features.one_cc_consent_default');
+export const consumerConsentDefaultDeny = () =>
+  getPreferences('features.one_cc_consent_notdefault');
+
+export const isCustomerConsentFeatureEnabled = () =>
+  customerConsentDefaultAccept() || consumerConsentDefaultDeny();

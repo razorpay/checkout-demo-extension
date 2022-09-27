@@ -2,6 +2,7 @@
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
+  import ConsentCheckbox from 'one_click_checkout/customer/ui/ConsentCheckbox.svelte';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -102,6 +103,7 @@
         {/if}
       </div>
     {/if}
+    <ConsentCheckbox />
   </div>
 {/if}
 

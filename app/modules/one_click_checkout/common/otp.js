@@ -29,6 +29,8 @@ import { submitAttemptIndex } from 'otp/store';
 import { consentGiven } from 'one_click_checkout/address/store';
 import { getDeviceId } from 'fingerprint';
 import * as ObjectUtils from 'utils/object';
+import { updateCustomerConsent } from 'one_click_checkout/customer/controller';
+import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
 
 let customer;
 
@@ -116,6 +118,7 @@ const postSubmit = (msg, data) => {
       setDefaultSelectedAddress();
     }
     updateOTPStore({ renderCtaOneCC: false });
+    updateCustomerConsent(get(customerConsentCheckboxState));
     screensHistory.config.otp.props.successHandler(data);
   }
 };

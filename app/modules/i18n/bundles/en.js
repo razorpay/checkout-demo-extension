@@ -11,6 +11,7 @@ import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import topbar from 'one_click_checkout/topbar/i18n/en';
 import cart from 'one_click_checkout/cart/i18n/en';
+import customer_consent_one_cc from 'one_click_checkout/customer/i18n/en';
 
 import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
@@ -1495,4 +1496,5 @@ export default {
       round_off_callout: 'Do not round-off the amount as your payment may fail'
     },
   },
+  customer_consent_one_cc,
 };

@@ -51,6 +51,10 @@ import { getElementById } from 'utils/doc';
 import { setBraveBrowser } from 'common/useragent';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
+import {
+  setCustomerConsentStatus,
+  setCustomerConsentCheckboxStatus,
+} from 'one_click_checkout/customer/controller';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import { checkoutInvokedTime } from 'checkoutstore/screens/home';
 import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
@@ -561,6 +565,8 @@ function setSessionPreferences(session, preferences) {
   updateOptions(preferences);
   updateAnalyticsFromPreferences(preferences);
   updatePreferredMethods(preferences);
+  setCustomerConsentStatus(preferences.customer?.['1cc_customer_consent']);
+  setCustomerConsentCheckboxStatus();
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);

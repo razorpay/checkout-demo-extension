@@ -32,6 +32,7 @@
   import { shouldShowCoupons } from 'one_click_checkout/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+  import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
 
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
@@ -66,6 +67,7 @@
     getPrefilledEmail,
   } from 'checkoutframe/customer';
   import { initSummaryMetaAnalytics } from 'one_click_checkout/coupons/controller';
+  import { updateCustomerConsent } from 'one_click_checkout/customer/controller';
 
   // constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -85,6 +87,7 @@
     !$isContactAndEmailValid;
 
   function onSubmitLoggedInUser() {
+    updateCustomerConsent($customerConsentCheckboxState);
     const addressWidget = getElementById(DELIVERY_ADDRESS_WIDGET_DOM_ID);
     if (!$selectedAddress?.serviceability && addressWidget) {
       addressWidget.scrollIntoView({
@@ -205,6 +208,7 @@
   }
 
   function onAddressHeaderClick() {
+    updateCustomerConsent($customerConsentCheckboxState);
     navigator.navigateTo({ path: views.SAVED_ADDRESSES });
   }
 </script>
