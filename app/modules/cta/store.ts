@@ -75,14 +75,17 @@ class CTAStore {
     }));
   }
 
-  setState(state: CTAState = {}, key = 'default-tab') {
-    this.stateMap.update((existing) => ({
-      ...existing,
-      [key]: {
-        ...(existing[key] || {}),
-        ...state,
-      },
-    }));
+  setState(state: CTAState = {}, key = ['default-tab']) {
+    this.stateMap.update((existing) => {
+      const updatedState = { ...existing };
+      key.forEach((keyName) => {
+        updatedState[keyName] = {
+          ...(existing[keyName] || {}),
+          ...state,
+        };
+      });
+      return updatedState;
+    });
   }
 
   isCTAShown() {

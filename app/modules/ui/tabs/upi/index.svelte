@@ -1053,8 +1053,8 @@
       />
     </div>
     <CTA
-      screen="upi"
-      tab="upi"
+      screen={['upi', 'upi_otm']}
+      tab={['upi', 'upi_otm']}
       disabled={((Boolean(helpTextToDisplay) || vpaEntered?.length === 0) &&
         selectedToken === 'new') ||
         CTADisabled}

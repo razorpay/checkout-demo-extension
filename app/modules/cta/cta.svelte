@@ -8,8 +8,8 @@
   import { PAY_NOW_CTA_LABEL } from './i18n';
 
   // Fake CTA
-  export let screen = 'default';
-  export let tab = 'tab';
+  export let screen: string | string[] = 'default';
+  export let tab: string | string[] = 'tab';
   export let disabled = false;
   export let show = true;
   export let label = PAY_NOW_CTA_LABEL;
@@ -32,7 +32,17 @@
   export let onSubmit: (...args: any) => void = defaultCTAAction;
   export let onViewDetailsClick: () => void = defaultOnViewDetailsClick;
 
-  $: key = `${screen}:${tab}`;
+  let key: string[] = [];
+  $: {
+    let tempScreen = !Array.isArray(screen) ? [screen] : screen;
+    let tempTab = !Array.isArray(tab) ? [tab] : tab;
+    key = [];
+    tempScreen.forEach((screenName) => {
+      tempTab.forEach((tabName) => {
+        key.push(`${screenName}:${tabName}`);
+      });
+    });
+  }
 
   $: {
     CTAStore.setState(

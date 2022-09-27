@@ -593,7 +593,7 @@
   }
   .error-container {
     position: absolute;
-    z-index: 1;
+    z-index: 11;
     background: #fff;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
     bottom: 0;
