@@ -65,7 +65,7 @@ export interface QueueType<K> {
   flush: (flushAll?: boolean) => void;
   push: (data: K) => void;
   size: () => number;
-  pause: (toFlush: boolean) => void;
+  pause: (toFlush?: boolean) => void;
   resume: () => void;
 }
 

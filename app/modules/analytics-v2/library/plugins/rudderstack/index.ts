@@ -39,6 +39,7 @@ export default function ({
      * - initializes the plugin (for sdk, this can be injecting a script)
      * - boots up the queue for batching events
      * - subscribes to unload event to flush out all the events at once
+     * - pauses/resumes sending events when network goes offline/online
      */
     initialize: () => {
       eventQ = createQueue(
@@ -66,9 +67,26 @@ export default function ({
         }
       );
 
+      /**
+       * flush all events when user is leaving page
+       */
       window.addEventListener('beforeunload', () => {
         useBeacon = true;
         eventQ?.flush(true);
+      });
+
+      /**
+       * halt sending events when network is offline (events are still pushed in queue)
+       */
+      window.addEventListener('offline', () => {
+        eventQ?.pause();
+      });
+
+      /**
+       * resume sending events when network is online
+       */
+      window.addEventListener('online', () => {
+        eventQ?.resume();
       });
     },
 
