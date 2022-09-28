@@ -495,3 +495,6 @@ export function getServiceabilityOfAddresses(addresses, onSavedAddress) {
     });
   });
 }
+
+export const getServiceabilityCache = (zipcode) =>
+  serviceabilityCache[getOrderId()][zipcode];

@@ -35,7 +35,10 @@ import {
 } from 'one_click_checkout/address/constants';
 
 // service imports
-import { getServiceabilityOfAddresses } from 'one_click_checkout/address/service';
+import {
+  getServiceabilityCache,
+  getServiceabilityOfAddresses,
+} from 'one_click_checkout/address/service';
 
 /**
  *
@@ -149,6 +152,7 @@ export const updateAddressesInStore = (_addresses) => {
       (savedAddr) => savedAddr.id === addr.id
     );
     const updatedAddress = {
+      ...getServiceabilityCache(addr.zipcode),
       ...formatApiAddress(addr, addr.type),
       id: addr.id,
     };
