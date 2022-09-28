@@ -17,7 +17,7 @@ import { getCurrency } from 'razorpay';
 import { SHIPPING_CHARGES_LABEL } from 'one_click_checkout/address/i18n/labels';
 import { formatTemplateWithLocale } from 'i18n';
 import { formatAmountWithSymbol } from 'common/currency';
-import { availableCoupons } from 'one_click_checkout/coupons/store';
+import { disabledMethods } from 'one_click_checkout/coupons/store';
 
 /**
  *
@@ -345,12 +345,10 @@ export function showShippingChargeAddedToast(charge) {
   );
 }
 
-export const isCodApplicableOnCoupon = (couponCode) => {
-  const coupon =
-    storeGetter(availableCoupons).find((item) => item.code === couponCode) ||
-    {};
+export const isCodApplicableOnCoupon = () => {
+  const disabled = storeGetter(disabledMethods);
 
-  if (coupon?.disabled_methods?.includes('cod')) {
+  if (disabled.includes('cod')) {
     return false;
   }
 

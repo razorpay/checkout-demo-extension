@@ -39,10 +39,12 @@ export function removeCouponInStore() {
   amount.set(total);
   cartDiscount.set(0);
   couponValRem.set(0);
+  disabledMethods.set([]);
 }
 
 export function applyCouponInStore(code, response) {
   couponState.set('idle');
+  disabledMethods.set(response.promotions[0].disabled_methods || []);
   appliedCoupon.set(code);
   const cartValue = get(cartAmount);
   let couponValue = response.promotions[0].value;
@@ -87,3 +89,5 @@ export function resetChargesCoupons() {
 }
 
 export const couponListTimer = writable('');
+
+export const disabledMethods = writable([]);

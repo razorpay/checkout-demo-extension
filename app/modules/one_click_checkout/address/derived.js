@@ -21,8 +21,8 @@ import { isCodApplicableOnCoupon } from 'one_click_checkout/address/helpersExtra
 
 export const isCodAvailable = derived(
   [selectedShippingAddress, appliedCoupon],
-  ([$selectedShippingAddress, $appliedCoupon]) => {
-    if (!isCodApplicableOnCoupon($appliedCoupon)) {
+  ([$selectedShippingAddress]) => {
+    if (!isCodApplicableOnCoupon()) {
       return false;
     }
     return $selectedShippingAddress?.cod;
