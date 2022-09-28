@@ -90,9 +90,6 @@
 </div>
 
 <style>
-  .screen-one-cc {
-    min-height: 110%;
-  }
   .cvv-container {
     padding: 24px 16px;
   }

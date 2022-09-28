@@ -30,6 +30,7 @@ import {
   isStackPopulated,
   moveControlToSession,
   popStack,
+  isMainStackPopulated,
 } from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
@@ -6451,7 +6452,11 @@ Session.prototype = {
               });
             } else {
               let instance = session.getCurrentTabInstance();
-              if (instance && instance.onShown) {
+              const isNavstackControlled =
+                isMainStackPopulated() && !controlledViaSession();
+              // if navstack is invoked and sessionjs is not in control of rendering UI
+              // skip invoking the onshown method
+              if (instance && instance.onShown && !isNavstackControlled) {
                 instance.onShown();
               }
             }
