@@ -1,7 +1,8 @@
 import Razorpay from 'common/Razorpay';
+import { getOrderId, isOneClickCheckout } from 'razorpay';
 
 export const emitMagicFunnelEvent = (eventName: string, eventData = {}) => {
-  if (!eventName) {
+  if (!eventName || !isOneClickCheckout()) {
     return;
   }
 
@@ -9,7 +10,11 @@ export const emitMagicFunnelEvent = (eventName: string, eventData = {}) => {
     event: 'event',
     data: {
       event: eventName,
-      data: eventData,
+      data: {
+        ...eventData,
+        order_id: getOrderId(),
+        timestamp: Date.now(),
+      },
     },
   });
 };

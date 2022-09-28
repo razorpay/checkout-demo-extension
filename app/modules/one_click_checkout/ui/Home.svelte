@@ -38,9 +38,11 @@
   import {
     CATEGORIES,
     ACTIONS,
+    MAGIC_FUNNEL,
   } from 'one_click_checkout/merchant-analytics/constant';
   import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
+  import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
 
   let topbar;
   let isBackEnabled;
@@ -65,6 +67,7 @@
     merchantFBStandardAnalytics({
       event: ACTIONS.INITIATECHECKOUT,
     });
+    emitMagicFunnelEvent(MAGIC_FUNNEL.CHECKOUT_RENDERED);
     const checkoutTopbar = document.querySelector('#topbar-wrap');
     if (checkoutTopbar) {
       checkoutTopbar.classList.add('hide-topbar');
@@ -153,9 +156,10 @@
     font-weight: var(--font-weight-regular);
     font-size: var(--font-size-body);
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
   }
-  .container::-webkit-scrollbar { /* WebKit */
+  .container::-webkit-scrollbar {
+    /* WebKit */
     width: 0;
     height: 0;
   }

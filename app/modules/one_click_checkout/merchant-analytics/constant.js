@@ -29,4 +29,9 @@ export const CATEGORIES = {
 
 export const MAGIC_FUNNEL = {
   COUPON_APPLIED: 'magic_funnel.coupon_applied',
+  CHECKOUT_RENDERED: 'magic_funnel.checkout_rendered',
+  ADDRESS_ENTERED: 'magic_funnel.address_entered',
+  ADDRESS_SCREEN: 'magic_funnel.address_screen',
+  PAYMENTS_SCREEN: 'magic_funnel.payments_screen',
+  PAYMENT_ATTEMPT: 'magic_funnel.payment_attempted',
 };

@@ -33,6 +33,8 @@ import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import OneCCEvents from 'one_click_checkout/analytics';
+import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
+import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
 
 // service imports
 import {
@@ -214,6 +216,7 @@ export function redirectToPaymentMethods(
         if (address.cod) {
           showCodLoader.set(true);
         }
+        emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENTS_SCREEN);
         oneClickCheckoutRedirection(showSnackbar);
         navigator.navigateTo({ path: views.METHODS });
 

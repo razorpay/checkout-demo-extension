@@ -41,6 +41,8 @@
     views as addressViews,
   } from 'one_click_checkout/address/constants';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+  import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
+  import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
 
   import Resource from 'one_click_checkout/address/resource';
   import { views } from 'one_click_checkout/routing/constants';
@@ -75,6 +77,7 @@
   $: isSavedAddrView = routeMap[currentView] === addressViews.SAVED_ADDRESSES;
 
   function postSubmit() {
+    emitMagicFunnelEvent(MAGIC_FUNNEL.ADDRESS_ENTERED);
     if (!$shouldSaveAddress || isSavedAddrView) {
       redirectToPaymentMethods();
       return;
@@ -107,6 +110,7 @@
   }
 
   onMount(() => {
+    emitMagicFunnelEvent(MAGIC_FUNNEL.ADDRESS_SCREEN);
     Analytics.setMeta(
       MetaProperties.ADDRESS_SCREEN_TYPE,
       ADDRESS_TYPES.SHIPPING_ADDRESS

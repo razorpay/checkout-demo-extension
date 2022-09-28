@@ -1,5 +1,9 @@
 import Razorpay from 'common/Razorpay';
+import { isOneClickCheckout } from 'razorpay';
+import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
 import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+
+const ORDER_ID = 'order_KBrMyS1jyO0w8w';
 
 jest.mock('common/Razorpay', () => {
   const originalModule = jest.requireActual('common/Razorpay');
@@ -9,13 +13,33 @@ jest.mock('common/Razorpay', () => {
   };
 });
 
+jest.mock('razorpay', () => {
+  const originalModule = jest.requireActual('razorpay');
+  return {
+    ...originalModule,
+    getOrderId: () => ORDER_ID,
+    isOneClickCheckout: jest.fn(),
+  };
+});
+
 describe('emitMagicFunnel event tests', () => {
+  it('should not emit event for std checkout', () => {
+    isOneClickCheckout.mockReturnValue(false);
+
+    emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENTS_SCREEN);
+    expect(Razorpay.sendMessage).not.toHaveBeenCalled();
+  });
+
   it('should not emit event if eventName not passed', () => {
+    isOneClickCheckout.mockReturnValue(true);
+
     emitMagicFunnelEvent();
     expect(Razorpay.sendMessage).not.toHaveBeenCalled();
   });
 
   it('should construct sendMessage argument object', () => {
+    isOneClickCheckout.mockReturnValue(true);
+
     const eventName = 'test';
     const eventData = { user: 'xyz' };
 
@@ -23,7 +47,7 @@ describe('emitMagicFunnel event tests', () => {
       event: 'event',
       data: {
         event: eventName,
-        data: eventData,
+        data: { ...eventData, order_id: ORDER_ID, timestamp: Date.now() },
       },
     };
 

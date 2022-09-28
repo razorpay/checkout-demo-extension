@@ -38,6 +38,8 @@
   import { isQRPaymentActive, isQRPaymentCancellable } from 'upi/helper';
   import { getCTAAmount } from 'cta';
   import { cfbAmount } from 'checkoutstore/screens/upi';
+  import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+  import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
 
   // Props
   export let view = 'qr';
@@ -139,6 +141,7 @@
       event: 'submit',
       data: paymentData,
     });
+    emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENT_ATTEMPT);
     session.r
       .createPayment(paymentData, {
         upiqr: true,

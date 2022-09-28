@@ -61,6 +61,8 @@ import { injectSentry } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
 import { screenStore, tabStore } from 'checkoutstore';
 import { isDebitIssuer } from 'common/bank';
+import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
 import triggerErrorModal, {
   closeErrorModal,
   updateLoadingCTA,
@@ -5983,6 +5985,7 @@ Session.prototype = {
     this.preferredInstrument = P13n.processInstrument(data, this);
     isQRPaymentCancellable({}, true);
 
+    emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENT_ATTEMPT);
     let payment = this.r.createPayment(data, request);
     payment
       .on('payment.success', successHandler.bind(this))
