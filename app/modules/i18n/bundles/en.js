@@ -365,7 +365,7 @@ export default {
       cards: 'EMI on Cards',
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
-      walnut369: 'Axio',
+      walnut369: 'axio',
       sezzle: 'Sezzle',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
@@ -384,7 +384,7 @@ export default {
     select_option_title: 'Select an option',
     select_recommended_title: 'Recommended',
     other_options: 'Other Options',
-    walnut_banner_text: 'Get No Cost EMI quickly with Axio',
+    walnut_banner_text: 'Get No Cost EMI quickly with axio',
     bank_emi_options: 'Bank EMI',
     other_emi_options: 'Other EMI options',
     more_banks_label: 'More Banks',
@@ -1486,14 +1486,13 @@ export default {
       routing_code: 'Routing Code',
       routing_type: 'Routing Type',
       note_label: 'Note:',
-      note: 'It may take 5-7 business days for the payment to reflect in the seller\'s account. In case of any queries, reach out to them directly.',
-      heading:
-        'To complete your payment:',
+      note: "It may take 5-7 business days for the payment to reflect in the seller's account. In case of any queries, reach out to them directly.",
+      heading: 'To complete your payment:',
       content1:
         'Log in to your internet banking portal and add the below account as a beneficiary, or visit your nearest bank branch and request an ACH transfer to the below account',
       content2:
         'Alternatively you may visit your nearest bank branch and request local ACH transfer to below account.',
-      round_off_callout: 'Do not round-off the amount as your payment may fail'
+      round_off_callout: 'Do not round-off the amount as your payment may fail',
     },
   },
   customer_consent_one_cc,
