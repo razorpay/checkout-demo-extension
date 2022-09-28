@@ -24,6 +24,7 @@
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { t } from 'svelte-i18n';
   import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
+  import { isSelectedBankBajaj } from 'emiV2/helper/helper';
 
   export let tabs: TabList = [];
 
@@ -33,7 +34,11 @@
       provider_name: $selectedBank?.name || 'NA',
       credit: $selectedBank?.creditEmi || false,
       debit: $selectedBank?.debitEmi || false,
-      cardless: $selectedBank?.isCardless || false,
+      cardless:
+        $selectedBank?.isCardless ||
+        $selectedBank?.method === 'cardless_emi' ||
+        isSelectedBankBajaj() ||
+        false,
       debit_and_cardless: !!$selectedBank?.debitCardlessConfig,
       tab_view: tabs.length > 1,
       default_tab: tabs[0].value,

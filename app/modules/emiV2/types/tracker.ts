@@ -23,7 +23,7 @@ export type EmiProviderMeta = {
 export type EmiTabMeta = {
   provider_name: string;
   tab_name: string;
-  eligible?: boolean;
+  is_eligible?: boolean | NA; // if eligibility check is not done (Eg. bajaj) is_eligible should be NA
 };
 
 export type EmiPlanMeta = {
@@ -32,7 +32,7 @@ export type EmiPlanMeta = {
 };
 
 export type EmiPlansMeta = {
-  saved_card?: SavedCardMeta | string;
+  saved_card?: SavedCardMeta;
   provider_name: string;
   tab_name: string;
   emi_plans?: EmiPlanMeta[];
@@ -46,21 +46,22 @@ export type payFullAmountMeta = {
   provider_name?: string;
   card_type: string | null;
   tab_name: string;
-  emi_plan?: EmiPlanMeta;
+  emi_plan?: EmiPlanMeta | NA;
 };
 
-export type paymentMeta = {
-  emi_type: string;
+export type PaymentMeta = {
+  emi_type: emiType;
   provider_name?: string;
   tab_name: string;
   mobile_number?: string;
   is_default_mobile_number?: boolean;
   is_eligible?: boolean;
-  emi_plans?: EmiPlanMeta;
+  emi_plans?: EmiPlanMeta | NA; // for eligilbilty API emi plans are not present therefore need to set them to NA
   status?: string;
   failure_reason?: string;
   emi_via_cards_screen?: boolean;
   saved_card?: SavedCardMeta;
+  success?: boolean;
 };
 
 export type addCardMeta = {
@@ -77,14 +78,14 @@ export type addCardMeta = {
 };
 
 export type CVVMeta = {
-  saved_card?: SavedCardMeta | string;
+  saved_card?: SavedCardMeta;
   provider_name: string;
   tab_name: string;
   emi_plan: EmiPlanMeta;
 };
 
 export type DebitEligibilityChecked = {
-  saved_card?: SavedCardMeta | string;
+  saved_card?: SavedCardMeta;
   provider_name: string;
   tab_name: string;
   emi_plan: EmiPlanMeta;
@@ -93,18 +94,23 @@ export type DebitEligibilityChecked = {
   is_eligible: boolean;
   is_default_mobile_number: boolean;
   check_eligibility_info_clicked: boolean;
+  emi_type: emiType;
 };
 
 export interface OtpMeta {
-  emi_type: string;
+  emi_type: emiType;
   otp_screen_time_out: boolean;
   emi_via_cards_screen: boolean;
-  saved_card?: SavedCardMeta | string;
+  saved_card?: SavedCardMeta;
   provider_name?: string;
   tab_name?: string;
   card_type?: string;
-  emi_plan: EmiPlanMeta | string;
+  emi_plan: EmiPlanMeta | NA;
   otp_type: OtpType;
 }
 
 export type OtpType = 'native' | 'login';
+
+export type emiType = 'emi' | 'cardless_emi';
+
+export type NA = 'NA';

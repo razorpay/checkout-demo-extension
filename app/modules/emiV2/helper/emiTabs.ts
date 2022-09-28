@@ -53,7 +53,8 @@ export const handleEmiProviderSelection = () => {
         {
           provider_name: get(selectedBank)?.name,
           tab_name: get(selectedTab),
-          card_type: get(currentCardType),
+          card_type: get(currentCardType) || 'NA',
+          emi_plan: 'NA',
         },
         'try_another'
       );

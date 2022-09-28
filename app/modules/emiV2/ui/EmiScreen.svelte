@@ -46,6 +46,7 @@
   import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
   import { filterSavedCardsAgainstCustomBlock } from 'emiV2/helper/configurability';
   import { getSavedCardsForEMI } from 'emiV2/helper/card';
+  import { selectedPlan } from 'checkoutstore/emi';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -59,9 +60,11 @@
       discountedAmount,
       currentInstrumentMethod
     );
-    // Set selected tab as null when user lands on the L0 screen
+    // Set selected tab as null when user lands on the L1 screen
     // From further screens
     selectedTab.set('');
+    // Clearing the selected plan after the user lands on L1 screen
+    selectedPlan.set(null);
   });
 
   // Putting a manual check to verify for a custom block because on navstack redirection

@@ -38,10 +38,11 @@
     const tabChangeMeta: EmiTabMeta = {
       provider_name: $selectedBank?.name || 'NA',
       tab_name: $selectedTab,
+      is_eligible: 'NA',
     };
 
     if (isPureCardlessScreen) {
-      tabChangeMeta.eligible = $selectedInstrumentCardlessEligible;
+      tabChangeMeta.is_eligible = $selectedInstrumentCardlessEligible;
     }
 
     trackEmiTabChange(tabChangeMeta);

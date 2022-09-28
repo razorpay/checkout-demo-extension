@@ -32,7 +32,7 @@ import type {
   CardlessEMIStore,
   Customer,
   EmiPlan,
-  paymentMeta,
+  PaymentMeta,
   Tokens,
 } from 'emiV2/types';
 import { selectedBank, emiViaCards } from 'emiV2/store';
@@ -52,7 +52,6 @@ import {
 } from 'checkoutstore/screens/card';
 import {
   trackCardlessEligibility,
-  trackDebitCardEligibilityChecked,
   trackPayFullAmount,
   trackPaymentAttempt,
 } from 'emiV2/events/tracker';
@@ -67,6 +66,7 @@ import { showAuthOverlay } from 'card/helper';
 import Analytics from 'analytics';
 import { getSavedCardsForEMI } from 'emiV2/helper/card';
 import { handleFeeBearer } from 'emiV2/helper/fee-bearer';
+import { isCardlessTab } from 'emiV2/helper/tabs';
 
 const getIssuerForEmiFromPayload = (payload: EMIPayload) => {
   const currentCustomer = get(customer) as Customer;
@@ -108,12 +108,16 @@ function responseHandler(params: { status: PaymentStatus }) {
     const savedToken = get(selectedCard);
     const currentTab = get(selectedTab);
 
-    const paymentTrackerMeta: paymentMeta = {
-      emi_type:
-        get(selectedTab) === 'debit_cardless' ? 'cardless' : get(selectedTab),
+    // emi_type should be either cardless_emi or emi
+    // if user is on a screen and has cardless tab enabled
+    // for providers like zestmoney, walnut etc we dont come to the tabs screen
+    // therefor tab_name by default will be cardless
+    const paymentTrackerMeta: PaymentMeta = {
+      emi_type: isCardlessTab() ? 'cardless_emi' : 'emi',
       provider_name: get(selectedBank)?.name,
-      tab_name: currentTab,
+      tab_name: currentTab || 'cardless',
       emi_via_cards_screen: get(emiViaCards),
+      emi_plans: 'NA',
     };
 
     const selectedPlanForEmi: EmiPlan = get(selectedPlan);
@@ -132,6 +136,7 @@ function responseHandler(params: { status: PaymentStatus }) {
         ...paymentTrackerMeta,
         status,
         failure_reason: status !== 'success' ? errorDescription : '',
+        success: status === 'success',
       },
       status,
       savedToken
@@ -323,8 +328,12 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
   session.payload = paymentPayload;
 
-  if (plan && plan.duration) {
-    paymentPayload.emi_duration = plan.duration.toString();
+  // If the payment request call has been made for cardless eligiblity check
+  // We dont't need to send emi plan duration
+  if (!emiConfig.cardlessEligibilityFlow) {
+    if (plan && plan.duration) {
+      paymentPayload.emi_duration = plan.duration.toString();
+    }
   }
 
   if (paymentParams.feesRedirect) {
@@ -466,8 +475,7 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
     //TrackCardless Emi Eligibility Check
     trackCardlessEligibility({
-      emi_type:
-        get(selectedTab) === 'debit_cardless' ? 'cardless' : get(selectedTab),
+      emi_type: isCardlessTab() ? 'cardless_emi' : 'emi',
       provider_name: provider,
       tab_name: get(selectedTab),
       mobile_number: contact,

@@ -16,7 +16,7 @@ import type {
   EmiTabMeta,
   EmiPlansMeta,
   payFullAmountMeta,
-  paymentMeta,
+  PaymentMeta,
   addCardMeta,
   CVVMeta,
   DebitEligibilityChecked,
@@ -35,6 +35,13 @@ import { clone } from 'utils/object';
 
 import { EVENTS } from './constants';
 import { capture, SEVERITY_LEVELS } from 'error-service';
+import { isCardlessTab } from 'emiV2/helper/tabs';
+
+const emptyToken: SavedCardMeta = {
+  card_issuer: 'NA',
+  card_network: 'NA',
+  card_type: 'NA',
+};
 
 export const emiMethodClicked = (labelShown: boolean) => {
   Analytics.track(EVENTS.L0_EMI_CLICK, {
@@ -113,7 +120,7 @@ export const trackEmiPlansRendered = (
     if (savedCard) {
       plans.saved_card = getSavedCardMeta(savedCard);
     } else {
-      plans.saved_card = 'NA';
+      plans.saved_card = emptyToken;
     }
     Analytics.track(EVENTS.EMI_PLANS_RENDERED, {
       type: AnalyticsTypes.RENDER,
@@ -130,7 +137,7 @@ export const trackEmiPlansSelected = (plan: EmiPlansMeta, trigger?: string) => {
   if (savedCard) {
     plan.saved_card = getSavedCardMeta(savedCard);
   } else {
-    plan.saved_card = 'NA';
+    plan.saved_card = emptyToken;
   }
   Analytics.track(
     trigger === 'nc_emi'
@@ -160,7 +167,7 @@ export const trackPayFullAmount = (
   );
 };
 
-export const trackCardlessEligibility = (data: paymentMeta) => {
+export const trackCardlessEligibility = (data: PaymentMeta) => {
   Analytics.track(EVENTS.CARDLESS_EMI_ELIGIBILITY_CHECK, {
     type: AnalyticsTypes.BEHAV,
     data,
@@ -215,7 +222,7 @@ export const trackAddCardDetailsError = (
 };
 
 export const trackPaymentAttempt = (
-  data: paymentMeta,
+  data: PaymentMeta,
   eventType: string,
   savedCard?: Tokens | null
 ) => {
@@ -226,6 +233,8 @@ export const trackPaymentAttempt = (
 
   if (savedCard) {
     data.saved_card = getSavedCardMeta(savedCard);
+  } else {
+    data.saved_card = emptyToken;
   }
 
   Analytics.track(analyticEvent, {
@@ -267,13 +276,14 @@ export const trackDebitCardEligibilityChecked = (isEligible: boolean) => {
       mobile_number: contact || 'NA',
       is_default_mobile_number: contact ? isDefaultContact : true,
       check_eligibility_info_clicked: get(eligibilityInfoClicked),
+      emi_type: 'emi',
     };
     if (savedCards) {
       payload.saved_card = getSavedCardMeta(savedCards);
       payload.card_type = 'NA';
     } else {
       payload.card_type = get(currentCardType) || 'NA';
-      payload.saved_card = 'NA';
+      payload.saved_card = emptyToken;
     }
 
     Analytics.track(EVENTS.DC_ELIGIBILITY_CHECK, {
@@ -296,7 +306,7 @@ export const trackOtpEntered = (otp_timer: boolean, otp_type: OtpType) => {
       tab_name: currentTab,
       emi_plan: 'NA',
       emi_via_cards_screen: get(emiViaCards),
-      emi_type: currentTab === 'debit_cardless' ? 'cardless' : currentTab,
+      emi_type: isCardlessTab() ? 'cardless_emi' : 'emi',
       otp_screen_time_out: otp_timer,
       otp_type,
     };
@@ -314,7 +324,7 @@ export const trackOtpEntered = (otp_timer: boolean, otp_type: OtpType) => {
       payload.card_type = 'NA';
     } else {
       payload.card_type = get(currentCardType) || 'NA';
-      payload.saved_card = 'NA';
+      payload.saved_card = emptyToken;
     }
 
     Analytics.track(EVENTS.OTP_ENTERED, {
