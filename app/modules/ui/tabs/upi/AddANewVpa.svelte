@@ -29,11 +29,12 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
-  import { phone, selectedBlock } from 'checkoutstore/screens/home';
+  import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA, suggestionVPAForRecurring } from 'common/upi';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { isVpaValid } from 'upi/helper';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
   export let selected = false;
@@ -98,10 +99,7 @@
       instrumentSelectTracked = true;
       try {
         MiscTracker.INSTRUMENT_SELECTED({
-          block: {
-            category: $selectedBlock.category,
-            name: $selectedBlock.name,
-          },
+          block: AnalyticsV2State.selectedBlock,
           method: { name: 'upi' },
           instrument: {
             name: 'upi',

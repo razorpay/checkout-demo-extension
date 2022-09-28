@@ -10,7 +10,7 @@
   import { isRedesignV15 } from 'razorpay';
 
   // Store imports
-  import { methodInstrument, selectedBlock } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -20,6 +20,7 @@
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { testid } from 'tests/autogen';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
@@ -60,10 +61,7 @@
     if (getSession().screen === 'paylater') {
       try {
         MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
-          block: {
-            category: $selectedBlock.category,
-            name: $selectedBlock.name,
-          },
+          block: AnalyticsV2State.selectedBlock,
           method: {
             name: 'paylater',
           },

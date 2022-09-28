@@ -54,13 +54,7 @@ import {
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
-import { ContextProperties, EventsV2 } from 'analytics-v2';
-import {
-  checkoutInvokedTime,
-  selecetedInstrumentForPayment,
-  selectedBlock,
-} from 'checkoutstore/screens/home';
-import { get } from 'svelte/store';
+import { ContextProperties, EventsV2, AnalyticsV2State } from 'analytics-v2';
 import { PaymentTracker } from 'payment/analytics/events';
 
 const RAZORPAY_COLOR = '#528FF0';
@@ -183,7 +177,7 @@ function trackNewPayment(data, params, r) {
 
   EventsV2.setContext(
     ContextProperties.RENDER_TO_SUBMIT,
-    Date.now() - get(checkoutInvokedTime)
+    Date.now() - AnalyticsV2State.checkoutInvokedTime
   );
 
   Analytics.track('submit', {
@@ -198,10 +192,10 @@ function trackNewPayment(data, params, r) {
   });
   try {
     const instrumentData = getInstrumentDataAfterSubmitClick(data);
-    selecetedInstrumentForPayment.set(instrumentData);
+    AnalyticsV2State.selectedInstrumentForPayment = instrumentData;
 
     PaymentTracker.SUBMIT({
-      block: { category: get(selectedBlock)?.title },
+      block: AnalyticsV2State.selectedBlock,
       ...instrumentData,
     });
   } catch {}
@@ -570,9 +564,9 @@ Payment.prototype = {
         data: ObjectUtils.clone(data),
       });
       try {
-        PaymentTracker.PAYMENT_SUCCESSFUL({
-          ...get(selecetedInstrumentForPayment),
-        });
+        PaymentTracker.PAYMENT_SUCCESSFUL(
+          AnalyticsV2State.selectedInstrumentForPayment
+        );
       } catch {}
       updateLatestPaymentStatus('success', data);
       this.emit('success', data);
@@ -607,9 +601,9 @@ Payment.prototype = {
         Analytics.track('ajax_error', data);
       }
       try {
-        PaymentTracker.PAYMENT_FAILED({
-          ...get(selecetedInstrumentForPayment),
-        });
+        PaymentTracker.PAYMENT_FAILED(
+          AnalyticsV2State.selectedInstrumentForPayment
+        );
       } catch {}
 
       updateLatestPaymentStatus('error', data);
@@ -761,9 +755,9 @@ Payment.prototype = {
     // else make ajax request
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
     try {
-      PaymentTracker.PAYMENT_INITIATED_SYSTEM({
-        ...get(selecetedInstrumentForPayment),
-      });
+      PaymentTracker.PAYMENT_INITIATED_SYSTEM(
+        AnalyticsV2State.selectedInstrumentForPayment
+      );
     } catch {}
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),

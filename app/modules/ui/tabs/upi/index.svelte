@@ -57,7 +57,7 @@
 
   // Store
   import { customer } from 'checkoutstore/customer';
-  import { methodInstrument, selectedBlock } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
   import {
     resetSelectedUPIAppForPay,
     selectedUPIAppForPay,
@@ -104,6 +104,7 @@
 
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
   export let selectedApp = undefined;
@@ -393,23 +394,6 @@
     }
   }
 
-  $: {
-    try {
-      if (getSession().screen === 'upi') {
-        MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
-          block: {
-            category: $selectedBlock.category,
-            name: $selectedBlock.name,
-          },
-          method: {
-            name: 'upi',
-          },
-          instruments: getInstrumentsWithOrder(tokens, 'upi'),
-        });
-      }
-    } catch {}
-  }
-
   function determineCtaVisibility() {
     let isRedesign = isRedesignV15();
     if (requiresBankSelection) {
@@ -514,7 +498,7 @@
     });
     try {
       MiscTracker.METHOD_SELECTED({
-        block: { category: $selectedBlock.category, name: $selectedBlock.name },
+        block: AnalyticsV2State.selectedBlock,
         method: { name: 'qr' },
       });
     } catch {}
@@ -535,6 +519,15 @@
         qr: shouldShowQr,
       }),
     });
+    try {
+      MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
+        block: AnalyticsV2State.selectedBlock,
+        method: {
+          name: 'upi',
+        },
+        instruments: getInstrumentsWithOrder(tokens, 'upi'),
+      });
+    } catch {}
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
@@ -717,17 +710,14 @@
     try {
       if (event.detail.id !== 'new') {
         MiscTracker.INSTRUMENT_SELECTED({
-          block: {
-            category: $selectedBlock.category,
-            name: $selectedBlock.name,
-          },
+          block: AnalyticsV2State.selectedBlock,
           method: {
             name: 'upi',
           },
           instrument: {
             name: getUPIAppDataFromHandle(event.detail?.vpa?.handle)?.app_name,
             saved: true,
-            personalisation: $selectedBlock.category === 'p13n',
+            personalisation: AnalyticsV2State.selectedBlock.category === 'p13n',
           },
         });
       }

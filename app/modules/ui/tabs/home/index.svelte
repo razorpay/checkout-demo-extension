@@ -50,7 +50,6 @@
     blocks,
     countryISOCode,
     isIndianCustomer,
-    selectedBlock,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -211,6 +210,7 @@
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -1220,10 +1220,11 @@
         $locale
       );
     }
-    selectedBlock.set({
+
+    AnalyticsV2State.selectedBlock = {
       category: instrument.section,
       name: instrument.block?.title || '',
-    });
+    };
 
     try {
       MiscTracker.METHOD_SELECTED({

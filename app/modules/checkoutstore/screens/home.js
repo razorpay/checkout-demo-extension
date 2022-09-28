@@ -126,7 +126,7 @@ export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
-export const selectedBlock = writable({});
+
 export const instruments = derived(blocks, (allBlocks) => {
   const allInstruments = allBlocks.flatMap((block) => block.instruments);
 
@@ -143,8 +143,6 @@ export const selectedInstrument = derived(
   ([$instruments = [], $selectedInstrumentId = null]) =>
     $instruments.find((instrument) => instrument.id === $selectedInstrumentId)
 );
-
-export const selecetedInstrumentForPayment = writable({});
 
 export const personalisationVersionId = writable('');
 /**
@@ -198,5 +196,3 @@ export function resetContactToPrevious() {
   phone.set(prevContactPhone);
   email.set(prevContactEmail);
 }
-
-export const checkoutInvokedTime = writable(null);

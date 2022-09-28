@@ -1,5 +1,6 @@
 import { BEHAV, API } from 'analytics-types';
 import { createTrackMethodForModule } from 'analytics-v2';
+import type { Instrument, Method } from 'analytics-v2/types';
 
 export const PaymentEvents = {
   SUBMIT: { name: 'submit', type: BEHAV },
@@ -8,39 +9,25 @@ export const PaymentEvents = {
   PAYMENT_FAILED: { name: 'payment_failed', type: API },
 };
 
-interface METHOD {
-  name: string;
-}
-
-interface Instrument {
-  name?: string;
-  saved: boolean;
-  personalisation: boolean;
-  network?: string;
-  vpa?: string;
-  issuer?: string;
-  type?: string;
-}
-
 interface PaymentEventMap {
   SUBMIT: {
     block: {
       name: string;
       category: string;
     };
-    method: METHOD;
+    method: Method;
     instrument: Instrument;
   };
   PAYMENT_INITIATED_SYSTEM: {
-    method: METHOD;
+    method: Method;
     instrument: Instrument;
   };
   PAYMENT_SUCCESSFUL: {
-    method: METHOD;
+    method: Method;
     instrument: Instrument;
   };
   PAYMENT_FAILED: {
-    method: METHOD;
+    method: Method;
     instrument: Instrument;
   };
 }

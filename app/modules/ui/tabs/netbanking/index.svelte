@@ -12,7 +12,6 @@
   } from 'checkoutstore/screens/netbanking';
   import {
     methodInstrument,
-    selectedBlock,
     selectedInstrument,
   } from 'checkoutstore/screens/home';
 
@@ -82,6 +81,7 @@
   import CTA from 'cta';
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -304,10 +304,7 @@
       });
       try {
         MiscTracker.INSTRUMENT_SELECTED({
-          block: {
-            category: $selectedBlock?.category,
-            name: $selectedBlock.name,
-          },
+          block: AnalyticsV2State.selectedBlock,
           method: { name: 'netbanking' },
           instrument: {
             name: bankCode,
@@ -332,10 +329,7 @@
   onMount(() => {
     try {
       MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
-        block: {
-          category: $selectedBlock.category,
-          name: $selectedBlock.name,
-        },
+        block: AnalyticsV2State.selectedBlock,
         method: {
           name: 'netbanking',
         },

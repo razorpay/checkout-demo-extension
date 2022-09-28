@@ -35,8 +35,8 @@
   import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { IntentFlowsHeader } from 'upi/ui/components/IntentFlowHeader';
-  import { selectedBlock } from 'checkoutstore/screens/home';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
   export let apps = [];
@@ -101,7 +101,7 @@
     });
     try {
       MiscTracker.INSTRUMENT_SELECTED({
-        block: { category: $selectedBlock.category, name: $selectedBlock.name },
+        block: AnalyticsV2State.selectedBlock,
         method: { name: 'upi' },
         instrument: {
           name: app_name,

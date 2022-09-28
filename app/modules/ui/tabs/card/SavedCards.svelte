@@ -22,10 +22,9 @@
 
   import { isCardTokenized } from './utils';
   import { writable, Writable } from 'svelte/store';
-  import { selectedBlock } from 'checkoutstore/screens/home';
-  import { getSession } from 'sessionmanager';
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
   // Props
   export let cards = [];
   export let tab;
@@ -68,10 +67,7 @@
     });
     try {
       MiscTracker.INSTRUMENT_SELECTED({
-        block: {
-          category: $selectedBlock.category,
-          name: $selectedBlock.name,
-        },
+        block: AnalyticsV2State.selectedBlock,
         method: {
           name: 'card',
         },
@@ -106,14 +102,11 @@
 
   $: {
     try {
-      if (getSession().screen === 'card') {
+      if (tab === 'card' || tab === 'emi') {
         MiscTracker.INSTRUMENTATION_SELECTION_SCREEN({
-          block: {
-            category: $selectedBlock.category,
-            name: $selectedBlock.name,
-          },
+          block: AnalyticsV2State.selectedBlock,
           method: {
-            name: 'card',
+            name: tab,
           },
           instruments: getInstrumentsWithOrder(cards, 'cards'),
         });

@@ -79,9 +79,8 @@ import {
 import { getSelectedBankCode } from 'emiV2/helper/plans';
 import { selectedTab } from 'components/Tabs/tabStore';
 import { isCardlessTab } from 'emiV2/helper/tabs';
-import { EventsV2, ContextProperties } from 'analytics-v2';
+import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
-import { checkoutInvokedTime } from 'checkoutstore/screens/home';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 
 let emo = {};
@@ -1208,7 +1207,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.render', discreet.timer());
     EventsV2.setContext(
       ContextProperties.INIT_TO_RENDER,
-      Date.now() - storeGetter(checkoutInvokedTime)
+      Date.now() - AnalyticsV2State.checkoutInvokedTime
     );
   },
   setHomeTab: function () {
@@ -1373,10 +1372,7 @@ Session.prototype = {
 
     try {
       MiscTracker.INSTRUMENT_SELECTED({
-        block: {
-          category: storeGetter(HomeScreenStore.selectedBlock)?.category,
-          name: storeGetter(HomeScreenStore.selectedBlock)?.name,
-        },
+        block: AnalyticsV2State.selectedBlock,
         method: {
           name: storeGetter(HomeScreenStore.selectedInstrument)?.method,
         },

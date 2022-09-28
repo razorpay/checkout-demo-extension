@@ -38,6 +38,7 @@
   import { SELECT_WALLET } from 'wallet/i18n/label';
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   const session = getSession();
   const wallets = getWallets();
@@ -147,10 +148,7 @@
     });
     try {
       MiscTracker.INSTRUMENT_SELECTED({
-        block: {
-          category: $selectedBlock?.category,
-          name: $selectedBlock.name,
-        },
+        block: AnalyticsV2State.selectedBlock,
         method: { name: 'wallet' },
         instrument: {
           name: $selectedWallet,
@@ -180,10 +178,7 @@
         method: {
           name: 'wallet',
         },
-        block: {
-          category: $selectedBlock.category,
-          name: $selectedBlock.name,
-        },
+        block: AnalyticsV2State.selectedBlock,
         instruments: getInstrumentsWithOrder(filteredWallets, 'wallet'),
       });
     } catch {}

@@ -55,8 +55,7 @@ import {
   setCustomerConsentStatus,
   setCustomerConsentCheckboxStatus,
 } from 'one_click_checkout/customer/controller';
-import { EventsV2, ContextProperties } from 'analytics-v2';
-import { checkoutInvokedTime } from 'checkoutstore/screens/home';
+import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
 
 let CheckoutBridge = window.CheckoutBridge;
@@ -130,7 +129,7 @@ const setAnalyticsMeta = (message) => {
       MetaProperties.TIME_SINCE_OPEN,
       () => _.now() - message.metadata.openedAt
     );
-    checkoutInvokedTime.set(message.metadata.openedAt);
+    AnalyticsV2State.checkoutInvokedTime = message.metadata.openedAt;
   }
 
   /**

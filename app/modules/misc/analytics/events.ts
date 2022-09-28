@@ -1,5 +1,6 @@
 import { BEHAV, INTEGRATION, RENDER } from 'analytics-types';
 import { createTrackMethodForModule } from 'analytics-v2';
+import type { Block } from 'analytics-v2/types';
 import type { LOGIN_SOURCE_TYPES } from './constants';
 
 export const MiscEvents = {
@@ -90,10 +91,7 @@ interface MiscEventMap {
     method: {
       name: string;
     };
-    block: {
-      name: string;
-      category: string;
-    };
+    block: Block;
     instruments: {
       [key: number]: {
         order: number;
@@ -102,19 +100,13 @@ interface MiscEventMap {
     };
   };
   METHOD_SELECTED: {
-    block: {
-      name: string;
-      category: string;
-    };
+    block: Block;
     method: {
       name: string;
     };
   };
   INSTRUMENT_SELECTED: {
-    block: {
-      name: string;
-      category: string;
-    };
+    block: Block;
     method: {
       name: string;
     };
