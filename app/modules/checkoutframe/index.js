@@ -55,7 +55,12 @@ import {
   setCustomerConsentStatus,
   setCustomerConsentCheckboxStatus,
 } from 'one_click_checkout/customer/controller';
-import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
+import {
+  EventsV2,
+  ContextProperties,
+  AnalyticsV2State,
+  INTEGRATION_PLATFORM,
+} from 'analytics-v2';
 import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
 
 let CheckoutBridge = window.CheckoutBridge;
@@ -162,12 +167,37 @@ const setAnalyticsMeta = (message) => {
   /**
    * Set SDK details.
    */
+
+  const sdk = message.sdk;
+  if (sdk) {
+    if (sdk.framework) {
+      EventsV2.setContext(ContextProperties.SDK_FRAMEWORK, sdk.framework);
+    }
+    if (sdk.name) {
+      EventsV2.setContext(ContextProperties.SDK_NAME, sdk.name);
+      EventsV2.setContext(ContextProperties.INTEGRATION_NAME, sdk.name);
+    }
+    if (sdk.version) {
+      EventsV2.setContext(ContextProperties.SDK_VERSION, sdk.version);
+      EventsV2.setContext(ContextProperties.INTEGRATION_VERSION, sdk.version);
+    }
+    if (sdk.platform) {
+      EventsV2.setContext(ContextProperties.SDK_PLATFORM, sdk.platform);
+    }
+    if (sdk.type) {
+      EventsV2.setContext(ContextProperties.SDK_TYPE, sdk.type);
+    }
+
+    EventsV2.setContext(
+      ContextProperties.INTEGRATION_PLATFORM,
+      INTEGRATION_PLATFORM.SDK
+    );
+  }
+
   if (qpmap.platform && ['android', 'ios'].includes(qpmap.platform)) {
-    EventsV2.setContext(ContextProperties.SDK_PLATFORM, qpmap.platform);
     Events.setMeta(MetaProperties.SDK_PLATFORM, qpmap.platform);
 
     if (qpmap.version) {
-      EventsV2.setContext(ContextProperties.SDK_VERSION, qpmap.version);
       Events.setMeta(MetaProperties.SDK_VERSION, qpmap.version);
     }
   }

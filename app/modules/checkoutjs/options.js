@@ -128,6 +128,7 @@ RazorpayDefaults._ = {
   integration: null, // Used for passing the integration mode. eg.: flutter, woocommerce
   integration_version: null, // Used for passing the integration version. eg.: 1.0.2
   integration_parent_version: null, // Used for passing the version of the platform eg.: Magento version for Magento integration
+  integration_type: null, // used for passing the type of integration eg plugin, sdk, rzp_app
 };
 
 RazorpayDefaults.config = {

@@ -10,9 +10,12 @@ export const ContextProperties = {
   EXPERIMENTS: 'checkout.experiments',
   FEATURES: 'checkout.features',
   CHECKOUT_ID: 'checkout.id',
-  INTEGRATION_NAME: 'checkout.integration.name', // TODO
-  INTEGRATION_TYPE: 'checkout.integration.type', // TODO
-  INTEGRATION_VERSION: 'checkout.integration.version', // TODO
+  REFERRER_TYPE: 'checkout.referrerType',
+  INTEGRATION_NAME: 'checkout.integration.name',
+  INTEGRATION_TYPE: 'checkout.integration.type',
+  INTEGRATION_VERSION: 'checkout.integration.version',
+  INTEGRATION_PARENT_VERSION: 'checkout.integration.parentVersion',
+  INTEGRATION_PLATFORM: 'checkout.integration.platform',
   LIBRARY: 'checkout.library',
   MERCHANT_KEY: 'checkout.merchant.key',
   MERCHANT_NAME: 'checkout.merchant.name',
@@ -22,10 +25,10 @@ export const ContextProperties = {
   OPTIONAL_CONTACT: 'checkout.optional.contact',
   OPTIONAL_EMAIL: 'checkout.optional.email',
   SDK: 'checkout.sdk',
-  SDK_FRAMEWORK: 'checkout.sdk.framework', // TODO
-  SDK_NAME: 'checkout.sdk.name', // TODO
+  SDK_FRAMEWORK: 'checkout.sdk.framework',
+  SDK_NAME: 'checkout.sdk.name',
   SDK_PLATFORM: 'checkout.sdk.platform',
-  SDK_TYPE: 'checkout.sdk.type', // TODO
+  SDK_TYPE: 'checkout.sdk.type',
   SDK_VERSION: 'checkout.sdk.version',
   INIT_TO_RENDER: 'checkout.timeSince.initToRender',
   RENDER_TO_SUBMIT: 'checkout.timeSince.renderToSubmit',
@@ -49,3 +52,27 @@ export const RUDDERSTACK_URL = isProdEnv
 export const RUDDERSTACK_KEY = isProdEnv
   ? '27TM2uVMCl4nm4d7gqR4tysvdU1'
   : '27TM2uVMCl4nm4d7gqR4tysvdU1';
+
+/**
+ * type of referrer which launched checkout
+ */
+export enum REFERRER_TYPE {
+  /**
+   * for plugin, sdk, web integration
+   */
+  INTEGRATION = 'integration',
+  /**
+   * for payment_pages, payment_links, etc
+   */
+  RZP_APP = 'rzp_app',
+  /**
+   * for external integration like HDFC VAS
+   */
+  EXTERNAL = 'external',
+}
+
+export enum INTEGRATION_PLATFORM {
+  WEB = 'web',
+  PLUGIN = 'plugin',
+  SDK = 'sdk',
+}

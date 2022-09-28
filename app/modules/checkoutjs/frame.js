@@ -19,9 +19,7 @@ import { submitForm } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
-import { sendToAll } from 'checkoutjs/analytics';
-import { EventsV2, ContextProperties } from 'analytics-v2';
-import { getOrderId } from 'razorpay';
+import { sendToAll, setInitialContext } from 'checkoutjs/analytics';
 
 const { screen, scrollTo } = global;
 
@@ -154,28 +152,6 @@ function setTestRibbonInvisible() {
   }
 }
 
-/**
- * sets initial context for events
- * @param {obj} rzp razorpay instance
- */
-function setInitialContext(rzp) {
-  const prefilledContact = rzp.get('prefill.contact');
-  const prefilledEmail = rzp.get('prefill.email');
-  const amount = rzp.get('amount');
-  if (amount) {
-    EventsV2.setContext(ContextProperties.AMOUNT, rzp.get('amount'));
-  }
-  if (prefilledContact) {
-    EventsV2.setContext(ContextProperties.TRAITS_CONTACT, prefilledContact);
-  }
-  if (prefilledEmail) {
-    EventsV2.setContext(ContextProperties.TRAITS_EMAIL, prefilledEmail);
-  }
-  if (getOrderId()) {
-    EventsV2.setContext(ContextProperties.ORDER_ID, getOrderId());
-  }
-}
-
 let loader;
 
 export default function CheckoutFrame(rzp) {
@@ -235,7 +211,7 @@ CheckoutFrame.prototype = {
       this.rzp = rzp;
     }
 
-    setInitialContext(this.rzp);
+    setInitialContext();
 
     if (parent) {
       el |> _El.setStyle('minHeight', '530px');
