@@ -275,6 +275,10 @@
     flex-basis: 440px;
   }
 
+  .mobile .one-cc-screen {
+    min-height: auto;
+  }
+
   .redesign {
     #error-message {
       padding-top: 0;

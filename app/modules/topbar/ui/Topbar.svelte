@@ -76,7 +76,9 @@
 
   .back {
     cursor: pointer;
-    margin-right: 10px;
+    width: 38px;
+    height: 45px;
+    line-height: 45px;
   }
   .title-section {
     display: flex;

@@ -16,6 +16,7 @@
   import { isEmiV2 } from 'razorpay';
   import { trackOtpEntered } from 'emiV2/events/tracker';
   import { getSession } from 'sessionmanager';
+  import { showAccountTab } from 'checkoutstore';
   import { CardsTracker } from 'card/analytics/events';
 
   export let hidden;
@@ -183,13 +184,19 @@
       class="otp-input theme-border"
       class:otp-input-small={$digits.length > 6}
       bind:value={$digits[i]}
-      on:focus={() => trackInput(i)}
+      on:focus={() => {
+        $showAccountTab = false;
+        trackInput(i);
+      }}
       on:input={(e) => onOtpDigitInput(e, i)}
       on:keydown={(e) => onOtpDigitKeyDown(e, i)}
       autocomplete={autoCompleteMethod}
       on:paste={otpPaste}
       class:otp-error={isError}
       on:blur={onBlur}
+      on:blur={() => {
+        $showAccountTab = true;
+      }}
     />
   {/each}
 </div>

@@ -10,7 +10,7 @@
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import { showSavedCardTooltip } from 'checkoutstore/screens/card';
   import { isRecurring, isSubscription } from 'razorpay';
-  import { isDesktop } from 'common/useragent';
+  import { iPhone } from 'common/useragent';
 
   //i18n
   import {
@@ -37,7 +37,7 @@
       e.stopPropagation();
     }
 
-    if (!isDesktop()) {
+    if (iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
     }
 

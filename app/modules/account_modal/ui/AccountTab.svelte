@@ -17,6 +17,7 @@
   // analytics imports
   import { Events } from 'analytics';
   import AccountEvents from 'account_modal/analytics';
+  import { showAccountTab } from 'checkoutstore';
 
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
@@ -41,7 +42,7 @@
 </script>
 
 {#if isRedesignV15()}
-  <div class="account-tab">
+  <div class="account-tab" class:hide-account-tab={!$showAccountTab}>
     <div class="separator" />
     <div class="account-tab-container">
       <div class="account-wrapper" class:no-foh={!showMerchantPolicyBtn}>
@@ -94,6 +95,9 @@
 {/if}
 
 <style>
+  :global(.mobile) .account-tab.hide-account-tab {
+    display: none;
+  }
   .account-tab-container {
     margin-top: auto;
     width: 100%;

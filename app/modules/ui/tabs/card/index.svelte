@@ -1390,7 +1390,7 @@
 
   :global(.redesign) #show-saved-cards {
     padding-top: 20px;
-    text-transform: capitalize;
+    text-transform: initial;
     font-size: 13px;
   }
 
@@ -1456,7 +1456,7 @@
 
   :global(.redesign) {
     #show-add-card {
-      text-transform: capitalize;
+      text-transform: initial;
       font-size: 13px;
       font-weight: 500;
 

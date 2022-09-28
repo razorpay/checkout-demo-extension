@@ -21,6 +21,10 @@ export const makeAuthUrl = (url) => _makeAuthUrl(RazorpayStore.get(), url);
 /** required for CTA */
 export const screenStore = writable('');
 export const tabStore = writable('');
+/**
+ * We are hiding account when input is focus in mobile device
+ */
+export const showAccountTab = writable(true);
 
 function updateActiveScreen(screenStore, tabStore) {
   if (!screenStore) {

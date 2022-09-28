@@ -23,6 +23,7 @@ response = [[
   src: url("https://cdn.razorpay.com/lato.woff2") format('woff2'), url("https://cdn.razorpay.com/lato.woff") format('woff');
 }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" type="text/css" />
 <script>
   function _retry() {
     var script = document.createElement('script');

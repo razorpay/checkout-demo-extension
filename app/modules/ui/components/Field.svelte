@@ -12,7 +12,7 @@
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
   const { solid_down_arrow } = getIcons();
-  
+
   import * as ObjectUtils from 'utils/object';
   import * as _El from 'utils/DOM';
   // Actions
@@ -21,6 +21,7 @@
     blur as blurAction,
     input as inputAction,
   } from 'actions/input';
+  import { showAccountTab } from 'checkoutstore';
 
   // Props
   export let id = '';
@@ -218,12 +219,14 @@
   function handleInputFocus(event) {
     focused = true;
     getPrediction();
+    $showAccountTab = false;
   }
 
   function handleInputBlur(event) {
     focused = false;
     // showValidations if required field only
     showValidations = required;
+    $showAccountTab = true;
     setTimeout(() => {
       // prevent dropdown selection destroy before click
       dropDownSuggestion = [];

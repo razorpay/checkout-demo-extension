@@ -1069,6 +1069,9 @@ Session.prototype = {
   },
 
   render: function () {
+    if (RazorpayHelper.isRedesignV15()) {
+      discreet.fonts.loadInterFont();
+    }
     if (NativeStore.getUPIIntentApps().filtered.length) {
       /**
        * We need to show "(Recommended)" string alongside the app name
@@ -1134,9 +1137,6 @@ Session.prototype = {
     this.setSvelteComponents();
     if (!RazorpayHelper.isPayout()) {
       this.fillData();
-    }
-    if (RazorpayHelper.isRedesignV15()) {
-      discreet.fonts.loadInterFont();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
       if (!RazorpayHelper.shouldOverrideBrandColor()) {
@@ -2013,7 +2013,7 @@ Session.prototype = {
 
     let session = this;
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isRedesignV15()
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
         ? 'skip_saving_card_one_cc'
         : 'skip_saving_card',
     });
@@ -3373,7 +3373,7 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isRedesignV15()
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
         ? 'skip_saved_cards_one_cc'
         : 'skip_saved_cards',
     });
@@ -3403,7 +3403,7 @@ Session.prototype = {
 
     this.topBar.setTitleOverride('otp', 'text', 'card');
     this.otpView.updateScreen({
-      skipTextLabel: RazorpayHelper.isRedesignV15()
+      skipTextLabel: RazorpayHelper.isOneClickCheckout()
         ? 'skip_saved_cards_one_cc'
         : 'skip_saved_cards',
       showCtaOneCC: true,

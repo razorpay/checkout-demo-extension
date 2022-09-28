@@ -73,7 +73,7 @@
   import { Safari } from 'common/useragent';
   import { VERIFY_LABEL } from 'cta/i18n';
   import CTA, { hideCta } from 'cta';
-  import { tabStore } from 'checkoutstore';
+  import { showAccountTab, tabStore } from 'checkoutstore';
   import { isDebitIssuer } from 'common/bank';
   import {
     trackDebitCardEligibilityChecked,
@@ -169,6 +169,7 @@
   }
 
   export function trackInput() {
+    $showAccountTab = true;
     if (!$otp) {
       $showFeeLabel = false;
     }
@@ -365,6 +366,9 @@
             <input
               bind:this={input}
               on:blur={trackInput}
+              on:focus={() => {
+                $showAccountTab = false;
+              }}
               type="tel"
               class="input"
               name="otp"
@@ -555,7 +559,7 @@
   }
 
   #form-otp :global(.one-cc-btn) {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .tab-content-one-cc {
@@ -608,6 +612,10 @@
   }
 
   :global(.redesign) {
+    .title-logo {
+      height: 28px;
+    }
+
     :global(.otp-screen-contents .card-box:first-child .emboss) {
       background-color: #fff;
       border: 0;

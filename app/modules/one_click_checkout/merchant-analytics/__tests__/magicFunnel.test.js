@@ -42,6 +42,7 @@ describe('emitMagicFunnel event tests', () => {
 
     const eventName = 'test';
     const eventData = { user: 'xyz' };
+    Date.now = jest.fn(() => 1664363839565);
 
     const arg = {
       event: 'event',
@@ -50,7 +51,6 @@ describe('emitMagicFunnel event tests', () => {
         data: { ...eventData, order_id: ORDER_ID, timestamp: Date.now() },
       },
     };
-
     emitMagicFunnelEvent(eventName, eventData);
     expect(Razorpay.sendMessage).toHaveBeenCalledWith(arg);
   });

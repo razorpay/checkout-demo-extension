@@ -916,7 +916,7 @@
           {/if}
 
           {#if shouldShowQr && $qrRenderState.upiScreenQRPosition === 'top' && $qrRenderState.upiScreenQR}
-            <QRWrapper parent="upiScreen" />
+            <QRWrapper parent="upiScreen" position="top" />
           {/if}
 
           {#if shouldShowCollect}

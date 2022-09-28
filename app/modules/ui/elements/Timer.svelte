@@ -85,7 +85,8 @@
       justify-content: space-between;
       padding: 7px 16px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 600;
+      background: linear-gradient(89.97deg, #fff5d8 -1.19%, #fffaed 99.97%);
 
       i svg {
         margin-right: 4px;
