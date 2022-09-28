@@ -3,6 +3,8 @@ import * as ContactStorage from 'checkoutframe/contact-storage';
 import {
   getOption,
   getPreferences,
+  isPrefilledAndReadOnlyContact,
+  isPrefilledAndReadOnlyEmail,
   shouldStoreCustomerInStorage,
 } from 'razorpay';
 import { capture, SEVERITY_LEVELS } from 'error-service';
@@ -29,15 +31,19 @@ export const getPrefilledContact = () => {
   try {
     let prefilledContact = getOption('prefill.contact');
     const savedCustomer = getPreferences('customer');
-    if (savedCustomer && savedCustomer.contact) {
-      /* saved card details take priority over prefill */
-      prefilledContact = savedCustomer.contact;
-    } else if (shouldStoreCustomerInStorage()) {
-      // from localstorage
-      const storedUserDetails = ContactStorage.get();
-      // Pick details from storage if not given in prefill
-      if (!prefilledContact && storedUserDetails.contact) {
-        prefilledContact = storedUserDetails.contact;
+    // override contact only if its not prefill and not read only
+    const shouldOverridePrefill = !isPrefilledAndReadOnlyContact();
+    if (shouldOverridePrefill) {
+      if (savedCustomer && savedCustomer.contact) {
+        /* saved card details take priority over prefill if not readonly */
+        prefilledContact = savedCustomer.contact;
+      } else if (shouldStoreCustomerInStorage()) {
+        // from localstorage
+        const storedUserDetails = ContactStorage.get();
+        // Pick details from storage if not given in prefill
+        if (!prefilledContact && storedUserDetails.contact) {
+          prefilledContact = storedUserDetails.contact;
+        }
       }
     }
     analyticData.prefilledContact = prefilledContact;
@@ -69,15 +75,19 @@ export const getPrefilledEmail = () => {
   let prefilledEmail = getOption('prefill.email');
   const savedCustomer = getPreferences('customer');
 
-  if (savedCustomer && savedCustomer.email) {
-    /* saved card details take priority over prefill */
-    prefilledEmail = savedCustomer.email;
-  } else if (shouldStoreCustomerInStorage()) {
-    // from localstorage
-    const storedUserDetails = ContactStorage.get();
-    // Pick details from storage if not given in prefill
-    if (!prefilledEmail && storedUserDetails.email) {
-      prefilledEmail = storedUserDetails.email;
+  const shouldOverridePrefill = !isPrefilledAndReadOnlyEmail();
+  // override email only if its not prefill and not read only
+  if (shouldOverridePrefill) {
+    if (savedCustomer && savedCustomer.email) {
+      /* saved card details take priority over prefill if not readonly */
+      prefilledEmail = savedCustomer.email;
+    } else if (shouldStoreCustomerInStorage()) {
+      // from localstorage
+      const storedUserDetails = ContactStorage.get();
+      // Pick details from storage if not given in prefill
+      if (!prefilledEmail && storedUserDetails.email) {
+        prefilledEmail = storedUserDetails.email;
+      }
     }
   }
   return prefilledEmail;

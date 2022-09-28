@@ -67,3 +67,11 @@ export const getPrefillBillingAddress = (nvs = false) => {
 
   return prefill;
 };
+
+export const isPrefilledAndReadOnlyEmail = () => {
+  return getOption('prefill.email') && getOption('readonly.email');
+};
+
+export const isPrefilledAndReadOnlyContact = () => {
+  return getOption('prefill.contact') && getOption('readonly.contact');
+};
