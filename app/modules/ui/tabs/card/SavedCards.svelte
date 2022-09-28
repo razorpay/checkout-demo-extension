@@ -25,6 +25,7 @@
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { CardsTracker } from 'card/analytics/events';
   // Props
   export let cards = [];
   export let tab;
@@ -66,6 +67,7 @@
       },
     });
     try {
+      CardsTracker.GEN_SAVED_CARD_SELECTED();
       MiscTracker.INSTRUMENT_SELECTED({
         block: AnalyticsV2State.selectedBlock,
         method: {

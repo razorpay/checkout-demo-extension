@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   // Store imports
   import { locale } from 'svelte-i18n';
@@ -19,9 +19,17 @@
 
   // helpers
   import { getSectionCategoryForBlock, setDynamicFees } from './helpers';
+  import { CardsTracker } from 'card/analytics/events';
 
   // Props
   export let block;
+
+  onMount(() => {
+    const cardShown = block.instruments?.some((item) => item.method === 'card');
+    if (cardShown) {
+      CardsTracker.GEN_CARD_SHOWN();
+    }
+  });
 
   const dispatch = createEventDispatcher();
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { CardsTracker } from 'card/analytics/events';
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
 
@@ -121,6 +122,10 @@
     });
   }
 
+  const trackCvvFilled = () => {
+    CardsTracker.GEN_CVV_FILLED();
+  };
+
   function handleClick(event, avoidFocus = false) {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', card.type);
@@ -185,6 +190,7 @@
             isFormValid = showCvv && cvvInput?.isValid();
           }}
           bind:this={cvvInput}
+          on:blur={trackCvvFilled}
           length={cvvDigits}
           showHelp={false}
           showPlaceholder={!isRedesignV15Enabled}

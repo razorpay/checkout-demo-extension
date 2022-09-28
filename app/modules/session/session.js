@@ -83,6 +83,7 @@ import { isCardlessTab } from 'emiV2/helper/tabs';
 import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
+import { CardsTracker } from 'card/analytics/events';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -592,6 +593,9 @@ function askOTP(
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
+        if (thisSession.tab === 'card') {
+          CardsTracker.GEN_NATIVE_OTP_SENT();
+        }
         textView = 'otp_sent_no_phone';
         if (_.isNonNullObject(origText)) {
           if (origText.metadata) {
@@ -2071,6 +2075,12 @@ Session.prototype = {
       data: resendEventData,
     });
 
+    if (this.payload?.method === 'card') {
+      CardsTracker.GEN_NATIVE_OTP_SMS_RESEND_CLICKED({
+        instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
+      });
+    }
+
     if (this.headless) {
       this.otpView.updateScreen({
         showCtaOneCC: false,
@@ -2137,6 +2147,10 @@ Session.prototype = {
         type: AnalyticsTypes.BEHAV,
         immediately: true,
       });
+
+      CardsTracker.GEN_NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED({
+        instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
+      });
       this.hideTimer();
       this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
@@ -2148,6 +2162,8 @@ Session.prototype = {
         while_submitting: !!payload,
       },
     });
+    CardsTracker.GEN_SKIP_SAVED_CARD_CLICKED();
+
     $('#save').attr('checked', 0);
     this.wants_skip = true;
     if (payload) {

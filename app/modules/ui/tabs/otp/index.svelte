@@ -80,6 +80,7 @@
     trackOtpEntered,
   } from 'emiV2/events/tracker';
   import type { OtpType } from 'emiV2/types';
+  import { CardsTracker } from 'card/analytics/events';
 
   // Props
   export let on = {};
@@ -181,6 +182,14 @@
           headless: session.headless,
         },
       });
+
+      if (!isWallet) {
+        if (session.headless) {
+          CardsTracker.GEN_NATIVE_OTP_FILLED();
+        } else {
+          CardsTracker.GEN_OTP_ENTERED();
+        }
+      }
     }
 
     trackEmiOtpEntered();
@@ -212,6 +221,13 @@
   function onResend(event) {
     Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
     invoke('resend', event);
+  }
+
+  $: {
+    const isCard = session?.tab === 'card';
+    if (showInput && isCard && !session.headless) {
+      CardsTracker.GEN_OTP_SCREEN();
+    }
   }
 </script>
 

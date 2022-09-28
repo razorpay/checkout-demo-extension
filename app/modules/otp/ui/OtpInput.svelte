@@ -16,6 +16,7 @@
   import { isEmiV2 } from 'razorpay';
   import { trackOtpEntered } from 'emiV2/events/tracker';
   import { getSession } from 'sessionmanager';
+  import { CardsTracker } from 'card/analytics/events';
 
   export let hidden;
   export let isError;
@@ -51,6 +52,14 @@
           headless: isHeadless(),
         },
       });
+
+      if (!isWalletPayment()) {
+        if (isHeadless()) {
+          CardsTracker.GEN_NATIVE_OTP_FILLED();
+        } else {
+          CardsTracker.GEN_OTP_ENTERED();
+        }
+      }
 
       // Track Razorpay otp entered for new emi flow
       if (isNewEmiFlow && session.tab === 'emi') {

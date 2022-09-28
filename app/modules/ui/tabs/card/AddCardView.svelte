@@ -109,6 +109,7 @@
     trackAddCardDetails,
     trackAddCardDetailsError,
   } from 'emiV2/events/tracker';
+  import { CardsTracker } from 'card/analytics/events';
 
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
@@ -573,6 +574,8 @@
       },
     });
 
+    CardsTracker.GEN_CARD_NUMBER_ENTERED();
+
     // Track Add Card Event for new EMI flow
     if (isNewEmiFlow && prevTab === 'emi') {
       const cardMetaData = getCardMetadata($cardNumber);
@@ -614,6 +617,7 @@
         valid: cvvField.isValid(),
       },
     });
+    CardsTracker.GEN_CVV_FILLED();
   }
 
   function trackExpiryFilled() {
@@ -623,6 +627,7 @@
         valid: expiryField.isValid(),
       },
     });
+    CardsTracker.GEN_EXPIRY_ENTERED();
   }
 
   function onNameFilled() {
@@ -632,6 +637,7 @@
         valid: nameField.isValid(),
       },
     });
+    CardsTracker.GEN_NAME_ENTERED();
   }
 </script>
 

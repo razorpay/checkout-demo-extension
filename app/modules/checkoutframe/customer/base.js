@@ -26,6 +26,7 @@ import * as _ from 'utils/_';
 import { ContextProperties, EventsV2 } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
+import { CardsTracker } from 'card/analytics/events';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -201,6 +202,8 @@ Customer.prototype = {
           !!data.saved_address
         );
 
+        CardsTracker.HAS_SAVED_CARD({ hasSavedCards });
+
         Events.TrackBehav(CardEvents.CHECK_SAVED_CARDS, {
           hasSavedCards,
         });
@@ -212,6 +215,7 @@ Customer.prototype = {
 
         if (customer.saved && !queryParams.skip_otp) {
           OtpService.markOtpSent('razorpay');
+          CardsTracker.GEN_OTP_SENT();
         }
 
         if (data.tokens) {

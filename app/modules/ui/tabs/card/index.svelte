@@ -166,6 +166,7 @@
   import { TRY_ANOTHER_EMI_OPTION } from 'ui/labels/debit-emi';
   import { isEmiContactValid } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { selectedTab } from 'components/Tabs/tabStore';
+  import { CardsTracker } from 'card/analytics/events';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -1104,12 +1105,14 @@
     if (tabVisible) {
       if (currentView === Views.ADD_CARD) {
         Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
+        CardsTracker.GEN_ADD_NEW_CARD_SCREEN();
       } else if (
         currentView === Views.SAVED_CARDS &&
         isSavedCardsEnabled &&
         savedCards.length
       ) {
         Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
+        CardsTracker.GEN_SAVED_CARD_SCREEN({ savedCards: savedCards.length });
       }
     }
   }

@@ -21,6 +21,7 @@
     SAVED_CARD_CHECKBOX_TOOLTIP,
     SAVE_CARD_SUBTITLE_SUBSCRIPTION,
   } from 'ui/labels/card';
+  import { CardsTracker } from 'card/analytics/events';
 
   // Export statements
   export let checked;
@@ -58,11 +59,17 @@
     });
   };
   function trackUserConsentForTokenization(event) {
+    CardsTracker.GEN_CARD_CONSENT_TOGGLED({
+      instrument: {
+        saveCardConsent: event?.target?.checked,
+      },
+    });
     $showSavedCardTooltip = false;
     if (modalType.includes('add')) {
       // in add-card flow we already have remember user event
       return;
     }
+
     Events.TrackBehav(CardEvents.USER_CONSENT_FOR_TOKENIZATION, {
       block: modalType.includes('p13n') ? 'p13n' : 'saved-card',
       active: event.target.checked,
@@ -78,6 +85,13 @@
     if (isRecurring()) {
       checked = false;
     }
+
+    CardsTracker.GEN_CONSENT_BOX_SHOWN({
+      instrument: {
+        saveCardConsent: checked,
+        screenName: modalType,
+      },
+    });
   });
 </script>
 
