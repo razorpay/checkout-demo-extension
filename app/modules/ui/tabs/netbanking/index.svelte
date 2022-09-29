@@ -10,10 +10,7 @@
     selectedBank,
     hiddenBanksUsingConfig,
   } from 'checkoutstore/screens/netbanking';
-  import {
-    methodInstrument,
-    selectedInstrument,
-  } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -302,17 +299,6 @@
           bank: bankCode,
         },
       });
-      try {
-        MiscTracker.INSTRUMENT_SELECTED({
-          block: AnalyticsV2State.selectedBlock,
-          method: { name: 'netbanking' },
-          instrument: {
-            name: bankCode,
-            saved: false,
-            personalisation: !!$selectedInstrument?.meta?.preferred,
-          },
-        });
-      } catch {}
 
       Events.TrackBehav(NETBANKING_EVENTS.BANK_SELECTED, {
         bank_selected: bankCode,
