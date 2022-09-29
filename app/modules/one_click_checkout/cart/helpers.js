@@ -19,6 +19,7 @@ export const formatLineItems = (lineItems) => {
       image_url,
       variant_id,
       product_url,
+      offer_price,
     } = item;
     return {
       name,
@@ -28,6 +29,7 @@ export const formatLineItems = (lineItems) => {
       image_url,
       variant_id,
       product_url,
+      offer_price,
     };
   });
 };
@@ -79,10 +81,12 @@ export const isCartTruthy = (cart) => {
     });
   });
 
-  const lineItemsTotalAmount = cart.reduce(
-    (acc, curr) => acc + curr.quantity * +curr.price,
-    0
-  );
+  const lineItemsTotalAmount = cart.reduce((acc, curr) => {
+    if ( curr.offer_price !== undefined && +curr.price !== +curr.offer_price ) {
+      return acc + curr.quantity * +curr.offer_price;
+    }
+    return acc + curr.quantity * +curr.price;
+  } , 0);
 
   return areAllItemsTruthy && lineItemsTotalAmount === get(cartAmount);
 };

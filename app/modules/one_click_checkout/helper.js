@@ -10,6 +10,7 @@ import {
   getPreferences,
   isOneClickCheckout,
   isMandatoryLoginEnabled,
+  scriptCouponApplied,
 } from 'razorpay';
 
 // Analytics imports
@@ -99,6 +100,10 @@ export function init1CCMetaData() {
   Analytics.setMeta(
     OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
     isOneClickCheckout()
+  );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.SCRIPT_EDITED_COUPON_APPLIED,
+    scriptCouponApplied()
   );
 }
 

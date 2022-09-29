@@ -9,6 +9,7 @@ export default {
   HAS_SAVED_ADDRESSES: 'has_saved_addresses',
   INITIAL_LOGGED_IN: 'initial_loggedIn',
   INITIAL_HAS_SAVED_ADDRESS: 'initial_hasSavedAddress',
+  SCRIPT_EDITED_COUPON_APPLIED: 'script_editor_coupon_applied',
 
   /** Coupon code meta **/
   AVAILABLE_COUPONS_COUNT: 'available_coupons_count',

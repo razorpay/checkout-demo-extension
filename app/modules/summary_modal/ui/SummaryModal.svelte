@@ -19,6 +19,7 @@
     COUPON_DISCOUNT_LABEL,
     FREE_LABEL,
     OFFER_LABEL,
+    SCRIPT_COUPON_DISCOUNT_LABEL,
   } from 'summary_modal/i18n/labels';
 
   // store imports
@@ -42,6 +43,7 @@
     getCurrency,
     getOption,
     isOneClickCheckout,
+    scriptCouponApplied,
   } from 'razorpay';
 
   // analytics imports
@@ -66,6 +68,8 @@
   let backdropHeight;
   let currency = getCurrency();
   const spaceAmountWithSymbol = false;
+  let priceBeforeScriptDisc = $cartAmount;
+  let scriptCouponDiscount = null;
 
   afterUpdate(() => {
     tableHeight = document.getElementById('summary-table').offsetHeight;
@@ -141,6 +145,16 @@
     }
   }
 
+  $: {
+    if(scriptCouponApplied()) {
+      priceBeforeScriptDisc = $cartItems.reduce(
+        (acc, curr) => acc + curr.quantity * +curr.price,
+        0
+      );
+      scriptCouponDiscount = priceBeforeScriptDisc - $cartAmount;
+    }
+  }
+
   function onConfirm() {
     Events.Track(events.ORDER_SUMMARY_CTA_CLICK);
     Events.TrackBehav(events.ORDER_SUMMARY_CTA_CLICK_V2);
@@ -190,19 +204,33 @@
         <div>{$t(AMOUNT_LABEL)}</div>
         <div data-test-id="cart-amount">
           {formatAmountWithSymbol(
-            isOneClickCheckout() ? $cartAmount : getPaymentAmount(),
+            isOneClickCheckout() ? priceBeforeScriptDisc : getPaymentAmount(),
             currency,
             spaceAmountWithSymbol
           )}
         </div>
       </div>
+      {#if scriptCouponDiscount}
+        <div class="summary-row">
+          <div>
+            {$t(SCRIPT_COUPON_DISCOUNT_LABEL)}
+          </div>
+          <div class="text-green">
+            - {formatAmountWithSymbol(
+              scriptCouponDiscount,
+              currency,
+              spaceAmountWithSymbol
+            )}
+          </div>
+        </div>
+      {/if}
       {#if $isCouponApplied}
         <div class="summary-row">
           <div data-test-id="applied-coupon-label">
             {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
           </div>
           <div data-test-id="discount-amount" class="text-green">
-            -{formatAmountWithSymbol(
+            - {formatAmountWithSymbol(
               $cartDiscount,
               currency,
               spaceAmountWithSymbol

@@ -43,7 +43,7 @@
     overflow-y: scroll;
     max-height: var(--max-height, 'none');
   }
-  :global(.cart-item:not(:last-child)) {
+  #cart-list :global(.cart-item:not(:last-child)) {
     margin-bottom: 16px;
   }
 </style>

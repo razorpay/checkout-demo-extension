@@ -43,6 +43,7 @@ export const RazorpayDefaults = {
   enable_fb_analytics: false,
   // temporary option, provides the cart information for FB Analytics
   customer_cart: {},
+  script_coupon_applied: false,
   disable_emi_ux: null,
 };
 

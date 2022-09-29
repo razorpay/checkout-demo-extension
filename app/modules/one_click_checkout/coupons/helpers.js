@@ -42,7 +42,7 @@ import {
   consentGiven,
 } from 'one_click_checkout/address/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
-import { isEnableAutoFetchCoupons } from 'razorpay';
+import { isEnableAutoFetchCoupons, scriptCouponApplied } from 'razorpay';
 import { shouldShowCoupons } from 'one_click_checkout/store';
 
 // utils imports
@@ -84,7 +84,11 @@ export function nextView() {
 }
 
 export function fetchCoupons() {
-  if (!shouldShowCoupons() || !isEnableAutoFetchCoupons()) {
+  if (
+    !shouldShowCoupons() ||
+    !isEnableAutoFetchCoupons() ||
+    scriptCouponApplied()
+  ) {
     return;
   }
 
@@ -117,6 +121,10 @@ export function fetchCoupons() {
  * @param {string} code The coupon code enetered/selected by the user
  */
 export function applyCouponCode(code) {
+  if (scriptCouponApplied()) {
+    // to handle prefilled coupon case and such
+    return;
+  }
   const source = code ? 'selection' : 'manual_entry';
   const input = code || get(couponInputValue);
 

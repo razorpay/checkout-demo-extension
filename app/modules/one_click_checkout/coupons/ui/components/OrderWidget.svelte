@@ -6,7 +6,7 @@
   import CartCta from 'one_click_checkout/coupons/ui/components/CartCta.svelte';
 
   // store imports
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, scriptCouponApplied } from 'razorpay';
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
@@ -38,6 +38,7 @@
     AMOUNT_LABEL,
     SHIPPING_CHARGES_LABEL,
     FREE_LABEL,
+    SCRIPT_COUPON_DISCOUNT_LABEL,
   } from 'summary_modal/i18n/labels';
 
   // session imports
@@ -61,6 +62,8 @@
   const spaceAmountWithSymbol = false;
   let showTotal;
   const cartExperiment = getCartExperiment();
+  let priceBeforeScriptDisc = null;
+  let scriptCouponDiscount = null;
 
   let cartItemsToShow = [];
   $: {
@@ -82,6 +85,17 @@
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
     } else {
       amount.set($cartAmount - $cartDiscount);
+    }
+  }
+
+  $: {
+    if (scriptCouponApplied()) {
+      priceBeforeScriptDisc = $cartItems.reduce(
+        (acc, curr) => acc + curr.quantity * +curr.price,
+        0
+      );
+      scriptCouponDiscount = priceBeforeScriptDisc - $cartAmount;
+      showTotal = true;
     }
   }
 </script>
@@ -121,10 +135,30 @@
     class:price-label={!showTotal}
   >
     <p>{$t(AMOUNT_LABEL)}</p>
-    <p data-test-id="cart-amount">
-      {formatAmountWithSymbol($cartAmount, currency, spaceAmountWithSymbol)}
-    </p>
+    {#if priceBeforeScriptDisc}
+      <p>
+        {formatAmountWithSymbol(priceBeforeScriptDisc, currency, spaceAmountWithSymbol)}
+      </p>
+    {:else}
+      <p data-test-id="cart-amount">
+        {formatAmountWithSymbol($cartAmount, currency, spaceAmountWithSymbol)}
+      </p>
+    {/if}
   </div>
+  {#if scriptCouponDiscount}
+    <div class="row justify-between color-gray">
+      <p>
+        {$t(SCRIPT_COUPON_DISCOUNT_LABEL)}
+      </p>
+      <p class="color-green">
+        - {formatAmountWithSymbol(
+          scriptCouponDiscount,
+          currency,
+          spaceAmountWithSymbol
+        )}
+      </p>
+    </div>
+  {/if}
   {#if $isCouponApplied && $couponInputValue === $appliedCoupon}
     <div class="row justify-between color-gray">
       <p>

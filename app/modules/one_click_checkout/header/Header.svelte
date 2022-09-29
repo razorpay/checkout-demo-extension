@@ -96,7 +96,6 @@
     justify-content: space-between;
     padding: 18px 16px 0px;
     align-items: center;
-    background: #00000014;
   }
 
   #header-1cc .header-title-wrapper-with-extra-padding {
@@ -145,7 +144,6 @@
     display: flex;
     flex-direction: column;
     padding: 12px 16px 0px;
-    background: #00000014;
   }
 
   .title-section {

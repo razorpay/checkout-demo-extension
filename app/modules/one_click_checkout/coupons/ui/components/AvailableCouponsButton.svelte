@@ -15,6 +15,7 @@
     REMOVE_LABEL,
     AVAILABLE_LABEL,
     APPLIED_LABEL,
+COUPONS_DISABLED_TOAST_MESSAGE,
   } from 'one_click_checkout/coupons/i18n/labels';
 
   // analytics imports
@@ -25,14 +26,28 @@
   import { views } from 'one_click_checkout/routing/constants';
 
   // utils imports
+  import { scriptCouponApplied } from 'razorpay';
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
+  import {
+    showToast,
+    TOAST_THEME,
+    TOAST_SCREEN,
+  } from 'one_click_checkout/Toast';
 
   export let removeCoupon;
 
   const { offers, circle_arrow_next } = getIcons();
   const showAvailableCoupons = () => {
     Events.TrackBehav(CouponEvents.SUMMARY_COUPON_CLICKED);
+    if (scriptCouponApplied()) {
+      showToast({
+        message: $t(COUPONS_DISABLED_TOAST_MESSAGE),
+        theme: TOAST_THEME.ERROR,
+        screen: TOAST_SCREEN.ONE_CC,
+      });
+      return;
+    }
     navigator.navigateTo({ path: views.COUPONS_LIST });
   };
   const handleRemoveCoupon = () => {
@@ -44,6 +59,7 @@
 <div
   id="coupons-available-container"
   class:apply={!$appliedCoupon}
+  class:disabled={scriptCouponApplied()}
   on:click|preventDefault={!$appliedCoupon && showAvailableCoupons}
 >
   <Icon icon={offers} />
@@ -86,6 +102,13 @@
     align-items: center;
     font-size: var(--font-size-body);
     font-weight: var(--font-weight-semibold);
+  }
+  #coupons-available-container.disabled {
+    opacity: 0.55;
+  }
+
+  .disabled .coupon-arrow-next {
+    opacity: 0.8;
   }
 
   .coupons-available-text {

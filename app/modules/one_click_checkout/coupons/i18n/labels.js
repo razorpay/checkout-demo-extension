@@ -27,3 +27,4 @@ export const ADDRESS_WIDGET_SERVICEABLE_TEXT =
   'coupons.address_widget_serviceable_text';
 export const ADDRESS_WIDGET_UNSERVICEABLE_TEXT =
   'coupons.address_widget_unserviceable_text';
+export const COUPONS_DISABLED_TOAST_MESSAGE = 'coupons.coupons_disabled_toast_message';

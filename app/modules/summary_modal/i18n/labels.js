@@ -7,3 +7,4 @@ export const SHIPPING_CHARGES_LABEL = 'summary_modal.shipping_charges_label';
 export const COUPON_DISCOUNT_LABEL = 'summary_modal.coupon_discount_label';
 export const FREE_LABEL = 'summary_modal.free_label';
 export const OFFER_LABEL = 'summary_modal.offer_label';
+export const SCRIPT_COUPON_DISCOUNT_LABEL = 'summary_modal.script_coupon_discount_label';

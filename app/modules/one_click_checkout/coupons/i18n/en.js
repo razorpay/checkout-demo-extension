@@ -26,4 +26,5 @@ export default {
   address_widget_serviceable_text: 'Delivery available at given address',
   address_widget_unserviceable_text:
     'Order cannot be delivered to this address. Add or change the address.',
+  coupons_disabled_toast_message: 'Coupons not applicable on already discounted items',
 };

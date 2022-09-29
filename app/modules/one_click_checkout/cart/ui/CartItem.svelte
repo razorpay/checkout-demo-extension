@@ -1,16 +1,26 @@
 <script lang="ts">
   // util imports
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getCurrency } from 'razorpay';
+  import { getCurrency, scriptCouponApplied } from 'razorpay';
 
   // i18n imports
   import { t } from 'svelte-i18n';
   import { QUANTITY_LABEL } from 'one_click_checkout/cart/i18n/label';
+  import { FREE_LABEL } from 'summary_modal/i18n/labels';
 
   export let name = '';
   export let price = '';
   export let image_url = '';
   export let quantity;
+  export let offer_price: string | number;
+
+  let scriptEditedPrice = false;
+
+  $: scriptEditedPrice =
+    scriptCouponApplied() &&
+    offer_price !== undefined &&
+    +price !== +offer_price &&
+    +offer_price >= 0;
 
   const currency = getCurrency();
 </script>
@@ -23,9 +33,20 @@
     </p>
     <p class="text quantity">{$t(QUANTITY_LABEL)}: {quantity}</p>
   </div>
-  <p class="text price shift-up">
-    {formatAmountWithSymbol(price, currency, false)}
-  </p>
+  <div class="shift-up" class:script-edited={scriptEditedPrice}>
+    <p class="text price">
+      {formatAmountWithSymbol(price, currency, false)}
+    </p>
+    {#if scriptEditedPrice}
+      {#if +offer_price === 0}
+        <p class="text free-item">{$t(FREE_LABEL)}</p>
+      {:else}
+        <p class="text offer-price">
+          {formatAmountWithSymbol(offer_price, currency, false)}
+        </p>
+      {/if}
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -78,5 +99,14 @@
   .shift-up {
     position: relative;
     top: -2px;
+  }
+  .script-edited .price {
+    font-size: var(--font-size-tiny);
+    text-decoration: line-through;
+    color: var(--secondary-text-color);
+    opacity: 0.8;
+  }
+  .script-edited .free-item {
+    color: var(--positive-text-color);
   }
 </style>

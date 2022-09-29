@@ -8,4 +8,5 @@ export default {
   coupon_discount_label: 'Coupon ({code})',
   free_label: 'FREE',
   offer_label: 'Offer {offer_name}',
+  script_coupon_discount_label: 'Discount on Price',
 };

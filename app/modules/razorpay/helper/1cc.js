@@ -51,6 +51,8 @@ export const allowLangEngOnly = () =>
 export const shouldOverrideBrandColor = () =>
   getPreferences('features.one_cc_override_theme') || false;
 
+export const scriptCouponApplied = () => getOption('script_coupon_applied');
+
 export const customerConsentDefaultAccept = () =>
   getPreferences('features.one_cc_consent_default');
 export const consumerConsentDefaultDeny = () =>
