@@ -718,6 +718,7 @@ export default {
     ifsc_label: 'IFSC',
     name_help: 'Please enter a valid Name as per your account',
     name_label: 'Account Holder Name',
+    bank_account_details_title: 'Bank Account Details',
   },
   emi: {
     available_action: 'Pay with EMI',
@@ -1428,7 +1429,7 @@ export default {
     tooltip_text: 'Unlock free rewards after payment',
   },
   recurring_callout_overlay: {
-    supported_cards: 'Supported cards for recurring payments',
+    supported_cards: 'Supported cards',
     bank: 'Bank',
     credit_cards: 'Credit Cards',
     debit_cards: 'Debit Cards',

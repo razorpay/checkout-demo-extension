@@ -22,9 +22,15 @@
   export let value;
 
   const PATTERN = '^[a-zA-Z0-9]{4,20}$';
+  let validationText = $t(ACCOUNT_NUMBER_HELP);
+  let showValidations = false;
 
   function handleInput(event) {
     value = event.target.value;
+  }
+  function handleInputBlur() {
+    let isValid = new RegExp(PATTERN).test(value);
+    showValidations = !isValid;
   }
 </script>
 
@@ -35,6 +41,7 @@
 
   <Field
     type="text"
+    labelClasses="fs-12"
     {name}
     {id}
     {readonly}
@@ -42,6 +49,7 @@
     {dir}
     label={$t(ACCOUNT_NUMBER_LABEL)}
     helpText={$t(ACCOUNT_NUMBER_HELP)}
+    {validationText}
     maxlength="20"
     required={true}
     formatter={{ type: 'alphanumeric' }}
@@ -50,9 +58,10 @@
     autocorrect="off"
     autocapitalize="off"
     handleBlur
-    handleFocus
     handleInput
     on:input={handleInput}
+    on:blur={handleInputBlur}
+    bind:showValidations
   />
 </div>
 
@@ -72,5 +81,14 @@
   .bank-icon img {
     max-width: 100%;
     max-height: 100%;
+  }
+
+  :global(.redesign) {
+    .bank-icon {
+      right: 13px;
+    }
+    .account-number-field {
+      margin-bottom: 16px;
+    }
   }
 </style>

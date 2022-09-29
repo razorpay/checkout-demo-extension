@@ -46,3 +46,7 @@ export function isASubscription(method = null) {
 export const isMethodRestrictionEnabledForMerchant = () => {
   return RECURRING_METHOD_RESTRICTION_KEYS.includes(getKey());
 };
+// return true for only recurring caw orders. Returns false for subscriptions
+export function isCAW() {
+  return isRecurring() && getOption('recurring');
+}

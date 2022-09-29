@@ -37,6 +37,7 @@
     SEARCH_ALL,
     SELECT_BANK,
   } from 'ui/labels/netbanking';
+  import { AUTHENTICATE } from 'cta/i18n';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -48,7 +49,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
-  import { isRecurring } from 'razorpay';
+  import { isRecurring, isCAW } from 'razorpay';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import * as InputActions from 'actions/input';
   import {
@@ -471,7 +472,13 @@
     {#if !recurring && !isRedesignV15Enabled}
       <CTAOld on:click={() => getSession().preSubmit()} />
     {/if}
-    <CTA screen="netbanking" tab="netbanking" disabled={!$selectedBank} />
+    <CTA
+      screen="netbanking"
+      tab="netbanking"
+      disabled={!$selectedBank}
+      showAmount={!isCAW()}
+      label={isCAW() ? $t(AUTHENTICATE) : ''}
+    />
   </Screen>
 </Tab>
 

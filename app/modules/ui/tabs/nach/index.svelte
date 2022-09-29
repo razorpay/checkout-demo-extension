@@ -39,6 +39,7 @@
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import CTA from 'cta';
   import { UPLOAD_NACH_FORM } from 'cta/i18n';
+  import { isRedesignV15 } from 'razorpay';
 
   let abortUploadRequest;
   let uploaded = false;
@@ -263,9 +264,9 @@
   }
 </script>
 
-<Tab method="nach" overrideMethodCheck="true" pad={true}>
+<Tab method="nach" overrideMethodCheck="true" pad={!isRedesignV15()}>
   <Screen>
-    <div>
+    <div class="nach-wrapper">
       <input
         type="file"
         bind:this={fileInput}
@@ -315,5 +316,15 @@
 <style>
   .ref-illustration {
     text-align: center;
+  }
+  :global(.redesign) {
+    .nach-wrapper {
+      min-height: 100%;
+      font-size: 12px;
+      color: var(--primary-text-color);
+    }
+    p {
+      margin: 16px 0;
+    }
   }
 </style>

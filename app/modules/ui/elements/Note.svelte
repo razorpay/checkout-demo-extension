@@ -19,4 +19,13 @@
       margin: 0;
     }
   }
+
+  :global(.redesign) {
+    div {
+      font-size: 12px;
+      background: linear-gradient(89.97deg, #fff5d8 -1.19%, #fffaed 99.97%);
+      border-radius: 6px;
+      margin: 16px 0;
+    }
+  }
 </style>

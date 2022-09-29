@@ -15,7 +15,7 @@ describe('RecurringCardsOverlay.svelte', () => {
 
   describe('Labels', () => {
     it('should display modal title', () => {
-      const label = 'Supported cards for recurring payments';
+      const label = 'Supported cards';
       const { getByText } = setup();
       expect(getByText(label, { exact: false })).toBeInTheDocument();
     });

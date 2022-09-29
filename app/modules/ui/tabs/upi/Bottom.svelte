@@ -62,7 +62,10 @@
   {/if}
   <!-- Both CAW and subscriptions show the same callout with the same information -->
   {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-    <Callout classes={['downtime-callout']} showIcon={true}>
+    <Callout
+      classes={['downtime-callout', 'recurring-callout']}
+      showIcon={true}
+    >
       <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
       <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
       <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->

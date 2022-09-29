@@ -12,8 +12,6 @@ const sliceAndLower = (str = '', len = 4) =>
 export const isValidIFSC = (ifsc: string, bankCode: string): boolean => {
   ifsc = sliceAndLower(ifsc);
   bankCode = sliceAndLower(bankCode);
-  if (bankCode === ifsc) {
-    return false;
-  }
-  return true;
+
+  return bankCode === ifsc;
 };

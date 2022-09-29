@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t, locale } from 'svelte-i18n';
+  import RazorpayConfig from 'common/RazorpayConfig';
   import {
     formatMessageWithLocale,
     getLongBankName,
@@ -26,7 +27,7 @@
       let providerName = cobrandingPartners.includes(provider)
         ? formatMessageWithLocale(`misc.${provider.toLowerCase()}`, $locale)
         : getLongBankName(provider, $locale);
-      return [providerName, value];
+      return [providerName, { value, code: provider }];
     })
   );
 </script>
@@ -39,95 +40,102 @@
 
   <div />
   <div class="networks-list-container">
-    {#each [...providerEntries] as [providerName, value]}
+    {#each [...providerEntries] as [providerName, { value, code }]}
       <div class="recurring-cards-row">
         <div class="recurring-cards-col">
+          <img
+            class="bank-logo"
+            src={`${RazorpayConfig.cdn}bank/${code}.gif`}
+            alt={code}
+          />
+        </div>
+        <div class="recurring-provider-wrapper">
           <!-- LABEL: Bank short name -->
           <div class="recurring-provider" id={providerName}>
             {providerName}
           </div>
-        </div>
-        <div
-          class="recurring-networks-container"
-          id={`${providerName}-networkd`}
-        >
-          <!-- if credit cards is available and has any supporting networkd-->
-          {#if value.credit && value.credit.length}
-            <div class="recurring-card-networks">
-              <!-- Card type -->
-              <div
-                class="recurring-card-type"
-                data-testid={`${providerName}-credit-cards`}
-              >
-                {$t(CREDIT_CARD)}
+          <div
+            class="recurring-networks-container"
+            id={`${providerName}-networkd`}
+          >
+            <!-- if credit cards is available and has any supporting networkd-->
+            {#if value.credit && value.credit.length}
+              <div class="recurring-card-networks">
+                <!-- Card type -->
+                <div
+                  class="recurring-card-type"
+                  data-testid={`${providerName}-credit-cards`}
+                >
+                  {$t(CREDIT_CARD)}
+                </div>
+                <span class="dot" />
+                <div
+                  class="recurring-networks"
+                  data-testid={`${providerName}-credit-networks`}
+                >
+                  <!-- Supported networks under credit cards-->
+                  {#each [...value.credit] as network}
+                    <span data-testid={`${getNetworkName(network, $locale)}`}>
+                      {getNetworkName(network, $locale)}
+                    </span>
+                    <hr />
+                  {/each}
+                </div>
               </div>
-              <span class="dot" />
-              <div
-                class="recurring-networks"
-                data-testid={`${providerName}-credit-networks`}
-              >
-                <!-- Supported networks under credit cards-->
-                {#each [...value.credit] as network}
-                  <span data-testid={`${getNetworkName(network, $locale)}`}>
-                    {getNetworkName(network, $locale)}
-                  </span>
-                  <hr />
-                {/each}
-              </div>
-            </div>
-          {/if}
+            {/if}
 
-          <!-- if debit cards is available and has any supporting networkd-->
-          {#if value.debit && value.debit.length}
-            <div class="recurring-card-networks">
-              <!-- Card type -->
-              <div
-                class="recurring-card-type"
-                data-testid={`${providerName}-debit-cards`}
-              >
-                {$t(DEBIT_CARD)}
+            <!-- if debit cards is available and has any supporting networkd-->
+            {#if value.debit && value.debit.length}
+              <div class="recurring-card-networks">
+                <!-- Card type -->
+                <div
+                  class="recurring-card-type"
+                  data-testid={`${providerName}-debit-cards`}
+                >
+                  {$t(DEBIT_CARD)}
+                </div>
+                <span class="dot" />
+                <div
+                  class="recurring-networks"
+                  data-testid={`${providerName}-debit-networks`}
+                >
+                  <!-- Supported networks under debit cards-->
+                  {#each [...value.debit] as network}
+                    <span data-testid={`${getNetworkName(network, $locale)}`}>
+                      {getNetworkName(network, $locale)}
+                    </span>
+                    <hr />
+                  {/each}
+                </div>
               </div>
-              <span class="dot" />
-              <div
-                class="recurring-networks"
-                data-testid={`${providerName}-debit-networks`}
-              >
-                <!-- Supported networks under debit cards-->
-                {#each [...value.debit] as network}
-                  <span data-testid={`${getNetworkName(network, $locale)}`}>
-                    {getNetworkName(network, $locale)}
-                  </span>
-                  <hr />
-                {/each}
-              </div>
-            </div>
-          {/if}
+            {/if}
 
-          <!-- if super cards is available and has any supporting networkd-->
-          {#if value.super_cards && value.super_cards.length}
-            <div class="recurring-card-networks">
-              <!-- Card type -->
-              <div
-                class="recurring-card-type"
-                data-testid={`${providerName}-super-cards`}
-              >
-                {$t(SUPER_CARD)}
+            <!-- if super cards is available and has any supporting networkd-->
+            {#if value.super_cards && value.super_cards.length}
+              <div class="recurring-card-networks">
+                <!-- Card type -->
+                <div
+                  class="recurring-card-type"
+                  data-testid={`${providerName}-super-cards`}
+                >
+                  {$t(SUPER_CARD)}
+                </div>
+                <span class="dot" />
+                <div
+                  class="recurring-networks"
+                  data-testid={`${providerName}-super-networks`}
+                >
+                  <!-- Supported networks under super cards-->
+                  {#each [...value.super_cards] as network}
+                    <span data-testid={`${getNetworkName(network, $locale)}`}>
+                      {getNetworkName(network, $locale)}
+                    </span>
+                    <hr />
+                  {/each}
+                </div>
               </div>
-              <span class="dot" />
-              <div
-                class="recurring-networks"
-                data-testid={`${providerName}-super-networks`}
-              >
-                <!-- Supported networks under super cards-->
-                {#each [...value.super_cards] as network}
-                  <span data-testid={`${getNetworkName(network, $locale)}`}>
-                    {getNetworkName(network, $locale)}
-                  </span>
-                  <hr />
-                {/each}
-              </div>
-            </div>
-          {/if}
+            {/if}
+          </div>
         </div>
       </div>
     {/each}
@@ -138,21 +146,6 @@
 </section>
 
 <style>
-  .networks-list-container {
-    overflow: auto;
-    max-height: 400px;
-  }
-  .recurring-card-overlay-inner {
-    border-radius: 3px;
-    width: 440px !important;
-    bottom: auto !important;
-    text-align: left;
-    top: 50%;
-    max-width: 92vw;
-    transform: translateX(-50%) translateY(-50%);
-    left: 50%;
-  }
-
   .recurring-networks {
     display: flex;
     flex-direction: inherit;
@@ -160,38 +153,12 @@
     padding-left: 4px;
     align-items: center;
   }
-
-  .recurring-provider {
-    line-height: 30px;
-    color: #132644;
-    white-space: pre-wrap;
-  }
-  .recurring-cards-title {
-    border-radius: 3px 3px 0 0;
-    line-height: 32px;
-    font-size: 14px;
-    padding: 16px 26px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    background-color: #f7f7f7;
-    color: #5d6d86;
-    font-weight: bold;
-    text-transform: capitalize;
-  }
-
   .recurring-cards-row {
     padding: 8px 26px;
     display: flex;
     font-size: 12px;
     display: flex;
     border-top: 1px solid #e9e9e9;
-  }
-  .recurring-networks-container {
-    border: none;
-    display: flex;
-    flex-direction: column;
-    color: #5d6d86;
   }
   .recurring-card-networks {
     display: flex;
@@ -220,10 +187,9 @@
     display: none;
   }
   .recurring-cards-col {
-    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 40%;
+    min-width: unset;
   }
 
   .recurring-cards-col ~ * {
@@ -239,5 +205,76 @@
     line-height: 1;
     top: 15px;
     right: 20px;
+  }
+  img {
+    width: 31px;
+    height: 31px;
+    display: inline-block;
+  }
+  .recurring-card-overlay-inner {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+  }
+  .recurring-provider-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-left: 11px;
+  }
+  .networks-list-container {
+    overflow: auto;
+    height: 101%;
+    background: #fff;
+  }
+  .mobile .networks-list-container {
+    max-height: calc(100% - 51px);
+    overflow: auto;
+  }
+  :global(.redesign) {
+    .networks-list-container {
+      max-height: calc(100% - 51px);
+    }
+  }
+  .recurring-provider {
+    font-size: 14px;
+    line-height: 17px;
+    font-weight: 400;
+    text-align: left;
+    margin-bottom: -4px;
+    color: #333;
+    white-space: pre-wrap;
+  }
+  .recurring-networks-container {
+    border: none;
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    padding-top: 6px;
+    color: #333;
+  }
+  .recurring-card-networks {
+    line-height: 10px;
+    padding-left: 0;
+  }
+  .recurring-cards-row {
+    padding: 16px;
+  }
+  .recurring-cards-close-icon {
+    top: 8px;
+  }
+  .recurring-cards-title {
+    line-height: 19px;
+    padding: 16px;
+    background: #fff;
+    font-weight: 500;
+    color: #424242;
+    border-radius: 3px 3px 0 0;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-transform: capitalize;
   }
 </style>

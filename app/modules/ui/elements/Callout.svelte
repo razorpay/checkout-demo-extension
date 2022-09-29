@@ -26,4 +26,18 @@
     color: var(--primary-text-color);
     padding: 16px;
   }
+  :global(.redesign) {
+    .recurring-callout {
+      background: linear-gradient(89.97deg, #fff5d8 -1.19%, #fffaed 99.97%);
+      display: flex;
+      font-size: 12px;
+      line-height: 18px;
+      font-weight: 400;
+      padding: 10px 16px 10px 18px !important;
+      > span {
+        font-size: 14px;
+        margin-right: 10px;
+      }
+    }
+  }
 </style>

@@ -1334,7 +1334,7 @@
         />
       {/if}
       {#if isRecurring() && currentView !== Views.ADD_CARD}
-        <Callout>
+        <Callout classes={['recurring-callout']}>
           {#if !session.subscription}
             <!-- LABEL: Future payments on this card will be charged automatically. -->
             {$t(RECURRING_CALLOUT)}

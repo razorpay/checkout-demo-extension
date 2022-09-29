@@ -16,8 +16,7 @@
 </script>
 
 <p class="recurring-card-callout">
-  <!-- Warning Icon -->
-  <WarningIcon />
+  <span class="warning-icon">&#x2139;</span>
   <!-- LABEL: Only limited cards support recurring payments as per RBI's new regulations. -->
   <span>
     {$t(RECURRING_CARDS_LIMITED_SUPPORT)}
@@ -42,5 +41,31 @@
   }
   u {
     cursor: pointer;
+  }
+
+  .warning-icon {
+    font-size: 14px;
+  }
+
+  :global(.redesign) {
+    .recurring-card-callout {
+      line-height: 18px;
+      color: var(--primary-text-color);
+      padding: 10px 16px 10px 18px;
+      display: flex;
+      background: linear-gradient(89.97deg, #fff5d8 -1.19%, #fffaed 99.97%);
+    }
+    u {
+      display: block;
+      color: var(--primary-color);
+      font-weight: 400;
+      margin-top: 4px;
+    }
+    svg {
+      margin-right: 10px;
+    }
+    .warning-icon {
+      margin-right: 10px;
+    }
   }
 </style>

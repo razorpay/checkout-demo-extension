@@ -9,6 +9,7 @@
   import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
   import NameField from 'ui/elements/fields/emandate/NameField.svelte';
   import { getDirectionForField } from 'ui/elements/fields/helpers';
+  import SelectField from 'ui/components/SelectField.svelte';
   // Svelte imports
   import { fade } from 'svelte/transition';
 
@@ -33,7 +34,7 @@
   // i18n
   import { locale, t } from 'svelte-i18n';
   import { getLongBankName } from 'i18n';
-
+  import { isCAW, isRedesignV15 } from 'razorpay';
   import {
     CHANGE_BANK_BTN,
     AUTH_TYPE_HEADER,
@@ -45,15 +46,16 @@
     AUTH_TYPE_AADHAAR_DESCRIPTION,
     ACCOUNT_TYPE_CURRENT,
     ACCOUNT_TYPE_SAVINGS,
-    ACCOUNT_TYPE_LABEL,
+    BANK_ACCOUNT_DETAILS_TITLE,
     ACCOUNT_TYPE_HELP,
+    ACCOUNT_TYPE_LABEL,
   } from 'ui/labels/emandate';
 
   // Utils
   import { getBankLogo } from 'common/bank';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { hideCta, showCtaWithDefaultText } from 'cta';
+  import CTA, { hideCta, showCtaWithDefaultText } from 'cta';
   import { getAnimationOptions } from 'svelte-utils';
   import {
     getAuthType,
@@ -61,6 +63,7 @@
     getPrefillBankDetails,
   } from 'netbanking/helper';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { AUTHENTICATE } from 'cta/i18n';
 
   const session = getSession();
 
@@ -102,6 +105,11 @@
   $ifsc = prefilledIfsc;
   $accountType = prefilledAccountType;
   $authType = prefilledAuthType;
+
+  const bankAccountTypesArr = accountTypes.map((type) => ({
+    label: $t(accountTextLabels[type]),
+    value: type,
+  }));
 
   // set field directions
   const dir = getDirectionForField();
@@ -206,9 +214,22 @@
   let currentView = Views.AUTH_SELECTION;
 
   let bankName;
+  let disableCTA = false;
+
   $: {
     const defaultBankName = (banks[selectedBank] || {}).name;
     bankName = getLongBankName($selectedBank, $locale, defaultBankName);
+
+    const isBankDetailsPageInvalid = () => {
+      return (
+        !$selectedBank || !$accountNumber || !$ifsc || !$name || !$accountType
+      );
+    };
+
+    // Doesnt disable cta if there are custom validations at component level
+    disableCTA =
+      currentView === Views.AUTH_SELECTION ||
+      (currentView === Views.BANK_DETAILS && isBankDetailsPageInvalid());
   }
 
   let active = false;
@@ -265,7 +286,7 @@
 </script>
 
 <Tab method="emandate" overrideMethodCheck pad={false}>
-  <Screen>
+  <Screen pad={!isRedesignV15()}>
     <div id="emandate-inner">
       {#if currentView === Views.AUTH_SELECTION}
         <div
@@ -351,6 +372,11 @@
           class="emandate-fields"
           in:fade={getAnimationOptions({ duration: 200, delay: 200 })}
         >
+          {#if isRedesignV15()}
+            <div class="emandate-details-title">
+              {$t(BANK_ACCOUNT_DETAILS_TITLE)}
+            </div>
+          {/if}
           <AccountNumberField
             name="bank_account[account_number]"
             id="nb-acc-no"
@@ -359,52 +385,52 @@
             bind:value={$accountNumber}
             {dir}
           />
-
-          <IfscField
-            id="nb-acc-ifsc"
-            name="bank_account[ifsc]"
-            bankCode={$selectedBank}
-            readonly={Boolean(prefilledIfsc)}
-            bind:value={$ifsc}
-            {dir}
-          />
-
-          <NameField
-            id="nb-acc-name"
-            name="bank_account[name]"
-            readonly={Boolean(prefilledName)}
-            bind:value={$name}
-            {dir}
-          />
-
-          <div class="elem-wrap">
-            <div class="elem select" class:readonly={prefilledAccountType}>
-              <i class="select-arrow"></i>
-              <!-- LABEL: Please select a bank account type -->
-              <div class="help">{$t(ACCOUNT_TYPE_HELP)}</div>
-              <select
-                name="bank_account[account_type]"
-                required
-                class="input"
-                bind:value={$accountType}
-              >
-                {#if prefilledAccountType}
-                  <option value={prefilledAccountType}>
-                    {$t(accountTextLabels[prefilledAccountType])}
-                  </option>
-                {:else}
-                  <!-- LABEL: Type of Bank Account -->
-                  <option value="">{$t(ACCOUNT_TYPE_LABEL)}</option>
-                  {#each accountTypes as type (type)}
-                    <option value={type}>{$t(accountTextLabels[type])}</option>
-                  {/each}
-                {/if}
-              </select>
-            </div>
+          <div class="ifsc-field">
+            <IfscField
+              id="nb-acc-ifsc"
+              name="bank_account[ifsc]"
+              bankCode={$selectedBank}
+              readonly={Boolean(prefilledIfsc)}
+              bind:value={$ifsc}
+              {dir}
+            />
           </div>
+          <div class="bank-account-name">
+            <NameField
+              id="nb-acc-name"
+              name="bank_account[name]"
+              readonly={Boolean(prefilledName)}
+              bind:value={$name}
+              {dir}
+            />
+          </div>
+
+          <SelectField
+            isReadOnly={!!prefilledAccountType}
+            isRequired={true}
+            fieldLabel={$t(ACCOUNT_TYPE_LABEL)}
+            fieldName={'bank_account[account_type]'}
+            helpText={$t(ACCOUNT_TYPE_HELP)}
+            validationText={$t(ACCOUNT_TYPE_HELP)}
+            optionsArr={bankAccountTypesArr}
+            preFilledOption={prefilledAccountType
+              ? {
+                  label: $t(accountTextLabels[prefilledAccountType]),
+                  value: prefilledAccountType,
+                }
+              : ''}
+            bind:value={$accountType}
+          />
         </div>
       {/if}
     </div>
+    <CTA
+      screen="emandate"
+      tab="emandate"
+      showAmount={!isCAW()}
+      disabled={disableCTA}
+      label={`${isCAW() ? $t(AUTHENTICATE) : ''}`}
+    />
   </Screen>
 </Tab>
 
@@ -517,5 +543,38 @@
   .bank-icon img {
     max-width: 100%;
     max-height: 100%;
+  }
+
+  .emandate-details-title {
+    margin: 24px 0 14px;
+    font-size: 13px;
+    line-height: 16px;
+    font-weight: 600;
+    color: var(--primary-text-color);
+  }
+
+  :global(.redesign) {
+    #emandate-inner {
+      min-height: 100%;
+      padding: 0 16px;
+    }
+    .emandate-fields {
+      padding: 0;
+    }
+    #emandate-bank .btn-change-bank {
+      min-width: 90px;
+    }
+    .desc {
+      font-size: 10px;
+    }
+    .auth-option {
+      line-height: 17px;
+    }
+    .bank-account-name {
+      margin-bottom: 4px;
+    }
+    .ifsc-field {
+      margin-bottom: 16px;
+    }
   }
 </style>

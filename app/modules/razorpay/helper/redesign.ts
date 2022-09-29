@@ -33,6 +33,10 @@ export const isRedesignV15 = (): boolean => {
     }
     const disableRedesignFromOption = getOption('disable_redesign_v15');
     const allowInternational = getPreferences('experiments.cb_redesign_v1_5');
+    const allowRecurring = getPreferences(
+      'experiments.recurring_redesign_v1_5'
+    );
+
     let allow = getPreferences('experiments.checkout_redesign_v1_5');
     const { isOrgRazorpay } = getOrgDetails() || {};
 
@@ -57,10 +61,11 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
-    if (isRecurringOrPreferredPayment()) {
+    if (isRecurringOrPreferredPayment() && !allowRecurring) {
       // recurring or subscription payments
       allow = false;
     }
+
     if (isPayout()) {
       allow = false;
     }

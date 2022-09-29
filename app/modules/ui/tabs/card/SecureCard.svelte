@@ -276,10 +276,22 @@
     }
     .saved-card-text {
       color: var(--primary-text-color);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 15.6px;
+    }
+
+    .save-card-subtext {
+      opacity: 0.8;
+      color: var(--secondary-text-color);
+      font-weight: 400;
     }
 
     .know-more-text {
       color: var(--primary-color);
+      line-height: 16px;
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .p13n-block {

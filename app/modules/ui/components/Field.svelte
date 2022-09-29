@@ -931,4 +931,7 @@
       padding-top: 15px !important;
     }
   }
+  .fs-12 {
+    font-size: 12px;
+  }
 </style>

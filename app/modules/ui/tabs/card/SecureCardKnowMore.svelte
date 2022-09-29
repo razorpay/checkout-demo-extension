@@ -208,4 +208,10 @@
   .secure-card-know-more-overlay-one-cc {
     padding: 16px 16px 4px;
   }
+  :global(.redesign) {
+    .secure-card-know-more-header-one-cc {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+  }
 </style>
