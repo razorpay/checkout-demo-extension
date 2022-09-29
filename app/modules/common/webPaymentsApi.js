@@ -4,22 +4,22 @@ import {
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
   CRED_PACKAGE_NAME,
-  BHIM_UPI_PACKAGE_NAME,
   PAYTM_PACKAGE_NAME,
 } from 'common/upi';
 import RazorpayStore from 'razorpay';
 
-export const appsThatSupportWebPayments = [
+export let appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
   { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
   { package_name: CRED_PACKAGE_NAME, method: 'app' },
 ];
 
 export function additionalSupportedPaymentApps() {
-  appsThatSupportWebPayments.push(
-    { package_name: BHIM_UPI_PACKAGE_NAME, method: 'upi' },
-    { package_name: PAYTM_PACKAGE_NAME, method: 'upi' }
-  );
+  appsThatSupportWebPayments = [
+    { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
+    { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
+    { package_name: PAYTM_PACKAGE_NAME, method: 'upi' },
+  ];
 }
 
 const webPaymentsApps = {};

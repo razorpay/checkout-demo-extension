@@ -2,6 +2,7 @@
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
   import { t, locale } from 'svelte-i18n';
+  import { isUpiUxExperimentSupported } from 'checkoutstore/native';
 
   import { getUpiIntentAppName } from 'i18n';
 
@@ -72,7 +73,9 @@
   }
 
   $: {
-    if (apps.length <= 5 || showAll) {
+    if (isUpiUxExperimentSupported('variant_2') && apps.length > 3) {
+      showableApps = apps.slice(0, 3);
+    } else if (apps.length <= 5 || showAll) {
       showableApps = apps;
     } else {
       showableApps = apps.slice(0, 4);
@@ -149,6 +152,16 @@
     dispatch('select', params);
   }
 
+  function isAppsInGridView() {
+    let isGridView = false;
+    if (isUpiUxExperimentSupported('variant_2')) {
+      isGridView = false;
+    } else if (upiTiles.status === true) {
+      isGridView = true;
+    }
+    return isGridView;
+  }
+
   onMount(() => {
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
     Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
@@ -165,7 +178,7 @@
       visible={isIntentFlowVisible}
       showRedirectV2message={showIntentListHeaderForIos}
     />
-    {#if upiTiles.status === true}
+    {#if isAppsInGridView()}
       {#if Array.isArray(showableApps) && showableApps.length > 0}
         <div class="intent-apps-container uninteractive">
           <UPIAppStack

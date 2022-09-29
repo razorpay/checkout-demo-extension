@@ -6,6 +6,9 @@ import {
 } from 'common/apps';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
+import { appsThatSupportWebPayments } from 'common/webPaymentsApi';
+import { getPreferences } from 'razorpay';
+import { android } from 'common/useragent';
 import * as _ from 'utils/_';
 
 let message;
@@ -28,7 +31,7 @@ export function setUpiApps(apps) {
   const sortedApps = getSortedApps(apps);
 
   // Have a unique check in place
-  const filteredUniqueApps = sortedApps.reduce((pV, cV) => {
+  let filteredUniqueApps = sortedApps.reduce((pV, cV) => {
     const allPackageNames = pV.map((app) => app.package_name);
     if (allPackageNames.includes(cV.package_name)) {
       return pV;
@@ -41,6 +44,19 @@ export function setUpiApps(apps) {
         (filteredApp) => filteredApp.package_name === app.package_name
       )
   );
+
+  try {
+    if (isUpiUxExperimentSupported('variant_1')) {
+      filteredUniqueApps = filteredUniqueApps.filter((a) =>
+        appsThatSupportWebPayments.some(
+          (b) => a.package_name === b.package_name
+        )
+      );
+    }
+    if (shouldAppsReorder()) {
+      filteredUniqueApps = upiAppsReorderByPreference(filteredUniqueApps);
+    }
+  } catch (error) {}
 
   upiApps = {
     all: [...filteredUniqueApps, ...unusedApps],
@@ -191,4 +207,57 @@ export function processNativeMessage(_message) {
   message = {};
   ObjectUtils.loop(messageTransformers, (fn) => fn(message, _message));
   return message;
+}
+
+export function isUpiUxExperimentSupported(variantName = null) {
+  try {
+    const sdkMeta = getSDKMeta();
+    const supportedPlatform =
+      (sdkMeta.platform === 'web' && android) ||
+      sdkMeta.platform === 'android' ||
+      sdkMeta.platform === 'ios';
+
+    if (!supportedPlatform) {
+      return false;
+    }
+
+    if (variantName && variantName === getPreferences('experiments.upi_ux')) {
+      return true;
+    }
+    if (
+      !variantName &&
+      (getPreferences('experiments.upi_ux') === 'variant_1' ||
+        getPreferences('experiments.upi_ux') === 'variant_2')
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+function shouldAppsReorder() {
+  const sdkMeta = getSDKMeta();
+  if (isUpiUxExperimentSupported()) {
+    return true;
+  } else if (sdkMeta.platform === 'android') {
+    return true;
+  }
+  return false;
+}
+
+const APP_PREFERENCE_ORDER = ['phonepe', 'google_pay', 'paytm', 'bhim'];
+function upiAppsReorderByPreference(paymentApps) {
+  let preferredApp = [];
+  APP_PREFERENCE_ORDER.forEach((appShortCode) => {
+    const app = paymentApps.find((app) => app.shortcode === appShortCode);
+    if (app) {
+      preferredApp.push(app);
+    }
+  });
+  return [
+    ...preferredApp,
+    ...paymentApps.filter((app) => preferredApp.indexOf(app) === -1),
+  ];
 }

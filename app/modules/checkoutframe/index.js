@@ -62,6 +62,7 @@ import {
   INTEGRATION_PLATFORM,
 } from 'analytics-v2';
 import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
+import { isUpiUxExperimentSupported } from 'checkoutstore/native';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -628,7 +629,7 @@ function setSessionPreferences(session, preferences) {
   }
 
   try {
-    if (preferences?.experiments?.upi_ux === 'variant_1') {
+    if (isUpiUxExperimentSupported('variant_1')) {
       additionalSupportedPaymentApps();
       checkForPossibleWebPayments();
     }
