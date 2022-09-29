@@ -376,6 +376,10 @@ function errorHandler(response) {
           return this.hideOverlayMessage();
         }
       }
+      // for prefill related error we don't show error dialog
+      if (error.from === 'prefill') {
+        return;
+      }
     }
   }
 
@@ -887,6 +891,7 @@ Session.prototype = {
           errorHandler.call(self, {
             error: {
               field: option,
+              from: 'prefill',
             },
           });
         }
