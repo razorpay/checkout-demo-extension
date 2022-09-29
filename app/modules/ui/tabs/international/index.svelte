@@ -17,7 +17,7 @@
     NVSFormData,
     setNVSFormData,
   } from 'checkoutstore/screens/international';
-  import { AVSDccPayload } from 'checkoutstore/screens/card';
+  import { AVSDccPayload, dccCurrency } from 'checkoutstore/screens/card';
   import { isPartialPayment, getAmount } from 'razorpay';
 
   // i18n
@@ -278,6 +278,8 @@
       setView(VIEWS_MAP.SELECT_PROVIDERS);
       return true;
     }
+    // Reset dccCurrency on back
+    $dccCurrency = null;
     tabVisible = false;
     session.dccPayload = {};
     return false;

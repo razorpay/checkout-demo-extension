@@ -319,9 +319,36 @@
   function onSelect(currency) {
     selectedCurrency = currency;
     setDCCPayload({ currency });
+
+    /*
+     * Coming back to Card from Paypal screen, the selectedCurrency becomes null.
+     * Again set the selectedCurrency value from cache for respective Payment method.
+     * */
+    if (!selectedCurrency && currencyCache[entityWithAmount]) {
+      currencyConfig = currencyCache[entityWithAmount];
+      if (typeof currencyConfig === 'object') {
+        /*
+         * Update reactive states
+         * */
+        selectedCurrency =
+          currencyConfig.card_currency ||
+          currencyConfig.wallet_currency ||
+          currencyConfig.app_currency;
+        $defaultDCCCurrency = selectedCurrency;
+        $dccCurrency = selectedCurrency;
+        $currencyRequestId = currencyConfig.currency_request_id;
+
+        AVSRequired =
+          currencyConfig.avs_required || currencyConfig.address_name_required;
+      }
+    }
   }
 
   $: {
+    /*
+     * In case of DCC on Card, DCC component is never unmounted once loaded. Because of Card component.
+     * The only prop change is tabVisible.
+     * */
     if (tabVisible) {
       onSelect($dccCurrency);
     }
@@ -383,7 +410,7 @@
   $: fee =
     (currencies &&
       selectedCurrency &&
-      currencies[selectedCurrency].conversion_percentage) ||
+      currencies[selectedCurrency]?.conversion_percentage) ||
     0;
   $: selectedCurrencyInDisplay = displayCurrencies?.find(
     ({ currency }) => currency === selectedCurrency
@@ -515,7 +542,7 @@
                     ? `${currency} ${formatAmount(amount, currency)}`
                     : currency}
                   value={amount}
-                  checked={currency === selectedCurrency}
+                  checked={currency === $dccCurrency}
                   on:change={() => onSelect(currency)}
                 >
                   {explicitUI ? `${$t(PAY_IN)} ${currency}` : amount}
