@@ -218,6 +218,58 @@ const responseTypes = {
       this.checkRedirect();
     }
   },
+  redirect: function (request) {
+    let popup = this.popup;
+    if (this.nativeotp) {
+      Analytics.track('native_otp:error', {
+        data: {
+          error: 'TYPE_REDIRECT',
+        },
+      });
+      // We were expecting `type: 'otp'` response from API (to ask OTP on checkout),
+      // API sent `type: 'redirect'` response, can't open popup now.
+      // Most gateways block iframe.
+      // The only option left now is to redirect.
+      if (this.r.get('redirect')) {
+        this.redirect(request);
+        return;
+      }
+      // ಠ_ಠ - Should not reach here.
+      Analytics.track('native_otp:error', {
+        data: {
+          error: 'REDIRECT_PARAMS_MISSING',
+        },
+      });
+
+      //  we got request (method = post) with url.
+      this.gotoBankRequest = request;
+
+      return this.emit('3ds.required');
+    } else if (popup) {
+      if (this.iframe) {
+        popup.show();
+      }
+
+      if (!popupIframeCheck(this, request)) {
+        submitForm({
+          url: request.url,
+          params: null,
+          method: request.method,
+          target: popup.name,
+        });
+      }
+
+      // popup blocking addons close popup once we set a url
+      setTimeout(() => {
+        if (popup.window.closed && this.r.get('callback_url')) {
+          this.r.set('redirect', true);
+          this.checkRedirect();
+        }
+      });
+    } else {
+      this.checkRedirect();
+    }
+  },
 
   async: function (request, fullResponse) {
     Analytics.track('metric:polling_started', {

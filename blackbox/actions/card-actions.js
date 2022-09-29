@@ -151,6 +151,20 @@ async function handleCardValidationForNativeOTP(
       submit_url_private: 'https://api.razorpay.com/otp_submit',
       resend_url_private: 'https://api.razorpay.com/otp_resend',
     });
+  } else if (coproto === 'redirect') {
+    await context.respondJSON({
+      type: 'redirect',
+      request: {
+        content: null,
+        method: 'POST',
+        url: 'https://api.razorpay.com/v1/payments/K1rL2EogDLgqFZ/authenticate',
+      },
+      version: 1,
+      payment_id: 'pay_K4FTlb6UsuaRWH',
+      amount: '\u20b9 1',
+      image: null,
+      magic: false,
+    });
   } else {
     await context.respondJSON({
       type: 'first',
