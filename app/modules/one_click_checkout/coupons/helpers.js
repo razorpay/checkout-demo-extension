@@ -90,6 +90,10 @@ export function fetchCoupons() {
 
   return getCoupons()
     .then((coupons) => {
+      // Avoid updating state if there are not coupons.
+      if (!coupons.length) {
+        return;
+      }
       Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, coupons.length);
       availableCoupons.set(coupons);
     })

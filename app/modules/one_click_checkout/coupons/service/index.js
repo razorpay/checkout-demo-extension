@@ -7,15 +7,22 @@ import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';
 
+let inProgress = false;
+let pendingPromise = null;
 /**
  * method to fetch coupons for merchant from backend
  * @returns {Array} a list of coupons for the specific merchant.
  */
 export function getCoupons() {
+  // return pending promise to avoid hitting rate limiting
+  if (inProgress) {
+    return pendingPromise;
+  }
+
   const getDuration = timer();
   Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
 
-  return new Promise((resolve, reject) => {
+  pendingPromise = new Promise((resolve, reject) => {
     const payload = getContactPayload();
 
     const key = payload.contact || 'default';
@@ -26,6 +33,7 @@ export function getCoupons() {
       return;
     }
 
+    inProgress = true;
     fetch.post({
       url: makeAuthUrl('merchant/coupons'),
       data: {
@@ -33,6 +41,7 @@ export function getCoupons() {
         order_id: getOrderId(),
       },
       callback: (response) => {
+        inProgress = false;
         Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
           time: getDuration(),
         });
@@ -45,6 +54,7 @@ export function getCoupons() {
       },
     });
   });
+  return pendingPromise;
 }
 
 /**

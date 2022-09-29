@@ -8,5 +8,9 @@ export function getCache(key) {
 }
 
 export function setCache(key, value) {
+  // Avoid updating cache if there are no coupons.
+  if (!value.length) {
+    return;
+  }
   cache[key] = value;
 }
