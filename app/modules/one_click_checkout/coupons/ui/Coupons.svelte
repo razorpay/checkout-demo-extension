@@ -34,6 +34,10 @@
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
 
+  // controller imports
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { validateEmail } from 'one_click_checkout/common/validators/email';
+
   // session imports
   import { removeCouponCode } from 'one_click_checkout/coupons/sessionInterface';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
@@ -59,7 +63,6 @@
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
-  import { validateEmail } from 'one_click_checkout/common/validators/email';
   import { getPhoneNumberRegex } from 'one_click_checkout/helper';
   import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
@@ -141,6 +144,10 @@
           },
         });
 
+        updateContactStorage({
+          contact: $contact,
+          email: $email,
+        });
         if (!isUserLoggedIn() && $isIndianCustomer) {
           updateOrderWithCustomerDetails();
           onSubmitLogoutUser();

@@ -1001,13 +1001,10 @@
     // Update save address/card checkbox
     remember.set($isIndianCustomer);
 
-    // Store only on mobile since Desktops can be shared b/w users
-    if (isMobile()) {
-      updateContactStorage({
-        contact: $contact,
-        email: $email,
-      });
-    }
+    updateContactStorage({
+      contact: $contact,
+      email: $email,
+    });
   }
 
   export function next(forcedView) {

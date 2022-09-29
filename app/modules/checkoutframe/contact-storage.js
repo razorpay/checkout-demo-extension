@@ -1,10 +1,13 @@
+import BrowserStorage from 'browserstorage';
+import { isMobile } from 'common/useragent';
+
 const KEY = 'rzp_contact';
 
 export function get() {
   let details;
 
   try {
-    details = JSON.parse(global.localStorage.getItem(KEY));
+    details = JSON.parse(BrowserStorage.getItem(KEY));
   } catch (err) {}
 
   if (!details) {
@@ -21,12 +24,15 @@ export function get() {
 }
 
 function set(details) {
-  try {
-    global.localStorage.setItem(KEY, JSON.stringify(details));
-  } catch (err) {}
+  BrowserStorage.setItem(KEY, JSON.stringify(details));
 }
 
 export function update({ contact, email }) {
+  // Store only on mobile since Desktops can be shared b/w users
+  if (!isMobile()) {
+    return;
+  }
+
   let existing = get();
 
   existing.contact = contact || existing.contact;

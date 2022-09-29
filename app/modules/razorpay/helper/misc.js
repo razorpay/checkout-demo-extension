@@ -8,10 +8,11 @@ import { getMerchantOption, getPreferences } from './base';
 import { hasFeature } from './preferences';
 
 export function shouldStoreCustomerInStorage() {
-  const globalCustomer = getPreferences('global');
+  const isLocalCustomer =
+    !!getMerchantOption('customer_id') || !getPreferences('global');
   const rememberCustomer = getMerchantOption('remember_customer');
 
-  return globalCustomer && rememberCustomer;
+  return !isLocalCustomer && rememberCustomer;
 }
 
 export function isAddressEnabled() {

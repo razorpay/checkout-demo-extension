@@ -8,6 +8,7 @@ import {
   shouldStoreCustomerInStorage,
 } from 'razorpay';
 import { capture, SEVERITY_LEVELS } from 'error-service';
+import Analytics from 'analytics';
 
 /**
  * A valid contact can only contain
@@ -42,6 +43,7 @@ export const getPrefilledContact = () => {
         const storedUserDetails = ContactStorage.get();
         // Pick details from storage if not given in prefill
         if (!prefilledContact && storedUserDetails.contact) {
+          Analytics.setMeta('contact_prefill_source', 'browserstorage');
           prefilledContact = storedUserDetails.contact;
         }
       }
@@ -86,6 +88,7 @@ export const getPrefilledEmail = () => {
       const storedUserDetails = ContactStorage.get();
       // Pick details from storage if not given in prefill
       if (!prefilledEmail && storedUserDetails.email) {
+        Analytics.setMeta('email_prefill_source', 'browserstorage');
         prefilledEmail = storedUserDetails.email;
       }
     }

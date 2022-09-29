@@ -89,6 +89,9 @@
   import { CTA_LABEL } from 'cta/i18n';
   import { MiscTracker } from 'misc/analytics/events';
 
+  // controller imports
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+
   // Props
   export let tpv;
   export let onSubmit;
@@ -218,6 +221,10 @@
     validateEmail($email).then((value) => {
       if (value || isEmailOptional()) {
         Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
+          contact: $contact,
+          email: $email,
+        });
+        updateContactStorage({
           contact: $contact,
           email: $email,
         });

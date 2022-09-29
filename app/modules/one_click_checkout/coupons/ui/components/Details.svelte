@@ -4,7 +4,6 @@
 
   // UI Imports
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
-  import CTAButton from 'one_click_checkout/cta/button.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Session related imports
@@ -26,7 +25,7 @@
     errorCode,
     couponInputValue,
   } from 'one_click_checkout/coupons/store';
-  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import { contact, email } from 'checkoutstore/screens/home';
 
   // utils imports
   import { popStack } from 'navstack';
@@ -39,6 +38,9 @@
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'otp/constants';
   import { toggleHeader } from 'one_click_checkout/header/helper';
+
+  // controller imports
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
 
   const { close } = getIcons();
 
@@ -63,6 +65,10 @@
     }
     popStack();
     toggleHeader(true);
+    updateContactStorage({
+      contact: $contact,
+      email: $email,
+    });
     if (!isUserLoggedIn() && $isIndianCustomer) {
       askForOTP(otpReasons.verify_coupon);
     }
