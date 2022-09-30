@@ -5,24 +5,50 @@
 import RazorpayStore from '../store';
 import { get } from 'utils/object';
 import { displayAmount } from 'common/currency';
+import type {
+  Preferences,
+  PreferencesObject,
+} from 'razorpay/types/Preferences';
+import type { Option, OptionObject } from 'razorpay/types/Options';
 
 /**
  * Helper methods
  */
-export const getPreferences = (path, defaultValue) => {
+// function overload
+export function getPreferences<T extends undefined | null>(
+  path?: T
+): PreferencesObject;
+export function getPreferences<T extends keyof Preferences>(
+  path: T,
+  defaultValue?: Partial<Preferences[T]> | Preferences[T]
+): Preferences[T];
+export function getPreferences<T>(path: string, defaultValue: T): any;
+export function getPreferences<T extends keyof Preferences>(
+  path?: T,
+  defaultValue?: Preferences[T]
+): Preferences[T] | PreferencesObject {
   if (!path) {
     return RazorpayStore.preferences;
   }
   return get(RazorpayStore.preferences, path, defaultValue);
-};
+}
 
-export const getOption = (path) => {
+export function getOption<T extends undefined | null>(
+  path?: T
+): Partial<OptionObject>;
+export function getOption<T extends keyof Option>(path: T): Option[T];
+export function getOption<T extends string>(path: T): any;
+export function getOption<T extends keyof Option>(
+  path?: T
+): Option[T] | Partial<OptionObject> {
   return !path
     ? RazorpayStore.triggerInstanceMethod('get')
     : RazorpayStore.get(path);
-};
+}
 
-export const getOptionCurry = (path) => {
+export const getOptionCurry = <T extends keyof Option>(
+  path: T
+): (() => Option[T]) => {
   return () => getOption(path);
 };
 
@@ -38,13 +64,14 @@ export const getCardFeatures = RazorpayStore.getCardFeatures;
  * set a timeout of 10s, if the API is taking > 10s to resolve;
  * proceed regardless of verification
  */
-export const verifyVPA = (vpa) => RazorpayStore.get().verifyVpa(vpa, 10000);
+export const verifyVPA = (vpa: string) =>
+  RazorpayStore.get().verifyVpa(vpa, 10000);
 
-export const getCurrencies = (...args) =>
+export const getCurrencies = (...args: any) =>
   RazorpayStore.get().getCurrencies(...args);
 
 // formatting
-export const getDisplayAmount = (amount) =>
+export const getDisplayAmount = (amount: string) =>
   displayAmount(RazorpayStore.get(), amount);
 
 export function isPayout() {
@@ -106,7 +133,7 @@ function getConfigFromGetOption() {
 
 export const getLanguageCodeFromPrefs = () => getPreferences('language_code');
 export const getLanguageCodeFromOptions = () =>
-  get(getConfigFromGetOption(), 'display.language');
+  get(getConfigFromGetOption() as object, 'display.language');
 
 export const getLanguageCode = () =>
   getLanguageCodeFromOptions() || getLanguageCodeFromPrefs();

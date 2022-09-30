@@ -546,7 +546,7 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
   // since no callbacks are pending reset if any
   resetCallbackOnEmiPayViaBank();
 
-  const rzpInstanceWithPayment = (RazorpayStore.razorpayInstance as any)
+  const rzpInstanceWithPayment = RazorpayStore.razorpayInstance
     .createPayment(paymentPayload, paymentParams)
     .on(
       'payment.success',

@@ -22,8 +22,13 @@ function getQRPaymentTestUrlForImage() {
     pn: 'Razorpay',
     tr: 'M10rKVfkNww2eBE',
     am: (
-      parseInt(getOption('amount') || getPreferences('order.amount') || 10000) /
-      100
+      parseInt(
+        (
+          getOption('amount') ||
+          getPreferences('order.amount') ||
+          10000
+        ).toString()
+      ) / 100
     ).toString(),
     cu: 'INR',
     mc: '5411',

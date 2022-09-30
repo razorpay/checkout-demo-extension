@@ -107,7 +107,7 @@ export function enableUPITiles(
     ...response,
     status: Boolean(name),
     variant,
-    config,
+    config: config as { apps: UPI.AppConfiguration[] },
   };
 
   return response;

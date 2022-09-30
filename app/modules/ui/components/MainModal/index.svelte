@@ -36,7 +36,7 @@
   const ctaStore = getStore();
   const noanim = disableAnimation();
   const isOneCC = isOneClickCheckout();
-  const isLiveMode = (RazorpayStore.razorpayInstance as any).isLiveMode();
+  const isLiveMode = (RazorpayStore.razorpayInstance ).isLiveMode();
   const isRedesignV15Enabled = isRedesignV15();
   let mobileDevice = isMobile();
   const orderMethod = getSingleMethod();

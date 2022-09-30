@@ -7,8 +7,10 @@ import { getMerchantOrder } from './preferences';
 
 // Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
 export const isOneClickCheckout = () =>
-  getMerchantOrder()?.line_items_total &&
-  getPreferences('features.one_click_checkout');
+  Boolean(
+    getMerchantOrder()?.line_items_total &&
+      getPreferences('features.one_click_checkout')
+  );
 
 export const getPrefilledCouponCode = () => getOption('prefill.coupon_code');
 
@@ -24,8 +26,7 @@ export const getCustomerCart = () => getOption('customer_cart');
 
 export const getMerchantName = () => getOption('name');
 
-export const isCodEnabled = () =>
-  getPreferences('preferences.methods.cod') || false;
+export const isCodEnabled = () => getPreferences('methods.cod') || false;
 
 export const isBillingAddressEnabled = () =>
   getPreferences('1cc.configs.one_cc_capture_billing_address') || false;

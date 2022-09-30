@@ -25,7 +25,7 @@ export function isAddressEnabled() {
  * @param code
  * @returns {*}
  */
-export function getCustomSubtextForMethod(code) {
+export function getCustomSubtextForMethod(code: string) {
   if (code === 'cred') {
     return getPreferences('methods.app_meta.cred.offer.description', null);
   }

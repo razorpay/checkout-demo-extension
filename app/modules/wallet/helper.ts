@@ -10,7 +10,9 @@ import { isPowerWallet } from 'common/wallet';
  * @returns {boolean}
  */
 export function isDynamicWalletFlow(): boolean {
-  return !ajaxRouteNotSupported && getPreferences('dynamic_wallet_flow');
+  return (
+    !ajaxRouteNotSupported && (getPreferences('dynamic_wallet_flow') as boolean)
+  );
 }
 
 // check and return prefill wallet

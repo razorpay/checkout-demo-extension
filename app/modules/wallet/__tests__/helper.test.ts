@@ -103,7 +103,7 @@ jest.mock('common/useragent', () => ({
   },
 }));
 
-const getOption = razorpay.getOption as jest.MockedFunction<
+const getOption = razorpay.getOption as unknown as jest.MockedFunction<
   typeof razorpay.getOption
 >;
 

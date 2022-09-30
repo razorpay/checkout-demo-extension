@@ -51,7 +51,16 @@ export const getPrefillMethod = () => {
 };
 
 export const getPrefillBillingAddress = (nvs = false) => {
-  const prefill = {
+  const prefill: {
+    line1: string;
+    line2: string;
+    state: string;
+    city: string;
+    country: string;
+    postal_code: string;
+    first_name?: string;
+    last_name?: string;
+  } = {
     line1: getOption('prefill.billing_address[line1]'),
     line2: getOption('prefill.billing_address[line2]'),
     state: getOption('prefill.billing_address[state]'),

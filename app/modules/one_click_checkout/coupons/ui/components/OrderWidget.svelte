@@ -137,7 +137,11 @@
     <p>{$t(AMOUNT_LABEL)}</p>
     {#if priceBeforeScriptDisc}
       <p>
-        {formatAmountWithSymbol(priceBeforeScriptDisc, currency, spaceAmountWithSymbol)}
+        {formatAmountWithSymbol(
+          priceBeforeScriptDisc,
+          currency,
+          spaceAmountWithSymbol
+        )}
       </p>
     {:else}
       <p data-test-id="cart-amount">

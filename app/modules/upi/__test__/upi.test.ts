@@ -94,18 +94,18 @@ describe('definePlatform: Utility test', () => {
 
 describe('enableUPITiles: feature test', () => {
   afterEach(() => {
-    (getPreferences as jest.Mock).mockRestore();
+    (getPreferences as unknown as jest.Mock).mockRestore();
     (isRecurring as jest.Mock).mockRestore();
   });
   test("should be disabled if pref doesn't have data", () => {
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce([]);
     expect(enableUPITiles()?.status).toBeFalsy();
   });
   test('should be disabled if recurring', () => {
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce([]);
@@ -114,7 +114,7 @@ describe('enableUPITiles: feature test', () => {
   });
 
   test('should be disabled if upi_intent disable', () => {
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce([]);
@@ -123,7 +123,7 @@ describe('enableUPITiles: feature test', () => {
   });
 
   test('should be enabled if preferences available', () => {
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(feature_overrides.features);
@@ -134,7 +134,7 @@ describe('enableUPITiles: feature test', () => {
 
   test('should be subtext mode for desktop', () => {
     (isDesktop as jest.Mock).mockReturnValue(true);
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(feature_overrides.features);
@@ -143,7 +143,7 @@ describe('enableUPITiles: feature test', () => {
     expect(response?.variant).toBe('subText');
   });
   test('should be row mode for NON_DESKTOP_MODE', () => {
-    (getPreferences as jest.Mock)
+    (getPreferences as unknown as jest.Mock)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(feature_overrides.features);
@@ -193,7 +193,7 @@ describe('#getGridArray utility test', () => {
 
 describe('#definePlatformReturnMethodIdentifier: utility test', () => {
   test('should return none for desktop', () => {
-    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getOption as unknown as jest.Mock).mockReturnValueOnce(true);
     (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
     (isDesktop as jest.Mock).mockReturnValueOnce(true);
     (isUPIFlowEnabled as jest.Mock).mockReturnValueOnce(false);
@@ -213,7 +213,7 @@ describe('#definePlatformReturnMethodIdentifier: utility test', () => {
         },
       ],
     });
-    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getOption as unknown as jest.Mock).mockReturnValueOnce(true);
     (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
     (isUPIFlowEnabled as jest.Mock).mockReturnValueOnce(true);
     const cb = definePlatformReturnMethodIdentifier();
@@ -222,7 +222,7 @@ describe('#definePlatformReturnMethodIdentifier: utility test', () => {
   });
 
   test('should return none for other click', () => {
-    (getOption as jest.Mock).mockReturnValueOnce(true);
+    (getOption as unknown as jest.Mock).mockReturnValueOnce(true);
     (getMerchantMethods as jest.Mock).mockReturnValueOnce({ upi: true });
     (isDesktop as jest.Mock).mockReturnValueOnce(true);
     const cb = definePlatformReturnMethodIdentifier();

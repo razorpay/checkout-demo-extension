@@ -12,7 +12,7 @@ import { isRecurringOrPreferredPayment } from './recurring';
 const demoMerchantKey = ['rzp_test_1DP5mmOlF5G5ag', 'rzp_live_ILgsfZCZoFIKMb'];
 
 function isDemoMerchant() {
-  const merchantKey = getOption('key') as string;
+  const merchantKey = getOption('key');
   return demoMerchantKey.includes(merchantKey);
 }
 
@@ -37,7 +37,7 @@ export const isRedesignV15 = (): boolean => {
       'experiments.recurring_redesign_v1_5'
     );
 
-    let allow = getPreferences('experiments.checkout_redesign_v1_5');
+    let allow = getPreferences('experiments.checkout_redesign_v1_5') as boolean;
     const { isOrgRazorpay } = getOrgDetails() || {};
 
     const isFOHEnabled = hasMerchantPolicy();

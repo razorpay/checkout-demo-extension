@@ -15,7 +15,7 @@
     REMOVE_LABEL,
     AVAILABLE_LABEL,
     APPLIED_LABEL,
-COUPONS_DISABLED_TOAST_MESSAGE,
+    COUPONS_DISABLED_TOAST_MESSAGE,
   } from 'one_click_checkout/coupons/i18n/labels';
 
   // analytics imports

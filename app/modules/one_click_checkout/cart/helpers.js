@@ -82,11 +82,11 @@ export const isCartTruthy = (cart) => {
   });
 
   const lineItemsTotalAmount = cart.reduce((acc, curr) => {
-    if ( curr.offer_price !== undefined && +curr.price !== +curr.offer_price ) {
+    if (curr.offer_price !== undefined && +curr.price !== +curr.offer_price) {
       return acc + curr.quantity * +curr.offer_price;
     }
     return acc + curr.quantity * +curr.price;
-  } , 0);
+  }, 0);
 
   return areAllItemsTruthy && lineItemsTotalAmount === get(cartAmount);
 };

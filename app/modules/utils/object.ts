@@ -6,10 +6,13 @@
  * @returns {any}
  */
 export function get(
-  object: Common.Object,
+  object: Record<string, any>,
   path: string | string[],
   defaultValue: any = null
 ): any {
+  if (!isNonNullObject(object)) {
+    return object;
+  }
   if (typeof path === 'string') {
     path = path.split('.');
   }

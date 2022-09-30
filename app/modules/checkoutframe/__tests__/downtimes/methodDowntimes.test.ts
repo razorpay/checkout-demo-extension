@@ -82,14 +82,14 @@ const mockPrefs = {
 };
 describe('getMethodDowntimes method tests', () => {
   it('should return high and low downtime methods as a object', () => {
-    (getPreferences as jest.Mock).mockReturnValue(mockPrefs);
+    (getPreferences as unknown as jest.Mock).mockReturnValue(mockPrefs);
     expect(getMethodDowntimes()).toEqual({
       high: [],
       low: [],
     });
   });
   it('should return upi/qr as high downtime method when prefs has payment.downtimes with no instrument', () => {
-    (getPreferences as jest.Mock).mockReturnValue({
+    (getPreferences as unknown as jest.Mock).mockReturnValue({
       ...mockPrefs,
       payment_downtime: {
         ...mockPrefs.payment_downtime,
@@ -108,7 +108,7 @@ describe('getMethodDowntimes method tests', () => {
   });
 
   it('should return upi/qr as high downtime method when prefs has payment.downtimes with scheduled downtime', () => {
-    (getPreferences as jest.Mock).mockReturnValue({
+    (getPreferences as unknown as jest.Mock).mockReturnValue({
       ...mockPrefs,
       payment_downtime: {
         ...mockPrefs.payment_downtime,
@@ -121,7 +121,7 @@ describe('getMethodDowntimes method tests', () => {
     });
   });
   it('should return NB as high downtime method when prefs has payment.downtimes with all enabled banks', () => {
-    (getPreferences as jest.Mock).mockReturnValue({
+    (getPreferences as unknown as jest.Mock).mockReturnValue({
       ...mockPrefs,
       payment_downtime: {
         ...mockPrefs.payment_downtime,
@@ -134,7 +134,7 @@ describe('getMethodDowntimes method tests', () => {
     });
   });
   it('should return NB as Low downtime method when prefs has payment.downtimes low with all enabled banks', () => {
-    (getPreferences as jest.Mock).mockReturnValue({
+    (getPreferences as unknown as jest.Mock).mockReturnValue({
       ...mockPrefs,
       payment_downtime: {
         ...mockPrefs.payment_downtime,
@@ -150,7 +150,7 @@ describe('getMethodDowntimes method tests', () => {
     });
   });
   it('edge cases', () => {
-    (getPreferences as jest.Mock).mockReturnValueOnce({
+    (getPreferences as unknown as jest.Mock).mockReturnValueOnce({
       ...mockPrefs,
       netbanking: undefined,
       payment_downtime: undefined,
@@ -159,7 +159,7 @@ describe('getMethodDowntimes method tests', () => {
       high: [],
       low: [],
     });
-    (getPreferences as jest.Mock).mockReturnValueOnce({
+    (getPreferences as unknown as jest.Mock).mockReturnValueOnce({
       ...mockPrefs,
       methods: undefined,
       payment_downtime: undefined,
@@ -168,7 +168,7 @@ describe('getMethodDowntimes method tests', () => {
       high: [],
       low: [],
     });
-    (getPreferences as jest.Mock).mockReturnValueOnce(undefined);
+    (getPreferences as unknown as jest.Mock).mockReturnValueOnce(undefined);
     expect(getMethodDowntimes()).toEqual({
       high: [],
       low: [],

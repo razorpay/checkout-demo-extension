@@ -138,10 +138,10 @@ export function getMethodDowntimes() {
   //#region Newly added code to remove dependency
   const preferences = getPreferences();
   const downtimeItems: Downtime.RawDowntime[] =
-    (preferences &&
+    ((preferences &&
       preferences.payment_downtime &&
-      preferences.payment_downtime.items) ||
-    [];
+      preferences.payment_downtime
+        .items) as unknown as Downtime.RawDowntime[]) || [];
 
   const groupedDowntimes: Common.Object<Downtime.RawDowntime[]> =
     copyMethodsIfNeeded(groupDowntimesByMethod(downtimeItems));

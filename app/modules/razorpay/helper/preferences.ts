@@ -1,3 +1,4 @@
+import type { Preferences } from 'razorpay/types/Preferences';
 import { getPreferences } from './base';
 
 // Preference related
@@ -11,6 +12,9 @@ export const getMerchantOrderDueAmount = () =>
 export const getMerchantKey = () => getPreferences('merchant_key');
 export const isGlobalVault = () => getPreferences('global');
 export const isPartialPayment = () => getPreferences('order.partial_payment');
-export const hasFeature = (feature, fallbackValue) =>
-  getPreferences(`features.${feature}`, fallbackValue);
+export const hasFeature = (feature: string, fallbackValue: boolean): boolean =>
+  getPreferences(
+    `features.${feature}` as unknown as keyof Preferences,
+    fallbackValue
+  ) as unknown as boolean;
 export const getBanks = () => getPreferences('methods.netbanking');

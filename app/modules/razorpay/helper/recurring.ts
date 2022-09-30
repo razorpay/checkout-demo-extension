@@ -10,7 +10,7 @@ export const getRecurringMethods = () => getPreferences('methods.recurring');
 export function getSubscription() {
   return getPreferences('subscription');
 }
-export function isRecurring() {
+export function isRecurring(): boolean {
   if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
   }
@@ -19,7 +19,7 @@ export function isRecurring() {
 export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
-export function isSubscription() {
+export function isSubscription(): boolean {
   return isRecurring() && getPreferences('subscription');
 }
 
@@ -27,7 +27,7 @@ export function isRecurringOrPreferredPayment() {
   return isRecurring() || isSubscription();
 }
 
-export function isASubscription(method = null) {
+export function isASubscription(method = null): boolean {
   if (!getPreferences('subscription')) {
     return false;
   }

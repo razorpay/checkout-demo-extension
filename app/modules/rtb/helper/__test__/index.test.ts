@@ -10,9 +10,10 @@ jest.mock('razorpay', () => ({
   getPreferences: jest.fn(),
 }));
 
-const getPreferences = razorpay.getPreferences as jest.MockedFunction<
-  typeof razorpay.getPreferences
->;
+const getPreferences =
+  razorpay.getPreferences as unknown as jest.MockedFunction<
+    typeof razorpay.getPreferences
+  >;
 
 let razorpayInstance = {
   id: 'id',

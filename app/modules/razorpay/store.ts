@@ -2,27 +2,35 @@
  * Don't Import any other module files here
  * If import requires make sure that file doesn't import any other module [to prevent circular dependencies]
  */
-import { writable } from 'svelte/store';
 import { IRCTC_KEYS } from './constant';
 import { get } from 'utils/object';
+import type { PreferencesObject } from './types/Preferences';
+import type { Option, OptionObject } from './types/Options';
 
 class RazorpayStore {
-  instance = null;
-  preferenceResponse = null;
+  instance: any = null;
+  preferenceResponse: PreferencesObject = {} as PreferencesObject;
   isEmbedded = false; // when parent is provided
 
+  subscription: Array<(instance: any) => void> = [];
+
   constructor() {
-    this._store = writable();
+    this.subscription = [];
   }
 
-  updateInstance = (instance) => {
+  updateInstance = (instance: any) => {
     this.razorpayInstance = instance;
   };
 
   set razorpayInstance(instance) {
     this.instance = instance;
-    this.preferenceResponse = instance.preferences;
-    this._store.set(instance);
+    this.preferenceResponse = instance.preferences as PreferencesObject;
+    // trigger subscriptions
+    this.subscription.forEach((fx) => {
+      if (typeof fx === 'function') {
+        fx(instance);
+      }
+    });
     if (this.isIRCTC()) {
       this.set('theme.image_frame', false);
     }
@@ -36,9 +44,9 @@ class RazorpayStore {
     return this.preferenceResponse;
   }
 
-  triggerInstanceMethod = (method, args = []) => {
+  triggerInstanceMethod = (method: string, args: any = []) => {
     if (this.instance) {
-      return this.instance[method].apply(this.instance, args);
+      return (this.instance[method] as () => any).apply(this.instance, args);
     }
   };
 
@@ -47,12 +55,12 @@ class RazorpayStore {
    * @param  {...any} args set options to razorpay instance
    * @returns
    */
-  set = (...args) => {
+  set = (...args: any) => {
     return this.triggerInstanceMethod('set', args);
   };
 
-  subscribe = (...args) => {
-    return this._store.subscribe.apply(this, args);
+  subscribe = (fx: (instance: any) => void) => {
+    this.subscription.push(fx);
   };
 
   /**
@@ -60,14 +68,14 @@ class RazorpayStore {
    * @param  {...any} args get options from razorpay instance if arg provided else returns razorpay instance
    * @returns
    */
-  get = (...args) => {
+  get = (...args: any) => {
     if (args.length) {
       return this.triggerInstanceMethod('get', args);
     }
     return this.instance;
   };
 
-  getMerchantOption = (path = '') => {
+  public getMerchantOption = (path = ''): any => {
     const options = this.triggerInstanceMethod('get') || {};
     if (!path) {
       return options;
@@ -83,7 +91,7 @@ class RazorpayStore {
     return IRCTC_KEYS.indexOf(this.get('key')) >= 0;
   };
 
-  getCardFeatures = (iin) => {
+  getCardFeatures = (iin: string) => {
     return this.instance.getCardFeatures(iin);
   };
 }

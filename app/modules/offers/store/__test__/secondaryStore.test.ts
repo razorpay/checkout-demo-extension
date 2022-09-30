@@ -87,7 +87,7 @@ describe('$computeOfferClass', () => {
   });
 
   test('test get(computeOfferClass)', () => {
-    (getOption as jest.Mock).mockImplementationOnce(() => undefined);
+    (getOption as unknown as jest.Mock).mockImplementationOnce(() => undefined);
     expect(get(computeOfferClass)).toMatchObject({
       hasFee: false,
       hasDiscount: true,

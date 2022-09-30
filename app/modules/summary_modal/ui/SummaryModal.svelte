@@ -146,7 +146,7 @@
   }
 
   $: {
-    if(scriptCouponApplied()) {
+    if (scriptCouponApplied()) {
       priceBeforeScriptDisc = $cartItems.reduce(
         (acc, curr) => acc + curr.quantity * +curr.price,
         0

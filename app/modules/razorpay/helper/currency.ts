@@ -1,11 +1,14 @@
+import type { Preferences } from 'razorpay/types/Preferences';
 import { entityWithAmount } from '../constant';
 import { getOption, getPreferences } from './base';
 import { hasFeature } from './preferences';
 
 /** currency related */
-export const getCurrency = () => {
+export const getCurrency = (): string => {
   const entityWithAmountData =
-    entityWithAmount.find((entity) => getPreferences(entity)) || {};
+    (entityWithAmount as any).find((entity: keyof Preferences) =>
+      getPreferences(entity)
+    ) || {};
   return entityWithAmountData?.currency || getOption('currency');
 };
 
