@@ -26,6 +26,7 @@ import {
   INDIAN_CONTACT_REGEX,
 } from 'common/constants';
 import { getElementById } from 'utils/doc';
+import * as _ from 'utils/_';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
@@ -35,7 +36,12 @@ export function clickOutside(node) {
       !event.defaultPrevented &&
       typeof node.dispatchEvent === 'function'
     ) {
-      node.dispatchEvent(new CustomEvent('click_outside', node));
+      // in IE11 type of CustomEvent comes as Object using an IE-compatible Custom Event in that case
+      if (typeof CustomEvent === 'function') {
+        node.dispatchEvent(new CustomEvent('click_outside', node));
+      } else {
+        node.dispatchEvent(_.CustomEvent('click_outside', node));
+      }
     }
   };
 
