@@ -42,7 +42,7 @@ describe('test #getInstrumentDetails', () => {
       section: 'p13n',
       skipCTAClick: false,
       token_id: 'token_GpaXi2JbdnNQo4',
-      vpas: ['nanda120idbi@ybl'],
+      vpas: ['testupi@ybl'],
     };
 
     expect(getInstrumentDetails(instrument)).toStrictEqual({

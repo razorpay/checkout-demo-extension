@@ -15,8 +15,8 @@ describe('validate SavedCards', () => {
   let tokens: Tokens[] = [];
 
   customer.set({
-    email: 'nandakishor.j9@gmail.com',
-    contact: '+919912054784',
+    email: 'test@razorpay.com',
+    contact: '+918111111111',
     tokens: {
       entity: 'collection',
       count: 2,
@@ -32,7 +32,7 @@ describe('validate SavedCards', () => {
           card: {
             country: 'US',
             entity: 'card',
-            name: 'Nanda',
+            name: 'user',
             last4: '7369',
             network: 'Visa',
             type: 'debit',

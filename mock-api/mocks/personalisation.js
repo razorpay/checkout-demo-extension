@@ -37,9 +37,9 @@ const preferredInsturments = {
 
 const preferredMethodForTokenization = {
   preferred_methods: {
-    '+919912054784': {
+    '+918111111111': {
       instruments: [
-        { instrument: 'nanda120idbi@ybl', method: 'upi' },
+        { instrument: 'testupi@provider', method: 'upi' },
         {
           instrument: 'token_HMpQW2ILsIXGxA',
           method: 'card',

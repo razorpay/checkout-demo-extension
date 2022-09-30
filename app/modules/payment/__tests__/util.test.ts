@@ -32,8 +32,8 @@ describe('Instrument Detail for Submit Event', () => {
       id: 'b740feb2_rzp.cluster_1_3_wallet_true',
     });
     const data = {
-      contact: '+919912054784',
-      email: 'nandakishor.j9@gmail.com',
+      contact: '+918111111111',
+      email: 'test@razorpay.com',
       method: 'wallet',
       wallet: 'phonepe',
       amount: 550000,
@@ -61,8 +61,8 @@ describe('Instrument Detail for Submit Event', () => {
       id: 'b740feb2_rzp.cluster_1_0_card_true',
     });
     const data = {
-      contact: '+919912054784',
-      email: 'nandakishor.j9@gmail.com',
+      contact: '+918111111111',
+      email: 'test@razorpay.com',
       method: 'card',
       'card[number]': '4111111111111111',
       'card[expiry]': '11 / 23',
@@ -105,7 +105,7 @@ describe('Instrument Detail for Submit Event', () => {
       types: ['debit'],
     });
     customer.set({
-      contact: '+919912054784',
+      contact: '+918111111111',
       customer_id: undefined,
       haveSavedCard: true,
       logged: true,
@@ -145,8 +145,8 @@ describe('Instrument Detail for Submit Event', () => {
       },
     });
     const data = {
-      contact: '+919912054784',
-      email: 'nandakishor.j9@gmail.com',
+      contact: '+918111111111',
+      email: 'test@razorpay.com',
       amount: 550000,
       'card[cvv]': '123',
       method: 'card',
@@ -184,7 +184,7 @@ describe('Instrument Detail for Submit Event', () => {
       id: 'b740feb2_rzp.cluster_1_1_upi_true',
     });
     customer.set({
-      contact: '+919912054784',
+      contact: '+918111111111',
       customer_id: undefined,
       haveSavedCard: true,
       logged: true,
@@ -199,9 +199,9 @@ describe('Instrument Detail for Submit Event', () => {
             token: '8NHRLBA1JXAzVN',
             method: 'upi',
             vpa: {
-              username: 'nanda120idbi',
+              username: 'testupi@provider',
               handle: 'ybl',
-              name: 'NANDA KISHOR JERIPOTHULA',
+              name: 'TEST USER',
               status: 'valid',
             },
           },
@@ -209,8 +209,8 @@ describe('Instrument Detail for Submit Event', () => {
       },
     });
     const data = {
-      contact: '+919912054784',
-      email: 'nandakishor.j9@gmail.com',
+      contact: '+918111111111',
+      email: 'test@razorpay.com',
       method: 'upi',
       token: '8NHRLBA1JXAzVN',
       upi: {

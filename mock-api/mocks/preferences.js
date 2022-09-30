@@ -5973,8 +5973,8 @@ const preferences = {
   },
   loggedIn: {
     customer: {
-      email: 'nandakishor.j9@gmail.com',
-      contact: '+919912054784',
+      email: 'test@razorpay.com',
+      contact: '+918111111111',
       tokens: {
         entity: 'collection',
         count: 2,
@@ -5990,7 +5990,7 @@ const preferences = {
             card: {
               country: 'US',
               entity: 'card',
-              name: 'Nanda',
+              name: 'user',
               last4: '7369',
               network: 'Visa',
               type: 'debit',
@@ -6026,9 +6026,9 @@ const preferences = {
             wallet: null,
             method: 'upi',
             vpa: {
-              username: 'nanda120idbi',
+              username: 'testupi@provider',
               handle: 'ybl',
-              name: 'NANDA KISHOR JERIPOTHULA',
+              name: 'TEST USER',
               status: 'valid',
               received_at: 1616391822,
             },

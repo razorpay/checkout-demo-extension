@@ -167,9 +167,9 @@ describe('test getInstrumentsWithOrder utility', () => {
         wallet: null,
         method: 'upi',
         vpa: {
-          username: 'nanda120idbi',
+          username: 'testupi@provider',
           handle: 'ybl',
-          name: 'NANDA KISHOR JERIPOTHULA',
+          name: 'TEST USER',
           status: 'valid',
           received_at: 1616391822,
         },

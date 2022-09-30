@@ -11,7 +11,7 @@ export const customerTokens = {
       card: {
         country: 'US',
         entity: 'card',
-        name: 'Nanda',
+        name: 'user',
         last4: '7369',
         network: 'Visa',
         type: 'debit',

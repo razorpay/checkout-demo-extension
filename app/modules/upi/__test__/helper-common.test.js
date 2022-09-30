@@ -107,7 +107,7 @@ describe('UPI Helper functions tests', () => {
     expect(isPreferredApp(GOOGLE_PAY_PACKAGE_NAME, UPI_APPS.preferred)).toBe(
       true
     );
-    expect(isVpaValid('nanda@ybl')).toBe(true);
+    expect(isVpaValid('user@ybl')).toBe(true);
   });
 
   it('isOtherIntentApp, doesAppExist, isPreferredApp, isVpaValid should work as expected:Negative Case', () => {
@@ -118,7 +118,7 @@ describe('UPI Helper functions tests', () => {
     );
     expect(isPreferredApp('other_intent_apps', UPI_APPS.preferred)).toBe(false);
     expect(isPreferredApp('com.whatsapp', UPI_APPS.preferred)).toBe(false);
-    expect(isVpaValid('nanda')).toBe(false);
+    expect(isVpaValid('user')).toBe(false);
     expect(isVpaValid('@ybl')).toBe(false);
     expect(isVpaValid('@')).toBe(false);
     expect(isVpaValid('$')).toBe(false);
