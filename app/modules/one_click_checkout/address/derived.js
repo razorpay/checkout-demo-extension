@@ -1,3 +1,4 @@
+import { getPreferences } from 'razorpay';
 import { get, derived } from 'svelte/store';
 import {
   savedAddresses,
@@ -16,13 +17,20 @@ import {
   shouldSaveAddress as shouldSaveBillingAddress,
   resetAddress as resetBillingAddress,
 } from 'one_click_checkout/address/billing_address/store';
-import { appliedCoupon } from 'one_click_checkout/coupons/store';
+import {
+  appliedCoupon,
+  isCouponApplied,
+} from 'one_click_checkout/coupons/store';
 import { isCodApplicableOnCoupon } from 'one_click_checkout/address/helpersExtra';
 
 export const isCodAvailable = derived(
-  [selectedShippingAddress, appliedCoupon],
-  ([$selectedShippingAddress]) => {
-    if (!isCodApplicableOnCoupon()) {
+  [selectedShippingAddress, appliedCoupon, isCouponApplied],
+  ([$selectedShippingAddress, $isCouponApplied]) => {
+    if (
+      !isCodApplicableOnCoupon() &&
+      $isCouponApplied &&
+      getPreferences('merchant_key') === 'rzp_live_doOidGOxQnkbe5'
+    ) {
       return false;
     }
     return $selectedShippingAddress?.cod;

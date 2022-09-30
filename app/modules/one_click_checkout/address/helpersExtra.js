@@ -349,8 +349,8 @@ export const isCodApplicableOnCoupon = () => {
   const disabled = storeGetter(disabledMethods);
 
   if (disabled.includes('cod')) {
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 };
