@@ -1,6 +1,6 @@
 import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
 import { selectedBank } from 'emiV2/store';
-import { providersToAvoid } from 'emiV2/constants';
+import { providersToAvoid, redirectFlowEmiProviders } from 'emiV2/constants';
 import type { EmiBankPlans, EMIBANKS, EMIBanksMap } from 'emiV2/types';
 import { get } from 'svelte/store';
 
@@ -54,4 +54,9 @@ export const isSelectedBankBajaj = () => {
     return code.toUpperCase() === 'BAJAJ';
   }
   return false;
+};
+
+/* Checks if the selected emi provider has the redirect flow */
+export const isEmiRedirectFlow = (provider: string) => {
+  return redirectFlowEmiProviders.includes(provider);
 };

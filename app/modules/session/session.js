@@ -68,7 +68,10 @@ import triggerErrorModal, {
   closeErrorModal,
   updateLoadingCTA,
 } from 'components/ErrorModal';
-import { handleBackNavigation } from 'emiV2/helper/navigation';
+import {
+  attemptCardlessEmiPayment,
+  handleBackNavigation,
+} from 'emiV2/helper/navigation';
 import { getCardlessEMIProviders } from 'checkoutstore/methods';
 import { trackEmiFromCardScreen } from 'emiV2/events/tracker';
 import { isContactHidden, isEmailHidden, isEmiV2 } from 'razorpay';
@@ -1353,7 +1356,12 @@ Session.prototype = {
      * to the EMI screen, hence preSubmit should not be called.
      */
     if (provider !== 'cards') {
-      this.preSubmit();
+      if (!isEmiV2()) {
+        this.preSubmit();
+        return;
+      }
+      // Use the navstack function to redirect the user to respect screen or payment gateway
+      attemptCardlessEmiPayment(provider);
     }
   },
 

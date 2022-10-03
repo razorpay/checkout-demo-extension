@@ -109,7 +109,9 @@
             <EmiOptionGridItem
               type={providerSection}
               emi={provider}
-              selected={!$selectedCard && selectedIssuer.code === provider.code}
+              selected={!$selectedCard &&
+                selectedIssuer.code.toLowerCase() ===
+                  provider.code.toLowerCase()}
               on:click={() => {
                 onEmiOptionSelect(provider, providerSection);
               }}

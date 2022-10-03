@@ -100,3 +100,9 @@ export const banksWithConvenienveFee: string[] = [
   AXIS_BANK_CODE,
   RBL_BANK_CODE,
 ];
+
+// Emi providers that support redirect based flow
+export const redirectFlowEmiProviders: string[] = [
+  ZESTMONEY_CODE,
+  WALNUT369_CODE,
+];

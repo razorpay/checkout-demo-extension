@@ -26,6 +26,7 @@ import updateScore from 'analytics/checkoutScore';
 import Analytics from 'analytics';
 import type { EmiPlan } from 'emiV2/types';
 import { selectedPlan } from 'checkoutstore/emi';
+import { cardlessEmiStore } from 'emiV2/ui/components/EmiTabsScreen/store';
 
 export const clearEmiPaymentPayload = () => {
   selectedBank.set(null);
@@ -142,6 +143,8 @@ export const payInFull = () => {
 export const clearPaymentRequest = () => {
   const session = getSession();
   if (session.r._payment) {
+    // set cardless emi store to empty after clearing the payment request
+    cardlessEmiStore.set([]);
     session.r._payment.off();
     session.r._payment.clear();
   }
