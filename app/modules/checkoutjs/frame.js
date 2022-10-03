@@ -4,6 +4,7 @@ import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
 import { COMMIT_HASH, TRAFFIC_ENV } from 'common/constants';
 import Analytics, { Track } from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import {
   ACTIONS,
   CATEGORIES,
@@ -407,6 +408,34 @@ CheckoutFrame.prototype = {
     ) {
       return;
     }
+
+    try {
+      // Only process message if the iframe origin isn't
+      // tampered with or belong to razorpay domain
+      if (
+        RazorpayConfig.api.indexOf(e.origin) !== 0 &&
+        !/.*[.]razorpay.(com|in)$/.test(e.origin)
+      ) {
+        Analytics.track('postmessage_origin_redflag', {
+          type: AnalyticsTypes.METRIC,
+          data: {
+            origin: e.origin,
+          },
+          immediately: true,
+        });
+
+        // Commenting out `return`, as we initially want to
+        // track the origins first. Based on the data
+        // we will either modify the conditions or
+        // simply uncomment the next line if there
+        // are no unexpected origins.
+
+        // return;
+      }
+    } catch (error) {
+      // no-op
+    }
+
     data = data.data;
     this['on' + event](data);
 
