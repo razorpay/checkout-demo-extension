@@ -57,7 +57,8 @@ type EnableUPITilesReturnType = {
 };
 
 export function enableUPITiles(
-  validateL0ForSDK?: boolean
+  validateL0ForSDK?: boolean,
+  isL0Page = false
 ): EnableUPITilesReturnType {
   let response: EnableUPITilesReturnType = {
     status: false,
@@ -77,8 +78,7 @@ export function enableUPITiles(
   if (
     isRecurring() ||
     !upiNrL0L1Improvements.enabled() ||
-    (isBrave && iOS) ||
-    definePlatform('mWebiOS')
+    (definePlatform('mWebiOS') && isL0Page)
   ) {
     return response;
   }

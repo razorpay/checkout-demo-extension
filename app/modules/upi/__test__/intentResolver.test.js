@@ -1,11 +1,9 @@
 import { tryOpeningIntentUrl } from '../helper/intent/resolver';
-import { tryOpeningIntentUrlOniOSMWeb } from '../helper/intent/upiOniOSMWeb';
 jest.mock('checkoutstore', () => ({
   getMerchantKey: () => '',
 }));
 
 jest.mock('../helper/intent/upiOniOSMWeb', () => ({
-  tryOpeningIntentUrlOniOSMWeb: jest.fn(),
   upiPopUpForiOSMWeb: {
     instance: null,
   },
@@ -34,10 +32,8 @@ describe('#tryOpeningIntentUrl', () => {
   });
 
   it('should call safari related call based on config', () => {
-    tryOpeningIntentUrlOniOSMWeb.mockResolvedValue(true);
     tryOpeningIntentUrl(intentUrl, true);
     finishTimeout();
-    expect(tryOpeningIntentUrlOniOSMWeb).toHaveBeenCalledTimes(1);
   });
 
   it('should resolve after 2 seconds', async () => {

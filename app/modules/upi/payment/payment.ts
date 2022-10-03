@@ -1,14 +1,11 @@
 import { UPI_POLL_URL, PENDING_PAYMENT_TS } from 'common/constants';
 import RazorpayStore from 'razorpay';
 import { getSession } from 'sessionmanager';
-import { UPI_TAB_CALLBACK_NAME } from 'upi/constants';
 import { trackTrace, TRACES } from 'upi/events';
 import { getNewIosBridge } from 'bridge';
 import { handleFeeBearer } from 'upi/helper/fee-bearer';
 import { creatUPIPaymentV2, setFlowInPayload } from './prePaymentHandlers';
-import { definePlatform, resetCallbackOnUPIAppForPay } from 'upi/helper/upi';
-import popupContent from 'upi/helper/intent/popupContent';
-import { upiPopUpForiOSMWeb } from 'upi/helper/intent/upiOniOSMWeb';
+import { resetCallbackOnUPIAppForPay } from 'upi/helper/upi';
 import {
   adoptSessionUI,
   handleDeeplinkAction,
@@ -93,13 +90,6 @@ function handleUPIPayments(
     data: paymentPayload,
   });
 
-  if (config.action === 'deepLinkIntent' && definePlatform('mWebiOS')) {
-    upiPopUpForiOSMWeb.createWindow(
-      popupContent(UPI_TAB_CALLBACK_NAME),
-      UPI_TAB_CALLBACK_NAME
-    );
-  }
-
   // before we create the payment,
   // since no callbacks are pending reset if any
   resetCallbackOnUPIAppForPay();
@@ -107,7 +97,7 @@ function handleUPIPayments(
   /**
    * This is needed to use the session driven UI control
    */
-  const rzpInstanceWithPayment = (RazorpayStore.razorpayInstance as any)
+  const rzpInstanceWithPayment = RazorpayStore.razorpayInstance
     .createPayment(paymentPayload, paymentParams)
     .on(
       'payment.success',

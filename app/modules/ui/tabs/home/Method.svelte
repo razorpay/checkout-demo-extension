@@ -71,7 +71,7 @@
    * remove experimentation
    * Note: enableUPITiles is to be called with true, once we remove the experiment.
    */
-  let upiTiles = enableUPITiles(upiUxV1dot1.enabled());
+  let upiTiles = enableUPITiles(upiUxV1dot1.enabled(), true);
 
   let _subtitle;
   const isMethodCOD = method === 'cod';

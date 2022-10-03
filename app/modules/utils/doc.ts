@@ -51,7 +51,7 @@ export function resolveUrl(relativeUrl: string) {
  * @param {Object} data
  */
 export function redirectTo(data: {
-  target: string;
+  target?: string;
   url: string;
   content: any;
   method: string;
