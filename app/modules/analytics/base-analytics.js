@@ -1,6 +1,9 @@
 import Track from './tracker';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
+import { constructErrorObject } from 'error-service/helpers';
+import { SEVERITY_LEVELS } from 'error-service/models';
+import ErrorEvents from 'analytics/errors/events';
 
 const META = {};
 const REQUEST_INDEX = {};
@@ -101,7 +104,24 @@ const Analytics = () => ({
       }
 
       Track(r, name, data, immediately);
-    } catch (e) {}
+    } catch (e) {
+      /**
+       * not using error-service (capture) here as it creates a circular dependency.
+       */
+      Track(
+        r,
+        ErrorEvents.JS_ERROR,
+        {
+          data: {
+            error: constructErrorObject(e, {
+              severity: SEVERITY_LEVELS.S2,
+              unhandled: false,
+            }),
+          },
+        },
+        true
+      );
+    }
   },
 
   /**

@@ -1212,7 +1212,7 @@
     ctaV15Disabled = instrument._type === 'method';
 
     if (instrument.section === 'generic' && instrument.block) {
-      instrument.block.title = getBlockTitle(
+      instrument.blockTitle = getBlockTitle(
         instrument.block.instruments,
         $locale
       );
@@ -1220,12 +1220,12 @@
 
     AnalyticsV2State.selectedBlock = {
       category: instrument.section,
-      name: instrument.block?.title || '',
+      name: instrument.blockTitle || '',
     };
 
     try {
       MiscTracker.METHOD_SELECTED({
-        block: { category: instrument.section, name: instrument.block?.title },
+        block: { category: instrument.section, name: instrument.blockTitle },
         method: { name: instrument.method },
       });
 
@@ -1233,7 +1233,7 @@
         MiscTracker.INSTRUMENT_SELECTED({
           block: {
             category: instrument.section,
-            name: instrument.block?.title,
+            name: instrument.blockTitle,
           },
           method: { name: instrument.method },
           instrument: getInstrumentDetails(instrument),
