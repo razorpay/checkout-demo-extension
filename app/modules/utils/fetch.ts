@@ -402,6 +402,24 @@ function put(opts: options): FetchPrototype {
 }
 
 /**
+ * Sends delete request with the given options.
+ * @param {Object} opts
+ *
+ * @returns {Object}
+ */
+function deleteRequest(opts: options): FetchPrototype {
+  opts.method = 'delete';
+  if (!opts.headers) {
+    opts.headers = {};
+  }
+  if (!opts.headers['Content-type']) {
+    opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
+  }
+
+  return fetch(opts);
+}
+
+/**
  * Sends patch request with the given options.
  * @param {Object} opts
  *
@@ -500,6 +518,7 @@ function jsonp(options: options): FetchPrototype {
 fetch.post = resetPoll.bind(post);
 fetch.patch = resetPoll.bind(patch);
 fetch.put = resetPoll.bind(put);
+fetch.delete = deleteRequest;
 fetch.setSessionId = setSessionId;
 fetch.setTrackId = setTrackId;
 fetch.setKeylessHeader = setKeylessHeader;

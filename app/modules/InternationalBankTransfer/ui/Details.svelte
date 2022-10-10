@@ -38,7 +38,11 @@
   import { getVAs } from '../helpers';
 
   // constants
-  import { HELP_TEXT_MAPPING, MEHTOD_CURRENCY_MAPPING, TAB_NAME } from '../constants';
+  import {
+    HELP_TEXT_MAPPING,
+    MEHTOD_CURRENCY_MAPPING,
+    TAB_NAME,
+  } from '../constants';
 
   // types
   import type { VA_RESPONSE_TYPE } from '../types';
@@ -299,7 +303,8 @@
       color: var(--primary-text-color);
     }
 
-    .intl-bt-detail p, .intl-bt-detail__note {
+    .intl-bt-detail p,
+    .intl-bt-detail__note {
       font-size: 0.75rem;
       color: var(--primary-text-color);
     }

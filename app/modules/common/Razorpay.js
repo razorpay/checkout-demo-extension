@@ -17,6 +17,7 @@ import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from './constants';
+import { getDevice } from './useragent';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import * as _ from 'utils/_';
 
@@ -416,6 +417,10 @@ export function makePrefParams(rzp) {
     params['_[checkout_id]'] = rzp.id;
     params['_[library]'] = Track.props.library;
     params['_[platform]'] = Track.props.platform;
+
+    if (getDevice() === 'desktop') {
+      params.qr_required = true;
+    }
 
     // adding agent details
     const agentPayload = getAgentPayload() || {};

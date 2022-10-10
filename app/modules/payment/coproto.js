@@ -522,20 +522,33 @@ const responseTypes = {
 
   intent: function (request, fullResponse) {
     const CheckoutBridge = global.CheckoutBridge;
-    let ra = ({ transactionReferenceId } = {}) =>
-      fetch
-        .jsonp({
-          url: request.url,
-          callback: (response) => {
-            // transactionReferenceId is required for Google Pay microapps payments
-            if (transactionReferenceId) {
-              response.transaction_reference = transactionReferenceId; // This is snake_case to maintain convention
-            }
+    let ra = ({ transactionReferenceId } = {}) => {
+      const isCheckoutOrder = fullResponse.is_checkout_order;
+      let fetchRequest = fetch.jsonp;
+      let headers;
+      if (isCheckoutOrder) {
+        fetchRequest = fetch;
+        headers = {
+          'Content-type': 'application/json',
+        };
+      }
+      fetchRequest({
+        url: request.url,
+        callback: (response) => {
+          // transactionReferenceId is required for Google Pay microapps payments
+          if (transactionReferenceId) {
+            response.transaction_reference = transactionReferenceId; // This is snake_case to maintain convention
+          }
 
-            this.complete(response);
-          },
-        })
-        .till((response) => response && response.status, 10);
+          this.complete(response);
+        },
+        headers,
+      }).till(
+        (response) => response && response.status,
+        isCheckoutOrder ? 5 : 10, // as time increase of polling in case of checkout order
+        isCheckoutOrder ? 6e3 : 3e3
+      );
+    };
 
     let intent_url = (fullResponse.data || {}).intent_url;
 

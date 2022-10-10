@@ -122,10 +122,11 @@
   }
   .screen.screen-comp {
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
   }
 
-  .screen.screen-comp::-webkit-scrollbar { /* WebKit */
+  .screen.screen-comp::-webkit-scrollbar {
+    /* WebKit */
     width: 0;
     height: 0;
   }

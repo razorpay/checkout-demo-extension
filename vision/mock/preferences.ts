@@ -1,7 +1,7 @@
 import { MERCHANT_TEST_KEY } from '../constant';
 
-const Preferences = {
-  default: {
+const Preferences = (overrides: Record<string, any> = {}) => {
+  let preferenceResponse = {
     options: {
       theme: { color: '#528FF0' },
       image: null,
@@ -121,7 +121,13 @@ const Preferences = {
     },
     rtb: true,
     rtb_experiment: { experiment: false },
-  },
+  };
+
+  if (typeof overrides === 'object' && overrides) {
+    preferenceResponse = { ...preferenceResponse, ...overrides };
+  }
+
+  return preferenceResponse;
 };
 
 export default Preferences;

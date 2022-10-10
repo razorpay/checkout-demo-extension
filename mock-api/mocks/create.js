@@ -475,6 +475,9 @@ const getAjax = (body) => {
   if (body.method === 'cod') {
     return ajax.cod;
   }
+  if (body.method === 'upi' && body._['upiqr']) {
+    return ajax.upi_qr;
+  }
   if (body.method === 'app' && ['trustly', 'poli'].includes(body.provider)) {
     return ajax.hdfc_first;
   }

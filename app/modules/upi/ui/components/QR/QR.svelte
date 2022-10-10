@@ -1,13 +1,18 @@
 <script lang="ts">
   // Svelte imports
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy, onMount, tick } from 'svelte';
 
   // UI Imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';
-  import { clearActiveQRPayment, getQRImage } from 'upi/helper';
+  import {
+    autoGenerateQREnabled,
+    clearActiveQRPayment,
+    getQRImage,
+    updateV2FailureState,
+  } from 'upi/helper';
   import {
     startTimer,
     readableTimeLeft,
@@ -40,7 +45,12 @@
     SHOW_QR,
     TIMER_CALLOUT_QR_LINE0,
   } from 'upi/i18n/labels';
-  import { renderQRSection, trackQRStatus, trackQRGenerate } from 'upi/events';
+  import {
+    renderQRSection,
+    trackQRStatus,
+    trackQRGenerate,
+    trackQRAutoGenerate,
+  } from 'upi/events';
   import { returnAsIs } from 'lib/utils';
 
   export let parent: UPI.QRParent;
@@ -56,6 +66,10 @@
         /** QR Payment might have already cancelled from session hence don't reset again */
         break;
       case 'error':
+        // in case new API throw error make sure we fallback to ajax api next time
+        autoGenerateQREnabled() &&
+          response.error.reason === 'qr_v2_disabled' &&
+          updateV2FailureState(true);
         resetQRState();
         Analytics.track(UPI_EVENTS.QR_GENERATION_FAIL, {
           reason: response.error.description,
@@ -68,6 +82,8 @@
     updateQrState({ status: 'loading', manualRefresh });
     if (manualRefresh) {
       trackQRGenerate(parent);
+    } else if (autoGenerateQREnabled() && manualRefresh === false) {
+      trackQRAutoGenerate(parent);
     }
     trackQRStatus('paymentInitiation', parent);
     handleUPIPayments(
@@ -79,7 +95,7 @@
             const timerExpiresAt = startTimer(
               getRelativeGracefulTime(QR_EXPIRE_TIME, QR_GRACEFUL_CANCEL_TIME),
               () => {
-                clearActiveQRPayment(true);
+                clearActiveQRPayment(true, true);
                 trackQRStatus('qrExpired', parent);
               }
             );
@@ -90,33 +106,28 @@
               ),
             });
           },
+          qrv2: autoGenerateQREnabled(), // means auto generate using QRv2 api
         },
       },
       onResponse,
       {
         cancel: false,
-        error: true,
+        error: manualRefresh,
       }
     );
   };
 
   onMount(() => {
     renderQRSection(parent);
-    /**
-     * Intended Comment
-     * The following logic is to auto generate QR on first time of component loading
-     * Due to various reasons of Payment DB and SR/CR issues we are temporarily
-     * disabling this feature and making a CTA SHOW QR on image
-     * When qrState.state is refresh and qrState.autoGenerate:true, we are showing SHOW QR CTA
-     *
-     */
-    // if ($qrState.autoGenerate && !$qrState.url) {
-    //   createQRPayment(false);
-    // } else
-    if ($qrState.url) {
-      fetch.resumePoll();
-    }
+    tick().then(() => {
+      if ($qrState.autoGenerate && autoGenerateQREnabled() && !$qrState.url) {
+        createQRPayment(false);
+      } else if ($qrState.url) {
+        fetch.resumePoll();
+      }
+    });
   });
+
   onDestroy(() => {
     if ($qrState.url) {
       // fetch pause

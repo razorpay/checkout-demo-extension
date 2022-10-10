@@ -45,6 +45,7 @@ declare namespace UPI {
         intent_url: string;
         qr_code_url: string;
       }) => void;
+      qrv2?: boolean;
     };
   }
 

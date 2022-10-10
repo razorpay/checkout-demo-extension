@@ -55,6 +55,7 @@ import {
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
+import { processCheckoutOrder } from './checkoutOrder';
 import { ContextProperties, EventsV2, AnalyticsV2State } from 'analytics-v2';
 import { PaymentTracker } from 'payment/analytics/events';
 
@@ -91,14 +92,28 @@ function onPaymentCancel(metaParam) {
     }
     updateLatestPaymentStatus('cancel', cancelError);
     if (payment_id && !this.persistentMode) {
+      const isCheckoutOrder = this.is_checkout_order;
       eventData.payment_id = payment_id;
       let url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
-
+      let fetchRequest = fetch;
+      let requestData;
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
       }
-      fetch({
+
+      if (isCheckoutOrder) {
+        url = makeAuthUrl(razorpay, `checkout/order/${payment_id}`);
+        fetchRequest = fetch.delete;
+        requestData = {
+          close_reason: metaParam['_[reason]']?.includes('payment_expired')
+            ? 'expired'
+            : 'opt_out',
+        };
+      }
+
+      fetchRequest({
         url: url,
+        data: requestData,
         callback: (response) => {
           if (response.razorpay_payment_id) {
             Analytics.track('cancel_success', {
@@ -767,6 +782,19 @@ Payment.prototype = {
 
     // else make ajax request
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
+
+    const useCheckoutOrderAPI = data['_[checkout_order]'];
+    delete data['_[checkout_order]'];
+
+    // use Checkout Order API instead of ajax (for standard checkout only)
+    if (
+      useCheckoutOrderAPI &&
+      isRazorpayFrame() &&
+      this.tryCheckoutOrderAPI(data)
+    ) {
+      return 1;
+    }
+
     try {
       PaymentTracker.PAYMENT_INITIATED_SYSTEM(
         AnalyticsV2State.selectedInstrumentForPayment
@@ -810,6 +838,21 @@ Payment.prototype = {
 
     this.ajax = makeAjaxCall();
     return 1;
+  },
+  /** tryCheckoutOrderAPI check if for given payload checkout order is applicable or not */
+  tryCheckoutOrderAPI: function (data) {
+    // only qr flow is supported for now if scope increase create new helper method
+    if (data.method === 'upi' && data['_[upiqr]']) {
+      data.receiver_type = 'qr_code';
+      data.checkout_id = data['_[checkout_id]'];
+      this.ajax = fetch.post({
+        url: makeAuthUrl(null, 'checkout/order'),
+        data,
+        callback: processCheckoutOrder.bind(this),
+      });
+      return 1;
+    }
+    return 0;
   },
 
   trySubmit: function () {

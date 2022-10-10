@@ -183,6 +183,20 @@ export const trackQRGenerate = (parent: UPI.QRParent) => {
   });
 };
 
+/**
+ * This event will trigger only for UPI-QR v2 API
+ */
+export const trackQRAutoGenerate = (parent: UPI.QRParent) => {
+  qrAnalyticsPayload = {};
+  Analytics.track(EVENTS.QR_AUTO_GENERATE, {
+    type: AnalyticsTypes.BEHAV,
+    data: {
+      parent: getScreenFromParent(parent),
+      CTA: getQRCTA(),
+    },
+  });
+};
+
 export const renderQRSection = (parent: UPI.QRParent) => {
   qrAnalyticsPayload = {};
   Analytics.track(EVENTS.QR_SECTION_RENDERED, {

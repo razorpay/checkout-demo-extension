@@ -6,6 +6,7 @@ import { clearPaymentRequest } from 'upi/payment';
 import { qrState, resetQRState } from 'upi/ui/components/QR/store';
 import { PAYMENT_CANCEL_REASONS } from 'common/constants';
 import { appliedOffer } from 'offers/store';
+import { autoGenerateQREnabled } from './qrV2';
 
 /**
  * Why this method?
@@ -18,7 +19,9 @@ import { appliedOffer } from 'offers/store';
  */
 function getQRPaymentTestUrlForImage() {
   return getPreparedUrl('upi://pay', {
-    pa: 'razorpay.pg@hdfcbank',
+    pa: autoGenerateQREnabled()
+      ? 'rpy.qrrazorpay768603936522&ver=01&mode=15' // adding extra payload
+      : 'razorpay.pg@hdfcbank',
     pn: 'Razorpay',
     tr: 'M10rKVfkNww2eBE',
     am: (

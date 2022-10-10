@@ -13,6 +13,7 @@ jest.mock('razorpay', () => ({
   getPreferences: () => {},
   isRecurring: () => false,
   getAmount: () => 100,
+  isPartialPayment: () => false,
   getCurrency: () => 'INR',
   getOptionalObject: jest.fn(),
   getOption: jest.fn(),
@@ -29,6 +30,7 @@ jest.mock('upi/payment', () => ({
 jest.mock('upi/helper', () => ({
   ...jest.requireActual('upi/helper'),
   clearActiveQRPayment: jest.fn(),
+  autoGenerateQREnabled: jest.fn(),
 }));
 
 jest.mock('analytics', () => ({

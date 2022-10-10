@@ -194,7 +194,8 @@
       margin-top: 0;
     }
 
-    .intl-bt__method-info, .intl-bt__title {
+    .intl-bt__method-info,
+    .intl-bt__title {
       padding: 0;
       margin-bottom: 1.25rem;
       background: none;

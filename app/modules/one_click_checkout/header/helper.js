@@ -1,6 +1,10 @@
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'razorpay';
-import { headerVisible, headerHiddenOnScroll, shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+import {
+  headerVisible,
+  headerHiddenOnScroll,
+  shouldOverrideVisibleState,
+} from 'one_click_checkout/header/store';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import { FORCED_HEADER_VIEWS } from 'one_click_checkout/header/constants';
 
@@ -41,4 +45,4 @@ export const onScrollToggleHeader = (contentRef) => {
     }
     headerHiddenOnScroll.set(false);
   }
-}
+};

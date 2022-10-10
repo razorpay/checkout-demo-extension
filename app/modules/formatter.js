@@ -26,11 +26,11 @@ export const Formatter = function (el, handlers, noBind) {
 
   if (!handlers || !_.isElement(el)) {
     return false;
-  } else {
+  } 
     ObjectUtils.loop(handlers, (val, key) => {
       this[key] = handlers[key];
     });
-  }
+  
 
   if (noBind) {
     el._formatter = this;
@@ -115,9 +115,9 @@ Formatter.rules = {
         return `${splittedVpa[0]}@${psp
           .replace(/[^a-zA-Z]/g, '')
           .toLowerCase()}`;
-      } else {
+      } 
         return returnVal;
-      }
+      
     },
 
     isValid: function () {

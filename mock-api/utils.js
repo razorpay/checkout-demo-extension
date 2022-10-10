@@ -6,12 +6,11 @@ function respondJSON(data, request, reply) {
     return reply
       .header('content-type', 'text/javascript; charset=UTF-8')
       .send(response);
-  } else {
-    reply.send(data);
   }
+  reply.json(data);
 }
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * This utility can be used to log the styled content

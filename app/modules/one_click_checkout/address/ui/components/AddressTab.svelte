@@ -37,7 +37,10 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
   import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-  import { formatAddressToFormData, showShippingChargeAddedToast } from 'one_click_checkout/address/helpersExtra';
+  import {
+    formatAddressToFormData,
+    showShippingChargeAddedToast,
+  } from 'one_click_checkout/address/helpersExtra';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';

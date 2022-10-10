@@ -1,7 +1,15 @@
 import path from 'path';
 import { readFile } from 'fs/promises';
 import type { Page, Request, Route } from '@playwright/test';
-import { appPath, cdnBuildPath, cdnImagePath, fontPath } from '../constant';
+import {
+  appPath,
+  cdnBuildPath,
+  cdnImagePath,
+  fontPath,
+  googleChartAPI,
+  localCDNPath,
+  mockAssetsPath,
+} from '../constant';
 
 type CustomRoute = {
   url: string;
@@ -12,6 +20,10 @@ type CustomRoute = {
   handler: (route: Route, request: Request) => void;
   options: { partialMatch?: boolean };
 };
+
+function delay(time = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 const routes: CustomRoute[] = [];
 
@@ -37,11 +49,18 @@ function requestHandler(route: Route, request: Request) {
         path.join(appPath, 'dist/v1', url.slice(cdnBuildPath.length))
       );
     } else if (url.startsWith(cdnImagePath)) {
+      const cdnPath = url.slice(cdnImagePath.length);
       return serveFile(
         route,
-        path.join(appPath, 'images', url.slice(cdnImagePath.length)),
-        path.join(appPath, 'images', 'bank/ICIC.gif') // TODO need better fallback images
+        path.join(appPath, 'images', cdnPath),
+        [
+          path.join(localCDNPath, cdnPath),
+          path.join(mockAssetsPath, cdnPath.split('/').slice(-1)[0]), // extract filename
+          path.join(appPath, 'images', 'bank/ICIC.gif'),
+        ] // TODO need better fallback images
       );
+    } else if (url.startsWith(googleChartAPI)) {
+      return serveFile(route, path.join(mockAssetsPath, 'upiqr.png'));
     } else if (url.startsWith('data:')) {
       return route.continue();
     }
@@ -93,17 +112,19 @@ export async function createRouter(page: Page) {
 async function serveFile(
   route: Route,
   path: string,
-  fallbackFilePath?: string
+  fallbackFilePath?: string[]
 ) {
   try {
     const body = await readFile(path);
+    await delay(1000);
     route.fulfill({
       status: 200,
       body,
+      contentType: path.endsWith('.svg') ? 'image/svg+xml' : undefined,
     });
   } catch (e) {
-    if (fallbackFilePath) {
-      serveFile(route, fallbackFilePath);
+    if (fallbackFilePath && fallbackFilePath.length > 0) {
+      serveFile(route, fallbackFilePath[0], fallbackFilePath.slice(1));
       return;
     }
     route.fulfill({

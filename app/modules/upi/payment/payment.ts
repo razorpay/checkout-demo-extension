@@ -50,6 +50,9 @@ function handleUPIPayments(
   }
   if (config.action === 'none' && config.qrFlow) {
     setFlowInPayload(basePayload, 'qr');
+    if (config.qrFlow.qrv2) {
+      basePayload['_[checkout_order]'] = '1';
+    }
   }
 
   const { paymentPayload, paymentParams } = creatUPIPaymentV2(basePayload, {
