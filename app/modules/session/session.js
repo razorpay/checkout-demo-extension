@@ -6361,6 +6361,7 @@ Session.prototype = {
 
       UTILS.abortAjax(this.ajax);
       this.clearRequest(cancelReason);
+      this.r.emit('cancelPersistPayment');
       this.isOpen = false;
 
       es6components.destroyAll();

@@ -4,6 +4,7 @@ import {
   processOtpResponse,
 } from 'payment/coproto';
 import fetch from 'utils/fetch';
+import PaymentState from './state';
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 import { returnAsIs } from 'lib/utils';
@@ -89,7 +90,7 @@ function onPaymentCancel(metaParam) {
       cancelError.error.metadata = metadata;
     }
     updateLatestPaymentStatus('cancel', cancelError);
-    if (payment_id) {
+    if (payment_id && !this.persistentMode) {
       eventData.payment_id = payment_id;
       let url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
 
@@ -225,6 +226,9 @@ export default function Payment(data, params = {}, r) {
 
   // payment will be validated when resumed. So it's possible to have invalid arguments till it's paused
   this.on('cancel', onPaymentCancel);
+  this.r.on('cancelPersistPayment', () => {
+    PaymentState.cancelAllPayments();
+  });
 
   // Set the UPI app to use.
   if (data && data.upi_app) {
@@ -437,6 +441,15 @@ Payment.prototype = {
   },
 
   generate: function (data) {
+    /**
+     * persistentMode works only with ajax api
+     * to reuse ajax response on retry on same payment Id
+     * we don't cancel payment if its of persistentMode
+     */
+    if (data.persistentMode) {
+      this.persistentMode = true;
+      delete data.persistentMode;
+    }
     // Append `data` to `this.data`
     this.data = Object.assign(
       ObjectUtils.clone(this.data || {}),
@@ -759,11 +772,43 @@ Payment.prototype = {
         AnalyticsV2State.selectedInstrumentForPayment
       );
     } catch {}
-    this.ajax = fetch.post({
-      url: makeUrl('payments/create/ajax'),
-      data,
-      callback: processPaymentCreate.bind(this),
-    });
+    const self = this;
+
+    const makeAjaxCall = (persistentMode = false) => {
+      return fetch.post({
+        url: makeUrl('payments/create/ajax'),
+        data,
+        callback: (response) => {
+          if (persistentMode) {
+            PaymentState.setPersistentState(data, response);
+          }
+          processPaymentCreate.call(this, response);
+        },
+      });
+    };
+
+    try {
+      if (this.persistentMode) {
+        const persistentResult = PaymentState.getPersistentPayment(data);
+        persistentResult
+          .then((response) => {
+            if (response) {
+              processPaymentCreate.call(self, response);
+              return;
+            }
+            self.ajax = makeAjaxCall(self.persistentMode);
+          })
+          .catch(() => {
+            // fallback create payment in case of any err
+            self.ajax = makeAjaxCall(self.persistentMode);
+          });
+        return 1;
+      }
+    } catch (e) {
+      this.persistentMode = false;
+    }
+
+    this.ajax = makeAjaxCall();
     return 1;
   },
 

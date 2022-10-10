@@ -1,5 +1,5 @@
 import { UPI_POLL_URL, PENDING_PAYMENT_TS } from 'common/constants';
-import RazorpayStore from 'razorpay';
+import RazorpayStore, { getPreferences } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { trackTrace, TRACES } from 'upi/events';
 import { getNewIosBridge } from 'bridge';
@@ -38,6 +38,9 @@ function handleUPIPayments(
   }
   if (config.action === 'deepLinkIntent') {
     setFlowInPayload(basePayload, 'intent');
+    if (getPreferences('experiments.reuse_upi_paymentId')) {
+      basePayload.persistentMode = true;
+    }
   }
   if (config.action === 'paymentRequestAPI' && config.app) {
     // basePayload.method = 'app';

@@ -52,7 +52,7 @@ export function generateFingerprint() {
   return sha(components.join());
 }
 
-function sha(str) {
+export function sha(str) {
   // We transform the string into an arraybuffer.
   var buffer = new global.TextEncoder('utf-8').encode(str);
 
