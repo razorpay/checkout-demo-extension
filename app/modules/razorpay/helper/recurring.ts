@@ -46,6 +46,18 @@ export function isASubscription(method = null): boolean {
 export const isMethodRestrictionEnabledForMerchant = () => {
   return RECURRING_METHOD_RESTRICTION_KEYS.includes(getKey());
 };
+
+// Autopay QR/Intent experiment
+export const isRecurringQRIntentExperimentEnabled = () => {
+  const allow = getPreferences('experiments.recurring_upi_intent_qr');
+  return allow;
+};
+
+// Enables available PSP's on autopay intent if experiment is enabled
+export const isEnableAllPSPExperimentEnabled = () => {
+  const allow = getPreferences('experiments.recurring_upi_all_psp');
+  return allow;
+};
 // return true for only recurring caw orders. Returns false for subscriptions
 export function isCAW() {
   return isRecurring() && getOption('recurring');

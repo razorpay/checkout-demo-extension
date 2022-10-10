@@ -5,6 +5,7 @@ import {
   getAppFromPackageName,
   GOOGLE_PAY_PACKAGE_NAME,
   parseUPIIntentResponse,
+  PHONE_PE_PACKAGE_NAME,
   upiBackCancel,
 } from 'common/upi';
 import * as _ from 'utils/_';
@@ -625,7 +626,17 @@ const responseTypes = {
         data: data,
         immediately: true,
       });
-      if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
+      /**
+       * PhonePe is not providing any data in the callback in case of autopay
+       * intent(recurring/subscription). We are starting polling as soon as
+       * we get any response from PhonePe for subscription/recurring
+       */
+      if (
+        (this.data.recurring || this.data.subscription_id) &&
+        this.upi_app === PHONE_PE_PACKAGE_NAME
+      ) {
+        this.emit('upi.intent_success_response', data);
+      } else if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
         this.emit('upi.intent_success_response', data);
       } else {
         this.emit('cancel', upiBackCancel);

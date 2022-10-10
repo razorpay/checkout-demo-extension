@@ -28,9 +28,7 @@
 
   // i18n imports
   import { t } from 'svelte-i18n';
-  import {
-    SAVED_ADDRESS_CTA_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
+  import { SAVED_ADDRESS_CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
 
   // Analytics imports
   import Analytics, { Events } from 'analytics';

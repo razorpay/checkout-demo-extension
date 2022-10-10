@@ -412,5 +412,16 @@ export const QR_IMAGE_DEFAULT_SIZE = 141;
  * Currently Rs.2000
  */
 export const QR_HOMESCREEN_AMOUNT_LIMIT = 2000 * 100;
-// Recurring: App supporting autopay intent registration
-export const APPS_SUPPORTING_AUTOPAY_INTENT = [BHIM_UPI_PACKAGE_NAME];
+
+// Recurring: App's supporting autopay intent registration
+// | PSP      | OS        | Integration |
+// |----------|-----------|-------------|
+// | BHIM     | Android   | SDK         |
+// | Paytm    | Android   | SDK         |
+// | PhonePe  | Android   | SDK/mWeb    |
+// |----------|-----------|-------------|
+export const APPS_SUPPORTING_AUTOPAY_INTENT = [
+  BHIM_UPI_PACKAGE_NAME,
+  PHONE_PE_PACKAGE_NAME,
+  PAYTM_PACKAGE_NAME,
+];

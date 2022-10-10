@@ -24,6 +24,8 @@ import {
   isPartialPayment,
   isOneClickCheckout,
   getOrderId,
+  isSubscription,
+  isRecurringQRIntentExperimentEnabled,
   isEmiV2,
 } from 'razorpay';
 
@@ -543,11 +545,25 @@ const UPI_METHODS = {
     !isMobileByMediaQuery() &&
     getMerchantMethods().upi_intent &&
     Boolean(getPreferences('methods.upi_type.intent', 1)),
-  intent: () =>
-    !isPayout() &&
-    getMerchantMethods().upi_intent &&
-    Boolean(getPreferences('methods.upi_type.intent', 1)) &&
-    getUPIIntentApps().all.length,
+  intent: () => {
+    const shouldEnableIntent =
+      !isPayout() &&
+      getMerchantMethods().upi_intent &&
+      Boolean(getPreferences('methods.upi_type.intent', 1)) &&
+      getUPIIntentApps().all.length;
+
+    if (isRecurring()) {
+      const shouldEnableIntentOnRecurring =
+        shouldEnableIntent && isRecurringQRIntentExperimentEnabled();
+      if (isSubscription()) {
+        return isASubscription('upi') && shouldEnableIntentOnRecurring;
+      }
+      return getSingleMethod() === 'upi' && shouldEnableIntentOnRecurring;
+    }
+
+    return shouldEnableIntent;
+  },
+
   intentUrl: () =>
     // available only on android+ios mobile web (no-sdk, no-fb-insta)
     !isRecurring() &&

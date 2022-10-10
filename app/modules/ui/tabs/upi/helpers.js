@@ -1,4 +1,4 @@
-import { getMerchantKey } from 'razorpay';
+import { getMerchantKey, isEnableAllPSPExperimentEnabled } from 'razorpay';
 import { APPS_SUPPORTING_AUTOPAY_INTENT } from 'upi/constants';
 import {
   banksThatSupportRecurring,
@@ -26,6 +26,9 @@ export const getSupportedBankForUPIRecurring = () => {
  * autopay intents
  */
 export function filterUPIIntentAppsForAutopayIntent(intentApps) {
+  if (isEnableAllPSPExperimentEnabled()) {
+    return intentApps;
+  }
   return intentApps.filter((app) =>
     APPS_SUPPORTING_AUTOPAY_INTENT.includes(app.package_name)
   );
