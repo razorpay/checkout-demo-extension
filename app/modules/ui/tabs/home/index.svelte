@@ -152,11 +152,7 @@
   } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
-  import {
-    CONTACT_REGEX,
-    EMAIL_REGEX,
-    PHONE_REGEX_INDIA,
-  } from 'common/constants';
+  import { EMAIL_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
@@ -210,6 +206,7 @@
   import { setNoCostAvailable } from 'emiV2/store';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { isValidContact } from 'helper/validation';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -875,6 +872,7 @@
       } else {
         hideCta();
       }
+      $customer = session.getCustomer($contact);
     } else {
       setDetailsCta();
     }
@@ -907,11 +905,7 @@
      */
     if (!isContactEmailOptional()) {
       if (!isContactValid) {
-        if ($country === '+91') {
-          isContactValid = PHONE_REGEX_INDIA.test($phone);
-        } else {
-          isContactValid = CONTACT_REGEX.test($contact);
-        }
+        isContactValid = isValidContact($country, $phone);
       }
 
       isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
@@ -1053,7 +1047,10 @@
 
   $: {
     if (view === HOME_VIEWS.METHODS && !isOneCCEnabled) {
-      $customer = session.getCustomer($contact);
+      /** update customer only if its valid */
+      if (isValidContact($country, $phone)) {
+        $customer = session.getCustomer($contact);
+      }
     }
     if (
       isRedesignV15() &&

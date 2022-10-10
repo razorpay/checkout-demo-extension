@@ -41,6 +41,7 @@
 
   // controller imports
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { isOneClickCheckout } from 'razorpay';
 
   const { close } = getIcons();
 
@@ -53,9 +54,10 @@
   });
 
   function onSubmit() {
-    let invalids = document
-      .getElementById('details-container')
-      .querySelectorAll('.invalid');
+    let invalids =
+      document
+        .getElementById('details-container')
+        ?.querySelectorAll('.invalid') || [];
     if (invalids.length) {
       invalids[0].className += ' focused mature';
       return;
@@ -69,8 +71,10 @@
       contact: $contact,
       email: $email,
     });
-    if (!isUserLoggedIn() && $isIndianCustomer) {
-      askForOTP(otpReasons.verify_coupon);
+    if (isOneClickCheckout()) {
+      if (!isUserLoggedIn() && $isIndianCustomer) {
+        askForOTP(otpReasons.verify_coupon);
+      }
     }
   }
 </script>
