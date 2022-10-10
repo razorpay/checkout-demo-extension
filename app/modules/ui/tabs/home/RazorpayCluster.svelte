@@ -77,7 +77,7 @@
         on:select={() => {
           setDynamicFees(instrument, 'rzpCluster');
           instrument.section = getSectionCategoryForBlock(block);
-          instrument.block = block;
+          instrument.blockTitle = title;
           dispatch('selectInstrument', instrument);
         }}
       />

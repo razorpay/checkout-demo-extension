@@ -15,7 +15,6 @@
   import {
     getAvailableMethods,
     getSectionsDisplayed,
-    getBlockTitle,
     getInstrumentDetails,
     trackPaypalRendered,
   } from 'ui/tabs/home/helpers';
@@ -1210,13 +1209,6 @@
   export function onSelectInstrument(event) {
     const instrument = event.detail;
     ctaV15Disabled = instrument._type === 'method';
-
-    if (instrument.section === 'generic' && instrument.block) {
-      instrument.blockTitle = getBlockTitle(
-        instrument.block.instruments,
-        $locale
-      );
-    }
 
     AnalyticsV2State.selectedBlock = {
       category: instrument.section,
