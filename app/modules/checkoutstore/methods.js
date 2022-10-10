@@ -24,6 +24,7 @@ import {
   isPartialPayment,
   isOneClickCheckout,
   getOrderId,
+  isEmiV2,
 } from 'razorpay';
 
 import {
@@ -1040,6 +1041,14 @@ export function getCardlessEMIProviders() {
   if (getEMIBanks().BAJAJ) {
     emiMethod.bajaj = true;
   }
+
+  // Adding onecard to cardless providers list for EMI UX
+  // Since it will be shown in Other EMI Options list
+  // and not in bank EMI
+  if (isEmiV2() && getEMIBanks().onecard) {
+    emiMethod.onecard = true;
+  }
+
   emiMethod = {
     ...emiMethod,
     ...getMerchantMethods().cardless_emi,

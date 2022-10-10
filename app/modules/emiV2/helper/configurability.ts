@@ -5,7 +5,7 @@ import type {
   InstrumentConfig,
   Tokens,
 } from 'emiV2/types';
-import { isOnlyCardlessProvider } from './helper';
+import { isOnlyCardlessProvider, isOtherCardEmiProvider } from './helper';
 
 /**
  * Filter Cardless emi providers against custom block selected
@@ -24,15 +24,24 @@ export const filterCardlessProvidersAgainstCustomBlock = (
     return providers;
   }
 
-  // If custom block is of emi method we need to show only bajaj emi
-  // Since it's a card emi and rest are cardless
+  // If custom block is of emi method we need to
+  // show card emi providers like bajaj and onecard
+  // in other emi options list
+  // Since they are card emi and rest are cardless
   if (instrument.method === 'emi') {
+    const issuers = instrument.issuers;
     return providers.filter((bank) => {
-      return bank.code === 'bajaj';
+      // If there are no issuers present
+      // match only card emi providers like onecard,bajaj etc
+      const issuerMatches = issuers
+        ? issuers.includes(bank.code)
+        : isOtherCardEmiProvider(bank.code);
+      return issuerMatches;
     });
   }
 
-  // If it's a cardless emi block we need to filter out bajaj
+  // If it's a cardless emi block we need to filter out
+  // card providers like bajaj, onecard etc
   // as well as filter out providers list
   if (instrument.method === 'cardless_emi') {
     return providers.filter((bank) => {
@@ -43,7 +52,7 @@ export const filterCardlessProvidersAgainstCustomBlock = (
         hasProviders && bank.code
           ? cardlessProviders.includes(bank.code.toLowerCase())
           : true;
-      return issuerMatches && bank.code !== 'bajaj';
+      return issuerMatches && !isOtherCardEmiProvider(bank.code);
     });
   }
 

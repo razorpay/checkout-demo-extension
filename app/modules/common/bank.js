@@ -133,6 +133,10 @@ export const emiBanks = [
     code: 'IDFB',
     name: 'IDFC First Bank',
   },
+  {
+    code: 'onecard',
+    name: 'OneCard',
+  },
 ];
 
 export const DEBIT_EMI_ISSUERS = ['KKBK', 'HDFC'];

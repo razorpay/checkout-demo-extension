@@ -160,7 +160,7 @@
         ? formatTemplateWithLocale(
             errorMessage,
             {
-              bank: getShortBankName(emiPayload.bank.code, $locale),
+              bank: emiPayload.bank.name,
               type: translateEmiTabName(emiPayload.tab, $locale),
             },
             $locale
@@ -644,7 +644,7 @@
 <div class="pad" id="add-card-container" class:faded>
   {#if isNewEmiFlow && prevTab === 'emi' && emiPayload}
     <UseBankCardLabel
-      selectedBank={emiPayload.bank.code}
+      selectedBank={emiPayload.bank.name}
       selectedTab={emiPayload.tab}
     />
   {/if}

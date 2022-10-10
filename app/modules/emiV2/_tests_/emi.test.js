@@ -1,4 +1,8 @@
-import { isSelectedBankBajaj } from 'emiV2/helper/helper';
+import {
+  isCoBrandingEmiProvider,
+  isOtherCardEmiProvider,
+  isSelectedBankBajaj,
+} from 'emiV2/helper/helper';
 import { selectedBank } from 'emiV2/store';
 import { getEMIStartingAt, isNoCostEMI } from '../helper/label';
 import { filterTabsAgainstInstrument, getEmiTabs } from '../helper/tabs';
@@ -446,4 +450,23 @@ describe('EMI tabs test', () => {
 
     expect(isSelectedBankBajaj()).toBeTruthy();
   });
+});
+
+describe('Validate: isOtherCardEmiProviders', () => {
+  let provider = 'onecard';
+  expect(isOtherCardEmiProvider(provider)).toBeTruthy();
+
+  provider = 'bajaj';
+  expect(isOtherCardEmiProvider(provider)).toBeTruthy();
+
+  provider = 'HDFC';
+  expect(isOtherCardEmiProvider(provider)).toBeFalsy();
+});
+
+describe('Validate: isCoBrandingEmiProvider', () => {
+  let provider = 'onecard';
+  expect(isCoBrandingEmiProvider(provider)).toBe(true);
+
+  provider = 'HDFC';
+  expect(isCoBrandingEmiProvider(provider)).toBe(false);
 });

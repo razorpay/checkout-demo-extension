@@ -17,6 +17,7 @@ const KOTAK_DEBIT_CODE = 'KKBK_DC';
 const KOTAK_BANK_CODE = 'KKBK';
 const ICICI_BANK_DEBIT_CODE = 'ICIC_DC';
 const RBL_BANK_CODE = 'RATN';
+const ONE_CARD_CODE = 'onecard';
 
 export const EmiBanksCode = {
   HDFC_BANK_CODE,
@@ -43,6 +44,7 @@ export const cardlessTabProviders: string[] = [
   BAJAJ_CODE,
   EARLY_SALARY_CODE,
   HCIN_CODE,
+  ONE_CARD_CODE,
 ];
 
 // Order in which emi options should come
@@ -59,6 +61,7 @@ export const otherEMIOptionsSortOrder: string[] = [
   WALNUT369_CODE,
   ZESTMONEY_CODE,
   BAJAJ_CODE,
+  ONE_CARD_CODE,
   EARLY_SALARY_CODE,
 ];
 
@@ -70,6 +73,7 @@ export const providersToAvoid = [
   'hcin',
   'walnut369',
   'sezzle',
+  ONE_CARD_CODE,
 ];
 
 // EMI Tab Labels
@@ -106,3 +110,16 @@ export const redirectFlowEmiProviders: string[] = [
   ZESTMONEY_CODE,
   WALNUT369_CODE,
 ];
+/**
+ * EMI Options received in emi_options which are card EMIs
+ * but should be part of Other Emi options list
+ * since they are not bank specific EMI providers
+ * Eg. bajaj, onecard etc.
+ */
+export const otherCardEmiProviders: string[] = [BAJAJ_CODE, ONE_CARD_CODE];
+
+/**
+ * List to store all the cobranding partners offering EMI
+ * Eg. Onecard
+ */
+export const coBrandingEmiProviders: string[] = [ONE_CARD_CODE];

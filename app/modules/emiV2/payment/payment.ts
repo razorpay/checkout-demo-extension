@@ -239,7 +239,9 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
       screenStore.set('emi');
       session.screen = 'emi';
-
+      // setting the card invalid state to false
+      isCurrentCardInvalidForEmi.set(false);
+      isCurrentCardProviderInvalid.set(false);
       return;
     }
 

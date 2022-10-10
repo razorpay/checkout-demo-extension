@@ -18,7 +18,10 @@ import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 import Analytics from 'analytics';
 import CTAHelper from './store';
-import { isCardValidForEMiPayment } from 'emiV2/store';
+import {
+  isCardIssuerValidForEMiPayment,
+  isCardValidForEMiPayment,
+} from 'emiV2/store';
 
 export const ctaInfo = writable({
   view: '',
@@ -236,6 +239,8 @@ export function setAppropriateCtaText() {
       // This happens in the case of new EMI flow
       if (!isCardValidForEMiPayment()) {
         setView(CtaViews.PAY_FULL_AMOUNT);
+      } else if (!isCardIssuerValidForEMiPayment()) {
+        setView(CtaViews.TRY_ANOTHER_EMI_OPTION);
       } else {
         setView(CtaViews.PAY_VIA_EMI);
       }

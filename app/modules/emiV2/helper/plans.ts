@@ -8,7 +8,7 @@ import { selectedTab } from 'components/Tabs/tabStore';
 import { get } from 'svelte/store';
 import { getEligiblePlansBasedOnMinAmount } from 'checkoutstore/methods';
 import { isCardlessTab } from 'emiV2/helper/tabs';
-import { isSelectedBankBajaj } from 'emiV2/helper/helper';
+import { isOtherCardEmiProvider } from 'emiV2/helper/helper';
 import { cardlessEmiPlansChecker } from 'emiV2/helper/eligibility';
 
 import type {
@@ -87,7 +87,7 @@ export const getEmiPlans = () => {
   const tab = get(selectedTab);
   const bankCode: string = getSelectedBankCode();
   // if current tab is cardless tab get the plans from svelte store
-  if (isCardlessTab() && !isSelectedBankBajaj()) {
+  if (isCardlessTab() && !isOtherCardEmiProvider()) {
     const emiPlansForContact: CardlessEMIStore | null =
       cardlessEmiPlansChecker();
     if (
@@ -101,10 +101,9 @@ export const getEmiPlans = () => {
     }
   }
 
-  if (!isCardlessTab() || isSelectedBankBajaj()) {
+  if (!isCardlessTab() || isOtherCardEmiProvider()) {
     // if tab is credit or debit get the credit card plans from merchant methods
-    // If plans contains no cost emi plan we need to use
-    // Else we need to generate emi plans from emi_plans from preferences
+    // or if selected provider has emi plans present in emi_options (Eg: bajaj/onecard)
     const plans = getEMIBankPlans(bankCode, tab);
     try {
       const emiPlans: EmiPlans = getEligiblePlansBasedOnMinAmount(plans);

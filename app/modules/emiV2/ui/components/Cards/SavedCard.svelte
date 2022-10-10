@@ -48,7 +48,7 @@
   <div class="cardtype" cardtype={card.networkCode} />
   <div class="saved-card-info">
     <p>
-      {getShortBankName(card.issuer, $locale)}
+      {getShortBankName(card.cobranding_partner || card.issuer, $locale)}
       <span class="card-type">{card.type} Card</span>
       - {card.last4}
       {#if !isTokenised}<span class="card-non-tokenised"> * </span> {/if}

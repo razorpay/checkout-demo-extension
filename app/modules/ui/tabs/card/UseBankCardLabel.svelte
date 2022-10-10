@@ -15,7 +15,7 @@
   {formatTemplateWithLocale(
     USE_BANK_CARD,
     {
-      bank: getShortBankName(selectedBank, $locale),
+      bank: selectedBank,
       type: translateEmiTabName(selectedTab, $locale),
     },
     $locale

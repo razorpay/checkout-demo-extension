@@ -7,6 +7,7 @@ import type { Instrument, EMIBANKS, TabList } from 'emiV2/types';
 import { cardlessTabProviders, tabLabels, tabValues } from 'emiV2/constants';
 import { getSelectedSavedCard } from './card';
 import { formatTemplateWithLocale } from 'i18n';
+import { isCoBrandingEmiProvider } from './helper';
 
 const { CREDIT, DEBIT, DEBIT_CARDLESS, CARDLESS } = tabValues;
 
@@ -56,13 +57,24 @@ export const getEmiTabs = (instrument: Instrument, locale: string): TabList => {
   /**
    * If selected emi option is Bajaj manually select Bajaj plans
    */
-  if (selectedBank.code && cardlessTabProviders.includes(selectedBank.code)) {
-    return [
-      {
-        label: formateTabNameWithLocale(tabLabels[CARDLESS], locale),
-        value: CARDLESS,
-      },
-    ];
+  if (selectedBank.code) {
+    // Since One card is a credit emi and we are rendering it in other emi options
+    // we need to change the tab to credit emi
+    if (isCoBrandingEmiProvider(selectedBank.code)) {
+      return [
+        {
+          label: formateTabNameWithLocale(tabLabels[CREDIT], locale),
+          value: CREDIT,
+        },
+      ];
+    } else if (cardlessTabProviders.includes(selectedBank.code)) {
+      return [
+        {
+          label: formateTabNameWithLocale(tabLabels[CARDLESS], locale),
+          value: CARDLESS,
+        },
+      ];
+    }
   }
 
   /**

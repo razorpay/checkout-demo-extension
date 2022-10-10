@@ -3722,6 +3722,7 @@ Session.prototype = {
     let trigger = e.currentTarget;
     let $trigger = $(trigger);
     let bank = $trigger.attr('data-bank');
+    let cobrandingPartner = $trigger.attr('data-cobranding');
     let cardIssuer = bank;
     let cardType = $trigger.attr('data-card-type');
     let isEmiOfferApplied = Boolean(
@@ -3729,6 +3730,12 @@ Session.prototype = {
         appliedOffer.payment_method === 'emi' &&
         !appliedOffer.emi_subvention
     );
+
+    // get emi plans wrt cobranding partner if the selected card
+    // has co branding partner available Eg. Onecard
+    if (cobrandingPartner) {
+      bank = cobrandingPartner;
+    }
 
     bank = getBankEMICode(bank, cardType);
 

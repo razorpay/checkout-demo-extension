@@ -222,6 +222,7 @@
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
           data-card-type={card.type}
+          data-cobranding={card.cobranding_partner}
           on:click={(event) => dispatch('viewPlans', event)}
         >
           {#if $selectedPlanTextForSavedCard && tab === 'emi'}

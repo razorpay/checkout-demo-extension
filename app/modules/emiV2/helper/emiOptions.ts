@@ -28,9 +28,29 @@ import {
   filterCardlessProvidersAgainstCustomBlock,
   filterEmiBanksAgainstCustomBlock,
 } from './configurability';
-import { getDownTimeForEmiBanks, isOnlyCardlessProvider } from './helper';
+import {
+  getDownTimeForEmiBanks,
+  isOnlyCardlessProvider,
+  isOtherCardEmiProvider,
+} from './helper';
 
 const cdnUrl = RazorpayConfig.cdn;
+
+/**
+ * Get available emi banks from preferences
+ * Returns the list of banks along with their emi plans based on the minimum amount
+ * @param amount
+ * @returns {EmiBankPlans}
+ */
+const getEmiBanksAvailable = (amount: number): EmiBankPlans => {
+  const emiOptions: EmiOptions = getMerchantMethods().emi_options;
+  const banks: EmiBankPlans = getEligibleBanksBasedOnMinAmount(
+    amount || Number(getAmount()),
+    emiOptions
+  ) as EmiBankPlans;
+
+  return banks;
+};
 
 /**
  * Returns _all_ Cardless EMI providers
@@ -41,6 +61,9 @@ const cdnUrl = RazorpayConfig.cdn;
 export function getAllProviders(amount: number, instrument: Instrument) {
   try {
     const providers: EMIBankList = [];
+    // Since we need to show Starting from label for onecard
+    // we need to have emi plans available for onecard to find the minimum interest rate
+    const banks: EmiBankPlans = getEmiBanksAvailable(amount);
     ObjectUtils.loop(
       getCardlessEMIProviders(),
       (providerObj: CardlessEmiProviders) => {
@@ -48,15 +71,25 @@ export function getAllProviders(amount: number, instrument: Instrument) {
         const providerCode: string = providerObj.code.toUpperCase();
         const emiBanks: EMIBanksMap = bankMap;
         const currentLocale: string = get(locale);
-        if (!emiBanks[providerCode] || isBajaj(providerCode)) {
+        if (!emiBanks[providerCode] || isOtherCardEmiProvider(providerCode)) {
           const provider: EMIBANKS = {
             ...createProvider(providerObj.code, providerObj),
             code: providerObj.code,
             name: getCardlessEmiProviderName(providerObj.code, currentLocale),
-            method: isBajaj(providerCode) ? 'emi' : 'cardless_emi',
+            method: isOtherCardEmiProvider(providerCode)
+              ? 'emi'
+              : 'cardless_emi',
             isNoCostEMI:
               isBajaj(providerCode) && isNoCostEMI(amount, providerCode),
           };
+          // If code is onecard use the logo as onecard.png
+          // Need to show the emi starting at value as well
+          // Set the credit EMI to true since One Card is CC EMI
+          if (provider.code === 'onecard') {
+            provider.icon = `${RazorpayConfig.cdn}cardless_emi-sq/onecard.png`;
+            provider.creditEmi = true;
+            provider.startingFrom = getEMIStartingAt(banks[provider.code]);
+          }
           if (providerObj.pushToFirst) {
             // higher priority then cardemi
             providers.unshift(provider);
@@ -150,10 +183,7 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
     getCardlessEMIProviders() as CardlessEmiProvidersList;
 
   const bankEMIOptions: EMIBanksMap = {};
-  const banks: EmiBankPlans = getEligibleBanksBasedOnMinAmount(
-    amount || Number(getAmount()),
-    emiOptions
-  ) as EmiBankPlans;
+  const banks: EmiBankPlans = getEmiBanksAvailable(amount);
 
   try {
     // if emi banks are not present and no banks is present in cardless providers
@@ -170,7 +200,13 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
         // bank code restricted to 4 characters to make a single entry for multiple bank options
         // Cases like HDFC_DC and HDFC should be treated as HDFC
         const commonBankName: string = bankCode.slice(0, 4);
-        if (emiOptions[bankCode] && !isBajaj(bankCode) && banks[bankCode]) {
+        // If only it's a bank emi we will append to list
+        // Avoiding Bajaj and onecard emi providers
+        if (
+          emiOptions[bankCode] &&
+          !isOtherCardEmiProvider(bankCode) &&
+          banks[bankCode]
+        ) {
           const plans: EmiPlanObject = banks[bankCode];
           const currentLocale: string = get(locale);
           bankEMIOptions[commonBankName] = {

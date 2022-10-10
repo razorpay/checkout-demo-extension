@@ -77,3 +77,7 @@ export const isCurrentCardProviderInvalid = writable(false);
 export const isCardValidForEMiPayment = () => {
   return !get(isCurrentCardInvalidForEmi);
 };
+
+export const isCardIssuerValidForEMiPayment = () => {
+  return !get(isCurrentCardProviderInvalid);
+};

@@ -69,5 +69,13 @@
   }
   .emi-label {
     margin-top: 8px;
+    min-height: 16px;
+  }
+  .emi-label:empty {
+    min-height: 8px;
+  }
+
+  #bank-item-onecard .emi-bank-item img {
+    margin-top: 10px;
   }
 </style>

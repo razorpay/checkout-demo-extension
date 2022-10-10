@@ -8,7 +8,7 @@
     selectedInstrumentCardlessEligible,
   } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { isRedesignV15 } from 'razorpay';
-  import { isSelectedBankBajaj } from 'emiV2/helper/helper';
+  import { isOtherCardEmiProvider } from 'emiV2/helper/helper';
   import { isCardlessTab } from 'emiV2/helper/tabs';
   import { tabLabels } from 'emiV2/constants';
   import { checkEligibility } from 'emiV2/helper/eligibility';
@@ -20,9 +20,9 @@
   import { CREDIT_DEBIT_CARD } from 'ui/labels/card';
 
   // Since for Bajaj also we are showing this screen to render emi plans
-  // Therefore we need to check for tab to be cardless and provider to not be Bajaj
+  // Therefore we need to check for tab to be cardless and provider to not be Bajaj / Onecard
   // To Avoid eligibility call and phone number component
-  const isPureCardlessScreen = isCardlessTab() && !isSelectedBankBajaj();
+  const isPureCardlessScreen = isCardlessTab() && !isOtherCardEmiProvider();
 
   onMount(() => {
     // Make a mobile number eligibility check for cardless emi
@@ -72,8 +72,11 @@
       <!-- Change the input field with new redesigned input -->
       <PhoneNumber />
     {/if}
-    <!-- Show EMI Plans for debit and credit and for cardless only when user is eligible -->
-    {#if !isCardlessTab() || isSelectedBankBajaj() || (isCardlessTab() && $selectedInstrumentCardlessEligible)}
+    <!-- Show EMI Plans for debit and credit emi
+      as well as for other emi options like Bajaj/Onecard etc
+      and for cardless only when user is eligible
+    -->
+    {#if !isCardlessTab() || isOtherCardEmiProvider() || (isCardlessTab() && $selectedInstrumentCardlessEligible)}
       <Emiplans />
     {/if}
   </div>

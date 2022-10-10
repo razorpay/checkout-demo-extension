@@ -13,7 +13,7 @@ const transformerByMethod = {
    */
   card: (token, { emi, recurring }) => {
     const { card } = token;
-    let { flows = [], issuer: bank, network, type } = card;
+    let { flows = [], issuer: bank, network, type, cobranding_partner } = card;
     let networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
@@ -21,6 +21,13 @@ const transformerByMethod = {
       bank = 'AMEX';
     }
     card.networkCode = networkCode;
+
+    // If co branding partner is present we need to fetch emi plans
+    // wrt to co branding partner and not card issuer
+    // therefore setting bank to co_branding value
+    if (cobranding_partner) {
+      bank = cobranding_partner;
+    }
 
     token.plans = bank && emi && card.emi && getEMIBankPlans(bank, type);
 

@@ -328,6 +328,11 @@
 
   const isNewEmiFlow = isEmiV2();
 
+  // Variable to store if we are reaching on card screen using emi method
+  // with revamped flow
+  let isNewEmiCardScreen = false;
+  $: isNewEmiCardScreen = isNewEmiFlow && tab === 'emi';
+
   onMount(() => {
     // Prefill
     $cardNumber = session.get('prefill.card[number]') || '';
@@ -603,6 +608,8 @@
    * Determine if subtext should be shown
    * We don't show subtext if subtext is empty
    * or if the instrument is a part of rzp.cluster block
+   * or if we are rendering card screen for new emi flow
+   * we dont show the subtext
    *
    * @returns {boolean}
    */
@@ -615,7 +622,7 @@
       block.instruments.includes($methodInstrument)
     );
 
-    return block && block.code !== 'rzp.cluster';
+    return block && block.code !== 'rzp.cluster' && !isNewEmiCardScreen;
   }
 
   let shouldShowSubtext = detemineIfSubtextShouldBeShown();
@@ -940,6 +947,13 @@
             // Handle AMEX
             if (amexCard) {
               issuer = 'AMEX';
+            }
+
+            // Handle cards with cobranding
+            // Eg. if entered card has cobranding partner as onecard
+            // get plans for onecard by setting issuer to co branding partner
+            if (features.cobranding_partner) {
+              issuer = features.cobranding_partner;
             }
 
             // Handle debit cards

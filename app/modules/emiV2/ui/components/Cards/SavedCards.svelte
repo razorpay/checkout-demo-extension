@@ -6,15 +6,22 @@
   import type { Tokens } from 'emiV2/types';
   import { t } from 'svelte-i18n';
   import { SAVED_CARDS } from 'ui/labels/card';
+  import { capture, SEVERITY_LEVELS } from 'error-service';
 
   export let cards: Tokens[];
-  const onSavedCardSelect = (card: Tokens) => {
-    $selectedCard = card;
-    $selectedBank = {
-      code: card.card.issuer,
-      name: card.card.issuer,
-    };
-    $emiMethod = 'bank';
+  const onSavedCardSelect = (token: Tokens) => {
+    try {
+      $selectedCard = token;
+      let { card } = token;
+      const coBrandingPartner: string = (card && card.cobranding_partner) || '';
+      $selectedBank = {
+        code: coBrandingPartner || card.issuer,
+        name: coBrandingPartner || card.issuer,
+      };
+      $emiMethod = 'bank';
+    } catch (e: any) {
+      capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
+    }
   };
 </script>
 

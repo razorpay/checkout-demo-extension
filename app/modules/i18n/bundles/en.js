@@ -206,6 +206,7 @@ export default {
       AMEX: 'AMEX',
       SCBL: 'Standard Chartered',
       BARB: 'Bank of Baroda',
+      ONECARD: 'OneCard',
     },
   },
   callouts: {
@@ -337,9 +338,9 @@ export default {
     save_card_compliant_with_guidelines:
       'All saved cards are compliant with the latest security guidelines',
     enter_cvv: 'Enter CVV',
-    use_bank_card: 'Use {bank} bank {type} card only',
+    use_bank_card: 'Use {bank} {type} card only',
     enter_bank_card_to_avail_emi:
-      'Enter a {bank} bank {type} card to avail EMI or try another EMI option.',
+      'Enter a {bank} {type} card to avail EMI or try another EMI option.',
     emi_not_supported:
       'EMI not supported on this card. Try again with another {bank} {type} card or pay full amount.',
     saved_cards: 'Saved Cards',
@@ -375,6 +376,7 @@ export default {
       kkbk: 'Kotak Mahindra Bank Cardless EMI',
       icic: 'ICICI Bank Cardless EMI',
       hcin: 'Home Credit Ujjwal Card',
+      onecard: 'OneCard',
     },
     walnut369: {
       subtitle: 'Quick and easy EMI approvals',

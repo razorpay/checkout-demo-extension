@@ -27,6 +27,43 @@ export const errorTypes = {
 };
 
 /**
+ * Helper function to validate entered card if it has a cobranding enabled
+ * Validate the card co_branding partner with the selected EMI provider
+ * @param {CardFeatures} features
+ * @param {string} bank
+ * @returns {boolean}
+ */
+export const validateCoBrandingPartner = (
+  features: CardFeatures,
+  bank: string
+) => {
+  // If co branding partner exists
+  // validate selected bank with co branding
+  return features.cobranding_partner && features.cobranding_partner === bank;
+};
+
+/**
+ * Helper function to check if entered card issuer is valid for emi payment
+ * If the entered card has cobranding partner,
+ * validate whether the cobranding partner matches the selected EMI provider
+ * else validate whether the card type and issuer matches the current tab and emi provider selected
+ * @param features
+ * @param emiPayload
+ * @returns {boolean}
+ */
+export const isEmiProviderInValid = (
+  features: CardFeatures,
+  emiPayload: EMIPayload
+) => {
+  // Validate Co branding partner against selected bank
+  // For co-branding validation we don't want to match the issuer
+  const { issuer, type, cobranding_partner } = features;
+  return cobranding_partner
+    ? !validateCoBrandingPartner(features, emiPayload.bank.code)
+    : issuer !== emiPayload.bank.code || type !== emiPayload.tab;
+};
+
+/**
  * Checks if the instrument is valid for the emi payment
  * @param {Features} features
  * @param {EMIPayload} emiPayload EMI payload
@@ -39,8 +76,8 @@ export function isInstrumentValidForEMI(
 ) {
   const { flows, issuer, type } = features;
   let errorType = '';
-  // Validating card type used in the selected tab
-  if (issuer !== emiPayload.bank.code || type !== emiPayload.tab) {
+  if (isEmiProviderInValid(features, emiPayload)) {
+    // Validating card type used in the selected tab
     errorType = errorTypes.BANK_INVALID;
   } else if (!flows.emi) {
     // Validating if emi is enabled on the card

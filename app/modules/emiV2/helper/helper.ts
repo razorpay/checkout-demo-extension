@@ -1,6 +1,11 @@
 import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
 import { selectedBank } from 'emiV2/store';
-import { providersToAvoid, redirectFlowEmiProviders } from 'emiV2/constants';
+import {
+  providersToAvoid,
+  redirectFlowEmiProviders,
+  otherCardEmiProviders,
+  coBrandingEmiProviders,
+} from 'emiV2/constants';
 import type { EmiBankPlans, EMIBANKS, EMIBanksMap } from 'emiV2/types';
 import { get } from 'svelte/store';
 
@@ -59,4 +64,29 @@ export const isSelectedBankBajaj = () => {
 /* Checks if the selected emi provider has the redirect flow */
 export const isEmiRedirectFlow = (provider: string) => {
   return redirectFlowEmiProviders.includes(provider);
+};
+
+/**
+ * Checks whether the provided code belongs to other bank providers
+ * Providers which should exist in Other Emi Option and are not bank emi providers
+ * Takes an optional provider as a arguement
+ * Eg: bajaj, onecard etc.
+ * @param {string} provider
+ * @returns {boolean}
+ */
+export const isOtherCardEmiProvider = (provider?: string) => {
+  // If we receive a provider to validate from the arguements use that
+  // Else the functions checks for selected provider from the svelte store
+  const code = provider || get(selectedBank)?.code;
+  return code && otherCardEmiProviders.includes(code.toLowerCase());
+};
+
+/**
+ * Helper function to validate whether the selected emi provider
+ * is a cobranding partner emi provider like onecard
+ * @param {string} provider
+ * @returns {boolean}
+ */
+export const isCoBrandingEmiProvider = (provider: string) => {
+  return coBrandingEmiProviders.includes(provider);
 };

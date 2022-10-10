@@ -1,4 +1,4 @@
-import { getAmount, getMerchantMethods } from 'razorpay';
+import { getAmount, getMerchantMethods, isEmiV2 } from 'razorpay';
 import {
   getAllProviders,
   getBankEmiOptions,
@@ -60,7 +60,6 @@ const merchantMethods = {
     hdfc: true,
     walnut369: true,
     zestmoney: true,
-    bajaj: true,
   },
   custom_providers: {
     debit_emi_providers: {
@@ -81,6 +80,7 @@ jest.mock('razorpay', () => ({
   ...jest.requireActual('razorpay'),
   getMerchantMethods: jest.fn(),
   getAmount: jest.fn(),
+  isEmiV2: () => true,
 }));
 
 describe('Emi Options list test', () => {
@@ -346,6 +346,61 @@ describe('Emi Options list test', () => {
     getMerchantMethods.mockReturnValue(mockPrefs);
     let expctedProviders = [];
     expect(JSON.stringify(getAllProviders(10000))).toBe(
+      JSON.stringify(expctedProviders)
+    );
+  });
+
+  test('Validate: Onecard in Other EMI provider list for emiUX', () => {
+    let amount = 1000000;
+    const mockPrefs = {
+      emi_options: {
+        onecard: [
+          {
+            duration: 3,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 400000,
+            merchant_payback: '2.45',
+          },
+          {
+            duration: 6,
+            interest: 16,
+            subvention: 'customer',
+            min_amount: 400000,
+            merchant_payback: '4.23',
+          },
+        ],
+      },
+      cardless_emi: {
+        zestmoney: true,
+      },
+    };
+    getMerchantMethods.mockReturnValue(mockPrefs);
+    let expctedProviders = [
+      {
+        data: { code: 'zestmoney' },
+        section: undefined,
+        highlightLabel: undefined,
+        icon: 'https://cdn.razorpay.com/cardless_emi-sq/zestmoney.svg',
+        code: 'zestmoney',
+        name: 'ZestMoney',
+        method: 'cardless_emi',
+        isNoCostEMI: false,
+      },
+      {
+        data: { code: 'onecard' },
+        section: undefined,
+        highlightLabel: undefined,
+        icon: 'https://cdn.razorpay.com/cardless_emi-sq/onecard.png',
+        code: 'onecard',
+        name: 'OneCard',
+        method: 'emi',
+        isNoCostEMI: false,
+        creditEmi: true,
+        startingFrom: 16,
+      },
+    ];
+    expect(JSON.stringify(getAllProviders(amount))).toBe(
       JSON.stringify(expctedProviders)
     );
   });

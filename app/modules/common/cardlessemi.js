@@ -68,6 +68,9 @@ const config = {
     headless: false,
     min_amount: 50000,
   },
+  onecard: {
+    name: 'OneCard',
+  },
 };
 
 /**
