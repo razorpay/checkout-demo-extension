@@ -53,7 +53,6 @@ import {
   getDevice,
   android,
   AndroidWebView,
-  iOS,
 } from 'common/useragent';
 
 import {
@@ -565,7 +564,7 @@ const UPI_METHODS = {
   },
 
   intentUrl: () =>
-    // available only on android+ios mobile web (no-sdk, no-fb-insta)
+    // available only on android mobile web (no-sdk, no-fb-insta)
     !isRecurring() &&
     !isPayout() &&
     !global.CheckoutBridge &&
@@ -575,7 +574,7 @@ const UPI_METHODS = {
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     intentEnabledInOption() &&
     getSDKMeta()?.platform === 'web' &&
-    (android || iOS),
+    android,
 };
 
 // additional checks for each sub-method based on UPI OTM
