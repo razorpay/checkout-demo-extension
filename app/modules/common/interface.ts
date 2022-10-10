@@ -20,8 +20,12 @@ class Interface {
     Interface.subscriptions[subscribeTopic].push(fx);
   }
 
-  static resetSubscriptions() {
-    Interface.subscriptions = {};
+  static resetSubscriptions(topic?: string) {
+    if (topic) {
+      Interface.subscriptions[topic] = [];
+    } else {
+      Interface.subscriptions = {};
+    }
   }
 
   static publishToParent(topic: string, data: any = {}) {
@@ -50,7 +54,7 @@ class Interface {
     }
   }
 
-  static sendMessage(topic: string, data: any) {
+  static sendMessage(topic: string, data?: any) {
     const frame =
       Interface.iframeReference && Interface.iframeReference.contentWindow
         ? Interface.iframeReference.contentWindow

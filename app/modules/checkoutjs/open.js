@@ -16,6 +16,7 @@ import { shouldUseVernacular } from 'checkoutstore/methods';
 import { getValidLocaleFromConfig, getValidLocaleFromStorage } from 'i18n/init';
 import { MiscTracker } from 'misc/analytics/events';
 import { getOption } from 'razorpay';
+import { setupFreezeCheck } from './freeze';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -244,8 +245,8 @@ function getPreloadedFrame(rzp) {
     preloadedFrame = new CheckoutFrame(rzp);
     Interface.iframeReference = preloadedFrame.el;
     Interface.setId(Track.id);
-    global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
-    frameContainer |> _El.append(preloadedFrame.el);
+    _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame))(global);
+    _El.append(frameContainer, preloadedFrame.el);
   }
 
   return preloadedFrame;
@@ -318,6 +319,8 @@ RazorProto.open = needBody(function () {
       getValidLocaleFromStorage() || getValidLocaleFromConfig() || 'en';
   }
   EventsV2.setContext(ContextProperties.LOCALE, initialLocale);
+
+  setupFreezeCheck();
 
   if (!frame.el.contentWindow) {
     frame.close();

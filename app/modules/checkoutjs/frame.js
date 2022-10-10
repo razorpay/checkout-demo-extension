@@ -21,6 +21,7 @@ import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import { sendToAll, setInitialContext } from 'checkoutjs/analytics';
+import { cleanupFreezeCheck } from './freeze';
 
 const { screen, scrollTo } = global;
 
@@ -290,7 +291,7 @@ CheckoutFrame.prototype = {
     if (ua_iPhone) {
       scrollTo(0, merchantMarkup.oldY);
     }
-
+    cleanupFreezeCheck();
     Track.flush();
   },
 
@@ -701,6 +702,7 @@ CheckoutFrame.prototype = {
   },
 
   afterClose: function () {
+    cleanupFreezeCheck();
     CheckoutFrame.container.style.display = 'none';
   },
 
