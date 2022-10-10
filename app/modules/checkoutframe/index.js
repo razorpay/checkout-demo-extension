@@ -131,10 +131,13 @@ const setAnalyticsMeta = (message) => {
    * Set time-related properties.
    */
   if (message.metadata && message.metadata.openedAt) {
-    Events.setMeta(
-      MetaProperties.TIME_SINCE_OPEN,
-      () => _.now() - message.metadata.openedAt
-    );
+    let openedAt = +message.metadata.openedAt;
+    if (Bridge.hasNewIosBridge()) {
+      // as iOS send openedAt in seconds
+      // converting to milliseconds
+      openedAt = openedAt * 1000;
+    }
+    Events.setMeta(MetaProperties.TIME_SINCE_OPEN, () => _.now() - openedAt);
     AnalyticsV2State.checkoutInvokedTime = message.metadata.openedAt;
   }
 
