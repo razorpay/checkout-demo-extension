@@ -29,7 +29,6 @@ export interface PluginState {
    * queue responsible for sending events after plugin has loaded
    */
   pendingQ: null | QueueType<{
-    type: PLUGIN_CALLBACK_TYPES;
     payload: TrackPayload | IdentifyPayload | CustomObject<string, unknown>;
   }>;
   config: Plugin;

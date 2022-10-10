@@ -405,31 +405,36 @@ export function setBlocks(
     },
   });
 
-  let orderedBlockData = {};
-  try {
-    orderedBlockData = getOrderedBlockData(allBlocks);
-  } catch {}
+  if (onMethodScreen) {
+    let orderedBlockData = {};
+    try {
+      orderedBlockData = getOrderedBlockData(allBlocks);
+    } catch {}
 
-  let personalisation = {};
-  personalisation.shown = addPreferredInstrumentsBlock;
-  const personalizationVersionId = get(personalisationVersionId);
+    let personalisation = {};
+    personalisation.shown =
+      addPreferredInstrumentsBlock && preferredBlock.instruments?.length > 0;
 
-  const preferencesVersionId =
-    getPreferences()?.preferred_methods?.[get(contact) || 'default']?.versionID;
+    const personalizationVersionId = get(personalisationVersionId);
 
-  //if personalizationVersionId is set the use that otherwise use preferencesVersionId
-  personalisation.version = personalizationVersionId || preferencesVersionId;
+    const preferencesVersionId =
+      getPreferences()?.preferred_methods?.[get(contact) || 'default']
+        ?.versionID;
 
-  if (addPreferredInstrumentsBlock) {
-    personalisation['instruments'] =
-      orderedBlockData['rzp.preferred']?.instruments || {};
+    //if personalizationVersionId is set the use that otherwise use preferencesVersionId
+    personalisation.version = personalizationVersionId || preferencesVersionId;
+
+    if (addPreferredInstrumentsBlock) {
+      personalisation['instruments'] =
+        orderedBlockData['rzp.preferred']?.instruments || {};
+    }
+    try {
+      MiscTracker.METHOD_SELECTION_SCREEN({
+        blocks: orderedBlockData,
+        personalisation: personalisation,
+      });
+    } catch {}
   }
-  try {
-    MiscTracker.METHOD_SELECTION_SCREEN({
-      blocks: orderedBlockData,
-      personalisation: personalisation,
-    });
-  } catch {}
 
   hiddenMethods.set(parsedConfig.display.hide.methods);
   hiddenInstruments.set(parsedConfig.display.hide.instruments);

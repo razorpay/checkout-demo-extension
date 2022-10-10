@@ -1,3 +1,5 @@
+import type { PLUGIN_CALLBACK_TYPES } from 'analytics-v2/library/analytics-core/types';
+
 /**
  * generic custom object with key and type parameter
  */
@@ -36,6 +38,7 @@ export interface TrackPayload {
   userId?: string;
   anonymousId: string;
   originalTimestamp: string;
+  type: PLUGIN_CALLBACK_TYPES.TRACK;
 }
 
 /**
@@ -45,6 +48,7 @@ export interface IdentifyPayload {
   userId: string;
   anonymousId: string;
   traits?: CustomObject<string, unknown>;
+  type: PLUGIN_CALLBACK_TYPES.IDENTIFY;
 }
 
 /**

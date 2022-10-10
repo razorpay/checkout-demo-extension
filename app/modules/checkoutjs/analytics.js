@@ -27,10 +27,7 @@ export function sendToAll(event, payload) {
 export function setInitialContext() {
   const prefilledContact = getOption('prefill.contact');
   const prefilledEmail = getOption('prefill.email');
-  const amount = getOption('amount');
-  if (amount) {
-    EventsV2.setContext(ContextProperties.AMOUNT, getOption('amount'));
-  }
+
   if (prefilledContact) {
     EventsV2.setContext(ContextProperties.TRAITS_CONTACT, prefilledContact);
   }

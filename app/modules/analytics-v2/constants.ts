@@ -40,17 +40,16 @@ export const ContextProperties = {
   REFERRER: 'referrer',
 } as const;
 
-const isProdEnv =
+export const isProdEnv =
   RazorpayConfig.api.startsWith('https://api.razorpay.com') ||
   RazorpayConfig.api.startsWith('https://api-dark.razorpay.com');
 
-// TODO: values need to be updated for prod env
 export const RUDDERSTACK_URL = isProdEnv
-  ? 'https://rudderstack.stage.razorpay.in'
-  : 'https://rudderstack.stage.razorpay.in';
+  ? 'https://rudderstack.razorpay.com'
+  : 'https://rudderstack.ext.dev.razorpay.in';
 
 export const RUDDERSTACK_KEY = isProdEnv
-  ? '27TM2uVMCl4nm4d7gqR4tysvdU1'
+  ? '2Fle0rY1hHoLCMetOdzYFs1RIJF'
   : '27TM2uVMCl4nm4d7gqR4tysvdU1';
 
 /**

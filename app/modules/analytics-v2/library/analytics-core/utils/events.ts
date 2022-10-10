@@ -29,10 +29,10 @@ function handlePendingEvents(
     // create a new queue for plugin and push events triggered before plugin loaded
     plugin.pendingQ = createQueue(
       (events: any[]) => {
-        events.forEach(({ type, payload }) => {
+        events.forEach((payload) => {
           if (!plugin.loaded()) {
             // plugin is still not loaded, push the event back in queue
-            plugin.pendingQ?.push({ payload, type });
+            plugin.pendingQ?.push(payload);
           } else if (pluginCallback) {
             pluginCallback(payload, options);
           }
@@ -43,7 +43,7 @@ function handlePendingEvents(
       }
     );
   }
-  plugin.pendingQ.push({ payload, type });
+  plugin.pendingQ.push(payload);
 }
 
 /**
@@ -75,7 +75,7 @@ export function processEvent<K extends keyof CallbackPayloadMap>(
         // trigger plugin callback for the type
         pluginCallback(payload, options);
       } else {
-        handlePendingEvents(plugin, state, options, type);
+        handlePendingEvents(plugin, payload, options, type);
       }
     }
   });

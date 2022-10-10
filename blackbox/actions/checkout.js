@@ -5,6 +5,7 @@ const {
   lumberjackUrl,
   bundleUrl,
   rudderstackStageUrl,
+  rudderstackProdUrl,
 } = require('../const');
 const { interceptor, delay } = require('../util');
 const { computed } = require('./options');
@@ -72,7 +73,10 @@ function checkoutRequestHandler(request) {
     url.includes(sentryUrl)
   ) {
     return request.respond({ status: 200 });
-  } else if (url.startsWith(rudderstackStageUrl)) {
+  } else if (
+    url.startsWith(rudderstackStageUrl) ||
+    url.startsWith(rudderstackProdUrl)
+  ) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;

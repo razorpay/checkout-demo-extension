@@ -1,7 +1,7 @@
 const { interceptor } = require('../../util');
 const { readFileSync } = require('fs');
 const devices = require('puppeteer/DeviceDescriptors');
-const { rudderstackStageUrl } = require('../../const');
+const { rudderstackStageUrl, rudderstackProdUrl } = require('../../const');
 
 const prefix = 'https://api-custom.razorpay.com/v1/checkout';
 const apiPrefix = 'https://api.razorpay.com/v1/checkout';
@@ -59,7 +59,10 @@ function checkoutRequestHandler(request) {
     return request.respond({ body: jsContent });
   } else if (url.startsWith('https://lumberjack.razorpay.com')) {
     return request.respond({ status: 200 });
-  } else if (url.startsWith(rudderstackStageUrl)) {
+  } else if (
+    url.startsWith(rudderstackStageUrl) ||
+    url.startsWith(rudderstackProdUrl)
+  ) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;

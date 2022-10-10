@@ -5,7 +5,7 @@ import {
   getExperimentsFromStorage,
   getRegisteredExperiments,
 } from 'experiments';
-import { getOrderId } from 'razorpay';
+import { getAmount, getOrderId } from 'razorpay';
 import type { CustomObject } from 'types';
 
 /**
@@ -48,6 +48,8 @@ function formatPrefExperiments(
 export function updateAnalyticsFromPreferences(
   preferences: CustomObject<unknown>
 ) {
+  EventsV2.setContext(ContextProperties.AMOUNT, getAmount());
+
   Events.setMeta(MetaProperties.FEATURES, preferences.features);
   EventsV2.setContext(ContextProperties.FEATURES, preferences.features);
   if (preferences && preferences.merchant_id) {

@@ -126,7 +126,7 @@ interface CardsEventMap {
   GEN_OTP_SENT: undefined;
 }
 
-export const CardsTracker = createTrackMethodForModule<
-  CardsEventMap,
-  typeof CardsEvents
->(CardsEvents);
+export const CardsTracker = createTrackMethodForModule<CardsEventMap>(
+  CardsEvents,
+  { skipEvents: true }
+);

@@ -1134,6 +1134,21 @@ Session.prototype = {
     this.setFormatting();
     es6components.render();
     this.setModal();
+    try {
+      MiscTracker.OPEN({
+        user: {
+          contact: {
+            hidden: isContactHidden(),
+            value: getPrefilledContact(),
+          },
+          email: {
+            hidden: isEmailHidden(),
+            value: getPrefilledEmail(),
+          },
+        },
+      });
+    } catch {}
+
     this.setBackdrop();
     if (RazorpayHelper.isBlockedDeactivated() && this.r.isLiveMode()) {
       new BlockedDeactivatedMerchant({
@@ -1191,20 +1206,6 @@ Session.prototype = {
     } else {
       first_screen = this.homeTab.getCurrentView();
     }
-    try {
-      MiscTracker.OPEN({
-        user: {
-          contact: {
-            hidden: isContactHidden(),
-            value: getPrefilledContact(),
-          },
-          email: {
-            hidden: isEmailHidden(),
-            value: getPrefilledEmail(),
-          },
-        },
-      });
-    } catch {}
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,

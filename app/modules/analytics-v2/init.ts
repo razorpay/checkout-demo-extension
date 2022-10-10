@@ -14,6 +14,7 @@ const analytics = new Analytics<ContextValues>({
         domainUrl: RUDDERSTACK_URL,
         key: RUDDERSTACK_KEY,
       }),
+      // TODO: add isProdEnv after verification
       enabled: !!Browserstorage.getItem('enable-analytics-V2'),
     },
   ],

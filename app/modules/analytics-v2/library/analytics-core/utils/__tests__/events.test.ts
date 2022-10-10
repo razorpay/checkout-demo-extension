@@ -61,7 +61,7 @@ describe('Events Utils', () => {
   describe('processEvent', () => {
     test('should follow execution order from first plugin to last', () => {
       processEvent(
-        eventPayload,
+        { ...eventPayload, type: PLUGIN_CALLBACK_TYPES.TRACK },
         analytics.getState(),
         {},
         PLUGIN_CALLBACK_TYPES.TRACK
@@ -72,7 +72,7 @@ describe('Events Utils', () => {
 
     test('should only call callbacks on active plugins', () => {
       processEvent(
-        eventPayload,
+        { ...eventPayload, type: PLUGIN_CALLBACK_TYPES.TRACK },
         analytics.getState(),
         {},
         PLUGIN_CALLBACK_TYPES.TRACK
