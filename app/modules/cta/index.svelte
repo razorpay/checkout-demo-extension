@@ -55,12 +55,24 @@
 
   const store = CTAStore.store;
   $: disableVariant = state.variant === 'disabled';
+
+  let reduceAmountSize = false;
+  $: {
+    try {
+      if (($store.amount || getAmount())?.toString()?.length > 5) {
+        reduceAmountSize = true;
+      }
+    } catch (e) {
+      // no action
+    }
+  }
 </script>
 
 <div
   class="cta-container"
   class:hidden={!state.show}
   class:with-amount={state.showAmount}
+  class:reduce-amount-size={reduceAmountSize}
 >
   {#if state.showAmount}
     <div class="flex-column">
@@ -131,6 +143,10 @@
   }
   .with-amount .redesign-v15-cta-wrapper {
     max-width: 70%;
+  }
+
+  .reduce-amount-size .price-label {
+    font-size: 14px !important;
   }
 
   /* #redesign-v15-cta:not(.disabled)::after {

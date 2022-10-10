@@ -3,7 +3,7 @@ import { getPreferences } from './base';
 
 // Preference related
 export const getPayoutContact = () => getPreferences('contact');
-export const getMerchantMethods = () => getPreferences('methods', {});
+export const getMerchantMethods = () => getPreferences('methods', {}) || {};
 export const getMerchantOrder = () => getPreferences('order');
 export const getOrderMethod = () => getPreferences('order.method');
 export const getMerchantOrderAmount = () => getPreferences('order.amount');

@@ -1312,7 +1312,7 @@
         CTAState.label =
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
       } else if (view === HOME_VIEWS.DETAILS) {
-        CTAState.showAmount = isPartialPayment ? true : false;
+        CTAState.showAmount = isPartialPayment || tpv;
         CTAState.onSubmit = onPaymentDetailSubmit;
         if (singleMethod) {
           const { label, labelData } = showPayViaSingleMethod(
