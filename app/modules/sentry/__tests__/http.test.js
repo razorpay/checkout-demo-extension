@@ -63,7 +63,6 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     const error = new Error('Something went wrong');
 
     window.Sentry = null;
-    getPreferences.mockReturnValue(null);
     isOneClickCheckout.mockReturnValue(false);
 
     captureError(error);
@@ -71,23 +70,10 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     expect(fetch.post).toHaveBeenCalled();
   });
 
-  it('should not make api calls if preferences is fetched', () => {
-    const error = new Error('Something went wrong');
-
-    window.Sentry = null;
-    getPreferences.mockReturnValue(preferences);
-    isOneClickCheckout.mockReturnValue(false);
-
-    captureError(error);
-
-    expect(fetch.post).not.toHaveBeenCalled();
-  });
-
   it('should not make api call if sentry already injected', () => {
     window.Sentry = { init: jest.fn() };
     const error = new Error('Something went wrong');
 
-    getPreferences.mockReturnValue(preferences);
     isOneClickCheckout.mockReturnValue(true);
 
     captureError(error);
@@ -95,15 +81,14 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     expect(fetch.post).not.toHaveBeenCalled();
   });
 
-  it('should not make api call if not one click checkout', () => {
+  it('should make api call if not one click checkout', () => {
     window.Sentry = null;
     const error = new Error('Something went wrong');
 
-    getPreferences.mockReturnValue(preferences);
     isOneClickCheckout.mockReturnValue(false);
 
     captureError(error);
 
-    expect(fetch.post).not.toHaveBeenCalled();
+    expect(fetch.post).toHaveBeenCalled();
   });
 });

@@ -36,6 +36,8 @@ module.exports = {
     'node_modules',
     '.module.ts',
     '.d.ts',
+    '/app/modules/utils/modal.ts',
+    'app/modules/sentry/init.ts', // IIFE module
     'app/modules/utils/modal.ts',
     'app/freeze-webworker.js',
     'app/modules/checkoutjs/freeze.ts',

@@ -1,5 +1,5 @@
-import { getSession } from 'sessionmanager';
-import { isOneClickCheckout } from 'razorpay';
+import { Track } from 'analytics/base-analytics';
+import { getOption, isOneClickCheckout } from 'razorpay';
 import { getSavedAddresses } from 'one_click_checkout/address/store';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 
@@ -12,16 +12,16 @@ let context: Context;
  * @returns {object} the context object
  */
 export function createContext(): Context {
-  const session = getSession();
-  const options = session.r.get();
+  const options = getOption() || {};
   const customer = getCustomerDetails();
 
   // mask pii information
   const maskedOptions = Object.keys(options).reduce(
     (masked: Record<string, any>, key: string) => {
+      const value = options[key as keyof typeof options];
       masked[key] = key.startsWith('prefill')
-        ? options[key]?.replace(/[A-Za-z0-9]/g, '*')
-        : options[key];
+        ? value?.replace(/[A-Za-z0-9]/g, '*')
+        : value;
       return masked;
     },
     {}
@@ -29,8 +29,8 @@ export function createContext(): Context {
 
   return {
     options: maskedOptions,
-    checkout_id: session.r?.id,
-    order_id: options.order_id,
+    checkout_id: Track.id,
+    order_id: options.order_id as string,
     logged_in: !!customer?.logged,
     one_click_checkout: isOneClickCheckout(),
     has_saved_address: !!getSavedAddresses()?.length,

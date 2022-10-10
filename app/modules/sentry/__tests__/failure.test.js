@@ -1,7 +1,7 @@
-import Analytics from 'analytics';
+import Analytics from 'analytics/base-analytics';
 import { captureSentryHttpFailure } from 'sentry/failure';
 
-jest.mock('analytics');
+jest.mock('analytics/base-analytics');
 
 describe('Sentry HTTP Failure handler', () => {
   it('should gracefully push data to looker', () => {

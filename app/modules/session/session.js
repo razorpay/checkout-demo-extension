@@ -58,7 +58,7 @@ import {
 } from 'emiV2/store';
 import EmiTabsScreen from 'emiV2/ui/components/EmiTabsScreen/EmiTabsScreen.svelte';
 import { cardlessTabProviders, providersToAvoid } from 'emiV2/constants';
-import { injectSentry } from 'sentry';
+import { updateSentryConfig } from 'sentry';
 import { validateAndFetchPrefilledWallet } from 'wallet/helper';
 import { screenStore, tabStore } from 'checkoutstore';
 import { isDebitIssuer } from 'common/bank';
@@ -1254,7 +1254,7 @@ Session.prototype = {
       OneClickCheckoutStore.shouldShowCoupons() ||
       OneClickCheckoutStore.shouldShowAddress();
     if (RazorpayHelper.isOneClickCheckout() && isCouponsOrAddressEnabled) {
-      injectSentry();
+      updateSentryConfig(); // change sentry project to 1cc
       this.setOneClickCheckoutHome();
     }
     if (!RazorpayHelper.isPayout()) {

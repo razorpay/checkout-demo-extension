@@ -18,6 +18,7 @@ const { handlePartialOrderUpdate } = require('./one-click-checkout/order');
 const puppeteer = require('puppeteer');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
+const sentryUrl = 'https://browser.sentry-cdn.com/7.2.0/bundle.min.js';
 const automaticCheckoutPublic =
   'https://api.razorpay.com/v1/checkout/public/automatic';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -66,7 +67,10 @@ function checkoutRequestHandler(request) {
       body: fontContent,
       headers: { 'Access-Control-Allow-Origin': '*' },
     });
-  } else if (url.startsWith('https://lumberjack.razorpay.com')) {
+  } else if (
+    url.startsWith('https://lumberjack.razorpay.com') ||
+    url.includes(sentryUrl)
+  ) {
     return request.respond({ status: 200 });
   } else if (url.startsWith(rudderstackStageUrl)) {
     return request.respond({ status: 200 });

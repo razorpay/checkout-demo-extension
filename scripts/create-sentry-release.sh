@@ -11,13 +11,13 @@ aws --output text s3 sync s3://${BUCKET}/build/${COMMIT_ID} build
 curl -sL https://sentry.io/get-cli/ | bash
 
 # Get app version
-APP_VERSION=$(sentry-cli releases propose-version)
+APP_VERSION=${COMMIT_ID}
 
 # Create a new release
 sentry-cli releases new $APP_VERSION
 
 # Upload sourcemaps
-sentry-cli releases files $APP_VERSION upload-sourcemaps build/*.map
+sentry-cli releases files $APP_VERSION upload-sourcemaps build --url-prefix "~/build/${COMMIT_ID}"
 
 # Commit Integration
 sentry-cli releases set-commits --auto $APP_VERSION

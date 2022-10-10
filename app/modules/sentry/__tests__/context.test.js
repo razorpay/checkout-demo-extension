@@ -1,20 +1,22 @@
-import { getSession } from 'sessionmanager';
-import { isOneClickCheckout } from 'razorpay';
+import { isOneClickCheckout, getOption } from 'razorpay';
 import * as contextModule from 'sentry/context';
 import { getSavedAddresses } from 'one_click_checkout/address/store';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
-
-jest.mock('sessionmanager', () => {
-  return {
-    __esModule: true,
-    getSession: jest.fn(),
-  };
-});
 
 jest.mock('razorpay', () => {
   return {
     __esModule: true,
     isOneClickCheckout: jest.fn(),
+    getOption: jest.fn(),
+  };
+});
+
+jest.mock('analytics/base-analytics', () => {
+  return {
+    __esModule: true,
+    Track: {
+      id: 'mock_checkout',
+    },
   };
 });
 
@@ -40,12 +42,7 @@ const common_options = {
 
 describe('createContext() method', () => {
   it('should create context', () => {
-    getSession.mockReturnValue({
-      r: {
-        id: 'mock_checkout',
-        get: () => common_options,
-      },
-    });
+    getOption.mockReturnValue(common_options);
     getCustomerDetails.mockReturnValue({});
     getSavedAddresses.mockReturnValue([]);
     isOneClickCheckout.mockReturnValue(true);
@@ -64,16 +61,11 @@ describe('createContext() method', () => {
   });
 
   it('should delete prefill if exists', () => {
-    getSession.mockReturnValue({
-      r: {
-        id: 'mock_checkout',
-        get: () => ({
-          ...common_options,
-          'prefill.name': 'Goutam B Seervi',
-          'prefill.contact': '+91999999999',
-          'prefill.email': 'goutam@test.com',
-        }),
-      },
+    getOption.mockReturnValue({
+      ...common_options,
+      'prefill.name': 'Test',
+      'prefill.contact': '+91999999999',
+      'prefill.email': 'goutam@test.com',
     });
     getCustomerDetails.mockReturnValue({});
     getSavedAddresses.mockReturnValue([]);
@@ -84,7 +76,7 @@ describe('createContext() method', () => {
     expect(context).toEqual({
       options: {
         ...common_options,
-        'prefill.name': '****** * ******',
+        'prefill.name': '****',
         'prefill.contact': '+***********',
         'prefill.email': '******@****.***',
       },
@@ -98,12 +90,7 @@ describe('createContext() method', () => {
   });
 
   it('should have saved address and cards if user logged in', () => {
-    getSession.mockReturnValue({
-      r: {
-        id: 'mock_checkout',
-        get: () => common_options,
-      },
-    });
+    getOption.mockReturnValue(common_options);
     getCustomerDetails.mockReturnValue({
       contact: '+919353231953',
       customer_id: undefined,
@@ -203,12 +190,7 @@ describe('createContext() method', () => {
 
 describe('getContext() method', () => {
   it('should return context object', () => {
-    getSession.mockReturnValue({
-      r: {
-        id: 'mock_checkout',
-        get: () => common_options,
-      },
-    });
+    getOption.mockReturnValue(common_options);
     getCustomerDetails.mockReturnValue({});
     getSavedAddresses.mockReturnValue([]);
     isOneClickCheckout.mockReturnValue(true);

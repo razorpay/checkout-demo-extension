@@ -1,5 +1,7 @@
 import 'lib/polyfill/checkoutframe'; // need always at top
 import 'error-service/init';
+/** any error on mount and before preference complete track under main checkout (CX) project */
+import 'sentry/init';
 import 'utils/modal';
 import { setSessionConstructor } from 'sessionmanager';
 import { initIframe } from 'checkoutframe/iframe';

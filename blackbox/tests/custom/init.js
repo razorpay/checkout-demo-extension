@@ -14,6 +14,7 @@ const redirectPage = 'v1/payments/create/checkout';
 const mockPageSubmit =
   'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
 const mockSubmitPageCardlessEMI = 'https://api.razorpay.com/v1/otp/verify';
+const sentryUrl = 'https://browser.sentry-cdn.com/7.2.0/bundle.min.js';
 
 const walletTopUpURL = 'https://walletapi.mobikwik.com/wallet';
 
@@ -62,7 +63,7 @@ function checkoutRequestHandler(request) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;
-  } else if (url.includes('livereload')) {
+  } else if (url.includes('livereload') || url.includes(sentryUrl)) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
   } else if (

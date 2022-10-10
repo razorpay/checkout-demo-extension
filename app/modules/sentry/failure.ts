@@ -1,4 +1,4 @@
-import Analytics from 'analytics';
+import Analytics from 'analytics/base-analytics';
 
 export function captureSentryHttpFailure(event: CustomEvent) {
   try {

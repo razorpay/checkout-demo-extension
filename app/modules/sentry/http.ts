@@ -1,14 +1,7 @@
 import fetch from 'utils/fetch';
-import { isEmpty } from 'utils/object';
-import { getPreferences, isOneClickCheckout } from 'razorpay';
+import { isOneClickCheckout } from 'razorpay';
 
-import {
-  SENTRY_ENVIRONMENT,
-  SENTRY_RELEASE_VERSION,
-  SENTRY_PUBLIC_KEY,
-  SENTRY_PROJECT_ID,
-  SENTRY_BASE_URL,
-} from './constants';
+import { SENTRY_CONFIG } from './constants';
 import { uuid4 } from 'common/uuid';
 import { getContext } from './context';
 import { exceptionFromError } from './parser';
@@ -17,6 +10,8 @@ const ERROR_TRACKING_URLS = [
   'https://checkout.razorpay.com',
   'https://checkout-static.razorpay.com',
 ];
+
+let isErrorCaptureForThisSession = false;
 
 export function isUrlApplicableForErrorTracking(url: string) {
   return ERROR_TRACKING_URLS.some(function (availableUrl) {
@@ -35,10 +30,20 @@ export function captureError(error: Error) {
     return;
   }
 
-  // don't proceed if preferences was fetched and it is std checkout flow.
-  if (!isEmpty(getPreferences()) && !isOneClickCheckout()) {
+  /**
+   * for standard checkout we want to capture max one error per user session
+   */
+  if (!isOneClickCheckout() && isErrorCaptureForThisSession) {
     return;
   }
+
+  const {
+    SENTRY_ENVIRONMENT,
+    SENTRY_RELEASE_VERSION,
+    SENTRY_PUBLIC_KEY,
+    SENTRY_PROJECT_ID,
+    SENTRY_BASE_URL,
+  } = SENTRY_CONFIG[isOneClickCheckout() ? 'magic' : 'standard'];
 
   const event_id = uuid4();
 
@@ -53,6 +58,7 @@ export function captureError(error: Error) {
       environment: SENTRY_ENVIRONMENT,
       exception,
       contexts: {
+        // its possible we don't get enough data for context if error trigger before preference completion
         checkout: getContext(),
       },
     };
@@ -66,6 +72,7 @@ export function captureError(error: Error) {
             })
           );
         }
+        isErrorCaptureForThisSession = true;
       },
       url: `${SENTRY_BASE_URL}/api/${SENTRY_PROJECT_ID}/store/`,
       data: JSON.stringify(payload),
