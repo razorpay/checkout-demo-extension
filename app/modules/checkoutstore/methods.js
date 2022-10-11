@@ -53,6 +53,7 @@ import {
   getDevice,
   android,
   AndroidWebView,
+  iOS,
 } from 'common/useragent';
 
 import {
@@ -574,7 +575,7 @@ const UPI_METHODS = {
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     intentEnabledInOption() &&
     getSDKMeta()?.platform === 'web' &&
-    android,
+    (android || (iOS && getPreferences('experiments.reuse_upi_paymentId'))),
 };
 
 // additional checks for each sub-method based on UPI OTM
