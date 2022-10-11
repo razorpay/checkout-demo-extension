@@ -201,7 +201,7 @@
 
   .input {
     outline: none;
-    padding: 12px;
+    padding: 14px 12px;
     border-radius: 4px;
     color: var(--primary-text-color);
     margin-bottom: 0px;
@@ -209,7 +209,7 @@
   .label {
     color: var(--tertiary-text-color);
     position: absolute;
-    top: 22px;
+    top: 24px;
     left: 16px;
     background: #fff;
     cursor: inherit;
