@@ -395,5 +395,9 @@
     .details-block {
       padding: 0;
     }
+
+    .partial-payment-block {
+      padding-top: 24px;
+    }
   }
 </style>
