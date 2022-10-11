@@ -47,6 +47,9 @@ function handleUPIPayments(
     // basePayload.provider = config?.app?.shortcode;
     basePayload.upi_app = config?.app?.package_name;
     setFlowInPayload(basePayload, 'intent');
+    if (getPreferences('experiments.reuse_upi_paymentId')) {
+      basePayload.persistentMode = true;
+    }
   }
   if (config.action === 'none' && config.qrFlow) {
     setFlowInPayload(basePayload, 'qr');

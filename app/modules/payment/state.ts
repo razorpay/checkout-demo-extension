@@ -9,21 +9,21 @@ import fetch from 'utils/fetch';
 
 const PERSISTENT_PAYMENT_EXPIRY_LIMIT = 6.5 * 60 * 1000; // 6.5 minutes
 
+const requiredMeta = ['_[app]'];
+
 function removeMeta(payload: Record<string, any>) {
-  return Object.keys(payload).reduce(
-    (acc: Record<string, any>, key: string) => {
-      if (key.indexOf('_') !== 0) {
+  return Object.keys(payload)
+    .sort()
+    .reduce((acc: Record<string, any>, key: string) => {
+      if (key.indexOf('_') !== 0 || requiredMeta.indexOf(key) !== -1) {
         acc[key] = payload[key];
       }
       return acc;
-    },
-    {}
-  );
+    }, {});
 }
 
 function getHashKey(payload: Record<string, any>) {
   const paymentPayload = removeMeta(payload);
-  // not using sha as its async
   return sha(JSON.stringify(paymentPayload));
 }
 

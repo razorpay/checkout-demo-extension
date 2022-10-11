@@ -29,8 +29,23 @@ describe('test PaymentState', () => {
     await PaymentState.setPersistentState(dummyRequest, response);
     expect(PaymentState.persistentState.size).toBe(1);
     const key = {
-      method: 'upi',
       email: 'test@example.com',
+      method: 'upi',
+      phone: '8888888888',
+    };
+    expect(PaymentState.persistentState.has(JSON.stringify(key))).toBeTruthy();
+  });
+
+  test('#setPersistentState with _[app]', async () => {
+    await PaymentState.setPersistentState(
+      { ...dummyRequest, '_[app]': 'com.test' },
+      response
+    );
+    expect(PaymentState.persistentState.size).toBe(1);
+    const key = {
+      '_[app]': 'com.test',
+      email: 'test@example.com',
+      method: 'upi',
       phone: '8888888888',
     };
     expect(PaymentState.persistentState.has(JSON.stringify(key))).toBeTruthy();
