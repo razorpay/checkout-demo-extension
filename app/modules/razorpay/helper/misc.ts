@@ -4,13 +4,16 @@
  * Customer related
  */
 
-import { getMerchantOption, getPreferences } from './base';
+import { isOneClickCheckout } from './1cc';
+import { getMerchantOption, getOption, getPreferences } from './base';
 import { hasFeature } from './preferences';
 
 export function shouldStoreCustomerInStorage() {
   const isLocalCustomer =
     !!getMerchantOption('customer_id') || !getPreferences('global');
-  const rememberCustomer = getMerchantOption('remember_customer');
+  const rememberCustomer = isOneClickCheckout()
+    ? getOption('remember_customer')
+    : getMerchantOption('remember_customer');
 
   return !isLocalCustomer && rememberCustomer;
 }
