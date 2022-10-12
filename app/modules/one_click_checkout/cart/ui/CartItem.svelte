@@ -18,7 +18,7 @@
 
   $: scriptEditedPrice =
     scriptCouponApplied() &&
-    offer_price !== undefined &&
+    !Number.isNaN(parseInt(offer_price, 10)) &&
     +price !== +offer_price &&
     +offer_price >= 0;
 

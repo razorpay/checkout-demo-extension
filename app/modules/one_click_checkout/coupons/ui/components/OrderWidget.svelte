@@ -80,7 +80,7 @@
   }
 
   $: {
-    showTotal = $isShippingAddedToAmount || $isCouponApplied;
+    showTotal = $isShippingAddedToAmount || $isCouponApplied || !!scriptCouponDiscount;
     if ($savedAddresses?.length && $shippingCharge) {
       amount.set($cartAmount - $cartDiscount + $shippingCharge);
     } else {
