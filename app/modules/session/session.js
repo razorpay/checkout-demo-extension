@@ -32,7 +32,11 @@ import {
   popStack,
   isMainStackPopulated,
 } from 'navstack';
-import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
+import {
+  isQRPaymentCancellable,
+  avoidSessionSubmit,
+  isQRPaymentActive,
+} from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
 import { processIntentOnMWeb } from 'upi/payment';
@@ -2180,7 +2184,10 @@ Session.prototype = {
 
     $('#save').attr('checked', 0);
     this.wants_skip = true;
-    if (payload) {
+
+    const isPayloadIsOfQR =
+      isQRPaymentActive() && payload?.['_[upiqr]'] === '1';
+    if (payload && !isPayloadIsOfQR) {
       delete payload.save;
       delete payload.app_token;
       // On otp skip action if it's new emi flow proceed with emi payment from seperate handler
@@ -4337,9 +4344,11 @@ Session.prototype = {
         this.payload && this.payload.method === 'cardless_emi';
 
       if (!isCardlessEmi && this.tab !== 'upi') {
+        const isPayloadIsOfQR =
+          isQRPaymentActive() && this.payload?.['_[upiqr]'] === '1';
         // card tab only past this
         // card filled by logged out user + remember me
-        if (this.payload) {
+        if (this.payload && !isPayloadIsOfQR) {
           callback = (msg) => {
             if (this.getCurrentCustomer().logged) {
               // OTP verification successful
