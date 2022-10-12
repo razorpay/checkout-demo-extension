@@ -86,6 +86,7 @@
     left: 'auto',
     right: 'auto',
   };
+  let touched = false;
 
   export let showValidations = false;
 
@@ -223,6 +224,7 @@
   }
 
   function handleInputBlur(event) {
+    touched = true;
     focused = false;
     // showValidations if required field only
     showValidations = required;
@@ -322,6 +324,10 @@
     }
     return true;
   }
+
+  let shouldShowErrorMessage = false;
+
+  $: shouldShowErrorMessage = showValidations && touched;
 </script>
 
 <!-- To Do: Refatoring Fields.js for 1cc post demo-->
@@ -345,7 +351,7 @@
     <input
       class={`input-one-click-checkout ${inputFieldClasses} main`}
       class:error-field-one-click-checkout={(validationText || isInvalid) &&
-        showValidations}
+        shouldShowErrorMessage}
       bind:this={input}
       id={identifier}
       type={inputType}
@@ -399,7 +405,7 @@
         }`}
         class:label-upper={focused || value}
         class:error-label-one-click-checkout={(validationText || isInvalid) &&
-          showValidations}>{label}</label
+          shouldShowErrorMessage}>{label}</label
       >
     {/if}
     {#if extraLabel}
@@ -439,7 +445,7 @@
         {/each}
       </ul>
     {/if}
-    {#if validationText && showValidations}
+    {#if validationText && shouldShowErrorMessage}
       <div
         class={`input-validation-error validation-error-one-click-checkout ${errorValidationClasses}`}
       >

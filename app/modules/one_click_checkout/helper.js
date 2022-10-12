@@ -25,8 +25,13 @@ import {
   INDIA_COUNTRY_CODE,
   INDIAN_CONTACT_REGEX,
 } from 'common/constants';
+import { PHONE_NUMBER_LENGTH_INDIA } from 'common/constants';
 import { getElementById } from 'utils/doc';
 import * as _ from 'utils/_';
+import {
+  CONTACT_ERROR_LABEL,
+  INDIA_CONTACT_ERROR_LABEL,
+} from 'one_click_checkout/address/i18n/labels';
 
 export function clickOutside(node) {
   const handleClick = (event) => {
@@ -139,4 +144,10 @@ export function getInputSource(elementId, defaultColor = 'rgba(0, 0, 0, 0)') {
   const currentBackground = window?.getComputedStyle(el)?.backgroundColor;
 
   return currentBackground === defaultColor ? 'manual' : 'selection';
+}
+
+export function getIndErrLabel(phone) {
+  return phone.length === PHONE_NUMBER_LENGTH_INDIA || !phone
+    ? CONTACT_ERROR_LABEL
+    : INDIA_CONTACT_ERROR_LABEL;
 }

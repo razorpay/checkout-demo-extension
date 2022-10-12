@@ -51,6 +51,7 @@
   import { getThemeMeta } from 'checkoutstore/theme';
   import { getAnimationOptions } from 'svelte-utils';
   import { screensHistory } from 'one_click_checkout/routing/History';
+  import { getIndErrLabel } from 'one_click_checkout/helper';
 
   // analytics imports
   import Analytics, { Events, HomeEvents } from 'analytics';
@@ -245,7 +246,7 @@
   function getValidationText() {
     if ($country === INDIA_COUNTRY_CODE) {
       return !PHONE_REGEX_INDIA.test($phone)
-        ? $t(INDIA_CONTACT_ERROR_LABEL)
+        ? $t(getIndErrLabel($phone))
         : null;
     }
     return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;

@@ -27,10 +27,7 @@
     // MOBILE_NUMBER,
     // MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
-  import {
-    CONTACT_ERROR_LABEL,
-    INDIA_CONTACT_ERROR_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
+  import { CONTACT_ERROR_LABEL } from 'one_click_checkout/address/i18n/labels';
 
   import { t } from 'svelte-i18n';
 
@@ -39,6 +36,8 @@
   import { isContactValid } from 'one_click_checkout/common/details/store';
 
   import { testid } from 'tests/autogen';
+
+  import { getIndErrLabel } from 'one_click_checkout/helper';
 
   // Refs
   let countryField;
@@ -135,15 +134,11 @@
     }
   }
 
-  function getIndErrLabel(phone) {
-    return phone?.length === PHONE_NUMBER_LENGTH_INDIA
-      ? $t(CONTACT_ERROR_LABEL)
-      : $t(INDIA_CONTACT_ERROR_LABEL);
-  }
-
   function validateContact(country, phone) {
     if (country === INDIA_COUNTRY_CODE) {
-      return !INDIAN_CONTACT_REGEX.test(phone) ? getIndErrLabel(phone) : null;
+      return !INDIAN_CONTACT_REGEX.test(phone)
+        ? $t(getIndErrLabel(phone))
+        : null;
     }
     return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
