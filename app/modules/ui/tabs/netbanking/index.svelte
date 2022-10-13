@@ -294,6 +294,19 @@
     }
 
     if (bankCode) {
+      try {
+        MiscTracker.INSTRUMENT_SELECTED({
+          block: AnalyticsV2State.selectedBlock,
+          method: {
+            name: 'netbanking',
+          },
+          instrument: {
+            name: bankCode,
+            saved: false,
+            personalisation: false,
+          },
+        });
+      } catch {}
       Analytics.track('bank:select', {
         type: AnalyticsTypes.BEHAV,
         data: {
