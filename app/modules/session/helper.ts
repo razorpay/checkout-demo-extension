@@ -9,6 +9,7 @@ import IneleigibleModalSvelte from 'ui/components/IneleigibleModal.svelte';
 import { isEmiV2 } from 'razorpay';
 import { isCardlessTab } from 'emiV2/helper/tabs';
 import { trackDebitCardEligibilityChecked } from 'emiV2/events/tracker';
+import { isQRPaymentActive } from 'upi/helper';
 
 export function handleErrorModal(this: Session, message: string) {
   if (isEmiV2() && this.tab === 'emi') {
@@ -110,4 +111,17 @@ export function handleErrorModal(this: Session, message: string) {
       );
     }
   }
+}
+
+/**
+ * for UPI QR at L0/L1 active or failed due to checkout order failure
+ * it causing issue when we skip OTP as it triggers the submit flow because of payload present
+ * @param payload TODO update exact type
+ * @returns
+ */
+export function isPayloadIsOfQR(payload?: Record<string, any> | null) {
+  return (
+    (isQRPaymentActive() && payload?.['_[upiqr]'] === '1') ||
+    payload?.['_[checkout_order]'] === '1'
+  );
 }

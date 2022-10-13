@@ -17,7 +17,7 @@ import {
   matchLatestPaymentWith,
   updateLatestPaymentErrorReason,
 } from 'payment/history';
-import { handleErrorModal } from 'session/helper';
+import { handleErrorModal, isPayloadIsOfQR } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
@@ -32,11 +32,7 @@ import {
   popStack,
   isMainStackPopulated,
 } from 'navstack';
-import {
-  isQRPaymentCancellable,
-  avoidSessionSubmit,
-  isQRPaymentActive,
-} from 'upi/helper';
+import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
 import { deletePrefsCache } from 'common/Razorpay';
 import { processIntentOnMWeb } from 'upi/payment';
@@ -2185,9 +2181,12 @@ Session.prototype = {
     $('#save').attr('checked', 0);
     this.wants_skip = true;
 
-    const isPayloadIsOfQR =
-      isQRPaymentActive() && payload?.['_[upiqr]'] === '1';
-    if (payload && !isPayloadIsOfQR) {
+    /**
+     * for UPI QR at L0/L1 active or failed due to checkout order failure
+     * it causing issue when we skip OTP as it triggers the submit flow because of payload present
+     */
+    const isPayloadIsOfQRFlow = isPayloadIsOfQR(payload);
+    if (payload && !isPayloadIsOfQRFlow) {
       delete payload.save;
       delete payload.app_token;
       // On otp skip action if it's new emi flow proceed with emi payment from seperate handler
@@ -4344,11 +4343,10 @@ Session.prototype = {
         this.payload && this.payload.method === 'cardless_emi';
 
       if (!isCardlessEmi && this.tab !== 'upi') {
-        const isPayloadIsOfQR =
-          isQRPaymentActive() && this.payload?.['_[upiqr]'] === '1';
+        const isPayloadIsOfQRFlow = isPayloadIsOfQR(this.payload);
         // card tab only past this
         // card filled by logged out user + remember me
-        if (this.payload && !isPayloadIsOfQR) {
+        if (this.payload && !isPayloadIsOfQRFlow) {
           callback = (msg) => {
             if (this.getCurrentCustomer().logged) {
               // OTP verification successful

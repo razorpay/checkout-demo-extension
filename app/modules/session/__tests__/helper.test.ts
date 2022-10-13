@@ -3,7 +3,14 @@ import { setLatestPayment } from 'payment/history';
 import { upiUxV1dot1 } from 'upi/experiments';
 import type Session from 'session/session';
 
-import { handleErrorModal } from 'session/helper';
+import { handleErrorModal, isPayloadIsOfQR } from 'session/helper';
+import { isQRPaymentActive } from 'upi/helper';
+
+jest.mock('upi/helper', () => ({
+  __esModule: true,
+  isQRPaymentActive: jest.fn(),
+}));
+
 jest.mock('upi/experiments', () => ({
   upiUxV1dot1: {
     enabled: jest.fn(),
@@ -176,5 +183,43 @@ describe(' Session/ helper / #handleErrorModal function tests', () => {
     expect(sessionMock.switchTab as jest.Mock).not.toBeCalled();
     expect(sessionMock.hideErrorMessage as jest.Mock).not.toBeCalled();
     expect(sessionMock.showLoadError).toBeCalled();
+  });
+});
+
+describe('test #isPayloadIsOfQR', () => {
+  test('UPI is active & payload is of Payment create QR', () => {
+    (isQRPaymentActive as jest.Mock).mockReturnValueOnce(true);
+    expect(
+      isPayloadIsOfQR({
+        '_[upiqr]': '1',
+      })
+    ).toBeTruthy();
+  });
+
+  test('UPI is active & payload is of Checkout Order QR', () => {
+    (isQRPaymentActive as jest.Mock).mockReturnValueOnce(true);
+    expect(
+      isPayloadIsOfQR({
+        '_[checkout_order]': '1',
+      })
+    ).toBeTruthy();
+  });
+
+  test('UPI is inactive & payload is of Checkout Order QR (in case qr failed)', () => {
+    (isQRPaymentActive as jest.Mock).mockReturnValueOnce(false);
+    expect(
+      isPayloadIsOfQR({
+        '_[checkout_order]': '1',
+      })
+    ).toBeTruthy();
+  });
+
+  test('UPI is inactive & payload is of Payment create QR', () => {
+    (isQRPaymentActive as jest.Mock).mockReturnValueOnce(false);
+    expect(
+      isPayloadIsOfQR({
+        '_[upiqr]': '1',
+      })
+    ).toBeFalsy();
   });
 });

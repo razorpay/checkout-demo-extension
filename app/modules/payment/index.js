@@ -845,6 +845,7 @@ Payment.prototype = {
     if (data.method === 'upi' && data['_[upiqr]']) {
       data.receiver_type = 'qr_code';
       data.checkout_id = data['_[checkout_id]'];
+      delete data.callback_url; // callback_url not supported
       this.ajax = fetch.post({
         url: makeAuthUrl(null, 'checkout/order'),
         data,
