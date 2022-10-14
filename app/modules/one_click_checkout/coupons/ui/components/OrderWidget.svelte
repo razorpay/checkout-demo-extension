@@ -49,19 +49,14 @@
 
   // constant imports
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
-  import {
-    CART_EXPERIMENTS,
-    DEFAULT_CART_ITEMS_COUNT,
-  } from 'one_click_checkout/cart/constants';
+  import { DEFAULT_CART_ITEMS_COUNT } from 'one_click_checkout/cart/constants';
   import { SCREEN_LIST } from 'one_click_checkout/analytics/constants';
   import { views } from 'one_click_checkout/routing/constants';
-  import { getCartExperiment } from 'one_click_checkout/store';
 
   const currency = getCurrency();
   const { order } = getIcons();
   const spaceAmountWithSymbol = false;
   let showTotal;
-  const cartExperiment = getCartExperiment();
   let priceBeforeScriptDisc = null;
   let scriptCouponDiscount = null;
 
@@ -70,12 +65,7 @@
     if ($areAllCartItemsShown) {
       cartItemsToShow = $cartItems;
     } else {
-      cartItemsToShow = $cartItems.slice(
-        0,
-        cartExperiment === CART_EXPERIMENTS.VARIANT_A
-          ? 0
-          : DEFAULT_CART_ITEMS_COUNT
-      );
+      cartItemsToShow = $cartItems.slice(0, DEFAULT_CART_ITEMS_COUNT);
     }
   }
 
@@ -105,12 +95,6 @@
     <span class="order-icon"><Icon icon={order} /></span>
     {$t(SUMMARY_LABEL)}
   </div>
-  {#if $enableCart}
-    <CartCta
-      screenName={SCREEN_LIST[views.COUPONS]}
-      variant={CART_EXPERIMENTS.VARIANT_A}
-    />
-  {/if}
 </div>
 
 <div data-test-id="order-summary" class="order-summary">
@@ -120,10 +104,7 @@
       screenName={SCREEN_LIST[views.COUPONS]}
     />
     {#if $cartItems.length > DEFAULT_CART_ITEMS_COUNT}
-      <CartCta
-        screenName={SCREEN_LIST[views.COUPONS]}
-        variant={CART_EXPERIMENTS.VARIANT_B}
-      />
+      <CartCta screenName={SCREEN_LIST[views.COUPONS]} />
     {/if}
     {#if cartItemsToShow.length}
       <hr class="split" />
@@ -279,7 +260,7 @@
     margin: 0px;
   }
 
-  .order-summary :global(.btn-theme-B) {
+  .order-summary :global(.btn-theme) {
     margin-top: 14px;
   }
 </style>

@@ -6573,10 +6573,6 @@ Session.prototype = {
       discreet.ChargesHelper.initializeAndReset(
         parseInt(preferences.order.line_items_total)
       );
-      Analytics.setMeta(
-        'exp_group_cart_items',
-        preferences['1cc_cart_items_exp'] || null
-      );
     }
 
     let customer;
