@@ -27,7 +27,7 @@
   on:click
 >
   <div class="emi-bank-item">
-    <img alt="" {src} />
+    <img class="bank-img" alt="" {src} />
     <div>
       {#if type === 'other'}
         {getCardlessEmiProviderName(code, $locale)}
@@ -55,7 +55,6 @@
     min-height: 94px;
     display: flex;
     justify-content: center;
-    align-items: center;
     position: relative;
     padding: 8px 6px;
   }
@@ -75,7 +74,7 @@
     min-height: 8px;
   }
 
-  #bank-item-onecard .emi-bank-item img {
-    margin-top: 10px;
+  .emi-bank-item .bank-img {
+    margin-top: 4px;
   }
 </style>
