@@ -48,6 +48,7 @@
   import { getSavedCardsForEMI } from 'emiV2/helper/card';
   import { selectedPlan } from 'checkoutstore/emi';
   import { shouldEmiOptionRender } from 'emiV2/helper/helper';
+  import { handleBackNavigation } from 'emiV2/helper/navigation';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -202,6 +203,11 @@
   };
 
   const isRedesignV15Enabled = isRedesignV15();
+
+  export function preventBack() {
+    handleBackNavigation();
+    return false;
+  }
 </script>
 
 <div>

@@ -2,17 +2,14 @@ import Analytics from 'analytics';
 import { screenStore, tabStore } from 'checkoutstore';
 import { selectedPlan } from 'checkoutstore/emi';
 import { selectedCard } from 'checkoutstore/screens/card';
-import { handleEmiPaymentV2 } from 'emiV2/payment';
 import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
 import { selectedBank } from 'emiV2/store';
-import EmiTabsScreen from 'emiV2/ui/components/EmiTabsScreen/EmiTabsScreen.svelte';
-import { moveControlToSession, pushStack } from 'navstack';
+import { moveControlToSession } from 'navstack';
 import { appliedOffer } from 'offers/store';
 import { isEmiV2 } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
 import { timer } from 'utils/timer';
-import { isEmiRedirectFlow } from './helper';
 
 /**
  * Helper function to update the session.scree value
@@ -119,43 +116,4 @@ export const handleBackNavigation = () => {
     session.screen = screen;
     screenStore.set(screen);
   }
-};
-
-/**
- * Helper function to initiate a cardless emi payment
- * When a prefill value is passed to checkout
- * The functions initiates a payment for providers like zestoney/axio
- * and for other cardless provider like hdfc, earlysalary
- * redirects the user to emi plans screen to show emi plans and check for cardless eligibilty
- * @param provider {string}
- */
-export const attemptCardlessEmiPayment = (provider: string) => {
-  // Update L1 screen value in session and screenstore
-  // Before moving to next screen in order to render CTA
-  updateTabStore('emi');
-  updateSessionScreenStore('emi');
-  // Update the selected emi provider
-  selectedBank.set({
-    code: provider,
-    name: provider,
-    isCardless: true,
-  });
-  // If the provider is redirect provider like zestmoney, earlysalary
-  // initiate the payment and redirect the user
-  if (isEmiRedirectFlow(provider)) {
-    handleEmiPaymentV2({
-      action: 'cardless',
-      payloadData: {
-        provider,
-      },
-    });
-    return;
-  }
-  // Update the navstack with emi plans screen
-  pushStack({
-    component: EmiTabsScreen,
-  });
-  // Update screen store and track screen switch event
-  // Since next screen is emiPlans
-  updateSessionScreenStore('emiPlans');
 };

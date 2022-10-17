@@ -68,10 +68,6 @@ import triggerErrorModal, {
   closeErrorModal,
   updateLoadingCTA,
 } from 'components/ErrorModal';
-import {
-  attemptCardlessEmiPayment,
-  handleBackNavigation,
-} from 'emiV2/helper/navigation';
 import { getCardlessEMIProviders } from 'checkoutstore/methods';
 import { trackEmiFromCardScreen } from 'emiV2/events/tracker';
 import { isContactHidden, isEmailHidden, isEmiV2 } from 'razorpay';
@@ -87,6 +83,7 @@ import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
+import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -2880,21 +2877,6 @@ Session.prototype = {
     return { currency, amount };
   },
   back: function (confirmedCancel) {
-    if (this.tab === 'emi' && isEmiV2()) {
-      // For EMI Screens we need to fallback to navstack back function
-      // And change screen using handleBackNavigation
-      // Can be improved
-      if (
-        (!controlledViaSession() ||
-          ['emi', 'emiPlans', 'cvv'].includes(this.screen)) &&
-        isStackPopulated()
-      ) {
-        handleBackNavigation();
-        backPressed();
-        return;
-      }
-    }
-
     // Else if control is with navstack and not session js
     if (isStackPopulated() && !controlledViaSession()) {
       backPressed();

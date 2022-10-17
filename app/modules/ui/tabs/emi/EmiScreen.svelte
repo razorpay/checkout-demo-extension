@@ -49,6 +49,7 @@
     trackAddCardDetailsError,
   } from 'emiV2/events/tracker';
   import { selectedTab } from 'components/Tabs/tabStore';
+  import { handleBackNavigation } from 'emiV2/helper/navigation';
 
   // Props
   export let emiDuration = '';
@@ -171,6 +172,11 @@
       trackAddCardDetailsError(trackMeta, 'bank', $t(CARD_NOT_SUPPORTED));
     }
   };
+
+  export function preventBack() {
+    handleBackNavigation();
+    return false;
+  }
 </script>
 
 <div

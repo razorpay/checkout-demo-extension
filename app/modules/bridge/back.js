@@ -6,7 +6,11 @@ import * as Backdrop from 'checkoutframe/components/backdrop';
 import { getCheckoutBridge, storage } from './index';
 import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { getPrefillMethod, isOneClickCheckout } from 'razorpay';
-import { backPressed as navBackPressed, isStackPopulated } from 'navstack';
+import {
+  backPressed as navBackPressed,
+  controlledViaSession,
+  isStackPopulated,
+} from 'navstack';
 import * as _ from 'utils/_';
 
 /**
@@ -35,7 +39,7 @@ export function backPressed(callback) {
     },
   });
   if (isOneClickCheckout()) {
-    if (isStackPopulated()) {
+    if (isStackPopulated() && !controlledViaSession()) {
       navBackPressed();
     } else if (session.tab === 'home-1cc') {
       // session
@@ -46,7 +50,7 @@ export function backPressed(callback) {
     return;
   }
 
-  if (isStackPopulated()) {
+  if (isStackPopulated() && !controlledViaSession()) {
     navBackPressed();
   } else if (
     session?.tab &&

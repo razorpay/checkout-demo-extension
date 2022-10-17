@@ -16,6 +16,7 @@
   import { selectedTab } from 'components/Tabs/tabStore';
   import { selectedPlan } from 'checkoutstore/emi';
   import { offerWindowOpen } from 'offers/store';
+  import { handleBackNavigation } from 'emiV2/helper/navigation';
 
   // const cardSelected = $selectedCard;
 
@@ -49,6 +50,11 @@
       action: 'card',
     });
   };
+
+  export function preventBack() {
+    handleBackNavigation();
+    return false;
+  }
 </script>
 
 <div class:screen-one-cc={isRedesignV15Enabled}>

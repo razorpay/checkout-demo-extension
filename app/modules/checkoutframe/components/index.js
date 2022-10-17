@@ -12,7 +12,6 @@ import { querySelector } from 'utils/doc';
 import * as ObjectUtils from 'utils/object';
 import { showTopbar } from 'topbar';
 import { showHeader } from 'header';
-import { handleBackNavigation } from 'emiV2/helper/navigation';
 
 let componentsMap = {};
 
@@ -44,7 +43,6 @@ export function render() {
     topbar.$on('back', () => {
       // If navstack is in control use the navstack functions for back press event
       if (isStackPopulated() && !controlledViaSession()) {
-        handleBackNavigation();
         backPressed();
       } else {
         session.back();

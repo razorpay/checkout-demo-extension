@@ -18,6 +18,7 @@
   import { onMount } from 'svelte';
   import type { Instrument, TabList } from 'emiV2/types';
   import { mode } from 'checkoutstore/screens/otp';
+  import { handleBackNavigation } from 'emiV2/helper/navigation';
 
   export let currentMethod: Instrument;
   let tabs: TabList = [];
@@ -62,6 +63,11 @@
     } else {
       ctaLabel = SELECT_PLAN;
     }
+  }
+
+  export function preventBack() {
+    handleBackNavigation();
+    return false;
   }
 </script>
 

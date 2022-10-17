@@ -167,6 +167,7 @@
   import { isEmiContactValid } from 'emiV2/ui/components/EmiTabsScreen/store';
   import { selectedTab } from 'components/Tabs/tabStore';
   import { CardsTracker } from 'card/analytics/events';
+  import { handleBackNavigation } from 'emiV2/helper/navigation';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -1137,6 +1138,11 @@
 
   let showCardTab = false;
   $: showCardTab = isNewEmiFlow && tab === 'emi';
+
+  export function preventBack() {
+    handleBackNavigation();
+    return false;
+  }
 </script>
 
 <Tab method="card" pad={false} shown={isRenderedByNavstack} overrideMethodCheck>
