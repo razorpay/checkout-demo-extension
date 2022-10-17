@@ -1,5 +1,5 @@
 // utils
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getMerchantMethods } from 'razorpay';
 import fetch from 'utils/fetch';
 import { formatMessageWithLocale } from 'i18n';

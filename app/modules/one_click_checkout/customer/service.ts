@@ -1,5 +1,5 @@
 import fetch from 'utils/fetch';
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 
 const CONSENT_UPDATE_URL = '1cc/customer/consent/marketing';
 

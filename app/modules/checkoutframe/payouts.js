@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import fetch from 'utils/fetch';
 import * as ObjectUtils from 'utils/object';
 

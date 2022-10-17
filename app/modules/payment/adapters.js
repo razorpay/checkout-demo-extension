@@ -4,7 +4,7 @@ import {
   CRED_PACKAGE_NAME,
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
-} from 'common/upi';
+} from 'upi/constants';
 import { isBraveBrowser, samsungBrowser } from 'common/useragent';
 
 const PaymentRequest = global.PaymentRequest;

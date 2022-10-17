@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import type Razorpay from 'common/Razorpay';
 import { getOption } from 'razorpay';
 

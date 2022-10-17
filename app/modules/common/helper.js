@@ -65,6 +65,9 @@ export const backendEntityIds = [
   'checkout_config_id',
 ];
 // TODO remove first param from usage of makeAuthUrl
+/**
+ * @deprecated use common/makeAuthUrl
+ */
 export function makeAuthUrl(r, url) {
   url = makeUrl(url);
   for (let i = 0; i < backendEntityIds.length; i++) {

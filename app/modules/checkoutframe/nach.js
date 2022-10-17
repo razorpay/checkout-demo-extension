@@ -1,4 +1,4 @@
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import fetch from 'utils/fetch';
 import { toTitleCase } from 'lib/utils';
 import { getOption, getOrderId } from 'razorpay';

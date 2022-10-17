@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import { locale } from 'svelte-i18n';
 import { isRecurring, isSubscription } from 'razorpay';
-import { definePlatform } from 'upi/helper';
+import { definePlatform } from 'upi/helper/upi';
 import * as UserAgent from 'common/useragent';
 import { INTERNATIONAL_APPS } from 'common/international';
 import {

@@ -2,7 +2,7 @@ import { getPreparedUrl } from 'lib/utils';
 import { getOption, getPreferences } from 'razorpay';
 import { get } from 'svelte/store';
 import { QR_IMAGE_DEFAULT_SIZE } from 'upi/constants';
-import { clearPaymentRequest } from 'upi/payment';
+import { clearPaymentRequest } from 'upi/payment/postPayment/postPaymentHandlers';
 import { qrState, resetQRState } from 'upi/ui/components/QR/store';
 import { PAYMENT_CANCEL_REASONS } from 'common/constants';
 import { appliedOffer } from 'offers/store';

@@ -3,7 +3,7 @@ import { timer } from 'utils/timer';
 import fetch from 'utils/fetch';
 // store imports
 import { getOrderId } from 'razorpay';
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 
 // Analytics imports
 import { Events } from 'analytics';

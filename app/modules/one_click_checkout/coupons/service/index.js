@@ -2,7 +2,7 @@ import fetch from 'utils/fetch';
 import { Events } from 'analytics';
 import { timer } from 'utils/timer';
 import { getOrderId } from 'razorpay';
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';

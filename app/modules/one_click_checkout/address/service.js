@@ -2,7 +2,7 @@
 import { get } from 'svelte/store';
 
 // store imports
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import { selectedAddressId as selectedShippingAddressId } from 'one_click_checkout/address/shipping_address/store';
 import { getContactPayload } from 'one_click_checkout/store';
 import { contact } from 'checkoutstore/screens/home';

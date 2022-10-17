@@ -30,7 +30,7 @@ import {
   CRED_PACKAGE_NAME,
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
-} from 'common/upi';
+} from 'upi/constants';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 import { format } from 'i18n';
 import { translatePaymentPopup as t } from 'i18n/popup';

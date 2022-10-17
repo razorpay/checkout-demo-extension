@@ -1,7 +1,7 @@
 import { getFingerprint, getDeviceId } from 'fingerprint';
 import { flattenProp } from 'common/options';
 import { Track } from 'analytics';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'upi/constants';
 import { luhnCheck } from 'lib/utils';
 import { getOption, getOrderId } from 'razorpay';
 import * as ObjectUtils from 'utils/object';

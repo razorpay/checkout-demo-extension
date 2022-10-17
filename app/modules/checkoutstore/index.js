@@ -10,13 +10,10 @@ import RazorpayStore, {
   isHDFCVASMerchant,
   isRecurringOrPreferredPayment,
 } from 'razorpay';
-import { makeAuthUrl as _makeAuthUrl } from 'common/helper';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import { CTAHelper } from 'cta';
-
-export const makeAuthUrl = (url) => _makeAuthUrl(RazorpayStore.get(), url);
 
 /** required for CTA */
 export const screenStore = writable('');

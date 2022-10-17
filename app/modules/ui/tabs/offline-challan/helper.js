@@ -8,7 +8,7 @@ import { getCheckoutBridge, getNewIosBridge } from 'bridge';
 import { getSDKMeta } from 'checkoutstore/native';
 
 // helpers
-import { makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import { copyToClipboard } from 'common/clipboard';
 import loadScript from 'common/loadScript';
 import fetch from 'utils/fetch';

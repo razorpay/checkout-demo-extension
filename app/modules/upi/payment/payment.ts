@@ -7,11 +7,11 @@ import { handleFeeBearer } from 'upi/helper/fee-bearer';
 import { creatUPIPaymentV2, setFlowInPayload } from './prePaymentHandlers';
 import { resetCallbackOnUPIAppForPay } from 'upi/helper/upi';
 import {
-  adoptSessionUI,
   handleDeeplinkAction,
   responseHandler,
   startUpiPaymentPolling,
-} from './postPaymentHandlers';
+} from './postPayment/postPaymentHandlers';
+import { adoptSessionUI } from './postPayment/adoptSessionUI';
 
 function handleUPIPayments(
   config: UPI.PaymentProcessConfiguration,

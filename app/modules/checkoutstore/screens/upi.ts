@@ -1,4 +1,4 @@
-import { isCtaShown, showCtaWithDefaultText, hideCta } from 'cta';
+import { isCtaShown, showCtaWithDefaultText, hideCta } from 'cta/helper';
 import { tick } from 'svelte';
 import { Writable, writable } from 'svelte/store';
 import { selectedInstrumentId } from './home';

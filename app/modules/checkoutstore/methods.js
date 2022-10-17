@@ -48,13 +48,12 @@ import { extendConfig } from 'common/cardlessemi';
 
 import {
   isFacebookWebView,
-  getOS,
   isMobileByMediaQuery,
-  getDevice,
   android,
   AndroidWebView,
   iOS,
 } from 'common/useragent';
+import { getAgentPayload } from 'common/useragentPayload';
 
 import {
   getUPIIntentApps,
@@ -686,21 +685,6 @@ export function isGpayMergedFlowEnabled() {
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
   return cardApps.all.includes('cred') || isWebPaymentsApiAvailable('cred');
-}
-
-export function getAgentPayload(option) {
-  const { platform } = getSDKMeta();
-
-  // for cred any mobile platform to send as mobile
-  return {
-    '_[agent][platform]': platform,
-    '_[agent][device]': option?.cred
-      ? getDevice() !== 'desktop'
-        ? 'mobile'
-        : 'desktop'
-      : getDevice(),
-    '_[agent][os]': getOS(),
-  };
 }
 
 export function getPayloadForCRED() {

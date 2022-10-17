@@ -1,11 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import {
-    getDowntimeForUPIApp,
-    initiateNecessaryFlow,
-    getGridArray,
-    definePlatform,
-  } from 'upi/helper';
+  import { getDowntimeForUPIApp, getGridArray } from 'upi/helper';
+  import { initiateNecessaryFlow } from './helper';
   import { getRecommendedAppsForUPIStack } from 'upi/features';
   import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
@@ -103,8 +99,8 @@
   }
 </script>
 
-<!-- 
-    This component is supposed to work 
+<!--
+    This component is supposed to work
     only on UPI method and only if upiTiles feature is enabled.
    -->
 {#if method !== 'upi' || !upiTiles.status}

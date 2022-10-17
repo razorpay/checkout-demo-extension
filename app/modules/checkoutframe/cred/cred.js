@@ -1,7 +1,8 @@
 import { makeAuthUrl } from 'common/helper';
 import BrowserStorage from 'browserstorage';
 import { getSession } from 'sessionmanager';
-import { getAgentPayload, isCREDEnabled } from 'checkoutstore/methods';
+import { isCREDEnabled } from 'checkoutstore/methods';
+import { getAgentPayload } from 'common/useragentPayload';
 import { getCustomerDetails } from 'checkoutstore/screens/home';
 import { hasFeature, isContactOptional } from 'razorpay';
 import { CredEvents, Events, Track } from 'analytics';
@@ -271,10 +272,9 @@ export const checkCREDEligibility = function (contact) {
           const offerDescription = response?.data?.offer?.description;
           setCREDEligibility(contact, true, offerDescription);
           return resolve(response);
-        } else {
-          setCREDEligibility(contact, false);
-          return reject(response);
         }
+        setCREDEligibility(contact, false);
+        return reject(response);
       },
     });
   });

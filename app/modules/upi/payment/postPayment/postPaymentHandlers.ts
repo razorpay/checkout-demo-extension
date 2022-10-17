@@ -1,10 +1,8 @@
-import { format } from 'i18n';
 import { getSession } from 'sessionmanager';
-import { enableUPITiles } from '../features';
-import { definePlatform } from '../helper/upi';
-import { tryOpeningIntentUrl } from '../helper/intent/resolver';
+import { enableUPITiles } from '../../features';
+import { definePlatform } from '../../helper/upi';
+import { tryOpeningIntentUrl } from '../../helper/intent/resolver';
 import { trackTrace, trackIntentFailure, TRACES } from 'upi/events';
-import { updateLoadingCTA } from 'components/ErrorModal';
 
 const startUpiPaymentPolling = () => {
   // emit success response and trigger polling
@@ -75,47 +73,6 @@ function handleDeeplinkAction(
   processIntentOnMWeb(`${appUrlScheme}?${queryParams}`);
 }
 
-function adoptSessionUI(
-  paymentInstance: any,
-  session: any,
-  config: UPI.PaymentProcessConfiguration
-) {
-  /**
-   * TODO remove when 100% migrate to v1.5
-   */
-  (document.querySelector('#error-message .link') as HTMLElement).textContent =
-    format('misc.cancel_action');
-
-  /** v1.5 error dialog */
-  updateLoadingCTA(
-    format('misc.cancel_action'),
-    session.hideErrorMessage.bind(session)
-  );
-  /**
-   * Start a general loader with cancel action
-   */
-  if (!config.qrFlow) {
-    session.showLoadError();
-  }
-
-  paymentInstance.on('payment.upi.noapp', function () {
-    session.showLoadError(format('upi.intent_no_apps_error'), true);
-
-    session.body.addClass('upi-noapp');
-  });
-
-  paymentInstance.on('payment.upi.selectapp', function () {
-    session.showLoadError(format('upi.intent_select_app'), false);
-  });
-
-  paymentInstance.on('payment.upi.pending', function (data: { flow: string }) {
-    if (data && data.flow === 'upi-intent') {
-      return session.showLoadError(format('misc.payment_waiting_confirmation'));
-    }
-    session.showLoadError(format('upi.intent_accept_request'));
-  });
-}
-
 function responseHandler(params: {
   status: Payment.PaymentStatus;
   onResponse?: UPI.PaymentResponseHandler;
@@ -145,7 +102,6 @@ function clearPaymentRequest(reason: string, silent = false) {
   });
 }
 export {
-  adoptSessionUI,
   handleDeeplinkAction,
   processIntentOnMWeb,
   responseHandler,

@@ -5,7 +5,8 @@ import {
   PHONE_PE_PACKAGE_NAME,
   CRED_PACKAGE_NAME,
   PAYTM_PACKAGE_NAME,
-} from 'common/upi';
+} from 'upi/constants';
+
 import RazorpayStore from 'razorpay';
 
 export let appsThatSupportWebPayments = [

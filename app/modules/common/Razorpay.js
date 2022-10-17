@@ -12,7 +12,7 @@ import {
   getCurrencyConfig,
   formatAmountWithSymbol,
 } from 'common/currency';
-import { getAgentPayload } from 'checkoutstore/methods';
+import { getAgentPayload } from 'common/useragentPayload';
 import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import * as ObjectUtils from 'utils/object';
