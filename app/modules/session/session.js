@@ -341,6 +341,7 @@ function errorHandler(response) {
   }
 
   if (this.get('retry') === false && !this.get('redirect')) {
+    this.hideOverlayMessage();
     return this.modal.hide();
   }
 

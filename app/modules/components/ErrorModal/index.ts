@@ -2,6 +2,7 @@ import * as Confirm from 'checkoutframe/components/confirm.js';
 import { getSession } from 'sessionmanager';
 import { isOverlayActive, popStack, pushOverlay } from 'navstack';
 import ErrorModal from './ErrorModal.svelte';
+import { getOption } from 'razorpay';
 import {
   contentStore,
   errorMessageCTA,
@@ -40,7 +41,8 @@ export default function triggerErrorModal(
 ) {
   closeErrorModal();
   // reset
-  loadedCTA.set('Try again');
+  const CtaText = getOption('retry') ? 'Try again' : 'Close';
+  loadedCTA.set(CtaText);
   setContent();
   setSecondaryLoadedCTA('');
   if (props) {
