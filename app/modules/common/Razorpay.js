@@ -22,6 +22,7 @@ import { EventsV2, ContextProperties } from 'analytics-v2';
 import * as _ from 'utils/_';
 
 let prefetchedPrefs;
+let isCheckoutFrameLoaded = false;
 
 /**
  *
@@ -39,6 +40,10 @@ export function getSdkMetaForRequestPayload() {
   }
 
   return sdk_meta;
+}
+
+export function setIsCheckoutFrameLoaded(val) {
+  isCheckoutFrameLoaded = val;
 }
 
 export default function Razorpay(overrides) {
@@ -552,6 +557,10 @@ Razorpay.configure = function (overrides, extra = {}) {
     Track.props.referer = extra.referer;
     EventsV2.setContext(ContextProperties.REFERRER, extra.referer);
   }
+};
+
+Razorpay.hasCheckoutFrameLoaded = function () {
+  return isCheckoutFrameLoaded;
 };
 
 Razorpay.defaults = RazorpayDefaults;

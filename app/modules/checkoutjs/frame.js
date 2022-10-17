@@ -1,4 +1,4 @@
-import { makePrefParams } from 'common/Razorpay';
+import { makePrefParams, setIsCheckoutFrameLoaded } from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
@@ -451,6 +451,7 @@ CheckoutFrame.prototype = {
      */
     if (data && data.origin === 'checkout-frame') {
       isCheckoutFrameLoaded = true;
+      setIsCheckoutFrameLoaded(true);
     }
     if (this.rzp) {
       this.postMessage(this.makeMessage());
