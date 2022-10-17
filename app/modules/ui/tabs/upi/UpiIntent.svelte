@@ -40,17 +40,17 @@
   import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
-  export let apps = [];
+  export let apps: UPI.AppConfiguration[] = [];
   export let showAll = false;
-  export let selected = null;
-  export let showRecommendedUPIApp;
+  export let selected: string | null = null;
+  export let showRecommendedUPIApp: boolean;
   export let skipCTA = false;
   export let payUsingApps = true;
 
   // Computed
-  export let showableApps;
+  export let showableApps: UPI.AppConfiguration[];
 
-  let downtimeSeverity = false;
+  let downtimeSeverity: string | boolean = false;
   let downtimeInstrument;
 
   let upiTiles = enableUPITiles();
@@ -73,7 +73,7 @@
   }
 
   $: {
-    if (isUpiUxExperimentSupported('variant_2') && apps.length > 3) {
+    if (isUpiUxExperimentSupported('variant_2' as any) && apps.length > 3) {
       showableApps = apps.slice(0, 3);
     } else if (apps.length <= 5 || showAll) {
       showableApps = apps;
@@ -83,7 +83,7 @@
   }
 
   const dispatch = createEventDispatcher();
-  function isDowntime(pspHandle) {
+  function isDowntime(pspHandle: string) {
     if (pspHandle) {
       const currentDowntime = checkDowntime(upiDowntimes, 'psp', pspHandle);
       if (currentDowntime) {
@@ -115,7 +115,7 @@
     } catch {}
   }
 
-  function onUpiAppSelect(packageName) {
+  function onUpiAppSelect(packageName: string) {
     Analytics.track('upi:app:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -129,12 +129,19 @@
     });
   }
 
-  function onAppSelectFromV2GridUI({ detail }) {
+  function onAppSelectFromV2GridUI({
+    detail,
+  }: {
+    detail: { app: UPI.AppConfiguration; index: number };
+  }) {
     trackIntentAppSelected(detail.app.app_name, detail.index);
     onUpiAppSelect(detail.app.package_name);
   }
 
-  export function onAppSelect({ detail }, index) {
+  export function onAppSelect(
+    { detail }: { detail: UPI.AppConfiguration },
+    index: number
+  ) {
     trackIntentAppSelected(detail.app_name, index);
     const packageName = detail.package_name;
     const psp = detail.shortcode;
@@ -163,7 +170,14 @@
   }
 
   onMount(() => {
-    Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
+    let listedApps: string[] = [];
+    if (showableApps) {
+      listedApps = showableApps.map((appData) => appData.app_name);
+      listedApps.push(
+        getUpiIntentAppName(getOtherAppsLabel(showableApps), $locale)
+      );
+    }
+    Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD, { listed_app: listedApps });
     Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
   });
 
@@ -175,7 +189,7 @@
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
     <IntentFlowsHeader
-      visible={isIntentFlowVisible}
+      visible={Boolean(isIntentFlowVisible)}
       showRedirectV2message={showIntentListHeaderForIos}
     />
     {#if isAppsInGridView()}

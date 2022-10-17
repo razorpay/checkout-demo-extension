@@ -16,7 +16,6 @@
     trackOtherSelection,
   } from 'upi/events';
   import { OTHER_INTENT_APPS } from 'upi/constants';
-  import { upiUxV1dot1 } from 'upi/experiments';
 
   const upiTiles = enableUPITiles();
   export let variant: UPI.AppStackVariant;

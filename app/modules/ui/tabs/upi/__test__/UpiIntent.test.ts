@@ -1,7 +1,7 @@
 import UpiIntent from '../UpiIntent.svelte';
 import { render, fireEvent } from '@testing-library/svelte';
 import { enableUPITiles } from 'upi/features';
-import Analytics from 'analytics';
+import Analytics, { Events } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 import { tick } from 'svelte';
 
@@ -49,6 +49,10 @@ jest.mock('upi/features', () => ({
 jest.mock('analytics', () => ({
   __esModule: true,
   ...jest.requireActual('analytics'),
+  Events: {
+    TrackRender: jest.fn(),
+    setMeta: jest.fn(),
+  },
   default: {
     track: jest.fn(() => {}),
   },
@@ -110,9 +114,9 @@ describe('UpiIntent', () => {
     // check radio button renders {4} from first four app as showall is disable {1} for other apps
     expect(document.getElementsByClassName('radio-option')).toHaveLength(5);
 
-    expect(Analytics.track).toHaveBeenCalledTimes(1);
+    expect(Events.TrackRender).toHaveBeenCalledTimes(2);
     fireEvent.click(document.querySelector('[data-name="bhim"]') as Element);
-    expect(Analytics.track).toHaveBeenCalledTimes(3);
+    expect(Analytics.track).toHaveBeenCalledTimes(2);
   });
 
   test('render UPIIntent with apps & enableUPITiles status is false & with downtime + select callback invoke', () => {
@@ -135,9 +139,9 @@ describe('UpiIntent', () => {
     // check radio button renders {4} from first four app as showall is disable {1} for other apps
     expect(document.getElementsByClassName('radio-option')).toHaveLength(5);
 
-    expect(Analytics.track).toHaveBeenCalledTimes(1);
+    expect(Events.TrackRender).toHaveBeenCalledTimes(2);
     fireEvent.click(document.querySelector('[data-name="bhim"]') as Element);
-    expect(Analytics.track).toHaveBeenCalledTimes(3);
+    expect(Analytics.track).toHaveBeenCalledTimes(2);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect.mock.calls.length).toEqual(1);
   });
@@ -185,9 +189,9 @@ describe('UpiIntent', () => {
     // check radio button renders {2} from app & {1} for other apps
     expect(document.getElementsByClassName('radio-option')).toHaveLength(3);
 
-    expect(Analytics.track).toHaveBeenCalledTimes(1);
+    expect(Events.TrackRender).toHaveBeenCalledTimes(2);
     fireEvent.click(document.querySelector('[data-name="bhim"]') as Element);
-    expect(Analytics.track).toHaveBeenCalledTimes(3);
+    expect(Analytics.track).toHaveBeenCalledTimes(2);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect.mock.calls.length).toEqual(1);
     await tick();
