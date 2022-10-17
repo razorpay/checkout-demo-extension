@@ -47,6 +47,7 @@
   import { filterSavedCardsAgainstCustomBlock } from 'emiV2/helper/configurability';
   import { getSavedCardsForEMI } from 'emiV2/helper/card';
   import { selectedPlan } from 'checkoutstore/emi';
+  import { shouldEmiOptionRender } from 'emiV2/helper/helper';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -119,15 +120,20 @@
       card_network: card.card.network,
       card_issuer: card.card.issuer,
     }));
+
+    const bankEmiProviders = Array.isArray(emiOptions.bank)
+      ? emiOptions.bank.slice(0, 5)
+      : [];
+    const otherEmiProviders = emiOptions.other || [];
     // Track EMI Providers rendered
     const emiOptionsMeta = {
       emiOptions:
         emiOptions && Object.keys(emiOptions).length
-          ? [...emiOptions.bank, ...emiOptions.other]
+          ? [...bankEmiProviders, ...otherEmiProviders]
           : [],
       savedCards: trackMeta,
     };
-    if (emiOptions) {
+    if (shouldEmiOptionRender(emiOptions, savedCards)) {
       emiOptionsRendered(emiOptionsMeta);
     }
   }

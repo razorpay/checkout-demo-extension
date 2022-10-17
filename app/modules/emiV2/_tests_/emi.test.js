@@ -2,6 +2,7 @@ import {
   isCoBrandingEmiProvider,
   isOtherCardEmiProvider,
   isSelectedBankBajaj,
+  shouldEmiOptionRender,
 } from 'emiV2/helper/helper';
 import { selectedBank } from 'emiV2/store';
 import { getEMIStartingAt, isNoCostEMI } from '../helper/label';
@@ -469,4 +470,33 @@ describe('Validate: isCoBrandingEmiProvider', () => {
 
   provider = 'HDFC';
   expect(isCoBrandingEmiProvider(provider)).toBe(false);
+});
+
+describe('Validate: shouldEmiOptionRender', () => {
+  let emiOptions = {
+    bank: {
+      code: 'hdfc',
+    },
+    other: {
+      code: 'zestmoney',
+    },
+  };
+
+  let savedCards = [];
+
+  expect(shouldEmiOptionRender(emiOptions, savedCards)).toBe(true);
+
+  emiOptions = {};
+  savedCards = [
+    {
+      card: {
+        issuer: 'ICIC',
+        type: 'credit',
+      },
+    },
+  ];
+
+  expect(shouldEmiOptionRender(emiOptions, savedCards)).toBe(true);
+
+  expect(shouldEmiOptionRender(null, [])).toBe(false);
 });

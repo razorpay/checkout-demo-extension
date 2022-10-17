@@ -77,14 +77,13 @@ export const emiOptionsRendered = (emiOptionsMeta: {
   savedCards: SavedCardMeta[];
 }) => {
   try {
-    // Slicing because we render only top 5 banks
-    const emiProvidersTrackMeta: EmiOptionsMeta[] = emiOptionsMeta.emiOptions
-      .map((providers: EMIBANKS) => ({
+    const emiProvidersTrackMeta: EmiOptionsMeta[] =
+      emiOptionsMeta.emiOptions.map((providers: EMIBANKS) => ({
         name: providers.name,
         nc_emi_tag: !!providers.isNoCostEMI,
         interest_rate_tag: !!providers.startingFrom,
-      }))
-      .slice(0, 5);
+      }));
+
     Analytics.track(EVENTS.EMI_OPTIONS_RENDERED, {
       type: AnalyticsTypes.RENDER,
       data: {

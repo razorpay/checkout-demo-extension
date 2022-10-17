@@ -6,7 +6,13 @@ import {
   otherCardEmiProviders,
   coBrandingEmiProviders,
 } from 'emiV2/constants';
-import type { EmiBankPlans, EMIBANKS, EMIBanksMap } from 'emiV2/types';
+import type {
+  EmiBankPlans,
+  EMIBANKS,
+  EMIBanksMap,
+  EMIOptionsMap,
+  Tokens,
+} from 'emiV2/types';
 import { get } from 'svelte/store';
 
 /**
@@ -89,4 +95,22 @@ export const isOtherCardEmiProvider = (provider?: string) => {
  */
 export const isCoBrandingEmiProvider = (provider: string) => {
   return coBrandingEmiProviders.includes(provider);
+};
+
+/**
+ * Helper function to check whether emi options are present
+ * or saved cards with emi enabled are present
+ * @param {EMIOptionsMap} emiProviders
+ * @param {Array<Tokens>} savedTokens
+ * @returns {boolean}
+ */
+export const shouldEmiOptionRender = (
+  emiProviders: EMIOptionsMap,
+  savedTokens: Tokens[]
+) => {
+  const emiOptionsPresent =
+    emiProviders && Object.keys(emiProviders).length > 0;
+  const savedCardsPresemt = savedTokens && savedTokens.length > 0;
+
+  return emiOptionsPresent || savedCardsPresemt;
 };
