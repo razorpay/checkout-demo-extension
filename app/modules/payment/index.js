@@ -538,7 +538,7 @@ Payment.prototype = {
     if (isRazorpayFrame() && !this.avoidPopup) {
       setCompleteHandler();
     }
-    this.offmessage = global |> _El.on('message', onMessage.bind(this));
+    this.offmessage = _El.on('message', onMessage.bind(this))(global);
   },
 
   complete: function (data, event) {

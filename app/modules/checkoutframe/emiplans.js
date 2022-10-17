@@ -161,7 +161,7 @@ emiPlansView.prototype = {
       });
 
       this.selectedPlan = plan;
-      querySelector('#body') |> _El.addClass('sub');
+      _El.addClass(querySelector('#body'), 'sub');
     };
 
     on.setContact = (contact) => {

@@ -76,8 +76,9 @@ export function getDowntimes() {
     downtimeItems = [];
   }
 
-  const groupedDowntimes =
-    downtimeItems |> groupDowntimesByMethod |> copyMethodsIfNeeded;
+  const groupedDowntimes = copyMethodsIfNeeded(
+    groupDowntimesByMethod(downtimeItems)
+  );
 
   return {
     cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },

@@ -67,13 +67,9 @@ function trackAvailabilty(event, severity) {
     url: 'https://lumberjack-metrics.razorpay.com/v1/frontend-metrics',
     data: {
       key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
-      data:
-        trackingPayload
-        |> JSON.stringify
-        |> encodeURIComponent
-        |> unescape
-        |> btoa
-        |> encodeURIComponent,
+      data: encodeURIComponent(
+        btoa(unescape(encodeURIComponent(JSON.stringify(trackingPayload))))
+      ),
     },
   };
   const key = getPreferences('merchant_key') || getOption('key') || '';

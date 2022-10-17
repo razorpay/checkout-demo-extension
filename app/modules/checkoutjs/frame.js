@@ -184,19 +184,17 @@ CheckoutFrame.prototype = {
       };
 
       attribs['class'] = 'razorpay-checkout-frame';
-      this.el = _El.create('iframe') |> _El.setAttributes(attribs);
+      this.el = _El.setAttributes(_El.create('iframe'), attribs);
     }
     return this.el;
   },
 
   openRzp: function (rzp) {
-    let el =
-      this.el
-      |> _El.setStyles({
-        // by the time checkout opens, other plugins might resize iframe
-        width: '100%',
-        height: '100%',
-      });
+    let el = _El.setStyles(this.el, {
+      // by the time checkout opens, other plugins might resize iframe
+      width: '100%',
+      height: '100%',
+    });
     let parent = rzp.get('parent');
     if (parent) {
       parent = resolveElement(parent);
@@ -216,10 +214,10 @@ CheckoutFrame.prototype = {
     setInitialContext();
 
     if (parent) {
-      el |> _El.setStyle('minHeight', '530px');
+      _El.setStyle(el, 'minHeight', '530px');
       this.embedded = true;
     } else {
-      parent2 |> _El.setStyle('display', 'block') |> _El.offsetWidth;
+      _El.offsetWidth(_El.setStyle(parent2, 'display', 'block')); // force reflow
       setBackdropColor(rzp.get('theme.backdrop_color'));
       if (/^rzp_t/.test(rzp.get('key'))) {
         setTestRibbonVisible();
@@ -310,7 +308,7 @@ CheckoutFrame.prototype = {
       }
 
       ObjectUtils.loop(eventPairs, (listener, event) => {
-        this.listeners.push(window |> _El.on(event, listener.bind(this)));
+        this.listeners.push(_El.on(event, listener.bind(this))(window));
       });
     }
   },
@@ -332,17 +330,15 @@ CheckoutFrame.prototype = {
     getMetas().forEach((meta) => _El.detach(meta));
 
     this.$metas = [
-      _El.create('meta')
-        |> _El.setAttributes({
-          name: 'viewport',
-          content:
-            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
-        }),
-      _El.create('meta')
-        |> _El.setAttributes({
-          name: 'theme-color',
-          content: this.rzp.get('theme.color'),
-        }),
+      _El.setAttributes(_El.create('meta'), {
+        name: 'viewport',
+        content:
+          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+      }),
+      _El.setAttributes(_El.create('meta'), {
+        name: 'theme-color',
+        content: this.rzp.get('theme.color'),
+      }),
     ];
 
     this.$metas.forEach(_El.appendTo(head));
@@ -472,7 +468,7 @@ CheckoutFrame.prototype = {
 
   onrender: function () {
     if (loader) {
-      loader |> _El.detach;
+      _El.detach(loader);
       loader = null;
     }
     this.rzp.emit('render');

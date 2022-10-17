@@ -17,20 +17,20 @@ export default function Iframe(src, name, payment) {
   this.payment = payment;
 
   const razorpayOptions = payment.r.get();
-  this.el =
-    _El.create('div')
-    |> _El.addClass('payment-frame')
-    |> _El.setContents(
-      frameHtml(
-        displayAmount(
-          payment.r,
-          razorpayOptions.amount,
-          razorpayOptions.currency
-        ),
-        razorpayOptions.name || razorpayOptions.description
-      )
-    )
-    |> _El.appendTo(querySelector('#modal-inner'));
+  this.el = _El.create('div');
+  _El.addClass('payment-frame', this.el);
+  _El.setContents(
+    frameHtml(
+      displayAmount(
+        payment.r,
+        razorpayOptions.amount,
+        razorpayOptions.currency
+      ),
+      razorpayOptions.name || razorpayOptions.description
+    ),
+    this.el
+  );
+  _El.appendTo(querySelector('#modal-inner'), this.el);
 
   Analytics.track('iframe:create');
 
@@ -38,23 +38,21 @@ export default function Iframe(src, name, payment) {
   contentWindow['name'] = name;
   this.window = contentWindow;
 
-  const closeListener =
-    querySelector('.iframe-close')
-    |> _El.on('click', () => {
-      Analytics.track('iframe:cancel:click', {
-        type: AnalyticsTypes.BEHAV,
-      });
-      if (global.confirm('Do you want to cancel this payment?')) {
-        this.close();
-        this.payment.emit('cancel');
-      }
+  const closeListener = _El.on('click', () => {
+    Analytics.track('iframe:cancel:click', {
+      type: AnalyticsTypes.BEHAV,
     });
+    if (global.confirm('Do you want to cancel this payment?')) {
+      this.close();
+      this.payment.emit('cancel');
+    }
+  })(querySelector('.iframe-close'));
   this.listeners = [closeListener];
 }
 
 Iframe.prototype = {
   on: function (event, func) {
-    this.listeners.push(global |> _El.on(event, func));
+    this.listeners.push(_El.on(event, func)(global));
   },
 
   write: function (html) {
@@ -68,8 +66,8 @@ Iframe.prototype = {
       this.closed = true;
       this.listeners.forEach((l) => l());
       this.listeners = [];
-      this.el |> _El.detach;
-      querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);
+      _El.detach(this.el);
+      _El.removeClass(querySelector('#modal'), CLASS_IFRAME_ACTIVE);
 
       Analytics.track('iframe:close');
       Analytics.removeMeta('iframe', false);
@@ -77,18 +75,17 @@ Iframe.prototype = {
   },
 
   show: function () {
-    this.el |> _El.setDisplay('block');
+    _El.setDisplay('block', this.el);
     const modalEl = querySelector('#modal');
-    const bbox = modalEl |> _El.bbox;
+    const bbox = _El.bbox(modalEl);
 
-    modalEl
-      |> _El.setStyles({
-        height: bbox.height + 'px',
-        width: bbox.width + 'px',
-      });
+    _El.setStyles(modalEl, {
+      height: bbox.height + 'px',
+      width: bbox.width + 'px',
+    });
 
-    modalEl |> _El.offsetHeight;
-    modalEl |> _El.addClass(CLASS_IFRAME_ACTIVE);
+    _El.offsetHeight(modalEl);
+    _El.addClass(modalEl, CLASS_IFRAME_ACTIVE);
 
     Analytics.track('iframe:show');
     Analytics.setMeta('iframe', true);

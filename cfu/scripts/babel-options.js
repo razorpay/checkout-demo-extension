@@ -5,10 +5,6 @@ const plugins = [
       regenerator: true,
     },
   ],
-  [
-    require('@babel/plugin-proposal-pipeline-operator'),
-    { proposal: 'minimal' },
-  ],
   [require('@babel/plugin-transform-spread'), { loose: false }],
 ];
 

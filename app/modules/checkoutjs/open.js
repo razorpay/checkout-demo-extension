@@ -139,7 +139,7 @@ function initAutomaticCheckout() {
   let key = opts.key;
   if (key && key.length > 0) {
     // passing form action as callback_url
-    // var form = currentScript |> _El.parent;
+    // var form = _El.parent(currentScript);
     opts.handler = defaultAutoPostHandler;
     let rzp = Razorpay(opts);
     if (!opts.parent) {

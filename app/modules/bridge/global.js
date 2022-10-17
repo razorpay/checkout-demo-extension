@@ -32,7 +32,7 @@ function handleOTP(otp) {
   if (session && otpEl && !otpEl.value) {
     $otp.set(otp);
 
-    querySelector('#otp-elem') |> _El.removeClass('invalid');
+    _El.removeClass(querySelector('#otp-elem'), 'invalid');
   }
 }
 
@@ -56,7 +56,7 @@ function upiIntentResponse(data) {
      * we tell the user that the payment was not completed.
      */
 
-    var successfulTxn = data |> parseUPIIntentResponse |> didUPIIntentSucceed;
+    var successfulTxn = didUPIIntentSucceed(parseUPIIntentResponse(data));
 
     if (!successfulTxn) {
       session.r.emit('activity_recreated_upi_intent_back_btn');

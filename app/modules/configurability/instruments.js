@@ -110,7 +110,7 @@ export function createInstrument(config) {
 
   const creator = INSTRUMENT_CREATORS[method] || INSTRUMENT_CREATORS.default;
 
-  const instrument = creator(config) |> addTypeAndCategory;
+  const instrument = addTypeAndCategory(creator(config));
 
   return instrument;
 }

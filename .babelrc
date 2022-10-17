@@ -1,22 +1,9 @@
 {
-  "plugins": [
-    [
-      "@babel/plugin-proposal-pipeline-operator",
-      {
-        "proposal": "minimal"
-      }
-    ]
-  ],
+  "plugins": [],
   "env": {
     "test": {
       "plugins": [
         "@babel/plugin-transform-modules-commonjs",
-        [
-          "@babel/plugin-proposal-pipeline-operator",
-          {
-            "proposal": "minimal"
-          }
-        ],
         "svelte-inline-compile"
       ],
       "presets": [

@@ -376,7 +376,7 @@ export const on = (
 ) => {
   if (_.is(event, ElementConstructor)) {
     return console.error(
-      "use el |> _El.til.on(e, cb) [import * as _El from 'utils/DOM';]"
+      "use _El.til.on(e, cb)(el) [import * as _El from 'utils/DOM';]"
     );
   }
   return (el: Element) => {

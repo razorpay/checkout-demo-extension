@@ -109,7 +109,7 @@ const messageTransformers = {
     const options = message.options;
 
     ObjectUtils.loop(features, (feature) => {
-      if (!(message[feature] |> _.isUndefined)) {
+      if (!_.isUndefined(message[feature])) {
         transfomed[feature] = message[feature];
       }
     });
@@ -196,7 +196,7 @@ const messageTransformers = {
     let props = ['referer', 'integration'];
 
     ObjectUtils.loop(props, (prop) => {
-      if (!(message[prop] |> _.isUndefined)) {
+      if (!_.isUndefined(message[prop])) {
         Track.props[prop] = message[prop];
       }
     });

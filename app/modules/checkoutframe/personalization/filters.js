@@ -279,11 +279,16 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
  * @returns {Array} filtered instruments
  */
 export function filterInstruments({ instruments, upiApps = [], customer }) {
-  return (
-    instruments
-    |> filterFalsyInstruments
-    |> filterInstrumentsForAvailableMethods({ customer })
-    |> filterInstrumentsByAvailableUpiApps(upiApps)
-    |> filterInstrumentsForSanity
+  const nonFalsyInstruments = filterFalsyInstruments(instruments);
+
+  const instrumentsForAvailableMethods = filterInstrumentsForAvailableMethods(
+    nonFalsyInstruments,
+    { customer }
   );
+  const instrumentsByAvailableUpiApps = filterInstrumentsByAvailableUpiApps(
+    instrumentsForAvailableMethods,
+    upiApps
+  );
+
+  return filterInstrumentsForSanity(instrumentsByAvailableUpiApps);
 }

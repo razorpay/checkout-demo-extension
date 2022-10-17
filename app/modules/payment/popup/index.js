@@ -80,7 +80,7 @@ export default function Popup(src, name) {
 
 Popup.prototype = {
   on: function (event, func) {
-    this.listeners.push(global |> _El.on(event, func));
+    this.listeners.push(_El.on(event, func)(global));
   },
 
   beforeunload: function (e) {

@@ -42,53 +42,67 @@ const makeDecimalComma = (str, comma = ',') => str.replace(/\./, comma);
  */
 const CURRENCY_FORMATTERS = {
   // #,###.##
-  three: (amount, decimals) =>
-    String(amount).replace(
+  three: (amount, decimals) => {
+    const amountStr = String(amount).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\..{${decimals}})$)`, 'g'),
       '$1,'
-    ) |> removeDecimals(decimals),
+    );
+    return removeDecimals(decimals)(amountStr);
+  },
 
   // #.###,##
-  threecommadecimal: (amount, decimals) =>
-    makeDecimalComma(String(amount)).replace(
+  threecommadecimal: (amount, decimals) => {
+    const amountStr = makeDecimalComma(String(amount)).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\,.{${decimals}})$)`, 'g'),
       '$1.'
-    ) |> removeDecimals(decimals, ','),
+    );
+    return removeDecimals(decimals, ',')(amountStr);
+  },
 
   // # ###.##
-  threespaceseparator: (amount, decimals) =>
-    String(amount).replace(
+  threespaceseparator: (amount, decimals) => {
+    const amountStr = String(amount).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\..{${decimals}})$)`, 'g'),
       '$1 '
-    ) |> removeDecimals(decimals),
+    );
+    return removeDecimals(decimals)(amountStr);
+  },
 
   // # ###,##
-  threespacecommadecimal: (amount, decimals) =>
-    makeDecimalComma(String(amount)).replace(
+  threespacecommadecimal: (amount, decimals) => {
+    const amountStr = makeDecimalComma(String(amount)).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\,.{${decimals}})$)`, 'g'),
       '$1 '
-    ) |> removeDecimals(decimals, ','),
+    );
+    return removeDecimals(decimals, ',')(amountStr);
+  },
 
   // #, ###.##
-  szl: (amount, decimals) =>
-    String(amount).replace(
+  szl: (amount, decimals) => {
+    const amountStr = String(amount).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\..{${decimals}})$)`, 'g'),
       '$1, '
-    ) |> removeDecimals(decimals),
+    );
+    return removeDecimals(decimals)(amountStr);
+  },
 
   // #'###.##
-  chf: (amount, decimals) =>
-    String(amount).replace(
+  chf: (amount, decimals) => {
+    const amountStr = String(amount).replace(
       new RegExp(`(.{1,3})(?=(...)+(\\..{${decimals}})$)`, 'g'),
       "$1'"
-    ) |> removeDecimals(decimals),
+    );
+    return removeDecimals(decimals)(amountStr);
+  },
 
   // 	#,##,###.##
-  inr: (amount, decimals) =>
-    String(amount).replace(
+  inr: (amount, decimals) => {
+    const amountStr = String(amount).replace(
       new RegExp(`(.{1,2})(?=.(..)+(\\..{${decimals}})$)`, 'g'),
       '$1,'
-    ) |> removeDecimals(decimals),
+    );
+    return removeDecimals(decimals)(amountStr);
+  },
 
   none: (amount) => String(amount),
 };

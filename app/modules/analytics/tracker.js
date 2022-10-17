@@ -148,13 +148,9 @@ const flushEvents = (mode) => {
     data: {
       key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
       // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
-      data:
-        trackingPayload
-        |> JSON.stringify
-        |> encodeURIComponent
-        |> unescape
-        |> btoa
-        |> encodeURIComponent,
+      data: encodeURIComponent(
+        btoa(unescape(encodeURIComponent(JSON.stringify(trackingPayload))))
+      ),
     },
   };
 

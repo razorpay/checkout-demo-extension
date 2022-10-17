@@ -40,12 +40,11 @@ function getOptions(module) {
     },
     plugins,
     onwarn: function (warning) {
-      // Suppress "this is undefined" warning due to an issue in the
-      // Supress typescript warning because of pipeline operator
-      // intl-messageformat module.
       if (
+        // Suppress "this is undefined" warning due to an issue in the intl-messageformat module.
         warning.code === 'THIS_IS_UNDEFINED' ||
-        warning.pluginCode === 'TS1109'
+        // Suppress "cannot write file to js" - ts tries to compile file which is not required
+        warning.pluginCode === 'TS5055'
       ) {
         return;
       }

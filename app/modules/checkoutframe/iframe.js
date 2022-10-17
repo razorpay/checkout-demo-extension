@@ -81,10 +81,7 @@ const platformSpecific = {
   },
 
   android: () => {
-    body
-      |> _El.setStyles({
-        background: 'rgba(0, 0, 0, 0.6)',
-      });
+    _El.setStyles(body, { background: 'rgba(0, 0, 0, 0.6)' });
   },
 };
 
@@ -113,27 +110,29 @@ export function initIframe() {
     } catch (err) {}
   };
 
-  window |> _El.on('message', parseMessage);
-  window |> _El.on('blur', flush);
-  window
-    |> _El.on('beforeunload', () => {
-      const session = getSession();
+  _El.on('message', parseMessage)(window);
 
-      /**
-       * If the user navigates away from the current website
-       * while Checkout is still open, track it
-       */
-      if (session && session.isOpen) {
-        Analytics.track('modal:close', {
-          data: {
-            navigation: true,
-          },
-          immediately: true,
-        });
-      }
+  _El.on('blur', flush)(window);
 
-      flush();
-    });
+  _El.on('beforeunload', () => {
+    const session = getSession();
+
+    /**
+     * If the user navigates away from the current website
+     * while Checkout is still open, track it
+     */
+    if (session && session.isOpen) {
+      Analytics.track('modal:close', {
+        data: {
+          navigation: true,
+        },
+        immediately: true,
+      });
+    }
+
+    flush();
+  })(window);
+
   window.addEventListener('sentry_http_failure', captureSentryHttpFailure);
 
   defineGlobalsForBridge();
@@ -142,7 +141,7 @@ export function initIframe() {
   const platform = qpmap.platform;
 
   if (platform) {
-    body |> _El.addClass(platform);
+    _El.addClass(body, platform);
 
     const platformFn = platformSpecific[platform];
 

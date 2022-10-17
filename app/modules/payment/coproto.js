@@ -644,7 +644,7 @@ const responseTypes = {
         this.upi_app === PHONE_PE_PACKAGE_NAME
       ) {
         this.emit('upi.intent_success_response', data);
-      } else if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
+      } else if (didUPIIntentSucceed(parseUPIIntentResponse(data))) {
         this.emit('upi.intent_success_response', data);
       } else {
         this.emit('cancel', upiBackCancel);

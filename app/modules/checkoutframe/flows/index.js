@@ -56,8 +56,10 @@ function getFlowsForPayment(paymentData, tokens = []) {
  * @return {Boolean}
  */
 export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
-  const flowPresent =
-    getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
+  const flowPresent = isFlowApplicable(
+    getFlowsForPayment(paymentData, tokens),
+    Flows.OTP
+  );
 
   return flowPresent;
 }
