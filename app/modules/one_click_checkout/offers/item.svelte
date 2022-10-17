@@ -1,6 +1,7 @@
 <script lang="ts">
   // util imports
   import { appliedOffer } from 'offers/store';
+  import OffersTerms from 'offers/ui/components/OffersTerms.svelte';
   // i18n imports
   import { t } from 'svelte-i18n';
   import {
@@ -55,6 +56,8 @@
         <!-- Only show the description if offer description is set. -->
         <div class="offer-detail">{getOfferDescription(offer)}</div>
       {/if}
+      <!-- Offers Terms -->
+      <OffersTerms {offer} />
       {#if offer.type === 'deferred'}
         <!-- LABEL: Cashback would be credited to source mode of payment. -->
         <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>

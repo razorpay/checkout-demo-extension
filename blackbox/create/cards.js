@@ -39,6 +39,7 @@ const {
   selectOffer,
   removeOffer,
   verifyOfferNotApplied,
+  verifyOfferTerms,
   // Partial Payment
   verifyPartialAmount,
   verifyFooterText,
@@ -219,6 +220,10 @@ module.exports = function (testFeatures) {
           await verifyOfferApplied(context);
           // since there is a validation going on, missing it causes test case failure
           await validateCardForOffer(context);
+
+          //validate terms and conditions
+          await viewOffers(context);
+          await verifyOfferTerms(context, '1');
 
           // remove
           await viewOffers(context);

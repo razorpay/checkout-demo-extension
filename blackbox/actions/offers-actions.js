@@ -44,6 +44,13 @@ async function verifyOfferNotApplied(context) {
   ).toEqual('Select Offer');
 }
 
+async function verifyOfferTerms(context, offernumber) {
+  await context.page.click('.offer-item:nth-of-type(' + offernumber + ')');
+  expect(
+    await context.page.$eval('.offer-terms-conditions', (el) => el.innerText)
+  ).toEqual('Terms and Conditions');
+}
+
 module.exports = {
   viewOffers,
   selectOffer,
@@ -52,4 +59,5 @@ module.exports = {
   validateCardForOffer,
   removeOffer,
   verifyOfferNotApplied,
+  verifyOfferTerms,
 };

@@ -11,6 +11,7 @@
     CASHBACK_DETAIL,
     REMOVE_ACTION,
   } from 'ui/labels/offers';
+  import OffersTerms from 'offers/ui/components/OffersTerms.svelte';
   export let selected;
   export let offers;
   export let removeOffer;
@@ -62,6 +63,8 @@
             <!-- Only show the description if offer description is set. -->
             <div class="offer-detail">{getOfferDescription(offer)}</div>
           {/if}
+          <!-- Offers Terms -->
+          <OffersTerms {offer} />
           {#if offer.type === 'deferred'}
             <!-- LABEL: Cashback would be credited to source mode of payment. -->
             <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>

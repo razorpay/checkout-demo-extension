@@ -22,6 +22,7 @@ declare namespace Offers {
     default_offer?: boolean;
     original_amount?: number;
     amount?: number;
+    terms?: string;
   }
 
   export type OffersList = OfferItem[];

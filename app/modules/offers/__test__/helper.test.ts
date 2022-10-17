@@ -30,6 +30,7 @@ const sampleOffer: Offers.OfferItem = {
   type: 'instant',
   original_amount: 100000,
   amount: 90000,
+  terms: 'Offers terms and conditions',
 };
 
 describe('#getAppliedOffer', () => {

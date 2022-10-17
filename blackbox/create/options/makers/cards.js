@@ -27,6 +27,7 @@ function makePreferences(features, preferences) {
         name: 'Card Offer VISA',
         payment_method: 'card',
         payment_network: 'VISA',
+        terms: `Offer terms and conditions`,
       },
       {
         original_amount: 200000,
