@@ -1,10 +1,13 @@
+import { hiddenMethods as HiddenMethodsStore } from 'checkoutstore/screens/home';
 import type {
   EMIBankList,
   EMIBANKS,
+  EmiMethod,
   Instrument,
   InstrumentConfig,
   Tokens,
 } from 'emiV2/types';
+import { get } from 'svelte/store';
 import { isOnlyCardlessProvider, isOtherCardEmiProvider } from './helper';
 
 /**
@@ -173,3 +176,42 @@ export function filterSavedCardsAgainstCustomBlock(
   });
   return eligibleTokens;
 }
+
+/**
+ * Helper function to filter out emi providers
+ * Based on config restriction
+ * if emi method is restricted hide all bank and card emi providers
+ * if cardless method is restricted hide all cardless emi providers
+ * @param {EMIBankList} providers
+ * @returns {EMIBankList}
+ */
+export const hideRestrictedProviders = (providers: EMIBankList) => {
+  let filteredProviders = providers;
+  // if custom config has hide restriction for Emi method
+  // card emi providers like Onecard/Bajaj should be filtered out
+  if (isEmiMethodHidden('emi')) {
+    filteredProviders = filteredProviders.filter(
+      (provider) => !isOtherCardEmiProvider(provider.code)
+    );
+  }
+
+  // if cardless emi method is restriceted
+  // filter out all cardless emi providers except card emis like bajaj and onecard
+  if (isEmiMethodHidden('cardless_emi')) {
+    filteredProviders = filteredProviders.filter((provider) =>
+      isOtherCardEmiProvider(provider.code)
+    );
+  }
+
+  return filteredProviders;
+};
+
+/**
+ * Helper function to validate if emi method is hidden or not
+ * @param {EmiMethod} method
+ * @returns {boolean}
+ */
+export const isEmiMethodHidden = (method: EmiMethod) => {
+  const hiddenMethod: string[] = get(HiddenMethodsStore);
+  return hiddenMethod.includes(method);
+};

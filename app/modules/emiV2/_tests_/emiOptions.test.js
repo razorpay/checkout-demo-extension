@@ -1,3 +1,4 @@
+import { hiddenInstruments, hiddenMethods } from 'checkoutstore/screens/home';
 import { getAmount, getMerchantMethods, isEmiV2 } from 'razorpay';
 import {
   getAllProviders,
@@ -81,9 +82,14 @@ jest.mock('razorpay', () => ({
   getMerchantMethods: jest.fn(),
   getAmount: jest.fn(),
   isEmiV2: () => true,
+  getPreferences: jest.fn(),
 }));
 
 describe('Emi Options list test', () => {
+  beforeEach(() => {
+    hiddenMethods.set([]);
+    hiddenInstruments.set([]);
+  });
   test('Should return bank emi options', () => {
     getMerchantMethods.mockReturnValue(merchantMethods);
     let amount = 1000000;
@@ -398,6 +404,132 @@ describe('Emi Options list test', () => {
         isNoCostEMI: false,
         creditEmi: true,
         startingFrom: 16,
+      },
+    ];
+    expect(JSON.stringify(getAllProviders(amount))).toBe(
+      JSON.stringify(expctedProviders)
+    );
+  });
+});
+
+describe('Validate: Emi providers with restricted configs', () => {
+  beforeEach(() => {
+    hiddenMethods.set([]);
+  });
+
+  test('Bank emi options should be empty if emi method is restricted', () => {
+    hiddenMethods.set(['emi']);
+    getMerchantMethods.mockReturnValue(merchantMethods);
+    let amount = 1000000;
+    getAmount.mockReturnValue(amount);
+    expect(JSON.stringify(getBankEmiOptions(amount))).toBe(JSON.stringify([]));
+  });
+
+  test('Bank emi options should not be empty if cardless emi method is restricted', () => {
+    hiddenMethods.set(['cardless_emi']);
+    getMerchantMethods.mockReturnValue(merchantMethods);
+    let amount = 1000000;
+    getAmount.mockReturnValue(amount);
+    let expectedEmiBanks = [
+      {
+        code: 'HDFC',
+        name: 'HDFC Bank',
+        debitEmi: false,
+        creditEmi: true,
+        isCardless: true,
+        isNoCostEMI: true,
+        startingFrom: 15,
+        icon: 'https://cdn.razorpay.com/bank/HDFC.gif',
+        downtimeConfig: {
+          downtimeInstrument: 'HDFC',
+          severe: '',
+        },
+        debitCardlessConfig: {
+          meta: {
+            flow: 'pan',
+          },
+          powered_by: {
+            method: 'cardless_emi',
+            provider: 'flexmoney',
+          },
+        },
+        method: 'emi',
+      },
+      {
+        code: 'SBIN',
+        name: 'State Bank of India',
+        debitEmi: false,
+        creditEmi: true,
+        isCardless: false,
+        isNoCostEMI: false,
+        startingFrom: 15,
+        icon: 'https://cdn.razorpay.com/bank/SBIN.gif',
+        downtimeConfig: {
+          downtimeInstrument: 'SBIN',
+          severe: '',
+        },
+        debitCardlessConfig: null,
+        method: 'emi',
+      },
+    ];
+    expect(JSON.stringify(getBankEmiOptions(amount))).toBe(
+      JSON.stringify(expectedEmiBanks)
+    );
+  });
+
+  test('Other emi provider should not be empty if emi method is restricted', () => {
+    hiddenMethods.set(['emi']);
+    getMerchantMethods.mockReturnValue(merchantMethods);
+    let amount = 1000000;
+    getAmount.mockReturnValue(amount);
+    let expctedProviders = [
+      {
+        data: { code: 'walnut369' },
+        section: undefined,
+        highlightLabel: undefined,
+        icon: 'https://cdn.razorpay.com/cardless_emi-sq/walnut369.svg',
+        code: 'walnut369',
+        name: 'axio',
+        method: 'cardless_emi',
+        isNoCostEMI: false,
+      },
+      {
+        data: { code: 'zestmoney' },
+        section: undefined,
+        highlightLabel: undefined,
+        icon: 'https://cdn.razorpay.com/cardless_emi-sq/zestmoney.svg',
+        code: 'zestmoney',
+        name: 'ZestMoney',
+        method: 'cardless_emi',
+        isNoCostEMI: false,
+      },
+    ];
+    expect(JSON.stringify(getAllProviders(amount))).toBe(
+      JSON.stringify(expctedProviders)
+    );
+  });
+
+  test('Other emi provider should be empty if cardless emi method is restricted', () => {
+    hiddenMethods.set(['cardless_emi']);
+    getMerchantMethods.mockReturnValue(merchantMethods);
+
+    let amount = 100000;
+    getAmount.mockReturnValue(amount);
+    expect(JSON.stringify(getAllProviders(amount))).toBe(JSON.stringify([]));
+
+    amount = 1000000;
+    getAmount.mockReturnValue(amount);
+
+    let expctedProviders = [
+      {
+        data: { code: 'bajaj' },
+        section: undefined,
+        highlightLabel: undefined,
+        icon: 'https://cdn.razorpay.com/cardless_emi-sq/bajaj.svg',
+        code: 'bajaj',
+        name: 'Bajaj Finserv',
+        method: 'emi',
+        isNoCostEMI: true,
       },
     ];
     expect(JSON.stringify(getAllProviders(amount))).toBe(

@@ -1,6 +1,9 @@
+import { hiddenMethods } from 'checkoutstore/screens/home';
 import {
   filterCardlessProvidersAgainstCustomBlock,
   filterEmiBanksAgainstCustomBlock,
+  hideRestrictedProviders,
+  isEmiMethodHidden,
 } from 'emiV2/helper/configurability';
 
 const emi_options = {
@@ -192,5 +195,57 @@ describe('Custom config instruments', () => {
     expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
     );
+  });
+});
+
+describe('Validate: hideRestrictedProviders', () => {
+  beforeEach(() => {
+    hiddenMethods.set([]);
+  });
+  test('Provider should not include bajaj/onecard if emi method is restricted', () => {
+    hiddenMethods.set(['emi']);
+    let expected = [
+      {
+        code: 'zestmoney',
+      },
+      {
+        code: 'earlysalary',
+      },
+    ];
+    expect(JSON.stringify(hideRestrictedProviders(CardlessOptions))).toBe(
+      JSON.stringify(expected)
+    );
+  });
+
+  test('Provider should not include cardless provider if cardless emi method is restricted', () => {
+    hiddenMethods.set(['cardless_emi']);
+    let expected = [
+      {
+        code: 'bajaj',
+      },
+    ];
+    expect(JSON.stringify(hideRestrictedProviders(CardlessOptions))).toBe(
+      JSON.stringify(expected)
+    );
+  });
+});
+
+describe('Validate: isEmiMethodHidden', () => {
+  beforeEach(() => {
+    hiddenMethods.set([]);
+  });
+
+  test('Provided method is hidden', () => {
+    let method = 'emi';
+    expect(isEmiMethodHidden(method)).toBe(false);
+
+    hiddenMethods.set(method);
+    expect(isEmiMethodHidden(method)).toBe(true);
+
+    method = 'cardless_emi';
+    expect(isEmiMethodHidden(method)).toBe(false);
+
+    hiddenMethods.set(method);
+    expect(isEmiMethodHidden(method)).toBe(true);
   });
 });

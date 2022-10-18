@@ -27,6 +27,8 @@ import { capture, SEVERITY_LEVELS } from 'error-service';
 import {
   filterCardlessProvidersAgainstCustomBlock,
   filterEmiBanksAgainstCustomBlock,
+  hideRestrictedProviders,
+  isEmiMethodHidden,
 } from './configurability';
 import {
   getDownTimeForEmiBanks,
@@ -106,7 +108,8 @@ export function getAllProviders(amount: number, instrument: Instrument) {
 
     const filteredCardlessProviders: EMIBankList =
       filterCardlessProvidersAgainstCustomBlock(sortedProviders, instrument);
-    return filteredCardlessProviders;
+
+    return hideRestrictedProviders(filteredCardlessProviders);
   } catch (e: any) {
     capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
     return [];
@@ -185,6 +188,11 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
   const bankEMIOptions: EMIBanksMap = {};
   const banks: EmiBankPlans = getEmiBanksAvailable(amount);
 
+  // if custom block has hide config for Emi method
+  // providers should be empty
+  if (isEmiMethodHidden('emi')) {
+    return [];
+  }
   try {
     // if emi banks are not present and no banks is present in cardless providers
     // we return empty array

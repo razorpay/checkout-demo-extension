@@ -33,6 +33,7 @@ import {
   DESCRIPTION_CARDLESS_EMI,
 } from 'ui/labels/methods';
 import { getPayLaterProvidersDisplayNames } from 'common/paylater';
+import { otherCardEmiProviders } from 'emiV2/constants';
 
 function getRecurringCardDescription(locale) {
   // TODO: fix this to return network codes instead of names
@@ -108,6 +109,36 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
 };
 
 /**
+ * If entered provider name belongs to other card emi providers
+ * Onecard or Bajaj
+ * @param {string} name
+ * @param {string} locale
+ * @returns
+ */
+const isOtherCardEmiProvider = (name, locale) => {
+  return otherCardEmiProviders.some((provider) => {
+    const providerName = getCardlessEmiProviderName(provider, locale);
+    return providerName === name;
+  });
+};
+
+/**
+ * If provided config belongs to card emi prefix
+ * Eg: Credit/Debit cards, Cards
+ * @param {string} text
+ * @param {string} locale
+ * @returns
+ */
+const isCardEmiPrefix = (text, locale) => {
+  const cardPrefix = ['card', 'credit_debit_cards', 'debit_credit_cards'];
+
+  return cardPrefix.some((prefix) => {
+    const cardMethodPrefix = getMethodPrefix(prefix, locale);
+    return cardMethodPrefix === text;
+  });
+};
+
+/**
  * Map of method v/s description fn
  */
 const DESCRIPTIONS = {
@@ -136,11 +167,29 @@ const DESCRIPTIONS = {
       providerNames.unshift(walnut369Name);
     }
 
+    // if emi is restricted
+    // Dont show Onecard/ bajaj in subtext -> as they are card emi providers only
+    if (!cardEmi && isEmiV2()) {
+      providerNames = providerNames.filter(
+        (provider) => !isOtherCardEmiProvider(provider, locale)
+      );
+    }
+
     if (cardEmi) {
       if (isDebitEMIEnabled()) {
         providerNames.unshift(getMethodPrefix('debit_credit_cards', locale));
       } else {
         providerNames.unshift(getMethodPrefix('card', locale));
+      }
+
+      // If cardless emi is restricted
+      // Subtext should include emi on cards and card emi providers like Onecard/Bajaj
+      if (!isMethodUsable('cardless_emi') && isEmiV2()) {
+        providerNames = providerNames.filter(
+          (provider) =>
+            isOtherCardEmiProvider(provider, locale) ||
+            isCardEmiPrefix(provider, locale)
+        );
       }
     }
 
