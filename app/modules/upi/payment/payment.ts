@@ -73,6 +73,7 @@ function handleUPIPayments(
      * Here the fee redirect screen has to be controlled
      *
      */
+    delete paymentPayload.persistentMode;
     trackTrace(TRACES.FEE_MODAL_WAITING_FOR_USER);
     handleFeeBearer(paymentPayload, ({ amount, fee }) => {
       trackTrace(TRACES.FEE_MODAL_USER_CONSENT_TAKEN);

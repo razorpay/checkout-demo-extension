@@ -71,6 +71,9 @@ class PaymentState {
     request: Record<string, any>,
     responsePayload: Record<string, any>
   ) {
+    if (typeof responsePayload.error !== 'undefined') {
+      return;
+    }
     getHashKey(request).then((hashKey: string) => {
       this.persistentState.set(hashKey, {
         response: responsePayload,
