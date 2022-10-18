@@ -7,4 +7,5 @@ createAddressTest({
   serviceable: true,
   addBillingAddress: true,
   isCODEligible: false,
+  billingEnabled: true,
 });

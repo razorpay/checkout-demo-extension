@@ -40,6 +40,14 @@ function makePreferences(features, preferences) {
     };
   }
 
+  if (features.billingEnabled) {
+    preferences['1cc'] = {
+      configs: {
+        one_cc_capture_billing_address: true,
+      },
+    };
+  }
+
   return preferences;
 }
 
