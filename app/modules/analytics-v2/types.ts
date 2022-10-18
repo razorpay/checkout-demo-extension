@@ -21,3 +21,8 @@ export interface Block {
   name?: string;
   category?: string;
 }
+
+export type MethodAndInstrument = {
+  method: Method;
+  instrument: Instrument;
+};

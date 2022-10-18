@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { AnalyticsV2State } from 'analytics-v2';
+  import { MiscTracker } from 'misc/analytics/events';
   import { getOption } from 'razorpay';
 
   import { getSession } from 'sessionmanager';
+  import { onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
   import {
@@ -14,10 +17,25 @@
   } from './store';
 
   const session = getSession();
+  let retryClick = false;
 
   export let onCTAClick: () => void;
   export let onSecondaryCTAClick: () => void;
   export let onBackPressed: () => void;
+
+  onDestroy(() => {
+    if (!$loadingState) {
+      if (!retryClick) {
+        MiscTracker.RETRY_VANISHED(
+          AnalyticsV2State.selectedInstrumentForPayment
+        );
+      }
+      MiscTracker.AFTER_RETRY_SCREEN({
+        screenName: session.screen,
+        retryCount: session.attemptCount,
+      });
+    }
+  });
 
   let showLink = false;
 
@@ -37,6 +55,12 @@
       return true;
     }
     return false;
+  }
+
+  function primaryClick() {
+    retryClick = true;
+    MiscTracker.RETRY_CLICKED(AnalyticsV2State.selectedInstrumentForPayment);
+    preventBack();
   }
 </script>
 
@@ -74,7 +98,7 @@
   {/if}
   {#if !$loadingState}
     <div class="loaded-state-cta">
-      <button on:click={preventBack} class="primary-cta cta-button btn">
+      <button on:click={primaryClick} class="primary-cta cta-button btn">
         {$loadedCTA}
       </button>
       {#if $secondaryLoadedCTA}

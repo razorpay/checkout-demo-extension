@@ -1,6 +1,11 @@
 import { BEHAV, INTEGRATION, RENDER } from 'analytics-types';
 import { createTrackMethodForModule } from 'analytics-v2';
-import type { Block } from 'analytics-v2/types';
+import type {
+  Block,
+  Instrument,
+  Method,
+  MethodAndInstrument,
+} from 'analytics-v2/types';
 import type { LOGIN_SOURCE_TYPES } from './constants';
 
 export const MiscEvents = {
@@ -24,6 +29,11 @@ export const MiscEvents = {
   },
   INSTRUMENT_SELECTED: { name: 'instrument:selected', type: BEHAV },
   USER_LOGGED_IN: { name: 'user_logged_in', type: BEHAV },
+  RETRY_BUTTON: { name: 'retry_button', type: RENDER },
+  RETRY_CLICKED: { name: 'retry_ckicked', type: BEHAV },
+  AFTER_RETRY_SCREEN: { name: 'after_retry_screen', type: RENDER },
+  RETRY_VANISHED: { name: 'retry_vanished', type: BEHAV },
+  PAYMENT_CANCELLED: { name: 'payment_cancelled', type: BEHAV },
 };
 
 interface MiscEventMap {
@@ -88,9 +98,7 @@ interface MiscEventMap {
   };
   CONTACT_DETAILS_PROCEED_CLICK: undefined;
   INSTRUMENTATION_SELECTION_SCREEN: {
-    method: {
-      name: string;
-    };
+    method: Method;
     block: Block;
     instruments: {
       [key: number]: {
@@ -107,22 +115,18 @@ interface MiscEventMap {
   };
   INSTRUMENT_SELECTED: {
     block: Block;
-    method: {
-      name: string;
-    };
-    instrument: {
-      name?: string;
-      saved: boolean;
-      personalisation: boolean;
-      network?: string;
-      issuer?: string;
-      type?: string;
-    };
+    method: Method;
+    instrument: Instrument;
   };
   USER_LOGGED_IN: {
     loginSource: LOGIN_SOURCE_TYPES;
     loginScreen?: string;
   };
+  RETRY_BUTTON: MethodAndInstrument;
+  RETRY_CLICKED: MethodAndInstrument;
+  AFTER_RETRY_SCREEN: MethodAndInstrument;
+  RETRY_VANISHED: MethodAndInstrument;
+  PAYMENT_CANCELLED: MethodAndInstrument;
 }
 
 export const MiscTracker = createTrackMethodForModule<MiscEventMap>(MiscEvents);
