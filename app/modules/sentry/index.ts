@@ -5,30 +5,34 @@ import { isOneClickCheckout } from 'razorpay';
 let errorTracked = false;
 
 function initSentry() {
-  const { SENTRY_RELEASE_VERSION, SENTRY_DSN, SENTRY_ENVIRONMENT } =
-    SENTRY_CONFIG[isOneClickCheckout() ? 'magic' : 'standard'];
-  window.Sentry.init({
-    dsn: SENTRY_DSN,
-    release: SENTRY_RELEASE_VERSION,
-    environment: SENTRY_ENVIRONMENT,
-    beforeSend(event: any) {
-      try {
-        if (!isOneClickCheckout()) {
-          // track only one error per session for standard checkout
-          if (errorTracked) {
-            return false;
+  try {
+    const { SENTRY_RELEASE_VERSION, SENTRY_DSN, SENTRY_ENVIRONMENT } =
+      SENTRY_CONFIG[isOneClickCheckout() ? 'magic' : 'standard'];
+    window.Sentry.init({
+      dsn: SENTRY_DSN,
+      release: SENTRY_RELEASE_VERSION,
+      environment: SENTRY_ENVIRONMENT,
+      beforeSend(event: any) {
+        try {
+          if (!isOneClickCheckout()) {
+            // track only one error per session for standard checkout
+            if (errorTracked) {
+              return false;
+            }
+            if (event.exception?.values?.length > 0) {
+              errorTracked = true;
+            }
           }
-          if (event.exception?.values?.length > 0) {
-            errorTracked = true;
-          }
+          return event;
+        } catch (e) {
+          //
         }
-        return event;
-      } catch (e) {
-        //
-      }
-    },
-  });
-  setContext();
+      },
+    });
+    setContext();
+  } catch (e) {
+    //e
+  }
 }
 
 export function injectSentry() {
@@ -44,7 +48,7 @@ export function injectSentry() {
       'sha384-yvW0r7aI4VkwNfs/eOzYsODvXkNVQon3MBtow61jPf/pOR166EPvTSNBr9nG3C3y';
     script.crossOrigin = 'anonymous';
     script.onload = function () {
-      initSentry();
+      updateSentryConfig();
     };
 
     document.body.appendChild(script);
