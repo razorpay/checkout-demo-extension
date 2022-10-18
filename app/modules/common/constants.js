@@ -49,6 +49,7 @@ export const SHOWN_CLASS = 'drishy';
 export const CONTACT_PATTERN = '^\\+?[0-9]{7,15}$';
 export const CONTACT_REGEX = new RegExp(CONTACT_PATTERN);
 export const PHONE_PATTERN = '^\\d{7,15}$';
+export const PHONE_REGEX = new RegExp(PHONE_PATTERN);
 export const PHONE_PATTERN_INDIA = `^\\d{10}$`;
 export const PHONE_REGEX_INDIA = new RegExp(PHONE_PATTERN_INDIA);
 export const COUNTRY_CODE_PATTERN = '^\\+[0-9]{1,6}$';

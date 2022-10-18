@@ -2,7 +2,11 @@ import * as GPay from 'gpay';
 import fetch from 'utils/fetch';
 import { getAppFromPackageName } from 'common/upi';
 import { parseUPIIntentResponse, didUPIIntentSucceed } from 'upi/helper/common';
-import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME, upiBackCancel } from 'upi/constants';
+import {
+  GOOGLE_PAY_PACKAGE_NAME,
+  PHONE_PE_PACKAGE_NAME,
+  upiBackCancel,
+} from 'upi/constants';
 import * as _ from 'utils/_';
 import { getMerchantKey } from 'razorpay';
 

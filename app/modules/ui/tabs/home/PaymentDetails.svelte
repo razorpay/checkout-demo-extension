@@ -27,7 +27,11 @@
     prevContact,
   } from 'checkoutstore/screens/home';
   import { activeRoute } from 'one_click_checkout/routing/store';
-  import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
+  import {
+    isContactAndEmailValid,
+    isEmailValid,
+    isContactValid,
+  } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 
   // Transitions
@@ -141,20 +145,25 @@
 
   function onContactBlur() {
     updateOrderWithCustomerDetails();
-    Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
-      country_code: $country,
-      contact_number: $phone,
-    });
+
+    if ($isContactValid) {
+      Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
+        country_code: $country,
+        contact_number: $phone,
+      });
+    }
   }
 
   function onEmailBlur() {
     const source = getInputSource('email');
 
     updateOrderWithCustomerDetails();
-    Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
-      email_id: $email,
-      source,
-    });
+    if ($isEmailValid) {
+      Events.TrackBehav(CouponEvents.SUMMARY_EMAIL_ENTERED, {
+        email_id: $email,
+        source,
+      });
+    }
   }
 
   function trackEmailFilled(e) {
@@ -395,10 +404,6 @@
     .partial-payment-block,
     .details-block {
       padding: 0;
-    }
-
-    .partial-payment-block {
-      padding-top: 24px;
     }
   }
 </style>
