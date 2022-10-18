@@ -773,8 +773,8 @@
   }
 
   onMount(() => {
-    if (currentView === addressViews.ADD_ADDRESS) {
-      onUpdate('name', $prefilledName ?? '');
+    if (currentView === addressViews.ADD_ADDRESS && $prefilledName) {
+      onUpdate('name', $prefilledName);
     }
 
     const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
