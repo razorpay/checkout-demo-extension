@@ -41,6 +41,7 @@
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
   import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
   import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+  import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 
   import Resource from 'one_click_checkout/address/resource';
   import { views } from 'one_click_checkout/routing/constants';
@@ -81,10 +82,17 @@
       return;
     }
     if (customer.logged) {
-      saveAddress().then((res) => {
-        $newUserAddress.id = res.shipping_address?.id;
-        redirectToPaymentMethods();
-      });
+      saveAddress()
+        .then((res) => {
+          $newUserAddress.id = res.shipping_address?.id;
+          redirectToPaymentMethods();
+        })
+        .catch((err) => {
+          captureError(err, {
+            severity: SEVERITY_LEVELS.S1,
+            unhandled: false,
+          });
+        });
     } else {
       askForOTP(otpReasons.saving_address);
     }
