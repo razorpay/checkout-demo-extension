@@ -82,7 +82,10 @@
 
   // other imports
   import { isIndianCustomer } from 'checkoutstore/screens/home';
-  import { savedAddresses } from 'one_click_checkout/address/store';
+  import {
+    savedAddresses,
+    prefilledName,
+  } from 'one_click_checkout/address/store';
   import {
     findItem,
     validateInputField,
@@ -770,6 +773,10 @@
   }
 
   onMount(() => {
+    if (currentView === addressViews.ADD_ADDRESS) {
+      onUpdate('name', $prefilledName ?? '');
+    }
+
     const isShippingAddress = $activeRoute?.name === views.ADD_ADDRESS;
     const address_type = isShippingAddress ? 'shipping' : 'billing';
 

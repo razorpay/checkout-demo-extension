@@ -47,8 +47,6 @@
     }
   }
 
-  $: handleInput('name', $prefilledName ?? '');
-
   const dispatch = createEventDispatcher();
   const handleInput = (id, value) => {
     value.extra ? onUpdate(id, value.val, value.extra) : onUpdate(id, value);
