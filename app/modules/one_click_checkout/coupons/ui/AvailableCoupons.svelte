@@ -44,6 +44,7 @@
     Events.Track(CouponEvents.AVAILABLE_COUPON_CLICKED);
     Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
       coupon_code_index: couponIndex,
+      coupon_source: 'merchant',
       meta: {
         coupon_code: couponCode,
         chosen_coupon_available: 1,

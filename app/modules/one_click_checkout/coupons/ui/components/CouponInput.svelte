@@ -64,6 +64,7 @@
     });
     if ($couponInputValue) {
       Events.TrackBehav(CouponEvents.COUPON_APPLY_BUTTON_CLICKED, {
+        coupon_source: 'manual',
         meta: {
           coupon_code: $couponInputValue,
           chosen_coupon_available: 0,
