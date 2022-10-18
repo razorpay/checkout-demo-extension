@@ -755,6 +755,11 @@
   }
 
   export function setSelectedApp(code) {
+    CardsTracker.PAY_WITH_APPS_PAYMENT_SELECTED({
+      instrument: {
+        appSelected: code,
+      },
+    });
     Events.TrackBehav(CardEvents.APP_SELECT, {
       app: code,
     });

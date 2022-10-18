@@ -83,6 +83,20 @@ export const CardsEvents = {
     name: 'gen_otp_entered',
     type: BEHAV,
   },
+
+  //TODO: Update prefix as per response of DE/Analytics team
+  PAY_WITH_APPS_DISPLAYED: {
+    name: 'gen_pay_with_apps_displayed',
+    type: RENDER,
+  },
+  PAY_WITH_APPS_PAYMENT_SELECTED: {
+    name: 'gen_pay_with_apps_payment_selected',
+    type: BEHAV,
+  },
+  PAY_WITH_APPS_PAYMENT_INITIATED: {
+    name: 'gen_pay_with_apps_payment_initiated',
+    type: BEHAV,
+  },
 };
 
 interface CardsEventMap {
@@ -124,6 +138,18 @@ interface CardsEventMap {
   GEN_OTP_ENTERED: undefined;
   GEN_OTP_SCREEN: undefined;
   GEN_OTP_SENT: undefined;
+
+  PAY_WITH_APPS_DISPLAYED: undefined;
+  PAY_WITH_APPS_PAYMENT_SELECTED: {
+    instrument: {
+      appSelected: string;
+    };
+  };
+  PAY_WITH_APPS_PAYMENT_INITIATED: {
+    instrument: {
+      appSelected: string;
+    };
+  };
 }
 
 export const CardsTracker = createTrackMethodForModule<CardsEventMap>(

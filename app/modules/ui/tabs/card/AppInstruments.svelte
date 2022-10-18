@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   // Store
   import { proxyCountry, proxyPhone } from 'checkoutstore/screens/home';
@@ -19,6 +19,7 @@
   import { getAppProviderName } from 'i18n';
 
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
+  import { CardsTracker } from 'card/analytics/events';
   const dispatch = createEventDispatcher();
 
   export let apps = [];
@@ -31,6 +32,10 @@
   function isContactRequired(provider) {
     return isContactOptional() && isContactRequiredForAppProvider(provider);
   }
+
+  onMount(() => {
+    CardsTracker.PAY_WITH_APPS_DISPLAYED();
+  });
 </script>
 
 {#each apps as app}

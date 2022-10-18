@@ -5859,6 +5859,12 @@ Session.prototype = {
 
     if (data.method === 'app') {
       let provider = data.provider;
+
+      CardsTracker.PAY_WITH_APPS_PAYMENT_INITIATED({
+        instrument: {
+          appSelected: provider,
+        },
+      });
       Analytics.track('app:attempt', {
         data: {
           method: data.method,
