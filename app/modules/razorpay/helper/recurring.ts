@@ -58,6 +58,7 @@ export const isEnableAllPSPExperimentEnabled = () => {
   const allow = getPreferences('experiments.recurring_upi_all_psp');
   return allow;
 };
+
 // return true for only recurring caw orders. Returns false for subscriptions
 export function isCAW() {
   return isRecurring() && getOption('recurring');

@@ -973,6 +973,7 @@ export default {
       paypal: 'PayPal',
       qr: 'UPI QR',
       upi: 'UPI',
+      nach: 'Nach',
       upi_otm: 'UPI OTM',
       wallet: 'Wallets',
       cod: 'COD',

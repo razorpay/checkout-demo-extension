@@ -205,14 +205,14 @@ export const initUpiQrV2 = () => {
       upiQrOnL0.enabled() &&
       !hasFeature('disable_homescreen_qr', false) &&
       Number(getAmount()) <= QR_HOMESCREEN_AMOUNT_LIMIT &&
-      !orderMethod &&
+      (!orderMethod || (isRecurring() && orderMethod === 'upi')) &&
       !isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
 
     const upiScreenQR =
       status &&
       upiQrOnL1.enabled() &&
       !hasFeature('disable_upiscreen_qr', false) &&
-      (!orderMethod || orderMethod === 'upi');
+      (!orderMethod || (isRecurring() && orderMethod === 'upi'));
 
     const upiScreenQRPosition = (() => {
       if (upiScreenQR) {

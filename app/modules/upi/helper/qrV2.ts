@@ -2,7 +2,7 @@
  * file created to remove circular deps
  */
 
-import { getPreferences, isPartialPayment } from 'razorpay';
+import { getPreferences, isPartialPayment, isRecurring } from 'razorpay';
 
 let anyV2APIAttemptFailed = false;
 
@@ -25,5 +25,10 @@ export function autoGenerateQREnabled(): boolean {
     */
   // adding partial payment flow
   const isFlowEnabled = !isPartialPayment();
-  return isExperimentEnable && isFlowEnabled && !anyV2APIAttemptFailed;
+  return (
+    isExperimentEnable &&
+    isFlowEnabled &&
+    !anyV2APIAttemptFailed &&
+    !isRecurring()
+  );
 }

@@ -196,7 +196,7 @@ const ALL_METHODS = {
 
   upi() {
     const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
-    if (isASubscription()) {
+    if (isSubscription()) {
       return (
         isASubscription('upi') &&
         getRecurringMethods()?.upi &&
@@ -537,13 +537,29 @@ const UPI_METHODS = {
   collect: () => Boolean(getPreferences('methods.upi_type.collect', 1)),
   omnichannel: () =>
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () =>
-    !isRecurring() &&
-    !isPayout() &&
-    getOption('method.qr') &&
-    !isMobileByMediaQuery() &&
-    getMerchantMethods().upi_intent &&
-    Boolean(getPreferences('methods.upi_type.intent', 1)),
+
+  qr: () => {
+    const shouldEnableQR =
+      !isPayout() &&
+      getOption('method.qr') &&
+      !isMobileByMediaQuery() &&
+      getMerchantMethods().upi_intent &&
+      Boolean(getPreferences('methods.upi_type.intent', 1));
+
+    if (isRecurring()) {
+      const shouldEnableQROnRecurring =
+        shouldEnableQR &&
+        getRecurringMethods()?.upi &&
+        isRecurringQRIntentExperimentEnabled();
+
+      if (isSubscription()) {
+        return isASubscription('upi') && shouldEnableQROnRecurring;
+      }
+      return getSingleMethod() === 'upi' && shouldEnableQROnRecurring;
+    }
+    return shouldEnableQR;
+  },
+
   intent: () => {
     const shouldEnableIntent =
       !isPayout() &&

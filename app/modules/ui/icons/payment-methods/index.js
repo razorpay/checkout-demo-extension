@@ -136,6 +136,7 @@ function getIconFn(iconName) {
       return bank_transfer;
 
     case 'emandate':
+    case 'nach':
       return bank_transfer;
 
     case 'contact':

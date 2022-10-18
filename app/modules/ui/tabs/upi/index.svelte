@@ -306,6 +306,10 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
+
+  $: intent =
+    (availableFlows.intent || availableFlows.intentUrl) && preferIntent;
+
   $: {
     if (showStaticIntentAppsForIos) {
       intentApps = getRecommendedAppsForUPIStack(false, 3);
@@ -339,8 +343,6 @@
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
-  $: intent =
-    (availableFlows.intent || availableFlows.intentUrl) && preferIntent;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     availableFlows.qr &&
