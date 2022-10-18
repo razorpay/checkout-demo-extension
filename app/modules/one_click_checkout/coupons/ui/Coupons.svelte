@@ -29,7 +29,10 @@
     consentViewCount,
   } from 'one_click_checkout/address/store';
   import { isIndianCustomer } from 'checkoutstore/screens/home';
-  import { shouldShowCoupons } from 'one_click_checkout/store';
+  import {
+    shouldShowCoupons,
+    getCouponWidgetExperiment,
+  } from 'one_click_checkout/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
@@ -80,6 +83,7 @@
 
   const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
+  const couponsWidgetExperiment = getCouponWidgetExperiment();
 
   let ctaDisabled = false;
   let orderWidget;
@@ -164,6 +168,11 @@
   function summaryLoadedEvent() {
     initSummaryMetaAnalytics();
 
+    Analytics.setMeta(
+      '1cc_zero_coupon_move_experiment',
+      $availableCoupons?.length > 0 ? null : couponsWidgetExperiment ? 'B' : 'A'
+    );
+
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
       prefill_contact_number: getPrefilledContact(),
@@ -234,7 +243,16 @@
       <div class="separator" />
     {/if}
 
-    {#if showCoupons}
+    <!-- Coupons Widget if experiment is false -->
+    {#if showCoupons && !couponsWidgetExperiment}
+      <div class="widget-wrapper">
+        <AvailableCouponsButton removeCoupon={removeCouponCode} />
+      </div>
+      <div class="separator" />
+    {/if}
+
+    <!-- Coupons Widget if merchant coupons are available and experiment is true -->
+    {#if showCoupons && couponsWidgetExperiment && $availableCoupons.length > 0}
       <div class="widget-wrapper">
         <AvailableCouponsButton removeCoupon={removeCouponCode} />
       </div>
@@ -243,6 +261,14 @@
     <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
       <OrderWidget />
     </div>
+
+    <!-- Coupons Widget if merchant coupons are not available  and experiment is true -->
+    {#if showCoupons && couponsWidgetExperiment && $availableCoupons.length <= 0}
+      <div class="separator" />
+      <div class="widget-wrapper">
+        <AvailableCouponsButton removeCoupon={removeCouponCode} />
+      </div>
+    {/if}
   </div>
   <CTA
     screen="home-1cc"
