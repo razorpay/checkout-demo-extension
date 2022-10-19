@@ -1,4 +1,4 @@
-FROM satantime/puppeteer-node as builder
+FROM satantime/puppeteer-node:16.17 as builder
 
 COPY ./scripts /scripts
 
