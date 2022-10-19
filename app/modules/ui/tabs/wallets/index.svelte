@@ -14,7 +14,6 @@
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
   import { locale, t } from 'svelte-i18n';
-  import { testid } from 'tests/autogen';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -23,6 +22,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
   import { getAnimationOptions } from 'svelte-utils';
+  import autotest from 'autotest';
 
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -224,7 +224,7 @@
             slot="title"
             bind:this={walletReferences[wallet.code]}
             id={`wallet-radio-${wallet.code}`}
-            {...!i && testid('click', 'wallet', wallet.code)}
+            {...!i && autotest('wallet', wallet.code)}
           >
             <span class="title">{getWalletName(wallet.code, $locale)}</span>
             <span class="subtitle"

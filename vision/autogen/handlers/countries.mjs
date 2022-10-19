@@ -1,12 +1,5 @@
-import { JsonResponse } from '#vision/autogen/utils/index.mjs';
-
-export default function* handleCountries({ state }) {
-  yield {
-    label: 'countries-base',
-    data: JsonResponse({
-      ...BASE_COUNTRIES,
-    }),
-  };
+export default function* handleCountries() {
+  yield BASE_COUNTRIES;
 }
 
 const BASE_COUNTRIES = [

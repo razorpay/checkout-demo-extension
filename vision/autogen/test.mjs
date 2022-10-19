@@ -1,9 +1,11 @@
 import router from './routes.mjs';
-import { delay, promisePair, HEADLESS, DEVTOOLS } from './utils/index.mjs';
+import { delay, promisePair, isSerializable, md5 } from './utils/index.mjs';
+import { HEADLESS, DEVTOOLS, HistoryType } from './utils/constants.mjs';
 import makeOptions from './handlers/options.mjs';
 import ProcessQueue from './utils/ProcessQueue.mjs';
 import { processNext, replay, newPageState } from './utils/process.mjs';
 import { report } from './utils/screenshot.mjs';
+const { createHash } = await import('node:crypto');
 
 const pages = new WeakMap();
 
@@ -55,25 +57,29 @@ async function requestHandler(route, request) {
 
 async function respondEmpty(pendingRequest, state) {
   const response = { status: 204 };
-  state.history = appendRequest(state.history, {
-    url: pendingRequest.url,
-    method: pendingRequest.method,
-    response,
-    label: '',
-  });
+  state.history = appendRequest(
+    state.history,
+    {
+      type: HistoryType.REQUEST,
+      url: pendingRequest.url,
+      method: pendingRequest.method,
+      response,
+    },
+  );
   await pendingRequest.respond(response);
-}
+};
 
 async function processRequest(pendingRequest, pageState) {
   const { url, method, request } = pendingRequest;
-  const { state } = pageState;
+  const { state, clientState } = pageState;
   const handler = router.match(request);
 
   if (!handler) {
     console.error(`handler missing for ${method} ${url}`);
     await respondEmpty(pendingRequest, state);
   } else {
-    const [ firstResponse, ...responses ] = Array.from(handler(state));
+
+    const [ firstResponse, ...responses ] = handler(clientState);
 
     if (!firstResponse) {
       console.error(`no response from handler for ${method} ${url}`);
@@ -84,27 +90,19 @@ async function processRequest(pendingRequest, pageState) {
     for (let resp of responses) {
       fork({
         ...state,
-        labels: [...state.labels],
-        history: appendRequest(state.history, {
-          url,
-          method,
-          response: resp.data,
-          label: resp.label,
-        }),
+        history: appendRequest(state.history, firstResponse),
       });
     }
 
-    if (!firstResponse.immediately) {
+    // do not respond till dom actions get completed
+    // except for files
+    if (firstResponse.hash) {
       await Promise.all(Array.from(pageState.pendingReplays));
     }
 
-    state.history = appendRequest(state.history, {
-      url,
-      method,
-      response: firstResponse.data,
-      label: firstResponse.label,
-    });
-    await pendingRequest.respond(firstResponse.data);
+    state.history = appendRequest(state.history, firstResponse);
+
+    await pendingRequest.respond(firstResponse.response);
   }
 }
 
@@ -118,28 +116,11 @@ async function matchRequestReplay(pendingRequest, pendingReplay) {
   }
 }
 
-function appendRequest(history, pastRequest) {
-  history = [...history]; // make a copy, don't mutate history
-  let last = history[history.length - 1];
-  if (last?.type === 'requests') {
-    last = history[history.length - 1] = {
-      ...last,
-      requests: [...last.requests, pastRequest],
-    };
-  } else {
-    last = {
-      type: 'requests',
-      requests: [pastRequest],
-    };
-    history.push(last);
-  }
-
-  last.label = last.requests
-    .map(item => item.label)
-    .filter(Boolean)
-    .join();
-
-  return history;
+function appendRequest(history, reqObj) {
+  return [
+    ...history, // make a copy, don't mutate history
+    reqObj,
+  ];
 }
 
 async function runTestInPage(page, state) {
@@ -147,7 +128,9 @@ async function runTestInPage(page, state) {
   const pageState = newPageState(page, state);
   pages.set(page, pageState);
 
-  await page.exposeFunction('getState', () => JSON.stringify(state));
+  await page.exposeFunction('getOptions', () => {
+    return state.history[0].value;
+  });
   await page.exposeFunction('__CheckoutBridge_oncomplete', async (data) => {
     markPageClosed();
   });
@@ -163,10 +146,10 @@ async function runTestInPage(page, state) {
 async function processReplays(pageState) {
   const { state, page, pendingRequests } = pageState;
 
-  for (let historyObject of state.history) {
+  for (let historyObject of state.history.slice(1)) {
     try {
-      if (historyObject.type === 'requests') {
-        await processPastRequests(historyObject, pageState);
+      if (historyObject.type === HistoryType.REQUEST) {
+        await processPastRequest(historyObject, pageState);
       } else {
         await replay(historyObject, pageState);
       }
@@ -184,14 +167,6 @@ async function processReplays(pageState) {
       return processRequest(pendingRequest, pageState);
     }));
   }
-}
-
-function processPastRequests(historyObject, pageState) {
-  return Promise.all(
-    historyObject.requests.map(
-      pastRequest => processPastRequest(pastRequest, pageState)
-    )
-  );
 }
 
 async function processPastRequest(pastRequest, pageState) {
@@ -223,15 +198,24 @@ let browser; // shared browser instance
 export function init(_browser) {
   browser = _browser;
   for (let options of makeOptions()) {
-    const state = {
-      offset: 0,
-      labels: [ options.label ],
-      options: options.data,
-      url: 'https://api.razorpay.com/v1/checkout/public',
-      history: [],
-    };
+    if (isSerializable(options)) {
+      const hash = md5(JSON.stringify(options));
+      const state = {
+        offset: 0,
+        cursor: null, // needed to quickly jump to cursor in a fork
+        // indices: [], // remove cursor and re-enable indices to make `state` serializable as well
+        url: 'https://api.razorpay.com/v1/checkout/public',
+        history: [{
+          type: HistoryType.OPTIONS,
+          value: options,
+          hash,
+        }],
+      };
 
-    fork(state, browser);
+      fork(state, browser);
+    } else {
+      // TODO
+    }
   }
   ProcessQueue.then(async () => {
     const [ result ] = await Promise.all([

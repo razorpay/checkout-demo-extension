@@ -34,9 +34,7 @@
   import { isRedesignV15 } from 'razorpay';
   import { isContactReadOnly } from 'checkoutframe/customer';
   import { isContactValid } from 'one_click_checkout/common/details/store';
-
-  import { testid } from 'tests/autogen';
-
+  import autotest from 'autotest';
   import { getIndErrLabel } from 'one_click_checkout/helper';
 
   // Refs
@@ -215,7 +213,7 @@
       : ''}
     {validationText}
     {showValidations}
-    attributes={{ ...testid('input', 'contact') }}
+    attributes={{ ...autotest('contact') }}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

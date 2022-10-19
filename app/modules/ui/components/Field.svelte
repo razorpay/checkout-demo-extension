@@ -368,6 +368,7 @@
       {spellcheck}
       {dir}
       {disabled}
+      {...attributes}
       use:formatterAction={formatter}
       use:focusAction={handleFocus}
       use:blurAction={handleBlur}

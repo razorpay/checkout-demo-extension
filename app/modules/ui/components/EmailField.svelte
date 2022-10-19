@@ -26,8 +26,7 @@
   import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   import { debounce } from 'lib/utils';
-
-  import { testid } from 'tests/autogen';
+  import autotest from 'autotest';
 
   const isOptional = isEmailOptional();
   const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
@@ -66,7 +65,7 @@
     autocomplete={isOneClickCheckout() ? 'email' : 'off'}
     {validationText}
     {showValidations}
-    attributes={{ ...testid('input', 'email') }}
+    attributes={{ ...autotest('email') }}
   />
   <!-- LABEL: Please enter a valid email. Example: you@example.com -->
 </div>

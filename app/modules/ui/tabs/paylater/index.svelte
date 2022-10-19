@@ -19,7 +19,7 @@
   import { getSession } from 'sessionmanager';
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
-  import { testid } from 'tests/autogen';
+  import autotest from 'autotest';
   import { AnalyticsV2State } from 'analytics-v2';
 
   const providers = getPayLaterProviders().map((providerObj) =>
@@ -84,7 +84,7 @@
           <NextOption
             attributes={{
               'data-paylater': provider.data.code,
-              ...(!index && testid('click', 'paylater_provider')),
+              ...(!index && autotest('provider', provider.data.code)),
             }}
             tabindex={0}
             {...provider}

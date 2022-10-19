@@ -1,4 +1,4 @@
-import { HEADLESS, DEVTOOLS } from './utils/index.mjs';
+import { HEADLESS, DEVTOOLS } from './utils/constants.mjs';
 import { chromium } from 'playwright-chromium';
 import ProcessQueue from './utils/ProcessQueue.mjs';
 import { init } from './test.mjs';

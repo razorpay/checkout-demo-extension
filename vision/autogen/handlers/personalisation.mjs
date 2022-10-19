@@ -1,12 +1,5 @@
-import { JsonResponse } from '#vision/autogen/utils/index.mjs';
-
-export default function* handlePersonalisation({ state }) {
-  yield {
-    label: 'personalisation-base',
-    data: JsonResponse({
-      ...BASE_PERSONALISATION,
-    }),
-  };
+export default function* handlePersonalisation() {
+  yield BASE_PERSONALISATION;
 }
 
 const BASE_PERSONALISATION = {

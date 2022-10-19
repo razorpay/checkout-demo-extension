@@ -1,8 +1,29 @@
 import { capture } from './screenshot.mjs';
-import { getValue } from '../handlers/actions.mjs';
-import { delay, promisePair, HEADLESS } from './index.mjs';
+import * as actions from '#vision/autogen/actions/index.mjs';
+import { delay, promisePair } from './index.mjs';
+import { HEADLESS, HistoryType } from './constants.mjs';
 
-const SELECTOR = '[autogen-data-test-id]:visible';
+const SELECTOR = '[autogen-name]:visible';
+
+function getValues(element, state) {
+  const handler = actions[element.name];
+
+  const values = new Set();
+
+  for (let val of handler(state, element.variant)) {
+    switch (element.action) {
+      case HistoryType.FILL:
+        values.add(String(val));
+        break;
+
+      case HistoryType.CLICK:
+        values.add(Boolean(val));
+        break;
+    }
+  }
+
+  return Array.from(values);
+}
 
 export function newPageState(page, state) {
   const pageState = {
@@ -10,45 +31,73 @@ export function newPageState(page, state) {
     state,
     pendingRequests: new Set(),
     pendingReplays: new Set(),
-    path: null,
     replayed: false,
+    clientState: {
+      options: state.history[0].value,
+    },
   };
 
   return pageState;
 }
 
 function getElements(page) {
-  return page.$$eval(SELECTOR, nodes => {
-    return nodes.map(node => {
-      const css = getComputedStyle(node);
-      if (css.pointerEvents === 'none') {
-        return;
-      }
+  return page.$$eval(SELECTOR, (nodes, HistoryType) => {
+    return nodes
+      .map((node) => {
+        const css = getComputedStyle(node);
+        if (css.pointerEvents === 'none') {
+          return;
+        }
 
-      const id = node.getAttribute('autogen-data-test-id');
-      const selector = `[autogen-data-test-id="${id}"]`;
-      const action = node.getAttribute('autogen-data-test-action');
-      const name = node.getAttribute('autogen-data-test-name');
-      const variant = node.getAttribute('autogen-data-test-variant');
+        const isInput = node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA';
+        let action = HistoryType.CLICK;
+        if (isInput) {
+          action = HistoryType.FILL;
+        }
+        const name = node.getAttribute('autogen-name');
+        const variant = node.getAttribute('autogen-variant');
+        let selector = `[autogen-name="${name}"]`;
+        if (variant) {
+          selector += `[autogen-variant="${variant}"]`;
+        }
 
-      return {
-        id,
-        selector,
-        action,
-        name,
-        variant,
-      };
-    }).filter(Boolean);
-  });
+        return {
+          selector,
+          action,
+          name,
+          variant,
+        };
+      })
+      .filter(Boolean);
+  }, HistoryType);
 }
 
 export async function processNext(pageState, fork) {
-  const { page } = pageState;
+  const { page, state: { history } } = pageState;
   await page.mainFrame().waitForSelector(SELECTOR);
   await closePendingRequests(pageState);
   await capture(pageState);
   const elements = await getElements(page);
-  await loopElements({ fork, elements, pageState, offset: 0 });
+
+  if (elements.length) {
+    const actions = history.filter(e => e.selector);
+    const replayedIndex = [...actions].reverse()
+      .findIndex(action => action.selector === elements[0].selector); // use findLastIndex when it lands in node
+
+    let offset = 0;
+    if (replayedIndex !== -1) {
+      const restActions = actions.slice(actions.length - 1 - replayedIndex);
+      if (restActions.length < elements.length) {
+        if (restActions.every((action, index) => {
+          return action.selector === elements[index].selector;
+        })) {
+          offset = restActions.length;
+        }
+      }
+    }
+
+    await loopElements({ fork, elements, pageState, offset });
+  }
 }
 
 async function loopElements({ fork, elements, pageState, offset }) {
@@ -57,44 +106,38 @@ async function loopElements({ fork, elements, pageState, offset }) {
   }
 
   const { state } = pageState;
-  const elementsStr = JSON.stringify(elements);
   const groupedElements = elements.slice(offset).reduce((group, element) => {
-    if (!group.has(element.name)) {
-      group.set(element.name, []);
+    let elementActions = group.get(element.name);
+    if (!elementActions) {
+      elementActions = [];
+      group.set(element.name, elementActions);
     }
-    const elementActions = group.get(element.name);
-    elementActions.push(...Array.from(getValue(element)).map(value => ({
-      element,
-      value,
-    })));
+    elementActions.push(
+      ...getValues(element, state).map((value) => ({
+        element,
+        value,
+      }))
+    );
     return group;
   }, new Map());
 
   for (let element of groupedElements) {
     const history = state.history;
-    const [ firstAction, ...actions ] = element[1];
+    const [firstAction, ...actions] = element[1];
 
     for (let action of actions) {
       fork({
         ...state,
-        labels: [...state.labels],
         history: [
           ...history,
-          newHistory({ element: action.element, value: action.value, state }),
+          newHistory(action),
         ],
       });
     }
 
-    const historyObject = newHistory({
-      element: firstAction.element,
-      value: firstAction.value,
-      state,
-    });
+    const historyObject = newHistory(firstAction);
 
-    state.history = [
-      ...history,
-      historyObject,
-    ];
+    state.history = [...history, historyObject];
     const resolver = await replay(historyObject, pageState);
     await capture(pageState);
     resolver();
@@ -113,7 +156,11 @@ async function loopElements({ fork, elements, pageState, offset }) {
     // dedupe new elements from top
     let commonElements = 0;
     for (let i = 0; i < elements.length; i++) {
-      if (newElements[i] && visitLabel(elements[i]) === visitLabel(newElements[i])) {
+      if (
+        newElements[i] &&
+        elements[i].name === newElements[i].name &&
+        elements[i].variant === newElements[i].variant
+      ) {
         commonElements++;
       } else {
         break;
@@ -136,23 +183,18 @@ async function loopElements({ fork, elements, pageState, offset }) {
 
 async function closePendingRequests(pageState) {
   if (pageState.pendingRequests.size) {
-    await Promise.all(Array.from(pageState.pendingRequests).map(p => p.closure));
+    await Promise.all(
+      Array.from(pageState.pendingRequests).map((p) => p.closure)
+    );
     await closePendingRequests(pageState);
   }
 }
 
-function visitLabel(element) {
-  return element.variant ? `${element.name}=${element.variant}` : element.name;
-}
-
-function newHistory({ element, value, state }) {
-  let label = visitLabel(element);
-  if (value.label) {
-    label += `=${value.label}`;
-  }
+function newHistory({ element, value }) {
   return {
-    label,
-    value: value.value,
+    name: element.name,
+    variant: element.variant,
+    value,
     type: element.action,
     selector: element.selector,
   };
@@ -160,7 +202,7 @@ function newHistory({ element, value, state }) {
 
 export async function replay(historyObject, pageState) {
   const { page } = pageState;
-  const [ closure, resolver ] = promisePair();
+  const [closure, resolver] = promisePair();
 
   if (pageState.replayed) {
     closure.finally(() => {
@@ -173,19 +215,22 @@ export async function replay(historyObject, pageState) {
   if (!targetElement) {
     throw `element not found during REPLAY ${historyObject.selector}`;
   }
-
-  switch (historyObject.type) {
-    case 'click':
-      await targetElement.click();
-      break;
-
-    case 'input':
-      await targetElement.fill(historyObject.value);
-      break;
+  if (!HEADLESS) {
+    // await delay(500);
   }
 
-  if (!HEADLESS) {
-    await delay(500);
+  switch (historyObject.type) {
+    case HistoryType.CLICK:
+      await targetElement.click({
+        noWaitAfter: true,
+      });
+      break;
+
+    case HistoryType.FILL:
+      await targetElement.fill(historyObject.value, {
+        noWaitAfter: true,
+      });
+      break;
   }
 
   return resolver;

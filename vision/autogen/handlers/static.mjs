@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs';
-
-const cache = new Map();
+import { md5 } from '#vision/autogen/utils/index.mjs';
 
 export function* servePublicPage() {
   yield serveFile('vision/mock/publicPage.html');
@@ -24,37 +23,8 @@ export function* serveCdn({ params }) {
 }
 
 export function serveFile(path) {
-  if (cache.has(path)) {
-    return cache.get(path);
-  }
-
-  const response = {
-    immediately: true,
-  };
   try {
-    const body = readFileSync(path);
-    response.data = {
-      status: 200,
-      body,
-      headers: {
-        'content-type': mime[path.split('.').pop()],
-      },
-    };
+    return readFileSync(path);
   } catch (e) {
-    response.data = {
-      status: 404,
-    };
   }
-
-  cache.set(path, response);
-  return response;
 }
-
-const mime = {
-  png: 'image/png',
-  svg: 'image/svg+xml',
-  jpg: 'image/jpeg',
-  css: 'text/css',
-  html: 'text/html',
-  js: 'application/javascript',
-};

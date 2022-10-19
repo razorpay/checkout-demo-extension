@@ -47,10 +47,7 @@ body>span {
     },
   };
 
-  getState().then(state => {
-    state = JSON.parse(state);
-    const { history, options } = state;
-    console.log(history);
+  getOptions().then(options => {
     handleMessage({ options });
   });
 </script>

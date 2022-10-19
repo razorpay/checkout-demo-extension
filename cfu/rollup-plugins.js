@@ -75,8 +75,9 @@ const getPlugins = ({ src }) => {
       __GIT_COMMIT_HASH__: JSON.stringify(process.env.GIT_COMMIT_HASH) || null,
       // env is prod but traffic env can be production/canary/baseline
       __TRAFFIC_ENV__: JSON.stringify(process.env.TRAFFIC_ENV),
-      __AUTOTEST_ANNOTATE__:
-        JSON.stringify(process.env.AUTOTEST_ANNOTATE) === '"include"',
+      __AUTOTEST_ANNOTATE__: JSON.stringify(
+        !isProd || process.env.AUTOTEST_ANNOTATE
+      ),
     }),
     typescript({ sourceMap: true, inlineSources: !isProd }),
 

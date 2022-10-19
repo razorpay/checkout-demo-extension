@@ -3,7 +3,8 @@ import { execSync } from 'child_process';
 import { compare } from 'odiff-bin';
 // import pixelmatch from 'pixelmatch';
 // import { PNG } from 'pngjs';
-import { RECORD_MODE, HEADLESS } from './index.mjs';
+import { md5 } from './index.mjs';
+import { RECORD_MODE, HEADLESS, HistoryType } from './constants.mjs';
 
 const BASE_DIR = 'vision/autogen/screenshots/';
 const TEMP_DIR = 'vision/autogen/.screenshots-temp/';
@@ -61,11 +62,13 @@ async function doPixelMatch(firstImagePath, secondImagePath, diffPath) {
   return true;
 }
 
-function captureScreenshot(page, path) {
-  return page.screenshot({
-    path,
+async function captureScreenshot(page) {
+  const shotBuffer = await page.screenshot({
     fullPage: true,
   });
+  const name = md5(shotBuffer);
+  await fs.writeFile(`${TEMP_DIR}${name}.png`, shotBuffer);
+  return name;
 }
 
 function getMapPath(dir) {
@@ -77,80 +80,90 @@ async function getReferenceMap() {
     return JSON.parse(String(await fs.readFile(getMapPath(BASE_DIR))));
   } catch(e) {
     return {
-      data: {},
       count: 0,
+      snaps: [],
+      refs: {},
     }
   }
 }
 
 const referenceMap = await getReferenceMap();
-const map = referenceMap;
-map.newCount = 0;
+referenceMap.newCount = 0;
+referenceMap.newRefs = {};
 
-function pathLabel(historySlice) {
-  if (historySlice.length === 1) {
-    const first = historySlice[0];
-    if (first.type === 'requests' && !first.label) {
-      return 'req';
-    }
-    return first.label;
-  }
-  return historySlice.map(h => h.label).filter(Boolean).join();
-}
+function updateCursor(state) {
+  let cursor = state.cursor || referenceMap;
 
-function getPath(map, labels) {
-  let parent = map;
-  for (let label of labels) {
-    if (parent = parent.data[label]) {
-      continue;
+  const actions = state.history.slice(state.offset).filter(action => {
+    if (action.hash) {
+      referenceMap.newRefs[action.hash] = {
+        url: action.url,
+        method: action.method,
+        value: action.value,
+      };
+    } else if (action.type === HistoryType.REQUEST) {
+      return false; // remove static files
     }
+    return true;
+  });
+  const existingSnap = cursor.snaps.find(existingSnap => {
+    if (existingSnap.events.length === actions.length) {
+      return existingSnap.events.every((event, index) => {
+        const action = actions[index];
+        switch (action.type) {
+          case HistoryType.REQUEST:
+          case HistoryType.OPTIONS:
+            return action.hash === event;
+
+          default:
+            return action.name === event[0]
+              && action.variant === event[1]
+              && action.value === event[2];
+        }
+      });
+    }
+  });
+
+  if (existingSnap) {
+    cursor = existingSnap;
+  } else {
+    const snap = {
+      snaps: [],
+      events: actions.map(action => {
+        return action.hash || [ action.name, action.variant, action.value ];
+      }),
+    };
+    cursor.snaps.push(snap);
+    cursor = snap;
   }
-  return parent;
+
+  state.offset = state.history.length;
+  state.cursor = cursor;
+  return cursor;
 }
 
 export async function capture(pageState) {
   const { page, state } = pageState;
 
-  let label = pathLabel(state.history.slice(state.offset));
-
-  if (!state.offset) {
-    label = state.labels[0] += ',' + label;
-    pageState.path = map;
-  } else {
-    if (!pageState.path) {
-      pageState.path = getPath(map, state.labels);
-    }
-    state.labels.push(label);
-  }
-
-  state.offset = state.history.length;
-
-  if (!pageState.path.data) {
-    pageState.path.data = {};
-  }
-  if (!pageState.path.data[label]) {
-    pageState.path.data[label] = {};
-  }
-  pageState.path = pageState.path.data[label];
+  // insert new entries appeared in history
+  const cursor = updateCursor(state);
 
   if (!HEADLESS) {
     return;
   }
 
-  const fileName = ++map.newCount;
-  const filePath = `${TEMP_DIR}${fileName}.png`;
-  await captureScreenshot(page, filePath);
-  pageState.path.newShot = fileName;
+  referenceMap.newCount++;
+  const fileName = await captureScreenshot(page);
+  cursor.newKey = fileName;
 
-  if (pageState.path.shot) {
-    const baseFilePath = `${BASE_DIR}${pageState.path.shot}.png`;
+  if (cursor.key) {
+    const baseFilePath = `${BASE_DIR}${cursor.key}.png`;
+    const filePath = `${TEMP_DIR}${fileName}.png`;
 
     // compare
     const result = await matchScreenshot(baseFilePath, filePath);
-    if (!result) {
-      console.error('no match for path', state.labels);
-    } else {
-      pageState.path.match = true;
+    if (result) {
+      cursor.match = true;
     }
   }
 }
@@ -158,6 +171,8 @@ export async function capture(pageState) {
 export async function report() {
   const { map, matched, notMatched, newShots } = mapFromReference(referenceMap, {
     count: referenceMap.newCount,
+    snaps: [],
+    refs: referenceMap.newRefs,
   });
   const missing = referenceMap.newCount - matched - notMatched - newShots;
   console.table({
@@ -195,29 +210,32 @@ function mapFromReference(referenceMap, map) {
   let matched = 0;
   let newShots = 0;
 
-  for (let o of Object.entries(referenceMap.data)) {
-    if (o[1].newShot) {
-      if (o[1].match) {
-        matched++;
-      } else if (o[1].shot) {
-        notMatched++;
-      } else {
-        newShots++;
-      }
-      if (!map.data) {
-        map.data = {};
-      }
-      map.data[o[0]] = {
-        shot: o[1].newShot
-      };
-      if (o[1].data) {
-        const subresult = mapFromReference(o[1], map.data[o[0]]);
-        notMatched += subresult.notMatched;
-        matched += subresult.matched;
-        newShots += subresult.newShots;
-      }
+  referenceMap.snaps.forEach(snap => {
+    if (!snap.newKey) {
+      return;
     }
-  }
+    if (snap.match) {
+      matched++;
+    } else if (snap.key) {
+      notMatched++;
+    } else {
+      newShots++;
+    }
+
+    const newSnap = {
+      key: snap.newKey,
+      events: snap.events,
+    };
+    map.snaps.push(newSnap);
+
+    if (snap.snaps) {
+      newSnap.snaps = [];
+    }
+    const subresult = mapFromReference(snap, newSnap);
+    notMatched += subresult.notMatched;
+    matched += subresult.matched;
+    newShots += subresult.newShots;
+  });
 
   return {
     map,

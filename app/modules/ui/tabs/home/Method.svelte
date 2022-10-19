@@ -25,7 +25,7 @@
   import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
   import { isRedesignV15, getCurrency, isEmiV2 } from 'razorpay';
   import { getRTBAnalyticsPayload } from 'rtb/helper';
-  import { testid } from 'tests/autogen';
+  import autotest from 'autotest';
 
   // Store imports
   import {
@@ -197,7 +197,7 @@
   } ${uninteractive ? 'uninteractive' : ''}`}
   defaultStyles={false}
   on:click={onClick}
-  attributes={{ method, ...testid('click', 'method', method) }}
+  attributes={{ method, ...autotest('method', method) }}
   flexGrow={codLoading}
   {disabled}
   withRow={method === 'upi' && upiTiles?.status}

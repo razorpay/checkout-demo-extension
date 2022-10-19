@@ -1,41 +1,11 @@
-import { JsonResponse } from '#vision/autogen/utils/index.mjs';
-
-export default function* handlePreferences({ state }) {
-  if (state.options.key) {
+export default function* handlePreferences({ options }) {
+  if (options.key) {
     yield {
-      label: 'prefs-key',
-      data: JsonResponse({
-        ...BASE_PREFERENCES,
-        merchant_key: state.options.key,
-        mode: state.options.key.startsWith('rzp_live_') ? 'live' : 'test',
-      }),
-    };
-  }
-  return;
-
-  if (state.options.order_id) {
-    yield {
-      label: 'prefs-order',
-      data: JsonResponse({
-        ...BASE_PREFERENCES,
-        order: {
-          partial_payment: false,
-          amount: 10000,
-          currency: 'INR',
-          amount_paid: 0,
-          amount_due: 10000,
-          first_payment_min_amount: null,
-        },
-      }),
-    };
-  }
-
-  yield {
-    label: 'prefs-base',
-    data: JsonResponse({
       ...BASE_PREFERENCES,
-    }),
-  };
+      merchant_key: options.key,
+      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+    };
+  }
 }
 
 const BASE_PREFERENCES = {

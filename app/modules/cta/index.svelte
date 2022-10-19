@@ -18,6 +18,8 @@
   import FeeLabel from 'ui/components/FeeLabel.svelte';
   import { formatTemplateWithLocale } from 'i18n';
 
+  import autotest from 'autotest';
+
   // Props
   export let showAmount = true;
   let offerAmount = 0;
@@ -128,6 +130,7 @@
         CTAStore.triggerAction(e);
       }}
       on:click|preventDefault
+      {...autotest('cta')}
     >
       <slot>{label}</slot>
     </button>

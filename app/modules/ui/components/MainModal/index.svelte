@@ -30,7 +30,7 @@
   import { expandedHeader } from 'header';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
-  import { testid } from 'tests/autogen';
+  import autotest from 'autotest';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const ctaStore = getStore();
@@ -247,7 +247,7 @@
                 role="button"
                 class="button"
                 class:hidden={isRedesignV15Enabled}
-                {...testid('click', 'footer-cta')}
+                {...autotest('cta')}
               >
                 <span id="footer-cta">{ctaStore}</span>
               </div>
