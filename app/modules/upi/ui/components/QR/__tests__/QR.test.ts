@@ -5,6 +5,8 @@ import { handleUPIPayments } from 'upi/payment';
 import { QR_EXPIRE_TIME } from 'upi/constants';
 import fetch from 'utils/fetch';
 
+jest.mock('checkoutstore/methods');
+
 jest.mock('razorpay', () => ({
   get: jest.fn(),
   isOneClickCheckout: () => false,

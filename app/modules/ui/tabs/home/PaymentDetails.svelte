@@ -401,9 +401,12 @@
     }
 
     .multi-tpv-block,
-    .partial-payment-block,
     .details-block {
       padding: 0;
+    }
+
+    .partial-payment-block {
+      padding: 24px 0;
     }
   }
 </style>

@@ -149,7 +149,7 @@
   }
 
   .reduce-amount-size .price-label {
-    font-size: 14px !important;
+    font-size: 13px !important;
   }
 
   /* #redesign-v15-cta:not(.disabled)::after {

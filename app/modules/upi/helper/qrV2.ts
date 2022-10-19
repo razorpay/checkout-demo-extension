@@ -2,6 +2,7 @@
  * file created to remove circular deps
  */
 
+import { getTPV } from 'checkoutstore/methods';
 import { getPreferences, isPartialPayment, isRecurring } from 'razorpay';
 
 let anyV2APIAttemptFailed = false;
@@ -24,11 +25,6 @@ export function autoGenerateQREnabled(): boolean {
      * we hide the QR L0/L1 feature in those case
     */
   // adding partial payment flow
-  const isFlowEnabled = !isPartialPayment();
-  return (
-    isExperimentEnable &&
-    isFlowEnabled &&
-    !anyV2APIAttemptFailed &&
-    !isRecurring()
-  );
+  const isFlowEnabled = !isPartialPayment() && !getTPV() && !isRecurring();
+  return isExperimentEnable && isFlowEnabled && !anyV2APIAttemptFailed;
 }
