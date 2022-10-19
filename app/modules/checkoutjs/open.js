@@ -16,7 +16,7 @@ import { shouldUseVernacular } from 'checkoutstore/methods';
 import { getValidLocaleFromConfig, getValidLocaleFromStorage } from 'i18n/init';
 import { MiscTracker } from 'misc/analytics/events';
 import { getOption } from 'razorpay';
-import { setupFreezeCheck } from './freeze';
+// import { setupFreezeCheck } from './freeze';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -320,7 +320,7 @@ RazorProto.open = needBody(function () {
   }
   EventsV2.setContext(ContextProperties.LOCALE, initialLocale);
 
-  setupFreezeCheck();
+  // setupFreezeCheck();
 
   if (!frame.el.contentWindow) {
     frame.close();
