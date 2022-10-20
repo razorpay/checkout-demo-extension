@@ -42,7 +42,7 @@ module.exports = function (testFeatures) {
           options,
           preferences,
         });
-        if (options.show_coupons) {
+        if (features.showCoupons) {
           await handleAvailableCouponReq(context);
         }
         const screenEle = await context.page.waitForSelector('.screen-comp');

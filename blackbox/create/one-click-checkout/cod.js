@@ -54,7 +54,7 @@ module.exports = function (testFeatures) {
         preferences,
       });
 
-      if (options.show_coupons) {
+      if (features.showCoupons) {
         await handleAvailableCouponReq(context);
       }
       await fillUserDetails(context);

@@ -31,7 +31,7 @@ module.exports = function (testFeatures) {
     testFeatures
   );
 
-  const { closeModalOnBack, closeModalOnCross, skip } = features;
+  const { closeModalOnBack, closeModalOnCross } = features;
 
   describe.each(
     getTestData(title, {
@@ -46,7 +46,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
-      if (options.show_coupons) {
+      if (features.showCoupons) {
         await handleAvailableCouponReq(context);
       }
       if (closeModalOnBack || closeModalOnCross) {

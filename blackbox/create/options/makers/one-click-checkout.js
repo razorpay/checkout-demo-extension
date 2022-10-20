@@ -1,10 +1,9 @@
 function makeOptions(features, options) {
-  const { showCoupons, showAddress, orderId, callbackUrl } = features;
+  const { orderId, callbackUrl } = features;
 
   options = {
     one_click_checkout: true,
-    show_address: showAddress,
-    show_coupons: showCoupons,
+    show_coupons: !features.couponsDisabled,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
 
@@ -34,8 +33,8 @@ function makePreferences(features, preferences) {
 
   preferences['1cc'] = {
     configs: {
-      one_cc_auto_fetch_coupons: features.showCoupons,
-      one_cc_capture_billing_address: features.billingEnabled,
+      one_cc_auto_fetch_coupons: !!features.showCoupons,
+      one_cc_capture_billing_address: !!features.billingEnabled,
     },
   };
 

@@ -125,7 +125,7 @@ module.exports = function (testFeatures) {
         preferences,
       });
       await delay(500);
-      if (options.show_coupons) {
+      if (features.showCoupons) {
         await handleAvailableCouponReq(context);
       }
       // loggedIn address flows

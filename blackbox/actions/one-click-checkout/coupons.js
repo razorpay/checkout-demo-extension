@@ -105,8 +105,9 @@ async function getOrderSummary(context, isValidCoupon) {
 }
 
 async function verifyValidCoupon(context, features) {
-  const { amount, discountAmount, availableCoupons, couponCode } = features;
-  if (availableCoupons) {
+  const { amount, discountAmount, availableCoupons, couponCode, showCoupons } =
+    features;
+  if (availableCoupons && showCoupons) {
     applyAvailableCoupon(context, couponCode);
   } else {
     applyCoupon(context, couponCode);
@@ -184,6 +185,16 @@ async function handleFillUserDetails(context, contact, email) {
   await context.page.click('.button.details-verify-button');
 }
 
+async function verifyAutoFetchDisabled(context) {
+  const el = await context.page.$('.coupons-available-count');
+  expect(el).toBeFalsy();
+}
+
+async function verifyCouponWidgetHidden(context) {
+  const el = await context.page.$('#coupons-available-container');
+  expect(el).toBeFalsy();
+}
+
 module.exports = {
   verifyValidCoupon,
   verifyInValidCoupon,
@@ -193,4 +204,6 @@ module.exports = {
   handleApplyCouponReq,
   handleFillUserDetails,
   handleCouponView,
+  verifyAutoFetchDisabled,
+  verifyCouponWidgetHidden,
 };

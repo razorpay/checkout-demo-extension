@@ -12,6 +12,8 @@ const {
   handleApplyCouponReq,
   handleFillUserDetails,
   handleCouponView,
+  verifyAutoFetchDisabled,
+  verifyCouponWidgetHidden,
 } = require('../../actions/one-click-checkout/coupons');
 const {
   handleCustomerStatusReq,
@@ -44,6 +46,8 @@ module.exports = function (testFeatures) {
     personalised,
     discountAmount,
     saveAddress,
+    showCoupons,
+    couponsDisabled,
   } = features;
 
   describe.each(
@@ -53,51 +57,62 @@ module.exports = function (testFeatures) {
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
     test(title, async () => {
+      debugger;
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
-      if (options.show_coupons) {
+      if (couponsDisabled) {
+        await verifyCouponWidgetHidden(context);
+      }
+
+      if (showCoupons) {
         await handleAvailableCouponReq(context, availableCoupons);
-      }
-      await handleCouponView(context);
-      if (personalised) {
-        await applyCoupon(context, couponCode);
-        await handleApplyCouponReq(
-          context,
-          false,
-          discountAmount,
-          personalised
-        );
-        await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
-        await handleCreateOTPReq(context);
-        await handleTypeOTP(context);
-        await delay(200);
-        await proceedOneCC(context);
-        await handleVerifyOTPReq(context);
-        await delay(400);
-        handleApplyCouponReq(context, true, discountAmount);
-        handleShippingInfo(context, false, true);
-        handleAvailableCouponReq(context, availableCoupons);
-        await delay(400);
       } else {
-        if (couponValid || availableCoupons) {
-          await verifyValidCoupon(context, features);
-        } else {
-          await verifyInValidCoupon(context, amount);
-        }
-
-        if (removeCoupon) {
-          await handleRemoveCoupon(context, amount);
-        }
-
-        await delay(200);
-        await fillUserDetails(context);
-        await proceedOneCC(context);
-        await handleCustomerStatusReq(context);
-        await fillUserAddress(context, { saveAddress, serviceable });
+        await verifyAutoFetchDisabled(context);
       }
+
+      if (!couponsDisabled) {
+        await handleCouponView(context);
+        if (personalised) {
+          await applyCoupon(context, couponCode);
+          await handleApplyCouponReq(
+            context,
+            false,
+            discountAmount,
+            personalised
+          );
+          await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
+          await delay(400);
+          await handleCreateOTPReq(context);
+          await handleTypeOTP(context);
+          await delay(200);
+          await proceedOneCC(context);
+          await handleVerifyOTPReq(context);
+          await delay(400);
+          handleApplyCouponReq(context, true, discountAmount);
+          handleShippingInfo(context, false, true);
+          handleAvailableCouponReq(context, availableCoupons);
+          await delay(400);
+        } else {
+          if (couponValid || availableCoupons) {
+            await verifyValidCoupon(context, features);
+          } else {
+            await verifyInValidCoupon(context, amount);
+          }
+
+          if (removeCoupon) {
+            await handleRemoveCoupon(context, amount);
+          }
+        }
+      }
+
+      await delay(200);
+      await fillUserDetails(context);
+      await proceedOneCC(context);
+      await handleCustomerStatusReq(context);
+      await fillUserAddress(context, { saveAddress, serviceable });
       await proceedOneCC(context);
       await mockPaymentSteps(context, options, features);
     });
