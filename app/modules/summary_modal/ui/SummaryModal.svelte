@@ -266,7 +266,7 @@
       {/if}
       {#if $appliedOffer?.amount}
         <div class="summary-row">
-          <div>
+          <div data-test-id="offer-label">
             {$t(OFFER_LABEL, {
               values: {
                 offer_name: `(${truncateString(

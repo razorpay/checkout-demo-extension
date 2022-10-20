@@ -17,7 +17,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { amount, mandatoryLogin, consentBannerViews } = features;
+  const { amount, mandatoryLogin, offers, consentBannerViews } = features;
 
   preferences.features = {
     one_click_checkout: true,
@@ -43,6 +43,30 @@ function makePreferences(features, preferences) {
       ...preferences.customer,
       '1cc_consent_banner_views': consentBannerViews,
     };
+  }
+
+  if (offers) {
+    preferences.offers = [
+      {
+        original_amount: amount,
+        amount: amount - 20 * 100,
+        id: 'offer_DdMaQ3KHyKxcDN',
+        name: 'Card Offer VISA',
+        payment_method: 'card',
+        payment_network: 'VISA',
+        terms: `Offer terms and conditions`,
+        display_text: 'Display text for VISA Offer',
+      },
+      {
+        original_amount: amount,
+        amount: 0,
+        id: 'offer_DdOL4XeZosJh2t',
+        name: 'Card Offer - MasterCard 20',
+        payment_method: 'card',
+        payment_network: 'MC',
+        display_text: 'Display text for MC Offer',
+      },
+    ];
   }
 
   return preferences;

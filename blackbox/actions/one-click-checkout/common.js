@@ -15,6 +15,9 @@ const { passRequestNetbanking } = require('../common');
 const { fillUserDetails } = require('../home-page-actions');
 const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
 
+const truncateString = (str, num) =>
+  str?.length > num ? `${str.slice(0, num)}...` : str;
+
 function getVerifyOTPResponse(inValidOTP, addresses = [], mandatoryLogin) {
   let successAddresses;
 
@@ -95,11 +98,16 @@ async function handleCustomerStatusReq(
 }
 
 async function handleUpdateOrderReq(context, orderId) {
-  await context.getRequest(`/v1/orders/1cc/${orderId}/customer`);
-  const req = await context.expectRequest();
-  expect(req.method).toBe('PATCH');
-  expect(req.url).toContain('orders/1cc');
-  await context.respondJSON([]);
+  let request = await context.getRequest(`/v1/orders/1cc/${orderId}/customer`);
+  if (!request) {
+    request = await context.expectRequest();
+    expect(request.url).toContain(`orders/1cc/${orderId}/customer`);
+    expect(request.method).toBe('PATCH');
+    await context.respondJSON([]);
+    return;
+  }
+  request.respond(makeJSONResponse([]));
+  context.resetRequest(request);
 }
 
 async function handleCreateOTPReq(context) {
@@ -140,10 +148,16 @@ async function handleThirdWatchReq(context, isThirdWatchEligible = false) {
   await delay(200);
 }
 
-async function getSummaryInfo(context, isValidCoupon, codFee) {
-  const summaryModalEle = await getDataAttrSelector(context, 'summary-modal');
-  const orderInfo = await context.page.evaluate(
-    (element, isValidCoupon, codFee) => {
+async function getSummaryInfo(context, isValidCoupon, codFee, features) {
+  const orderInfo = await context.page.$eval(
+    '[data-test-id=summary-modal]',
+    (element, isValidCoupon, codFee, offersEnabled) => {
+      let discountAmount;
+      let couponText;
+      let codAmount;
+      let offerText;
+      let offerAmount;
+
       const cartAmount = element.querySelector(
         '[data-test-id=cart-amount]'
       ).innerText;
@@ -155,35 +169,44 @@ async function getSummaryInfo(context, isValidCoupon, codFee) {
       ).innerText;
 
       if (isValidCoupon) {
-        const discountAmount = element.querySelector(
+        discountAmount = element.querySelector(
           '[data-test-id=discount-amount]'
-        ).innerText;
-        const couponText = element.querySelector(
+        )?.innerText;
+        couponText = element.querySelector(
           '[data-test-id=applied-coupon-label]'
-        ).innerText;
-
-        return {
-          cartAmount,
-          discountAmount,
-          totalAmount,
-          couponText,
-          shippingAmount,
-        };
-      } else if (codFee) {
-        const codAmount = element.querySelector(
-          '[data-test-id=cod-amount]'
-        ).innerText;
-
-        return { cartAmount, codAmount, totalAmount, shippingAmount };
-      } else {
-        return { cartAmount, totalAmount, shippingAmount };
+        )?.innerText;
       }
-    },
-    summaryModalEle,
-    isValidCoupon,
-    codFee
-  );
 
+      if (offersEnabled) {
+        offerText = element.querySelector(
+          '[data-test-id=offer-label'
+        )?.innerText;
+        offerAmount = element.querySelector(
+          '[data-test-id=offer-amount'
+        )?.innerText;
+      }
+
+      if (codFee > 0) {
+        codAmount = element.querySelector(
+          '[data-test-id=cod-amount]'
+        )?.innerText;
+      }
+
+      return {
+        cartAmount,
+        discountAmount,
+        totalAmount,
+        couponText,
+        shippingAmount,
+        codAmount,
+        offerText,
+        offerAmount,
+      };
+    },
+    isValidCoupon,
+    codFee,
+    features.offers
+  );
   return orderInfo;
 }
 
@@ -195,6 +218,8 @@ async function handleFeeSummary(context, features) {
     couponCode,
     removeCoupon,
     isSelectCOD,
+    offers,
+    offerIndex = 1,
   } = features;
   await delay(200);
   if (!isSelectCOD) {
@@ -206,48 +231,57 @@ async function handleFeeSummary(context, features) {
   }
   await context.page.waitForSelector('.summary-modal');
   const { shippingFee, codFee } = context.state;
-  if (couponValid && !removeCoupon) {
-    const {
-      cartAmount,
-      discountAmount: _discountAmount,
-      totalAmount,
-      couponText,
-      shippingAmount,
-    } = await getSummaryInfo(context, couponValid);
-    if (!shippingFee) {
-      expect('FREE').toEqual(shippingAmount);
-    }
-    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-    expect(`Coupon (${couponCode})`).toEqual(couponText);
-    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
-    const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
-    expect(formatTextToNumber(totalAmount)).toEqual(calcTotalAmount);
-  } else if (isSelectCOD) {
-    const { cartAmount, totalAmount, shippingAmount, codAmount } =
-      await getSummaryInfo(context, false, codFee);
-    if (!shippingFee) {
-      expect('FREE').toEqual(shippingAmount);
-    }
-    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-    expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
-    expect(formatTextToNumber(totalAmount)).toEqual(
-      amount / 100 + codFee / 100
-    );
-  } else {
-    const { cartAmount, totalAmount, shippingAmount } = await getSummaryInfo(
-      context
-    );
-    let totalAmtWithShipping;
-    if (shippingFee) {
-      totalAmtWithShipping = Number(shippingAmount.slice(1)) + amount / 100;
-    } else {
-      expect('FREE').toEqual(shippingAmount);
-    }
-    expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-    expect(formatTextToNumber(totalAmount)).toEqual(
-      totalAmtWithShipping || amount / 100
-    );
+  const {
+    codAmount,
+    cartAmount,
+    discountAmount: _discountAmount,
+    totalAmount,
+    couponText,
+    shippingAmount,
+    offerAmount,
+    offerText,
+  } = await getSummaryInfo(context, couponValid, codFee, features);
+  if (!shippingFee) {
+    expect('FREE').toEqual(shippingAmount);
   }
+  expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+
+  let expectedAmount = amount / 100;
+  if (couponValid && !removeCoupon) {
+    expectedAmount -= discountAmount / 100;
+    expect(couponText).toEqual(`Coupon (${couponCode})`);
+    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
+  }
+
+  if (shippingFee) {
+    expectedAmount += shippingFee / 100;
+  } else {
+    expect(shippingAmount).toEqual('FREE');
+  }
+
+  if (codFee) {
+    expectedAmount += codFee / 100;
+  }
+
+  if (offers) {
+    const offerDiscount =
+      context.preferences.offers[offerIndex - 1].original_amount -
+      context.preferences.offers[offerIndex - 1].amount;
+    expectedAmount -= offerDiscount / 100;
+
+    expect(offerText).toContain(
+      truncateString(
+        context.preferences.offers[offerIndex - 1].display_text,
+        20
+      )
+    );
+    expect(formatTextToNumber(offerAmount)).toEqual(offerDiscount / 100);
+  }
+
+  expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
+  expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
+  expect(formatTextToNumber(totalAmount)).toEqual(expectedAmount);
+
   if (isSelectCOD) {
     await context.page.click('.summary-modal-cta');
   } else {
@@ -299,7 +333,10 @@ function scrollToEnd(context, selectorOrElem) {
 }
 
 function formatTextToNumber(str) {
-  return str ? +`${str}`.replace(/\D/g, '') : null;
+  if (typeof str !== 'string') {
+    return parseInt(str);
+  }
+  return +`${str}`.replace(/\D/g, '');
 }
 
 async function proceedOneCC(context) {
