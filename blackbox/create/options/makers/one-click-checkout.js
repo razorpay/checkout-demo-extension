@@ -17,12 +17,14 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { amount, mandatoryLogin, offers, consentBannerViews } = features;
+  const { amount, mandatoryLogin, offers, consentBannerViews, twDisabled } =
+    features;
 
   preferences.features = {
     one_click_checkout: true,
     one_cc_merchant_dashboard: true,
     one_cc_mandatory_login: mandatoryLogin ?? false,
+    cod_intelligence: !twDisabled,
   };
 
   preferences.order = {

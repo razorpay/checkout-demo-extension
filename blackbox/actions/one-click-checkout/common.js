@@ -111,7 +111,7 @@ async function handleUpdateOrderReq(context, orderId) {
 }
 
 async function handleCreateOTPReq(context) {
-  let req = context.getRequest('otp/create');
+  let req = context.getRequest('/v1/otp/create');
   if (!req) {
     req = await context.expectRequest();
     expect(req.url).toContain('otp/create');
@@ -121,7 +121,7 @@ async function handleCreateOTPReq(context) {
     });
     return;
   }
-  req.respondJSON(
+  req.respond(
     makeJSONResponse({
       success: true,
     })
@@ -177,18 +177,18 @@ async function getSummaryInfo(context, isValidCoupon, codFee, features) {
         )?.innerText;
       }
 
+      if (codFee >= 0) {
+        codAmount = element.querySelector(
+          '[data-test-id=cod-amount]'
+        )?.innerText;
+      }
+
       if (offersEnabled) {
         offerText = element.querySelector(
           '[data-test-id=offer-label'
         )?.innerText;
         offerAmount = element.querySelector(
           '[data-test-id=offer-amount'
-        )?.innerText;
-      }
-
-      if (codFee > 0) {
-        codAmount = element.querySelector(
-          '[data-test-id=cod-amount]'
         )?.innerText;
       }
 

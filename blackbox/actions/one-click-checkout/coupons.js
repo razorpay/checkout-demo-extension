@@ -108,12 +108,12 @@ async function verifyValidCoupon(context, features) {
   const { amount, discountAmount, availableCoupons, couponCode, showCoupons } =
     features;
   if (availableCoupons && showCoupons) {
-    applyAvailableCoupon(context, couponCode);
+    await applyAvailableCoupon(context, couponCode);
   } else {
-    applyCoupon(context, couponCode);
+    await applyCoupon(context, couponCode);
   }
   await delay(200);
-  handleApplyCouponReq(context, true, discountAmount);
+  await handleApplyCouponReq(context, true, discountAmount);
   const {
     cartAmount,
     discountAmount: _discountAmount,
