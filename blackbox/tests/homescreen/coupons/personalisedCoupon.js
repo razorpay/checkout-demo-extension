@@ -6,15 +6,6 @@ createCouponsTest({
   couponValid: true,
   discountAmount: 100 * 100,
   couponCode: 'PERSON50',
-  serviceable: true,
-  personalised: true,
-});
-
-createCouponsTest({
-  amount: 200 * 100,
-  couponValid: true,
-  discountAmount: 100 * 100,
-  couponCode: 'PERSON50',
   showCoupons: true,
   availableCoupons: [
     {

@@ -10,11 +10,9 @@ const {
   handleRemoveCoupon,
   applyCoupon,
   handleApplyCouponReq,
+  handleFillUserDetails,
   handleCouponView,
 } = require('../../actions/one-click-checkout/coupons');
-const {
-  handleFillUserDetails,
-} = require('../../actions/one-click-checkout/personalisedCoupons.js');
 const {
   handleCustomerStatusReq,
   handleCreateOTPReq,
@@ -60,7 +58,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
-      if (availableCoupons) {
+      if (options.show_coupons) {
         await handleAvailableCouponReq(context, availableCoupons);
       }
       await handleCouponView(context);
@@ -73,7 +71,6 @@ module.exports = function (testFeatures) {
           personalised
         );
         await handleFillUserDetails(context, '9952395555', 'test@gmail.com');
-        await delay(400);
         await handleCreateOTPReq(context);
         await handleTypeOTP(context);
         await delay(200);

@@ -66,7 +66,11 @@ function getVerifyOTPResponse(inValidOTP, addresses = [], mandatoryLogin) {
   return inValidOTP ? failureResp : successResp;
 }
 
-async function handleCustomerStatusReq(context, saved_address = false) {
+async function handleCustomerStatusReq(
+  context,
+  saved_address = false,
+  consent_banner_views = 0
+) {
   let req = context.getRequest(
     `/v1/customers/status/+91${context.state.contact}`
   );
@@ -77,6 +81,7 @@ async function handleCustomerStatusReq(context, saved_address = false) {
     await context.respondJSON({
       saved: saved_address,
       saved_address,
+      '1cc_consent_banner_views': consent_banner_views,
     });
     return;
   }
@@ -98,10 +103,22 @@ async function handleUpdateOrderReq(context, orderId) {
 }
 
 async function handleCreateOTPReq(context) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('otp/create');
-  expect(req.method).toBe('POST');
-  await context.respondJSON({ success: false });
+  let req = context.getRequest('otp/create');
+  if (!req) {
+    req = await context.expectRequest();
+    expect(req.url).toContain('otp/create');
+    expect(req.method).toBe('POST');
+    await context.respondJSON({
+      success: true,
+    });
+    return;
+  }
+  req.respondJSON(
+    makeJSONResponse({
+      success: true,
+    })
+  );
+  context.resetRequest(req);
 }
 
 async function handleVerifyOTPReq(context, inValidOTP = false, options = {}) {

@@ -88,6 +88,7 @@ module.exports = function (testFeatures) {
     invalidAddress,
     mandatoryLogin,
     shippingFee,
+    consentBannerViews,
   } = features;
 
   describe.each(
@@ -202,7 +203,11 @@ module.exports = function (testFeatures) {
 
         await fillUserDetails(context);
         await proceedOneCC(context);
-        await handleCustomerStatusReq(context, addresses.length);
+        await handleCustomerStatusReq(
+          context,
+          addresses.length,
+          consentBannerViews
+        );
 
         if (addresses.length) {
           // OTP screen if user has addresses
@@ -229,6 +234,7 @@ module.exports = function (testFeatures) {
               await checkInvalidOTP(context);
               return;
             }
+            debugger;
             await handleShippingInfo(context, options);
           }
         } else {
@@ -286,7 +292,6 @@ module.exports = function (testFeatures) {
           !mandatoryLogin &&
           (!addresses.length || skipAccessOTP)
         ) {
-          await delay(200);
           await handleCreateOTPReq(context);
           if (skipSaveOTP) {
             await handleSkipOTP(context);

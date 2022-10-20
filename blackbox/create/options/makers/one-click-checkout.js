@@ -18,7 +18,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { amount, mandatoryLogin } = features;
+  const { amount, mandatoryLogin, consentBannerViews } = features;
 
   preferences.features = {
     one_click_checkout: true,
@@ -32,19 +32,17 @@ function makePreferences(features, preferences) {
     partial_payment: false,
   };
 
-  if (features.showCoupons) {
-    preferences['1cc'] = {
-      configs: {
-        one_cc_auto_fetch_coupons: true,
-      },
-    };
-  }
+  preferences['1cc'] = {
+    configs: {
+      one_cc_auto_fetch_coupons: features.showCoupons,
+      one_cc_capture_billing_address: features.billingEnabled,
+    },
+  };
 
-  if (features.billingEnabled) {
-    preferences['1cc'] = {
-      configs: {
-        one_cc_capture_billing_address: true,
-      },
+  if (preferences.customer) {
+    preferences.customer = {
+      ...preferences.customer,
+      '1cc_consent_banner_views': consentBannerViews,
     };
   }
 

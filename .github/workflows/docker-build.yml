@@ -103,7 +103,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Run Fts
-        run: NODE_ENV=production npx jest blackbox/tests/homescreen/**/*.test.js --shard=${{ matrix.shard }} --runInBand
+        run: NODE_ENV=production npx jest blackbox/tests/homescreen/**/*.test.js --shard=${{ matrix.shard }} --runInBand --detectOpenHandles
   fts:
     needs: [customFTs, functional-test]
     name: fts

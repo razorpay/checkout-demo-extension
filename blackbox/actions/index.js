@@ -27,6 +27,7 @@ const getDataUpdatedForKeyless = (d) => {
 const getTestData = (
   title,
   {
+    consentBannerViews = 0,
     preferences = {},
     options = {},
     //do not run logged in tests by default
@@ -38,7 +39,11 @@ const getTestData = (
 ) => {
   keyless = false;
   let tests = [];
-  const preferencesLoggedIn = makePreferencesLogged(preferences, addresses);
+  const preferencesLoggedIn = makePreferencesLogged(
+    preferences,
+    addresses,
+    consentBannerViews
+  );
   preferences = makePreferences(preferences);
   options = makeOptions(options);
   if (loggedIn) {

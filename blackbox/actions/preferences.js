@@ -91,7 +91,7 @@ module.exports = {
   makePreferences,
   preferencesParams,
 
-  makePreferencesLogged(overrides, addresses = []) {
+  makePreferencesLogged(overrides, addresses = [], consentBannerViews) {
     const token = randomId();
     return {
       ...makePreferences(overrides),
@@ -120,6 +120,7 @@ module.exports = {
         ],
       },
       customer: {
+        '1cc_consent_banner_views': consentBannerViews,
         email: randomEmail(),
         contact: randomContact(),
         addresses,

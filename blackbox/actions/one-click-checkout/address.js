@@ -209,8 +209,8 @@ async function checkInvalidAddressForm(context) {
 }
 
 async function unCheckBillAddress(context) {
-  await context.page.waitForSelector('#same-address-checkbox');
-  await context.page.$eval('#same-address-checkbox', (ele) => ele.click());
+  const el = await context.page.$('#same-address-checkbox');
+  await el.click();
 }
 
 /**
