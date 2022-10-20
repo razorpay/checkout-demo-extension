@@ -10,9 +10,11 @@ const {
   handleRemoveCoupon,
   applyCoupon,
   handleApplyCouponReq,
-  handleFillUserDetails,
   handleCouponView,
 } = require('../../actions/one-click-checkout/coupons');
+const {
+  handleFillUserDetails,
+} = require('../../actions/one-click-checkout/personalisedCoupons.js');
 const {
   handleCustomerStatusReq,
   handleCreateOTPReq,
@@ -44,7 +46,6 @@ module.exports = function (testFeatures) {
     personalised,
     discountAmount,
     saveAddress,
-    skip,
   } = features;
 
   describe.each(
@@ -53,17 +54,13 @@ module.exports = function (testFeatures) {
       preferences,
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
-    if (skip) {
-      test.skip(title, () => {});
-      return;
-    }
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
-      if (options.show_coupons) {
+      if (availableCoupons) {
         await handleAvailableCouponReq(context, availableCoupons);
       }
       await handleCouponView(context);
