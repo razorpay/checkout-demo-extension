@@ -466,6 +466,10 @@
       i++;
     }
 
+    /**
+     * Array.sort behaving differently in Firefox compare to google chrome. Array.sort method should
+     * always return predictable result, even though the value of arguments _a and _b is interchanged.
+     */
     const sorted = Object.entries(currencies).sort((_a, _b) => {
       const a = _a[CODE];
       const b = _b[CODE];
@@ -476,12 +480,10 @@
         return 1;
       }
       if (topCurrencies.includes(a)) {
-        if (topCurrencies.includes(b)) {
-          const indexOfA = topCurrencies.indexOf(a);
-          const indexOfB = topCurrencies.indexOf(b);
-          return indexOfA > indexOfB ? 1 : -1;
-        }
         return -1;
+      }
+      if (topCurrencies.includes(b)) {
+        return 1;
       }
       return 0;
     });

@@ -335,21 +335,23 @@
           <div class="divider" />
         </div>
       {/if}
-      <div class="list">
-        {#each items as item, index (IDs.allItem(item, index))}
-          <div
-            class="list-item"
-            class:focused={index + results.length === focusedIndex}
-            class:list-item-checkout-redesign={isRedesignV15Enabled}
-            id={IDs.allItem(item, index)}
-            role="option"
-            aria-selected={index + results.length === focusedIndex}
-            on:click={() => onSelectHandler(item)}
-          >
-            <svelte:component this={component} {item} />
-          </div>
-        {/each}
-      </div>
+      {#if !(query && isRedesignV15Enabled)}
+        <div class="list">
+          {#each items as item, index (IDs.allItem(item, index))}
+            <div
+              class="list-item"
+              class:focused={index + results.length === focusedIndex}
+              class:list-item-checkout-redesign={isRedesignV15Enabled}
+              id={IDs.allItem(item, index)}
+              role="option"
+              aria-selected={index + results.length === focusedIndex}
+              on:click={() => onSelectHandler(item)}
+            >
+              <svelte:component this={component} {item} />
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
   </Stack>
 </div>
@@ -497,7 +499,9 @@
   } */
   .list-item-checkout-redesign {
     border-bottom: none;
+    padding: 1rem;
     color: var(--primary-text-color);
+    border-bottom: 1px solid #e6e7e8;
   }
 
   .search-field-checkout-redesign {
