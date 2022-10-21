@@ -27,6 +27,7 @@ import {
   isSubscription,
   isRecurringQRIntentExperimentEnabled,
   isEmiV2,
+  reusePaymentIdExperimentEnabled,
 } from 'razorpay';
 
 import {
@@ -590,7 +591,7 @@ const UPI_METHODS = {
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
     intentEnabledInOption() &&
     getSDKMeta()?.platform === 'web' &&
-    (android || (iOS && getPreferences('experiments.reuse_upi_paymentId'))),
+    (android || (iOS && reusePaymentIdExperimentEnabled())),
 };
 
 // additional checks for each sub-method based on UPI OTM

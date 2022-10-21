@@ -410,9 +410,10 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
-  if (!this.payload) {
+  if (!this.payload || response._silent) {
     return;
   }
+
   updateScore('cancelledPayment');
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
@@ -434,7 +435,7 @@ function cancelHandler(response) {
           matchLatestPaymentWith({
             referrer: 'UPI_UX',
             inStatuses: ['cancel'],
-            paymentId: this.r._payment.payment_id,
+            paymentId: this.r._payment?.payment_id,
             errorReason: 'manual',
           })
         )
@@ -4108,7 +4109,6 @@ Session.prototype = {
     if (this.headless && this.screen === 'card') {
       return;
     }
-
     let actionState;
     let loadingState = true;
 

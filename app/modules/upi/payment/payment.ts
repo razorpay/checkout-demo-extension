@@ -1,5 +1,5 @@
 import { UPI_POLL_URL, PENDING_PAYMENT_TS } from 'common/constants';
-import RazorpayStore, { getPreferences } from 'razorpay';
+import RazorpayStore, { reusePaymentIdExperimentEnabled } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { trackTrace, TRACES } from 'upi/events';
 import { getNewIosBridge } from 'bridge';
@@ -7,6 +7,7 @@ import { handleFeeBearer } from 'upi/helper/fee-bearer';
 import { creatUPIPaymentV2, setFlowInPayload } from './prePaymentHandlers';
 import { resetCallbackOnUPIAppForPay } from 'upi/helper/upi';
 import {
+  clearPaymentRequest,
   handleDeeplinkAction,
   responseHandler,
   startUpiPaymentPolling,
@@ -38,8 +39,12 @@ function handleUPIPayments(
   }
   if (config.action === 'deepLinkIntent') {
     setFlowInPayload(basePayload, 'intent');
-    if (getPreferences('experiments.reuse_upi_paymentId')) {
+    if (reusePaymentIdExperimentEnabled()) {
       basePayload.persistentMode = true;
+      // clear old payment if any (this will trigger mainly in case of mweb [edge case])
+      if (session.r._payment) {
+        clearPaymentRequest('clear persistent payment', true);
+      }
     }
   }
   if (config.action === 'paymentRequestAPI' && config.app) {
@@ -47,7 +52,7 @@ function handleUPIPayments(
     // basePayload.provider = config?.app?.shortcode;
     basePayload.upi_app = config?.app?.package_name;
     setFlowInPayload(basePayload, 'intent');
-    if (getPreferences('experiments.reuse_upi_paymentId')) {
+    if (reusePaymentIdExperimentEnabled()) {
       basePayload.persistentMode = true;
     }
   }

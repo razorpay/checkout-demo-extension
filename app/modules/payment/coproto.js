@@ -531,7 +531,7 @@ const responseTypes = {
           'Content-type': 'application/json',
         };
       }
-      fetchRequest({
+      this.upiStatusAjax = fetchRequest({
         url: request.url,
         callback: (response) => {
           // transactionReferenceId is required for Google Pay microapps payments

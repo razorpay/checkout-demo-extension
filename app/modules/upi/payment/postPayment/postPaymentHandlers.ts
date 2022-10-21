@@ -3,11 +3,41 @@ import { enableUPITiles } from '../../features';
 import { definePlatform } from '../../helper/upi';
 import { tryOpeningIntentUrl } from '../../helper/intent/resolver';
 import { trackTrace, trackIntentFailure, TRACES } from 'upi/events';
+import { reusePaymentIdExperimentEnabled } from 'razorpay';
 
 const startUpiPaymentPolling = () => {
   // emit success response and trigger polling
   getSession().r.emit('payment.upi.intent_success_response');
 };
+let isLoadingScreenVisible = true;
+
+function handleVisibleChange() {
+  const session = getSession();
+  if (document.visibilityState === 'hidden' && session.r._payment) {
+    // user redirected from app back to checkout show loader
+    session.showLoadError();
+    isLoadingScreenVisible = true;
+  }
+}
+
+function onFocus() {
+  const container = document.getElementById('container') as HTMLDivElement;
+  function clearPayment() {
+    if (!isLoadingScreenVisible && document.visibilityState !== 'hidden') {
+      clearPaymentRequest('clear persistent payment', true);
+    }
+    container?.removeEventListener('touchstart', clearPayment);
+  }
+  /** cleanup touchstart listener before setup */
+  container?.removeEventListener('touchstart', clearPayment);
+  /**
+   * after getting focus when we touch
+   * then we cancel the payment if exist
+   */
+  container?.addEventListener('touchstart', clearPayment);
+  /** cleanup focus listener we want focus event only for one time */
+  window.removeEventListener('focus', onFocus);
+}
 
 const processIntentOnMWeb = (intentUrl: string) => {
   const session = getSession();
@@ -19,7 +49,28 @@ const processIntentOnMWeb = (intentUrl: string) => {
         : { canProceed: response, reason: null };
 
     if (canProceed) {
-      session.showLoadError();
+      if (reusePaymentIdExperimentEnabled() && definePlatform('mWebiOS')) {
+        session.hideOverlayMessage();
+        isLoadingScreenVisible = false;
+        // detect app installed
+        /** cleanup any old lister */
+        window.removeEventListener('focus', onFocus);
+        document.removeEventListener('visibilitychange', handleVisibleChange);
+        /**
+         * setup the focus check
+         * in case like chrome when it doesn't ask permission and app is not available
+         * it doesn't show any error in UI so this check will
+         */
+        if (document.hasFocus()) {
+          /** if still in focus probably most-probably app is not available */
+          onFocus();
+        } else {
+          window.addEventListener('focus', onFocus);
+        }
+        document.addEventListener('visibilitychange', handleVisibleChange);
+      } else {
+        session.showLoadError();
+      }
       startUpiPaymentPolling();
     } else {
       const metaParam = { upiNoApp: true };
@@ -100,6 +151,7 @@ function clearPaymentRequest(reason: string, silent = false) {
     '_[reason]': reason,
     _silent: silent,
   });
+  document.removeEventListener('visibilitychange', handleVisibleChange);
 }
 export {
   handleDeeplinkAction,

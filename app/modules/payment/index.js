@@ -83,6 +83,7 @@ function onPaymentCancel(metaParam) {
           : t('payment_canceled'),
         reason: metaParam?.upiNoApp ? 'intent_no_apps_error' : '',
       },
+      _silent: metaParam?._silent || false,
     };
     let payment_id = this.payment_id;
     let razorpay = this.r;
@@ -677,6 +678,10 @@ Payment.prototype = {
 
     if (this.ajax) {
       this.ajax.abort();
+    }
+    if (this.upiStatusAjax) {
+      /** clear upi polling */
+      this.upiStatusAjax.abort();
     }
   },
 
