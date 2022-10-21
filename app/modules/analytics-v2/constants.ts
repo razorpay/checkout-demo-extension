@@ -1,4 +1,4 @@
-import RazorpayConfig from 'common/RazorpayConfig';
+import { IS_PROD } from 'common/constants';
 
 /**
  * flattened Context keys
@@ -40,15 +40,11 @@ export const ContextProperties = {
   REFERRER: 'referrer',
 } as const;
 
-export const isProdEnv =
-  RazorpayConfig.api.startsWith('https://api.razorpay.com') ||
-  RazorpayConfig.api.startsWith('https://api-dark.razorpay.com');
-
-export const RUDDERSTACK_URL = isProdEnv
+export const RUDDERSTACK_URL = IS_PROD
   ? 'https://rudderstack.razorpay.com'
   : 'https://rudderstack.ext.dev.razorpay.in';
 
-export const RUDDERSTACK_KEY = isProdEnv
+export const RUDDERSTACK_KEY = IS_PROD
   ? '2Fle0rY1hHoLCMetOdzYFs1RIJF'
   : '27TM2uVMCl4nm4d7gqR4tysvdU1';
 

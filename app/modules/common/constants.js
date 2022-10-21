@@ -1,3 +1,6 @@
+import { resolveUrl } from 'utils/doc';
+import RazorpayConfig from './RazorpayConfig';
+
 /*
 https://pincode.net.in/listofstates.php
 https://en.wikipedia.org/wiki/ISO_3166-2:IN
@@ -185,3 +188,22 @@ export const constantCSSVars = {
   'background-color-magic': '#f0f0f4',
   'light-dark-color': '#d9dadb',
 };
+
+function isProd() {
+  try {
+    let url = RazorpayConfig.api;
+
+    // RazorpayConfig.api is setting up later for checkout-frame that's why using frameApi url in case of iframe
+    if (isIframe) {
+      url = resolveUrl(RazorpayConfig.frameApi);
+    }
+    return (
+      url.startsWith('https://api.razorpay.com') ||
+      url.startsWith('https://api-dark.razorpay.com')
+    );
+  } catch (e) {
+    return false;
+  }
+}
+
+export const IS_PROD = isProd();
