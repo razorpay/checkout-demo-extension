@@ -413,24 +413,26 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
 
   disableCTA.set(false);
 
-  if (tab === 'debit') {
-    const emiCode = getIssuerForEmiFromPayload(paymentPayload);
-    session.otpView.updateScreen({
-      maxlength: 6,
-      digits: new Array(6),
-      mode: emiCode,
-    });
-  } else if (session.headless) {
-    // OTP of length 8 is only required for Headless OTP.
-    session.otpView.updateScreen({
-      maxlength: 8,
-      digits: new Array(8),
-    });
-  } else {
-    session.otpView.updateScreen({
-      maxlength: 6,
-      digits: new Array(6),
-    });
+  if (session.otpView) {
+    if (tab === 'debit') {
+      const emiCode = getIssuerForEmiFromPayload(paymentPayload);
+      session.otpView.updateScreen({
+        maxlength: 6,
+        digits: new Array(6),
+        mode: emiCode,
+      });
+    } else if (session.headless) {
+      // OTP of length 8 is only required for Headless OTP.
+      session.otpView.updateScreen({
+        maxlength: 8,
+        digits: new Array(8),
+      });
+    } else {
+      session.otpView.updateScreen({
+        maxlength: 6,
+        digits: new Array(6),
+      });
+    }
   }
 
   if (session.r._payment) {
