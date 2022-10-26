@@ -467,7 +467,7 @@ Payment.prototype = {
      * to reuse ajax response on retry on same payment Id
      * we don't cancel payment if its of persistentMode
      */
-    if (data.persistentMode) {
+    if (data && data.persistentMode) {
       this.persistentMode = true;
       delete data.persistentMode;
     }
