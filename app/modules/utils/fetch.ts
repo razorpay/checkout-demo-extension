@@ -267,33 +267,46 @@ const fetchPrototype: FetchPrototype = {
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
-        let json = ObjectUtils.parse(xhr.responseText) as response;
-        if (!json) {
-          json = _.rzpError('Parsing error');
-          json.xhr = {
-            status: xhr.status,
-            text: xhr.responseText,
-          };
+        // using xhr.getResponseHeader because xhr.responseType is '' for all api calls
+        if (xhr.getResponseHeader('content-type')?.includes('text')) {
+          callback({
+            status_code: xhr.status,
+            xhr: { status: xhr.status, text: xhr.responseText },
+          });
+          return;
         }
+        if (xhr.responseText) {
+          let json = ObjectUtils.parse(xhr.responseText) as response;
+          if (!json) {
+            json = _.rzpError('Parsing error');
+            json.xhr = {
+              status: xhr.status,
+              text: xhr.responseText,
+            };
+          }
 
-        if (json.error) {
-          global.dispatchEvent(
-            _.CustomEvent('rzp_network_error', {
-              detail: {
-                method,
-                url,
-                baseUrl: url?.split('?')[0],
-                status: xhr.status,
-                xhrErrored: false,
-                response: json,
-              },
-            })
-          );
+          if (json.error) {
+            global.dispatchEvent(
+              _.CustomEvent('rzp_network_error', {
+                detail: {
+                  method,
+                  url,
+                  baseUrl: url?.split('?')[0],
+                  status: xhr.status,
+                  xhrErrored: false,
+                  response: json,
+                },
+              })
+            );
+          }
+
+          json['status_code'] = xhr.status;
+
+          callback(json);
+          return;
         }
-
-        json['status_code'] = xhr.status;
-
-        callback(json);
+        const response = { status_code: xhr.status };
+        callback(response);
       }
     };
     xhr.onerror = function () {

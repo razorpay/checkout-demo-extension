@@ -8,6 +8,7 @@ import {
 import createQueue from 'analytics-v2/library/common/queue';
 import { batchRudderRequest, identifyRudderRequest } from './service';
 import { BATCH_SIZE, BATCH_TIME_INTERVAL } from './constants';
+import { returnAsIs } from 'lib/utils';
 
 const BEACON_SUPPORTED =
   typeof navigator !== 'undefined' &&
@@ -58,7 +59,7 @@ export default function ({
               key,
               events,
               useBeacon: useBeacon && BEACON_SUPPORTED,
-            });
+            }).catch(returnAsIs);
           } catch {}
         },
         {
@@ -115,7 +116,7 @@ export default function ({
         url: domainUrl,
         key,
         payload,
-      });
+      }).catch(returnAsIs);
     },
 
     /**
