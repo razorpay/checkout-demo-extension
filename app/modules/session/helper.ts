@@ -59,6 +59,7 @@ export function handleErrorModal(this: Session, message: string) {
     }
     if (
       !this.tab &&
+      this.get('retry') &&
       matchLatestPaymentWith({
         referrer: 'UPI_UX',
         inStatuses: ['cancel', 'error'],
@@ -68,6 +69,7 @@ export function handleErrorModal(this: Session, message: string) {
       /**
        * If user has chosen app tile from L0 and payment is somehow failed,
        * then we should land the user automatically in l1 with error message as alert in L1
+       * note: only switch when retry is enabled
        */
       this.switchTab('upi');
       this.hideErrorMessage();

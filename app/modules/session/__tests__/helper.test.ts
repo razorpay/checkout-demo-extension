@@ -30,6 +30,7 @@ const sessionMock = {
   showLoadError: jest.fn(),
   switchTab: jest.fn(),
   hideErrorMessage: jest.fn(),
+  get: jest.fn().mockReturnValue(false),
   /**
    * Homscreen
    */
@@ -46,8 +47,9 @@ describe(' Session/ helper / #handleErrorModal function tests', () => {
     handleErrorModal.call(sessionMock as unknown as Session, '');
     expect(sessionMock.showLoadError).toBeCalledWith(defaultErrorMessage, true);
   });
-  it('While in Home screen: should reset the UPI UX app, when the latest payment is UPI UX, and if payment is auto-cancelled/api-errored, we should switch the screen and hide-error-message if any', () => {
+  it('While in Home screen: should reset the UPI UX app, when the latest payment is UPI UX, and if payment is auto-cancelled/api-errored and retry is enabled, we should switch the screen and hide-error-message if any', () => {
     (upiUxV1dot1.enabled as jest.Mock).mockReturnValue(true);
+    (sessionMock.get as jest.Mock).mockReturnValueOnce(true);
     setLatestPayment({
       params: {
         additionalInfo: {
@@ -64,6 +66,26 @@ describe(' Session/ helper / #handleErrorModal function tests', () => {
     expect(sessionMock.hideErrorMessage as jest.Mock).toBeCalled();
 
     expect(sessionMock.showLoadError).not.toBeCalled();
+  });
+  it('While in Home screen: should reset the UPI UX app, when the latest payment is UPI UX, and if payment is auto-cancelled/api-errored and retry is DISABLED, we should NOT switch the screen and should NOT hide-error-message if any', () => {
+    (upiUxV1dot1.enabled as jest.Mock).mockReturnValue(true);
+    (sessionMock.get as jest.Mock).mockReturnValueOnce(false);
+    setLatestPayment({
+      params: {
+        additionalInfo: {
+          referrer: 'UPI_UX',
+        },
+      } as any,
+      status: 'error',
+      errorReason: 'automatic',
+    });
+
+    handleErrorModal.call(sessionMock as unknown as Session, testErrorMessage);
+    expect(resetSelectedUPIAppForPay as jest.Mock).toBeCalled();
+    expect(sessionMock.switchTab as jest.Mock).not.toBeCalled();
+    expect(sessionMock.hideErrorMessage as jest.Mock).not.toBeCalled();
+
+    expect(sessionMock.showLoadError).toBeCalled();
   });
   it('While in Home screen: should reset the UPI UX app, when the latest payment is UPI UX, and if payment is manual-cancelled, we should NOT switch the screen and DO NOT show any error modal', () => {
     (upiUxV1dot1.enabled as jest.Mock).mockReturnValue(true);
