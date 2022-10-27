@@ -56,9 +56,9 @@
 
       if (!isWalletPayment()) {
         if (isHeadless()) {
-          CardsTracker.GEN_NATIVE_OTP_FILLED();
+          CardsTracker.NATIVE_OTP_FILLED();
         } else {
-          CardsTracker.GEN_OTP_ENTERED();
+          CardsTracker.OTP_ENTERED();
         }
       }
 

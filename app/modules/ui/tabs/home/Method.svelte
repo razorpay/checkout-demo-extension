@@ -157,10 +157,6 @@
       },
     });
 
-    if (method === 'card') {
-      CardsTracker.GEN_CARD_SELECTED();
-    }
-
     if (isMethodCOD) {
       Events.TrackBehav(HomeEvents.COD_METHOD_SELECTED);
     }

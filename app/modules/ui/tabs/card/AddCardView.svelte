@@ -574,7 +574,7 @@
       },
     });
 
-    CardsTracker.GEN_CARD_NUMBER_ENTERED();
+    CardsTracker.CARD_NUMBER_ENTERED();
 
     // Track Add Card Event for new EMI flow
     if (isNewEmiFlow && prevTab === 'emi') {
@@ -617,7 +617,7 @@
         valid: cvvField.isValid(),
       },
     });
-    CardsTracker.GEN_CVV_FILLED();
+    CardsTracker.CVV_FILLED();
   }
 
   function trackExpiryFilled() {
@@ -627,7 +627,7 @@
         valid: expiryField.isValid(),
       },
     });
-    CardsTracker.GEN_EXPIRY_ENTERED();
+    CardsTracker.EXPIRY_ENTERED();
   }
 
   function onNameFilled() {
@@ -637,7 +637,7 @@
         valid: nameField.isValid(),
       },
     });
-    CardsTracker.GEN_NAME_ENTERED();
+    CardsTracker.NAME_ENTERED();
   }
 </script>
 

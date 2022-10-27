@@ -4,7 +4,6 @@
 
   // Store imports
   import { locale } from 'svelte-i18n';
-  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
 
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
@@ -17,6 +16,9 @@
   import { formatTemplateWithLocale } from 'i18n';
   import { SINGLE_BLOCK_TITLE } from 'ui/labels/methods';
 
+  // Analytics imports
+  import { genericMethodShown } from 'home/analytics/helpers';
+
   // helpers
   import { getSectionCategoryForBlock, setDynamicFees } from './helpers';
   import { CardsTracker } from 'card/analytics/events';
@@ -25,10 +27,9 @@
   export let block;
 
   onMount(() => {
-    const cardShown = block.instruments?.some((item) => item.method === 'card');
-    if (cardShown) {
-      CardsTracker.GEN_CARD_SHOWN();
-    }
+    block.instruments?.forEach((item) => {
+      genericMethodShown(item?.method as string);
+    });
   });
 
   const dispatch = createEventDispatcher();

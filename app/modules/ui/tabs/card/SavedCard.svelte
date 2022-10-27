@@ -123,7 +123,7 @@
   }
 
   const trackCvvFilled = () => {
-    CardsTracker.GEN_CVV_FILLED();
+    CardsTracker.CVV_FILLED();
   };
 
   function handleClick(event, avoidFocus = false) {

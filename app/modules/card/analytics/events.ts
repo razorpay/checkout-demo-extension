@@ -3,152 +3,164 @@ import { createTrackMethodForModule } from 'analytics-v2';
 import type { Instrument } from 'analytics-v2/types';
 
 export const CardsEvents = {
-  GEN_NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
-    name: 'gen_native_otp_native_to_3DS_redirect_clicked',
+  NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
+    name: 'native_otp_native_to_3DS_redirect_clicked',
     type: BEHAV,
   },
-  GEN_NATIVE_OTP_SMS_RESEND_CLICKED: {
-    name: 'gen_native_otp_SMS_resend_clicked',
+  NATIVE_OTP_SMS_RESEND_CLICKED: {
+    name: 'native_otp_SMS_resend_clicked',
     type: BEHAV,
   },
-  GEN_NATIVE_OTP_FILLED: {
-    name: 'gen_native_otp_filled',
+  NATIVE_OTP_FILLED: {
+    name: 'native_otp_filled',
     type: BEHAV,
   },
-  GEN_NATIVE_OTP_SENT: {
-    name: 'gen_native_otp_sent',
+  NATIVE_OTP_SENT: {
+    name: 'native_otp_sent',
     type: API,
   },
-  GEN_NAME_ENTERED: {
-    name: 'gen_name_entered',
+  NAME_ENTERED: {
+    name: 'name_entered',
     type: BEHAV,
   },
-  GEN_EXPIRY_ENTERED: {
-    name: 'gen_expiry_entered',
+  EXPIRY_ENTERED: {
+    name: 'expiry_entered',
     type: BEHAV,
   },
-  GEN_CARD_NUMBER_ENTERED: {
-    name: 'gen_card_number_entered',
+  CARD_NUMBER_ENTERED: {
+    name: 'card_number_entered',
     type: BEHAV,
   },
-  GEN_ADD_NEW_CARD_SCREEN: {
-    name: 'gen_add_new_card_screen',
+  ADD_NEW_CARD_SCREEN: {
+    name: 'add_new_card_screen',
     type: RENDER,
   },
-  GEN_SKIP_SAVED_CARD_CLICKED: {
-    name: 'gen_skip_saved_card_clicked',
+  SKIP_SAVED_CARD_CLICKED: {
+    name: 'skip_saved_card_clicked',
     type: BEHAV,
   },
-  GEN_CVV_FILLED: {
-    name: 'gen_cvv_filled',
+  CVV_FILLED: {
+    name: 'cvv_filled',
     type: BEHAV,
   },
-  GEN_SAVED_CARD_SCREEN: {
-    name: 'gen_saved_card_screen',
+  SAVED_CARD_SCREEN: {
+    name: 'saved_card_screen',
     type: RENDER,
   },
   HAS_SAVED_CARD: {
     name: 'has_saved_cards',
     type: API,
   },
-  GEN_CARD_SHOWN: {
+  GEN_SHOWN: {
     name: 'gen_card_shown',
     type: RENDER,
   },
-  GEN_CARD_SELECTED: {
-    name: 'gen_card_selected',
+  SELECTED: {
+    name: 'card_selected',
     type: BEHAV,
   },
-  GEN_OTP_SENT: {
-    name: 'gen_otp_sent',
+  OTP_SENT: {
+    name: 'otp_sent',
     type: API,
   },
-  GEN_OTP_SCREEN: {
-    name: 'gen_otp_sreen',
+  OTP_SCREEN: {
+    name: 'otp_sreen',
     type: RENDER,
   },
-  GEN_SAVED_CARD_SELECTED: {
-    name: 'gen_saved_card_selected',
+  SAVED_CARD_SELECTED: {
+    name: 'saved_card_selected',
     type: BEHAV,
   },
-  GEN_CARD_CONSENT_TOGGLED: {
-    name: 'gen_card_consent_toggled',
+  CARD_CONSENT_TOGGLED: {
+    name: 'card_consent_toggled',
     type: BEHAV,
   },
-  GEN_CONSENT_BOX_SHOWN: {
-    name: 'gen_consent_box_shown',
+  CONSENT_BOX_SHOWN: {
+    name: 'consent_box_shown',
     type: RENDER,
   },
-  GEN_OTP_ENTERED: {
-    name: 'gen_otp_entered',
+  OTP_ENTERED: {
+    name: 'otp_entered',
     type: BEHAV,
   },
-
+  P13N_SHOWN: {
+    name: 'p13n_card_shown',
+    type: RENDER,
+  },
+  RESEND_OTP_CLICKED: {
+    name: 'resend_otp_clicked',
+    type: BEHAV,
+  },
   //TODO: Update prefix as per response of DE/Analytics team
   PAY_WITH_APPS_DISPLAYED: {
-    name: 'gen_pay_with_apps_displayed',
+    name: 'pay_with_apps_displayed',
     type: RENDER,
   },
   PAY_WITH_APPS_PAYMENT_SELECTED: {
-    name: 'gen_pay_with_apps_payment_selected',
+    name: 'pay_with_apps_payment_selected',
     type: BEHAV,
   },
   PAY_WITH_APPS_PAYMENT_INITIATED: {
-    name: 'gen_pay_with_apps_payment_initiated',
+    name: 'pay_with_apps_payment_initiated',
     type: BEHAV,
   },
 };
 
 interface CardsEventMap {
-  GEN_NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
+  NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
     instrument: Instrument;
   };
-  GEN_NATIVE_OTP_SMS_RESEND_CLICKED: {
+  NATIVE_OTP_SMS_RESEND_CLICKED: {
     instrument: Instrument;
   };
 
-  GEN_NATIVE_OTP_FILLED: undefined;
-  GEN_NATIVE_OTP_SENT: undefined;
-  GEN_NAME_ENTERED: undefined;
-  GEN_EXPIRY_ENTERED: undefined;
-  GEN_CARD_NUMBER_ENTERED: undefined;
-  GEN_ADD_NEW_CARD_SCREEN: undefined;
-  GEN_SKIP_SAVED_CARD_CLICKED: undefined;
-  GEN_CVV_FILLED: undefined;
-  GEN_SAVED_CARD_SCREEN: {
+  NATIVE_OTP_FILLED: undefined;
+  NATIVE_OTP_SENT: undefined;
+  NAME_ENTERED: undefined;
+  EXPIRY_ENTERED: undefined;
+  CARD_NUMBER_ENTERED: undefined;
+  ADD_NEW_CARD_SCREEN: undefined;
+  SKIP_SAVED_CARD_CLICKED: undefined;
+  CVV_FILLED: undefined;
+  SAVED_CARD_SCREEN: {
     savedCards: number;
   };
   HAS_SAVED_CARD: {
     hasSavedCards: boolean;
   };
-  GEN_CARD_SHOWN: undefined;
-  GEN_CARD_SELECTED: undefined;
-  GEN_SAVED_CARD_SELECTED: undefined;
-  GEN_CARD_CONSENT_TOGGLED: {
+  GEN_SHOWN: undefined;
+  SELECTED:
+    | string
+    | {
+        instrument: Instrument;
+      };
+  CARD_CONSENT_TOGGLED: {
     instrument: {
       saveCardConsent: boolean;
     };
   };
-  GEN_CONSENT_BOX_SHOWN: {
+  CONSENT_BOX_SHOWN: {
     instrument: {
       saveCardConsent: boolean;
       screenName: string;
     };
   };
-  GEN_OTP_ENTERED: undefined;
-  GEN_OTP_SCREEN: undefined;
-  GEN_OTP_SENT: undefined;
-
+  OTP_ENTERED: undefined;
+  OTP_SCREEN: undefined;
+  OTP_SENT: undefined;
+  SAVED_CARD_SELECTED: {
+    instrument: Instrument;
+  };
+  P13N_SHOWN: {
+    instrument: Instrument;
+  };
+  RESEND_OTP_CLICKED: undefined;
   PAY_WITH_APPS_DISPLAYED: undefined;
   PAY_WITH_APPS_PAYMENT_SELECTED: {
-    instrument: {
-      appSelected: string;
-    };
+    instrument: Instrument;
   };
   PAY_WITH_APPS_PAYMENT_INITIATED: {
-    instrument: {
-      appSelected: string;
-    };
+    instrument: Instrument;
   };
 }
 

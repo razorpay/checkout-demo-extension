@@ -186,9 +186,9 @@
 
       if (!isWallet) {
         if (session.headless) {
-          CardsTracker.GEN_NATIVE_OTP_FILLED();
+          CardsTracker.NATIVE_OTP_FILLED();
         } else {
-          CardsTracker.GEN_OTP_ENTERED();
+          CardsTracker.OTP_ENTERED();
         }
       }
     }
@@ -222,12 +222,14 @@
   function onResend(event) {
     Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
     invoke('resend', event);
+
+    CardsTracker.RESEND_OTP_CLICKED();
   }
 
   $: {
     const isCard = session?.tab === 'card';
     if (showInput && isCard && !session.headless) {
-      CardsTracker.GEN_OTP_SCREEN();
+      CardsTracker.OTP_SCREEN();
     }
   }
 </script>

@@ -38,6 +38,7 @@ export const ContextProperties = {
   TRAITS_EMAIL: 'traits.email',
   USER_LOGGEDIN: 'user.loggedIn',
   REFERRER: 'referrer',
+  SECTION: 'section',
 } as const;
 
 export const RUDDERSTACK_URL = IS_PROD

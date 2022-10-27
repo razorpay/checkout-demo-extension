@@ -67,7 +67,13 @@
       },
     });
     try {
-      CardsTracker.GEN_SAVED_CARD_SELECTED();
+      CardsTracker.SAVED_CARD_SELECTED({
+        instrument: {
+          issuer: getCardMetadata(card.id)?.issuer,
+          network: getCardMetadata(card.id)?.network,
+          type: getCardMetadata(card.id)?.type,
+        },
+      });
       MiscTracker.INSTRUMENT_SELECTED({
         block: AnalyticsV2State.selectedBlock,
         method: {

@@ -15,7 +15,6 @@
   import {
     getAvailableMethods,
     getSectionsDisplayed,
-    getInstrumentDetails,
     trackPaypalRendered,
   } from 'ui/tabs/home/helpers';
   import {
@@ -146,10 +145,7 @@
 
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import {
-    isInstrumentForEntireMethod,
-    isInstrumentGrouped,
-  } from 'configurability/instruments';
+  import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import { EMAIL_REGEX } from 'common/constants';
@@ -166,7 +162,6 @@
   } from 'common/international';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
-  import { isMobile } from 'common/useragent';
   import { remember } from 'checkoutstore/screens/card';
 
   import { formatTemplateWithLocale } from 'i18n';
@@ -204,9 +199,11 @@
   import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
-  import { MiscTracker } from 'misc/analytics/events';
-  import { AnalyticsV2State } from 'analytics-v2';
   import { isValidContact } from 'helper/validation';
+  import {
+    p13nInstrumentShown,
+    triggerInstAnalytics,
+  } from 'home/analytics/helpers';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -688,6 +685,9 @@
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
 
+      if (isPersonalizationEnabled && setPreferredInstruments?.length) {
+        setPreferredInstruments.forEach(p13nInstrumentShown);
+      }
       if (
         isPersonalizationEnabled &&
         allPreferredInstrumentsForCustomer.length
@@ -1207,38 +1207,7 @@
     const instrument = event.detail;
     ctaV15Disabled = instrument._type === 'method';
 
-    AnalyticsV2State.selectedBlock = {
-      category: instrument.section,
-      name: instrument.blockTitle || '',
-    };
-
-    try {
-      MiscTracker.METHOD_SELECTED({
-        block: { category: instrument.section, name: instrument.blockTitle },
-        method: { name: instrument.method },
-      });
-
-      if (!isInstrumentForEntireMethod(instrument)) {
-        MiscTracker.INSTRUMENT_SELECTED({
-          block: {
-            category: instrument.section,
-            name: instrument.blockTitle,
-          },
-          method: { name: instrument.method },
-          instrument: getInstrumentDetails(instrument),
-        });
-      }
-    } catch {}
-    Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
-      instrument,
-    });
-    Events.TrackBehav(HOME_EVENTS.PAYMENT_INSTRUMENT_SELECTED_V2, {
-      instrument,
-    });
-    Events.TrackBehav(HOME_EVENTS.PAYMENT_METHOD_SELECTED_V2, {
-      method: instrument.method,
-      section: instrument.section,
-    });
+    triggerInstAnalytics(instrument);
 
     updateScore('instrumentSelected');
 

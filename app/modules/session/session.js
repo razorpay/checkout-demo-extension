@@ -84,6 +84,7 @@ import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
 import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
+import { HomeTracker } from 'home/analytics/events';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -600,7 +601,7 @@ function askOTP(
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
         if (thisSession.tab === 'card') {
-          CardsTracker.GEN_NATIVE_OTP_SENT();
+          CardsTracker.NATIVE_OTP_SENT();
         }
         textView = 'otp_sent_no_phone';
         if (_.isNonNullObject(origText)) {
@@ -871,10 +872,13 @@ Session.prototype = {
     let tab = oldMethod || RazorpayHelper.getPrefillMethod();
 
     if (tab) {
+      EventsV2.setContext(ContextProperties.SECTION, 'prefill');
+      HomeTracker.PREFILL_SECTION_SELECTED({
+        method: {
+          name: tab,
+        },
+      });
       updateScore('hadMethodPrefilled');
-    }
-
-    if (tab) {
       let optional = {
         contact: RazorpayHelper.isContactOptional(),
         email: RazorpayHelper.isEmailOptional(),
@@ -2089,7 +2093,7 @@ Session.prototype = {
     });
 
     if (this.payload?.method === 'card') {
-      CardsTracker.GEN_NATIVE_OTP_SMS_RESEND_CLICKED({
+      CardsTracker.NATIVE_OTP_SMS_RESEND_CLICKED({
         instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
       });
     }
@@ -2161,7 +2165,7 @@ Session.prototype = {
         immediately: true,
       });
 
-      CardsTracker.GEN_NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED({
+      CardsTracker.NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED({
         instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
       });
       this.hideTimer();
@@ -2175,7 +2179,7 @@ Session.prototype = {
         while_submitting: !!payload,
       },
     });
-    CardsTracker.GEN_SKIP_SAVED_CARD_CLICKED();
+    CardsTracker.SKIP_SAVED_CARD_CLICKED();
 
     $('#save').attr('checked', 0);
     this.wants_skip = true;
@@ -5862,7 +5866,7 @@ Session.prototype = {
 
       CardsTracker.PAY_WITH_APPS_PAYMENT_INITIATED({
         instrument: {
-          appSelected: provider,
+          name: provider,
         },
       });
       Analytics.track('app:attempt', {

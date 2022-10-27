@@ -215,7 +215,7 @@ Customer.prototype = {
 
         if (customer.saved && !queryParams.skip_otp) {
           OtpService.markOtpSent('razorpay');
-          CardsTracker.GEN_OTP_SENT();
+          CardsTracker.OTP_SENT();
         }
 
         if (data.tokens) {

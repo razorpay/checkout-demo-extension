@@ -59,7 +59,7 @@
     });
   };
   function trackUserConsentForTokenization(event) {
-    CardsTracker.GEN_CARD_CONSENT_TOGGLED({
+    CardsTracker.CARD_CONSENT_TOGGLED({
       instrument: {
         saveCardConsent: event?.target?.checked,
       },
@@ -86,7 +86,7 @@
       checked = false;
     }
 
-    CardsTracker.GEN_CONSENT_BOX_SHOWN({
+    CardsTracker.CONSENT_BOX_SHOWN({
       instrument: {
         saveCardConsent: checked,
         screenName: modalType,

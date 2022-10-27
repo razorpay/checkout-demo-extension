@@ -757,7 +757,7 @@
   export function setSelectedApp(code) {
     CardsTracker.PAY_WITH_APPS_PAYMENT_SELECTED({
       instrument: {
-        appSelected: code,
+        name: code,
       },
     });
     Events.TrackBehav(CardEvents.APP_SELECT, {
@@ -1125,14 +1125,14 @@
     if (tabVisible) {
       if (currentView === Views.ADD_CARD) {
         Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
-        CardsTracker.GEN_ADD_NEW_CARD_SCREEN();
+        CardsTracker.ADD_NEW_CARD_SCREEN();
       } else if (
         currentView === Views.SAVED_CARDS &&
         isSavedCardsEnabled &&
         savedCards.length
       ) {
         Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
-        CardsTracker.GEN_SAVED_CARD_SCREEN({ savedCards: savedCards.length });
+        CardsTracker.SAVED_CARD_SCREEN({ savedCards: savedCards.length });
       }
     }
   }

@@ -41,6 +41,7 @@
 
   // Other Imports
   import { isRedesignV15 } from 'razorpay';
+  import { CardsTracker } from 'card/analytics/events';
 
   let downtimeSeverity;
   let downtimeInstrument = '';
@@ -170,6 +171,10 @@
       labelUpperClasses: 'cvv-one-cc-label-upper-prefered-block',
     };
   }
+
+  function trackCVVFilled() {
+    CardsTracker.CVV_FILLED();
+  }
 </script>
 
 <svelte:component
@@ -210,6 +215,7 @@
         bind:this={cvvRef}
         handleBlur={true}
         {...additionalCvvProps}
+        on:blur={trackCVVFilled}
       />
     {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>
