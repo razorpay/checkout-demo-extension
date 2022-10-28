@@ -2,6 +2,7 @@ import { AnalyticsV2State, ContextProperties, EventsV2 } from 'analytics-v2';
 import { Events } from 'analytics';
 import { MiscTracker } from 'misc/analytics/events';
 import { CardsTracker } from 'card/analytics/events';
+import { NetbankingTracker } from 'netbanking/analytics/events';
 import {
   isInstrumentForEntireMethod,
   isSavedCardInstrument,
@@ -10,9 +11,10 @@ import { getInstrumentDetails } from 'ui/tabs/home/helpers';
 import { METHODS } from 'checkoutframe/constants';
 import { HOME_EVENTS } from 'analytics/home/events';
 
-const { CARD } = METHODS;
+const { CARD, NETBANKING } = METHODS;
 const Tracker = {
   [CARD]: CardsTracker,
+  [NETBANKING]: NetbankingTracker,
 };
 
 type MetaType = {

@@ -64,6 +64,7 @@
 
   // Analytics imports
   import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
+  import { NetbankingTracker } from 'netbanking/analytics/events';
 
   // Props
   export let banks;
@@ -294,6 +295,9 @@
     }
 
     if (bankCode) {
+      NetbankingTracker.BANK_OPTION_SELECTED({
+        name: bankCode,
+      });
       try {
         MiscTracker.INSTRUMENT_SELECTED({
           block: AnalyticsV2State.selectedBlock,
@@ -335,8 +339,10 @@
         },
         instruments: getInstrumentsWithOrder(netbanks, 'netbanking'),
       });
+      NetbankingTracker.BANK_OPTIONS_SHOWN({
+        instruments: getInstrumentsWithOrder(netbanks, 'netbanking'),
+      });
     } catch {}
-
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD_V2);
   });

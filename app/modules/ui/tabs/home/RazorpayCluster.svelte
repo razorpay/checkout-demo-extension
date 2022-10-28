@@ -21,7 +21,6 @@
 
   // helpers
   import { getSectionCategoryForBlock, setDynamicFees } from './helpers';
-  import { CardsTracker } from 'card/analytics/events';
 
   // Props
   export let block;

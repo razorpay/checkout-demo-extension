@@ -47,7 +47,6 @@
   import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
   import { emiMethodClicked } from 'emiV2/events/tracker';
-  import { CardsTracker } from 'card/analytics/events';
 
   // Props
   export let method: string = null; // Name of the method

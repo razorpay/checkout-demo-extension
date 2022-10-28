@@ -102,8 +102,8 @@ interface MiscEventMap {
     block: Block;
     instruments: {
       [key: number]: {
+        name: string;
         order: number;
-        method: string;
       };
     };
   };
