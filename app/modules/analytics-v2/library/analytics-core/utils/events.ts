@@ -1,7 +1,8 @@
-import type {
+import {
   AnalyticsState,
   CallbackPayloadMap,
   PluginState,
+  PLUGIN_CALLBACK_TYPES,
 } from 'analytics-v2/library/analytics-core/types';
 import { fitlerDisabledPlugins } from 'analytics-v2/library/analytics-core/utils';
 import createQueue from 'analytics-v2/library/common/queue';
@@ -24,26 +25,34 @@ function handlePendingEvents(
   options: PayloadOptions,
   type: keyof CallbackPayloadMap
 ) {
-  const pluginCallback = plugin.config?.[type];
   if (!plugin.pendingQ) {
     // create a new queue for plugin and push events triggered before plugin loaded
     plugin.pendingQ = createQueue(
       (events: any[]) => {
-        events.forEach((payload) => {
-          if (!plugin.loaded()) {
-            // plugin is still not loaded, push the event back in queue
-            plugin.pendingQ?.push(payload);
-          } else if (pluginCallback) {
-            pluginCallback(payload, options);
+        events.forEach(
+          ({
+            payload,
+            type,
+          }: {
+            payload: any;
+            type: PLUGIN_CALLBACK_TYPES;
+          }) => {
+            const pluginCallback = plugin.config?.[type];
+            if (!plugin.loaded()) {
+              // plugin is still not loaded, push the event back in queue
+              plugin.pendingQ?.push({ payload, type });
+            } else if (pluginCallback) {
+              pluginCallback(payload, options);
+            }
           }
-        });
+        );
       },
       {
         interval: PENDING_QUEUE_INTERVAL,
       }
     );
   }
-  plugin.pendingQ.push(payload);
+  plugin.pendingQ.push({ payload, type });
 }
 
 /**
@@ -71,7 +80,8 @@ export function processEvent<K extends keyof CallbackPayloadMap>(
   enabledPlugins.forEach((plugin: PluginState) => {
     const pluginCallback = plugin.config?.[type];
     if (typeof pluginCallback === 'function') {
-      if (plugin?.loaded()) {
+      // initialize event should be triggered instantly and not pushed in queue
+      if (plugin?.loaded() || type === PLUGIN_CALLBACK_TYPES.INITIALIZE) {
         // trigger plugin callback for the type
         pluginCallback(payload, options);
       } else {

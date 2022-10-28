@@ -30,6 +30,7 @@ export interface PluginState {
    */
   pendingQ: null | QueueType<{
     payload: TrackPayload | IdentifyPayload | CustomObject<string, unknown>;
+    type: PLUGIN_CALLBACK_TYPES;
   }>;
   config: Plugin;
 }
