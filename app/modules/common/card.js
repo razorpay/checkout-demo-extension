@@ -184,7 +184,28 @@ export const getNetworkFromCardNumber = (cardNumber) => {
 
   return network;
 };
+/**
+ * Validate the card is international or domestic
+ * @param {string} country
+ *@param {String[]} countries
+ * @returns {boolean}
+ */
+export const isCountryInAllowedList = (country, countries) => {
+  // If country explicitly allowed
+  if (countries.includes(country)) {
+    return true;
+  }
+  // If country explicitly mentioned in inverse-list
+  if (countries.includes('non_' + country)) {
+    return false;
+  }
+  // If atlease 1 inverse-list is present after doing above check
+  if (countries.some((data) => data.startsWith('non_'))) {
+    return true;
+  }
 
+  return false;
+};
 /**
  * Tells us if the card network is AMEX
  * @param {string} cardNumber

@@ -313,6 +313,7 @@ describe('Module: configurability/validate', () => {
             issuer: 'HDFC',
             international: false,
             emi: true,
+            country: 'US',
             expiry_month: 11,
             expiry_year: 2022,
             flows: {
@@ -369,6 +370,25 @@ describe('Module: configurability/validate', () => {
         )
       ).resolves.toBe(false);
 
+      // validate restrict country codes
+      await expect(
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', countries: ['non_IN'] },
+          payment,
+          {
+            tokens,
+          }
+        )
+      ).resolves.toBe(true);
+      await expect(
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', countries: ['IN'] },
+          payment,
+          {
+            tokens,
+          }
+        )
+      ).resolves.toBe(false);
       await expect(
         Validate.isInstrumentValidForPayment(
           { method: 'card', networks: ['MasterCard', 'Visa'] },

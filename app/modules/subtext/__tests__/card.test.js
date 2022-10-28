@@ -373,6 +373,109 @@ describe('Module: subtext/card', () => {
       );
 
       // -----------------
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+      };
+
+      expect('Only international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC'],
+      };
+
+      expect('Only HDFC international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC', 'ICIC'],
+      };
+
+      expect('Only HDFC and ICICI international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC', 'ICIC'],
+        networks: ['Visa'],
+      };
+
+      expect('Only HDFC and ICICI Visa international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC', 'ICIC'],
+        networks: ['Visa', 'MasterCard'],
+      };
+
+      expect('Only select international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC', 'ICIC'],
+        networks: ['Visa', 'MasterCard'],
+        types: ['credit'],
+      };
+
+      expect('Only select credit international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        types: ['credit'],
+      };
+
+      expect('Only credit international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC', 'ICIC'],
+        types: ['credit'],
+      };
+
+      expect('Only HDFC and ICICI credit international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        issuers: ['HDFC'],
+        types: ['credit'],
+      };
+
+      expect('Only HDFC credit international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
+
+      instrument = {
+        method: 'card',
+        countries: ['non_IN'],
+        types: ['credit'],
+      };
+
+      expect('Only credit international cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+      );
     });
   });
 

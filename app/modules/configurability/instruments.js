@@ -23,7 +23,7 @@ function addTypeAndCategory(instrument) {
  */
 const PUBLIC_API_INSTRUMENT_KEYS = {
   cod: [],
-  card: ['issuers', 'networks', 'types', 'iins'],
+  card: ['issuers', 'networks', 'types', 'iins', 'countries'],
   emi: ['issuers', 'networks', 'types', 'iins', 'durations'],
   netbanking: ['banks'],
   emandate: ['banks'],

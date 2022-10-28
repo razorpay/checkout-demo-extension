@@ -847,16 +847,16 @@ const getFlows = (query) => {
       card_currency: 'USD',
       avs_required: false,
     };
-  } else {
+  } 
     return {
       recurring: false,
       otp: true,
       emi: false,
     };
-  }
+  
 };
 
-const getIin = (query) => {
+const getIin = () => {
   const response = {
     flows: {
       otp: true,
@@ -867,6 +867,7 @@ const getIin = (query) => {
     type: 'prepaid',
     issuer: 'HDFC',
     http_status_code: 200,
+    country: 'US',
   };
 
   return response;

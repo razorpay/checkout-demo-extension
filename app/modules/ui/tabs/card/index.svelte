@@ -51,7 +51,7 @@
     isIndianCustomer,
   } from 'checkoutstore/screens/home';
 
-  import { findCodeByNetworkName } from 'common/card';
+  import { findCodeByNetworkName, isCountryInAllowedList } from 'common/card';
   import { customer } from 'checkoutstore/customer';
 
   import {
@@ -504,10 +504,12 @@
     const eligibleTokens = tokens.filter((token) => {
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
+      const hasCountries = Boolean(instrument.countries);
 
       const hasIins = Boolean(instrument.iins);
       const issuers = instrument.issuers || [];
       const networks = instrument.networks || [];
+      const countries = instrument.countries || [];
 
       let hasTypes = Boolean(instrument.types);
       let types = instrument.types || [];
@@ -522,6 +524,10 @@
       if (hasIins) {
         return false;
       }
+      const countryMatches =
+        hasCountries && token.card.country
+          ? isCountryInAllowedList(token.card.country, countries)
+          : true;
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
@@ -534,7 +540,7 @@
 
       const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
-      return issuerMatches && networkMatches && typeMatches;
+      return issuerMatches && networkMatches && typeMatches && countryMatches;
     });
     return eligibleTokens;
   }

@@ -5972,6 +5972,26 @@ const preferences = {
     features: { google_pay: true, save_vpa: true },
   },
   loggedIn: {
+    checkout_config: {
+      display: {
+        blocks: {
+          test: {
+            name: 'Pay via Card',
+            instruments: [
+              {
+                method: 'card',
+                countries: ['IN'],
+              },
+            ],
+          },
+        },
+
+        sequence: ['block.test'],
+        preferences: {
+          show_default_blocks: false,
+        },
+      },
+    },
     customer: {
       email: 'test@razorpay.com',
       contact: '+918111111111',
@@ -6056,6 +6076,7 @@ const preferences = {
             dcc_enabled: true,
             card: {
               entity: 'card',
+              country: 'IN',
               name: 'Siddharth Goswami',
               last4: '0176',
               network: 'MasterCard',
@@ -6085,6 +6106,7 @@ const preferences = {
             consent_taken: false,
             card: {
               entity: 'card',
+              country: 'IN',
               name: 'Siddharth',
               last4: '8882',
               network: 'MasterCard',

@@ -2,6 +2,7 @@ import {
   getIin,
   networks as CardNetworks,
   getNetworkFromCardNumber,
+  isCountryInAllowedList,
 } from 'common/card';
 import { getCardFeatures } from 'razorpay';
 
@@ -29,7 +30,7 @@ export function validateCardInstrument(
     // Set things from features
     const type = features.type;
     const issuer = features.issuer;
-
+    const country = features.country;
     let network;
     let iin;
 
@@ -50,12 +51,13 @@ export function validateCardInstrument(
       iin = getIin(cardNumberFromPayment);
     }
 
-    const { types, iins, issuers, networks } = instrument;
+    const { types, iins, issuers, networks, countries } = instrument;
 
     let isTypeValid = true;
     let isNetworkValid = true;
     let isIssuerValid = true;
     let isIinValid = true;
+    let isCountryValid = true;
 
     if (iin && iins) {
       isIinValid = iins.includes(iin);
@@ -72,7 +74,15 @@ export function validateCardInstrument(
     if (network && networks) {
       isNetworkValid = networks.includes(network);
     }
-
-    return isTypeValid && isNetworkValid && isIssuerValid && isIinValid;
+    if (country && countries) {
+      isCountryValid = isCountryInAllowedList(country, countries);
+    }
+    return (
+      isTypeValid &&
+      isNetworkValid &&
+      isIssuerValid &&
+      isIinValid &&
+      isCountryValid
+    );
   });
 }

@@ -46,6 +46,21 @@ export function formatTemplateWithLocale(label, data, locale, defaultValue) {
   }
 }
 
+export const formatCountriesMessage = (instrumentCountries) => {
+  let countriesString;
+  instrumentCountries
+    .map((data) => {
+      if (data.includes('non_IN')) {
+        return (countriesString = 'international');
+      } else if (data.includes('IN')) {
+        return (countriesString = 'Indian');
+      }
+      return;
+    })
+    .filter((countriesString) => !!countriesString);
+  return countriesString;
+};
+
 /**
  * Formats the message with the given locale
  * @param {string} label

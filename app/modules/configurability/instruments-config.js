@@ -113,7 +113,14 @@ function createCombinations(instrument, sequence = []) {
   return soFar;
 }
 
-const cardProperties = ['types', 'iins', 'issuers', 'networks', 'token_id'];
+const cardProperties = [
+  'types',
+  'iins',
+  'issuers',
+  'networks',
+  'token_id',
+  'countries',
+];
 const upiProperties = ['flows', 'apps', 'token_id', 'vpas'];
 const config = {
   card: {
@@ -167,6 +174,7 @@ const config = {
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
+      const hasCountries = Boolean(instrument.countries);
 
       if (hasIssuers && !instrument.issuers.length) {
         return false;
@@ -179,7 +187,9 @@ const config = {
       if (hasTypes && !instrument.types.length) {
         return false;
       }
-
+      if (hasCountries && !instrument.countries.length) {
+        return false;
+      }
       return true;
     },
   },

@@ -86,4 +86,14 @@ describe('common/card', () => {
     expect(luhnCheck(testCards.maestro)).toBe(true);
     expect(luhnCheck('4242424242424246')).toBe(false);
   });
+  //isCountryInAllowedList restrict through country codes
+  test('isCountryInAllowedList', function () {
+    expect(Card.isCountryInAllowedList('US', ['non_IN'])).toBe(true);
+    expect(Card.isCountryInAllowedList('US', ['IN'])).toBe(false);
+    expect(Card.isCountryInAllowedList('IN', ['IN'])).toBe(true);
+    expect(Card.isCountryInAllowedList('IN', ['non_IN'])).toBe(false);
+    expect(Card.isCountryInAllowedList('IN', ['BR'])).toBe(false);
+    expect(Card.isCountryInAllowedList('IN', ['non_IN', 'non_US'])).toBe(false);
+    expect(Card.isCountryInAllowedList('IN', ['non_IN', 'IN'])).toBe(true);
+  });
 });
