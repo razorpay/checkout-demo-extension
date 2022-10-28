@@ -41,7 +41,7 @@
         false,
       debit_and_cardless: !!$selectedBank?.debitCardlessConfig,
       tab_view: tabs.length > 1,
-      default_tab: tabs[0].value,
+      default_tab: tabs.length > 0 ? tabs[0].value : 'NA',
     });
   });
 

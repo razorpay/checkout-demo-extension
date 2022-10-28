@@ -4,7 +4,7 @@ import { selectedPlan } from 'checkoutstore/emi';
 import { selectedCard } from 'checkoutstore/screens/card';
 import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
 import { selectedBank } from 'emiV2/store';
-import { moveControlToSession } from 'navstack';
+import { isOverlayActive, moveControlToSession } from 'navstack';
 import { appliedOffer } from 'offers/store';
 import { isEmiV2 } from 'razorpay';
 import { getSession } from 'sessionmanager';
@@ -65,6 +65,12 @@ export const updateTabStore = (tab = '') => {
 export const handleBackNavigation = () => {
   const session = getSession();
   if (isEmiV2() && session.tab === 'emi') {
+    // If any overlay is currently active
+    // we don't need to run any logic for screen/tab store update
+    // since popstack has already ran
+    if (isOverlayActive()) {
+      return;
+    }
     let screen: string = session.screen;
     // current screen is card / bajaj card screen or cvv screen
     // set the current screen explicitly to emi plans screen
