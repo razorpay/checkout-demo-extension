@@ -57,7 +57,6 @@ module.exports = function (testFeatures) {
     })
   )('One Click Checkout coupons test', ({ preferences, title, options }) => {
     test(title, async () => {
-      debugger;
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
