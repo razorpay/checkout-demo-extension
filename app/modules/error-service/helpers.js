@@ -36,6 +36,14 @@ export const constructErrorObject = (error, tags) => {
       customError.message = error;
       break;
 
+    case typeof error === 'object' && isNetworkError(error): {
+      customError = {
+        ...JSON.parse(JSON.stringify(error)),
+        message: `[NETWORK ERROR] ${error.description}`,
+      };
+      break;
+    }
+
     case typeof error === 'object':
       {
         const { name, message, stack, fileName, lineNumber, columnNumber } =
@@ -64,3 +72,20 @@ export const constructErrorObject = (error, tags) => {
 
   return customError;
 };
+
+/**
+ * return true/false based on whether error object follow API error schema
+ * @param err Error object
+ */
+function isNetworkError(err) {
+  const errorKeys = [
+    'source',
+    'step',
+    'description',
+    'reason',
+    'code',
+    'metadata',
+  ];
+
+  return errorKeys.every((key) => err.hasOwnProperty(key));
+}
