@@ -52,9 +52,8 @@ export function generateTextFromList(list, locale, max = Infinity) {
       { text: list.slice(0, max - 1).join(', ') },
       locale
     );
-  } else {
-    return oxfordComma(list, locale);
   }
+  return oxfordComma(list, locale);
 }
 
 export function toLowerCaseSafe(str) {

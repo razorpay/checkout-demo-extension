@@ -13,9 +13,8 @@ export function getAmount(): string {
 
   if (display_amount && display_currency) {
     return displayCurrencies[display_currency] + display_amount;
-  } else {
-    return formatAmountWithCurrency(amount);
   }
+  return formatAmountWithCurrency(amount);
 }
 
 /**

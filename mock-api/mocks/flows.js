@@ -847,13 +847,12 @@ const getFlows = (query) => {
       card_currency: 'USD',
       avs_required: false,
     };
-  } 
-    return {
-      recurring: false,
-      otp: true,
-      emi: false,
-    };
-  
+  }
+  return {
+    recurring: false,
+    otp: true,
+    emi: false,
+  };
 };
 
 const getIin = () => {

@@ -15,4 +15,4 @@ jobs:
           eslint_flags: 'app/modules'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           level: error
-          fail_on_error: false
+          fail_on_error: true

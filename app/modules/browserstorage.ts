@@ -4,7 +4,7 @@
 const BrowserStorage: Partial<Storage> = {
   _storage: {},
 
-  setItem: function (key: string, value: any) {
+  setItem: function (key: string, value: unknown) {
     this._storage[key] = value;
   },
 
@@ -36,9 +36,8 @@ function determineStorage(): Storage {
     // If timestamp from storage doesn't match, use our mocked storage
     if (now !== parseInt(String(fromStorage))) {
       return BrowserStorage as Storage;
-    } else {
-      return global.localStorage;
     }
+    return global.localStorage;
   } catch (err) {
     // In case something fails, use our mocked storage.
     return BrowserStorage as Storage;

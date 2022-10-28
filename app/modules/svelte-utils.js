@@ -13,9 +13,8 @@ function getAnimationDuration(duration) {
 
   if (disableAnimations) {
     return 0;
-  } else {
-    return duration;
   }
+  return duration;
 }
 
 /**
