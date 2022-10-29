@@ -28,7 +28,7 @@ const {
   handleAddAddress,
   fillUserAddress,
   handleCustomerAddressReq,
-  handleCheckUnserviceable,
+  assertUnserviceableAddress,
   unCheckBillAddress,
   handleManageAddress,
   handleEditAddress,
@@ -36,6 +36,7 @@ const {
   handleBillingAddress,
   checkStateFieldDisabled,
   checkInvalidAddressForm,
+  selectUnselectedAddress,
 } = require('../../actions/one-click-checkout/address');
 const {
   assertAddressTab,
@@ -88,6 +89,8 @@ module.exports = function (testFeatures) {
     invalidAddress,
     mandatoryLogin,
     shippingFee,
+    manageAddress,
+    selectUnserviceable,
     consentBannerViews,
   } = features;
 
@@ -136,8 +139,25 @@ module.exports = function (testFeatures) {
 
         // default address is unserviceable at L0 screen
         if (!serviceable) {
-          await handleCheckUnserviceable(context);
+          await assertUnserviceableAddress(context);
           return;
+        }
+
+        if (manageAddress) {
+          await delay(100);
+          await handleManageAddress(context);
+          await handleShippingInfo(context, {
+            zipcode: '560002',
+            serviceable: !selectUnserviceable,
+          });
+          await delay(100);
+          if (selectUnserviceable) {
+            // select second unserviceable address
+            await selectUnselectedAddress(context, addresses, 1);
+            // assert disabled cta
+            await assertUnserviceableAddress(context);
+            return;
+          }
         }
 
         if (addShippingAddress || editShippingAddress) {
@@ -234,7 +254,6 @@ module.exports = function (testFeatures) {
               await checkInvalidOTP(context);
               return;
             }
-            debugger;
             await handleShippingInfo(context, options);
           }
         } else {
@@ -271,7 +290,7 @@ module.exports = function (testFeatures) {
           // unserviceable address in add address form
           if (!serviceable) {
             await delay(200);
-            await handleCheckUnserviceable(context, true);
+            await assertUnserviceableAddress(context, true);
             return;
           }
 
@@ -283,6 +302,14 @@ module.exports = function (testFeatures) {
               saveAddress,
               isBillingAddress: true,
             });
+          }
+          if (
+            saveAddress &&
+            !mandatoryLogin &&
+            (!addresses.length || skipAccessOTP)
+          ) {
+            await delay(400);
+            await proceedOneCC(context);
           }
         }
 
@@ -305,6 +332,18 @@ module.exports = function (testFeatures) {
 
       await delay(200);
       await proceedOneCC(context);
+
+      if (loggedIn && !addresses.length) {
+        await delay(400);
+        await fillUserAddress(context, {
+          saveAddress,
+          isCODEligible,
+          serviceable,
+          addLandmark,
+        });
+        await delay(100);
+        await proceedOneCC(context);
+      }
 
       if (saveAddress && (!skipSaveOTP || mandatoryLogin)) {
         await handleCustomerAddressReq(context);

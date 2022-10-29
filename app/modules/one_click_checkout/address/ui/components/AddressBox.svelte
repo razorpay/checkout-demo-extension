@@ -58,7 +58,7 @@
 {:else}
   <button
     data-testid="address-box"
-    id={`address-container${isSelected ? '-selected' : ''}`}
+    id={`address-container-${isSelected ? 'selected' : address?.id}`}
     class="card address-container"
     class:card-border={withBorder}
     class:selected-container={isSelected}

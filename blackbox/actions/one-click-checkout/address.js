@@ -182,7 +182,7 @@ async function handleEditAddressReq(context) {
   await delay(200);
 }
 
-async function handleCheckUnserviceable(context, addAddress) {
+async function assertUnserviceableAddress(context, addAddress) {
   if (addAddress) {
     await assertVisible('[data-test-id=toast-error]');
   } else {
@@ -193,6 +193,13 @@ async function handleCheckUnserviceable(context, addAddress) {
       el.classList.contains('disabled')
     )
   ).toBe(true);
+}
+
+async function selectUnselectedAddress(context, addresses, index) {
+  const inactiveAddrBox = await context.page.$(
+    `#address-container-${addresses[index]?.id}`
+  );
+  await inactiveAddrBox.click();
 }
 
 /**
@@ -278,7 +285,7 @@ module.exports = {
   fillUserAddress,
   handleAddAddress,
   handleCustomerAddressReq,
-  handleCheckUnserviceable,
+  assertUnserviceableAddress,
   unCheckBillAddress,
   handleManageAddress,
   handleEditAddress,
@@ -286,4 +293,5 @@ module.exports = {
   handleBillingAddress,
   checkStateFieldDisabled,
   checkInvalidAddressForm,
+  selectUnselectedAddress,
 };

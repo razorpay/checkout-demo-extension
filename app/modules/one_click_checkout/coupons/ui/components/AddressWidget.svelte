@@ -154,7 +154,7 @@
     margin-top: 10px;
     margin-bottom: 0;
   }
-  .address-widget-container :global(#address-container) {
+  .address-widget-container :global(.address-container) {
     cursor: default;
   }
 </style>
