@@ -1,4 +1,5 @@
 import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 import fetch from 'utils/fetch';
 import { isNonNullObject } from 'utils/object';
 import { makeUrl } from 'common/helper';
@@ -13,6 +14,10 @@ import * as _ from 'utils/_';
  * @returns promise making the API call
  */
 export function create1ccShopifyCheckout(params, body, callback) {
+  const apiTimer = _.timer();
+  Analytics.track('1cc_shopify_checkout:start', {
+    type: AnalyticsTypes.METRIC,
+  });
   if (isNonNullObject(params)) {
     params['_[request_index]'] = Analytics.updateRequestIndex('preferences');
   }
@@ -20,6 +25,10 @@ export function create1ccShopifyCheckout(params, body, callback) {
     url: _.appendParamsToUrl(makeUrl('1cc/shopify/checkout'), params),
     data: { send_preferences: true, ...body },
     callback: function (response) {
+      Analytics.track('1cc_shopify_checkout:end', {
+        type: AnalyticsTypes.METRIC,
+        data: { time: apiTimer() },
+      });
       callback(response);
     },
   });
