@@ -2204,9 +2204,8 @@ Session.prototype = {
       if (!this.headless) {
         this.setScreen('card');
       }
-      if (!this.preferences.fee_bearer) {
-        this.commenceOTP('payment_processing');
-      }
+
+      this.commenceOTP('payment_processing');
     } else {
       // If it's a new emi flow skipping otp takes us to emi options flow for emi tab
       if (this.tab === 'emi' && RazorpayHelper.isEmiV2()) {
