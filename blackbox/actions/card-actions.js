@@ -1,4 +1,4 @@
-const { delay, innerText, visible } = require('../util');
+const { delay, innerText, visible, makeJSONResponse } = require('../util');
 const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 const { sendSiftJS } = require('./siftjs');
@@ -17,9 +17,7 @@ const AVS_DATA = {
 };
 
 async function handleCardValidation(context, { urlShouldContain } = {}) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain(urlShouldContain || 'create/ajax');
-  await context.respondJSON({
+  const response = {
     type: 'first',
     request: {
       url: 'http://localhost:9008',
@@ -29,7 +27,17 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
     payment_id: 'pay_DLXKaJEF1T1KxC',
     amount: '\u20b9 51',
     image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-  });
+  };
+
+  let req = await context.getRequest('/v1/payments/create/ajax');
+  if (!req) {
+    const req = await context.expectRequest();
+    expect(req.url).toContain(urlShouldContain || 'create/ajax');
+    await context.respondJSON(response);
+    return;
+  }
+  req.respond(makeJSONResponse(response));
+  context.resetRequest(req);
 }
 
 async function fillAVSForm({

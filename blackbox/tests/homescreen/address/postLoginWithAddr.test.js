@@ -5,4 +5,5 @@ createAddressTest({
   amount: 200 * 100,
   serviceable: true,
   addresses,
+  isCODEligible: true,
 });

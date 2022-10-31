@@ -9,4 +9,5 @@ createAddressTest({
   addresses,
   serviceable: true,
   saveAddress: true,
+  isCODEligible: true,
 });

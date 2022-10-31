@@ -8,4 +8,5 @@ createAddressTest({
   serviceable: true,
   skipAccessOTP: true,
   addresses,
+  isCODEligible: true,
 });

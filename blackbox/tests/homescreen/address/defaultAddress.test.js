@@ -7,6 +7,6 @@ createAddressTest({
   loggedIn: true,
   anon: false,
   serviceable: true,
-  isCODEligible: false,
+  isCODEligible: true,
   addresses,
 });

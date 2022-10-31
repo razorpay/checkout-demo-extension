@@ -35,6 +35,7 @@ const getTestData = (
     anon = true,
     keyless = true,
     addresses = [],
+    methods = [],
   } = {}
 ) => {
   keyless = false;
@@ -68,6 +69,22 @@ const getTestData = (
       tests.push(getDataUpdatedForKeyless(anonymousUserData));
     }
   }
+
+  if (methods.length) {
+    const res = [].concat(
+      ...tests.map((test) => {
+        return methods.map((method) => {
+          return {
+            ...test,
+            method,
+            title: title + ` - ${method}`,
+          };
+        });
+      })
+    );
+    return res;
+  }
+
   return tests;
 };
 

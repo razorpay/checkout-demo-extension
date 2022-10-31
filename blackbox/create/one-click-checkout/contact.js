@@ -36,7 +36,7 @@ const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions.js');
 
-module.exports = function (testFeatures) {
+module.exports = function (testFeatures, methods = ['upi', 'card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
@@ -48,9 +48,12 @@ module.exports = function (testFeatures) {
     getTestData(title, {
       options,
       preferences,
+      methods,
     })
   )('One Click Checkout Contact test', ({ preferences, title, options }) => {
     test.skip(title, async () => {
+      preferences.methods.upi = true;
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,

@@ -3,6 +3,14 @@ const { selectQRScanner } = require('../../tests/homescreen/actions');
 const {
   respondToUPIAjax,
   responseWithQRImage,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIPaymentStatus,
+  handleSaveVpaRequest,
+  enterCardDetails,
+  handleCardValidation,
+  typeOTPandSubmit,
 } = require('../../actions/common');
 const {
   delay,
@@ -11,9 +19,14 @@ const {
   makeJSONResponse,
   assertHidden,
 } = require('../../util');
-const { passRequestNetbanking } = require('../common');
 const { fillUserDetails } = require('../home-page-actions');
-const { selectBank, handleMockSuccessDialog } = require('../shared-actions');
+const { submit, handleMockSuccessDialog } = require('../shared-actions');
+const { handleCODPayment } = require('./cod');
+const {
+  selectSavedCardAndTypeCvv,
+  handleCustomerCardStatusRequest,
+  respondSavedCards,
+} = require('../card-actions');
 
 const truncateString = (str, num) =>
   str?.length > num ? `${str.slice(0, num)}...` : str;
@@ -431,25 +444,74 @@ async function mockPaymentSteps(
   context,
   options,
   features,
-  updateOrder = true
+  updateOrder = true,
+  method = 'upi'
 ) {
   if (updateOrder) {
     await handleUpdateOrderReq(context, options.order_id);
   }
-  await handleThirdWatchReq(context);
+  await handleThirdWatchReq(context, true);
   await delay(200);
-  await handleFeeSummary(context, features);
-  await handleWalletModalClose(context, features);
-  await handleQRModalClose(context, features);
-  await selectPaymentMethod(context, 'netbanking');
-  await selectBank(context, 'SBIN');
-  await proceedOneCC(context);
-  await passRequestNetbanking(context);
-  await delay(200);
-  await handleMockSuccessDialog(context);
-  await delay(400);
+  if (method !== 'cod') {
+    await handleFeeSummary(context, features);
+  }
+
+  switch (method) {
+    case 'upi':
+      await makeUpiPayment(context);
+      break;
+    case 'card':
+      await makeCardPayment(context, features);
+      break;
+    case 'cod':
+      await makeCodPayment(context, features);
+      break;
+    default:
+      throw Error(`unexpected method ${method} received`);
+  }
 }
 
+async function makeCodPayment(context, features) {
+  await selectPaymentMethod(context, 'cod');
+  await delay(200);
+  await proceedOneCC(context);
+  await handleFeeSummary(context, features);
+  await handleCODPayment(context);
+}
+
+async function makeCardPayment(context, features) {
+  const loggedIn =
+    (features.saveAddress &&
+      (!features.skipSaveOTP || !features.skipAccessOTP)) ||
+    (features.addresses?.length && !features.skipAccessOTP);
+
+  await selectPaymentMethod(context, 'card');
+  if (!loggedIn) {
+    await handleCustomerCardStatusRequest(context);
+    await handleTypeOTP(context);
+    await proceedOneCC(context);
+    await respondSavedCards(context);
+  }
+  const isSavedCardsView = await context.page.$('.saved-inner');
+  if (isSavedCardsView) {
+    await selectSavedCardAndTypeCvv(context);
+  } else {
+    await enterCardDetails(context);
+  }
+  await submit(context);
+  await handleCardValidation(context);
+  await handleMockSuccessDialog(context);
+}
+
+async function makeUpiPayment(context) {
+  await selectPaymentMethod(context, 'upi');
+  await selectUPIMethod(context, 'new');
+  await enterUPIAccount(context, 'sarashgupta1909@okaxios');
+  await submit(context);
+  await handleUPIAccountValidation(context);
+  await handleSaveVpaRequest(context);
+  await respondToUPIPaymentStatus(context);
+}
 async function closeModal(context) {
   const crossCTA = await context.page.waitForSelector('.modal-close');
   await crossCTA.click();

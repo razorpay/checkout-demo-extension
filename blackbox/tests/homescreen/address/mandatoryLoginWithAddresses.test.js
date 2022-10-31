@@ -6,4 +6,5 @@ createAddressTest({
   serviceable: true,
   addresses,
   mandatoryLogin: true,
+  isCODEligible: true,
 });

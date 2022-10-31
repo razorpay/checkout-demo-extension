@@ -6,6 +6,6 @@ createAddressTest({
   saveAddress: false,
   serviceable: true,
   addBillingAddress: true,
-  isCODEligible: false,
+  isCODEligible: true,
   billingEnabled: true,
 });

@@ -28,6 +28,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
       });
+
       const screenEle = await context.page.waitForSelector('.screen-comp');
       await scrollToEnd(context, screenEle);
       await delay(1700);

@@ -17,6 +17,7 @@ const {
   handleVerifyOTPReq,
   handleUpdateOrderReq,
   handleFeeSummary,
+  handleThirdWatchReq,
 } = require('../../actions/one-click-checkout/common');
 const {
   fillUserAddress,
@@ -35,10 +36,21 @@ const {
 const {
   selectPaymentMethod,
 } = require('../../tests/homescreen/homeActions.js');
-const { enterCardDetails } = require('../../actions/card-actions.js');
-const { submit } = require('../../actions/shared-actions.js');
+const {
+  enterCardDetails,
+  handleCardValidation,
+} = require('../../actions/card-actions.js');
+const { handleMockSuccessDialog } = require('../../actions/shared-actions.js');
+const {
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  handleSaveVpaRequest,
+  respondToUPIPaymentStatus,
+} = require('../../actions/upi-actions.js');
 
-module.exports = function (testFeatures = {}) {
+// TODO: UPI Method disabled for now, due to a bug in the flow.
+module.exports = function (testFeatures = {}, methods = ['card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     {
@@ -58,55 +70,82 @@ module.exports = function (testFeatures = {}) {
     getTestData(title, {
       options,
       preferences,
+      methods,
     })
-  )('One Click Checkout offers test', ({ preferences, title, options }) => {
-    test(title, async () => {
-      debugger;
-      const availableCoupons = [];
-      const context = await openCheckoutWithNewHomeScreen({
-        page,
-        options,
-        preferences,
+  )(
+    'One Click Checkout offers test',
+    ({ preferences, title, options, method }) => {
+      test(title, async () => {
+        preferences.methods.upi = true;
+
+        const availableCoupons = [];
+        const context = await openCheckoutWithNewHomeScreen({
+          page,
+          options,
+          preferences,
+        });
+
+        await handleAvailableCouponReq(context, availableCoupons);
+
+        await delay(200);
+        await fillUserDetails(context);
+        if (features.couponValid) {
+          await handleCouponView(context);
+          await verifyValidCoupon(context, features);
+        }
+        await delay(200);
+        await proceedOneCC(context);
+        await handleCustomerStatusReq(context);
+        await fillUserAddress(context, {
+          saveAddress: true,
+          serviceable: true,
+        });
+        await delay(200);
+        await proceedOneCC(context);
+        await handleCreateOTPReq(context);
+        await handleTypeOTP(context);
+        await proceedOneCC(context);
+        await handleVerifyOTPReq(context);
+        await handleCustomerAddressReq(context);
+        await handleUpdateOrderReq(context, options.order_id);
+        await handleThirdWatchReq(context);
+
+        await selectPaymentMethod(context, method);
+        await delay(200);
+        if (method === 'card') {
+          await enterCardDetails(context, {
+            recurring: false,
+            dcc: false,
+            internationalCard: false,
+          });
+        } else if (method === 'upi') {
+          await selectUPIMethod(context, 'new');
+          await enterUPIAccount(context, 'sarashgupta1909@okaxios');
+        }
+        await delay(200);
+        await viewOffers(context);
+        await delay(200);
+        await selectOffer(context, '1');
+        await verifyOfferApplied(context);
+        if (method === 'card') {
+          await validateCardForOffer(context);
+        }
+        await handleFeeSummary(context, {
+          ...features,
+          offerIndex: method === 'upi' ? 3 : 1,
+        });
+        await delay(200);
+        await proceedOneCC(context);
+
+        if (method === 'card') {
+          await handleCardValidation(context);
+          await handleMockSuccessDialog(context);
+        } else if (method === 'upi') {
+          await handleUPIAccountValidation(context);
+          await handleSaveVpaRequest(context);
+          await respondToUPIPaymentStatus(context);
+        }
       });
-      context.isRedesignV15Enabled = true;
-
-      await handleAvailableCouponReq(context, availableCoupons);
-
-      await delay(200);
-      await fillUserDetails(context);
-      if (features.couponValid) {
-        await handleCouponView(context);
-        await verifyValidCoupon(context, features);
-      }
-      await delay(200);
-      await proceedOneCC(context);
-      await handleCustomerStatusReq(context);
-      await fillUserAddress(context, { saveAddress: true, serviceable: true });
-      await delay(200);
-      await proceedOneCC(context);
-      await handleCreateOTPReq(context);
-      await handleTypeOTP(context);
-      await proceedOneCC(context);
-      await handleVerifyOTPReq(context);
-      await handleCustomerAddressReq(context);
-      await handleUpdateOrderReq(context, options.order_id);
-
-      await selectPaymentMethod(context, 'card');
-      await enterCardDetails(context, {
-        recurring: false,
-        dcc: false,
-        internationalCard: false,
-      });
-      await delay(200);
-      await viewOffers(context);
-      await delay(200);
-      await selectOffer(context, '1');
-      await verifyOfferApplied(context);
-      await validateCardForOffer(context);
-
-      await handleFeeSummary(context, features);
-      await proceedOneCC(context);
-      await submit(context);
-    });
-  });
+    }
+  );
 };

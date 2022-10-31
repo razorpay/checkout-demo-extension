@@ -115,7 +115,7 @@ async function respondToUPIPaymentStatus(context) {
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
   let timeout = 2000;
-  await context.page.waitFor('#modal-inner', {
+  await context.page.waitForSelector('#modal-inner', {
     timeout,
     hidden: true,
   });

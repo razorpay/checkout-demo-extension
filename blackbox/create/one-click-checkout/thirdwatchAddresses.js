@@ -36,7 +36,7 @@ const addresses = require('../../data/one-click-checkout/addresses.json');
  * @param {*} testFeatures.skipAccessOTP skip OTP to access savedAddresses
  *
  */
-module.exports = function (testFeatures) {
+module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
@@ -49,15 +49,17 @@ module.exports = function (testFeatures) {
       options,
       preferences,
       addresses,
+      methods,
     })
   )('One Click Checkout Address test', ({ preferences, title, options }) => {
     test(title, async () => {
+      preferences.methods.upi = true;
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
-      context.page.setDefaultTimeout(1000);
       await delay(500);
 
       if (loggedIn) {

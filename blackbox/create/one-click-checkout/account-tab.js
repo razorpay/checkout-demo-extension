@@ -19,7 +19,7 @@ const {
   handleAvailableCouponReq,
 } = require('../../actions/one-click-checkout/coupons.js');
 
-module.exports = function (testFeatures) {
+module.exports = function (testFeatures, methods = ['card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
@@ -32,16 +32,20 @@ module.exports = function (testFeatures) {
       ...features,
       options,
       preferences,
+      methods,
     })
   )(
     'One Click Checkout Account tab test',
     ({ preferences, title, options }) => {
       test(title, async () => {
+        preferences.methods.upi = true;
+
         const context = await openCheckoutWithNewHomeScreen({
           page,
           options,
           preferences,
         });
+
         if (features.showCoupons) {
           await handleAvailableCouponReq(context);
         }

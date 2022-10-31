@@ -392,6 +392,7 @@ module.exports = {
       page,
       options,
       preferences,
+      isRedesignV15Enabled: preferences.features.one_click_checkout,
       ...computed(options, preferences),
       ...interceptorOptions,
       forceTargetInitialization,

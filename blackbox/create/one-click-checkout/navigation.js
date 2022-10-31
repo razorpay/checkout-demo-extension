@@ -25,7 +25,7 @@ const {
   fillUserAddress,
 } = require('../../actions/one-click-checkout/address.js');
 
-module.exports = function (testFeatures) {
+module.exports = function (testFeatures, methods = ['upi', 'card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
@@ -38,9 +38,12 @@ module.exports = function (testFeatures) {
       ...features,
       options,
       preferences,
+      methods,
     })
   )('One Click Checkout Navigation test', ({ preferences, title, options }) => {
     test(title, async () => {
+      preferences.methods.upi = true;
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,

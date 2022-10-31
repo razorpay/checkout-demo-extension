@@ -10,7 +10,7 @@ createAddressTest({
   saveAddress: true,
   addShippingAddress: true,
   serviceable: true,
-  isCODEligible: false,
+  isCODEligible: true,
   addLandmark: true,
   addresses,
 });

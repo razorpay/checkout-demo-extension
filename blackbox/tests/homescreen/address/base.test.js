@@ -8,4 +8,5 @@ createAddressTest({
   addresses,
   powerWalletModalClose: true,
   qrModalClose: true,
+  isCODEligible: true,
 });

@@ -66,7 +66,7 @@ const CONTACT_ERROR_LABEL = 'Enter a valid mobile number.';
  * @param {*} testFeatures.mandatoryLogin user has to login after details/summary screen
  *
  */
-module.exports = function (testFeatures) {
+module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
     testFeatures
@@ -82,7 +82,6 @@ module.exports = function (testFeatures) {
     serviceable,
     skipAccessOTP,
     skipSaveOTP,
-    isCODEligible,
     inValidOTP,
     addLandmark,
     addresses = [],
@@ -99,261 +98,284 @@ module.exports = function (testFeatures) {
       ...features,
       options,
       preferences,
+      methods,
     })
-  )('One Click Checkout Address test', ({ preferences, title, options }) => {
-    if (skip) {
-      test.skip(title, () => {});
-      return;
-    }
-    test(title, async () => {
-      preferences.methods.cod = true;
-      preferences.methods.upi = true;
-
-      /**
-       * L1 QRv2 has to be disable, for old flow to work
-       */
-      let qrV2FeatureFlags = {
-        disable_homescreen_qr: true,
-        disable_upiscreen_qr: true,
-      };
-      if (preferences.features) {
-        preferences.features = { ...preferences.features, ...qrV2FeatureFlags };
-      } else {
-        preferences.features = qrV2FeatureFlags;
+  )(
+    'One Click Checkout Address test',
+    ({ preferences, title, options, method }) => {
+      const isCODEligible = method === 'cod' ? true : features.isCODEligible;
+      if (skip) {
+        test.skip(title, () => {});
+        return;
       }
+      test(title, async () => {
+        preferences.methods.upi = true;
 
-      const context = await openCheckoutWithNewHomeScreen({
-        page,
-        options,
-        preferences,
-      });
-      await delay(500);
-      if (features.showCoupons) {
-        await handleAvailableCouponReq(context);
-      }
-      // loggedIn address flows
-      if (loggedIn) {
-        if (addresses.length) {
-          await handleShippingInfo(context, { serviceable });
+        /**
+         * L1 QRv2 has to be disable, for old flow to work
+         */
+        let qrV2FeatureFlags = {
+          disable_homescreen_qr: true,
+          disable_upiscreen_qr: true,
+        };
+        if (preferences.features) {
+          preferences.features = {
+            ...preferences.features,
+            ...qrV2FeatureFlags,
+          };
+        } else {
+          preferences.features = qrV2FeatureFlags;
         }
 
-        // default address is unserviceable at L0 screen
-        if (!serviceable) {
-          await assertUnserviceableAddress(context);
-          return;
+        const context = await openCheckoutWithNewHomeScreen({
+          page,
+          options,
+          preferences,
+        });
+        await delay(500);
+        if (features.showCoupons) {
+          await handleAvailableCouponReq(context);
         }
+        // loggedIn address flows
+        if (loggedIn) {
+          if (addresses.length) {
+            await handleShippingInfo(context, { serviceable, isCODEligible });
+          }
 
-        if (manageAddress) {
-          await delay(100);
-          await handleManageAddress(context);
-          await handleShippingInfo(context, {
-            zipcode: '560002',
-            serviceable: !selectUnserviceable,
-          });
-          await delay(100);
-          if (selectUnserviceable) {
-            // select second unserviceable address
-            await selectUnselectedAddress(context, addresses, 1);
-            // assert disabled cta
+          // default address is unserviceable at L0 screen
+          if (!serviceable) {
             await assertUnserviceableAddress(context);
             return;
           }
-        }
 
-        if (addShippingAddress || editShippingAddress) {
-          await handleManageAddress(context);
-          await delay(400);
-          if (addShippingAddress) {
+          if (manageAddress) {
+            await delay(100);
+            await handleManageAddress(context);
+            await handleShippingInfo(context, {
+              zipcode: '560002',
+              serviceable: !selectUnserviceable,
+              isCODEligible,
+            });
+            await delay(100);
+            if (selectUnserviceable) {
+              // select second unserviceable address
+              await selectUnselectedAddress(context, addresses, 1);
+              // assert disabled cta
+              await assertUnserviceableAddress(context);
+              return;
+            }
+          }
+
+          if (addShippingAddress || editShippingAddress) {
+            await handleManageAddress(context);
+            await delay(400);
+            if (addShippingAddress) {
+              await handleAddAddress(
+                context,
+                {
+                  saveAddress,
+                  isCODEligible,
+                  zipcode: '560002',
+                  addLandmark,
+                  shippingFee,
+                },
+                addresses
+              );
+              await checkStateFieldDisabled(context);
+
+              if (editBillingAddress || addBillingAddress) {
+                await handleBillingAddress(
+                  context,
+                  addBillingAddress,
+                  addresses
+                );
+                await checkStateFieldDisabled(context);
+              }
+            } else {
+              // edit shipping address
+
+              await handleEditAddress(context);
+              if (editBillingAddress || addBillingAddress) {
+                await handleBillingAddress(
+                  context,
+                  addBillingAddress,
+                  addresses
+                );
+              }
+            }
+          } else if (editBillingAddress || addBillingAddress) {
+            // unchecking billing address checkbox at L0 screen
+
+            await unCheckBillAddress(context);
+            await proceedOneCC(context);
             await handleAddAddress(
               context,
               {
                 saveAddress,
-                isCODEligible,
-                zipcode: '560002',
-                addLandmark,
-                shippingFee,
+                isBillingAddress: true,
               },
               addresses
             );
-            await checkStateFieldDisabled(context);
+          }
+        } else {
+          // logged out / guest user flows
 
-            if (editBillingAddress || addBillingAddress) {
-              await handleBillingAddress(context, addBillingAddress, addresses);
-              await checkStateFieldDisabled(context);
+          await checkPhoneValidation(
+            context,
+            '995239840',
+            INDIAN_CONTACT_ERROR_LABEL
+          );
+          await resetContactDetails(context);
+          await checkPhoneValidation(
+            context,
+            '99523984078',
+            INDIAN_CONTACT_ERROR_LABEL
+          );
+          await resetContactDetails(context);
+          await checkPhoneValidation(
+            context,
+            '1000000000',
+            CONTACT_ERROR_LABEL
+          );
+          await resetContactDetails(context);
+
+          await fillUserDetails(context);
+          await proceedOneCC(context);
+          await handleCustomerStatusReq(
+            context,
+            addresses.length,
+            consentBannerViews
+          );
+
+          if (addresses.length) {
+            // OTP screen if user has addresses
+            await handleCreateOTPReq(context);
+            await handleTypeOTP(context);
+            await delay(200);
+
+            if (skipAccessOTP) {
+              await handleSkipOTP(context);
+              await fillUserAddress(context, {
+                saveAddress,
+                isCODEligible,
+                serviceable,
+              });
+              await delay(400);
+              await proceedOneCC(context);
+            } else {
+              if (mandatoryLogin) {
+                await checkSkipOTPHidden();
+              }
+              await proceedOneCC(context);
+              await handleVerifyOTPReq(context, inValidOTP, { addresses });
+              if (inValidOTP) {
+                await checkInvalidOTP(context);
+                return;
+              }
+              await handleShippingInfo(context, {
+                serviceable,
+                isCODEligible,
+              });
             }
           } else {
-            // edit shipping address
-
-            await handleEditAddress(context);
-            if (editBillingAddress || addBillingAddress) {
-              await handleBillingAddress(context, addBillingAddress, addresses);
+            if (mandatoryLogin) {
+              await handleCreateOTPReq(context);
+              await handleTypeOTP(context);
+              await delay(200);
+              await checkSkipOTPHidden();
+              await proceedOneCC(context);
+              await handleVerifyOTPReq(context, inValidOTP, {
+                addresses,
+                mandatoryLogin,
+              });
+              if (inValidOTP) {
+                await checkInvalidOTP(context);
+                return;
+              }
             }
-          }
-        } else if (editBillingAddress || addBillingAddress) {
-          // unchecking billing address checkbox at L0 screen
 
-          await unCheckBillAddress(context);
-          await proceedOneCC(context);
-          await handleAddAddress(
-            context,
-            {
-              saveAddress,
-              isBillingAddress: true,
-            },
-            addresses
-          );
-        }
-      } else {
-        // logged out / guest user flows
+            if (invalidAddress) {
+              await delay(400);
+              await proceedOneCC(context);
+              await checkInvalidAddressForm(context);
+              await assertAddressTab(context);
+              return;
+            }
 
-        await checkPhoneValidation(
-          context,
-          '995239840',
-          INDIAN_CONTACT_ERROR_LABEL
-        );
-        await resetContactDetails(context);
-        await checkPhoneValidation(
-          context,
-          '99523984078',
-          INDIAN_CONTACT_ERROR_LABEL
-        );
-        await resetContactDetails(context);
-        await checkPhoneValidation(context, '1000000000', CONTACT_ERROR_LABEL);
-        await resetContactDetails(context);
-
-        await fillUserDetails(context);
-        await proceedOneCC(context);
-        await handleCustomerStatusReq(
-          context,
-          addresses.length,
-          consentBannerViews
-        );
-
-        if (addresses.length) {
-          // OTP screen if user has addresses
-          await handleCreateOTPReq(context);
-          await handleTypeOTP(context);
-          await delay(200);
-
-          if (skipAccessOTP) {
-            await handleSkipOTP(context);
             await fillUserAddress(context, {
               saveAddress,
               isCODEligible,
               serviceable,
             });
-            await delay(400);
-            await proceedOneCC(context);
-          } else {
-            if (mandatoryLogin) {
-              await checkSkipOTPHidden();
-            }
-            await proceedOneCC(context);
-            await handleVerifyOTPReq(context, inValidOTP, { addresses });
-            if (inValidOTP) {
-              await checkInvalidOTP(context);
+
+            // unserviceable address in add address form
+            if (!serviceable) {
+              await delay(200);
+              await assertUnserviceableAddress(context, true);
               return;
             }
-            await handleShippingInfo(context, options);
-          }
-        } else {
-          if (mandatoryLogin) {
-            await handleCreateOTPReq(context);
-            await handleTypeOTP(context);
-            await delay(200);
-            await checkSkipOTPHidden();
-            await proceedOneCC(context);
-            await handleVerifyOTPReq(context, inValidOTP, {
-              addresses,
-              mandatoryLogin,
-            });
-            if (inValidOTP) {
-              await checkInvalidOTP(context);
-              return;
+
+            if (addBillingAddress) {
+              await unCheckBillAddress(context);
+              await proceedOneCC(context);
+
+              await fillUserAddress(context, {
+                saveAddress,
+                isBillingAddress: true,
+              });
+            }
+            if (
+              saveAddress &&
+              !mandatoryLogin &&
+              (!addresses.length || skipAccessOTP)
+            ) {
+              await delay(400);
+              await proceedOneCC(context);
             }
           }
 
-          if (invalidAddress) {
-            await delay(400);
-            await proceedOneCC(context);
-            await checkInvalidAddressForm(context);
-            await assertAddressTab(context);
-            return;
-          }
-
-          await fillUserAddress(context, {
-            saveAddress,
-            isCODEligible,
-            serviceable,
-          });
-
-          // unserviceable address in add address form
-          if (!serviceable) {
-            await delay(200);
-            await assertUnserviceableAddress(context, true);
-            return;
-          }
-
-          if (addBillingAddress) {
-            await unCheckBillAddress(context);
-            await proceedOneCC(context);
-
-            await fillUserAddress(context, {
-              saveAddress,
-              isBillingAddress: true,
-            });
-          }
+          // to show OTP screen to save address
           if (
             saveAddress &&
             !mandatoryLogin &&
             (!addresses.length || skipAccessOTP)
           ) {
-            await delay(400);
-            await proceedOneCC(context);
+            await handleCreateOTPReq(context);
+            if (skipSaveOTP) {
+              await handleSkipOTP(context);
+            } else {
+              await handleTypeOTP(context);
+              await proceedOneCC(context);
+              await handleVerifyOTPReq(context);
+            }
           }
         }
 
-        // to show OTP screen to save address
-        if (
-          saveAddress &&
-          !mandatoryLogin &&
-          (!addresses.length || skipAccessOTP)
-        ) {
-          await handleCreateOTPReq(context);
-          if (skipSaveOTP) {
-            await handleSkipOTP(context);
-          } else {
-            await handleTypeOTP(context);
-            await proceedOneCC(context);
-            await handleVerifyOTPReq(context);
-          }
-        }
-      }
-
-      await delay(200);
-      await proceedOneCC(context);
-
-      if (loggedIn && !addresses.length) {
-        await delay(400);
-        await fillUserAddress(context, {
-          saveAddress,
-          isCODEligible,
-          serviceable,
-          addLandmark,
-        });
-        await delay(100);
+        await delay(200);
         await proceedOneCC(context);
-      }
 
-      if (saveAddress && (!skipSaveOTP || mandatoryLogin)) {
-        await handleCustomerAddressReq(context);
-      }
+        if (loggedIn && !addresses.length) {
+          await delay(400);
+          await fillUserAddress(context, {
+            saveAddress,
+            isCODEligible,
+            serviceable,
+            addLandmark,
+          });
+          await delay(100);
+          await proceedOneCC(context);
+        }
 
-      if (editShippingAddress || editBillingAddress) {
-        await handleEditAddressReq(context);
-      }
+        if (saveAddress && (!skipSaveOTP || mandatoryLogin)) {
+          await handleCustomerAddressReq(context);
+        }
 
-      await mockPaymentSteps(context, options, features);
-    });
-  });
+        if (editShippingAddress || editBillingAddress) {
+          await handleEditAddressReq(context);
+        }
+
+        await mockPaymentSteps(context, options, features, true, method);
+      });
+    }
+  );
 };

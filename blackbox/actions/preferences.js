@@ -68,6 +68,7 @@ function makePreferences(overrides) {
 
     feature_overrides: {},
     methods: {
+      cod: true,
       emi: true,
       emi_subvention: 'customer',
       ...card,
