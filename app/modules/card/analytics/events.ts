@@ -64,7 +64,7 @@ export const CardsEvents = {
     type: API,
   },
   OTP_SCREEN: {
-    name: 'otp_sreen',
+    name: 'otp_screen',
     type: RENDER,
   },
   SAVED_CARD_SELECTED: {
