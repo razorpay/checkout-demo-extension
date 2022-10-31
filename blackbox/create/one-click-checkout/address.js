@@ -91,6 +91,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     manageAddress,
     selectUnserviceable,
     consentBannerViews,
+    internationalShippingEnabled,
   } = features;
 
   describe.each(
@@ -306,6 +307,8 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               saveAddress,
               isCODEligible,
               serviceable,
+              internationalShippingEnabled,
+              zipcode: internationalShippingEnabled ? '10001' : '560001',
             });
 
             // unserviceable address in add address form
@@ -360,6 +363,8 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
             saveAddress,
             isCODEligible,
             serviceable,
+            internationalShippingEnabled,
+            zipcode: internationalShippingEnabled ? '10001' : '560001',
             addLandmark,
           });
           await delay(100);

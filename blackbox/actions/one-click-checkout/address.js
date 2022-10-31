@@ -86,6 +86,15 @@ async function handlePincodes(context) {
   });
 }
 
+async function switchCountry(context, country = 'US') {
+  await delay(200);
+  const el = await context.page.$('#country_name');
+  await el.click();
+
+  await context.page.$('.search-results');
+  await context.page.click(`[id*=_${country}_]`);
+}
+
 async function fillUserAddress(
   context,
   {
@@ -97,13 +106,18 @@ async function fillUserAddress(
     zipcode = '560001',
     isBillingAddress,
     addLandmark = false,
+    internationalShippingEnabled = false,
   }
 ) {
   await context.page.waitForSelector('.address-new');
   if (!isBillingAddress) {
     await handleStateReq(context);
   }
+
   await context.page.type('#name', 'Test');
+  if (internationalShippingEnabled) {
+    await switchCountry(context);
+  }
   await context.page.type('#zipcode', zipcode);
   if (!isBillingAddress) {
     await handleShippingInfo(context, {
@@ -134,7 +148,7 @@ async function fillUserAddress(
     await delay(200);
     await context.page.type('#landmark', 'Adugodi');
   }
-  if (!saveAddress) {
+  if (!saveAddress && !internationalShippingEnabled) {
     await delay(200);
     await context.page.waitForSelector('#address-consent-checkbox');
     await context.page.click('#address-consent-checkbox');

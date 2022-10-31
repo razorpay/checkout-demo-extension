@@ -38,6 +38,7 @@ function makePreferences(features, preferences) {
     configs: {
       one_cc_auto_fetch_coupons: !!features.showCoupons,
       one_cc_capture_billing_address: !!features.billingEnabled,
+      one_cc_international_shipping: !!features.internationalShippingEnabled,
     },
   };
 

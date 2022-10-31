@@ -524,14 +524,15 @@ function getShippingInfoResponse({
   shippingFee = 0,
   zipcode = '560001',
 }) {
+  const isNewYorkZipcode = zipcode === '10001';
   const resp = {
     addresses: [
       {
         zipcode,
-        country: 'in',
-        city: 'Bengaluru',
-        state: 'KARNATAKA',
-        state_code: 'KA',
+        country: isNewYorkZipcode ? 'us' : 'in',
+        city: isNewYorkZipcode ? 'New York' : 'Bengaluru',
+        state: isNewYorkZipcode ? 'New York' : 'KARNATAKA',
+        state_code: isNewYorkZipcode ? 'NY' : 'KA',
         cod: isCODEligible,
         cod_fee: codFee,
         shipping_fee: shippingFee,
