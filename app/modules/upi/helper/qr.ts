@@ -20,7 +20,7 @@ import { autoGenerateQREnabled } from './qrV2';
 function getQRPaymentTestUrlForImage() {
   return getPreparedUrl('upi://pay', {
     pa: autoGenerateQREnabled()
-      ? 'rpy.qrrazorpay768603936522&ver=01&mode=15' // adding extra payload
+      ? 'rpy.qrrazorpay768603936522&ver=01&mode=15&qrMedium=04' // adding extra payload
       : 'razorpay.pg@hdfcbank',
     pn: 'Razorpay',
     tr: 'M10rKVfkNww2eBE',
@@ -35,9 +35,12 @@ function getQRPaymentTestUrlForImage() {
     ).toString(),
     cu: 'INR',
     mc: '5411',
-    tn: `${getPreferences('merchant_name', '')}${
-      getOption('description') || ''
-    }`.replace(/ /g, ''),
+    tn:
+      autoGenerateQREnabled() && getPreferences('merchant_brand_name')
+        ? `Paymentto${getPreferences('merchant_brand_name')}`
+        : `${getPreferences('merchant_name', '')}${
+            getOption('description') || ''
+          }`.replace(/ /g, ''),
   });
 }
 
