@@ -1,8 +1,33 @@
-import { processCheckoutOrder } from 'payment/checkoutOrder';
+import {
+  processCheckoutOrder,
+  prepareCheckoutOrderRequestPayload,
+} from 'payment/checkoutOrder';
 import { processPaymentCreate } from 'payment/coproto';
 jest.mock('payment/coproto', () => ({
   processPaymentCreate: jest.fn(),
 }));
+
+const requestPayload = {
+  contact: '+918888888888',
+  email: 'test@razorpay.com',
+  key_id: 'rzp_live_ILgsfZCZoFIKMb',
+  amount: 100,
+  method: 'upi',
+  upi: {
+    flow: 'intent',
+  },
+  '_[upiqr]': '1',
+  '_[flow]': 'intent',
+  currency: 'INR',
+  description: 'Fine tshirt',
+  '_[shield][fhash]': '069a7598fa5cf4d27b9aea85b73b0a46148415e4',
+  '_[device_id]':
+    '1.55b11706d57c79b7ad91b2961094564175b9e05f.1666266349529.55923087',
+  '_[shield][tz]': 330,
+  '_[build]': 3323243946,
+  '_[checkout_id]': 'KaGJwnOd6WtvA8',
+  '_[request_index]': 0,
+};
 
 const sampleQRResponse = {
   id: 'KMoPzBSBhHWNuN',
@@ -69,5 +94,22 @@ describe('Checkout Order Utils', () => {
         reason: 'qr_v2_disabled',
       },
     });
+  });
+
+  test('Checkout order request payload', () => {
+    expect(prepareCheckoutOrderRequestPayload(requestPayload)).toMatchObject(
+      requestPayload
+    );
+
+    expect(
+      prepareCheckoutOrderRequestPayload({ ...requestPayload, bank: 'HDFC' })
+    ).toMatchObject(requestPayload);
+
+    expect(
+      prepareCheckoutOrderRequestPayload({
+        ...requestPayload,
+        someOtherDummyParameter: 'DummyValue',
+      })
+    ).toMatchObject(requestPayload);
   });
 });

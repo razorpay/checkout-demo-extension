@@ -55,7 +55,10 @@ import {
 import { isInternationalProvider } from 'common/international';
 import { setLatestPayment, updateLatestPaymentStatus } from './history';
 import { calculateFlow } from 'analytics/feature-track';
-import { processCheckoutOrder } from './checkoutOrder';
+import {
+  prepareCheckoutOrderRequestPayload,
+  processCheckoutOrder,
+} from './checkoutOrder';
 import { ContextProperties, EventsV2, AnalyticsV2State } from 'analytics-v2';
 import { PaymentTracker } from 'payment/analytics/events';
 import { RetryTracker } from 'misc/analytics/events';
@@ -858,7 +861,7 @@ Payment.prototype = {
       delete data.callback_url; // callback_url not supported
       this.ajax = fetch.post({
         url: makeAuthUrl(null, 'checkout/order'),
-        data,
+        data: prepareCheckoutOrderRequestPayload(data),
         callback: processCheckoutOrder.bind(this),
       });
       return 1;

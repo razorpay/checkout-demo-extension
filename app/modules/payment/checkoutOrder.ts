@@ -1,5 +1,30 @@
-import { makeAuthUrl } from 'common/helper';
+import { makeAuthUrl } from 'common/makeAuthUrl';
 import { processPaymentCreate } from 'payment/coproto';
+
+const VALID_REQUEST_PAYLOAD = {
+  checkout_id: true,
+  contact: true,
+  email: true,
+  expire_at: true,
+  invoice_id: true,
+  order_id: true,
+  status: true,
+  account_id: true,
+  amount: true,
+  auth_link_id: true,
+  currency: true,
+  customer_id: true,
+  description: true,
+  method: true,
+  name: true,
+  notes: true,
+  offer_id: true,
+  payment_link_id: true,
+  receiver_type: true,
+  signature: true,
+  upi: true,
+  key_id: true,
+};
 
 /**
  * For QR V2 specific payment
@@ -41,6 +66,23 @@ type CheckoutOrderResponse = {
   qr_code: QrCode;
   request: Request;
 };
+
+export const prepareCheckoutOrderRequestPayload = (
+  data: Record<string, any>
+) => {
+  return Object.keys(data).reduce((finalObj: Record<string, any>, key) => {
+    if (
+      key.startsWith('_') ||
+      key.startsWith('upi') ||
+      key.startsWith('notes') ||
+      VALID_REQUEST_PAYLOAD[key as keyof typeof VALID_REQUEST_PAYLOAD]
+    ) {
+      finalObj[key] = data[key];
+    }
+    return finalObj;
+  }, {});
+};
+
 export const processCheckoutOrder = function (
   this: any,
   response: CheckoutOrderResponse
@@ -78,7 +120,6 @@ function convertCheckoutOrderResponseForCoproto(
       ? response.request
       : {
           url: makeAuthUrl(
-            null,
             `checkout/qr_code/${response.qr_code?.id}/payment/status`
           ),
           method: 'GET',
