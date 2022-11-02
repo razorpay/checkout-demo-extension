@@ -421,13 +421,7 @@ CheckoutFrame.prototype = {
           immediately: true,
         });
 
-        // Commenting out `return`, as we initially want to
-        // track the origins first. Based on the data
-        // we will either modify the conditions or
-        // simply uncomment the next line if there
-        // are no unexpected origins.
-
-        // return;
+        return;
       }
     } catch (error) {
       // no-op
