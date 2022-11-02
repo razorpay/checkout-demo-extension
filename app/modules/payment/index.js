@@ -58,7 +58,7 @@ import { calculateFlow } from 'analytics/feature-track';
 import { processCheckoutOrder } from './checkoutOrder';
 import { ContextProperties, EventsV2, AnalyticsV2State } from 'analytics-v2';
 import { PaymentTracker } from 'payment/analytics/events';
-import { MiscTracker } from 'misc/analytics/events';
+import { RetryTracker } from 'misc/analytics/events';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -133,7 +133,7 @@ function onPaymentCancel(metaParam) {
       this.complete(cancelError);
     }
 
-    MiscTracker.PAYMENT_CANCELLED(
+    RetryTracker.PAYMENT_CANCELLED(
       AnalyticsV2State.selectedInstrumentForPayment
     );
 

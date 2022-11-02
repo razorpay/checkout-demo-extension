@@ -1,6 +1,6 @@
 <script lang="ts">
   import { AnalyticsV2State } from 'analytics-v2';
-  import { MiscTracker } from 'misc/analytics/events';
+  import { RetryTracker } from 'misc/analytics/events';
   import { getOption } from 'razorpay';
 
   import { getSession } from 'sessionmanager';
@@ -26,11 +26,11 @@
   onDestroy(() => {
     if (!$loadingState) {
       if (!retryClick) {
-        MiscTracker.RETRY_VANISHED(
+        RetryTracker.RETRY_VANISHED(
           AnalyticsV2State.selectedInstrumentForPayment
         );
       }
-      MiscTracker.AFTER_RETRY_SCREEN({
+      RetryTracker.AFTER_RETRY_SCREEN({
         screenName: session.screen,
         retryCount: session.attemptCount,
       });
@@ -59,7 +59,7 @@
 
   function primaryClick() {
     retryClick = true;
-    MiscTracker.RETRY_CLICKED(AnalyticsV2State.selectedInstrumentForPayment);
+    RetryTracker.RETRY_CLICKED(AnalyticsV2State.selectedInstrumentForPayment);
     preventBack();
   }
 </script>

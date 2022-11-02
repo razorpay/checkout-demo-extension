@@ -23,6 +23,7 @@ import {
 } from 'common/international';
 
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from './constants';
+import { P13NTracker } from 'misc/analytics/events';
 
 /**
  * this object is a key/value pair of contact and p13n api data
@@ -132,6 +133,7 @@ function getInstrumentsFromApi(customer) {
   });
 
   const p13nFetchStart = new Date();
+  P13NTracker.P13N_INITIATED();
   const promise = new Promise((resolve) => {
     fetch({
       url,
@@ -146,6 +148,16 @@ function getInstrumentsFromApi(customer) {
             time: new Date() - p13nFetchStart,
           },
         });
+
+        if (response.error) {
+          P13NTracker.P13N_CALL_FAILED({
+            error: {
+              description: response.error?.description,
+              category: response.error?.code,
+            },
+          });
+        }
+
         // Empty objects are arrays in PHP
         if (_.isArray(response)) {
           response = {
@@ -293,6 +305,8 @@ export function trackP13nMeta(data) {
     return;
   }
   const eventData = [];
+  //adding eventDataV2 for analytics revamp
+  const eventDataV2 = {};
   ObjectUtils.loop(
     data,
     (
@@ -312,6 +326,13 @@ export function trackP13nMeta(data) {
           versionID,
           count: instruments && instruments.length,
         });
+        eventDataV2.versionID = versionID;
+        eventDataV2.instruments = instruments.reduce((list, item, index) => {
+          list[index] = {
+            method: { name: item.method },
+          };
+          return list;
+        }, {});
       }
     }
   );
@@ -321,4 +342,5 @@ export function trackP13nMeta(data) {
       instrument_data_meta: eventData,
     },
   });
+  P13NTracker.P13N_RESPONSE(eventDataV2);
 }

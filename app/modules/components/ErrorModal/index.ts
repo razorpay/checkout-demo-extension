@@ -11,7 +11,7 @@ import {
   loadedCTA,
   secondaryLoadedCTA,
 } from './store';
-import { MiscTracker } from 'misc/analytics/events';
+import { RetryTracker } from 'misc/analytics/events';
 import { AnalyticsV2State } from 'analytics-v2';
 
 function defaultCTAClickAction() {
@@ -108,7 +108,7 @@ export function setHeading(content?: string) {
 export function setLoadingState(state?: boolean) {
   loadingState.set(state ?? false);
   if (!state) {
-    MiscTracker.RETRY_BUTTON(AnalyticsV2State.selectedInstrumentForPayment);
+    RetryTracker.RETRY_BUTTON(AnalyticsV2State.selectedInstrumentForPayment);
   }
 }
 

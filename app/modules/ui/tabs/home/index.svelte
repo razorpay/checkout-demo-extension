@@ -16,6 +16,7 @@
     getAvailableMethods,
     getSectionsDisplayed,
     trackPaypalRendered,
+    getInstrumentDetails,
   } from 'ui/tabs/home/helpers';
   import {
     showToast,
@@ -204,6 +205,7 @@
     p13nInstrumentShown,
     triggerInstAnalytics,
   } from 'home/analytics/helpers';
+  import { P13NTracker } from 'misc/analytics/events';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -685,9 +687,31 @@
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
 
-      if (isPersonalizationEnabled && setPreferredInstruments?.length) {
-        setPreferredInstruments.forEach(p13nInstrumentShown);
+      if (
+        isPersonalizationEnabled &&
+        setPreferredInstruments &&
+        setPreferredInstruments.length > 0
+      ) {
+        try {
+          const isLoading = setPreferredInstruments.some(
+            (instrument) => instrument._loading
+          );
+          if (!isLoading) {
+            setPreferredInstruments.forEach(p13nInstrumentShown);
+            P13NTracker.P13N_SECTION();
+            let list = {};
+            list = setPreferredInstruments.reduce((acc, item, index) => {
+              acc[index] = {
+                method: { name: item.method },
+                instrument: getInstrumentDetails(item),
+              };
+              return acc;
+            }, {});
+            P13NTracker.P13N_METHOD_SHOWN({ list });
+          }
+        } catch (e) {}
       }
+
       if (
         isPersonalizationEnabled &&
         allPreferredInstrumentsForCustomer.length
