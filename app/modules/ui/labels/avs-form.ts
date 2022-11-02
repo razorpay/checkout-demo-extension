@@ -16,3 +16,6 @@ export const AVS_STATE_ALL = 'card.avs_state_all';
 export const AVS_FORM_INPUT_REQUIRED = 'card.avs_form_input_required';
 export const AVS_FIRST_NAME = 'international.nvs_first_name';
 export const AVS_LAST_NAME = 'international.nvs_last_name';
+export const AVS_COUNTRY_SELECT = 'card.avs_country_select';
+export const AVS_STATE_SELECT = 'card.avs_state_select';
+export const AVS_ADDRESS_DETAILS = 'card.avs_address_details';

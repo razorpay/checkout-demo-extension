@@ -345,6 +345,9 @@
         ><Icon icon={solid_down_arrow} /></span
       >
     {/if}
+    {#if leftImage}
+      <img alt="left-img" class="left-img" src={leftImage} />
+    {/if}
     <input
       class={`input-one-click-checkout ${inputFieldClasses} main`}
       class:error-field-one-click-checkout={hasError}
@@ -935,5 +938,21 @@
   }
   .fs-12 {
     font-size: 12px;
+  }
+
+  :global(.redesign) .left-img {
+    position: absolute;
+    left: 11px;
+    bottom: 50%;
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+    margin-bottom: -11px;
+  }
+
+  .redesign-left-img + .input-one-click-checkout {
+    padding-left: 1.8rem;
   }
 </style>

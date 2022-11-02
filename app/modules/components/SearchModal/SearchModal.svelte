@@ -314,7 +314,11 @@
                 aria-selected={index === focusedIndex}
                 on:click={() => onSelectHandler(item)}
               >
-                <svelte:component this={component} {item} />
+                <svelte:component
+                  this={component}
+                  isRedesign={isRedesignV15Enabled}
+                  {item}
+                />
               </div>
             {/each}
           </div>
@@ -347,7 +351,11 @@
               aria-selected={index + results.length === focusedIndex}
               on:click={() => onSelectHandler(item)}
             >
-              <svelte:component this={component} {item} />
+              <svelte:component
+                this={component}
+                isRedesign={isRedesignV15Enabled}
+                {item}
+              />
             </div>
           {/each}
         </div>

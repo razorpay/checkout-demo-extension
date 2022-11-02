@@ -295,8 +295,8 @@ export default {
     avs_form_country: 'Country*',
     avs_form_state: 'State*',
     avs_form_city: 'City*',
-    avs_country_search_title: 'Select Country',
-    avs_state_search_title: 'Search for a State',
+    avs_country_search_title: 'Search for a country',
+    avs_state_search_title: 'Search for a state',
     avs_info_title: 'Help us verify the transaction',
     avs_heading: 'Verify your billing address linked to the bank',
     avs_info_message_1:
@@ -307,6 +307,9 @@ export default {
       'Your address is used only for verification and is securely processed via encrypted servers.',
     avs_country_all: 'All Countries',
     avs_state_all: 'All States',
+    avs_country_select: 'Select a country',
+    avs_state_select: 'Select a state',
+    avs_address_details: 'Address Details',
     avs_form_input_required: 'This field is required',
     save_card_know_more_existing_card_modal_title:
       'Keep card saved for future payments',

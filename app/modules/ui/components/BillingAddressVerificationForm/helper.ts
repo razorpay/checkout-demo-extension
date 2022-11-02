@@ -7,7 +7,9 @@ import {
   AVS_FORM_STATE,
   AVS_COUNTRY_ALL,
   AVS_FORM_COUNTRY,
+  AVS_STATE_SELECT,
   AVS_FORM_ZIP_CODE,
+  AVS_COUNTRY_SELECT,
   AVS_STATE_SEARCH_TITLE,
   AVS_FORM_ADDRESS_LINE_1,
   AVS_FORM_ADDRESS_LINE_2,
@@ -81,7 +83,7 @@ const fieldDetails = (t: TranslateType, field: string) => {
       return {
         id: field,
         placeholder: t(AVS_FORM_COUNTRY),
-        autocomplete: '__off__',
+        autocomplete: 'new-password',
         searchable: true,
         required: true,
       };
@@ -96,7 +98,7 @@ const fieldDetails = (t: TranslateType, field: string) => {
       return {
         id: field,
         placeholder: t(AVS_FORM_STATE),
-        autocomplete: '__off__',
+        autocomplete: 'new-password',
         searchable: true,
         required: true,
       };
@@ -104,7 +106,7 @@ const fieldDetails = (t: TranslateType, field: string) => {
       return {
         id: FORM_FIELDS.state,
         placeholder: '',
-        autocomplete: 'do-not-autocomplete',
+        autocomplete: 'new-password',
         required: true,
       };
   }
@@ -123,20 +125,21 @@ export const createFormFields = (
 };
 
 export const createSearchModalFields = (
-  t: TranslateType
+  t: TranslateType,
+  isRedesignV15 = false
 ): SearchModalFieldSType => {
   return {
     [FORM_FIELDS.country]: {
       data: [],
       keys: ['label'],
-      all: t(AVS_COUNTRY_ALL),
+      all: isRedesignV15 ? t(AVS_COUNTRY_SELECT) : t(AVS_COUNTRY_ALL),
       title: t(AVS_COUNTRY_SEARCH_TITLE),
       placeholder: t(AVS_COUNTRY_SEARCH_TITLE),
     },
     [FORM_FIELDS.state]: {
       data: [],
       keys: ['label'],
-      all: t(AVS_STATE_ALL),
+      all: isRedesignV15 ? t(AVS_STATE_SELECT) : t(AVS_STATE_ALL),
       title: t(AVS_STATE_SEARCH_TITLE),
       placeholder: t(AVS_STATE_SEARCH_TITLE),
     },

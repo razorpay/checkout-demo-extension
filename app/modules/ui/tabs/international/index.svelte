@@ -87,6 +87,7 @@
 
   let tabVisible = false;
   let checkFormErrors: () => void;
+  let isFormValid = false;
 
   let CTAState: {
     show: boolean;
@@ -214,7 +215,13 @@
     return countries.filter((country) => countryCodeMap.includes(country.key));
   }
 
-  function handleAVSFormInput(evt) {
+  function handleAVSFormInput(evt: CustomEvent<any>) {
+    const { isValid, value } = evt.detail;
+    isFormValid = isValid;
+    setNVSFormData(value);
+  }
+
+  function handleAVSFormBlur(evt: CustomEvent<any>) {
     setNVSFormData(evt.detail);
   }
 
@@ -362,14 +369,15 @@
           value={$NVSFormData}
           bind:checkFormErrors
           on:input={handleAVSFormInput}
-          on:blur={handleAVSFormInput}
+          on:blur={handleAVSFormBlur}
         />
       </div>
     {/if}
     <CTA
       screen="international"
       tab="international"
-      disabled={tabVisible && !$selectedInternationalProvider}
+      disabled={(tabVisible && !$selectedInternationalProvider) ||
+        (currentView === VIEWS_MAP.NVS_FORM && !isFormValid)}
       show={CTAState.show}
       label={CTAState.label}
       onSubmit={CTAState.onSubmit}

@@ -323,6 +323,11 @@
    */
   let cardAVSFlowsMap = {};
 
+  /**
+   * Boolean state to indicate if AVSForm is valid
+   */
+  let isAVSFormValid = false;
+
   function isSiftJSEnabled() {
     return hasFeature('disable_sift_js', false) !== true;
   }
@@ -714,9 +719,15 @@
     });
   }
 
-  function handleAVSFormInput(evt: CustomEvent<any>) {
+  const handleAVSFormInput = (evt: CustomEvent<any>) => {
+    const { value, isValid } = evt.detail;
+    setAVSBillingAddressData(value);
+    isAVSFormValid = isValid;
+  };
+
+  const handleAVSFormBlur = (evt: CustomEvent<any>) => {
     setAVSBillingAddressData(evt.detail);
-  }
+  };
 
   /**
    * Filter AVS countries to show in AVS form
@@ -1150,6 +1161,22 @@
   let showCardTab = false;
   $: showCardTab = isNewEmiFlow && tab === 'emi';
 
+  $: isCTADisabled =
+    (currentView === Views.ADD_CARD &&
+      !isAddNewCardFormValid &&
+      !$selectedApp) ||
+    (currentView === Views.SAVED_CARDS &&
+      !isSavedCardFormValid &&
+      !$selectedApp) ||
+    (!$isEmiContactValid &&
+    $isCurrentCardInvalidForEmi &&
+    $isCurrentCardProviderInvalid &&
+    isNewEmiFlow &&
+    $selectedTab === 'debit'
+      ? true
+      : false) ||
+    (currentView === Views.AVS && !isAVSFormValid);
+
   export function preventBack() {
     handleBackNavigation();
     return false;
@@ -1276,7 +1303,7 @@
             bind:checkFormErrors
             value={$AVSBillingAddress}
             on:input={handleAVSFormInput}
-            on:blur={handleAVSFormInput}
+            on:blur={handleAVSFormBlur}
           />
         </div>
       {:else}
@@ -1384,19 +1411,7 @@
     <CTA
       screen="card"
       tab={$tabStore}
-      disabled={(currentView === Views.ADD_CARD &&
-        !isAddNewCardFormValid &&
-        !$selectedApp) ||
-        (currentView === Views.SAVED_CARDS &&
-          !isSavedCardFormValid &&
-          !$selectedApp) ||
-        (!$isEmiContactValid &&
-        $isCurrentCardInvalidForEmi &&
-        $isCurrentCardProviderInvalid &&
-        isNewEmiFlow &&
-        $selectedTab === 'debit'
-          ? true
-          : false)}
+      disabled={isCTADisabled}
       show
       showAmount
       {onSubmit}
