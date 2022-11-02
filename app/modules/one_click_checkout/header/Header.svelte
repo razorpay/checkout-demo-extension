@@ -23,6 +23,8 @@
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
   import LanguageSelection from 'topbar/ui/components/LanguageSelection.svelte';
   import { truncateString } from 'utils/strings';
+  import { getThemeMeta } from 'checkoutstore/theme';
+  const themeMeta = getThemeMeta();
 
   // Other Imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -30,7 +32,7 @@
 
   const isRTBEnabled = RTBEnabled($RTBExperiment);
   const merchantName = truncateString(getMerchantName(), 20);
-  const closeIcon = close(HEADER_ELEMENTS_COLOR);
+  const closeIcon = close(themeMeta.textColor);
 
   $: routeName = $activeRoute?.name;
 </script>
@@ -73,7 +75,7 @@
             {merchantName}
           </p>
           <div class="rtb-section">
-            <TrustedBadge iconColor={HEADER_ELEMENTS_COLOR} />
+            <TrustedBadge />
           </div>
         </div>
         <button class="modal-close" on:click={handleModalClose}>
@@ -89,7 +91,8 @@
     position: sticky;
     z-index: 2;
     color: #fff;
-    background-color: var(--magic-brand-color);
+    background-color: var(--primary-color);
+    color: var(--text-color);
   }
   .header-title-wrapper {
     display: flex;
