@@ -411,7 +411,7 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
-  if (!this.payload || response._silent) {
+  if (!this.payload || response?._silent) {
     return;
   }
 
