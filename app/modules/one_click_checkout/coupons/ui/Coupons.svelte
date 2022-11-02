@@ -173,6 +173,8 @@
       $availableCoupons?.length > 0 ? null : couponsWidgetExperiment ? 'B' : 'A'
     );
 
+    Analytics.setMeta('count_coupons_available', $availableCoupons?.length);
+
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_LOADED, {
       is_CTA_enabled: !ctaDisabled,
       prefill_contact_number: getPrefilledContact(),
