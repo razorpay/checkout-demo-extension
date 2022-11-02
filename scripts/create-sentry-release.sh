@@ -7,9 +7,6 @@ mkdir -p build
 BUCKET="rzp-1415-prod-checkout-static"
 aws --output text s3 sync s3://${BUCKET}/build/${COMMIT_ID} build
 
-# Install Sentry CLI
-curl -sL https://sentry.io/get-cli/ | bash
-
 # Get app version
 APP_VERSION=${COMMIT_ID}
 

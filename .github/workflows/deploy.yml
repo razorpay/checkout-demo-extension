@@ -6,7 +6,6 @@ jobs:
   deploy:
     if: github.event.deployment.task == 'static'
     runs-on: self-hosted
-
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
@@ -23,6 +22,15 @@ jobs:
         with:
           entrypoint: scripts/deploy.sh
           args: ${{ github.event.deployment.payload.commit_id }} ${{ github.event.deployment.payload.canary }} ${{ github.event.deployment.payload.baseline }} ${{ github.event.deployment.payload.production }} ${{ github.event.deployment.payload.one_cc }}
+
+      - name: Install sentry CLI
+        env: 
+          COMMIT_ID: ${{ github.event.deployment.payload.commit_id }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_IO_AUTH_TOKEN }}
+          SENTRY_ORG: rzp
+          SENTRY_PROJECT: checkout
+          APP_ENV: production
+        run: curl -sL https://sentry.io/get-cli/ | bash
 
       - name: Create Sentry Release Magic Checkout
         env: 
