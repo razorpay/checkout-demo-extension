@@ -1,9 +1,14 @@
 import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
-import Analytics, { ErrorEvents, trackAvailabilty } from 'analytics/index';
+import Analytics, {
+  ErrorEvents,
+  Track,
+  trackAvailabilty,
+} from 'analytics/index';
 import Interface from 'common/interface';
 import { ErrorTracker } from './analytics/events';
 import { EventsV2 } from 'analytics-v2';
+import { IS_PROD } from 'common/constants';
 
 /**
  * @param {String|Error|Object} error -
@@ -19,6 +24,14 @@ export const capture = (
 ) => {
   try {
     const { event, data, immediately = true } = analytics || {};
+    /**
+     * don't track if its not prod
+     * if its standard checkout library then check for domain
+     * mode check is already available in tracker & availability module
+     */
+    if (Track.props.library !== 'razorpayjs' && !IS_PROD) {
+      return;
+    }
     /**
      * Event name to be used for analytics.
      * Defaulting to 'js_error' till we move to the new system of analytics events
