@@ -422,7 +422,30 @@ describe('Validate: Emi providers with restricted configs', () => {
     getMerchantMethods.mockReturnValue(merchantMethods);
     let amount = 1000000;
     getAmount.mockReturnValue(amount);
-    expect(JSON.stringify(getBankEmiOptions(amount))).toBe(JSON.stringify([]));
+    let expected = [
+      {
+        code: 'HDFC',
+        name: 'HDFC Bank',
+        debitEmi: false,
+        creditEmi: false,
+        isCardless: true,
+        isNoCostEMI: true,
+        startingFrom: null,
+        icon: 'https://cdn.razorpay.com/bank/HDFC.gif',
+        downtimeConfig: {
+          downtimeInstrument: 'HDFC',
+          severe: '',
+        },
+        debitCardlessConfig: {
+          meta: { flow: 'pan' },
+          powered_by: { method: 'cardless_emi', provider: 'flexmoney' },
+        },
+        method: 'emi',
+      },
+    ];
+    expect(JSON.stringify(getBankEmiOptions(amount))).toBe(
+      JSON.stringify(expected)
+    );
   });
 
   test('Bank emi options should not be empty if cardless emi method is restricted', () => {
@@ -436,7 +459,7 @@ describe('Validate: Emi providers with restricted configs', () => {
         name: 'HDFC Bank',
         debitEmi: false,
         creditEmi: true,
-        isCardless: true,
+        isCardless: false,
         isNoCostEMI: true,
         startingFrom: 15,
         icon: 'https://cdn.razorpay.com/bank/HDFC.gif',

@@ -29,6 +29,7 @@ import {
   filterEmiBanksAgainstCustomBlock,
   hideRestrictedProviders,
   isEmiMethodHidden,
+  filterHiddenEmiProviders,
 } from './configurability';
 import {
   getDownTimeForEmiBanks,
@@ -188,11 +189,6 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
   const bankEMIOptions: EMIBanksMap = {};
   const banks: EmiBankPlans = getEmiBanksAvailable(amount);
 
-  // if custom block has hide config for Emi method
-  // providers should be empty
-  if (isEmiMethodHidden('emi')) {
-    return [];
-  }
   try {
     // if emi banks are not present and no banks is present in cardless providers
     // we return empty array
@@ -242,7 +238,10 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
     // we need to manually add those to bank list and not cardless list
     if (Object.keys(cardlessProviders).length) {
       ObjectUtils.loop(cardlessProviders, (bank: CardlessEmiProviders) => {
-        if (isOnlyCardlessProvider(banks, bank, cardlessProviders)) {
+        if (
+          isOnlyCardlessProvider(banks, bank, cardlessProviders) &&
+          !isEmiMethodHidden('cardless_emi')
+        ) {
           const transformedBankCode: string = bank.code.toUpperCase();
           const currentLocale: string = get(locale);
           bankEMIOptionsList.push({
@@ -266,12 +265,17 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
       bankSortOrder
     );
     // Filter against bank instruments from custom block
-    const filteredBanks: EMIBankList = filterEmiBanksAgainstCustomBlock({
+    let filteredBanks: EMIBankList = filterEmiBanksAgainstCustomBlock({
       emiBankList: sortedBankOptions,
       instrument,
       emiBanksProviders: banks,
       cardlessEmiProviders: cardlessProviders,
     });
+
+    // Filter out emi providers based on the hide config passed
+    // if cardless method is hidden -> hide cardless emi tab from the bank
+    // if emi method is hidden -> hide credit/debit tabs from the bank
+    filteredBanks = filterHiddenEmiProviders(filteredBanks);
     return filteredBanks;
   } catch (e: any) {
     capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });

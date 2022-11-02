@@ -8,7 +8,7 @@ export type EMIBANKS = {
   creditEmi?: boolean;
   isCardless?: boolean;
   isNoCostEMI?: boolean;
-  startingFrom?: number;
+  startingFrom?: number | null;
   icon?: string;
   logo?: string;
   section?: string;

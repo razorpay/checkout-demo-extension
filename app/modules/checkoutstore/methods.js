@@ -83,6 +83,7 @@ import {
 import { DEBIT_EMI_BANKS, isDebitEMIBank, isDebitIssuer } from 'common/bank';
 
 import { isIntlBankTransferEnabled } from 'InternationalBankTransfer/helpers';
+import { otherCardEmiProviders } from 'emiV2/constants';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -231,8 +232,16 @@ const ALL_METHODS = {
       return false;
     }
     const providers = getCardlessEMIProviders();
+
     const enabled =
       getOption('method.cardless_emi') !== false || providers.bajaj;
+
+    // For new EMI flow we are grouping bajaj and onecard under emi block
+    // Since they are card emi providers and are grouped under 'Other EMI options'
+    // therefore for validating empty cardless emi provider we need to filter out bajaj and onecard
+    if (isEmiV2()) {
+      otherCardEmiProviders.forEach((provider) => delete providers[provider]);
+    }
     return enabled && !ObjectUtils.isEmpty(providers);
   },
 

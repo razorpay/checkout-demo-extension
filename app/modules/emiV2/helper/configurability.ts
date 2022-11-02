@@ -215,3 +215,40 @@ export const isEmiMethodHidden = (method: EmiMethod) => {
   const hiddenMethod: string[] = get(HiddenMethodsStore);
   return hiddenMethod.includes(method);
 };
+
+/**
+ * Filter providers based on the hide custom config passed
+ * If cardless emi method is hidden set isCardless to false to show only credit/debit tab
+ * If emi method is hidden filter out bank that have cardless enabled and show only cardless tab
+ * @param {EMIBankList} emiBanks
+ * @returns {EMIBankList}
+ */
+export const filterHiddenEmiProviders = (emiBanks: EMIBankList) => {
+  // If emi method is hidden we need to
+  // filter out bank that have cardless enabled
+  // and set debit/credit emi to false so as to not show credit/debit tab
+  if (isEmiMethodHidden('emi')) {
+    return emiBanks
+      .filter((bank) => bank.isCardless)
+      .map((bank) => {
+        return {
+          ...bank,
+          debitEmi: false,
+          creditEmi: false,
+          startingFrom: null,
+        };
+      });
+  }
+
+  // If cardless method is hidden we need to set isCardless to false
+  // so as to only show credit/debit emi tab
+  if (isEmiMethodHidden('cardless_emi')) {
+    return emiBanks.map((bank) => {
+      return {
+        ...bank,
+        isCardless: false,
+      };
+    });
+  }
+  return emiBanks;
+};
