@@ -657,8 +657,10 @@
     const { id } = detail;
     const field = findItem(INPUT_FORM, id);
 
-    // this line insures no field have trailing spaces
-    $formData = { ...$formData, [id]: $formData[id]?.trim() };
+    // this line insures no field have trailing spaces in the string values
+    if (typeof $formData[id] === 'string') {
+      $formData = { ...$formData, [id]: $formData[id]?.trim() };
+    }
 
     const errorLabel = validateInputField(
       $formData[id],
