@@ -30,5 +30,5 @@ ut1ccMetrics.csv
 
 #playwright
 vision/test-results
-vision/autogen/.screenshots-temp
+vision/autogen/screenshots/temp
 *darwin.png

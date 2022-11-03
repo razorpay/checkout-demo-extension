@@ -6,8 +6,8 @@ import { compare } from 'odiff-bin';
 import { md5 } from './index.mjs';
 import { RECORD_MODE, HEADLESS, HistoryType } from './constants.mjs';
 
-const BASE_DIR = 'vision/autogen/screenshots/';
-const TEMP_DIR = 'vision/autogen/.screenshots-temp/';
+const BASE_DIR = 'vision/autogen/screenshots/base/';
+const TEMP_DIR = 'vision/autogen/screenshots/temp/';
 
 execSync(`rm -rf ${TEMP_DIR}/*; mkdir -p ${TEMP_DIR}`);
 
@@ -201,6 +201,8 @@ export async function report() {
   if (RECORD_MODE) {
     execSync(`rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf "${BASE_DIR}*-diff.png"`);
   }
+
+  console.log(`You can view results at http://localhost:8000/autotest${RECORD_MODE ? '-base' : ''}`);
 
   return testSuccess ? 0 : 1;
 }

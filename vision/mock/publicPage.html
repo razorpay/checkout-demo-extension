@@ -35,8 +35,45 @@ body>span {
 }
 </style>
 <script>
+  // Make random & date fn same for every run
+  // we generate checkout-id based on Date.now which is used in API calls
   Math.random = () => 0.5;
   Date.now = () => 1660817290856;
+
+  let t = 0;
+
+  // every time its called, increase by 100
+  performance.now = () => t += 100;
+
+  // timeouts > 0 are made zero-timeouts, but right order is ensured
+  (() => {
+    const st = setTimeout;
+    const timeouts = [];
+
+    // immediately call requestAnimationFrame with mocked increased time
+    requestAnimationFrame = (cb) => {
+      st(() => cb(t += 100));
+    }
+
+    // execute all timeouts immediately in correct order
+    function trigger() {
+      while (timeouts.length) {
+        try {
+          timeouts.shift()[0]();
+        } catch(e) {}
+      }
+    }
+    setTimeout = function(cb, dur = 0) {
+      const pair = [ cb, dur ];
+      const index = timeouts.findIndex(t => t[1] > dur);
+      if (index !== -1) {
+        timeouts.splice(1, 0, pair);
+      } else {
+        timeouts.push(pair);
+      }
+      st(trigger);
+    }
+  })();
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout-frame.js"></script>
 <script>

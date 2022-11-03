@@ -39,6 +39,10 @@ apiRouter.get('/v1/checkout/rewards', function* () {
 apiRouter.get('/v1/personalisation', function* () {
   yield {preferred_methods:{}};
 });
+apiRouter.post('/v1/payments/validate/account', function* ({ request }) {
+  const vpa = new URLSearchParams(request.postData()).get('value');
+  yield { vpa, customer: null, success: true };
+});
 apiRouter.post('/v1/payments/create/ajax', payment.createAjax);
 apiRouter.post('/v1/payments/create/checkout', payment.createCheckout);
 apiRouter.get('/v1/payments/:payment_id/status/(.)*', handleStatus);

@@ -10,6 +10,7 @@ function getValues(element, state) {
 
   const values = new Set();
 
+
   for (let val of handler(state, element.variant)) {
     switch (element.action) {
       case HistoryType.FILL:
@@ -125,6 +126,11 @@ async function loopElements({ fork, elements, pageState, offset }) {
     const history = state.history;
     const [firstAction, ...actions] = element[1];
 
+    if (!firstAction) {
+      // no action to be recorded, ignore this element but continue with rest
+      continue;
+    }
+
     for (let action of actions) {
       fork({
         ...state,
@@ -138,7 +144,13 @@ async function loopElements({ fork, elements, pageState, offset }) {
     const historyObject = newHistory(firstAction);
 
     state.history = [...history, historyObject];
+
+
     const resolver = await replay(historyObject, pageState);
+    if (!resolver) {
+      continue;
+    }
+
     await capture(pageState);
     resolver();
 
@@ -201,6 +213,10 @@ function newHistory({ element, value }) {
 }
 
 export async function replay(historyObject, pageState) {
+  if (historyObject.type === HistoryType.CLICK && !historyObject.value) {
+    return; // no click is performed, so screenshot is unnecessary
+  }
+
   const { page } = pageState;
   const [closure, resolver] = promisePair();
 
@@ -216,7 +232,7 @@ export async function replay(historyObject, pageState) {
     throw `element not found during REPLAY ${historyObject.selector}`;
   }
   if (!HEADLESS) {
-    // await delay(500);
+    await delay(500);
   }
 
   switch (historyObject.type) {
