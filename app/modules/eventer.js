@@ -1,3 +1,5 @@
+import { Track } from 'analytics';
+import { capture, SEVERITY_LEVELS } from 'error-service';
 import { returnAsIs } from 'lib/utils';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
@@ -85,6 +87,13 @@ Eventer.prototype = {
       } catch (e) {
         if (console.error) {
           console.error(e);
+          if (Track.props.library === 'razorpayjs') {
+            if (['TypeError', 'ReferenceError'].indexOf(e?.name) >= 0) {
+              capture(e, { severity: SEVERITY_LEVELS.S1 });
+            } else {
+              capture(e, { severity: SEVERITY_LEVELS.S2 });
+            }
+          }
         }
       }
     });
