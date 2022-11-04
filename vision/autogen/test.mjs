@@ -135,8 +135,18 @@ async function runTestInPage(page, state) {
     markPageClosed();
   });
 
-  page.goto(state.url); // do not await else it'll not let replayable requests to finish
+  // do not await page load operation to avoid getting stuck here itself
+  page.goto(state.url, {
+    waitUntil: 'commit',
+  });
+
   await processReplays(pageState);
+
+  // ensures js/css resources to be loaded.
+  // these files may take longer to be uploaded to remote server because of size
+  await page.waitForLoadState('load', {
+    timeout: 30e3,
+  });
 
   await processNext(pageState, fork);
   await pageClosure;

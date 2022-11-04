@@ -1,5 +1,6 @@
 import { match } from 'path-to-regexp';
 import { isSerializable, md5 } from './index.mjs';
+import { File } from '../handlers/static.mjs';
 
 class Router {
   #origins = new Map();
@@ -67,13 +68,8 @@ class OriginRouter {
                 response: {},
               };
 
-              if (value instanceof Buffer) {
-                reqObj.response.body = value;
-                const ext = /\.(\w+)$/.exec(url);
-                const contentType = ext && mime[ext[1]];
-                if (contentType) {
-                  reqObj.response.contentType = contentType;
-                }
+              if (value instanceof File) {
+                reqObj.response.path = value.path;
                 if (values.length === 1) {
                   this.#cache.set(url, [ reqObj ]);
                 }
@@ -125,12 +121,3 @@ function add(method, routes) {
     });
   };
 }
-
-const mime = {
-  png: 'image/png',
-  svg: 'image/svg+xml',
-  jpg: 'image/jpeg',
-  css: 'text/css',
-  html: 'text/html',
-  js: 'application/javascript',
-};

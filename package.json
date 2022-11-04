@@ -66,8 +66,8 @@
     "test:unit:1cc": "NODE_ENV=test && jest --config jest.1cc.ut.config.js",
     "test:unit:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.ut.config.js --coverage --outputFile test-results.json --json",
     "test:unit:1cc:coverage": "NODE_ENV=test && __SVELTE_COVERAGE__=true jest --config jest.1cc.ut.config.js --coverage --outputFile test-1cc-results.json --json 2>&1 | tee log-1cc.txt",
-    "test:autogen": "docker run --workdir=/c -v `pwd`:/c -u `id -u $USER` --rm -it mcr.microsoft.com/playwright:v1.25.0-focal node vision/autogen/index.mjs $@",
-    "test:autogen:headed": "node vision/autogen/index.mjs --headed $@",
+    "autotest": "node vision/autogen/index.mjs --remote",
+    "autotest:record": "node vision/autogen/index.mjs --remote --record",
     "test": "npm run test:all",
     "vision": "./scripts/vision.sh",
     "vision:test": "npx playwright test",
@@ -160,10 +160,10 @@
     "uglify-js": "^3.13.10"
   },
   "dependencies": {
-    "@playwright/test": "^1.25.0",
+    "@playwright/test": "1.27.1",
     "acorn": "^8.8.0",
     "node-sass": "^7.0.1",
-    "playwright-chromium": "^1.25.0"
+    "playwright-chromium": "1.27.1"
   },
   "engines": {
     "node": ">=16.10.0"

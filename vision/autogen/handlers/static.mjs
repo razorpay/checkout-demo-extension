@@ -1,5 +1,8 @@
-import { readFileSync } from 'fs';
-import { md5 } from '#vision/autogen/utils/index.mjs';
+export class File {
+  constructor(path) {
+    this.path = path;
+  }
+}
 
 export function* servePublicPage() {
   yield serveFile('vision/mock/publicPage.html');
@@ -24,7 +27,7 @@ export function* serveCdn({ params }) {
 
 export function serveFile(path) {
   try {
-    return readFileSync(path);
+    return new File(path);
   } catch (e) {
   }
 }
