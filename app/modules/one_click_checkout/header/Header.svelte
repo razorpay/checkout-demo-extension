@@ -58,14 +58,14 @@
             {/if}
           </div>
           {#if !isRTBEnabled}
-            <LanguageSelection color={HEADER_ELEMENTS_COLOR} />
+            <LanguageSelection color={themeMeta.textColor} />
           {/if}
         </div>
       </div>
       {#if isRTBEnabled}
         <div class="header-body-wrapper">
           <TrustedBadge expanded iconColor={HEADER_ELEMENTS_COLOR} />
-          <LanguageSelection color={HEADER_ELEMENTS_COLOR} />
+          <LanguageSelection color={themeMeta.textColor} />
         </div>
       {/if}
     {:else}

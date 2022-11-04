@@ -10,8 +10,6 @@
   // Other Imports
   import { showAccountModal } from 'account_modal';
   import { ACCOUNT_VARIANT } from 'account_modal/constants';
-  import { getThemeMeta } from 'checkoutstore/theme';
-  const themeMeta = getThemeMeta();
 
   export let color: string;
 
@@ -30,7 +28,7 @@
   <span data-test-id="vernacular-text" class="selected-language"
     >{getLocaleName($locale)}</span
   >
-  <Icon icon={arrow_down('14', '14', themeMeta.textColor)} />
+  <Icon icon={arrow_down('14', '14', color)} />
 </div>
 
 <style>
