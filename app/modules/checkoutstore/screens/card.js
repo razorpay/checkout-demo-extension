@@ -27,8 +27,13 @@ export const selectedCardFromHome = writable(null); // use by AVS if card select
 export const AVSBillingAddress = writable(null);
 export const isAVSEnabledForEntity = writable(null); // to check avs is enabled or not value is set in presubmit flow only
 
+export const cardNetwork = writable();
 // State to store the current card network derived from the card number
-export const cardNetwork = derived(cardNumber, getCardType);
+// but we can set cardNetwork after iin response
+cardNumber.subscribe(($cardNumber) => {
+  cardNetwork.set(getCardType($cardNumber));
+});
+
 export const currentCardType = writable(null); // to check the current card type is debit, credit or prepaid
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.

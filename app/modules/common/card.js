@@ -158,6 +158,11 @@ const cardLengths = {
 
 export const getCardType = (cardNumber = '') => {
   cardNumber = (cardNumber || '').replace(/\D/g, '');
+  const iinCardData = getCardMetadata(cardNumber);
+  /** use iin response over regex */
+  if (iinCardData && typeof iinCardData.network === 'string') {
+    return iinCardData.network.toLowerCase();
+  }
   let cardType = '';
   cardPatterns.forEach((card) => {
     if (card.regex.test(cardNumber)) {

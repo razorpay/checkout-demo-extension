@@ -227,6 +227,9 @@
       if (lastIin) {
         getCardFeatures($cardNumber)
           .then((data) => {
+            if (data?.network) {
+              $cardNetwork = data.network;
+            }
             const { emi } = data.flows || {};
             if (!emi) {
               Analytics.track('card:emi:invalid', {
