@@ -6,7 +6,9 @@ function makeOptions(features, options) {
     show_coupons: !features.couponsDisabled,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
   };
-
+  if (features.prefill) {
+    options.prefill = { coupon_code: features.couponCode };
+  }
   if (callbackUrl) {
     options.callback_url =
       'http://www.merchanturl.com/callback?test1=abc&test2=xyz';

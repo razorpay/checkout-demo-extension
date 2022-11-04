@@ -105,12 +105,20 @@ async function getOrderSummary(context, isValidCoupon) {
 }
 
 async function verifyValidCoupon(context, features) {
-  const { amount, discountAmount, availableCoupons, couponCode, showCoupons } =
-    features;
-  if (availableCoupons && showCoupons) {
-    await applyAvailableCoupon(context, couponCode);
-  } else {
-    await applyCoupon(context, couponCode);
+  const {
+    amount,
+    discountAmount,
+    availableCoupons,
+    couponCode,
+    showCoupons,
+    prefill,
+  } = features;
+  if (!prefill) {
+    if (availableCoupons && showCoupons) {
+      await applyAvailableCoupon(context, couponCode);
+    } else {
+      await applyCoupon(context, couponCode);
+    }
   }
   await delay(200);
   await handleApplyCouponReq(context, true, discountAmount);
