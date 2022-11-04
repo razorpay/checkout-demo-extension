@@ -128,8 +128,17 @@ async function verifyValidCoupon(context, features) {
     totalAmount,
   } = await getOrderSummary(context, true);
   expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-  expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
-  const calcTotalAmount = Math.abs(amount / 100 - discountAmount / 100);
+  if (discountAmount === amount) {
+    expect(formatTextToNumber(_discountAmount) + 1).toEqual(
+      discountAmount / 100
+    );
+  } else {
+    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
+  }
+  const calcTotalAmount =
+    amount === discountAmount
+      ? 1
+      : Math.abs(amount / 100 - discountAmount / 100);
   expect(formatTextToNumber(totalAmount)).toEqual(calcTotalAmount);
 }
 

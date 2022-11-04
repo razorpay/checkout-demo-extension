@@ -263,7 +263,14 @@ async function handleFeeSummary(context, features) {
   if (couponValid && !removeCoupon) {
     expectedAmount -= discountAmount / 100;
     expect(couponText).toEqual(`Coupon (${couponCode})`);
-    expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
+    if (amount === discountAmount) {
+      expectedAmount = 1;
+      expect(formatTextToNumber(_discountAmount) + 1).toEqual(
+        discountAmount / 100
+      );
+    } else {
+      expect(formatTextToNumber(_discountAmount)).toEqual(discountAmount / 100);
+    }
   }
 
   if (shippingFee) {
