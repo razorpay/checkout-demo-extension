@@ -8,7 +8,7 @@ import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 import { appsThatSupportWebPayments } from 'common/webPaymentsApi';
 import { getPreferences } from 'razorpay';
-import { android } from 'common/useragent';
+import { android, isWebView } from 'common/useragent';
 import * as _ from 'utils/_';
 
 let message;
@@ -217,7 +217,7 @@ export function isUpiUxExperimentSupported(variantName = null) {
       sdkMeta.platform === 'android' ||
       sdkMeta.platform === 'ios';
 
-    if (!supportedPlatform) {
+    if (!supportedPlatform || isWebView) {
       return false;
     }
 
