@@ -76,7 +76,12 @@ async function assertEditUserDetailsAndBack(context) {
 /**
  * Fill user contact and email
  */
-async function fillUserDetails(context, number) {
+async function fillUserDetails(
+  context,
+  number,
+  internationalPhoneNumber = false,
+  country = 'US'
+) {
   let contact = context.prefilledContact || number || randomContact();
   let email = context.prefilledEmail || randomEmail();
 
@@ -101,7 +106,10 @@ async function fillUserDetails(context, number) {
     if (contactToType && contactToType.startsWith('+91')) {
       contactToType = contactToType.replace('+91', '');
     }
-
+    if (internationalPhoneNumber) {
+      await context.page.click('#country-code');
+      await context.page.click(`[id*=_${country}_]`);
+    }
     await context.page.type('#contact', contactToType);
 
     if (context.options.one_click_checkout) {

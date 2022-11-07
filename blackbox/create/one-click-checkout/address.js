@@ -92,6 +92,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     selectUnserviceable,
     consentBannerViews,
     internationalShippingEnabled,
+    internationalPhoneNumber,
   } = features;
 
   describe.each(
@@ -220,34 +221,40 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
           }
         } else {
           // logged out / guest user flows
-
-          await checkPhoneValidation(
-            context,
-            '995239840',
-            INDIAN_CONTACT_ERROR_LABEL
-          );
-          await resetContactDetails(context);
-          await checkPhoneValidation(
-            context,
-            '99523984078',
-            INDIAN_CONTACT_ERROR_LABEL
-          );
-          await resetContactDetails(context);
-          await checkPhoneValidation(
-            context,
-            '1000000000',
-            CONTACT_ERROR_LABEL
-          );
-          await resetContactDetails(context);
-
-          await fillUserDetails(context);
-          await proceedOneCC(context);
-          await handleCustomerStatusReq(
-            context,
-            addresses.length,
-            consentBannerViews
-          );
-
+          if (!internationalPhoneNumber) {
+            await checkPhoneValidation(
+              context,
+              '995239840',
+              INDIAN_CONTACT_ERROR_LABEL
+            );
+            await resetContactDetails(context);
+            await checkPhoneValidation(
+              context,
+              '99523984078',
+              INDIAN_CONTACT_ERROR_LABEL
+            );
+            await resetContactDetails(context);
+            await checkPhoneValidation(
+              context,
+              '1000000000',
+              CONTACT_ERROR_LABEL
+            );
+            await resetContactDetails(context);
+            await fillUserDetails(context);
+            await proceedOneCC(context);
+            await handleCustomerStatusReq(
+              context,
+              addresses.length,
+              consentBannerViews
+            );
+          } else {
+            await fillUserDetails(
+              context,
+              '999999991',
+              internationalPhoneNumber
+            );
+            await proceedOneCC(context);
+          }
           if (addresses.length) {
             // OTP screen if user has addresses
             await handleCreateOTPReq(context);
@@ -309,6 +316,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               serviceable,
               internationalShippingEnabled,
               zipcode: internationalShippingEnabled ? '10001' : '560001',
+              internationalPhoneNumber,
             });
 
             // unserviceable address in add address form
@@ -378,7 +386,6 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
         if (editShippingAddress || editBillingAddress) {
           await handleEditAddressReq(context);
         }
-
         await mockPaymentSteps(context, options, features, true, method);
       });
     }

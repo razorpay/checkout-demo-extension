@@ -107,6 +107,7 @@ async function fillUserAddress(
     isBillingAddress,
     addLandmark = false,
     internationalShippingEnabled = false,
+    internationalPhoneNumber = false,
   }
 ) {
   await context.page.waitForSelector('.address-new');
@@ -152,6 +153,10 @@ async function fillUserAddress(
     await delay(200);
     await context.page.waitForSelector('#address-consent-checkbox');
     await context.page.click('#address-consent-checkbox');
+  }
+  if (internationalPhoneNumber) {
+    await delay(200);
+    expect(await context.page.$('#address-consent-checkbox')).toEqual(null);
   }
 }
 
