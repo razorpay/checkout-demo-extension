@@ -139,8 +139,6 @@ let preferences,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
   CardViews = discreet.CardViews,
-  merchantAnalytics = discreet.merchantAnalytics,
-  merchantAnalyticsConstant = discreet.merchantAnalyticsConstant,
   TopbarMagicCheckoutStore = discreet.TopbarMagicCheckoutStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -4666,12 +4664,6 @@ Session.prototype = {
     let tab = this.tab;
     let selectedInstrument = this.getSelectedPaymentInstrument();
 
-    if (selectedInstrument) {
-      merchantAnalytics({
-        event: merchantAnalyticsConstant.ACTIONS.PAY_NOW_CLICKED,
-        category: merchantAnalyticsConstant.CATEGORIES.PAYMENT_METHODS,
-      });
-    }
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.

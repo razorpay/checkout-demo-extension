@@ -19,8 +19,6 @@ import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/Netb
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodes';
-import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
-import * as merchantAnalyticsConstant from 'one_click_checkout/merchant-analytics/constant';
 import * as _ from 'utils/_';
 
 /* Required for merchant.js migration */
@@ -244,8 +242,6 @@ export default {
   IntlBankTransferTab,
 
   isInternationalInPreferredInstrument,
-  merchantAnalytics,
-  merchantAnalyticsConstant,
   TopbarMagicCheckoutStore,
 
   CommonConstants,

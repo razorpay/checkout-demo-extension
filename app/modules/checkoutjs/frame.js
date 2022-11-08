@@ -22,6 +22,7 @@ import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import { sendToAll, setInitialContext } from 'checkoutjs/analytics';
 import { cleanupFreezeCheck } from './freeze';
+import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 
 const { screen, scrollTo } = global;
 
@@ -529,6 +530,10 @@ CheckoutFrame.prototype = {
   },
 
   onsubmit: function (data) {
+    merchantAnalytics({
+      event: ACTIONS.PAY_NOW_CLICKED,
+      category: CATEGORIES.PAYMENT_METHODS,
+    });
     Track.flush();
 
     let rzp = this.rzp;
