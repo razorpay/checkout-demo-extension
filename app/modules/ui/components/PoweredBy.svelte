@@ -35,7 +35,7 @@
 <i
   id="powered-by"
   class:branded={customLogo && fontLoaded}
-  class:powered-one-cc={isRedesignV15()}
+  class:powered-one-cc={isRedesignV15() && isOrgRazorpay}
 >
   {#if customLogo && fontLoaded}
     {$t(PARTNERSHIP_LABEL)}
