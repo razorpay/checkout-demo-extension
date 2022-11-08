@@ -173,7 +173,11 @@
       const selectedAddressBox = document.getElementById(
         SELECTED_ADDRESS_DOM_ID
       );
-      if (selectedAddressBox && !$selectedAddress.serviceability) {
+      if (
+        addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+        selectedAddressBox &&
+        !$selectedAddress.serviceability
+      ) {
         selectedAddressBox.scrollIntoView({
           behavior: 'smooth',
         });
