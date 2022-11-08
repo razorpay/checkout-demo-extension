@@ -989,6 +989,9 @@ Session.prototype = {
 
   completePendingPayment: function () {
     let self = this;
+    let params = {};
+    params[Constants.UPI_POLL_URL] = '';
+    params[Constants.PENDING_PAYMENT_TS] = '0';
     try {
       let pollUrl, pendingPaymentTimestamp;
       pendingPaymentTimestamp = StorageBridge.getString(
@@ -1014,9 +1017,6 @@ Session.prototype = {
         ) {
           pollUrl = StorageBridge.getString(Constants.UPI_POLL_URL);
         } else {
-          let params = {};
-          params[Constants.UPI_POLL_URL] = '';
-          params[Constants.PENDING_PAYMENT_TS] = '0';
           this.setParamsInStorage(params);
         }
       }
@@ -1043,6 +1043,8 @@ Session.prototype = {
 
               self.errorHandler(response);
             }
+            // reset storage post polling success/failure
+            this.setParamsInStorage(params);
           },
         }).till(function (response) {
           return response && response.status;
@@ -4583,7 +4585,9 @@ Session.prototype = {
     let params = {};
     params[Constants.UPI_POLL_URL] = '';
     params[Constants.PENDING_PAYMENT_TS] = '0';
-    this.setParamsInStorage(params);
+    if (!this.activity_recreated) {
+      this.setParamsInStorage(params);
+    }
 
     UTILS.abortAjax(this.ajax);
 
