@@ -103,7 +103,7 @@ export function fetchCoupons() {
     })
     .catch((e) => {
       Events.TrackMetric(CouponEvents.COUPONS_FETCH_FAILED, {
-        failure_reason: e.error.reason,
+        failure_reason: e?.error?.reason,
       });
     })
     .finally(() => {
