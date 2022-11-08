@@ -67,6 +67,7 @@
     elemClasses="address-elem"
     bind:this={inputRef}
     label={$t(CUSTOM_TAG_LABEL)}
+    maxlength={32}
     on:input={handleInput}
     on:blur={(e) =>
       Events.Track(AddressEvents.CUSTOM_TAG_INPUT, { tag: e.target.value })}
