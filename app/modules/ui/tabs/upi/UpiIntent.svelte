@@ -9,7 +9,14 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
+
+  // Analytics imports
   import Analytics from 'analytics';
+  import { AnalyticsV2State } from 'analytics-v2';
+  import UPI_EVENTS from 'ui/tabs/upi/events';
+  import { UPITracker } from 'upi/analytics/events';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
@@ -23,21 +30,16 @@
     UPI_SHOW_OTHER_APPS,
   } from 'ui/labels/upi';
 
-  import * as AnalyticsTypes from 'analytics-types';
-
-  import UPI_EVENTS from 'ui/tabs/upi/events';
   import {
     OTHER_INTENT_APPS,
     getOtherAppsLabel,
     isPreferredApp,
   } from 'common/upi';
-  import { Events } from 'analytics';
   import { definePlatform } from 'upi/helper';
   import { enableUPITiles } from 'upi/features';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { IntentFlowsHeader } from 'upi/ui/components/IntentFlowHeader';
-  import { MiscTracker } from 'misc/analytics/events';
-  import { AnalyticsV2State } from 'analytics-v2';
+  import { triggerAnalyticsOnLoad } from 'upi/analytics/helpers';
 
   // Props
   export let apps: UPI.AppConfiguration[] = [];
@@ -142,6 +144,7 @@
     { detail }: { detail: UPI.AppConfiguration },
     index: number
   ) {
+    UPITracker.PAY_WITH_OTHER_APPS_SELECTED();
     trackIntentAppSelected(detail.app_name, index);
     const packageName = detail.package_name;
     const psp = detail.shortcode;
@@ -170,15 +173,7 @@
   }
 
   onMount(() => {
-    let listedApps: string[] = [];
-    if (showableApps) {
-      listedApps = showableApps.map((appData) => appData.app_name);
-      listedApps.push(
-        getUpiIntentAppName(getOtherAppsLabel(showableApps), $locale)
-      );
-    }
-    Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD, { listed_app: listedApps });
-    Events.TrackRender(UPI_EVENTS.INTENT_APPS_LOAD_V2);
+    triggerAnalyticsOnLoad(showableApps);
   });
 
   $: isIntentFlowVisible = showableApps.length || payUsingApps;

@@ -87,6 +87,7 @@ import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
+import { UPITracker } from 'upi/analytics/events';
 import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
@@ -5134,9 +5135,10 @@ Session.prototype = {
     let self = this;
     self.showLoadError(I18n.format('upi.verifying_vpa_info'), false, true);
     $('#overlay-close').hide();
+    UPITracker.VPA_VERIFICATION_STARTED();
 
     RazorpayHelper.verifyVPA(data.vpa)
-      .then(function () {
+      .then(function (data) {
         $('#overlay-close').show();
         setTimeout(function () {
           hideOverlay($('#error-message'));
@@ -5144,12 +5146,18 @@ Session.prototype = {
             vpaVerified: true,
           });
         }, 200);
+        UPITracker.VPA_VERIFICATION_ENDED({
+          response: data,
+        });
       })
       .catch(function (vpaValidationError) {
         let errorDescription = ObjectUtils.get(
           vpaValidationError,
           'error.description'
         );
+        UPITracker.VPA_VERIFICATION_ENDED({
+          response: vpaValidationError?.error,
+        });
         let errorMessage = errorDescription
           ? I18n.translateErrorDescription(
               errorDescription,

@@ -20,26 +20,28 @@
   import { showSummaryModal } from 'summary_modal';
 
   import { getSession } from 'sessionmanager';
-  import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
 
   // i18n
   import { t } from 'svelte-i18n';
 
   import {
     QR_GENERATING_LABEL,
-    PAYMENT_CHECKING_STATUS,
     QR_RETRY,
     QR_SCAN_ON_PHONE,
     VIEW_AMOUNT_DETAILS,
   } from 'ui/labels/qr';
 
-  import UPI_EVENTS from 'ui/tabs/upi/events';
   import { isQRPaymentActive, isQRPaymentCancellable } from 'upi/helper';
   import { getCTAAmount } from 'cta';
   import { cfbAmount } from 'checkoutstore/screens/upi';
   import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
   import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
+
+  // Analytics imports
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { UPITracker } from 'upi/analytics/events';
+  import UPI_EVENTS from 'ui/tabs/upi/events';
 
   // Props
   export let view = 'qr';
@@ -106,6 +108,7 @@
   function qrLoaded() {
     loading = false;
 
+    UPITracker.QR_GENERATED();
     Analytics.track('upi:qr', {
       type: AnalyticsTypes.RENDER,
     });

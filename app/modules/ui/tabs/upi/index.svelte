@@ -105,6 +105,7 @@
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { UPITracker } from 'upi/analytics/events';
 
   // Props
   export let selectedApp = undefined;
@@ -457,6 +458,7 @@
   let oneClickUPIIntentFlow = false;
 
   onMount(() => {
+    UPITracker.UPI_L1_LOADED();
     Analytics.track(UPI_EVENTS.SCREEN_LOAD);
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {

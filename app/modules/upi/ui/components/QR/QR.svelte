@@ -32,6 +32,7 @@
   // Analytics
   import Analytics from 'analytics';
   import UPI_EVENTS from 'ui/tabs/upi/events';
+  import { UPITracker } from 'upi/analytics/events';
 
   // i18n
 
@@ -143,8 +144,14 @@
       return;
     }
 
+    UPITracker.QR_GENERATED();
     updateQrState({ status: 'qr' });
     trackQRStatus('qrLoaded', parent);
+  }
+
+  function handleSelectQR() {
+    UPITracker.SHOW_QR_CLICKED();
+    createQRPayment();
   }
 </script>
 
@@ -173,7 +180,7 @@
           data-testid="refresh"
           data-content="refresh"
           class="btn"
-          on:click={() => createQRPayment()}
+          on:click={handleSelectQR}
         >
           <!-- Instead of creating a new QR state, we will reuse the refresh state with autoGenerate to detect the show QR need -->
           {$t($qrState.autoGenerate ? SHOW_QR : REFRESH_QR)}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { createEventDispatcher } from 'svelte';
   import { getDowntimeForUPIApp, getGridArray } from 'upi/helper';
   import { initiateNecessaryFlow } from './helper';
@@ -16,6 +17,10 @@
     trackOtherSelection,
   } from 'upi/events';
   import { OTHER_INTENT_APPS } from 'upi/constants';
+  import { UPITracker } from 'upi/analytics/events';
+  import { getSession } from 'sessionmanager';
+  import { getCurrentScreen } from 'home/analytics/helpers';
+  import { trackUPIAppsShown } from 'upi/analytics/helpers';
 
   const upiTiles = enableUPITiles();
   export let variant: UPI.AppStackVariant;
@@ -33,6 +38,7 @@
    */
   export let apps = getDefaultApps();
   export let normalizeDowntime = true;
+  const session = getSession();
 
   function getDefaultApps() {
     return getRecommendedAppsForUPIStack(withOtherTile, limit);
@@ -48,6 +54,10 @@
       return row * maxItemInSingleRow + column;
     }
   }
+
+  onMount(() => {
+    trackUPIAppsShown(rowCol, session.screen as string);
+  });
 
   function handleClick(
     app: UPI.AppConfiguration,
@@ -65,6 +75,7 @@
         trackNoFlowAppSelection({ app, position });
       }
       if (app && app.shortcode === OTHER_INTENT_APPS.shortcode) {
+        UPITracker.UPI_OTHERS_SELECTED();
         trackOtherSelection(variant);
       }
       if (onOtherClick) {
@@ -82,6 +93,13 @@
       //   severe: 'low',
       //   downtimeInstrument: app.app_name || app.shortcode,
       // };
+      UPITracker.UPI_APP_SELECTED({
+        screen: getCurrentScreen(session.screen as string),
+        instrument: {
+          name: app?.shortcode,
+          type: 'intent',
+        },
+      });
       trackAppSelection(appForPay);
       initiateNecessaryFlow(
         appForPay,

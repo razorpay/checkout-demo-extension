@@ -3,27 +3,16 @@ import {
   genericMethodShown,
   p13nInstrumentShown,
   specificMethodSelected,
+  getCurrentScreen,
 } from 'home/analytics/helpers';
 import { CardsTracker } from 'card/analytics/events';
 import { METHODS } from 'checkoutframe/constants';
 
 const { CARD } = METHODS;
-const meta = { preferred: true };
 const savedCardInfo = {
   network: 'Visa',
   type: 'debit',
   issuer: 'HDFC',
-};
-const cardInstData = {
-  method: CARD,
-  section: 'generic',
-  meta,
-  _ungrouped: [
-    {
-      meta,
-      ...savedCardInfo,
-    },
-  ],
 };
 const formattedCardInst = {
   personalisation: true,
@@ -104,5 +93,13 @@ describe('test specificMethodSelected method', () => {
   it('should not call CardsTracker.SELECTED when we pass an invalid method parameter.', () => {
     specificMethodSelected({ method: '', section: 'generic' });
     expect(CardsTracker.SELECTED).not.toHaveBeenCalled();
+  });
+});
+describe('test getCurrentScreen method', () => {
+  it('should return L1 if screen has value.', () => {
+    expect(getCurrentScreen('card')).toBe('L1');
+  });
+  it('should return L0 if the screen value is empty.', () => {
+    expect(getCurrentScreen('')).toBe('L0');
   });
 });

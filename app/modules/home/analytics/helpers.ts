@@ -3,6 +3,7 @@ import { Events } from 'analytics';
 import { MiscTracker } from 'misc/analytics/events';
 import { CardsTracker } from 'card/analytics/events';
 import { NetbankingTracker } from 'netbanking/analytics/events';
+import { UPITracker } from 'upi/analytics/events';
 import { EMITracker } from 'emiV2/events/analyticsV2';
 import {
   isInstrumentForEntireMethod,
@@ -14,11 +15,12 @@ import { HOME_EVENTS } from 'analytics/home/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
 
-const { CARD, NETBANKING, PAYLATER, EMI, WALLET } = METHODS;
+const { CARD, NETBANKING, PAYLATER, UPI, EMI, WALLET } = METHODS;
 const Tracker = {
   [CARD]: CardsTracker,
   [NETBANKING]: NetbankingTracker,
   [PAYLATER]: PaylaterTracker,
+  [UPI]: UPITracker,
   [EMI]: EMITracker,
   [WALLET]: WalletTracker,
 };
@@ -34,6 +36,9 @@ type Ungrouped = {
   network?: string;
   type?: string;
   token_id?: string;
+  vendor_vpa?: string;
+  app?: string;
+  id?: string;
 };
 
 // TODO: the InstrumentType need to updated respective to all the methods
@@ -50,6 +55,8 @@ type InstrumentType = {
   skipCTAClick?: boolean;
   token_id?: string;
   consent_taken?: string;
+  flows?: string[];
+  apps?: string[];
   _type?: string;
   _ungrouped?: Array<Ungrouped>;
 };
@@ -154,3 +161,11 @@ export function triggerInstAnalytics(instrument: InstrumentType) {
     section: instrument.section,
   });
 }
+
+/**
+ * the method returns the current screen, whether L0 or L1.
+ * @param {String} screen
+ *
+ * @returns {String}
+ */
+export const getCurrentScreen = (screen: string) => (screen ? 'L1' : 'L0');

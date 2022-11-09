@@ -33,8 +33,11 @@
   import { suggestionVPA, suggestionVPAForRecurring } from 'common/upi';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { isVpaValid } from 'upi/helper';
-  import { MiscTracker } from 'misc/analytics/events';
+
+  // Analytics imports
   import { AnalyticsV2State } from 'analytics-v2';
+  import { UPITracker } from 'upi/analytics/events';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // Props
   export let selected = false;
@@ -149,6 +152,7 @@
   }
 
   function focusAfterTimeout() {
+    UPITracker.COLLECT_VPA_SELECTED();
     setTimeout(() => {
       if (vpaField && typeof vpaField.focus === 'function') {
         vpaField.focus();
@@ -173,6 +177,10 @@
       label = null;
       placeholder = $t(UPI_COLLECT_ENTER_ID);
     }
+  }
+
+  function handleVPABlur() {
+    UPITracker.VPA_FILLED();
   }
 </script>
 
@@ -288,6 +296,7 @@
             bind:readonlyValue={vpa}
             on:input={handleVpaInput}
             on:blur
+            on:blur={handleVPABlur}
             {placeholder}
             {label}
             inputFieldClasses={isRedesignV15Enabled && 'upi-vpa-field-one-cc'}
