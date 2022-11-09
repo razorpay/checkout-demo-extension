@@ -10,6 +10,7 @@ import { isEmiV2 } from 'razorpay';
 import { isCardlessTab } from 'emiV2/helper/tabs';
 import { trackDebitCardEligibilityChecked } from 'emiV2/events/tracker';
 import { isQRPaymentActive } from 'upi/helper';
+import { querySelector } from 'utils/doc';
 
 export function handleErrorModal(this: Session, message: string) {
   if (isEmiV2() && this.tab === 'emi') {
@@ -126,4 +127,15 @@ export function isPayloadIsOfQR(payload?: Record<string, any> | null) {
     (isQRPaymentActive() && payload?.['_[upiqr]'] === '1') ||
     payload?.['_[checkout_order]'] === '1'
   );
+}
+
+/**
+ * Method to add text content to the given HTML element
+ * @param {String} text
+ */
+export function updateSubLinkContent(text: string) {
+  const subLink = querySelector('#error-message .link') as HTMLElement;
+  if (subLink) {
+    subLink.textContent = text;
+  }
 }

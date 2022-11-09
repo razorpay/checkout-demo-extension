@@ -17,7 +17,11 @@ import {
   matchLatestPaymentWith,
   updateLatestPaymentErrorReason,
 } from 'payment/history';
-import { handleErrorModal, isPayloadIsOfQR } from 'session/helper';
+import {
+  handleErrorModal,
+  isPayloadIsOfQR,
+  updateSubLinkContent,
+} from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { isLoggedIn } from 'checkoutstore/customer';
@@ -6054,7 +6058,6 @@ Session.prototype = {
     }
 
     this.attemptCount++;
-    let sub_link = docUtil.querySelector('#error-message .link');
 
     let iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
@@ -6131,7 +6134,7 @@ Session.prototype = {
       );
     } else if (data.method === 'upi') {
       updateLoadingCTA(I18n.format('misc.cancel_action'));
-      sub_link.textContent = I18n.format('misc.cancel_action');
+      updateSubLinkContent(I18n.format('misc.cancel_action'));
 
       this.r.on('payment.upi.noapp', function () {
         that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
@@ -6183,7 +6186,7 @@ Session.prototype = {
       if (data.provider === 'trustly') {
         // Show goto payment popup link in loader
         updateLoadingCTA(I18n.format('misc.go_to_payment'));
-        sub_link.textContent = I18n.format('misc.go_to_payment');
+        updateSubLinkContent(I18n.format('misc.go_to_payment'));
       }
 
       this.r.on('payment.app.pending', function () {
@@ -6235,7 +6238,8 @@ Session.prototype = {
     } else {
       if (!this.headless) {
         updateLoadingCTA(I18n.format('misc.go_to_payment'));
-        sub_link.textContent = I18n.format('misc.go_to_payment');
+        // We are not using old error-dialog in the new, redesigned UI.
+        updateSubLinkContent(I18n.format('misc.go_to_payment'));
         this.r.on('payment.cancel', function () {
           that.showLoadError(I18n.format('misc.payment_canceled'), true);
         });

@@ -3,7 +3,11 @@ import { setLatestPayment } from 'payment/history';
 import { upiUxV1dot1 } from 'upi/experiments';
 import type Session from 'session/session';
 
-import { handleErrorModal, isPayloadIsOfQR } from 'session/helper';
+import {
+  handleErrorModal,
+  isPayloadIsOfQR,
+  updateSubLinkContent,
+} from 'session/helper';
 import { isQRPaymentActive } from 'upi/helper';
 
 jest.mock('upi/helper', () => ({
@@ -243,5 +247,19 @@ describe('test #isPayloadIsOfQR', () => {
         '_[upiqr]': '1',
       })
     ).toBeFalsy();
+  });
+});
+
+describe('test #updateSubLinkContent', () => {
+  test('Add the given text to link element', () => {
+    const text = 'Go to payment';
+    const ele = document.createElement('div');
+    ele.setAttribute('id', 'error-message');
+    const span = document.createElement('span');
+    span.className = 'link';
+    ele.appendChild(span);
+    document.body.appendChild(ele);
+    updateSubLinkContent(text);
+    expect(span.textContent).toBe(text);
   });
 });
