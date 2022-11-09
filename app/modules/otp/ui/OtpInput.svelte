@@ -151,16 +151,19 @@
       .slice(0, otpLength - currentInput)
       .split('');
 
-    const nextActiveInput = currentInput + pastedData.length - 1;
+    // pasteData value will be empty if we paste the alphabets on the field.
+    if (pastedData.length) {
+      const nextActiveInput = currentInput + pastedData.length - 1;
 
-    for (let pos = 0; pos < otpLength; ++pos) {
-      if (pos >= currentInput && pastedData.length > 0) {
-        $digits[pos] = pastedData.shift();
+      for (let pos = 0; pos < otpLength; ++pos) {
+        if (pos >= currentInput && pastedData.length > 0) {
+          $digits[pos] = pastedData.shift();
+        }
       }
-    }
 
-    onOtpDigitInput(e, nextActiveInput);
-    otpContainer.children[nextActiveInput].focus();
+      onOtpDigitInput(e, nextActiveInput);
+      otpContainer.children[nextActiveInput].focus();
+    }
   }
 
   afterUpdate(() => {
