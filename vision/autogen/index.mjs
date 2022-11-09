@@ -3,7 +3,7 @@ import { chromium } from 'playwright-chromium';
 import ProcessQueue from './utils/ProcessQueue.mjs';
 import { init } from './test.mjs';
 
-ProcessQueue.MAX_CONCURRENT_PROCESS = HEADLESS ? 20 : 1;
+ProcessQueue.MAX_CONCURRENT_PROCESS = HEADLESS ? 50 : 1;
 
 let browser;
 

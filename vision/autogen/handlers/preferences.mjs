@@ -5,6 +5,36 @@ export default function* handlePreferences({ options }) {
       merchant_key: options.key,
       mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
     };
+
+    /**
+     * Optional contact
+     */
+    yield {
+      ...BASE_PREFERENCES,
+      merchant_key: options.key,
+      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+      optional: ['contact'],
+    };
+
+    /**
+     * Optional Email
+     */
+    yield {
+      ...BASE_PREFERENCES,
+      merchant_key: options.key,
+      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+      optional: ['email'],
+    };
+
+    /**
+     * Optional Contact and Email
+     */
+    yield {
+      ...BASE_PREFERENCES,
+      merchant_key: options.key,
+      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+      optional: ['contact', 'email'],
+    };
   }
 }
 

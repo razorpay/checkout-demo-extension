@@ -164,6 +164,10 @@ export async function capture(pageState) {
     const result = await matchScreenshot(baseFilePath, filePath);
     if (result) {
       cursor.match = true;
+      if (cursor.key !== fileName) {
+        cursor.newKey = cursor.key;
+        fs.rename(`${TEMP_DIR}${fileName}.png`, `${TEMP_DIR}${cursor.key}.png`);
+      }
     }
   }
 }

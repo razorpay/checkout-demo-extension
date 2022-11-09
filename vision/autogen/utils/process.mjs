@@ -237,15 +237,11 @@ export async function replay(historyObject, pageState) {
 
   switch (historyObject.type) {
     case HistoryType.CLICK:
-      await targetElement.click({
-        noWaitAfter: true,
-      });
+      await targetElement.click();
       break;
 
     case HistoryType.FILL:
-      await targetElement.fill(historyObject.value, {
-        noWaitAfter: true,
-      });
+      await targetElement.fill(historyObject.value);
       break;
   }
 
