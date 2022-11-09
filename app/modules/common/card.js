@@ -149,6 +149,11 @@ const cardPatterns = [
   },
 ];
 
+const validNetworks = cardPatterns.reduce((acc, regexObj) => {
+  acc[regexObj.name] = true;
+  return acc;
+}, {});
+
 const cardLengths = {
   amex: 15,
   diners: 14,
@@ -161,7 +166,10 @@ export const getCardType = (cardNumber = '') => {
   const iinCardData = getCardMetadata(cardNumber);
   /** use iin response over regex */
   if (iinCardData && typeof iinCardData.network === 'string') {
-    return iinCardData.network.toLowerCase();
+    const network = iinCardData.network.toLowerCase();
+    if (validNetworks[network]) {
+      return network;
+    }
   }
   let cardType = '';
   cardPatterns.forEach((card) => {
@@ -306,6 +314,8 @@ export function updateCardIINMetadata(iin, data = {}) {
   } else {
     cache.network = getCardType(iin);
   }
+  // updating data
+  data.network = cache.network;
   if (data.type) {
     cache.type = data.type;
   }
