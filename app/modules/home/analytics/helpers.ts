@@ -10,11 +10,13 @@ import {
 import { getInstrumentDetails } from 'ui/tabs/home/helpers';
 import { METHODS } from 'checkoutframe/constants';
 import { HOME_EVENTS } from 'analytics/home/events';
+import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 
-const { CARD, NETBANKING } = METHODS;
+const { CARD, NETBANKING, PAYLATER } = METHODS;
 const Tracker = {
   [CARD]: CardsTracker,
   [NETBANKING]: NetbankingTracker,
+  [PAYLATER]: PaylaterTracker,
 };
 
 type MetaType = {
@@ -72,8 +74,8 @@ export const genericMethodShown = (method: string): void => {
 export const p13nInstrumentShown = (instrument: InstrumentType): void => {
   const { method } = instrument;
 
-  if (typeof Tracker[method]?.P13N_SHOWN === 'function') {
-    Tracker[method]?.P13N_SHOWN({
+  if (typeof (Tracker[method] as any)?.P13N_SHOWN === 'function') {
+    (Tracker[method] as any)?.P13N_SHOWN({
       instrument: getInstrumentDetails(instrument),
     });
   }

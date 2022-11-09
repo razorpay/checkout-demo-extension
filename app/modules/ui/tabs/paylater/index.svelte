@@ -21,6 +21,7 @@
   import { MiscTracker } from 'misc/analytics/events';
   import autotest from 'autotest';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { PaylaterTracker } from './analytics/events';
 
   const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
@@ -65,6 +66,9 @@
           method: {
             name: 'paylater',
           },
+          instruments: getInstrumentsWithOrder(filteredProviders, 'paylater'),
+        });
+        PaylaterTracker.APPS_SHOWN({
           instruments: getInstrumentsWithOrder(filteredProviders, 'paylater'),
         });
       } catch {}

@@ -85,6 +85,7 @@ import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
 import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
+import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1390,6 +1391,10 @@ Session.prototype = {
       data: {
         provider: providerCode,
       },
+    });
+
+    PaylaterTracker.APP_SELECTED({
+      instrument: { name: providerCode },
     });
 
     try {
