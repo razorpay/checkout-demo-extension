@@ -1,5 +1,5 @@
 <script lang="ts">
-  import downTimeIcon from 'ui/icons/payment-methods/downtimeIcon.js';
+  import downTimeIcon from 'ui/icons/payment-methods/downtimeIcon';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Props

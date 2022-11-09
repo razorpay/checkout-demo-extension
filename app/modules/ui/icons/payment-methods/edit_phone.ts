@@ -1,4 +1,4 @@
-export default (foregroundColor) =>
+export default (foregroundColor: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none">
   <path d="M0.125 10.2187V12.875H2.78125L10.6154 5.04082L7.95917 2.38457L0.125 10.2187ZM12.6696 2.98665C12.9458 2.7104 12.9458 2.26415 12.6696 1.9879L11.0121 0.330402C10.7358 0.0541522 10.2896 0.0541522 10.0133 0.330402L8.71708 1.62665L11.3733 4.2829L12.6696 2.98665Z" fill="${foregroundColor}"/>
   </svg>`;

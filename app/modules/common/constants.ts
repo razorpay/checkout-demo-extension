@@ -99,7 +99,7 @@ export const AVAILABLE_METHODS = [
   'cod',
   'international',
   'intl_bank_transfer',
-];
+] as const;
 
 /* VPA regex, copied from API */
 export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
@@ -155,7 +155,11 @@ export const SIFT_BEACON_KEY = '4dbbb1f7b6';
 export const CYBER_SOURCE_RZP_ORG_ID = 'k8vif92e';
 
 export const BUILD_NUMBER = __BUILD_NUMBER__; // eslint-disable-line no-undef
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const TRAFFIC_ENV = __TRAFFIC_ENV__ || '__S_TRAFFIC_ENV__'; // eslint-disable-line no-undef
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export const COMMIT_HASH = __GIT_COMMIT_HASH__; // eslint-disable-line no-undef
 
 export const STATIC_CDN_PREFIX = BUILD_NUMBER

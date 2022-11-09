@@ -9,7 +9,7 @@
   import { getThemeMeta } from 'checkoutstore/theme';
 
   const themeMeta = getThemeMeta();
-  const icons: { [x: string]: any } = themeMeta.icons;
+  const icons = themeMeta.icons;
 
   export let showSubTitle = true;
 </script>

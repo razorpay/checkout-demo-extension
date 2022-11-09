@@ -1,6 +1,6 @@
 export default (
-  foregroundColor,
-  backgroundColor
+  foregroundColor: string,
+  backgroundColor: string
 ) => `<svg width="31" height="30" viewBox="0 0 31 30" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M4.288 17.143a1.071 1.071 0 1 1 2.143 0V22.5a1.071 1.071 0 0 1-2.143 0v-5.357ZM10.716 17.143a1.071 1.071 0 1 1 2.143 0V22.5a1.071 1.071 0 0 1-2.143 0v-5.357ZM17.145 17.143a1.071 1.071 0 1 1 2.143 0V22.5a1.071 1.071 0 0 1-2.143 0v-5.357ZM1.073 27.857a1.071 1.071 0 0 1 0-2.143h21.429a1.071 1.071 0 1 1 0 2.143H1.073Z" fill="${foregroundColor}"/>
     <path fill-rule="evenodd" clip-rule="evenodd" d="M.459 11.98c-.858.6-.433 1.949.614 1.949h13.929l-1.071-3.215V8.796l.002-.63-.003-.001V5.55l-1.528-1.07a1.072 1.072 0 0 0-1.229 0L.46 11.98ZM13.93 8.164l-2.142-1.5-7.316 5.12h9.444l.014-2.99v-.63Z" fill="${foregroundColor}"/>

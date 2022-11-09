@@ -14,7 +14,7 @@
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-  import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
+  import SavedCardCTA from 'card/ui/component/SavedCardCTA.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
 

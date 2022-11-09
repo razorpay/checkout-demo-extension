@@ -1,4 +1,4 @@
-export default (foregroundColor, backgroundColor = '#3F71D7') => {
+export default (foregroundColor: string, backgroundColor = '#3F71D7') => {
   return `<svg
     width="7"
     height="7"

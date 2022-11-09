@@ -1,4 +1,4 @@
-export default (foregroundColor, backgroundColor) =>
+export default (foregroundColor: string, backgroundColor: string) =>
   `<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
       <g>

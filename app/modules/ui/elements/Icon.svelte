@@ -3,14 +3,14 @@
   import { onMount } from 'svelte';
 
   // Props
-  export let icon;
+  export let icon: string;
   export let placeholder = '';
   export let loaded = true;
   export let alt = '';
 
   // Computed
   export let loadableIcon = false;
-  export let iconToUse = undefined;
+  export let iconToUse = '';
 
   onMount(() => {
     if (loadableIcon) {

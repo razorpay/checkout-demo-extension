@@ -1,5 +1,5 @@
 export default (
-  foregroundColor,
+  foregroundColor: string,
   backgroundColor = '#072654'
 ) => `<svg width="26" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="m1 22.69 2.417-3.62a7.729 7.729 0 0 1 6.323-3.276h6.137c0 1.896-1.674 3.448-3.72 3.448h-1.859" stroke="${foregroundColor}" stroke-width="1.6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>

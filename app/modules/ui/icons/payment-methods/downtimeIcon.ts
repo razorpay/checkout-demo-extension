@@ -1,4 +1,4 @@
-export default (circleColor, arrowColor) => {
+export default (circleColor: string, arrowColor: string) => {
   if (!circleColor || !arrowColor) {
     return;
   }

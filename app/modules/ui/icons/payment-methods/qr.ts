@@ -1,4 +1,4 @@
-export default (foregroundColor, backgroundColor) =>
+export default (foregroundColor: string, backgroundColor: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-width="2">
     <path fill="#fff" stroke="${foregroundColor}" d="M2 7v16h16V7H2z"/>
     <g fill="${foregroundColor}" transform="translate(4.6 9.4)">

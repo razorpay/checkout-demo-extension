@@ -22,7 +22,7 @@
 
   const themeMeta = getThemeMeta();
   const icons = themeMeta.icons;
-  let snackBar;
+  let snackBar: Snackbar;
   let shown = true;
 
   onMount(() => {

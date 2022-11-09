@@ -57,7 +57,12 @@ import { AVAILABLE_METHODS } from 'common/constants';
 /**
  * Don't use getAllMethods which is functional representation for AVAILABLE_METHODS, as its creating CIRCULAR DEPENDENCY
  */
-const availIconNames = [...AVAILABLE_METHODS].concat([
+
+// const AVAILABLE_METHOD = [...AVAILABLE_METHODS] as const;
+// type NeededUnionType = typeof AVAILABLE_METHOD[number];
+
+const availIconNames = [
+  ...AVAILABLE_METHODS,
   'othermethods',
   'contact',
   'aadhaar',
@@ -100,9 +105,11 @@ const availIconNames = [...AVAILABLE_METHODS].concat([
   'caret_circle_right',
   'solid_down_arrow',
   'consent_location',
-]);
+] as const;
 
-function getIconFn(iconName) {
+type IconSupported = typeof availIconNames[number];
+
+function getIconFn(iconName: IconSupported) {
   switch (iconName) {
     case 'card':
       return card;
@@ -277,15 +284,21 @@ function getIconFn(iconName) {
 }
 
 export const getIcon = (
-  iconName,
+  iconName: IconSupported,
   { foregroundColor = '#072654', backgroundColor = '#3F71D7' }
 ) => {
   const iconFn = getIconFn(iconName);
   return iconFn && iconFn(foregroundColor, backgroundColor);
 };
 
-export const getIcons = (options) =>
-  availIconNames.reduce((result, method) => {
-    result[method] = getIcon(method, options);
-    return result;
-  }, {});
+export const getIcons = (options: {
+  backgroundColor: string;
+  foregroundColor: string;
+}) =>
+  availIconNames.reduce(
+    (result: { [key in IconSupported]?: string }, method) => {
+      result[method] = getIcon(method, options);
+      return result;
+    },
+    {}
+  );

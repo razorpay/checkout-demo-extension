@@ -1,4 +1,4 @@
-import SavedCardCTA from '../saved-card-cta.svelte';
+import SavedCardCTA from '../SavedCardCTA.svelte';
 
 import { render, fireEvent } from '@testing-library/svelte';
 

@@ -12,7 +12,7 @@ jobs:
         run: npm i
       - uses: reviewdog/action-eslint@v1
         with:
-          eslint_flags: 'app/modules'
+          eslint_flags: 'app/modules --quiet'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           level: error
           fail_on_error: true

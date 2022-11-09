@@ -1,6 +1,6 @@
 import initI18n from './init-i18n';
 import mockCanvas from './__mocks__/mock-canvas';
-import initThemeMock from './__mocks__/theme.js';
+import initThemeMock from './__mocks__/theme';
 
 global.matchMedia = jest.fn(() => ({ matches: false }));
 
