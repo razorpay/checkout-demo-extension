@@ -1,4 +1,4 @@
-import { selectedCard } from 'checkoutstore/screens/card';
+import { cardNetwork, selectedCard } from 'checkoutstore/screens/card';
 import type { Tokens, CardFeatures, EMIPayload, Customer } from 'emiV2/types';
 import { get } from 'svelte/store';
 import {
@@ -58,6 +58,13 @@ export const isEmiProviderInValid = (
   // Validate Co branding partner against selected bank
   // For co-branding validation we don't want to match the issuer
   const { issuer, type, cobranding_partner } = features;
+
+  // If AMEX card is used, we dont receive issuer in the iin response
+  // hence we need to validate against the card network
+  if (emiPayload.bank.code === 'AMEX' && get(cardNetwork) === 'amex') {
+    return false;
+  }
+
   return cobranding_partner
     ? !validateCoBrandingPartner(features, emiPayload.bank.code)
     : issuer !== emiPayload.bank.code || type !== emiPayload.tab;
