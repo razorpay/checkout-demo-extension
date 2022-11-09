@@ -1,12 +1,13 @@
 function makeOptions(features, options) {
-  const { orderId, callbackUrl } = features;
+  const { orderId, callbackUrl, prefillContact } = features;
 
   options = {
     one_click_checkout: true,
     show_coupons: !features.couponsDisabled,
     order_id: orderId || 'order_IPsh3f7t7s0bv3',
+    remember_customer: true,
   };
-  if (features.prefill) {
+  if (features.prefillCoupon) {
     options.prefill = { coupon_code: features.couponCode };
   }
   if (callbackUrl) {
@@ -15,12 +16,28 @@ function makeOptions(features, options) {
     options.redirect = true;
   }
 
+  if (prefillContact) {
+    options = {
+      ...options,
+      prefill: {
+        contact: '9999999999',
+        email: 'test@gmail.com',
+      },
+    };
+  }
+
   return options;
 }
 
 function makePreferences(features, preferences) {
-  const { amount, mandatoryLogin, offers, consentBannerViews, twDisabled } =
-    features;
+  const {
+    amount,
+    mandatoryLogin,
+    offers,
+    consentBannerViews,
+    twDisabled,
+    globalCustomer,
+  } = features;
 
   preferences.features = {
     one_click_checkout: true,
@@ -89,6 +106,10 @@ function makePreferences(features, preferences) {
         display_text: 'UPI Offer Display Text 2',
       },
     ];
+  }
+
+  if (globalCustomer) {
+    preferences.global = true;
   }
 
   preferences['options'] = {

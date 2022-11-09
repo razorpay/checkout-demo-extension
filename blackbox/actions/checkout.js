@@ -259,6 +259,17 @@ module.exports = {
     }
 
     await setExperiments(page, experiments);
+    if (preferences.features.one_click_checkout && emulate) {
+      await page.evaluate(
+        (contactObj) => {
+          localStorage.setItem('rzp_contact', JSON.stringify(contactObj));
+        },
+        {
+          contact: '+919999999999',
+          email: 'test@gmail.com',
+        }
+      );
+    }
     if (method && options.personalization) {
       await page.evaluate(
         (method, opt) => {
@@ -468,7 +479,7 @@ module.exports = {
       if (withSiftJS) {
         await sendSiftJS(returnObj);
       }
-      if (options.one_click_checkout) {
+      if (preferences.features.one_click_checkout) {
         await delay(200);
         sendRewardsOneCC(returnObj),
           handleResetReq(returnObj, options.order_id),

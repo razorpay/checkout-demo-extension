@@ -1,10 +1,5 @@
 const { getDataAttrSelector } = require('./common');
 
-async function editContactFromHome(context) {
-  const edtiCTA = await getDataAttrSelector(context, 'edit-contact');
-  await edtiCTA.click();
-}
-
 async function resetContactDetails(context) {
   const detailsEle = await getDataAttrSelector(
     context,
@@ -17,8 +12,7 @@ async function resetContactDetails(context) {
 }
 
 async function editContactFromOTP(context) {
-  const editCTA = await getDataAttrSelector(context, 'edit-contact-otp');
-  await editCTA.click();
+  await context.page.$eval('.edit-contact-btn', (elem) => elem.click());
 }
 
 async function checkPhoneValidation(context, phoneNumber, errMsg) {
@@ -32,7 +26,6 @@ async function checkPhoneValidation(context, phoneNumber, errMsg) {
 }
 
 module.exports = {
-  editContactFromHome,
   resetContactDetails,
   editContactFromOTP,
   checkPhoneValidation,

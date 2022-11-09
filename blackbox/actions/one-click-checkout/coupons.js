@@ -111,9 +111,9 @@ async function verifyValidCoupon(context, features) {
     availableCoupons,
     couponCode,
     showCoupons,
-    prefill,
+    prefillCoupon,
   } = features;
-  if (!prefill) {
+  if (!prefillCoupon) {
     if (availableCoupons && showCoupons) {
       await applyAvailableCoupon(context, couponCode);
     } else {

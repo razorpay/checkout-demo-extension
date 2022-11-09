@@ -1,10 +1,10 @@
 const makeOptionsAndPreferences = require('../options/index.js');
 const {
   openCheckoutWithNewHomeScreen,
+  openCheckoutOnMobileWithNewHomeScreen,
 } = require('../../tests/homescreen/open');
 const { getTestData } = require('../../actions');
 const {
-  editContactFromHome,
   resetContactDetails,
   editContactFromOTP,
 } = require('../../actions/one-click-checkout/contact.js');
@@ -34,7 +34,11 @@ const {
 } = require('../../actions/one-click-checkout/account-tab.js');
 const {
   fillUserDetails,
+  assertPrefilledUserDetails,
 } = require('../../tests/homescreen/userDetailsActions.js');
+const {
+  handlePartialOrderUpdate,
+} = require('../../actions/one-click-checkout/order.js');
 
 module.exports = function (testFeatures, methods = ['upi', 'card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -42,7 +46,14 @@ module.exports = function (testFeatures, methods = ['upi', 'card']) {
     testFeatures
   );
 
-  const { editFromHome, editFromAccount, editFromOTP, skip } = features;
+  const {
+    editFromHome,
+    editFromAccount,
+    editFromOTP,
+    prefillContact,
+    emulate,
+    skip,
+  } = features;
 
   describe.each(
     getTestData(title, {
@@ -51,58 +62,76 @@ module.exports = function (testFeatures, methods = ['upi', 'card']) {
       methods,
     })
   )('One Click Checkout Contact test', ({ preferences, title, options }) => {
-    test.skip(title, async () => {
+    if (skip) {
+      test.skip(title, () => {});
+      return;
+    }
+    test(title, async () => {
+      let context;
       preferences.methods.upi = true;
-
-      const context = await openCheckoutWithNewHomeScreen({
-        page,
-        options,
-        preferences,
-      });
-
+      if (emulate) {
+        context = await openCheckoutOnMobileWithNewHomeScreen({
+          page,
+          options,
+          preferences,
+          emulate,
+        });
+      } else {
+        context = await openCheckoutWithNewHomeScreen({
+          page,
+          options,
+          preferences,
+        });
+      }
       if (features.showCoupons) {
         await handleAvailableCouponReq(context);
       }
-
-      await fillUserDetails(context, randomContact());
+      if (prefillContact || emulate) {
+        await assertPrefilledUserDetails(context);
+      } else {
+        await fillUserDetails(context, randomContact());
+      }
       await delay(500);
       await proceedOneCC(context);
-      await handleCustomerStatusReq(context, true);
-      await handleCreateOTPReq(context);
+      if (editFromHome || editFromAccount || editFromOTP) {
+        await handleCustomerStatusReq(context, true);
+        await handleCreateOTPReq(context);
 
-      if (editFromHome) {
-        await goBack(context);
-        handleAvailableCouponReq(context);
-        await editContactFromHome(context);
-      } else if (editFromOTP) {
-        await editContactFromOTP(context);
-      } else if (editFromAccount) {
-        await handleTypeOTP(context);
+        if (editFromHome) {
+          await delay(400);
+          await goBack(context);
+        } else if (editFromOTP) {
+          await editContactFromOTP(context);
+          await delay(100);
+        } else if (editFromAccount) {
+          await handleTypeOTP(context);
+          await delay(200);
+          await proceedOneCC(context);
+          await handleVerifyOTPReq(context);
+          await handleShippingInfo(context);
+          await scrollToEnd(context, '.container');
+          await delay(1000);
+          await openAccounTab(context);
+          await openContactFromAccountTab(context);
+        }
+        await resetContactDetails(context);
+        await fillUserDetails(context, randomContact());
         await proceedOneCC(context);
-        await handleVerifyOTPReq(context);
-        await handleShippingInfo(context);
+        await delay(300);
 
-        await scrollToEnd(context, '.screen-comp');
-        await delay(1000);
-        await scrollToEnd(context, '.screen-comp');
-        await delay(1000);
-        await openAccounTab(context);
-        await openContactFromAccountTab(context);
+        if (editFromOTP || editFromAccount) {
+          handleResetReq(context, options.order_id);
+          if (editFromAccount) {
+            handleLogoutReq(context);
+          }
+
+          await proceedOneCC(context);
+        }
       }
-
-      await resetContactDetails(context);
-      await fillUserDetails(context, randomContact());
-      await proceedOneCC(context);
-      await delay(400);
-
-      handleResetReq(context, options.order_id);
-      if (editFromAccount) {
-        handleLogoutReq(context);
+      await delay(50);
+      if (prefillContact || emulate) {
+        await handlePartialOrderUpdate(context);
       }
-      handleAvailableCouponReq(context);
-
-      await delay(400);
-      await proceedOneCC(context);
       await handleCustomerStatusReq(context);
       await fillUserAddress(context, {
         saveAddress: false,

@@ -29,5 +29,5 @@ createPrefillCouponsTest({
   showCoupons: true,
   serviceable: true,
   saveAddress: false,
-  prefill: true,
+  prefillCoupon: true,
 });

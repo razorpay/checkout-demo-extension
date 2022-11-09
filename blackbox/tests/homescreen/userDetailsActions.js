@@ -172,6 +172,30 @@ async function assertBasicDetailsScreen(context) {
   }
 }
 
+async function assertPrefilledUserDetails(context, details = {}) {
+  const $contact = await context.page.$('#contact');
+  const $countryCode = await context.page.$('#country-code');
+  const $email = await context.page.$('#email');
+
+  let contact = details.contact || '9999999999';
+  let countryCode = '+91';
+  let email = details.email || 'test@gmail.com';
+
+  // Remove the country code from prefill
+  if (contact && contact.startsWith('+91')) {
+    contact = contact.replace('+91', '');
+  }
+
+  expect(await $countryCode.evaluate((el) => el.value)).toEqual(countryCode);
+  expect(await $contact.evaluate((el) => el.value)).toEqual(contact);
+  expect(await $email.evaluate((el) => el.value)).toEqual(email);
+
+  setState(context, {
+    contact,
+    email,
+  });
+}
+
 async function assertMissingDetails(context) {
   const strip = await context.page.$('#user-details');
   if (!context.preferences.customer) {
@@ -188,4 +212,5 @@ module.exports = {
   fillUserDetails,
   assertBasicDetailsScreen,
   assertMissingDetails,
+  assertPrefilledUserDetails,
 };
