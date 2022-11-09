@@ -2847,9 +2847,11 @@ Session.prototype = {
         // when offer is being and experiment is ON, avoid screen switch. And let the user do manually
         return;
       }
-      this.homeTab.onSelectInstrument({
-        detail: instrument,
-      });
+      if (this.homeTab?.onSelectInstrument) {
+        this.homeTab.onSelectInstrument({
+          detail: instrument,
+        });
+      }
     }
 
     let session = this;
