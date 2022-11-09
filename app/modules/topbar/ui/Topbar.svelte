@@ -19,6 +19,7 @@
   } from 'checkoutstore/dynamicfee';
   import back_arrow from 'icons/back_arrow';
   import LanguageSelection from './components/LanguageSelection.svelte';
+  import { showBackArrow } from 'topbar/store';
 
   const dispatch = createEventDispatcher();
 
@@ -49,9 +50,13 @@
 {#if shown}
   <div id="topbar-new" class:topbar-header={true}>
     <div class="title-section">
-      <span class="back" on:click={handleBackClick}>
-        <Icon icon={back_arrow()} />
-      </span>
+      {#if $showBackArrow}
+        <span class="back" on:click={handleBackClick}>
+          <Icon icon={back_arrow()} />
+        </span>
+      {:else}
+        <span />
+      {/if}
       <div>
         <LanguageSelection />
       </div>

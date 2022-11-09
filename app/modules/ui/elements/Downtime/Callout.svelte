@@ -72,7 +72,7 @@
   .downtime-callout {
     margin: auto;
     padding: 10px;
-    background: rgba(255, 219, 92, 0.4);
+    background-color: #fef7e2;
     color: #f99d27;
     display: flex;
     align-items: center;
@@ -80,10 +80,11 @@
     line-height: 14px;
   }
   .downtime-high {
-    color: #e95555;
+    background-color: rgba(246, 215, 219, 0.7);
   }
   .downtime-icon {
     margin-right: 10px;
+    align-self: flex-start;
   }
   .downtime-callout div {
     white-space: normal;
@@ -91,7 +92,6 @@
 
   .downtime-callout-one-cc {
     color: #263238;
-    background: #fef5e5;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 </style>

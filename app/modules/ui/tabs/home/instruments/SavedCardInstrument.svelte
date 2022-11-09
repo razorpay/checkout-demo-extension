@@ -5,7 +5,6 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import SecureCard from 'ui/tabs/card/SecureCard.svelte';
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
@@ -199,11 +198,6 @@
   </div>
 
   <div slot="extra" class="slots-extra">
-    {#if !!downtimeSeverity}
-      <div class="downtime-saved-card-icon">
-        <DowntimeIcon severe={downtimeSeverity} />
-      </div>
-    {/if}
     {#if hasCvv}
       <Field
         type="cvv"
@@ -233,7 +227,7 @@
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
       <DowntimeCallout
-        showIcon={false}
+        showIcon
         severe={downtimeSeverity}
         {downtimeInstrument}
       />
@@ -259,11 +253,6 @@
   }
   .downtime-saved-card {
     margin-top: 4px;
-  }
-  .downtime-saved-card-icon {
-    margin-right: 8px;
-    display: flex;
-    align-items: center;
   }
   .slots-extra {
     display: flex;

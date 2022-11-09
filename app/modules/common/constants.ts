@@ -61,6 +61,10 @@ export const PHONE_NUMBER_LENGTH_INDIA = 10;
 
 // Number may or may not contain +91 and should start with any of 6/7/8/9
 export const INDIAN_CONTACT_PATTERN = '^(\\+91)?[6-9]\\d{9}$';
+// Also added support of number starts from zero while validation (which we will remove on blur event)
+export const INDIAN_CONTACT_REGEX_WITH_ZERO = new RegExp(
+  '^(\\+91)?0?[6-9]\\d{9}$'
+);
 export const INDIAN_CONTACT_REGEX = new RegExp(INDIAN_CONTACT_PATTERN);
 
 export const EMAIL_PATTERN = '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';

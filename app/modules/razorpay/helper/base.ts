@@ -177,3 +177,9 @@ export const getCheckoutConfig = () => getPreferences('checkout_config');
 export const getOrgDetails = () => getPreferences('org');
 
 export const isEmbedded = () => RazorpayStore.isEmbedded;
+
+export const getMerchantName = () =>
+  getOption('name') ||
+  getPreferences('merchant_brand_name') ||
+  getPreferences('merchant_name') ||
+  '';

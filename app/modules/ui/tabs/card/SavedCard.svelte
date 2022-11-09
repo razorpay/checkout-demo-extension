@@ -19,12 +19,7 @@
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
 
-  import {
-    SAVED_CARD_LABEL,
-    NOCVV_LABEL,
-    AUTH_TYPE_PIN,
-    AUTH_TYPE_OTP,
-  } from 'ui/labels/card';
+  import { NOCVV_LABEL, AUTH_TYPE_PIN, AUTH_TYPE_OTP } from 'ui/labels/card';
 
   import {
     SAVED_CARD_UNAVAILABLE_HELP,
@@ -34,14 +29,13 @@
     AVAILABLE_ACTION,
   } from 'ui/labels/emi';
   import { TITLE_GENERIC } from 'ui/labels/methods';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { isDynamicFeeBearer, isRecurring, isRedesignV15 } from 'razorpay';
+  import { getBankText } from '../home/helpers';
 
   // Props
   export let card;
@@ -49,9 +43,9 @@
   export let plans;
   export let token;
   export let cvvDigits;
-  export let selected;
-  export let tab;
-  export let isTokenised;
+  export let selected: boolean;
+  export let tab: string;
+  export let isTokenised: boolean;
   export let isFormValid = true;
   let { downtimeSeverity, downtimeInstrument } = card;
 
@@ -167,20 +161,16 @@
   <div class="saved-inner">
     <div class="saved-number">
       <!-- LABEL: Card ending with {last4} -->
-      <FormattedText
+      {getBankText(card, true, Boolean(plans), $locale)}
+      <!-- <FormattedText
         text={formatTemplateWithLocale(
           SAVED_CARD_LABEL,
           { last4: card.last4 },
           $locale
         )}
-      />
+      /> -->
       {#if !isTokenised}<span class="card-non-tokenised"> * </span> {/if}
     </div>
-    {#if !!downtimeSeverity && selected}
-      <div class="downtime-saved-cards-icon">
-        <DowntimeIcon severe={downtimeSeverity} />
-      </div>
-    {/if}
     <div class="saved-cvv" class:saved-card-one-cc={isRedesignV15Enabled}>
       {#if showCvv}
         <CvvField
@@ -202,6 +192,16 @@
       {/if}
     </div>
   </div>
+
+  {#if !!downtimeSeverity && selected}
+    <div class="downtime-saved-cards">
+      <DowntimeCallout
+        showIcon
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
+    </div>
+  {/if}
 
   {#if collectCardTokenisationConsent}
     <div class="saved-cards-tokenisation-consent">
@@ -302,16 +302,6 @@
       {/if}
     </div>
   {/if}
-
-  {#if !!downtimeSeverity && selected}
-    <div class="downtime-saved-cards">
-      <DowntimeCallout
-        showIcon={false}
-        severe={downtimeSeverity}
-        {downtimeInstrument}
-      />
-    </div>
-  {/if}
 </div>
 
 <style lang="scss">
@@ -324,11 +314,6 @@
   .downtime-saved-cards {
     margin-bottom: 8px;
   }
-  .downtime-saved-cards-icon {
-    margin-right: 8px;
-    margin-top: 2px;
-  }
-
   .recurring-saved-card {
     padding-bottom: 8px;
   }
@@ -348,6 +333,11 @@
 
     .saved-inner {
       font-size: 13px;
+
+      .saved-number {
+        font-weight: 500;
+        font-size: 13px;
+      }
     }
   }
 </style>

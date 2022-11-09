@@ -13,8 +13,7 @@
     INDIA_COUNTRY_CODE,
     PHONE_PATTERN,
     PHONE_PATTERN_INDIA,
-    INDIAN_CONTACT_REGEX,
-    PHONE_NUMBER_LENGTH_INDIA,
+    INDIAN_CONTACT_REGEX_WITH_ZERO,
   } from 'common/constants';
 
   // i18n
@@ -24,8 +23,6 @@
     COUNTRY_LABEL,
     COUNTRY_HELP_TEXT,
     PHONE_NUMBER,
-    // MOBILE_NUMBER,
-    // MOBILE_NUMBER_OPTIONAL,
   } from 'ui/labels/home';
   import { CONTACT_ERROR_LABEL } from 'one_click_checkout/address/i18n/labels';
 
@@ -134,7 +131,7 @@
 
   function validateContact(country, phone) {
     if (country === INDIA_COUNTRY_CODE) {
-      return !INDIAN_CONTACT_REGEX.test(phone)
+      return !INDIAN_CONTACT_REGEX_WITH_ZERO.test(phone)
         ? $t(getIndErrLabel(phone))
         : null;
     }

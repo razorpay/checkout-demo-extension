@@ -119,8 +119,8 @@
   let nameField: NameField;
   let cvvField: CvvField;
   const nameReadonly = isNameReadOnly();
-  export let downtimeVisible;
-  export let downtimeSeverity;
+  export let downtimeVisible: boolean;
+  export let downtimeSeverity: string;
   export let downtimeInstrument;
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
@@ -651,6 +651,15 @@
       selectedTab={emiPayload.tab}
     />
   {/if}
+  {#if downtimeVisible}
+    <div class="downtime-cards">
+      <DowntimeCallout
+        showIcon={true}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
+    </div>
+  {/if}
   <div class="page-header">
     <span class="card-title">{$t(ADD_NEW_CARD)} </span>
     <span class="emi-plans-label">
@@ -737,15 +746,6 @@
       </div>
     {/if}
   </div>
-  {#if downtimeVisible}
-    <div class="downtime-cards">
-      <DowntimeCallout
-        showIcon={true}
-        severe={downtimeSeverity}
-        {downtimeInstrument}
-      />
-    </div>
-  {/if}
   <div class="row remember-check">
     <div>
       {#if showRememberCardCheck}

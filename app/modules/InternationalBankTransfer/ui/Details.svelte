@@ -185,9 +185,9 @@
         <div class="intl-bt-detail__row">
           <div class="intl-bt-detail__col" />
           <div class="intl-bt-detail__col text-heavy">
-            <button class="intl-bt-detail__copy" on:click={copyAccountDetails}
-              >{$t(copied ? COPIED : COPY_DETAILS)}</button
-            >
+            <button class="intl-bt-detail__copy" on:click={copyAccountDetails}>
+              {$t(copied ? COPIED : COPY_DETAILS)}
+            </button>
           </div>
         </div>
       {/if}

@@ -111,7 +111,6 @@ export function startErrorCapturing() {
 
   window.addEventListener('unhandledrejection', function (event) {
     let reason = event.reason;
-
     if (reason instanceof Error) {
       reason = {
         name: reason.name,

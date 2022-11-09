@@ -99,16 +99,16 @@
         on:click={handleBack}>{isRedesignV15Enabled ? 'Cancel' : 'Back'}</button
       >
       <button
-        class="continue-button {isRedesignV15Enabled
-          ? 'theme-bg-color'
-          : 'blue-continue-btn'}"
+        class={isRedesignV15Enabled
+          ? 'cta-btn'
+          : 'continue-button blue-continue-btn'}
         on:click={handleContinue}>Continue</button
       >
     </div>
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .line1 {
     color: #3f71d7;
   }
@@ -138,12 +138,12 @@
     font-size: 16px;
   }
   .container {
-    padding: 0 16px;
+    padding: 0 18px;
   }
   .back-button {
-    padding: 12px 32px;
+    padding: 11.25px 32px;
     border: 1px solid;
-    width: calc(40% - 10px);
+    width: calc(50% - 10px);
   }
 
   .blue-back-btn {
@@ -151,9 +151,9 @@
     color: #5aa4f5;
   }
   .continue-button {
-    padding: 12px 60px;
     color: #ffffff;
-    width: calc(60% - 10px);
+    text-align: center;
+    width: calc(50% - 10px);
   }
   .blue-continue-btn {
     background: linear-gradient(
@@ -174,7 +174,7 @@
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     height: 250px;
     transition: 0.2s;
-    padding-top: 20px;
+    padding-top: 24px;
     bottom: -55px;
   }
   #downtime-wrap.container-one-cc {
@@ -183,10 +183,11 @@
     padding: 20px 0px;
   }
   .container-one-cc .list {
-    margin: 6px 0px 26px;
+    margin: 0 0px 20px;
+    padding: 0;
   }
   .container-one-cc .list li div {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .line1-one-cc {
@@ -201,11 +202,12 @@
 
   .container-one-cc .buttons button {
     border-radius: 6px;
-    font-weight: 700;
+    font-weight: 600;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 16px;
+    font-size: 14px;
+    width: calc(50% - 10px);
   }
 
   :global(.redesign) #downtime-wrap {

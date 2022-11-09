@@ -5,11 +5,12 @@
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import { isRedesignV15 } from 'razorpay';
   import { onScrollToggleHeader } from 'one_click_checkout/header/helper';
+  import { screenStore } from 'checkoutstore';
 
   // Props
   export let pad = true;
   export let threshold = 16;
-  export let removeAccountTab;
+  export let removeAccountTab = false;
   // Refs
   export let contentRef: HTMLDivElement;
 
@@ -59,6 +60,7 @@
   class:pad
   bind:this={contentRef}
   on:scroll={onScroll}
+  class:show-scroll={$screenStore === 'upi'}
 >
   <slot />
   {#if !removeAccountTab}
@@ -68,7 +70,7 @@
 <div class="shadow shadow-top" />
 <div class="shadow shadow-bottom" />
 
-<style>
+<style lang="scss">
   .screen {
     flex: 1;
     box-sizing: border-box;
@@ -78,6 +80,17 @@
     height: 100%;
     overflow: auto;
     position: relative;
+
+    &.show-scroll {
+      height: auto;
+      min-height: 100%;
+      justify-content: space-between;
+      display: flex;
+
+      :global(.account-tab) {
+        transform: translate(0, 100%);
+      }
+    }
   }
 
   .one-cc {

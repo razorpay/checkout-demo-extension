@@ -1,9 +1,10 @@
 import { getSession } from 'sessionmanager';
+import { get } from 'svelte/store';
 import { didUPIIntentSucceed, parseUPIIntentResponse } from 'common/upi';
 import { processPaymentCreate } from 'payment/coproto';
-import { otp as $otp } from 'checkoutstore/screens/otp';
+import { digits, disableCTA, otp as $otp } from 'checkoutstore/screens/otp';
 import { getUPIIntentApps } from 'checkoutstore/native';
-import { querySelector } from 'utils/doc';
+import { querySelector, querySelectorAll } from 'utils/doc';
 import * as _El from 'utils/DOM';
 import { backPressed } from './back';
 
@@ -24,13 +25,30 @@ export function defineGlobals() {
 function handleOTP(otp) {
   /* Old OTPelf will now send the whole body of the
    * message instead of just OTP */
-  var matches = otp.match(/\b[0-9]{4}([0-9]{2})?\b/);
+  const matches = otp.match(/\b[0-9]{4}([0-9]{2})?\b/);
   otp = matches ? matches[0] : '';
   otp = String(otp).replace(/\D/g, '');
-  var session = getSession();
-  var otpEl = querySelector('#otp');
-  if (session && otpEl && !otpEl.value) {
-    $otp.set(otp);
+  const session = getSession();
+  const otpEl = querySelector('#otp');
+  const newOTPEl = querySelectorAll('input[id*=otp\\|]');
+
+  if (session) {
+    if (otpEl && !otpEl.value) {
+      $otp.set(otp);
+    }
+    /**
+     * razorpay OTP uses boxes layout and of length 6
+     */
+    if (
+      newOTPEl &&
+      newOTPEl.length === 6 &&
+      typeof get(digits)?.[0] === 'undefined' /** user not attempted */ &&
+      otp &&
+      otp.length === 6
+    ) {
+      digits.set(otp.split(''));
+      disableCTA.set(false);
+    }
 
     _El.removeClass(querySelector('#otp-elem'), 'invalid');
   }

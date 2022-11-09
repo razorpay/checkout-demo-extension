@@ -7,6 +7,8 @@ import { copyToClipboard } from 'common/clipboard';
 // module
 import Details from '../Details.svelte';
 
+jest.mock('razorpay');
+
 jest.mock('sessionmanager', () => ({
   getSession: () => ({
     setRawAmountInHeader: jest.fn(),

@@ -40,11 +40,15 @@
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import AccountEvents from 'account_modal/analytics';
   import { popStack, pushOverlay } from 'navstack';
-  import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
+  import {
+    isContactEmailHidden,
+    isOneClickCheckout,
+    isRedesignV15,
+  } from 'razorpay';
   import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
 
   export let options;
-  let isLoggedIn;
+  let isLoggedIn: boolean;
   let showLanguageList;
 
   let variant = ACCOUNT_VARIANT.DEFAULT;
@@ -209,7 +213,7 @@
         {/each}
       </ul>
     {:else}
-      {#if (isLoggedIn && isOneClickCheckout()) || !isOneClickCheckout()}
+      {#if (isLoggedIn && isOneClickCheckout()) || (!isOneClickCheckout() && !isContactEmailHidden())}
         <p
           data-test-id="edit-contact-account"
           class="account-menu"

@@ -473,6 +473,7 @@ export interface PreferencesObject {
   version: number;
   language_code: string;
   merchant_key: string;
+  merchant_brand_name: string;
   merchant_name: string;
   merchant_brand_name: string;
   contact: any;

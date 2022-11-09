@@ -201,6 +201,7 @@
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
   import { isValidContact } from 'helper/validation';
+  import { showBackArrow } from 'topbar/store';
   import {
     p13nInstrumentShown,
     triggerInstAnalytics,
@@ -1069,6 +1070,11 @@
     showMethods();
   }
 
+  /**
+   * determine onmount view used to determine whether to show back arrow or not
+   */
+  const initialView = determineLandingView();
+
   $: {
     if (view === HOME_VIEWS.METHODS && !isOneCCEnabled) {
       /** update customer only if its valid */
@@ -1076,6 +1082,11 @@
         $customer = session.getCustomer($contact);
       }
     }
+    const showTopbarBackArrow =
+      $screenStore === '' && showHome
+        ? canGoBack() && initialView !== HOME_VIEWS.METHODS
+        : true;
+    showBackArrow.set(showTopbarBackArrow);
     if (
       isRedesignV15() &&
       !isOneClickCheckout() &&
@@ -1330,7 +1341,11 @@
 </script>
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
-  <Screen bind:contentRef pad={false}>
+  <Screen
+    bind:contentRef
+    pad={false}
+    removeAccountTab={view === HOME_VIEWS.DETAILS}
+  >
     <div class="screen-main" class:screen-one-cc={isRedesignV15Enabled}>
       {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails

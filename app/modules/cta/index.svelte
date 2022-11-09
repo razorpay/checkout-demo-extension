@@ -256,13 +256,16 @@
       padding: 10px 14px;
       box-shadow: 0px -10px 10px rgba(23, 26, 30, 0.15);
     }
+    :global(.cta-btn),
     #redesign-v15-cta {
       padding: 14px 18px;
       font-size: var(--font-size-body);
       font-weight: var(--font-weight-semibold);
       color: var(--text-color);
       background: var(--primary-color);
+      position: relative;
     }
+    :global(.cta-btn::after),
     #redesign-v15-cta::after {
       left: 0;
       top: 0;

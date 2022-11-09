@@ -11,17 +11,13 @@
   // session imports
   import { handleModalClose } from 'header/sessionInterface';
 
-  import { getMerchantName, getOption, getPreferences } from 'razorpay';
+  import { getMerchantName, getOption } from 'razorpay';
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import { truncateString } from 'utils/strings';
   import { expandedHeader } from 'header/store';
   import { slide } from 'svelte/transition';
 
   const isRTBEnabled = RTBEnabled($RTBExperiment);
-  const merchantNameFallback = getPreferences('merchant_name') || '';
-  const name = getMerchantName() || merchantNameFallback;
-  const merchantName = truncateString(name, 20);
-
+  const name = getMerchantName();
   const closeIcon = close('#B0B8C2');
 </script>
 
@@ -32,7 +28,7 @@
 >
   <div class:with-rtb={isRTBEnabled}>
     <div class="header-container">
-      {#if getOption('image') || merchantName}
+      {#if getOption('image') || name}
         <div
           id="logo"
           class:image-frame={true}
@@ -41,13 +37,13 @@
           {#if getOption('image')}
             <img src={getOption('image')} alt="" />
           {:else}
-            {merchantName.slice(0, 1).toUpperCase()}
+            {name.slice(0, 1).toUpperCase()}
           {/if}
         </div>
       {/if}
       <div class="header-title-wrapper">
         <p title={name} class="header-title">
-          {merchantName}
+          {name}
         </p>
         {#if isRTBEnabled && !$expandedHeader}
           <div in:slide={{ delay: 150, duration: 150 }} class="rtb-section">
@@ -146,6 +142,10 @@
     font-weight: 600;
     font-size: 16px;
     line-height: 18px;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   p {
@@ -176,6 +176,7 @@
     flex: 1;
     flex-direction: row;
     align-items: center;
+    width: calc(100% - 70px);
   }
   .expanded .header-title-wrapper {
     flex-direction: column;

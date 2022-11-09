@@ -20,7 +20,7 @@
 
   // utils Imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  import { getMerchantName, getPreferences } from 'razorpay';
+  import { getMerchantName } from 'razorpay';
   import TrustedBadgeIcon from 'one_click_checkout/common/ui/TrustedBadge.svelte';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { popStack } from 'navstack';
@@ -28,7 +28,7 @@
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
   const { rtb_close } = getIcons();
-  const name = getMerchantName() || getPreferences('merchant_name') || '';
+  const name = getMerchantName();
   const merchantName = truncateString(name, 20);
 
   let listItems = [RTB_HIGHLIGHT1, RTB_HIGHLIGHT2, RTB_HIGHLIGHT3];
