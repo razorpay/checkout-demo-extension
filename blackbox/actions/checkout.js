@@ -130,7 +130,9 @@ function cdnRequestHandler(request) {
     request.respond({ body: url });
   } else if (
     url.startsWith(lumberjackUrl) ||
-    url.includes('https://browser.sentry-cdn.com/7.2.0/bundle.min.js')
+    url.includes('https://browser.sentry-cdn.com/7.2.0/bundle.min.js') ||
+    url.startsWith(rudderstackStageUrl) ||
+    url.startsWith(rudderstackProdUrl)
   ) {
     request.respond({ status: 204 });
   } else if (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) {
