@@ -10,7 +10,7 @@ describe('Sentry HTTP Failure handler', () => {
         detail: new Error('An exception occurred.'),
       })
     );
-    Analytics.track.mockReturnValue(true);
+    (Analytics.track as jest.Mock).mockReturnValue(true);
 
     expect(Analytics.track).toHaveBeenCalled();
   });
@@ -21,7 +21,7 @@ describe('Sentry HTTP Failure handler', () => {
         detail: new Error('An exception occurred.'),
       })
     );
-    Analytics.track.mockImplementation(() => {
+    (Analytics.track as jest.Mock).mockImplementation(() => {
       throw new Error('Unexpected error occured');
     });
 

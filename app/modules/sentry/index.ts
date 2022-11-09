@@ -1,6 +1,8 @@
 import { setContext } from './context';
 import { SENTRY_CONFIG } from './constants';
 import { isOneClickCheckout } from 'razorpay';
+import type { Exception } from './interfaces';
+import { filterUnWantedExceptions } from './helper';
 
 let errorTracked = false;
 
@@ -14,6 +16,12 @@ function initSentry() {
       environment: SENTRY_ENVIRONMENT,
       beforeSend(event: any) {
         try {
+          // filter checkout-frame.js error only
+          if (event.exception && event.exception.values?.length > 0) {
+            (event.exception as Exception).values = filterUnWantedExceptions(
+              (event.exception as Exception).values
+            );
+          }
           if (!isOneClickCheckout()) {
             // track only one error per session for standard checkout
             if (errorTracked) {
@@ -21,6 +29,8 @@ function initSentry() {
             }
             if (event.exception?.values?.length > 0) {
               errorTracked = true;
+            } else {
+              return false;
             }
           }
           return event;

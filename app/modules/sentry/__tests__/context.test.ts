@@ -42,10 +42,10 @@ const common_options = {
 
 describe('createContext() method', () => {
   it('should create context', () => {
-    getOption.mockReturnValue(common_options);
-    getCustomerDetails.mockReturnValue({});
-    getSavedAddresses.mockReturnValue([]);
-    isOneClickCheckout.mockReturnValue(true);
+    (getOption as unknown as jest.Mock).mockReturnValue(common_options);
+    (getCustomerDetails as jest.Mock).mockReturnValue({});
+    (getSavedAddresses as jest.Mock).mockReturnValue([]);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(true);
 
     const context = contextModule.createContext();
 
@@ -61,15 +61,15 @@ describe('createContext() method', () => {
   });
 
   it('should delete prefill if exists', () => {
-    getOption.mockReturnValue({
+    (getOption as unknown as jest.Mock).mockReturnValue({
       ...common_options,
       'prefill.name': 'Test',
       'prefill.contact': '+91999999999',
       'prefill.email': 'goutam@test.com',
     });
-    getCustomerDetails.mockReturnValue({});
-    getSavedAddresses.mockReturnValue([]);
-    isOneClickCheckout.mockReturnValue(true);
+    (getCustomerDetails as jest.Mock).mockReturnValue({});
+    (getSavedAddresses as jest.Mock).mockReturnValue([]);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(true);
 
     const context = contextModule.createContext();
 
@@ -90,8 +90,8 @@ describe('createContext() method', () => {
   });
 
   it('should have saved address and cards if user logged in', () => {
-    getOption.mockReturnValue(common_options);
-    getCustomerDetails.mockReturnValue({
+    (getOption as unknown as jest.Mock).mockReturnValue(common_options);
+    (getCustomerDetails as jest.Mock).mockReturnValue({
       contact: '+919353231953',
       customer_id: undefined,
       haveSavedCard: true,
@@ -151,7 +151,7 @@ describe('createContext() method', () => {
         ],
       },
     });
-    getSavedAddresses.mockReturnValue([
+    (getSavedAddresses as jest.Mock).mockReturnValue([
       {
         city: 'Bengaluru',
         contact: '+919353231953',
@@ -172,7 +172,7 @@ describe('createContext() method', () => {
         zipcode: '560002',
       },
     ]);
-    isOneClickCheckout.mockReturnValue(true);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(true);
 
     const context = contextModule.createContext();
 
@@ -190,10 +190,10 @@ describe('createContext() method', () => {
 
 describe('getContext() method', () => {
   it('should return context object', () => {
-    getOption.mockReturnValue(common_options);
-    getCustomerDetails.mockReturnValue({});
-    getSavedAddresses.mockReturnValue([]);
-    isOneClickCheckout.mockReturnValue(true);
+    (getOption as unknown as jest.Mock).mockReturnValue(common_options);
+    (getCustomerDetails as jest.Mock).mockReturnValue({});
+    (getSavedAddresses as jest.Mock).mockReturnValue([]);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(true);
 
     const context = contextModule.getContext();
 

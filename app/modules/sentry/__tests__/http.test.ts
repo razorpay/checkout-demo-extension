@@ -63,7 +63,7 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     const error = new Error('Something went wrong');
 
     window.Sentry = null;
-    isOneClickCheckout.mockReturnValue(false);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(false);
 
     captureError(error);
 
@@ -74,7 +74,7 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     window.Sentry = { init: jest.fn() };
     const error = new Error('Something went wrong');
 
-    isOneClickCheckout.mockReturnValue(true);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(true);
 
     captureError(error);
 
@@ -85,7 +85,7 @@ describe('captureError: pushes error to sentry store endpoint', () => {
     window.Sentry = null;
     const error = new Error('Something went wrong');
 
-    isOneClickCheckout.mockReturnValue(false);
+    (isOneClickCheckout as jest.Mock).mockReturnValue(false);
 
     captureError(error);
 

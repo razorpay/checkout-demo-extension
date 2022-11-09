@@ -24,8 +24,19 @@ export interface ExceptionValue {
   type: string;
   value: string;
   stacktrace: StackTrace;
+  mechanism?: Mechanism;
 }
 
 export interface StackTrace {
   frames: Array<StackFrame>;
+}
+
+export interface Mechanism {
+  type: string;
+  handled: boolean;
+  data: {
+    function: string;
+    handler: string;
+    target: string;
+  };
 }

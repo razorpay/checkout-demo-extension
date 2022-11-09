@@ -17,12 +17,14 @@ describe('exceptionFromError method: Takes error object and returns exception ob
 describe('parseStack method: parses error object and converts to stack', () => {
   it('should not parse IE9 Error', () => {
     expect(function () {
-      parseStack(CapturedExceptions.IE_9);
+      parseStack(CapturedExceptions.IE_9 as unknown as Error);
     }).toThrow(new Error('Cannot parse given Error object'));
   });
 
   it('should parse Safari 6 Error.stack', function () {
-    const stackFrames = parseStack(CapturedExceptions.SAFARI_6);
+    const stackFrames = parseStack(
+      CapturedExceptions.SAFARI_6 as unknown as Error
+    );
     const parsedStackFrames = [
       {
         function: undefined,
@@ -65,7 +67,6 @@ describe('parseStack method: parses error object and converts to stack', () => {
       {
         colno: 15,
         filename: 'http://path/to/file.js',
-        function: 'dumpException3',
         function: 'foo',
         in_app: true,
         lineno: 52,
@@ -114,7 +115,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse nested eval() from Safari 9', function () {
-    const stackFrames = parseStack(CapturedExceptions.SAFARI_9_NESTED_EVAL);
+    const stackFrames = parseStack(
+      CapturedExceptions.SAFARI_9_NESTED_EVAL as unknown as Error
+    );
     const parsedStackFrames = [
       { function: 'baz' },
       { function: 'foo' },
@@ -165,7 +168,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse nested eval() from Firefox 43', function () {
-    const stackFrames = parseStack(CapturedExceptions.FIREFOX_43_NESTED_EVAL);
+    const stackFrames = parseStack(
+      CapturedExceptions.FIREFOX_43_NESTED_EVAL as unknown as Error
+    );
     const parsedStackFrames = [
       {
         function: 'baz',
@@ -330,7 +335,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse V8 Error.stack', function () {
-    const stackFrames = parseStack(CapturedExceptions.CHROME_15);
+    const stackFrames = parseStack(
+      CapturedExceptions.CHROME_15 as unknown as Error
+    );
     const parsedStackFrames = [
       {
         function: 'bar',
@@ -370,7 +377,7 @@ describe('parseStack method: parses error object and converts to stack', () => {
   it('should parse V8 entries with no location', function () {
     const stackFrames = parseStack({
       stack: 'Error\n at Array.forEach (native)',
-    });
+    } as Error);
     const parsedStackFrames = [
       {
         function: 'Array.forEach',
@@ -479,7 +486,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse IE 10 Error stacks', function () {
-    const stackFrames = parseStack(CapturedExceptions.IE_10);
+    const stackFrames = parseStack(
+      CapturedExceptions.IE_10 as unknown as Error
+    );
 
     expect(stackFrames).toBeTruthy();
     expect(stackFrames.length).toBe(3);
@@ -585,7 +594,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse Opera 9.27 Error messages', function () {
-    const stackFrames = parseStack(CapturedExceptions.OPERA_927);
+    const stackFrames = parseStack(
+      CapturedExceptions.OPERA_927 as unknown as Error
+    );
     const parsedStackFrames = [
       {
         filename: 'http://path/to/file.js',
@@ -613,7 +624,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse Opera 10 Error messages', function () {
-    const stackFrames = parseStack(CapturedExceptions.OPERA_10);
+    const stackFrames = parseStack(
+      CapturedExceptions.OPERA_10 as unknown as Error
+    );
     const parsedStackFrames = [
       {
         function: undefined,
@@ -665,7 +678,9 @@ describe('parseStack method: parses error object and converts to stack', () => {
   });
 
   it('should parse Opera 11 Error messages', function () {
-    const stackFrames = parseStack(CapturedExceptions.OPERA_11);
+    const stackFrames = parseStack(
+      CapturedExceptions.OPERA_11 as unknown as Error
+    );
     const parsedStackFrames = [
       {
         function: '<anonymous function: run>([arguments not available])',
@@ -746,7 +761,7 @@ describe('parseStack method: parses error object and converts to stack', () => {
         'Error: Problem at this\nlocation. Error code:1234\n' +
         '    at http://path/to/file.js:47:22\n' +
         '    at foo (http://path/to/file.js:52:15)',
-    });
+    } as Error);
     const parsedStackFrames = [
       {
         function: undefined,
@@ -773,7 +788,7 @@ describe('parseStack method: parses error object and converts to stack', () => {
       stack:
         'ReferenceError: chilxdren is not defined\n ' +
         'at Layout (eval at proxyClass (webpack:///../react-hot-loader/~/react-proxy/modules/createClassProxy.js?), <anonymous>:4:17)',
-    });
+    } as Error);
     const parsedStackFrames = [
       {
         function: 'Layout',
