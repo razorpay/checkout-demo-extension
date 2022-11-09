@@ -90,6 +90,7 @@ import { CardsTracker } from 'card/analytics/events';
 import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
+import { WalletTracker } from 'wallet/analytics/events';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -604,7 +605,9 @@ function askOTP(
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
         if (thisSession.tab === 'card') {
-          CardsTracker.NATIVE_OTP_SENT();
+          CardsTracker.NATIVE_OTP_SENT(
+            AnalyticsV2State.selectedInstrumentForPayment
+          );
         }
         textView = 'otp_sent_no_phone';
         if (_.isNonNullObject(origText)) {
@@ -4313,6 +4316,14 @@ Session.prototype = {
         wallet: isWallet,
       },
     });
+    if (isWallet) {
+      WalletTracker.OTP_SUBMITTED({
+        method: { name: METHODS.WALLET },
+        instrument: {
+          name: (this.payload && this.payload.wallet) || '',
+        },
+      });
+    }
 
     let otp =
       storeGetter(discreet.OTPScreenStore.otp) ||
@@ -6096,6 +6107,14 @@ Session.prototype = {
 
     if (data.method === 'wallet' && (this.powerwallet || isDynamicWalletFlow)) {
       this.r.on('payment.otp.required', (message) => {
+        WalletTracker.NATIVE_OTP_SENT({
+          method: {
+            name: METHODS.WALLET,
+            instrument: {
+              name: (this.payload && this.payload.wallet) || '',
+            },
+          },
+        });
         this.askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
           showCtaOneCC: true,

@@ -18,6 +18,7 @@
   import { getSession } from 'sessionmanager';
   import { showAccountTab } from 'checkoutstore';
   import { CardsTracker } from 'card/analytics/events';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   export let hidden;
   export let isError;
@@ -54,9 +55,11 @@
         },
       });
 
-      if (!isWalletPayment()) {
+      if (session.tab === 'card') {
         if (isHeadless()) {
-          CardsTracker.NATIVE_OTP_FILLED();
+          CardsTracker.NATIVE_OTP_FILLED(
+            AnalyticsV2State.selectedInstrumentForPayment
+          );
         } else {
           CardsTracker.OTP_ENTERED();
         }

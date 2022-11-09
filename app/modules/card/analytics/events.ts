@@ -1,6 +1,6 @@
 import { API, BEHAV, RENDER } from 'analytics-types';
 import { createTrackMethodForModule } from 'analytics-v2';
-import type { Instrument } from 'analytics-v2/types';
+import type { Instrument, Method } from 'analytics-v2/types';
 
 export const CardsEvents = {
   NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
@@ -114,8 +114,14 @@ interface CardsEventMap {
     instrument: Instrument;
   };
 
-  NATIVE_OTP_FILLED: undefined;
-  NATIVE_OTP_SENT: undefined;
+  NATIVE_OTP_FILLED: {
+    method: Method;
+    instrument: Instrument;
+  };
+  NATIVE_OTP_SENT: {
+    method: Method;
+    instrument: Instrument;
+  };
   NAME_ENTERED: undefined;
   EXPIRY_ENTERED: undefined;
   CARD_NUMBER_ENTERED: undefined;

@@ -12,13 +12,15 @@ import { getInstrumentDetails } from 'ui/tabs/home/helpers';
 import { METHODS } from 'checkoutframe/constants';
 import { HOME_EVENTS } from 'analytics/home/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
+import { WalletTracker } from 'wallet/analytics/events';
 
-const { CARD, NETBANKING, PAYLATER, EMI } = METHODS;
+const { CARD, NETBANKING, PAYLATER, EMI, WALLET } = METHODS;
 const Tracker = {
   [CARD]: CardsTracker,
   [NETBANKING]: NetbankingTracker,
   [PAYLATER]: PaylaterTracker,
   [EMI]: EMITracker,
+  [WALLET]: WalletTracker,
 };
 
 type MetaType = {

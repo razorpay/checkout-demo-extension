@@ -81,6 +81,9 @@
   } from 'emiV2/events/tracker';
   import type { OtpType } from 'emiV2/types';
   import { CardsTracker } from 'card/analytics/events';
+  import { WalletTracker } from 'wallet/analytics/events';
+  import { METHODS } from 'checkoutframe/constants';
+  import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
   export let on = {};
@@ -184,9 +187,18 @@
         },
       });
 
-      if (!isWallet) {
+      if (isWallet) {
+        WalletTracker.NATIVE_OTP_FILLED({
+          method: { name: METHODS.WALLET },
+          instrument: {
+            name: (session.payload && session.payload.wallet) || '',
+          },
+        });
+      } else if (session.tab === 'card') {
         if (session.headless) {
-          CardsTracker.NATIVE_OTP_FILLED();
+          CardsTracker.NATIVE_OTP_FILLED(
+            AnalyticsV2State.selectedInstrumentForPayment
+          );
         } else {
           CardsTracker.OTP_ENTERED();
         }
@@ -228,8 +240,17 @@
 
   $: {
     const isCard = session?.tab === 'card';
+    const isWallet = session?.tab === 'wallet';
     if (showInput && isCard && !session.headless) {
       CardsTracker.OTP_SCREEN();
+    }
+    if (showInput && isWallet) {
+      WalletTracker.OTP_SCREEN_LOADED({
+        method: { name: METHODS.WALLET },
+        instrument: {
+          name: session?.payload?.wallet,
+        },
+      });
     }
   }
 </script>

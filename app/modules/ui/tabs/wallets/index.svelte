@@ -39,6 +39,7 @@
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { WalletTracker } from 'wallet/analytics/events';
 
   const session = getSession();
   const wallets = getWallets();
@@ -156,6 +157,11 @@
           personalisation: !!$selectedInstrument?.meta?.preferred,
         },
       });
+      WalletTracker.APP_SELECTED({
+        instrument: {
+          name: $selectedWallet,
+        },
+      });
     } catch {}
   }
 
@@ -179,6 +185,9 @@
           name: 'wallet',
         },
         block: AnalyticsV2State.selectedBlock,
+        instruments: getInstrumentsWithOrder(filteredWallets, 'wallet'),
+      });
+      WalletTracker.APPS_SHOWN({
         instruments: getInstrumentsWithOrder(filteredWallets, 'wallet'),
       });
     } catch {}
