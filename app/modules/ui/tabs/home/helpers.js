@@ -258,6 +258,13 @@ export function getInstrumentDetails(instrument) {
         };
       }
 
+      case 'cardless_emi': {
+        return {
+          name: instrument.providers?.[0],
+          personalisation,
+        };
+      }
+
       default: {
         return {
           saved: false,

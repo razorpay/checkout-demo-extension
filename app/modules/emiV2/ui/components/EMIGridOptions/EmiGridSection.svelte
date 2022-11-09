@@ -19,6 +19,7 @@
     trackDifferentBankSelected,
   } from 'emiV2/events/tracker';
   import { removeAppliedOfferForMethod } from 'emiV2/helper/offers';
+  import { triggerAnalyticsOnSelect } from 'emiV2/events/helpers';
 
   export let sections: string[];
   export let emiOptions: EMIOptionsMap;
@@ -51,6 +52,7 @@
   };
 
   const onEmiOptionSelect = (bank: EMIBANKS, emiProviderType: string) => {
+    triggerAnalyticsOnSelect(bank, emiProviderType);
     // When a bank emi is selected we need to clear the saved card selection
     $selectedBank = bank;
     selectedIssuer = bank;

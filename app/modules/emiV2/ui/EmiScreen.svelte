@@ -49,6 +49,7 @@
   import { selectedPlan } from 'checkoutstore/emi';
   import { shouldEmiOptionRender } from 'emiV2/helper/helper';
   import { handleBackNavigation } from 'emiV2/helper/navigation';
+  import { triggerAnalyticsOnShown } from 'emiV2/events/helpers';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -62,6 +63,7 @@
       discountedAmount,
       currentInstrumentMethod
     );
+    triggerAnalyticsOnShown(emiOptions);
     // Set selected tab as null when user lands on the L1 screen
     // From further screens
     selectedTab.set('');

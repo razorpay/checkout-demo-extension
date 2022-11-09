@@ -15,6 +15,10 @@ export interface Instrument {
   vpa?: string;
   issuer?: string;
   type?: string;
+  isCardless?: boolean;
+  isNoCostEMI?: boolean;
+  creditEmi?: boolean;
+  debitEmi?: boolean;
 }
 
 export interface Block {

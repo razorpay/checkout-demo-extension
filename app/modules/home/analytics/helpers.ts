@@ -3,6 +3,7 @@ import { Events } from 'analytics';
 import { MiscTracker } from 'misc/analytics/events';
 import { CardsTracker } from 'card/analytics/events';
 import { NetbankingTracker } from 'netbanking/analytics/events';
+import { EMITracker } from 'emiV2/events/analyticsV2';
 import {
   isInstrumentForEntireMethod,
   isSavedCardInstrument,
@@ -12,11 +13,12 @@ import { METHODS } from 'checkoutframe/constants';
 import { HOME_EVENTS } from 'analytics/home/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 
-const { CARD, NETBANKING, PAYLATER } = METHODS;
+const { CARD, NETBANKING, PAYLATER, EMI } = METHODS;
 const Tracker = {
   [CARD]: CardsTracker,
   [NETBANKING]: NetbankingTracker,
   [PAYLATER]: PaylaterTracker,
+  [EMI]: EMITracker,
 };
 
 type MetaType = {
