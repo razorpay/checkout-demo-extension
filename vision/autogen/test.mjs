@@ -90,7 +90,7 @@ async function processRequest(pendingRequest, pageState) {
     for (let resp of responses) {
       fork({
         ...state,
-        history: appendRequest(state.history, firstResponse),
+        history: appendRequest(state.history, resp),
       });
     }
 
