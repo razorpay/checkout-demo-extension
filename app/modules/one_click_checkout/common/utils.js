@@ -51,3 +51,13 @@ export const flatten = function (arr) {
   }
   return flatArray;
 };
+
+/**
+ * Method to check the value is matching for the given pattern
+ * @param {Object} param0
+ * @returns {boolean}
+ */
+export const checkPatternMatching = ({ value, pattern }) => {
+  const exp = new RegExp(pattern);
+  return exp.test(value);
+};

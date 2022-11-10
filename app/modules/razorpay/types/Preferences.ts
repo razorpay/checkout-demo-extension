@@ -365,6 +365,8 @@ interface OneCC {
     one_cc_international_shipping: boolean;
     one_cc_auto_fetch_coupons: boolean;
     one_cc_buy_now_button: boolean;
+    one_cc_capture_gstin: boolean;
+    one_cc_capture_order_instructions: boolean;
   };
 }
 

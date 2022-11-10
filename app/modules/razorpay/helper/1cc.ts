@@ -50,6 +50,12 @@ export const allowLangEngOnly = () =>
 export const shouldOverrideBrandColor = () =>
   getPreferences('features.one_cc_override_theme') || false;
 
+export const enabledGSTIN = () =>
+  getPreferences('1cc.configs.one_cc_capture_gstin') || false;
+
+export const enabledOrderInstruction = () =>
+  getPreferences('1cc.configs.one_cc_capture_order_instructions') || false;
+
 export const scriptCouponApplied = () => getOption('script_coupon_applied');
 
 export const customerConsentDefaultAccept = () =>

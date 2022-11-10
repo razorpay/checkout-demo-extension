@@ -11,6 +11,7 @@ import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 import topbar from 'one_click_checkout/topbar/i18n/en';
 import cart from 'one_click_checkout/cart/i18n/en';
+import gstin from 'one_click_checkout/gstin/i18n/en';
 import customer_consent_one_cc from 'one_click_checkout/customer/i18n/en';
 
 import upiLang from 'upi/i18n/en';
@@ -1460,6 +1461,7 @@ export default {
   details_modal,
   summary_modal,
   topbar,
+  gstin,
   cod: {
     disabled_label: 'Not available',
   },

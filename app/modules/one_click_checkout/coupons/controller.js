@@ -10,6 +10,15 @@ import Analytics from 'analytics';
 // store imports
 import { shouldShowCoupons, isCodForced } from 'one_click_checkout/store';
 import { RTBExperiment } from 'rtb/store';
+import {
+  gstinErrCount,
+  gstIn,
+  orderInstruction,
+} from 'one_click_checkout/gstin/store';
+import { showLoader } from 'one_click_checkout/loader/store';
+
+// service imports
+import { updateOrderNotes } from 'one_click_checkout/gstin/service';
 
 // utils imports
 import { isRTBEnabled } from 'rtb/helper';
@@ -21,7 +30,10 @@ import {
   isGoogleAnalyticsEnabled,
   isFacebookAnalyticsEnabled,
   isMandatoryLoginEnabled,
+  enabledGSTIN,
+  enabledOrderInstruction,
 } from 'razorpay';
+import { updateGSTIN, showGSTINErrMsg } from 'one_click_checkout/gstin/helpers';
 
 export function initSummaryMetaAnalytics() {
   Analytics.setMeta(
@@ -40,4 +52,33 @@ export function initSummaryMetaAnalytics() {
   Analytics.setMeta('google_analytics', isGoogleAnalyticsEnabled());
   Analytics.setMeta('facebook_pixel', isFacebookAnalyticsEnabled());
   Analytics.setMeta('magic_checkout', true);
+  Analytics.setMeta('gstin_enabled', enabledGSTIN());
+  Analytics.setMeta('order_instructions_enabled', enabledOrderInstruction());
 }
+
+export const handleGSTIN = (onSubmitUser) => {
+  if (updateGSTIN()) {
+    showLoader.set(true);
+    updateOrderNotes({
+      gstIn: get(gstIn),
+      orderInstruction: get(orderInstruction),
+    })
+      .then(() => {
+        onSubmitUser();
+      })
+      .catch(() => {
+        if (!get(gstinErrCount)) {
+          showGSTINErrMsg();
+          const errorCount = get(gstinErrCount) + 1;
+          gstinErrCount.set(errorCount);
+        } else {
+          onSubmitUser();
+        }
+      })
+      .finally(() => {
+        showLoader.set(false);
+      });
+  } else {
+    onSubmitUser();
+  }
+};

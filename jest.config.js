@@ -3,7 +3,7 @@ module.exports = {
   globalTeardown: './blackbox/teardown',
   testEnvironment: './blackbox/jest-environment',
   testPathIgnorePatterns: ['ersonalization'],
-  testTimeout: 120 * 1000,
+  testTimeout: 30 * 1000,
   maxWorkers: 10,
   // testRunner: 'jest-circus/runner',
   verbose: true,

@@ -241,6 +241,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
             );
             await resetContactDetails(context);
             await fillUserDetails(context);
+            await delay(200);
             await proceedOneCC(context);
             await handleCustomerStatusReq(
               context,
@@ -253,6 +254,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               '999999991',
               internationalPhoneNumber
             );
+            await delay(200);
             await proceedOneCC(context);
           }
           if (addresses.length) {

@@ -116,6 +116,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card']) {
         }
         await resetContactDetails(context);
         await fillUserDetails(context, randomContact());
+        await delay(200);
         await proceedOneCC(context);
         await delay(300);
 

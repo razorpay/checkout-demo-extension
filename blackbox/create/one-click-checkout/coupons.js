@@ -126,6 +126,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
 
         await delay(200);
         await fillUserDetails(context);
+        await delay(200);
         await proceedOneCC(context);
         await handleCustomerStatusReq(context);
         await fillUserAddress(context, {

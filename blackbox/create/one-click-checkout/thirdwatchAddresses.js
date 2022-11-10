@@ -90,6 +90,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
         });
       } else {
         await fillUserDetails(context);
+        await delay(200);
         await proceedOneCC(context);
         await handleCustomerStatusReq(context, false, consentBannerViews);
         await assertConsentModalVisible(context);

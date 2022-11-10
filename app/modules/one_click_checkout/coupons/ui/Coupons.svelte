@@ -8,6 +8,7 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
+  import GstinForm from 'one_click_checkout/gstin/ui/GstinForm.svelte';
   import CTA from 'cta';
 
   // store imports
@@ -35,6 +36,11 @@
   } from 'one_click_checkout/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+  import {
+    gstIn,
+    orderInstruction,
+    isGstInValid,
+  } from 'one_click_checkout/gstin/store';
   import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
 
   // controller imports
@@ -72,7 +78,12 @@
     getPrefilledContact,
     getPrefilledEmail,
   } from 'checkoutframe/customer';
-  import { initSummaryMetaAnalytics } from 'one_click_checkout/coupons/controller';
+  import {
+    initSummaryMetaAnalytics,
+    handleGSTIN,
+  } from 'one_click_checkout/coupons/controller';
+
+  // service imports
   import { updateCustomerConsent } from 'one_click_checkout/customer/controller';
 
   // constant imports
@@ -91,7 +102,8 @@
 
   $: ctaDisabled =
     ($savedAddresses.length && !$selectedAddress?.serviceability) ||
-    !$isContactAndEmailValid;
+    !$isContactAndEmailValid ||
+    !$isGstInValid;
 
   function onSubmitLoggedInUser() {
     updateCustomerConsent($customerConsentCheckboxState);
@@ -115,6 +127,19 @@
     }
   }
 
+  function onSubmitUser() {
+    updateContactStorage({
+      contact: $contact,
+      email: $email,
+    });
+    if (!isUserLoggedIn() && $isIndianCustomer) {
+      updateOrderWithCustomerDetails();
+      onSubmitLogoutUser();
+    } else {
+      onSubmitLoggedInUser();
+    }
+  }
+
   function handleOnSubmit() {
     const phoneNumberRegex = getPhoneNumberRegex($country);
     if (!phoneNumberRegex.test($contact)) {
@@ -130,6 +155,8 @@
           coupon_code_applied: $appliedCoupon,
           address_id: $selectedAddressId,
           address_country: $selectedAddress?.country,
+          gstin_filled: !!$gstIn,
+          instruction_filled: !!$orderInstruction,
           meta: {
             is_saved_address: !!$savedAddresses?.length,
           },
@@ -148,16 +175,8 @@
           },
         });
 
-        updateContactStorage({
-          contact: $contact,
-          email: $email,
-        });
-        if (!isUserLoggedIn() && $isIndianCustomer) {
-          updateOrderWithCustomerDetails();
-          onSubmitLogoutUser();
-        } else {
-          onSubmitLoggedInUser();
-        }
+        handleGSTIN(onSubmitUser);
+
         $shouldOverrideVisibleState = false;
         return;
       }
@@ -263,6 +282,7 @@
     <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
       <OrderWidget />
     </div>
+    <GstinForm />
 
     <!-- Coupons Widget if merchant coupons are not available  and experiment is true -->
     {#if showCoupons && couponsWidgetExperiment && $availableCoupons.length <= 0}
