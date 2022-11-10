@@ -5,6 +5,7 @@
 
   // utils import
   import { luhnCheck } from 'lib/utils';
+  import autotest from 'autotest';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -83,4 +84,5 @@
   {labelClasses}
   {labelUpperClasses}
   validationText={isRedesignV15() && helpTextToDisplay}
+  attributes={{ ...autotest('cardName') }}
 />

@@ -30,6 +30,7 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+  import autotest from 'autotest';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -401,6 +402,7 @@
               maxlength={$maxlength || 6}
               autocomplete={autoCompleteMethod}
               required
+              {...autotest('otp')}
             />
           </div>
         {/if}

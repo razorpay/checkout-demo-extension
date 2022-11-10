@@ -2,6 +2,8 @@ import { match } from 'path-to-regexp';
 import { isSerializable, md5 } from './index.mjs';
 import { File } from '../handlers/static.mjs';
 
+const noop = () => [];
+
 class Router {
   #origins = new Map();
 
@@ -27,6 +29,7 @@ class Router {
 class OriginRouter {
   #routes = [];
   #cache = new Map();
+  #disabled = false;
 
   get = add('get', this.#routes);
   post = add('post', this.#routes);
@@ -37,7 +40,14 @@ class OriginRouter {
   options = add('options', this.#routes);
   all = add('all', this.#routes);
 
+  ignore() {
+    this.#disabled = true;
+  }
+
   match(request) {
+    if (this.#disabled) {
+      return noop;
+    }
     const { pathname } = new URL(request.url());
     const method = request.method();
     const url = request.url();

@@ -3,6 +3,7 @@
 
   import { Formatter } from 'formatter';
   import { createEventDispatcher } from 'svelte';
+  import autotest from 'autotest';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -86,4 +87,5 @@
   {labelClasses}
   {labelUpperClasses}
   isInvalid={expiryValidationError}
+  attributes={{ ...autotest('cardExpiry') }}
 />

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Field from 'ui/components/Field.svelte';
+  import autotest from 'autotest';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -110,6 +111,7 @@
   {labelUpperClasses}
   validationText={isRedesignV15Enabled && helpTextToDisplay}
   {isInvalid}
+  attributes={{ ...autotest('cardCvv') }}
 />
 
 <style lang="scss">

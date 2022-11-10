@@ -164,9 +164,15 @@ export async function capture(pageState) {
     const result = await matchScreenshot(baseFilePath, filePath);
     if (result) {
       cursor.match = true;
+
+      // its possible for pixels to match despite md5 not matching
+      // restore base file in that case to avoid file changing in git diffs
       if (cursor.key !== fileName) {
         cursor.newKey = cursor.key;
-        fs.rename(`${TEMP_DIR}${fileName}.png`, `${TEMP_DIR}${cursor.key}.png`);
+        await Promise.all([
+          fs.unlink(filePath),
+          fs.copyFile(baseFilePath, `${TEMP_DIR}${cursor.key}.png`),
+        ]);
       }
     }
   }
@@ -178,7 +184,7 @@ export async function report() {
     snaps: [],
     refs: referenceMap.newRefs,
   });
-  const missing = referenceMap.newCount - matched - notMatched - newShots;
+  const missing = referenceMap.count - matched - notMatched;
   console.table({
     'Screenshots Matched': {
       count: matched,
@@ -203,7 +209,7 @@ export async function report() {
 
   await fs.writeFile(getMapPath(TEMP_DIR), JSON.stringify(map));
   if (RECORD_MODE) {
-    execSync(`rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf "${BASE_DIR}*-diff.png"`);
+    execSync(`rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}*-diff.png`);
   }
 
   console.log(`You can view results at http://localhost:8000/autotest${RECORD_MODE ? '-base' : ''}`);

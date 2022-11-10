@@ -19,7 +19,7 @@ async function requestHandler(route, request) {
       pageState = pages.get(opener);
     } else {
       console.log(`unhandled request ${request.url()}`);
-      return route.continue();
+      return route.abort();
     }
   }
 
@@ -82,7 +82,7 @@ async function processRequest(pendingRequest, pageState) {
     const [ firstResponse, ...responses ] = handler(clientState);
 
     if (!firstResponse) {
-      console.error(`no response from handler for ${method} ${url}`);
+      // handler exists but no action, we return 204
       await respondEmpty(pendingRequest, state);
       return;
     }
@@ -138,6 +138,7 @@ async function runTestInPage(page, state) {
   // do not await page load operation to avoid getting stuck here itself
   page.goto(state.url, {
     waitUntil: 'commit',
+    timeout: 30e3,
   });
 
   await processReplays(pageState);

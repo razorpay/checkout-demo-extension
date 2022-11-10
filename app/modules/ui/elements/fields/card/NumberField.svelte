@@ -23,6 +23,7 @@
   import { isRedesignV15 } from 'razorpay';
   import { isIndianCustomer } from 'checkoutstore/screens/home';
   import { isSIHubEnabledMerchant } from 'ui/tabs/card/utils';
+  import autotest from 'autotest';
 
   export let value = '';
   export let type = null;
@@ -151,6 +152,7 @@
     {labelClasses}
     {labelUpperClasses}
     {showValidations}
+    attributes={{ ...autotest('cardNumber') }}
   />
 </div>
 

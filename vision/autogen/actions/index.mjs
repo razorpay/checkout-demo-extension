@@ -49,3 +49,23 @@ export function* wallet() {
 export function* provider() {
   yield true;
 }
+
+export function* cardNumber() {
+  yield '4111111111111111';
+}
+
+export function* cardName() {
+  yield 'Gaurav Kumar';
+}
+
+export function* cardExpiry() {
+  yield '1234';
+}
+
+export function* cardCvv() {
+  yield '123';
+}
+
+export function* otp() {
+  yield '123456';
+}

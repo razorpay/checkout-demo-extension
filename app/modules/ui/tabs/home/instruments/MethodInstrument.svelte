@@ -9,6 +9,7 @@
   import { getSubtextForInstrument } from 'subtext';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatTemplateWithLocale } from 'i18n';
+  import autotest from 'autotest';
 
   // Store imports
   import { isCodAvailable } from 'one_click_checkout/address/derived';
@@ -65,7 +66,7 @@
   value={instrument.id}
   radio={false}
   className="instrument"
-  attributes={{ 'data-type': 'method' }}
+  attributes={{ 'data-type': 'method', ...autotest('method', method) }}
   on:click
   {disabled}
 >
