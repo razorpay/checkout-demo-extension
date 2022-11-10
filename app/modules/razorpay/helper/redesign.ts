@@ -1,5 +1,11 @@
 import { isOneClickCheckout } from './1cc';
-import { getOption, getPreferences, isPayout, hasMerchantPolicy } from './base';
+import {
+  getOption,
+  getPreferences,
+  isPayout,
+  hasMerchantPolicy,
+  getOrgDetails,
+} from './base';
 import { isDCCEnabled, isInternational } from './currency';
 import { isHDFCVASMerchant } from './misc';
 import { isRecurringOrPreferredPayment } from './recurring';
@@ -34,6 +40,7 @@ export const isRedesignV15 = (): boolean => {
     const allowRecurring = getPreferences(
       'experiments.recurring_redesign_v1_5'
     );
+    const { isOrgRazorpay } = getOrgDetails() || {};
 
     let allow = getPreferences('experiments.checkout_redesign_v1_5') as boolean;
 
@@ -45,7 +52,7 @@ export const isRedesignV15 = (): boolean => {
       allow = !disableRedesignFromOption;
     }
 
-    if (!allowBankingOrg && !isHDFCVASMerchant()) {
+    if (!isOrgRazorpay && !allowBankingOrg && !isHDFCVASMerchant()) {
       allow = false;
     }
 
