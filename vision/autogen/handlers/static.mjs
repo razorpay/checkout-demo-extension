@@ -20,6 +20,9 @@ export function* serveCdn({ params }) {
   const path = params.assetPath.join('/');
   if (path === 'lato.woff2') {
     yield serveFile(`app/fonts/${path}`);
+  } else if (path === 'static/assets/trustedbadge/rtb-live.svg') {
+    // remove trustedbadge inline animation
+    yield serveFile('vision/mock/assets/rtb-live.svg');
   } else {
     yield serveFile(`cdn/${path}`);
   }

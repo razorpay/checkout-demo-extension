@@ -28,6 +28,7 @@
     QR_OFF_SCREEN_POLL_DELAY_BY,
   } from 'upi/constants';
   import fetch from 'utils/fetch';
+  import autotest from 'autotest';
 
   // Analytics
   import Analytics from 'analytics';
@@ -181,6 +182,7 @@
           data-content="refresh"
           class="btn"
           on:click={handleSelectQR}
+          {...parent === 'homeScreen' && autotest('method', 'upi_qr')}
         >
           <!-- Instead of creating a new QR state, we will reuse the refresh state with autoGenerate to detect the show QR need -->
           {$t($qrState.autoGenerate ? SHOW_QR : REFRESH_QR)}
@@ -280,7 +282,7 @@
   }
 
   /**
-  .qr-image:after creates transparent rohmbus and create cutting-highliting borders for QR image 
+  .qr-image:after creates transparent rohmbus and create cutting-highliting borders for QR image
   */
   .qr-image:after {
     position: absolute;
