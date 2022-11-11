@@ -9,7 +9,9 @@ let browser;
 
 if (REMOTE_RUN) {
   console.log('Running tests remotely...');
-  browser = await chromium.connect('wss://playwright-chromium.stage.razorpay.in/ws');
+  browser = await chromium.connect(
+    'wss://playwright-chromium.stage.razorpay.in/ws'
+  );
 } else {
   browser = await chromium.launch({
     headless: HEADLESS,

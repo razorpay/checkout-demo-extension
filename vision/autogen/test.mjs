@@ -23,7 +23,7 @@ async function requestHandler(route, request) {
     }
   }
 
-  const [ closure, resolver ] = promisePair();
+  const [closure, resolver] = promisePair();
 
   const pendingRequest = {
     request,
@@ -31,7 +31,7 @@ async function requestHandler(route, request) {
     method: request.method(),
     ended: false,
     closure,
-    respond: async response => {
+    respond: async (response) => {
       pendingRequest.ended = true;
       pageState.pendingRequests.delete(pendingRequest);
       await route.fulfill(response);
@@ -57,17 +57,14 @@ async function requestHandler(route, request) {
 
 async function respondEmpty(pendingRequest, state) {
   const response = { status: 204 };
-  state.history = appendRequest(
-    state.history,
-    {
-      type: HistoryType.REQUEST,
-      url: pendingRequest.url,
-      method: pendingRequest.method,
-      response,
-    },
-  );
+  state.history = appendRequest(state.history, {
+    type: HistoryType.REQUEST,
+    url: pendingRequest.url,
+    method: pendingRequest.method,
+    response,
+  });
   await pendingRequest.respond(response);
-};
+}
 
 async function processRequest(pendingRequest, pageState) {
   const { url, method, request } = pendingRequest;
@@ -78,8 +75,7 @@ async function processRequest(pendingRequest, pageState) {
     console.error(`handler missing for ${method} ${url}`);
     await respondEmpty(pendingRequest, state);
   } else {
-
-    const [ firstResponse, ...responses ] = handler(clientState);
+    const [firstResponse, ...responses] = handler(clientState);
 
     if (!firstResponse) {
       // handler exists but no action, we return 204
@@ -124,7 +120,7 @@ function appendRequest(history, reqObj) {
 }
 
 async function runTestInPage(page, state) {
-  const [ pageClosure, markPageClosed ] = promisePair();
+  const [pageClosure, markPageClosed] = promisePair();
   const pageState = newPageState(page, state);
   pages.set(page, pageState);
 
@@ -174,14 +170,16 @@ async function processReplays(pageState) {
   // finish requests triggered due to replay actions,
   // before replays could be marked as done
   if (pendingRequests.size) {
-    await Promise.all(Array.from(pendingRequests).map(pendingRequest => {
-      return processRequest(pendingRequest, pageState);
-    }));
+    await Promise.all(
+      Array.from(pendingRequests).map((pendingRequest) => {
+        return processRequest(pendingRequest, pageState);
+      })
+    );
   }
 }
 
 async function processPastRequest(pastRequest, pageState) {
-  const [ promise, resolver ] = promisePair();
+  const [promise, resolver] = promisePair();
   const pendingReplay = {
     pastRequest,
     ended: false,
@@ -216,11 +214,13 @@ export function init(_browser) {
         cursor: null, // needed to quickly jump to cursor in a fork
         // indices: [], // remove cursor and re-enable indices to make `state` serializable as well
         url: 'https://api.razorpay.com/v1/checkout/public',
-        history: [{
-          type: HistoryType.OPTIONS,
-          value: options,
-          hash,
-        }],
+        history: [
+          {
+            type: HistoryType.OPTIONS,
+            value: options,
+            hash,
+          },
+        ],
       };
 
       fork(state, browser);
@@ -229,10 +229,7 @@ export function init(_browser) {
     }
   }
   ProcessQueue.then(async () => {
-    const [ result ] = await Promise.all([
-      report(),
-      browser.close(),
-    ]);
+    const [result] = await Promise.all([report(), browser.close()]);
     process.exit(result);
   });
 }

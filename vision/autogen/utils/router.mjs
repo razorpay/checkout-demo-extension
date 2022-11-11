@@ -58,8 +58,7 @@ class OriginRouter {
       if (method === route.method || route.method === 'ALL') {
         const match = route.matcher(pathname);
         if (match) {
-          return state => {
-
+          return (state) => {
             const values = route.handler({
               params: match.params,
               request,
@@ -81,14 +80,10 @@ class OriginRouter {
               if (value instanceof File) {
                 reqObj.response.path = value.path;
                 if (values.length === 1) {
-                  this.#cache.set(url, [ reqObj ]);
+                  this.#cache.set(url, [reqObj]);
                 }
               } else if (isSerializable(value)) {
-                reqObj.hash = md5(JSON.stringify([
-                  method,
-                  url,
-                  value,
-                ]));
+                reqObj.hash = md5(JSON.stringify([method, url, value]));
                 reqObj.value = value;
                 if (typeof value === 'string') {
                   reqObj.response.contentType = 'text/html';
@@ -109,7 +104,7 @@ class OriginRouter {
             }
 
             return reqObjs;
-          }
+          };
         }
       }
     }

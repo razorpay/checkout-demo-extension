@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 const { createHash } = await import('node:crypto');
 
-export const md5 = data => createHash('md5').update(data).digest('hex');
+export const md5 = (data) => createHash('md5').update(data).digest('hex');
 
 export const JsonResponse = (o) => ({
   status: 200,
@@ -23,10 +23,10 @@ export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function promisePair() {
   let resolver;
-  const promise = new Promise(resolve => {
+  const promise = new Promise((resolve) => {
     resolver = resolve;
   });
-  return [ promise, resolver ];
+  return [promise, resolver];
 }
 
 export function isSerializable(val, visited = new WeakSet()) {
@@ -57,7 +57,11 @@ export function isSerializable(val, visited = new WeakSet()) {
     }
     visited.add(val); // remember this object to use in circular check next time
   } else {
-    if (type !== 'boolean' && type !== 'string' && !(type === 'number' && Number.isFinite(val))) {
+    if (
+      type !== 'boolean' &&
+      type !== 'string' &&
+      !(type === 'number' && Number.isFinite(val))
+    ) {
       return false;
     }
   }

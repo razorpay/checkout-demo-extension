@@ -13,18 +13,22 @@ execSync(`rm -rf ${TEMP_DIR}/*; mkdir -p ${TEMP_DIR}`);
 
 async function matchScreenshot(firstImagePath, secondImagePath) {
   const diffPath = secondImagePath.replace(/\.png$/, '') + `-diff.png`;
-  const { match, reason } = await compare(firstImagePath, secondImagePath, diffPath);
+  const { match, reason } = await compare(
+    firstImagePath,
+    secondImagePath,
+    diffPath
+  );
   return match;
   return doPixelMatch(firstImagePath, secondImagePath, diffPath);
 }
 
 function readImage(path) {
-  return new Promise(resolve => fs
-    .open(path)
-    .then(handle => {
-      return handle.createReadStream()
+  return new Promise((resolve) =>
+    fs.open(path).then((handle) => {
+      return handle
+        .createReadStream()
         .pipe(new PNG())
-        .on('parsed', function() {
+        .on('parsed', function () {
           resolve(this);
         });
     })
@@ -32,12 +36,15 @@ function readImage(path) {
 }
 
 async function doPixelMatch(firstImagePath, secondImagePath, diffPath) {
-  const [ firstImage, secondImage ] = await Promise.all([
+  const [firstImage, secondImage] = await Promise.all([
     readImage(firstImagePath),
     readImage(secondImagePath),
   ]);
 
-  if (firstImage.width !== secondImage.width || firstImage.height !== secondImage.height) {
+  if (
+    firstImage.width !== secondImage.width ||
+    firstImage.height !== secondImage.height
+  ) {
     console.log(`dimension mismatch`);
     return false;
   }
@@ -50,7 +57,7 @@ async function doPixelMatch(firstImagePath, secondImagePath, diffPath) {
     secondImage.data,
     diff.data,
     width,
-    height,
+    height
   );
 
   if (mismatchedPixels) {
@@ -78,12 +85,12 @@ function getMapPath(dir) {
 async function getReferenceMap() {
   try {
     return JSON.parse(String(await fs.readFile(getMapPath(BASE_DIR))));
-  } catch(e) {
+  } catch (e) {
     return {
       count: 0,
       snaps: [],
       refs: {},
-    }
+    };
   }
 }
 
@@ -94,7 +101,7 @@ referenceMap.newRefs = {};
 function updateCursor(state) {
   let cursor = state.cursor || referenceMap;
 
-  const actions = state.history.slice(state.offset).filter(action => {
+  const actions = state.history.slice(state.offset).filter((action) => {
     if (action.hash) {
       referenceMap.newRefs[action.hash] = {
         url: action.url,
@@ -106,7 +113,7 @@ function updateCursor(state) {
     }
     return true;
   });
-  const existingSnap = cursor.snaps.find(existingSnap => {
+  const existingSnap = cursor.snaps.find((existingSnap) => {
     if (existingSnap.events.length === actions.length) {
       return existingSnap.events.every((event, index) => {
         const action = actions[index];
@@ -116,9 +123,11 @@ function updateCursor(state) {
             return action.hash === event;
 
           default:
-            return action.name === event[0]
-              && action.variant === event[1]
-              && action.value === event[2];
+            return (
+              action.name === event[0] &&
+              action.variant === event[1] &&
+              action.value === event[2]
+            );
         }
       });
     }
@@ -129,8 +138,8 @@ function updateCursor(state) {
   } else {
     const snap = {
       snaps: [],
-      events: actions.map(action => {
-        return action.hash || [ action.name, action.variant, action.value ];
+      events: actions.map((action) => {
+        return action.hash || [action.name, action.variant, action.value];
       }),
     };
     cursor.snaps.push(snap);
@@ -179,11 +188,14 @@ export async function capture(pageState) {
 }
 
 export async function report() {
-  const { map, matched, notMatched, newShots } = mapFromReference(referenceMap, {
-    count: referenceMap.newCount,
-    snaps: [],
-    refs: referenceMap.newRefs,
-  });
+  const { map, matched, notMatched, newShots } = mapFromReference(
+    referenceMap,
+    {
+      count: referenceMap.newCount,
+      snaps: [],
+      refs: referenceMap.newRefs,
+    }
+  );
   const missing = referenceMap.count - matched - notMatched;
   console.table({
     'Screenshots Matched': {
@@ -205,14 +217,20 @@ export async function report() {
   });
 
   const testSuccess = !Boolean(missing + notMatched + newShots);
-  console.log(`Test ${testSuccess ? "was successful" : "failed"}`);
+  console.log(`Test ${testSuccess ? 'was successful' : 'failed'}`);
 
   await fs.writeFile(getMapPath(TEMP_DIR), JSON.stringify(map));
   if (RECORD_MODE) {
-    execSync(`rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}*-diff.png`);
+    execSync(
+      `rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}*-diff.png`
+    );
   }
 
-  console.log(`You can view results at http://localhost:8000/autotest${RECORD_MODE ? '-base' : ''}`);
+  console.log(
+    `You can view results at http://localhost:8000/autotest${
+      RECORD_MODE ? '-base' : ''
+    }`
+  );
 
   return testSuccess ? 0 : 1;
 }
@@ -222,7 +240,7 @@ function mapFromReference(referenceMap, map) {
   let matched = 0;
   let newShots = 0;
 
-  referenceMap.snaps.forEach(snap => {
+  referenceMap.snaps.forEach((snap) => {
     if (!snap.newKey) {
       return;
     }

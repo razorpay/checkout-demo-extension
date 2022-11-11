@@ -31,6 +31,5 @@ export function* serveCdn({ params }) {
 export function serveFile(path) {
   try {
     return new File(path);
-  } catch (e) {
-  }
+  } catch (e) {}
 }

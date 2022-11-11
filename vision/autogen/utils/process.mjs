@@ -10,7 +10,6 @@ function getValues(element, state) {
 
   const values = new Set();
 
-
   for (let val of handler(state, element.variant)) {
     switch (element.action) {
       case HistoryType.FILL:
@@ -42,56 +41,67 @@ export function newPageState(page, state) {
 }
 
 function getElements(page) {
-  return page.$$eval(SELECTOR, (nodes, HistoryType) => {
-    return nodes
-      .map((node) => {
-        const css = getComputedStyle(node);
-        if (css.pointerEvents === 'none') {
-          return;
-        }
+  return page.$$eval(
+    SELECTOR,
+    (nodes, HistoryType) => {
+      return nodes
+        .map((node) => {
+          const css = getComputedStyle(node);
+          if (css.pointerEvents === 'none') {
+            return;
+          }
 
-        const isInput = node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA';
-        let action = HistoryType.CLICK;
-        if (isInput) {
-          action = HistoryType.FILL;
-        }
-        const name = node.getAttribute('autogen-name');
-        const variant = node.getAttribute('autogen-variant');
-        let selector = `[autogen-name="${name}"]`;
-        if (variant) {
-          selector += `[autogen-variant="${variant}"]`;
-        }
+          const isInput =
+            node.nodeName === 'INPUT' || node.nodeName === 'TEXTAREA';
+          let action = HistoryType.CLICK;
+          if (isInput) {
+            action = HistoryType.FILL;
+          }
+          const name = node.getAttribute('autogen-name');
+          const variant = node.getAttribute('autogen-variant');
+          let selector = `[autogen-name="${name}"]`;
+          if (variant) {
+            selector += `[autogen-variant="${variant}"]`;
+          }
 
-        return {
-          selector,
-          action,
-          name,
-          variant,
-        };
-      })
-      .filter(Boolean);
-  }, HistoryType);
+          return {
+            selector,
+            action,
+            name,
+            variant,
+          };
+        })
+        .filter(Boolean);
+    },
+    HistoryType
+  );
 }
 
 export async function processNext(pageState, fork) {
-  const { page, state: { history } } = pageState;
+  const {
+    page,
+    state: { history },
+  } = pageState;
   await page.mainFrame().waitForSelector(SELECTOR);
   await closePendingRequests(pageState);
   await capture(pageState);
   const elements = await getElements(page);
 
   if (elements.length) {
-    const actions = history.filter(e => e.selector);
-    const replayedIndex = [...actions].reverse()
-      .findIndex(action => action.selector === elements[0].selector); // use findLastIndex when it lands in node
+    const actions = history.filter((e) => e.selector);
+    const replayedIndex = [...actions]
+      .reverse()
+      .findIndex((action) => action.selector === elements[0].selector); // use findLastIndex when it lands in node
 
     let offset = 0;
     if (replayedIndex !== -1) {
       const restActions = actions.slice(actions.length - 1 - replayedIndex);
       if (restActions.length < elements.length) {
-        if (restActions.every((action, index) => {
-          return action.selector === elements[index].selector;
-        })) {
+        if (
+          restActions.every((action, index) => {
+            return action.selector === elements[index].selector;
+          })
+        ) {
           offset = restActions.length;
         }
       }
@@ -134,17 +144,13 @@ async function loopElements({ fork, elements, pageState, offset }) {
     for (let action of actions) {
       fork({
         ...state,
-        history: [
-          ...history,
-          newHistory(action),
-        ],
+        history: [...history, newHistory(action)],
       });
     }
 
     const historyObject = newHistory(firstAction);
 
     state.history = [...history, historyObject];
-
 
     const resolver = await replay(historyObject, pageState);
     if (!resolver) {

@@ -1,5 +1,5 @@
 {
-    "**/*.{js,svelte,ts}": [
+    "**/*.{js,svelte,ts,mjs}": [
         "npx prettier --write",
         "npx eslint --fix --quiet"
       ]

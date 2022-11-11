@@ -29,7 +29,7 @@ cdnRouter.get('/:assetPath*', serveCdn);
 
 googleChartRouter.get('/chart', serveQR);
 googleDNSRouter.get('/:foo*', function* () {
-  yield {Status: 0};
+  yield { Status: 0 };
 });
 
 apiRouter.get('/v1/checkout/public', servePublicPage);
@@ -42,7 +42,7 @@ apiRouter.get('/v1/checkout/rewards', function* () {
 });
 
 apiRouter.get('/v1/personalisation', function* () {
-  yield {preferred_methods:{}};
+  yield { preferred_methods: {} };
 });
 
 apiRouter.post('/v1/otp/verify', function* () {
