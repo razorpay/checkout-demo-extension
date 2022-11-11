@@ -184,7 +184,6 @@
   #redesign-v15-cta.disabled {
     background: #e9e9ea;
     color: #949494;
-    pointer-events: none;
   }
 
   .price-label {
@@ -284,7 +283,6 @@
     #redesign-v15-cta.disabled {
       background: var(--light-dark-color);
       color: var(--tertiary-text-color);
-      pointer-events: none;
     }
   }
 </style>
