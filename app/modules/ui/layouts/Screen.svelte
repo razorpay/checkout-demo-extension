@@ -60,7 +60,7 @@
   class:pad
   bind:this={contentRef}
   on:scroll={onScroll}
-  class:show-scroll={$screenStore === 'upi'}
+  class:show-scroll={$screenStore === ''}
 >
   <slot />
   {#if !removeAccountTab}
@@ -86,6 +86,7 @@
       min-height: 100%;
       justify-content: space-between;
       display: flex;
+      overflow: hidden;
 
       :global(.account-tab) {
         transform: translate(0, 100%);
