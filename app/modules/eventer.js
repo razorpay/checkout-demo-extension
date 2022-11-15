@@ -87,7 +87,10 @@ Eventer.prototype = {
       } catch (e) {
         if (console.error) {
           console.error(e);
-          if (Track.props.library === 'razorpayjs') {
+          if (
+            Track.props.library === 'razorpayjs' &&
+            event === 'payment.resume'
+          ) {
             if (['TypeError', 'ReferenceError'].indexOf(e?.name) >= 0) {
               capture(e, { severity: SEVERITY_LEVELS.S1 });
             } else {
