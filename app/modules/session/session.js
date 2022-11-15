@@ -3467,7 +3467,7 @@ Session.prototype = {
           const screenToSet = 'emi';
           Analytics.track('screen:switch', {
             data: {
-              from: this.screen || '',
+              from: self.screen || '',
               to: screenToSet || '',
             },
           });
