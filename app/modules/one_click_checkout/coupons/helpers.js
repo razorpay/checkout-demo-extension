@@ -42,7 +42,11 @@ import {
   consentGiven,
 } from 'one_click_checkout/address/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
-import { isEnableAutoFetchCoupons, scriptCouponApplied } from 'razorpay';
+import {
+  isEnableAutoFetchCoupons,
+  scriptCouponApplied,
+  getPrefilledCouponCode,
+} from 'razorpay';
 import { shouldShowCoupons } from 'one_click_checkout/store';
 
 // utils imports
@@ -302,4 +306,10 @@ export function onSubmitLogoutUser() {
     params,
     customer.contact
   );
+}
+
+export function applyPrefilledCoupon() {
+  if (getPrefilledCouponCode()) {
+    applyCouponCode(getPrefilledCouponCode());
+  }
 }

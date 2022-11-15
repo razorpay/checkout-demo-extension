@@ -13,7 +13,7 @@
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
-  import { getPrefilledCouponCode, getConsentViewCount } from 'razorpay';
+  import { getConsentViewCount } from 'razorpay';
   import {
     selectedAddress,
     selectedAddressId,
@@ -64,7 +64,6 @@
   // utils imports
   import {
     fetchCoupons,
-    applyCouponCode,
     onSubmitLogoutUser,
   } from 'one_click_checkout/coupons/helpers';
   import { getElementById } from 'utils/doc';
@@ -92,7 +91,6 @@
   import { CTA_LABEL } from 'cta/i18n';
   import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
 
-  const prefilledCoupon = getPrefilledCouponCode();
   const showCoupons = shouldShowCoupons();
   const couponsWidgetExperiment = getCouponWidgetExperiment();
 
@@ -228,9 +226,6 @@
         page_title: CATEGORIES.COUPONS,
       },
     });
-    if (prefilledCoupon) {
-      applyCouponCode(prefilledCoupon);
-    }
     Promise.all(promiseList).finally(summaryLoadedEvent);
   });
 

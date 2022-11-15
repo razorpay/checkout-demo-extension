@@ -11,6 +11,7 @@ import {
   sanitizeTokens,
 } from 'checkoutframe/customer';
 import { init1CCMetaData } from 'one_click_checkout/helper';
+import { applyPrefilledCoupon } from 'one_click_checkout/coupons/helpers';
 import { showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 import {
@@ -1179,6 +1180,7 @@ Session.prototype = {
           discreet.Constants.COLORS.MAGIC_BRAND_COLOR
         );
       }
+      applyPrefilledCoupon();
       this.switchTab('home-1cc');
     }
     this.setEMI();
