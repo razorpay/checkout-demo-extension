@@ -137,9 +137,13 @@ export const emiBanks = [
     code: 'onecard',
     name: 'OneCard',
   },
+  {
+    code: 'INDB_DC',
+    name: 'Indusind Bank Debit Cards',
+  }
 ];
 
-export const DEBIT_EMI_ISSUERS = ['KKBK', 'HDFC'];
+export const DEBIT_EMI_ISSUERS = ['KKBK', 'HDFC', 'INDB'];
 export const DEBIT_EMI_BANKS = DEBIT_EMI_ISSUERS.map((bank) => `${bank}_DC`);
 
 export const getBankFromCardCache = (cardNum) => {
