@@ -222,6 +222,149 @@ describe('$isCardValidForOffer', () => {
     await tick();
     expect(get(isCardValidForOffer)).toBeFalsy();
   });
+
+  test('Valid emi offer + valid card number', async () => {
+    cardTab.set('emi');
+    (getCardFeatures as jest.Mock).mockImplementation(() => {
+      return new Promise(async (resolve) => {
+        try {
+          resolve(true);
+        } catch (e) {}
+      });
+    });
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'HDFC',
+      code: 'HDFC',
+      logo: '',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeTruthy();
+  });
+
+  test('Validate issuer specific emi offers', async () => {
+    cardTab.set('emi');
+    (getCardFeatures as jest.Mock).mockImplementation(() => {
+      return new Promise(async (resolve) => {
+        try {
+          resolve(true);
+        } catch (e) {}
+      });
+    });
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'ICIC',
+      code: 'ICICI',
+      logo: '',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      issuer: 'HDFC',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeFalsy();
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'HDFC',
+      code: 'HDFC',
+      logo: '',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      issuer: 'HDFC',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeTruthy();
+  });
+
+  test('Validate network specific emi offers', async () => {
+    cardTab.set('emi');
+    (getCardFeatures as jest.Mock).mockImplementation(() => {
+      return new Promise(async (resolve) => {
+        try {
+          resolve(true);
+        } catch (e) {}
+      });
+    });
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'ICIC',
+      code: 'ICICI',
+      logo: '',
+      network: 'visa',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      payment_network: 'VISA',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeTruthy();
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'ICIC',
+      code: 'ICICI',
+      logo: '',
+      network: 'mastercard',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      payment_network: 'VISA',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeFalsy();
+  });
+
+  test('Valid emi offer + card with cobranding partner', async () => {
+    cardTab.set('emi');
+    (getCardFeatures as jest.Mock).mockImplementation(() => {
+      return new Promise(async (resolve) => {
+        try {
+          resolve(true);
+        } catch (e) {}
+      });
+    });
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'BARB',
+      code: 'BARB',
+      logo: '',
+      network: 'visa',
+      cobrandingPartner: 'onecard',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      issuer: 'BARB',
+    });
+    await tick();
+    // Issuer specifc offer wont work for card with co branding
+    expect(get(isCardValidForOffer)).toBeFalsy();
+
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'BARB',
+      code: 'BARB',
+      logo: '',
+      network: 'visa',
+      cobrandingPartner: 'onecard',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      payment_network: 'VISA',
+    });
+    await tick();
+    // Network specifc offer work for card with co branding
+    expect(get(isCardValidForOffer)).toBeTruthy();
+  });
 });
 
 describe('$amountAfterOffer', () => {

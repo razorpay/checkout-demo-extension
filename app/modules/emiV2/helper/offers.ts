@@ -4,6 +4,8 @@ import { appliedOffer } from 'offers/store';
 import { get } from 'svelte/store';
 import CTAStore from 'cta/store';
 import { getAmount } from 'ui/components/MainModal/helper';
+import type { EMIBANKS, EMIOptionsMap } from 'emiV2/types';
+import { emiMethod, selectedBank } from 'emiV2/store';
 
 /**
  * Helper function to remove Auto applied no cost emi offer
@@ -64,5 +66,59 @@ export const removeAppliedOfferForMethod = (method: string) => {
   const offerApplied: Offers.OfferItem | null = get(appliedOffer);
   if (offerApplied && offerApplied.payment_method !== method) {
     appliedOffer.set(null);
+  }
+};
+
+/**
+ * helper function to check if offer issuer matches the emi provider
+ * @param {EMIBANKS} emiProvider
+ * @returns {boolean}
+ */
+export const filterOfferIssuer = (emiProvider: EMIBANKS) => {
+  const offerApplied: Offers.OfferItem | null = get(appliedOffer);
+
+  // If Amex offer is applied we need to check for offer network since issuer can be null
+  const appliedOfferIssuer =
+    offerApplied?.payment_network === 'AMEX'
+      ? offerApplied.payment_network
+      : offerApplied?.issuer;
+
+  return offerApplied && appliedOfferIssuer === emiProvider.code;
+};
+
+/**
+ * Helper function to auto-select the emi provider
+ * if an offer is applied for a specific issuer
+ * Note: Since emi options are grouped into bank and other emi options
+ * Therefore we need to check both the lists to validate the offer issuer and select it
+ * @param {EMIOptionsMap} emiProviders
+ */
+export const selectEmiInstrumentForOffer = (emiProviders: EMIOptionsMap) => {
+  if (emiProviders && Object.keys(emiProviders).length > 0) {
+    const bankEmiProviders = emiProviders.bank;
+    const otherEmiProviders = emiProviders.other;
+
+    const offerIssuerMatchesBankEmiProvider = bankEmiProviders.find(
+      (provider) => {
+        return filterOfferIssuer(provider);
+      }
+    );
+    const offerIsssuerMatchesOtherEmiProvider = otherEmiProviders.find(
+      (provider) => {
+        return filterOfferIssuer(provider);
+      }
+    );
+
+    // If offer issuer matches the bank emi provider
+    // filter the provider from bankEmiProviders list
+    if (offerIssuerMatchesBankEmiProvider) {
+      selectedBank.set(offerIssuerMatchesBankEmiProvider);
+      emiMethod.set('bank');
+    } else if (offerIsssuerMatchesOtherEmiProvider) {
+      // If offer issuer matches the other emi provider like cardless emis
+      // filter the provider from otherEmiProviders list
+      selectedBank.set(offerIsssuerMatchesOtherEmiProvider);
+      emiMethod.set('other');
+    }
   }
 };

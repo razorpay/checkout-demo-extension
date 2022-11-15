@@ -41,7 +41,11 @@
   import { emiOptionsRendered } from 'emiV2/events/tracker';
   import Analytics from 'analytics';
   import { timer } from 'utils/timer';
-  import { offerWindowOpen } from 'offers/store';
+  import {
+    appliedOffer,
+    offerErrorViewOpen,
+    offerWindowOpen,
+  } from 'offers/store';
   import { selectedTab } from 'components/Tabs/tabStore';
   import { clearPaymentRequest } from 'emiV2/payment/prePaymentHandler';
   import { filterSavedCardsAgainstCustomBlock } from 'emiV2/helper/configurability';
@@ -50,6 +54,7 @@
   import { shouldEmiOptionRender } from 'emiV2/helper/helper';
   import { handleBackNavigation } from 'emiV2/helper/navigation';
   import { triggerAnalyticsOnShown } from 'emiV2/events/helpers';
+  import { selectEmiInstrumentForOffer } from 'emiV2/helper/offers';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -210,6 +215,18 @@
     handleBackNavigation();
     return false;
   }
+
+  $: {
+    // If an offer is applied on a specific issuer say HDFC credit
+    // Or if network specific offer is there for Amex
+    // select the corresponding emi provider
+    if (
+      $appliedOffer &&
+      ($appliedOffer.issuer || $appliedOffer?.payment_network)
+    ) {
+      selectEmiInstrumentForOffer(emiOptions);
+    }
+  }
 </script>
 
 <div>
@@ -233,11 +250,15 @@
   </div>
   <AccountTab />
 </div>
+<!-- 
+  Hide the CTA if offer window is open or offer error overlay is in view 
+  As with navtstack both offer CTA and screen CTA are coming into view
+-->
 <CTA
   screen="emi"
   tab="emi"
   showAmount={true}
-  show={!$offerWindowOpen}
+  show={$offerWindowOpen || $offerErrorViewOpen ? false : true}
   disabled={(!$selectedBank || !$selectedBank.code) && !$selectedCard}
   onSubmit={() => {
     handleSelectEMIProvider();

@@ -1,6 +1,6 @@
 import * as ChargesStore from 'one_click_checkout/charges/store';
 import { getBankFromCardCache } from 'common/bank';
-import { getCardFeatures } from 'common/card';
+import { API_NETWORK_CODES_MAP, getCardFeatures } from 'common/card';
 import { makeAuthUrl } from 'common/helper';
 import {
   getAmount,
@@ -19,6 +19,7 @@ import * as _ from 'utils/_';
 export const appliedOffer: Writable<Offers.OfferItem | null> = writable();
 export const offerWindowOpen = writable(false);
 export const showOfferAppliedStrip = writable(false);
+export const offerErrorViewOpen = writable(false);
 
 /**
  * to remove circular dep migrate from 1cc
@@ -60,8 +61,8 @@ export const isCardValidForOffer: Readable<boolean> = derived(
       currentRequest.abort();
     }
 
-    // Validate only for cards
-    if ($cardTab !== 'card') {
+    // Validate only for cards and emi
+    if (!['card', 'emi'].includes($cardTab)) {
       return;
     }
 
@@ -87,7 +88,8 @@ export const isCardValidForOffer: Readable<boolean> = derived(
     if (method !== 'card' && method !== 'emi') {
       return;
     }
-    if ($appliedOffer.emi_subvention) {
+
+    if ($appliedOffer.emi_subvention || method === 'emi') {
       getCardFeatures($cardIin)
         .then(() => {
           // IIN changed, abort
@@ -103,7 +105,23 @@ export const isCardValidForOffer: Readable<boolean> = derived(
               $appliedOffer[
                 bank.code === 'AMEX' ? 'payment_network' : 'issuer'
               ];
-            if (!bank || issuer !== bank.code) {
+
+            // Validate if a issuer specific order is applied
+            // If card issuer and offer issuer do not match set false
+            // If the card entered has a co-branding provider set false
+            // Since for co-branding cards issuer specific offers do not work
+            if (issuer && (issuer !== bank.code || bank.cobrandingPartner)) {
+              set(false);
+            }
+            // Validate if the offer applied is on a specific network
+            const offerNetworkCode: string = $appliedOffer['payment_network'];
+            // Since with offer entity we have network code as MC, VISA therefore we need to map to actual network codes
+            // Find the entry in API_NETWORK_CODES_MAP
+            const network = Object.entries(API_NETWORK_CODES_MAP).find(
+              (map) => map[0] === offerNetworkCode
+            );
+
+            if (network && network[1] !== bank.network) {
               set(false);
             }
           }

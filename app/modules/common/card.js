@@ -319,6 +319,11 @@ export function updateCardIINMetadata(iin, data = {}) {
   if (data.type) {
     cache.type = data.type;
   }
+
+  // Saving co-branding partner for entered card in cache
+  if (data.cobranding_partner) {
+    cache.cobranding_partner = data.cobranding_partner;
+  }
 }
 
 /**

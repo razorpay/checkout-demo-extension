@@ -63,7 +63,11 @@ export const createEMiPaymentV2 = (basePayload: Partial<EMIPayload>) => {
   const appliedOffer: Offers.OfferItem = session.getAppliedOffer();
   if (currentPlan && currentPlan.offer_id) {
     paymentPayload.offer_id = currentPlan.offer_id;
-  } else if (appliedOffer) {
+  } else if (
+    appliedOffer &&
+    (!session.offers || session.offers.shouldSendOfferToApi())
+  ) {
+    // If applied offer is not validated against the card -> show the original amount in payment loader screen
     if (appliedOffer.type !== 'read_only') {
       paymentPayload.offer_id = appliedOffer.id;
       session.r.display_amount = isOneClickCheckout()

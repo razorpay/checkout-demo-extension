@@ -114,6 +114,7 @@
   import {
     CTA_PROCEED,
     PAY_NOW_CTA_LABEL,
+    PAY_WITHOUT_OFFER,
     SELECT_EMI_PLAN_LABEL,
   } from 'cta/i18n';
 
@@ -168,6 +169,7 @@
   import { selectedTab } from 'components/Tabs/tabStore';
   import { CardsTracker } from 'card/analytics/events';
   import { handleBackNavigation } from 'emiV2/helper/navigation';
+  import { appliedOffer, isCardValidForOffer } from 'offers/store';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -200,7 +202,12 @@
       } else if ($isCurrentCardProviderInvalid) {
         ctaLabel = TRY_ANOTHER_EMI_OPTION;
       } else {
-        ctaLabel = PAY_VIA_EMI;
+        // If an offer is applied but not applicable on the entered card
+        if ($appliedOffer && !$isCardValidForOffer) {
+          ctaLabel = PAY_WITHOUT_OFFER;
+        } else {
+          ctaLabel = PAY_VIA_EMI;
+        }
       }
     } else if (AVSRequired && currentView !== Views.AVS) {
       /**
@@ -227,6 +234,16 @@
           (currentView === Views.SAVED_CARDS && !$selectedPlanTextForSavedCard))
           ? SELECT_EMI_PLAN_LABEL
           : PAY_NOW_CTA_LABEL;
+    }
+  }
+
+  $: {
+    // For card offers if the applied offer is not valid against card
+    // change CTA to PAY_WITHOUT_OFFER
+    if (session.tab === 'card') {
+      if ($appliedOffer && !$isCardValidForOffer) {
+        ctaLabel = PAY_WITHOUT_OFFER;
+      }
     }
   }
 

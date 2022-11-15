@@ -6565,6 +6565,8 @@ Session.prototype = {
       methodDescription = 'selected bank';
     } else if (screen === 'upi') {
       methodDescription = 'entered VPA';
+    } else if (isEmiV2() && screen === 'emi') {
+      methodDescription = 'selected emi provider';
     } else if (screen === 'emi' || screen === 'emiplans') {
       methodDescription = 'selected plan';
     } else {

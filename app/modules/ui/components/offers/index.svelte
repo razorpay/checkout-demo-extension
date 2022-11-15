@@ -51,6 +51,7 @@
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import {
     appliedOffer,
+    offerErrorViewOpen,
     isCardValidForOffer,
     offerWindowOpen,
     showOffers,
@@ -165,10 +166,12 @@
   export function showError(description, cb) {
     error = description;
     errorCb = cb;
+    $offerErrorViewOpen = true;
   }
 
   function hideError(withOffer) {
     error = null;
+    $offerErrorViewOpen = false;
     if (!withOffer) {
       removeOffer();
     }

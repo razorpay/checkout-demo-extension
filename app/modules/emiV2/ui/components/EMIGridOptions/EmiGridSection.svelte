@@ -1,7 +1,7 @@
 <script lang="ts">
   import { emiMethod, selectedBank } from 'emiV2/store';
   import { selectedCard } from 'checkoutstore/screens/card';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { t } from 'svelte-i18n';
   import {
     BANK_EMI_OPTIONS,
@@ -20,17 +20,12 @@
   } from 'emiV2/events/tracker';
   import { removeAppliedOfferForMethod } from 'emiV2/helper/offers';
   import { triggerAnalyticsOnSelect } from 'emiV2/events/helpers';
+  import { getSession } from 'sessionmanager';
 
   export let sections: string[];
   export let emiOptions: EMIOptionsMap;
 
-  onMount(() => {
-    // this is done in case user comes back to emi banks screen
-    // we need to show the active selection
-    if ($selectedBank && $selectedBank.code) {
-      selectedIssuer = $selectedBank;
-    }
-  });
+  const session = getSession();
 
   const dispatch = createEventDispatcher();
 
@@ -46,18 +41,28 @@
     other: OTHER_EMI_OPTIONS,
   };
   // Internal state variable to handle the bank change
-  let selectedIssuer: EMIBANKS = {
-    code: '',
-    name: '',
-  };
 
   const onEmiOptionSelect = (bank: EMIBANKS, emiProviderType: string) => {
     triggerAnalyticsOnSelect(bank, emiProviderType);
-    // When a bank emi is selected we need to clear the saved card selection
-    $selectedBank = bank;
-    selectedIssuer = bank;
-    $selectedCard = null;
-    $emiMethod = emiProviderType;
+     // If applied offer is invalid show offer error overlay
+    // If user continues without offer or there is no offer error set the respective stores.
+    const offerError = !session.validateOffers(
+      bank.code,
+      function (removeOffer: boolean) {
+        if (removeOffer) {
+          $selectedBank = bank;
+          $selectedCard = null;
+          $emiMethod = emiProviderType;
+        }
+      }
+    );
+
+    if (!offerError) {
+      // When a bank emi is selected we need to clear the saved card selection
+      $selectedBank = bank;
+      $selectedCard = null;
+      $emiMethod = emiProviderType;
+    }
 
     // remove applied offer
     // in case the selected provider does not match the offer method
@@ -65,14 +70,6 @@
       removeAppliedOfferForMethod(bank.method);
     }
   };
-
-  onMount(() => {
-    // this is done in case user comes back to emi banks screen
-    // we need to show the active selection
-    if ($selectedBank && $selectedBank.code) {
-      selectedIssuer = $selectedBank;
-    }
-  });
 
   const showSearchModal = () => {
     // Track More banks click
@@ -112,7 +109,7 @@
               type={providerSection}
               emi={provider}
               selected={!$selectedCard &&
-                selectedIssuer.code.toLowerCase() ===
+                $selectedBank?.code.toLowerCase() ===
                   provider.code.toLowerCase()}
               on:click={() => {
                 onEmiOptionSelect(provider, providerSection);

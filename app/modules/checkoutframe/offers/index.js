@@ -2,6 +2,7 @@ import { isPartialPayment, getMerchantOffers, isOfferForced } from 'razorpay';
 import {
   isMethodEnabled,
   getCardlessEMIProviders,
+  isMethodUsable,
 } from 'checkoutstore/methods';
 
 import {
@@ -202,7 +203,9 @@ export const getAllOffers = () => {
   if (isPartialPayment()) {
     return [];
   }
-  return (getMerchantOffers() || []).filter(isOfferEligible);
+  return (getMerchantOffers() || [])
+    .filter(isOfferEligible)
+    .filter(isOfferMethodUsable);
 };
 
 function _getAllInstrumentsForOffer(offer) {
@@ -303,3 +306,13 @@ export function removeNoCostEmiOffers(offers) {
 export function isNoCostEmiOffer(offer) {
   return offer.emi_subvention === true;
 }
+
+/**
+ * Validate offer against a payment method
+ * If the payment method for offer is hidden/restricted we hide the offer from the offers list
+ * @param {Offers.OfferItem} offer
+ * @returns {boolean}
+ */
+export const isOfferMethodUsable = (offer) => {
+  return isMethodUsable(offer.payment_method);
+};

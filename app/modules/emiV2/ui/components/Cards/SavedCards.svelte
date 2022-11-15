@@ -7,18 +7,42 @@
   import { t } from 'svelte-i18n';
   import { SAVED_CARDS } from 'ui/labels/card';
   import { capture, SEVERITY_LEVELS } from 'error-service';
+  import { getSession } from 'sessionmanager';
 
   export let cards: Tokens[];
+
+  const session = getSession();
   const onSavedCardSelect = (token: Tokens) => {
     try {
-      $selectedCard = token;
       let { card } = token;
       const coBrandingPartner: string = (card && card.cobranding_partner) || '';
-      $selectedBank = {
-        code: coBrandingPartner || card.issuer,
-        name: coBrandingPartner || card.issuer,
-      };
-      $emiMethod = 'bank';
+      let offerError = false;
+      // If a bank emi offer is applied we only validate offer for card without cobranding
+      // Since for co branding cards only bin based offer work
+      if (card.issuer && !coBrandingPartner) {
+        offerError = !session.validateOffers(
+          card.issuer,
+          function (removedOffer) {
+            if (removedOffer) {
+              $selectedCard = token;
+              $selectedBank = {
+                code: card.issuer,
+                name: card.issuer,
+              };
+              $emiMethod = 'bank';
+            }
+          }
+        );
+      }
+
+      if (!offerError) {
+        $selectedCard = token;
+        $selectedBank = {
+          code: coBrandingPartner || card.issuer,
+          name: coBrandingPartner || card.issuer,
+        };
+        $emiMethod = 'bank';
+      }
     } catch (e: any) {
       capture(e.message, { severity: SEVERITY_LEVELS.S2, unhandled: true });
     }

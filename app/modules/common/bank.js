@@ -150,6 +150,9 @@ export const getBankFromCardCache = (cardNum) => {
   const cardFeatures = getCardMetadata(cardNum);
   let issuer = cardFeatures.issuer;
 
+  let network = cardFeatures.network;
+  let cobrandingPartner = cardFeatures.cobranding_partner;
+
   if (!issuer && cardFeatures.network === 'amex') {
     issuer = 'AMEX';
   }
@@ -165,6 +168,8 @@ export const getBankFromCardCache = (cardNum) => {
       name: bankObj.name,
       code: bankObj.code,
       logo: getBankLogo(bankObj.code),
+      network,
+      cobrandingPartner,
     };
   }
 };

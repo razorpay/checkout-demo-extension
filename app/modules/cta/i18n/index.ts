@@ -9,3 +9,4 @@ export const VERIFY_LABEL = 'cta.verify';
 export const ENTER_CARD_DETAILS = 'cta_new.enter_card_details';
 export const AUTHENTICATE = 'cta.authenticate';
 export const UPLOAD_NACH_FORM = 'cta.upload_nach_form';
+export const PAY_WITHOUT_OFFER = 'cta.pay_without_offer';
