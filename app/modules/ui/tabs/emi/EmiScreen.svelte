@@ -152,24 +152,26 @@
   };
 
   const trackCardEntered = () => {
-    // Since Bajaj card dont have a type value (credit/debit)
-    // card issuer and network will be bajaj for this case
-    const trackMeta: addCardMeta = {
-      card_type: 'NA',
-      card_issuer: cardType,
-      card_network: cardType,
-      provider_name: $selectedBank?.code || 'NA',
-      tab_name: $selectedTab,
-      emi_plan: {
-        nc_emi_tag: $selectedPlan.subvention === 'merchant',
-        tenure: $selectedPlan.duration,
-      },
-    };
+    if ($selectedPlan) {
+      // Since Bajaj card dont have a type value (credit/debit)
+      // card issuer and network will be bajaj for this case
+      const trackMeta: addCardMeta = {
+        card_type: 'NA',
+        card_issuer: cardType,
+        card_network: cardType,
+        provider_name: $selectedBank?.code || 'NA',
+        tab_name: $selectedTab,
+        emi_plan: {
+          nc_emi_tag: $selectedPlan.subvention === 'merchant',
+          tenure: $selectedPlan.duration,
+        },
+      };
 
-    trackAddCardDetails(trackMeta);
-    // if card is invalid track card entered error event
-    if (cardInvalid) {
-      trackAddCardDetailsError(trackMeta, 'bank', $t(CARD_NOT_SUPPORTED));
+      trackAddCardDetails(trackMeta);
+      // if card is invalid track card entered error event
+      if (cardInvalid) {
+        trackAddCardDetailsError(trackMeta, 'bank', $t(CARD_NOT_SUPPORTED));
+      }
     }
   };
 

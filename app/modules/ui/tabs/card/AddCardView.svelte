@@ -580,7 +580,8 @@
     CardsTracker.CARD_NUMBER_ENTERED();
 
     // Track Add Card Event for new EMI flow
-    if (isNewEmiFlow && prevTab === 'emi') {
+    // Should only execute if the user cam from emi plan screen
+    if (isNewEmiFlow && prevTab === 'emi' && $selectedPlan) {
       const cardMetaData = getCardMetadata($cardNumber);
       const trackMeta: addCardMeta = {
         card_type: cardMetaData?.type || 'NA',
