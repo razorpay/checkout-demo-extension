@@ -586,8 +586,8 @@
         card_type: cardMetaData?.type || 'NA',
         card_issuer: cardMetaData?.issuer || 'NA',
         card_network: cardMetaData?.network || 'NA',
-        provider_name: emiPayload.bank?.name,
-        tab_name: emiPayload.tab,
+        provider_name: emiPayload?.bank?.name || 'NA',
+        tab_name: emiPayload?.tab || 'NA',
         emi_plan: {
           nc_emi_tag: $selectedPlan.subvention === 'merchant',
           tenure: $selectedPlan.duration,
