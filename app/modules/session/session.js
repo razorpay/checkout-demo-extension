@@ -941,6 +941,11 @@ Session.prototype = {
       tab = 'netbanking';
     }
 
+    // if prefilled method is disabled we are setting the tab to home tab
+    if (!MethodStore.isMethodEnabled(tab)) {
+      tab = '';
+    }
+
     if (tab || tab === '') {
       this.switchTab(tab);
     }
