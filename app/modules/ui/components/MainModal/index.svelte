@@ -31,6 +31,7 @@
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
+  import { offerFade } from 'header/store';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const ctaStore = getStore();
@@ -164,7 +165,7 @@
         class:header-expanded={isOneCC ? $headerVisible : headerExpanded}
       >
         {#if isRedesignV15Enabled}
-          <div id="header-1cc">
+          <div id="redesign-header" class:offers-fade={$offerFade}>
             <div id="header-redesign-v15-wrap" />
             <div id="topbar-redesign-v15-wrap" />
           </div>

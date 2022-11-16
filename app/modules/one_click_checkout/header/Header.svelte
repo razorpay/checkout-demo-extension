@@ -10,6 +10,7 @@
     headerVisible,
     headerHiddenOnScroll,
   } from 'one_click_checkout/header/store';
+  import { offerFade } from 'header/store';
 
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
@@ -38,7 +39,12 @@
 </script>
 
 {#if $headerVisible && !$headerHiddenOnScroll}
-  <div id="header-1cc" in:slide out:slide={{ duration: 150 }}>
+  <div
+    id="header-1cc"
+    in:slide
+    out:slide={{ duration: 150 }}
+    class:offers-fade={$offerFade}
+  >
     {#if routeName === views.COUPONS}
       <div class="header-wrapper" class:header-when-no-rtb={!isRTBEnabled}>
         {#if !isRTBEnabled}

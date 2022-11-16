@@ -58,6 +58,7 @@
   } from 'offers/store/store';
   import { querySelector } from 'utils/doc';
   import { getSession } from 'sessionmanager';
+  import { offerFade } from 'header/store';
 
   export let applicableOffers: Offers.OffersList; // eligible offers array
   export let setAppliedOffer;
@@ -188,6 +189,7 @@
   function continueWithOffer() {
     hideError(true);
   }
+
   function showList() {
     // If applied offer is no cost emi offer
     // And belongs to new emi flow we don't allow the click
@@ -203,10 +205,7 @@
     if ($appliedOffer) {
       selected = $appliedOffer;
     }
-    if (isRedesignV15Enabled) {
-      const headerMagicCheckout = document.querySelector('#header-1cc');
-      headerMagicCheckout.classList.add('offers-fade');
-    }
+    $offerFade = isRedesignV15Enabled && listActive;
     onShown();
   }
 
@@ -215,10 +214,7 @@
     $offerWindowOpen = false;
     selected = null;
 
-    if (isRedesignV15Enabled) {
-      const headerMagicCheckout = document.querySelector('#header-1cc');
-      headerMagicCheckout.classList.remove('offers-fade');
-    }
+    $offerFade = isRedesignV15Enabled && listActive;
   }
 
   export function isListShown() {
