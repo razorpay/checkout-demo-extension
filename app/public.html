@@ -23,7 +23,7 @@
         font-style: normal
     }
 </style>
-<link rel="stylesheet" href="dist/v1/css/checkout.css">
+<link rel="stylesheet" href="css/checkout.css">
 <script>
     function appendScript(element) {
         var script = document.createElement('script');
@@ -31,11 +31,11 @@
         document.body.appendChild(script);
     }
 </script>
-<!-- 
-    config.js file actually has frameApi and api slightly modified 
+<!--
+    config.js file actually has frameApi and api slightly modified
     hence without them local server cannot actually detect the api vs asset calls
  -->
 <script src="config.js" crossorigin></script>
-<script src="dist/v1/checkout-frame.js" crossorigin onerror="appendScript(this)"></script>
+<script src="checkout-frame.js" crossorigin onerror="appendScript(this)"></script>
 
 </html>

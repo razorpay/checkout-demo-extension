@@ -56,6 +56,8 @@ export function redirectTo(data: {
   content: any;
   method: string;
 }) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   if (!data.target && global !== global.parent) {
     return global.Razorpay.sendMessage({
       event: 'redirect',

@@ -2,6 +2,7 @@
   import Heading from 'ui/components/common/heading/Heading.svelte';
 
   export let expanded = false;
+  let props = {};
 
   $: ({ expanded, ...props } = $$props);
 </script>

@@ -1,7 +1,3 @@
-var globals = require('./cfu/scripts/rollup-injects.js');
-
-delete globals.include;
-
 const globalTypeNameSpace = [
   'NodeJS',
   'UPI',
@@ -13,10 +9,8 @@ const globalTypeNameSpace = [
   'EMIPlanView',
 ];
 
-var globalRollupReplace = ['__BUILD_NUMBER__'];
-globals = ['window', 'console', ...globalTypeNameSpace]
-  .concat(Object.keys(globals))
-  .concat(globalRollupReplace);
+var globalReplace = ['__BUILD_NUMBER__'];
+globals = ['window', 'console', ...globalTypeNameSpace].concat(globalReplace);
 
 var blacklistVars = globals.map((g) => `VariableDeclarator[id.name=${g}]`);
 

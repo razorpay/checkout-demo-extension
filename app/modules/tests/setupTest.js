@@ -6,8 +6,8 @@ global.matchMedia = jest.fn(() => ({ matches: false }));
 
 /**
  * Make these functions globally available for jest.
- * rollup-injects.js does the injection for application code
- * Presuming they are pure functions, it would be okay to use them as-is.
+ * webpack Define plugin does the injection for application code
+ * Presuming they are only variables, it would be okay to use them as-is.
  */
 global.__BUILD_NUMBER__ = '123456789';
 global.__TRAFFIC_ENV__ = '123456789';

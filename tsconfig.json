@@ -3,8 +3,8 @@
     "types": ["node", "svelte", "jest", "@testing-library/jest-dom"],
     "isolatedModules": false,
     "allowJs": true,
-    "target": "es5",
-    "lib": ["es2015", "dom", "es2017"],
+    "target": "es2019",
+    "lib": ["dom", "ES2019"],
     "module": "es6",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -13,9 +13,8 @@
     "noEmit": false,
     "strictNullChecks": true,
     "baseUrl": "app/modules",
-    "paths": {
-      "types": ["types"]
-    }
+    "paths": { "types": ["types"] },
+    "incremental": true
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
   "include": ["app/modules/**/*", "./global.d.ts", "app/modules/**/*.d.ts"],

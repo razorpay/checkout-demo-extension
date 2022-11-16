@@ -1,22 +1,13 @@
 const express = require('express');
 const fs = require('fs');
-const router = express.Router();
 
-module.exports = router;
+const { respondJSON, delay, requireOnce } = require('./utils');
 
-const { respondJSON, delay } = require('./utils');
+const app = express();
 
-const { getPreferences } = require('./mocks/preferences');
-const { getAjax, getCheckout } = require('./mocks/create');
-const { getFlows, getIin } = require('./mocks/flows');
-const { getOtpSubmit, getOtpResend } = require('./mocks/otp');
-const { getMisc } = require('./mocks/misc');
-const { preferredMethodForTokenization } = require('./mocks/personalisation');
-const { getStatus } = require('./mocks/status');
-const { getFees } = require('./mocks/fees');
-const { countries, states } = require('./mocks/countriesAndStates');
+app.get('/v1/preferences', function (request, response) {
+  const { getPreferences } = requireOnce('./mocks/preferences');
 
-router.get('/v1/preferences', function (request, response) {
   const preferences = getPreferences(
     // request.query.cred_offer_experiment
     //   ? `cred_${request.query.cred_offer_experiment}`
@@ -26,23 +17,32 @@ router.get('/v1/preferences', function (request, response) {
   respondJSON(preferences, request, response);
 });
 
-router.get('/v1/personalisation', function (request, response) {
+app.get('/v1/personalisation', function (request, response) {
+  const { preferredMethodForTokenization } = requireOnce(
+    './mocks/personalisation'
+  );
   respondJSON(preferredMethodForTokenization, request, response);
 });
 
-router.get('/v1/payment/iin', async function (request, response) {
+app.get('/v1/payment/iin', async function (request, response) {
+  const { getIin } = requireOnce('./mocks/flows');
+
   const preparedResponse = getIin(request.query);
   await delay(100);
   respondJSON(preparedResponse, request, response);
 });
 
-router.get('/v1/payment/flows', async function (request, response) {
+app.get('/v1/payment/flows', async function (request, response) {
+  const { getFlows } = requireOnce('./mocks/flows');
+
   const flows = getFlows(request.query);
   await delay(100);
   respondJSON(flows, request, response);
 });
 
-router.get('/v1/payments/:id/status', async function (request, response) {
+app.get('/v1/payments/:id/status', async function (request, response) {
+  const { getStatus } = requireOnce('./mocks/status');
+
   let preparedResponse;
   if (Math.random() > 0.5) {
     preparedResponse = getStatus('success');
@@ -53,9 +53,11 @@ router.get('/v1/payments/:id/status', async function (request, response) {
   respondJSON(preparedResponse, request, response);
 });
 
-router.get(
+app.get(
   '/v1/checkout/qr_code/:id/payment/status',
   async function (request, response) {
+    const { getStatus } = requireOnce('./mocks/status');
+
     // response.status(400).send({
     //   error: {
     //     code: 'BAD_REQUEST_ERROR',
@@ -77,7 +79,7 @@ router.get(
   }
 );
 
-router.delete('/v1/checkout/order/:id', async function (request, response) {
+app.delete('/v1/checkout/order/:id', async function (request, response) {
   let preparedResponse = {
     close_reason: 'opt_out',
   };
@@ -85,12 +87,16 @@ router.delete('/v1/checkout/order/:id', async function (request, response) {
   respondJSON(preparedResponse, request, response);
 });
 
-router.post('/v1/payments/create/checkout', async function (request, response) {
+app.post('/v1/payments/create/checkout', async function (request, response) {
+  const { getCheckout } = requireOnce('./mocks/create');
+
   await delay(100);
   response.send(getCheckout(request.body));
 });
 
-router.post('/v1/payments/create/ajax', async function (request, response) {
+app.post('/v1/payments/create/ajax', async function (request, response) {
+  const { getAjax } = requireOnce('./mocks/create');
+
   await delay(100);
   const body = getAjax(request.body);
   if (typeof body === 'object') {
@@ -100,7 +106,7 @@ router.post('/v1/payments/create/ajax', async function (request, response) {
   }
 });
 
-router.post('/v1/checkout/order', async function (request, response) {
+app.post('/v1/checkout/order', async function (request, response) {
   await delay(100);
   response.json({
     enabled: Math.random() < 0.5,
@@ -130,7 +136,7 @@ router.post('/v1/checkout/order', async function (request, response) {
   });
 });
 
-router.post(
+app.post(
   '/v1/payments/:payment_id/authentication/redirect',
   async function (request, response) {
     await delay(100);
@@ -140,36 +146,36 @@ router.post(
   }
 );
 
-router.get('/v1/customers/status/:phone', async function (request, response) {
+app.get('/v1/customers/status/:phone', async function (request, response) {
   await delay(100);
   response.send({ saved: true });
 });
 
-router.post('/v1/payments/calculate/fees', async function (request, response) {
-  // await delay(100);
+app.post('/v1/payments/calculate/fees', async function (request, response) {
+  const { getFees } = requireOnce('./mocks/fees');
+
   const preparedResponse = getFees();
   response.send(preparedResponse);
 });
 
-router.get(
-  '/v1/payments/:payment_id/cancel',
-  async function (request, response) {
-    response.status(400).send({
-      error: {
-        code: 'BAD_REQUEST_ERROR',
-        description: 'Payment processing cancelled by user',
-        source: 'customer',
-        step: 'payment_authentication',
-        reason: 'payment_cancelled',
-        metadata: { payment_id: 'pay_F9zA01NXXLFBCh' },
-      },
-    });
-  }
-);
+app.get('/v1/payments/:payment_id/cancel', async function (request, response) {
+  response.status(400).send({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: 'Payment processing cancelled by user',
+      source: 'customer',
+      step: 'payment_authentication',
+      reason: 'payment_cancelled',
+      metadata: { payment_id: 'pay_F9zA01NXXLFBCh' },
+    },
+  });
+});
 
-router.post(
+app.post(
   '/v1/payments/:payment_id/otp_submit/:token',
   async function (request, response) {
+    const { getOtpSubmit } = requireOnce('./mocks/otp');
+
     await delay(100);
     if (Math.random() > 0.5) {
       response.send(getOtpSubmit('success'));
@@ -179,15 +185,19 @@ router.post(
   }
 );
 
-router.post(
+app.post(
   '/v1/payments/:payment_id/otp_resend',
   async function (request, response) {
+    const { getOtpResend } = requireOnce('./mocks/otp');
+
     await delay(100);
     response.send(getOtpResend('hdfc'));
   }
 );
 
-router.post('/v1/otp/verify', async function (request, response) {
+app.post('/v1/otp/verify', async function (request, response) {
+  const { getMisc } = requireOnce('./mocks/misc');
+
   const { query } = request;
   await delay(100);
   // Odd OTPs are invalid, evens are valid
@@ -201,7 +211,7 @@ router.post('/v1/otp/verify', async function (request, response) {
   response.send(getMisc('saved_methods'));
 });
 
-router.post(
+app.post(
   '/v1/payments/:payment_id/redirect_callback',
   async function (request, response) {
     await delay(100);
@@ -209,18 +219,22 @@ router.post(
   }
 );
 
-router.post('/v1/otp/create', (request, response) => {
+app.post('/v1/otp/create', (request, response) => {
   response.send({
     success: 1,
   });
 });
 
-router.get('/v1/countries', (req, res) => {
+app.get('/v1/countries', (req, res) => {
+  const { countries } = requireOnce('./mocks/countriesAndStates');
+
   res.json(countries);
 });
 
-router.get('/v1/states/:countryCode', (req, res) => {
+app.get('/v1/states/:countryCode', (req, res) => {
+  const { states } = requireOnce('./mocks/countriesAndStates');
+
   res.json(states[req.query.countryCode || 'gb']);
 });
 
-module.exports = router;
+module.exports = app;

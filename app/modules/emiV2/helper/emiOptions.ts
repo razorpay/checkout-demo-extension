@@ -73,7 +73,7 @@ export function getAllProviders(amount: number, instrument: Instrument) {
         // if it's a bank emi ignore it and is not bajaj
         const providerCode: string = providerObj.code.toUpperCase();
         const emiBanks: EMIBanksMap = bankMap;
-        const currentLocale: string = get(locale);
+        const currentLocale: string = get(locale) as string;
         if (!emiBanks[providerCode] || isOtherCardEmiProvider(providerCode)) {
           const provider: EMIBANKS = {
             ...createProvider(providerObj.code, providerObj),
@@ -212,7 +212,7 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
           banks[bankCode]
         ) {
           const plans: EmiPlanObject = banks[bankCode];
-          const currentLocale: string = get(locale);
+          const currentLocale: string = get(locale) as string;
           bankEMIOptions[commonBankName] = {
             code: commonBankName,
             name: getLongBankName(commonBankName, currentLocale, bankObj.name),
@@ -243,7 +243,7 @@ export function getBankEmiOptions(amount: number, instrument: Instrument) {
           !isEmiMethodHidden('cardless_emi')
         ) {
           const transformedBankCode: string = bank.code.toUpperCase();
-          const currentLocale: string = get(locale);
+          const currentLocale: string = get(locale) as string;
           bankEMIOptionsList.push({
             code: transformedBankCode,
             name: getLongBankName(

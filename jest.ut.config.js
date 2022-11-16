@@ -32,6 +32,7 @@ module.exports = {
   coverageDirectory: '<rootDir>/coverage/',
   coverageReporters: ['html', 'json', 'lcov', 'text-summary'],
   testResultsProcessor: 'jest-sonar-reporter',
+  coverageProvider: 'v8',
   coveragePathIgnorePatterns: [
     'node_modules',
     '.module.ts',

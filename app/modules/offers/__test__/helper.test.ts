@@ -17,29 +17,31 @@ jest.mock('checkoutframe/offers', () => ({
   __esModule: true,
   getAllOffers: jest
     .fn()
-    .mockReturnValue([sampleOffer]) // rest of the calls will return default value
+    .mockReturnValue([sampleOffer()]) // rest of the calls will return default value
     .mockReturnValueOnce([]) // first call will return []
     .mockReturnValueOnce([]), // second call will return []
 }));
 
-const sampleOffer: Offers.OfferItem = {
-  id: 'offer_Jf1deiENY5fdlb',
-  name: 'instant offer',
-  payment_method: 'card',
-  display_text: '10% off card',
-  type: 'instant',
-  original_amount: 100000,
-  amount: 90000,
-  terms: 'Offers terms and conditions',
-};
+function sampleOffer(): Offers.OfferItem {
+  return {
+    id: 'offer_Jf1deiENY5fdlb',
+    name: 'instant offer',
+    payment_method: 'card',
+    display_text: '10% off card',
+    type: 'instant',
+    original_amount: 100000,
+    amount: 90000,
+    terms: 'Offers terms and conditions',
+  };
+}
 
 describe('#getAppliedOffer', () => {
   beforeEach(() => {
-    appliedOffer.set(sampleOffer);
+    appliedOffer.set(sampleOffer());
   });
 
   test('test getAppliedOffer()', () => {
-    expect(getAppliedOffer()).toBe(sampleOffer);
+    expect(getAppliedOffer()).toEqual(sampleOffer());
   });
 });
 
@@ -48,13 +50,13 @@ describe('#isOfferApplicableOnIssuer', () => {
     appliedOffer.set(null);
   });
   test('test isOfferApplicableOnIssuer', async () => {
-    appliedOffer.set({ ...sampleOffer, issuer: 'HDFC' });
+    appliedOffer.set({ ...sampleOffer(), issuer: 'HDFC' });
     await tick();
     expect(isOfferApplicableOnIssuer('HDFC')).toBeTruthy();
     expect(isOfferApplicableOnIssuer('ICIC')).toBeFalsy();
   });
   test('test isOfferApplicableOnIssuer amex', async () => {
-    appliedOffer.set({ ...sampleOffer, payment_network: 'Amex' });
+    appliedOffer.set({ ...sampleOffer(), payment_network: 'Amex' });
     await tick();
     expect(isOfferApplicableOnIssuer('amex')).toBeTruthy();
     expect(isOfferApplicableOnIssuer('ICIC')).toBeTruthy();
@@ -69,9 +71,9 @@ describe('#getDiscountedAmount', () => {
     appliedOffer.set(null);
   });
   test('test getDiscountedAmount', async () => {
-    appliedOffer.set(sampleOffer);
+    appliedOffer.set(sampleOffer());
     await tick();
-    expect(getDiscountedAmount()).toBe(sampleOffer.amount);
+    expect(getDiscountedAmount()).toBe(sampleOffer().amount);
   });
   test('test getDiscountedAmount when no offer', () => {
     expect(getDiscountedAmount()).toBe(5000);
@@ -80,7 +82,7 @@ describe('#getDiscountedAmount', () => {
 
 describe('#showOffersOnSelectedCurrncy', () => {
   beforeEach(() => {
-    appliedOffer.set(sampleOffer);
+    appliedOffer.set(sampleOffer());
   });
   test('test showOffersOnSelectedCurrncy with currency as empty string with no offers', async () => {
     await tick();

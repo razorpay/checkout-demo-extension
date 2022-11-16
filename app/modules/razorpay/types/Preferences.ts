@@ -477,7 +477,6 @@ export interface PreferencesObject {
   merchant_key: string;
   merchant_brand_name: string;
   merchant_name: string;
-  merchant_brand_name: string;
   contact: any;
   mode: string;
   magic: boolean;

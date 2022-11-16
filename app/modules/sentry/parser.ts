@@ -150,7 +150,7 @@ function parseOpera(e: Error): StackFrame[] {
 function parseOpera9(e: Error): StackFrame[] {
   const lineRE = /Line (\d+).*script (?:in )?(\S+)/i;
   const lines = e.message.split('\n');
-  const result = [];
+  const result: StackFrame[] = [];
 
   for (let i = 2, len = lines.length; i < len; i += 2) {
     const match = lineRE.exec(lines[i]);
@@ -170,7 +170,7 @@ function parseOpera9(e: Error): StackFrame[] {
 export function parseOpera10(e: Error): StackFrame[] {
   const lineRE = /Line (\d+).*script (?:in )?(\S+)(?:: In function (\S+))?$/i;
   const lines = (e as any)?.stacktrace?.split('\n') || [];
-  const result = [];
+  const result: StackFrame[] = [];
 
   for (let i = 0, len = lines.length; i < len; i += 2) {
     const match = lineRE.exec(lines[i] as string);

@@ -125,7 +125,7 @@ module.exports = function (testFeatures) {
       //   }
       // }
       preferences.methods.upi = true;
-      qrFeatureFlags = {
+      let qrFeatureFlags = {
         disable_homescreen_qr,
         disable_upiscreen_qr,
       };

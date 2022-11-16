@@ -34,7 +34,7 @@ export const cta = derived([ctaInfo, locale], ([$ctaInfo, $locale]) => {
     return '';
   }
   const label = `cta.${view}`;
-  return formatTemplateWithLocale(label, data, $locale);
+  return formatTemplateWithLocale(label, data, $locale as string);
 });
 
 export function init() {

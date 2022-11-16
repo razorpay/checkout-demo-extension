@@ -11,3 +11,5 @@ interface Window {
 }
 
 declare const global: Window;
+
+declare var Razorpay: Window['Razorpay'];

@@ -18,11 +18,11 @@
         font-style: normal;
       }
     </style>
-    <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet" />
+    <link href="/css/checkout.css" type="text/css" rel="stylesheet" />
   </head>
 
   <!-- This script introduces api params for development and is not present in the final bundle -->
-  <script src="config.js"></script>
+  <script src="/config.js"></script>
   <body></body>
   <!-- Everything till endbuild is bundled into a single js file -->
   <!-- build:js checkout-frame.js -->
@@ -31,7 +31,7 @@
   <!-- //1 Introduce globals to be used. Ideally should not be present.  -->
 
   <!-- The generated es6 code -->
-  <script src="/dist/v1/checkout-frame.js"></script>
+  <script src="/checkout-frame.js"></script>
   <!-- endbuild -->
 </html>
 <!-- not present in the prod bundle. options are received through handleMessage -->

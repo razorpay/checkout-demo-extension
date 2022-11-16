@@ -1,4 +1,6 @@
 import 'lib/polyfill/checkout';
+// TODO - explore if the modules/error-service can be leveraged here, to reduce duplication
+import '../../../cfu/src/error-service';
 import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';

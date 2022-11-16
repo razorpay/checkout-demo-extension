@@ -1,7 +1,6 @@
 app/modules/generated/**/*.js
 app/modules/**/*.test.js
 app/modules/**/*.test.ts
-cfu/src/fe/implicit/global.js
 app/modules/**/__tests__/*.*
 app/modules/tests/**/*.*
 .eslintrc.js

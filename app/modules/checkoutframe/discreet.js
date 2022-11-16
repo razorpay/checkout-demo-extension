@@ -96,7 +96,7 @@ import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.s
 import { isInternationalInPreferredInstrument } from 'common/international';
 
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
-import * as UTILS from 'lib/utils.js';
+import * as UTILS from 'lib/utils';
 
 import OneClickCheckoutHomeTab from 'one_click_checkout/ui/Home.svelte';
 import * as Header from 'checkoutframe/components/header';

@@ -1,3 +1,4 @@
+import '../../checkout.styl';
 import 'lib/polyfill/checkoutframe'; // need always at top
 import 'error-service/init';
 /** any error on mount and before preference complete track under main checkout (CX) project */

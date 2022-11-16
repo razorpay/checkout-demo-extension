@@ -108,7 +108,7 @@ describe('validate SavedCards', () => {
     section: 'custom',
   };
 
-  let filteredTokens = [];
+  let filteredTokens: Tokens[] = [];
 
   test('selected instrument is cardless provider', () => {
     currentCustomer = get(customer) as Customer;

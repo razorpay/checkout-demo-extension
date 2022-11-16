@@ -20,4 +20,17 @@ function logger(message) {
   console.log('\x1b[33m%s\x1b[0m', `\n${message}`);
 }
 
-module.exports = { respondJSON, delay, logger };
+/**
+ * modules are cached by nodejs from fs to memory
+ * When the mocks are updated in background, we want
+ * them to be loaded freshly instead of cached version of module
+ * @param path
+ * @returns {*}
+ */
+const requireOnce = (path) => {
+  const value = require(path);
+  delete require.cache[require.resolve(path)];
+  return value;
+};
+
+module.exports = { respondJSON, delay, logger, requireOnce };

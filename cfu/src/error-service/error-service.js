@@ -1,7 +1,6 @@
 import { constructErrorObject } from './helpers';
 /**
- * make sure while using window functions do append `window.` before
- * else it will create circular dep as this file is used in global.js
+ * make sure while using window functions do prepend `window.`
  */
 const SEVERITY_LEVELS = {
   S0: 'S0',

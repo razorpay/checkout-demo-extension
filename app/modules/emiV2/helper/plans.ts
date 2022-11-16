@@ -147,7 +147,7 @@ export const handlePlanDescription = (
   amountPerMonth: string,
   locale: string
 ) => {
-  const descriptionText = [];
+  const descriptionText: string[] = [];
   // Adding the plan description split as provided by product team
   if (isDebitIssuer(bank)) {
     const debitCardDescriptionText = formatTemplateWithLocale(

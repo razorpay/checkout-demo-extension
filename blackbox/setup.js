@@ -2,16 +2,16 @@ const puppeteer = require('puppeteer');
 const { execSync } = require('child_process');
 const DIR = require('./tmpdir');
 const fs = require('fs');
-const isProd = process.env.NODE_ENV === 'production';
+const isCI = process.env.CI === 'true';
 const flags = require('./chrome-flags');
 
-module.exports = async function() {
+module.exports = async function () {
   const opts = {
-    headless: isProd,
-    devtools: !isProd,
+    headless: isCI,
+    devtools: !isCI,
     args: ['--disable-web-security'],
   };
-  if (isProd) {
+  if (isCI) {
     opts.args = flags;
   }
   const browser = await puppeteer.launch(opts);
