@@ -1,0 +1,98 @@
+export const successResponse = {
+  all_currencies: {
+    CAD: {
+      code: '124',
+      denomination: 100,
+      min_value: 50,
+      min_auth_value: 50,
+      symbol: 'C$',
+      name: 'Canadian Dollar',
+      amount: 147,
+      forex_rate: 1.3550660000000001,
+      fee: 11,
+      conversion_percentage: 8,
+    },
+    EUR: {
+      code: '978',
+      denomination: 100,
+      min_value: 50,
+      min_auth_value: 50,
+      symbol: '\u20ac',
+      name: 'Euro',
+      amount: 109,
+      forex_rate: 1.0066679999999999,
+      fee: 9,
+      conversion_percentage: 8,
+    },
+    USD: {
+      code: '840',
+      denomination: 100,
+      min_value: 10,
+      min_auth_value: 50,
+      symbol: '$',
+      name: 'US Dollar',
+      amount: 100,
+      forex_rate: 1,
+      fee: 0,
+      conversion_percentage: 8,
+    },
+  },
+  currency_request_id: 'EW1CiHoC8eARvW',
+  card_currency: 'USD',
+  avs_required: false,
+};
+
+export const failedResponse = {
+  error: 'Something went wrong',
+};
+
+export const withoutAllCurrenciesResponse = {
+  currency_request_id: 'EW1CiHoC8eARvW',
+  card_currency: 'USD',
+  avs_required: false,
+};
+
+export const sortedCurrencies = [
+  {
+    _key: 'USD',
+    code: '840',
+    denomination: 100,
+    min_value: 10,
+    min_auth_value: 50,
+    symbol: '$',
+    name: 'US Dollar',
+    amount: 100,
+    forex_rate: 1,
+    fee: 0,
+    currency: 'USD',
+    conversion_percentage: 8,
+  },
+  {
+    _key: 'CAD',
+    code: '124',
+    denomination: 100,
+    min_value: 50,
+    min_auth_value: 50,
+    symbol: 'C$',
+    name: 'Canadian Dollar',
+    amount: 147,
+    forex_rate: 1.3550660000000001,
+    fee: 11,
+    currency: 'CAD',
+    conversion_percentage: 8,
+  },
+  {
+    _key: 'EUR',
+    code: '978',
+    denomination: 100,
+    min_value: 50,
+    min_auth_value: 50,
+    symbol: '\u20ac',
+    name: 'Euro',
+    amount: 109,
+    forex_rate: 1.0066679999999999,
+    fee: 9,
+    currency: 'EUR',
+    conversion_percentage: 8,
+  },
+];

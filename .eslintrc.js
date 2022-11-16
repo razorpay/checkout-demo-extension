@@ -7,6 +7,7 @@ const globalTypeNameSpace = [
   'Offers',
   'NavStack',
   'EMIPlanView',
+  'DCC',
 ];
 
 var globalReplace = ['__BUILD_NUMBER__'];

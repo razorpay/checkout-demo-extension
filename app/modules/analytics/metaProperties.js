@@ -38,4 +38,5 @@ export default {
   CUSTOM_CHALLAN: 'custom_challan',
   /** does user has affordablility widget enabled - depends on whether affordability fingerprint id is there */
   IS_AFFORDABILITY_WIDGET_ENABLED: 'is_affordability_widget_enabled',
+  DCC_DATA: 'dccData',
 };

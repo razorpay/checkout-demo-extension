@@ -8,11 +8,11 @@
   export let name = '';
   export let value = '';
   export let classes = '';
-  export let tabIndex = 0;
+  export let tabindex = 0;
 </script>
 
 <label class={`native-radio-control${classes ? ` ${classes}` : ''}`} for={id}>
-  <input type="radio" {id} {value} {checked} {name} {tabIndex} on:change />
+  <input type="radio" {id} {value} {checked} {name} {tabindex} on:change />
   <div class="native-radio-control--input" />
   {#if label}
     <span class="native-radio-control--label">{label}</span>
