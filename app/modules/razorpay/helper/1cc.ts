@@ -60,8 +60,13 @@ export const scriptCouponApplied = () => getOption('script_coupon_applied');
 
 export const customerConsentDefaultAccept = () =>
   getPreferences('features.one_cc_consent_default');
+
 export const consumerConsentDefaultDeny = () =>
   getPreferences('features.one_cc_consent_notdefault');
 
 export const isCustomerConsentFeatureEnabled = () =>
   customerConsentDefaultAccept() || consumerConsentDefaultDeny();
+
+export const disableEmailAsCookie = () => {
+  return getPreferences('features.one_cc_disableemailcookie') || false;
+};

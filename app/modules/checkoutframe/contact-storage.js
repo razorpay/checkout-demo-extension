@@ -1,5 +1,5 @@
 import BrowserStorage from 'browserstorage';
-import { isMobile } from 'common/useragent';
+import { disableEmailAsCookie } from 'razorpay';
 
 const KEY = 'rzp_contact';
 
@@ -28,8 +28,7 @@ function set(details) {
 }
 
 export function update({ contact, email }) {
-  // Store only on mobile since Desktops can be shared b/w users
-  if (!isMobile()) {
+  if (disableEmailAsCookie()) {
     return;
   }
 
