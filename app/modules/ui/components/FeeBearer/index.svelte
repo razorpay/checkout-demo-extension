@@ -136,10 +136,10 @@
   });
 
   export function onError(response) {
-    const errorMessage = translateErrorDescription(
-      response.error.description,
-      $locale
-    );
+    const errorDescription = response?.error?.description;
+    const errorMessage = errorDescription
+      ? translateErrorDescription(errorDescription, $locale)
+      : '';
     if (isOverlay) {
       popStack(); // @TODO future - replaceStack(ErrorScreen);
       session.showLoadError(errorMessage, response.error);
