@@ -12,7 +12,7 @@
   import { resetRouting, activeRoute } from 'one_click_checkout/routing/store';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { contact } from 'checkoutstore/screens/home';
-  import { getMerchantOrder } from 'razorpay';
+  import { getMerchantOrder, getOption } from 'razorpay';
   import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constants import
@@ -50,7 +50,9 @@
   let contentRef: HTMLDivElement;
 
   onMount(() => {
-    setLineItems(getMerchantOrder().line_items || []);
+    setLineItems(
+      getOption('cart')?.line_items || getMerchantOrder().line_items
+    );
     Analytics.setMeta(
       OneClickCheckoutMetaProperties.INITIAL_LOGGED_IN,
       isUserLoggedIn()

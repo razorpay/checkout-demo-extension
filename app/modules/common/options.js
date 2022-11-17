@@ -45,6 +45,9 @@ export const RazorpayDefaults = {
   customer_cart: {},
   script_coupon_applied: false,
   disable_emi_ux: null,
+
+  // cart used by magic checkout
+  cart: {},
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {
