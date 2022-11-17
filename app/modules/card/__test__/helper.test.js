@@ -3,6 +3,7 @@ import {
   getIntSelectedCardTokenId,
   fetchAVSFlagForCard,
   getEntityForAVSMap,
+  openConsentOverlay,
 } from 'card/helper';
 import { getCurrencies } from 'card/helper/dcc';
 import { shouldRememberCustomer } from 'checkoutstore/index.js';
@@ -14,6 +15,8 @@ import { get } from 'svelte/store';
 import { Views } from 'ui/tabs/card/constant';
 
 import { customerTokens } from '../__mocks__/customerToken';
+import CardTokenisationOverlaySvelte from 'ui/components/CardTokenisationOverlay.svelte';
+import { pushOverlay } from 'navstack';
 
 jest.mock('checkoutstore/index.js', () => ({
   shouldRememberCustomer: jest.fn((cb) => (cb ? cb() : true)),
@@ -35,6 +38,10 @@ jest.mock('card/experiments', () => ({
   delayOTP: {
     enabled: jest.fn((cb) => (cb ? cb() : true)),
   },
+}));
+
+jest.mock('navstack', () => ({
+  pushOverlay: jest.fn(),
 }));
 
 describe('delayLoginOTPExperiment', () => {
@@ -250,5 +257,21 @@ describe('AVS getEntityForAVSMap', () => {
       selectedCardFromHome: { id: '2' },
     });
     expect(entity).toStrictEqual(null);
+  });
+});
+
+describe('openConsentOverlay', () => {
+  test('openConsentOverlay should be shown', async () => {
+    expect(pushOverlay).not.toHaveBeenCalled();
+
+    openConsentOverlay();
+
+    expect(pushOverlay).toHaveBeenCalledTimes(1);
+
+    expect(pushOverlay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: CardTokenisationOverlaySvelte,
+      })
+    );
   });
 });

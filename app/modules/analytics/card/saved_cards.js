@@ -21,6 +21,12 @@ const savedCardEvents = {
   USER_CONSENT_FOR_TOKENIZATION: 'user_consent_for_tokenization',
   /** for know-more modal clicks */
   TOKENIZATION_KNOW_MORE_MODAL: 'tokenization_know_more_modal',
+  /** tokenisation benefits modal is shown */
+  TOKENIZATION_BENEFITS_MODAL_SHOWN: 'tokenization_benefits_modal_shown',
+  /** yes, secure my card is clicked in tokenisation benefits modal */
+  SECURE_CARD_CLICKED: 'secure_card_clicked',
+  /** maybe later is clicked in tokenisation benefits modal */
+  MAYBE_LATER_CLICKED: 'maybe_later_clicked',
 };
 
 export default getEventsName('saved_cards', savedCardEvents);

@@ -43,7 +43,10 @@ import {
   loadingEligibility,
 } from 'emiV2/ui/components/EmiTabsScreen/store';
 import { ELIGIBILITY_VALIDATION_ERROR } from 'ui/labels/debit-emi';
-import { isSelectedBankBajaj } from 'emiV2/helper/helper';
+import {
+  isSelectedBankBajaj,
+  showTokenisationBenefitModal,
+} from 'emiV2/helper/helper';
 import {
   cardName,
   cardNumber,
@@ -62,7 +65,7 @@ import { screenStore } from 'checkoutstore';
 import { resetCallbackOnEmiPayViaBank } from 'emiV2/helper/emi';
 import { disableCTA } from 'checkoutstore/screens/otp';
 import { showOffers } from 'offers/store';
-import { showAuthOverlay } from 'card/helper';
+import { openConsentOverlay, showAuthOverlay } from 'card/helper';
 import Analytics from 'analytics';
 import { getSavedCardsForEMI } from 'emiV2/helper/card';
 import { handleFeeBearer } from 'emiV2/helper/fee-bearer';
@@ -329,6 +332,23 @@ export const handleEmiPaymentV2 = (emiConfig: PaymentProcessConfiguration) => {
   const { paymentPayload, paymentParams } = createEMiPaymentV2(basePayload);
 
   session.payload = paymentPayload;
+
+  /** Ask popup to show benefits of save cards and get confirmation to save or not
+   * for card emi flow will ask when user didn't give consent to save card
+   * will not ask for bajaj card as we don't tokenized them in backend
+   */
+  if (showTokenisationBenefitModal(emiConfig)) {
+    if (!emiConfig?.tokenisationPopupShown) {
+      openConsentOverlay().then(function (saved) {
+        const newEmiConfig: PaymentProcessConfiguration = { action: 'card' };
+        if (!saved) {
+          newEmiConfig.tokenisationPopupShown = true;
+        }
+        handleEmiPaymentV2(newEmiConfig);
+      });
+      return;
+    }
+  }
 
   // If the payment request call has been made for cardless eligiblity check
   // We dont't need to send emi plan duration

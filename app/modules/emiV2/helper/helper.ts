@@ -14,6 +14,11 @@ import type {
   Tokens,
 } from 'emiV2/types';
 import { get } from 'svelte/store';
+import type { PaymentProcessConfiguration } from 'emiV2/payment/types/payment';
+import { remember } from 'checkoutstore/screens/card';
+import { shouldRememberCard } from 'ui/tabs/card/utils';
+import { isIndianCustomer } from 'checkoutstore/screens/home';
+import { isRemoveDefaultTokenizationSupported } from 'razorpay/helper/experiment';
 
 /**
  * Helper function to check for whether a bank has only cardless emi available
@@ -113,4 +118,23 @@ export const shouldEmiOptionRender = (
   const savedCardsPresemt = savedTokens && savedTokens.length > 0;
 
   return emiOptionsPresent || savedCardsPresemt;
+};
+
+/** Ask popup to show benefits of save cards and get confirmation to save or not
+ * for card emi flow will ask when user didn't give consent to save card
+ * will not ask for bajaj card as we don't tokenized them in backend
+ */
+export const showTokenisationBenefitModal = (
+  emiConfig: PaymentProcessConfiguration
+) => {
+  if (
+    emiConfig?.action === 'card' &&
+    !get(remember) &&
+    shouldRememberCard(get(isIndianCustomer)) &&
+    !isSelectedBankBajaj() &&
+    isRemoveDefaultTokenizationSupported()
+  ) {
+    return true;
+  }
+  return false;
 };

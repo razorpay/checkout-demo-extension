@@ -22,6 +22,7 @@ export interface PaymentProcessConfiguration {
   action: PaymentAction;
   payloadData?: Partial<EMIPayload>;
   cardlessEligibilityFlow?: boolean;
+  tokenisationPopupShown?: boolean;
 }
 
 export interface CardlessParams {

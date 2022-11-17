@@ -7,3 +7,9 @@ export function reusePaymentIdExperimentEnabled() {
     isRedesignV15()
   );
 }
+
+export function isRemoveDefaultTokenizationSupported() {
+  return !!getPreferences(
+    'experiments.remove_default_tokenization_flag'
+  ) ;
+}

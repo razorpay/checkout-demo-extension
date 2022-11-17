@@ -60,6 +60,7 @@
     getAmount,
     isEmiV2,
     isMethodRestrictionEnabledForMerchant,
+    isRemoveDefaultTokenizationSupported,
   } from 'razorpay';
   import {
     merchantAnalytics,
@@ -1017,7 +1018,7 @@
 
   function storeContactDetails() {
     // Update save address/card checkbox
-    remember.set($isIndianCustomer);
+    remember.set($isIndianCustomer && !isRemoveDefaultTokenizationSupported());
 
     updateContactStorage({
       contact: $contact,

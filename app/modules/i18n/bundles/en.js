@@ -349,6 +349,14 @@ export default {
       'EMI not supported on this card. Try again with another {bank} {type} card or pay full amount.',
     saved_cards: 'Saved Cards',
     credit_debit_card: '{type} Card',
+    rbi_tokenisation_guideline:
+      'As per RBI, the relevant card information will be tokenised & secured with card networks(VISA, Mastercard, RuPay, Amex & Diners) or card issuers ensuring your card number is not misused.',
+    card_tokenisation_warning: 'Save your card securely on {name}',
+    card_tokenisation_benefits0: 'Benefits of saving your card',
+    card_tokenisation_benefits1: 'Enter card details only once',
+    card_tokenisation_benefits2: 'Secure and faster payments',
+    secure_card: 'Pay and Save Card',
+    secure_card_later: 'Pay without Saving Card',
     ...cardLang,
   },
   card_subtext: {

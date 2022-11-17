@@ -1,6 +1,7 @@
 import { derived, writable } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
 import { isIndianCustomer } from 'checkoutstore/screens/home';
+import { isRemoveDefaultTokenizationSupported } from 'razorpay';
 export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');
@@ -76,4 +77,11 @@ But it won'r update remember value as its already initialized and handler to pre
 
 Fix: Revert remember default value to true, and update using subscription on isIndianCustomer
  */
-isIndianCustomer?.subscribe(remember.set);
+
+/**
+in case of false experiment (i.e old flow) it will work same as before
+in case of experiment as true we want to set remember as false when user in between the flow change number from indian to other 
+ */
+isIndianCustomer.subscribe((value) => {
+  remember.set(value && !isRemoveDefaultTokenizationSupported());
+});

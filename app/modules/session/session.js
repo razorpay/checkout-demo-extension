@@ -12,7 +12,7 @@ import {
 } from 'checkoutframe/customer';
 import { init1CCMetaData } from 'one_click_checkout/helper';
 import { applyPrefilledCoupon } from 'one_click_checkout/coupons/helpers';
-import { showAuthOverlay } from 'card/helper';
+import { openConsentOverlay, showAuthOverlay } from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 import {
   matchLatestPaymentWith,
@@ -93,6 +93,8 @@ import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
+import { remember } from 'checkoutstore/screens/card';
+import { showTokenisationBenefitModal } from 'card/helper/card';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1226,6 +1228,10 @@ Session.prototype = {
       first_screen = this.homeTab.getCurrentView();
     }
 
+    // remember store default value as false if experiment is true
+    if (RazorpayHelper.isRemoveDefaultTokenizationSupported()) {
+      remember.set(false);
+    }
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: Object.assign(
@@ -5085,6 +5091,27 @@ Session.prototype = {
       showConversionChargesCallout();
       return;
     }
+
+    /** Ask popup to show benefits of save cards and get confirmation to save or not
+     * for card flow will ask when user didn't give consent to save card
+     * will not ask for international card as we don't tokenized them in backend
+     */
+    const isSavedCardScreen = this.svelteCardTab?.isOnSavedCardsScreen();
+    if (showTokenisationBenefitModal() && !AVSRequired) {
+      if (this.tokenisationPopupShown) {
+        this.tokenisationPopupShown = false;
+      } else {
+        const thisSession = this;
+        openConsentOverlay(isSavedCardScreen).then(function (saved) {
+          if (!saved) {
+            thisSession.tokenisationPopupShown = true;
+          }
+          thisSession.preSubmit();
+        });
+        return;
+      }
+    }
+
     payload = this.payload;
     // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods
     if (
