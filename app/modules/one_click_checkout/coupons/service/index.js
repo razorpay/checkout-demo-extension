@@ -6,6 +6,9 @@ import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';
+import { get } from 'svelte/store';
+import { contact, email } from 'checkoutstore/screens/home';
+import { isEmailValid } from 'one_click_checkout/order/validators';
 
 let inProgress = false;
 let pendingPromise = null;
@@ -66,11 +69,21 @@ export function validateCoupon(code, source) {
   Events.TrackMetric(CouponEvents.COUPON_VALIDITY_START, {
     input_source: source,
   });
+
+  const payload = {};
+
+  if (get(email) && isEmailValid(get(email))) {
+    payload['email'] = get(email);
+  }
+  if (get(contact)) {
+    payload['contact'] = get(contact);
+  }
+
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl('merchant/coupon/apply'),
       data: {
-        ...getContactPayload(),
+        ...payload,
         order_id: getOrderId(),
         code,
       },

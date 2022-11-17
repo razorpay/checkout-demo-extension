@@ -140,7 +140,7 @@ export const emiBanks = [
   {
     code: 'INDB_DC',
     name: 'Indusind Bank Debit Cards',
-  }
+  },
 ];
 
 export const DEBIT_EMI_ISSUERS = ['KKBK', 'HDFC', 'INDB'];

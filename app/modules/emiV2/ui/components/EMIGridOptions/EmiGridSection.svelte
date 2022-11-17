@@ -44,7 +44,7 @@
 
   const onEmiOptionSelect = (bank: EMIBANKS, emiProviderType: string) => {
     triggerAnalyticsOnSelect(bank, emiProviderType);
-     // If applied offer is invalid show offer error overlay
+    // If applied offer is invalid show offer error overlay
     // If user continues without offer or there is no offer error set the respective stores.
     const offerError = !session.validateOffers(
       bank.code,
