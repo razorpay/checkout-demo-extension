@@ -1,3 +1,4 @@
+import type { Error, Tags, ErrorParam, CustomError } from 'error-service/types';
 /**
  * @typedef {Object} CustomError
  *
@@ -23,8 +24,11 @@
  *
  * @returns {CustomError} customError
  */
-export const constructErrorObject = (error, tags) => {
-  let customError = { tags };
+export const constructErrorObject = (
+  error: ErrorParam,
+  tags: Tags
+): CustomError => {
+  let customError: CustomError = { tags };
 
   switch (true) {
     case !error:
@@ -33,13 +37,13 @@ export const constructErrorObject = (error, tags) => {
       break;
 
     case typeof error === 'string':
-      customError.message = error;
+      customError.message = error as string;
       break;
 
     case typeof error === 'object' && isNetworkError(error): {
       customError = {
         ...JSON.parse(JSON.stringify(error)),
-        message: `[NETWORK ERROR] ${error.description}`,
+        message: `[NETWORK ERROR] ${(error as Error).description}`,
       };
       break;
     }
@@ -47,7 +51,7 @@ export const constructErrorObject = (error, tags) => {
     case typeof error === 'object':
       {
         const { name, message, stack, fileName, lineNumber, columnNumber } =
-          error;
+          error as Error;
 
         customError = {
           // this won't copy non-enumerable
@@ -77,7 +81,7 @@ export const constructErrorObject = (error, tags) => {
  * return true/false based on whether error object follow API error schema
  * @param err Error object
  */
-function isNetworkError(err) {
+function isNetworkError(err: Error) {
   const errorKeys = [
     'source',
     'step',
@@ -96,11 +100,11 @@ function isNetworkError(err) {
  *
  * @returns {Boolean}
  */
-export const isExtensionError = (error) =>
+export const isExtensionError = (error: Error) =>
   !!(
     error?.stack &&
     ['chrome-extension', 'moz-extension', 'webkit-masked-url'].some(
-      (extension) => error.stack.includes(extension)
+      (extension) => (error as any).stack.includes(extension)
     )
   );
 
@@ -110,7 +114,7 @@ export const isExtensionError = (error) =>
  *
  * @returns {Boolean}
  */
-export const filterInvalidError = (error) => {
+export const filterInvalidError = (error: Error): boolean => {
   try {
     const isInvalid = [isExtensionError].reduce(
       (isInvalidError, fn) => (!isInvalidError ? fn(error) : isInvalidError),

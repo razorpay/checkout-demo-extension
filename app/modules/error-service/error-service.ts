@@ -9,7 +9,12 @@ import Interface from 'common/interface';
 import { ErrorTracker } from './analytics/events';
 import { EventsV2 } from 'analytics-v2';
 import { IS_PROD } from 'common/constants';
-
+import type {
+  Error,
+  TrackerTriggered,
+  ErrorParam,
+  CaptureErrorOptions,
+} from 'error-service/types';
 /**
  * @param {String|Error|Object} error -
  * @param {Object} options
@@ -19,8 +24,12 @@ import { IS_PROD } from 'common/constants';
  * of the reported error
  */
 export const capture = (
-  error,
-  { analytics, severity = SEVERITY_LEVELS.S1, unhandled = false }
+  error: ErrorParam,
+  {
+    analytics,
+    severity = SEVERITY_LEVELS.S1,
+    unhandled = false,
+  }: CaptureErrorOptions
 ) => {
   try {
     const { event, data, immediately = true } = analytics || {};
@@ -31,7 +40,7 @@ export const capture = (
      */
     if (
       (Track.props.library !== 'razorpayjs' && !IS_PROD) ||
-      filterInvalidError(error)
+      filterInvalidError(error as Error)
     ) {
       return;
     }
@@ -43,6 +52,7 @@ export const capture = (
     if (severity === SEVERITY_LEVELS.S0 || severity === SEVERITY_LEVELS.S1) {
       trackAvailabilty('session_errored', severity);
     }
+    const errorObj = constructErrorObject(error, { severity, unhandled });
     Analytics.track(eventName, {
       data: {
         ...(typeof data === 'object' ? data : {}),
@@ -53,7 +63,7 @@ export const capture = (
          * reported. If there is any data getting lost we should
          * look at restructuring how the data is passed
          */
-        error: constructErrorObject(error, { severity, unhandled }),
+        error: errorObj,
       },
 
       /**
@@ -65,9 +75,9 @@ export const capture = (
     });
 
     ErrorTracker.TRIGGERED({
-      error: constructErrorObject(error, { severity, unhandled }),
+      error: errorObj,
       last: EventsV2.getState()?.last,
-    });
+    } as TrackerTriggered);
   } catch (e) {
     // try/catch to ensure `captureError` does not contribute to more
     // errors in global handler
@@ -79,7 +89,7 @@ const ERROR_TRACKING_URLS = [
   'https://checkout-static.razorpay.com',
 ];
 
-export function isUrlApplicableForErrorTracking(url) {
+export function isUrlApplicableForErrorTracking(url: string) {
   return ERROR_TRACKING_URLS.some(function (availableUrl) {
     return url.indexOf(availableUrl) === 0;
   });
@@ -90,7 +100,7 @@ export function startErrorCapturing() {
   Interface.sendMessage('clearMountErrorListener');
   window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
     if (typeof url === 'string' && !isUrlApplicableForErrorTracking(url)) {
-      existingOnError?.(errorMsg, url, lineNumber, column, errorObj, true);
+      existingOnError?.(errorMsg, url, lineNumber, column, errorObj);
       return;
     }
     const error = {
@@ -101,7 +111,7 @@ export function startErrorCapturing() {
       stack: errorObj && errorObj.stack,
     };
 
-    capture(error, {
+    capture(error as ErrorParam, {
       unhandled: true,
       analytics: {
         event: 'js_error',
@@ -109,7 +119,7 @@ export function startErrorCapturing() {
         data: error,
       },
     });
-    existingOnError?.(errorMsg, url, lineNumber, column, errorObj, true);
+    existingOnError?.(errorMsg, url, lineNumber, column, errorObj);
   };
 
   window.addEventListener('unhandledrejection', function (event) {
