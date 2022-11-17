@@ -18,6 +18,7 @@ const KOTAK_BANK_CODE = 'KKBK';
 const ICICI_BANK_DEBIT_CODE = 'ICIC_DC';
 const RBL_BANK_CODE = 'RATN';
 const ONE_CARD_CODE = 'onecard';
+const INDB_DEBIT_CODE = 'INDB_DC';
 
 export const EmiBanksCode = {
   HDFC_BANK_CODE,
@@ -30,6 +31,7 @@ export const EmiBanksCode = {
   KOTAK_BANK_CODE,
   ICICI_BANK_DEBIT_CODE,
   RBL_BANK_CODE,
+  INDB_DEBIT_CODE,
 };
 
 // Constants
@@ -103,6 +105,7 @@ export const banksWithConvenienveFee: string[] = [
   KOTAK_DEBIT_CODE,
   AXIS_BANK_CODE,
   RBL_BANK_CODE,
+  INDB_DEBIT_CODE,
 ];
 
 // Emi providers that support redirect based flow

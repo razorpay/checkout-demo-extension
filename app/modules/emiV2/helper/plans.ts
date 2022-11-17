@@ -38,8 +38,8 @@ import { capture, SEVERITY_LEVELS } from 'error-service';
  * @param {string} bank name of the bank to get processing fee for
  */
 export const getProcessingFeeForEmi = (bank: string): string => {
-  const { RBL_BANK_CODE, KOTAK_DEBIT_CODE } = EmiBanksCode;
-  if ([RBL_BANK_CODE, KOTAK_DEBIT_CODE].includes(bank)) {
+  const { RBL_BANK_CODE, KOTAK_DEBIT_CODE, INDB_DEBIT_CODE } = EmiBanksCode;
+  if ([RBL_BANK_CODE, KOTAK_DEBIT_CODE, INDB_DEBIT_CODE].includes(bank)) {
     return '199';
   }
   return '99';
