@@ -87,10 +87,6 @@
       justify-content: space-between;
       display: flex;
       overflow: hidden;
-
-      :global(.account-tab) {
-        transform: translate(0, 100%);
-      }
     }
   }
 
