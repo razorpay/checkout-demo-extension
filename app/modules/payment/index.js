@@ -157,7 +157,7 @@ function getTrackingData(data) {
   }, {});
 }
 
-function trackNewPayment(data, params, r) {
+function trackNewPayment(data, params, r, returnFunction = false) {
   if (!data) {
     data = {};
   }
@@ -205,25 +205,29 @@ function trackNewPayment(data, params, r) {
     Date.now() - AnalyticsV2State.checkoutInvokedTime
   );
 
-  Analytics.track('submit', {
-    data: {
-      data: trackingData,
-      params: params,
-      count: createdPaymentsCount,
-      flowCode,
-    },
-    r,
-    immediately: true,
-  });
-  try {
-    const instrumentData = getInstrumentDataAfterSubmitClick(data);
-    AnalyticsV2State.selectedInstrumentForPayment = instrumentData;
-
-    PaymentTracker.SUBMIT({
-      block: AnalyticsV2State.selectedBlock,
-      ...instrumentData,
+  function track() {
+    Analytics.track('submit', {
+      data: {
+        data: trackingData,
+        params: params,
+        count: createdPaymentsCount,
+        flowCode,
+      },
+      r,
+      immediately: true,
     });
-  } catch {}
+    try {
+      const instrumentData = getInstrumentDataAfterSubmitClick(data);
+      AnalyticsV2State.selectedInstrumentForPayment = instrumentData;
+
+      PaymentTracker.SUBMIT({
+        block: AnalyticsV2State.selectedBlock,
+        ...instrumentData,
+      });
+    } catch {}
+  }
+
+  return returnFunction ? track : track();
 }
 
 export default function Payment(data, params = {}, r) {
@@ -243,7 +247,12 @@ export default function Payment(data, params = {}, r) {
   this.isExternalGooglePayPayment = external.gpay;
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
-  trackNewPayment(data, params, r);
+  this.trackingFunction = trackNewPayment(
+    data,
+    params,
+    r,
+    Boolean(data['_[checkout_order]'])
+  );
 
   // saving razorpay instance
   this.r = r;
@@ -595,6 +604,16 @@ Payment.prototype = {
       try {
         assertPaymentSuccessMetadata(data);
       } catch (e) {}
+
+      try {
+        if (this.is_checkout_order && this.trackingFunction) {
+          this.trackingFunction();
+          this.trackingFunction = undefined;
+        }
+      } catch (e) {
+        //e
+      }
+
       // Track
       Analytics.track('oncomplete', {
         r: this.r,
