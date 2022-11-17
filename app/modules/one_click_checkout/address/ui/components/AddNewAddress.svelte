@@ -779,7 +779,11 @@
   }
 
   onMount(() => {
-    if (currentView === addressViews.ADD_ADDRESS && $prefilledName) {
+    if (
+      currentView === addressViews.ADD_ADDRESS &&
+      $prefilledName &&
+      !$formData.name
+    ) {
       onUpdate('name', $prefilledName);
     }
 
