@@ -1,4 +1,4 @@
-import { constructErrorObject } from './helpers';
+import { constructErrorObject, filterInvalidError } from './helpers';
 import { SEVERITY_LEVELS } from './models';
 import Analytics, {
   ErrorEvents,
@@ -29,7 +29,10 @@ export const capture = (
      * if its standard checkout library then check for domain
      * mode check is already available in tracker & availability module
      */
-    if (Track.props.library !== 'razorpayjs' && !IS_PROD) {
+    if (
+      (Track.props.library !== 'razorpayjs' && !IS_PROD) ||
+      filterInvalidError(error)
+    ) {
       return;
     }
     /**

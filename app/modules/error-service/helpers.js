@@ -89,3 +89,36 @@ function isNetworkError(err) {
 
   return errorKeys.every((key) => err.hasOwnProperty(key));
 }
+
+/**
+ * method checks whether the error is from a browser extension.
+ * @param {String} stack
+ *
+ * @returns {Boolean}
+ */
+export const isExtensionError = (error) =>
+  !!(
+    error?.stack &&
+    ['chrome-extension', 'moz-extension', 'webkit-masked-url'].some(
+      (extension) => error.stack.includes(extension)
+    )
+  );
+
+/**
+ * method checks whether the error is valid error.
+ * @param {Object} error
+ *
+ * @returns {Boolean}
+ */
+export const filterInvalidError = (error) => {
+  try {
+    const isInvalid = [isExtensionError].reduce(
+      (isInvalidError, fn) => (!isInvalidError ? fn(error) : isInvalidError),
+      false
+    );
+
+    return isInvalid;
+  } catch (e) {
+    return false;
+  }
+};
