@@ -6,9 +6,12 @@ let toast;
  * Creates a new Toast
  */
 function create(element) {
-  toast = new Toast({
-    target: document.getElementById(`form-${element}`),
-  });
+  const target = document.getElementById(`form-${element}`);
+  if (target) {
+    toast = new Toast({
+      target,
+    });
+  }
 }
 
 /**
@@ -19,7 +22,7 @@ function create(element) {
 export function showToast(options) {
   const { screen } = options || {};
   create(screen);
-  toast.show(options);
+  toast?.show(options);
 }
 
 /**
@@ -33,7 +36,7 @@ export function showToastAfterDelay(options, delay) {
   setTimeout(() => {
     const { screen } = options || {};
     create(screen);
-    toast.show(options);
+    toast?.show(options);
   }, delay);
 }
 
@@ -43,6 +46,7 @@ export function hideToast() {
   }
   if (toast.isVisible()) {
     toast.hide();
+    toast = null;
   }
 }
 
