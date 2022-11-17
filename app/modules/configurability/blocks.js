@@ -3,6 +3,7 @@ import {
   createInstrument,
 } from './instruments';
 import { getUniqueValues } from 'utils/array';
+import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 
 /**
  *
@@ -46,20 +47,29 @@ function _createBlock(code, config = {}, validate = false) {
     _type: 'block',
   };
 
-  let { instruments, name } = config;
+  try {
+    let { instruments, name } = config;
 
-  if (instruments) {
-    instruments = removeDuplicateInstruments(instruments);
-    block.instruments = instruments
-      .map(validate ? validateKeysAndCreateInstrument : createInstrument)
-      .filter(Boolean);
+    if (instruments) {
+      instruments = removeDuplicateInstruments(instruments);
+      block.instruments = instruments
+        .map(validate ? validateKeysAndCreateInstrument : createInstrument)
+        .filter(Boolean);
+    }
+
+    if (name) {
+      block.title = name;
+    }
+
+    return block;
+  } catch (error) {
+    captureError(error, {
+      severity: SEVERITY_LEVELS.S2,
+      analytics: {
+        data: { type: 'invalid_config' },
+      },
+    });
   }
-
-  if (name) {
-    block.title = name;
-  }
-
-  return block;
 }
 
 /**
