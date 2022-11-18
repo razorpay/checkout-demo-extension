@@ -1059,7 +1059,7 @@ Session.prototype = {
               self.errorHandler(response);
             }
             // reset storage post polling success/failure
-            this.setParamsInStorage(params);
+            self.setParamsInStorage(params);
           },
         }).till(function (response) {
           return response && response.status;
