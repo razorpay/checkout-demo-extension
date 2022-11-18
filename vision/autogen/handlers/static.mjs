@@ -1,3 +1,5 @@
+import path from 'path';
+
 export class File {
   constructor(path) {
     this.path = path;
@@ -28,8 +30,8 @@ export function* serveCdn({ params }) {
   }
 }
 
-export function serveFile(path) {
+export function serveFile(pathToFile) {
   try {
-    return new File(path);
+    return new File(path.resolve(pathToFile));
   } catch (e) {}
 }

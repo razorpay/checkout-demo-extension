@@ -196,30 +196,40 @@ export async function report() {
       refs: referenceMap.newRefs,
     }
   );
-  const missing = referenceMap.count - matched - notMatched;
+  const missing = referenceMap.count - matched.length - notMatched.length;
+
   console.table({
     'Screenshots Matched': {
-      count: matched,
-      result: matched ? '✅' : '❌',
+      count: matched.length,
+      result: matched.length ? '✅' : '❌',
     },
     'Screenshots Not Matching': {
-      count: notMatched,
-      result: notMatched ? '❌' : '✅',
+      count: notMatched.length,
+      result: notMatched.length ? '❌' : '✅',
     },
     'Screenshots Missing': {
       count: missing,
       result: missing ? '⚠️' : '✅',
     },
     'New Screenshots': {
-      count: newShots,
-      result: newShots ? '⚠️' : '✅',
+      count: newShots.length,
+      result: newShots.length ? '⚠️' : '✅',
     },
   });
 
-  const testSuccess = !Boolean(missing + notMatched + newShots);
+  const testSuccess = !Boolean(
+    missing + notMatched.length + newShots.length
+  );
   console.log(`Test ${testSuccess ? 'was successful' : 'failed'}`);
 
+  map.matches = {
+    matched,
+    notMatched,
+    newShots,
+  };
+
   await fs.writeFile(getMapPath(TEMP_DIR), JSON.stringify(map));
+
   if (RECORD_MODE) {
     execSync(
       `rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}*-diff.png`
@@ -236,20 +246,20 @@ export async function report() {
 }
 
 function mapFromReference(referenceMap, map) {
-  let notMatched = 0;
-  let matched = 0;
-  let newShots = 0;
+  let notMatched = [];
+  let matched = [];
+  let newShots = [];
 
   referenceMap.snaps.forEach((snap) => {
     if (!snap.newKey) {
       return;
     }
     if (snap.match) {
-      matched++;
+      matched.push(snap.newKey);
     } else if (snap.key) {
-      notMatched++;
+      notMatched.push(snap.key);
     } else {
-      newShots++;
+      newShots.push(snap.newKey);
     }
 
     const newSnap = {
@@ -262,9 +272,9 @@ function mapFromReference(referenceMap, map) {
       newSnap.snaps = [];
     }
     const subresult = mapFromReference(snap, newSnap);
-    notMatched += subresult.notMatched;
-    matched += subresult.matched;
-    newShots += subresult.newShots;
+    notMatched = notMatched.concat(subresult.notMatched);
+    matched = matched.concat(subresult.matched);
+    newShots = newShots.concat(subresult.newShots);
   });
 
   return {
