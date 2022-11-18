@@ -1,4 +1,3 @@
-import fs from 'fs/promises';
 const { createHash } = await import('node:crypto');
 
 export const md5 = (data) => createHash('md5').update(data).digest('hex');
@@ -11,13 +10,11 @@ export const JsonResponse = (o) => ({
   },
 });
 
-export const JsonpResponse = (o) => ({
-  status: 200,
-  body: o,
-  headers: {
-    'content-type': 'text/javascript',
-  },
-});
+export const JsonpResponse = (request, data) => {
+  const cbName = new URLSearchParams(request.url()).get('callback');
+
+  return `/**/${cbName}(${JSON.stringify(data)});`;
+};
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

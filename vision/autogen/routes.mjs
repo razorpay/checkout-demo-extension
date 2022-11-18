@@ -4,6 +4,7 @@ import handlePreferences from './handlers/preferences.mjs';
 import handlePersonalisation from './handlers/personalisation.mjs';
 import handleCountries from './handlers/countries.mjs';
 import handleStatus from './handlers/status.mjs';
+import handleCardIIN from './handlers/iin.mjs';
 import {
   serveCheckout,
   servePublicPage,
@@ -45,6 +46,10 @@ apiRouter.get('/v1/personalisation', function* () {
   yield { preferred_methods: {} };
 });
 
+apiRouter.post('/v1/otp/create', function* () {
+  yield { success: true };
+});
+
 apiRouter.post('/v1/otp/verify', function* () {
   yield { success: 1, addresses: [] };
 });
@@ -57,3 +62,9 @@ apiRouter.post('/v1/payments/validate/account', function* ({ request }) {
 apiRouter.post('/v1/payments/create/ajax', payment.createAjax);
 apiRouter.post('/v1/payments/create/checkout', payment.createCheckout);
 apiRouter.get('/v1/payments/:payment_id/status/(.)*', handleStatus);
+
+apiRouter.get('/v1/payment/iin', handleCardIIN);
+
+apiRouter.get('/v1/customers/status/:contact_no', function* () {
+  yield { saved: false };
+});
