@@ -1,6 +1,4 @@
-import Analytics from 'analytics';
 import * as Bridge from 'bridge';
-import fetch from 'utils/fetch';
 import Razorpay, {
   makePrefParams,
   validateOverrides,
@@ -44,7 +42,6 @@ import {
   additionalSupportedPaymentApps,
 } from 'common/webPaymentsApi';
 
-import { isStandardCheckout } from 'common/helper';
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
@@ -63,6 +60,11 @@ import {
 } from 'analytics-v2';
 import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
 import { isUpiUxExperimentSupported } from 'checkoutstore/native';
+import { fetchPreferencesLite } from 'checkoutframe/preferences_lite';
+import {
+  markRelevantPreferencesPayload,
+  setParamsForDdosProtection,
+} from 'checkoutframe/utils';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -268,6 +270,11 @@ export const handleMessage = function (message) {
     return;
   }
 
+  if (message.event === 'fetch_preferences_lite') {
+    fetchPreferencesLite(message.extra);
+    return;
+  }
+
   if (message.event === 'close') {
     if (session) {
       session.closeAndDismiss();
@@ -409,26 +416,6 @@ function syncOptionsAndSessionInstance(session, options) {
   Object.keys(updatedOptions).map((optionKey) => {
     session.r.set(optionKey, updatedOptions[optionKey]);
   });
-}
-
-/**
- * Set all the necessary values to fetch, so that these values get
- * appended on every XHR or jsonp request as query param
- * @param {Object} session
- */
-function setParamsForDdosProtection(session) {
-  fetch.setKeylessHeader(session.r.get('keyless_header'));
-
-  const qpmap = ObjectUtils.unflatten(_.getQueryParams());
-
-  if (isStandardCheckout() && qpmap?.captcha_id) {
-    Analytics.setMeta('captcha_id', qpmap.captcha_id);
-  }
-
-  if (isStandardCheckout() && qpmap?.session_token) {
-    global.session_token = qpmap.session_token;
-    Analytics.setMeta('session_token_available', true);
-  }
 }
 
 function processPreferences(preferences, session) {
@@ -673,19 +660,6 @@ function setSessionPreferences(session, preferences) {
 
     const retryErrorHandler = !!qpmap.error || !!params.error;
     bindI18nEvents(retryErrorHandler, qpmap);
-  });
-}
-
-function markRelevantPreferencesPayload(prefData) {
-  const preferencesPayloadToBeMarked = [
-    'subscription_id',
-    'order_id',
-    'key_id',
-  ];
-  preferencesPayloadToBeMarked.forEach((prop) => {
-    if (prefData[prop]) {
-      Events.setMeta(prop, prefData[prop]);
-    }
   });
 }
 

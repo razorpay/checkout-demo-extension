@@ -23,6 +23,7 @@ import { appendLoader } from 'common/loader';
 import { sendToAll, setInitialContext } from 'checkoutjs/analytics';
 import { cleanupFreezeCheck } from './freeze';
 import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+import { uuid4 } from 'common/uuid';
 
 const { screen, scrollTo } = global;
 
@@ -358,7 +359,7 @@ CheckoutFrame.prototype = {
     if (typeof response !== 'object') {
       // TODO roll
     }
-    response.id = this.rzp.id;
+    response.id = this.rzp?.id || uuid4();
     response = JSON.stringify(response);
     this.el?.contentWindow?.postMessage(response, '*');
   },
