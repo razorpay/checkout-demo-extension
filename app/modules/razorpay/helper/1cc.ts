@@ -70,3 +70,9 @@ export const isCustomerConsentFeatureEnabled = () =>
 export const disableEmailAsCookie = () => {
   return getPreferences('features.one_cc_disableemailcookie') || false;
 };
+
+export const getShopifyCheckoutId = () => {
+  return new Promise((resolve) => {
+    resolve('id');
+  });
+};

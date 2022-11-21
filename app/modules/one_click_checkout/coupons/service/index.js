@@ -1,7 +1,8 @@
 import fetch from 'utils/fetch';
 import { Events } from 'analytics';
 import { timer } from 'utils/timer';
-import { getOrderId } from 'razorpay';
+import { getOrderId } from 'razorpay/helper/order';
+import { getShopifyCheckoutId } from 'razorpay/helper/1cc';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
@@ -126,6 +127,44 @@ export function removeCoupon(code) {
           time: getDuration(),
         });
         resolve(response);
+      },
+    });
+  });
+}
+
+export async function getCouponsForShopify() {
+  if (inProgress) {
+    return pendingPromise;
+  }
+  const shopifyCheckoutId = await getShopifyCheckoutId();
+  const payload = getContactPayload();
+
+  const getDuration = timer();
+  Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
+  pendingPromise = new Promise((resolve, reject) => {
+    const key = payload.contact || 'default';
+    const cachedValue = getCache(key);
+
+    if (cachedValue) {
+      resolve(cachedValue);
+      return;
+    }
+
+    inProgress = true;
+    fetch({
+      url: makeAuthUrl(`magic/checkout/shopify/${shopifyCheckoutId}/coupons`),
+      callback: (res) => {
+        inProgress = false;
+        Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
+          success: res.ok ? true : false,
+          duration: getDuration(),
+        });
+        if (Array.isArray(res.promotions)) {
+          setCache(key, res.promotions);
+          resolve(res.promotions);
+        } else {
+          reject(res);
+        }
       },
     });
   });

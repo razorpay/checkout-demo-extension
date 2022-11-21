@@ -24,8 +24,7 @@ export function isStandardCheckout() {
  * @returns {string} - url with session token attached as query param
  */
 function makeSessionTokenUrl(path = '', session_token) {
-  const url =
-    RazorpayConfig.api + RazorpayConfig.version + 'standard_checkout/' + path;
+  const url = `${RazorpayConfig.api}${RazorpayConfig.version}standard_checkout/${path}`;
 
   return appendParamsToUrl(url, {
     session_token,
@@ -51,7 +50,7 @@ export function makeUrl(path = '', applySessionFlow = true) {
     return makeSessionTokenUrl(path, global.session_token);
   }
 
-  return RazorpayConfig.api + RazorpayConfig.version + path;
+  return `${RazorpayConfig.api}${RazorpayConfig.version}${path}`;
 }
 
 export const backendEntityIds = [
