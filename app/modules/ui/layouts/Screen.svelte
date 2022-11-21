@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
-  import { isRedesignV15 } from 'razorpay';
+  import { isOneClickCheckout, isRedesignV15 } from 'razorpay';
   import { onScrollToggleHeader } from 'one_click_checkout/header/helper';
   import { screenStore } from 'checkoutstore';
 
@@ -55,12 +55,12 @@
 
 <div
   class="screen screen-comp"
-  class:one-cc={isRedesignV15()}
+  class:redesign-v15={isRedesignV15()}
   class:bottomShadow
   class:pad
   bind:this={contentRef}
   on:scroll={onScroll}
-  class:show-scroll={$screenStore === ''}
+  class:show-scroll={$screenStore === '' && !isOneClickCheckout()}
 >
   <slot />
   {#if !removeAccountTab}
@@ -90,7 +90,7 @@
     }
   }
 
-  .one-cc {
+  .redesign-v15 {
     scroll-behavior: smooth;
     display: block;
   }
