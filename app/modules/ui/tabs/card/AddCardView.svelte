@@ -72,6 +72,7 @@
     getCardDigits,
     getCardMetadata,
     API_NETWORK_CODES_MAP,
+    getCardType,
   } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
@@ -228,7 +229,7 @@
         getCardFeatures($cardNumber)
           .then((data) => {
             if (data?.network) {
-              $cardNetwork = data.network;
+              $cardNetwork = getCardType($cardNumber);
             }
             const { emi } = data.flows || {};
             if (!emi) {

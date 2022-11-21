@@ -166,7 +166,9 @@ export const getCardType = (cardNumber = '') => {
   const iinCardData = getCardMetadata(cardNumber);
   /** use iin response over regex */
   if (iinCardData && typeof iinCardData.network === 'string') {
-    const network = iinCardData.network.toLowerCase();
+    const network =
+      findCodeByNetworkName(iinCardData.network) ||
+      iinCardData.network.toLowerCase();
     if (validNetworks[network]) {
       return network;
     }
@@ -314,8 +316,6 @@ export function updateCardIINMetadata(iin, data = {}) {
   } else {
     cache.network = getCardType(iin);
   }
-  // updating data
-  data.network = cache.network;
   if (data.type) {
     cache.type = data.type;
   }
