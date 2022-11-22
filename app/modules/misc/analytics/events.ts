@@ -1,5 +1,5 @@
 import { API, BEHAV, INTEGRATION, RENDER } from 'analytics-types';
-import { createTrackMethodForModule } from 'analytics-v2';
+import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type {
   Block,
   Instrument,
@@ -174,12 +174,15 @@ interface P13NEventMap {
 /*  adding different trackers for Misc , Retry and P13N for now becase we don't want to fire Retry
  and P13N as not verified by analytics team , will merge into one once verified by them */
 
-export const MiscTracker = createTrackMethodForModule<MiscEventMap>(MiscEvents);
+export const MiscTracker = createTrackMethodForModule<MiscEventMap>(
+  MiscEvents,
+  { funnel: FUNNEL_NAMES.HIGH_LEVEL }
+);
 export const RetryTracker = createTrackMethodForModule<RetryEventMap>(
   RetryEvents,
-  { skipEvents: true }
+  { skipEvents: true, funnel: FUNNEL_NAMES.HIGH_LEVEL }
 );
 export const P13NTracker = createTrackMethodForModule<P13NEventMap>(
   P13NEvents,
-  { skipEvents: true }
+  { skipEvents: true, funnel: FUNNEL_NAMES.HIGH_LEVEL }
 );

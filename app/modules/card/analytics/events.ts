@@ -1,5 +1,5 @@
 import { API, BEHAV, RENDER } from 'analytics-types';
-import { createTrackMethodForModule } from 'analytics-v2';
+import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type { Instrument, Method } from 'analytics-v2/types';
 
 export const CardsEvents = {
@@ -172,5 +172,5 @@ interface CardsEventMap {
 
 export const CardsTracker = createTrackMethodForModule<CardsEventMap>(
   CardsEvents,
-  { skipEvents: true }
+  { skipEvents: true, funnel: FUNNEL_NAMES.CARD }
 );

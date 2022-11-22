@@ -50,7 +50,7 @@ export function setContext(
 function getTrackMethod<
   N,
   K extends Record<keyof N, string | { name: string; type: string }>
->(events: K, eventID: keyof K, skipEvents: boolean) {
+>(events: K, eventID: keyof K, skipEvents: boolean, funnel: string) {
   return function (
     ...props: N[keyof N] extends undefined
       ? [undefined?, PayloadOptions?]
@@ -61,7 +61,7 @@ function getTrackMethod<
     }
 
     const event = events[eventID];
-    const payload = props[0];
+    const payload = props[0] ? { ...props[0], funnel } : { funnel };
     const options = props[1];
 
     if (typeof event === 'string') {
@@ -89,7 +89,7 @@ export function createTrackMethodForModule<
   K extends object = Record<keyof N, string | { name: string; type: string }>
 >(
   events: K,
-  { skipEvents } = { skipEvents: false }
+  { skipEvents = false, funnel = '' } = {}
 ): {
   [T in keyof N]: (
     ...props: N[T] extends undefined ? [undefined?] : [N[T]]
@@ -98,7 +98,7 @@ export function createTrackMethodForModule<
   const eventIDs = Object.keys(events) as (keyof K)[];
   const returnObj: any = {};
   eventIDs.forEach((eventID: keyof K) => {
-    returnObj[eventID] = getTrackMethod(events, eventID, skipEvents);
+    returnObj[eventID] = getTrackMethod(events, eventID, skipEvents, funnel);
   });
   return returnObj;
 }

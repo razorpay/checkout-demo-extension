@@ -72,3 +72,13 @@ export enum INTEGRATION_PLATFORM {
   PLUGIN = 'plugin',
   SDK = 'sdk',
 }
+
+export enum FUNNEL_NAMES {
+  HIGH_LEVEL = 'high-level',
+  CARD = 'card',
+  WALLET = 'wallet',
+  NETBANKING = 'netbanking',
+  EMI = 'emi',
+  PAYLATER = 'paylater',
+  UPI = 'upi',
+}

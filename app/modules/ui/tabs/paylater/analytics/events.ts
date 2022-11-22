@@ -1,5 +1,5 @@
 import { BEHAV, RENDER } from 'analytics-types';
-import { createTrackMethodForModule } from 'analytics-v2';
+import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type { Instrument } from 'analytics-v2/types';
 
 export const PaylaterEvents = {
@@ -45,5 +45,5 @@ interface PaylaterEventMap {
 
 export const PaylaterTracker = createTrackMethodForModule<PaylaterEventMap>(
   PaylaterEvents,
-  { skipEvents: true }
+  { skipEvents: true, funnel: FUNNEL_NAMES.PAYLATER }
 );

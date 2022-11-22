@@ -1,5 +1,5 @@
 import { BEHAV, API } from 'analytics-types';
-import { createTrackMethodForModule } from 'analytics-v2';
+import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type { Instrument, Method } from 'analytics-v2/types';
 
 export const PaymentEvents = {
@@ -32,5 +32,7 @@ interface PaymentEventMap {
   };
 }
 
-export const PaymentTracker =
-  createTrackMethodForModule<PaymentEventMap>(PaymentEvents);
+export const PaymentTracker = createTrackMethodForModule<PaymentEventMap>(
+  PaymentEvents,
+  { funnel: FUNNEL_NAMES.HIGH_LEVEL }
+);

@@ -1,5 +1,5 @@
 import { BEHAV, RENDER, API } from 'analytics-types';
-import { createTrackMethodForModule } from 'analytics-v2';
+import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type { Instrument } from 'analytics-v2/types';
 
 // TODO: During initialization, the event should accept the defaultData for payload.
@@ -103,4 +103,5 @@ interface UPIEventMap {
 
 export const UPITracker = createTrackMethodForModule<UPIEventMap>(UPIEvents, {
   skipEvents: true,
+  funnel: FUNNEL_NAMES.UPI,
 });
