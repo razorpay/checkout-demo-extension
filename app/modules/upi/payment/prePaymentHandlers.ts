@@ -14,6 +14,12 @@ import { getSession } from 'sessionmanager';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'upi/constants';
 import { reward } from 'checkoutstore/rewards';
 
+const enum GooglePayWrapperVersion {
+  ONE = '1',
+  TWO = '2',
+  BOTH = 'both',
+}
+
 /**
  * Pass by reference
  * @param {Partial<UPI.UPIPaymentPayload>} data
@@ -112,8 +118,8 @@ const googlePayRequestProcessor = (
     data.upi_app === GOOGLE_PAY_PACKAGE_NAME &&
     hasGooglePaySdk &&
     isGpayMergedFlowEnabled() &&
-    (googlePayWrapperVersion === Common.GooglePayWrapperVersion.TWO ||
-      googlePayWrapperVersion === Common.GooglePayWrapperVersion.BOTH)
+    (googlePayWrapperVersion === GooglePayWrapperVersion.TWO ||
+      googlePayWrapperVersion === GooglePayWrapperVersion.BOTH)
   ) {
     data.method = 'app';
     data.provider = 'google_pay';
@@ -131,8 +137,8 @@ const googlePayRequestProcessor = (
     data.method === 'upi' &&
     data.upi_app === GOOGLE_PAY_PACKAGE_NAME &&
     hasGooglePaySdk &&
-    (googlePayWrapperVersion === Common.GooglePayWrapperVersion.ONE ||
-      (googlePayWrapperVersion === Common.GooglePayWrapperVersion.BOTH &&
+    (googlePayWrapperVersion === GooglePayWrapperVersion.ONE ||
+      (googlePayWrapperVersion === GooglePayWrapperVersion.BOTH &&
         !isGpayMergedFlowEnabled()))
   ) {
     params.external.gpay = true;

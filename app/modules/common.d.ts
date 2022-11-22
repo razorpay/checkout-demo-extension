@@ -6,12 +6,6 @@ declare namespace Common {
     [key in T]: V;
   };
 
-  const enum GooglePayWrapperVersion {
-    ONE = '1',
-    TWO = '2',
-    BOTH = 'both',
-  }
-
   type JSFunction<
     ReturnType = any,
     DataType = any,
