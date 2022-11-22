@@ -1,17 +1,14 @@
-/**
- * @typedef {Object} SvelteComponent
- *
- * @property {Object} $$
- *   @property {Array} ctx
- *   @property {Object} props
- */
+import type { SvelteComponent } from 'svelte';
 
 /***
  * Extract prop from svelte component instance
  * @param {SvelteComponent} svelteComponent
  * @param {String} selectedProp
  */
-export const getComponentProps = (svelteComponent, selectedProp) => {
+export const getComponentProps = (
+  svelteComponent: SvelteComponent,
+  selectedProp: string
+) => {
   const index = svelteComponent?.$$?.props[selectedProp];
   if (index >= 0) {
     return svelteComponent.$$?.ctx[index];

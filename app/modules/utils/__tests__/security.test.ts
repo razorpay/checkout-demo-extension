@@ -8,8 +8,8 @@ describe('HTML Sanitizer', () => {
   });
 
   test('does not sanitize non string value', () => {
-    expect(sanitizeHTML(null)).toBe(null);
+    expect(sanitizeHTML(null as any)).toBe(null);
 
-    expect(sanitizeHTML(false)).toBe(false);
+    expect(sanitizeHTML(false as any)).toBe(false);
   });
 });

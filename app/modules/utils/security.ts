@@ -6,12 +6,12 @@
  * @param  {String} str  The user-submitted string
  * @return {String} str  The sanitized string
  */
-export function sanitizeHTML(str) {
+export function sanitizeHTML(str: string) {
   if (typeof str !== 'string') {
     return str;
   }
 
   return str.replace(/[^-\w. ]/gi, function (c) {
-    return '&#' + c.charCodeAt(0) + ';';
+    return `&#${c.charCodeAt(0)};`;
   });
 }
