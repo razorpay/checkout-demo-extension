@@ -117,7 +117,13 @@ function autoScrollHeaderIfLandscape() {
 
   if (isLandscape) {
     if (UserAgent.iOS) {
-      setTimeout(() => ownerWindow.scroll(0, 100));
+      setTimeout(() => {
+        try {
+          ownerWindow.scroll(0, 100);
+        } catch (error) {
+          // no-op
+        }
+      });
     }
     if (UserAgent.android) {
       setTimeout(() => global.scroll(0, 100));
