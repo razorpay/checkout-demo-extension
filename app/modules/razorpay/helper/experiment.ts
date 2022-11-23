@@ -9,7 +9,8 @@ export function reusePaymentIdExperimentEnabled() {
 }
 
 export function isRemoveDefaultTokenizationSupported() {
-  return !!getPreferences(
+  const tokenization_flag = !!getPreferences(
     'experiments.remove_default_tokenization_flag'
-  ) ;
+  );
+  return tokenization_flag && isRedesignV15();
 }
