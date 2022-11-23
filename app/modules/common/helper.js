@@ -1,8 +1,10 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import { appendParamsToUrl } from 'common/form';
 import { Track } from 'analytics';
-import { getOption } from 'razorpay';
+import { getOption, getPreferences } from 'razorpay';
 import { getUPIAppDataFromHandle } from './upi';
+import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
+import { COUNTRY_CONFIG } from 'common/countrycodes';
 
 export function isStandardCheckout() {
   return ['checkoutjs', 'hosted'].includes(Track.props.library);
@@ -131,4 +133,18 @@ export function getInstrumentsWithOrder(list, method) {
   } catch {
     return {};
   }
+}
+
+export function getDefaultCountryDialCodeInfo() {
+  let countryCode = INDIA_COUNTRY_CODE;
+  let countryISOCode = INDIA_COUNTRY_ISO_CODE;
+
+  const merchantCountryISO = getPreferences('merchant_country');
+  if (merchantCountryISO) {
+    const countryDetails = COUNTRY_CONFIG[merchantCountryISO];
+    countryCode = '+' + countryDetails.dial_code;
+    countryISOCode = merchantCountryISO;
+  }
+
+  return { countryCode, countryISOCode };
 }

@@ -39,10 +39,7 @@ import {
 import { INDIAN_CONTACT_PATTERN, PHONE_PATTERN } from 'common/constants';
 import { INDIA_COUNTRY_CODE, INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
-import {
-  COUNTRY_POSTALS_MAP,
-  INDIAN_PINCODE_LENGTH,
-} from 'common/countrycodes';
+import { COUNTRY_CONFIG, INDIAN_PINCODE_LENGTH } from 'common/countrycodes';
 import {
   views as addressViews,
   ENG_LANG_REGEX_PATTERN,
@@ -133,7 +130,7 @@ export const validateInputField = (value, formInput, selectedCountryIso) => {
     } else if (formInput.id === 'city' || formInput.id === 'state') {
       return CITY_STATE_ERROR_LABEL;
     } else if (formInput.id === 'zipcode') {
-      if (!COUNTRY_POSTALS_MAP[selectedCountryIso?.toUpperCase()]?.pattern) {
+      if (!COUNTRY_CONFIG[selectedCountryIso?.toUpperCase()]?.pattern) {
         return;
       }
       return selectedCountryIso?.toUpperCase() === INDIA_COUNTRY_ISO_CODE &&

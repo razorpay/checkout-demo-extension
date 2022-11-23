@@ -559,6 +559,8 @@ export interface PreferencesObject {
   };
   subscription?: any; // TODO
   line_items_total: number; // TODO confirm
+  merchant_currency: string;
+  merchant_country: string;
 }
 
 export type Preferences = {

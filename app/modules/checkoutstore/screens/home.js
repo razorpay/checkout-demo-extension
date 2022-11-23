@@ -5,7 +5,6 @@ import {
   CONTACT_REGEX,
   EMAIL_REGEX,
   INDIA_COUNTRY_CODE,
-  INDIA_COUNTRY_ISO_CODE,
   US_COUNTRY_ISO_CODE,
 } from 'common/constants';
 import {
@@ -14,6 +13,7 @@ import {
 } from 'configurability/instruments';
 import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 import { findCountryCode } from 'common/countrycodes';
+import { getDefaultCountryDialCodeInfo } from 'common/helper';
 
 export const getCustomerDetails = () => {
   const data = {
@@ -98,8 +98,12 @@ export function setContact(value) {
     country.set(`+${parsedContact.code}`);
     countryISOCode.set(getCountryISOCode(parsedContact.code));
   } else {
-    country.set(INDIA_COUNTRY_CODE);
-    countryISOCode.set(INDIA_COUNTRY_ISO_CODE);
+    // try/catch added to avoid breakage, no special reason
+    try {
+      const contactInfo = getDefaultCountryDialCodeInfo();
+      country.set(contactInfo.countryCode);
+      countryISOCode.set(contactInfo.countryISOCode);
+    } catch (error) {}
   }
 
   phone.set(parsedContact.phone);

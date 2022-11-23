@@ -3,7 +3,7 @@ import { get as storeGetter } from 'svelte/store';
 import { selectedCountryISO as selectedShippingCountryISO } from 'one_click_checkout/address/shipping_address/store';
 import { selectedCountryISO as selectedBillingCountryISO } from 'one_click_checkout/address/billing_address/store';
 import { getDeviceId } from 'fingerprint';
-import { COUNTRY_POSTALS_MAP, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
+import { COUNTRY_CONFIG, COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 import { removeTrailingCommas } from 'one_click_checkout/common/utils';
 import { views as addressViews } from 'one_click_checkout/address/constants';
 import { HOME, OFFICE, OTHERS } from 'one_click_checkout/address/i18n/labels';
@@ -116,7 +116,7 @@ export const formatApiAddress = (payload, type = 'shipping_address') => {
  * returns the country name from COUNTRY POSTAL CODE LIST
  */
 const getCountryName = (countryISO) => {
-  const rows = Object.entries(COUNTRY_POSTALS_MAP);
+  const rows = Object.entries(COUNTRY_CONFIG);
   for (const [iso, countryInfo] of rows) {
     if (countryISO && countryISO.toUpperCase() === iso) {
       return countryInfo.name;
@@ -137,7 +137,7 @@ export const formatAddressToFormData = (
   let countryName = '';
   let countryCode = '';
   if (countryPostalCode) {
-    countryName = COUNTRY_POSTALS_MAP[countryPostalCode.toUpperCase()].name;
+    countryName = COUNTRY_CONFIG[countryPostalCode.toUpperCase()].name;
     countryCode = `+${COUNTRY_TO_CODE_MAP[countryPostalCode.toUpperCase()]}`;
   }
 

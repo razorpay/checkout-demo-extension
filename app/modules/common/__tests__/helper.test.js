@@ -1,5 +1,15 @@
-import { makeUrl, getInstrumentsWithOrder } from 'common/helper';
+import {
+  makeUrl,
+  getInstrumentsWithOrder,
+  getDefaultCountryDialCodeInfo,
+} from 'common/helper';
 import { Track } from 'analytics';
+import { getPreferences } from 'razorpay';
+
+jest.mock('razorpay', () => ({
+  get: jest.fn(),
+  getPreferences: jest.fn(),
+}));
 
 describe('Make Url', () => {
   it('should not make session token url for non standard checkout', function () {
@@ -190,5 +200,21 @@ describe('test getInstrumentsWithOrder utility', () => {
       1: { name: 'PhonePe', order: 1 },
     };
     expect(getInstrumentsWithOrder(data, 'upi')).toStrictEqual(expectedResult);
+  });
+});
+
+describe('prepopulate dial code in contact dropdown', () => {
+  it('for malaysian merchants', function () {
+    getPreferences.mockReturnValueOnce('MY');
+    const countryDetails = getDefaultCountryDialCodeInfo();
+    expect(countryDetails.countryCode).toBe('+60');
+    expect(countryDetails.countryISOCode).toBe('MY');
+  });
+
+  it('for indian merchants', function () {
+    getPreferences.mockReturnValueOnce('IN');
+    const countryDetails = getDefaultCountryDialCodeInfo();
+    expect(countryDetails.countryCode).toBe('+91');
+    expect(countryDetails.countryISOCode).toBe('IN');
   });
 });

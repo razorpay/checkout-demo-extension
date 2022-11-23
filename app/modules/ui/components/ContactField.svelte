@@ -28,11 +28,12 @@
 
   import { t } from 'svelte-i18n';
 
-  import { isRedesignV15 } from 'razorpay';
+  import { isRedesignV15, getPreferences } from 'razorpay';
   import { isContactReadOnly } from 'checkoutframe/customer';
   import { isContactValid } from 'one_click_checkout/common/details/store';
   import autotest from 'autotest';
   import { getIndErrLabel } from 'one_click_checkout/helper';
+  import { COUNTRY_CONFIG } from 'common/countrycodes';
 
   // Refs
   let countryField;
@@ -130,10 +131,18 @@
   }
 
   function validateContact(country, phone) {
+    const merchantCountryCode = getPreferences('merchant_country');
     if (country === INDIA_COUNTRY_CODE) {
       return !INDIAN_CONTACT_REGEX_WITH_ZERO.test(phone)
         ? $t(getIndErrLabel(phone))
         : null;
+    } else if (merchantCountryCode) {
+      const countryDetails = COUNTRY_CONFIG[merchantCountryCode];
+      const regexPattern = countryDetails.phone_number_regex;
+      if (regexPattern) {
+        const phoneNumberRegex = new RegExp(regexPattern);
+        return !phoneNumberRegex.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
+      }
     }
     return !CONTACT_REGEX.test(phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }

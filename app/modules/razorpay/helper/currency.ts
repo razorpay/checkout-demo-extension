@@ -3,6 +3,7 @@ import { entityWithAmount } from '../constant';
 import { getOption, getPreferences } from './base';
 import { hasFeature } from './preferences';
 
+const i18nRegions = ['MY', 'IN'];
 /** currency related */
 export const getCurrency = (): string => {
   const entityWithAmountData =
@@ -12,8 +13,21 @@ export const getCurrency = (): string => {
   return entityWithAmountData?.currency || getOption('currency');
 };
 
+/**
+ * We are updating isInternational() as we expand to regions outside India,
+ * now we will treat payment as international when:
+ * 1) merchant currency and payment currency mismatch
+ * 2) if merchant is from outside of supported regions
+ */
 export function isInternational() {
-  return getOption('currency') !== 'INR';
+  const merchantBaseCurrency = getPreferences('merchant_currency') || 'INR';
+  const merchantCountryCode: string =
+    getPreferences('merchant_country') || 'IN';
+
+  return (
+    getOption('currency') !== merchantBaseCurrency ||
+    !i18nRegions.includes(merchantCountryCode)
+  );
 }
 
 export function isDCCEnabled() {

@@ -102,4 +102,34 @@ describe('Module: countrycodeutil', () => {
 
     expect(formatted).toEqual(expected);
   });
+
+  test('Malaysian: +60132758793', () => {
+    const formatted = findCountryCode('+60132758793');
+    const expected = {
+      phone: '132758793',
+      code: '60',
+    };
+
+    expect(formatted).toEqual(expected);
+  });
+
+  test('Malaysian: 132758793', () => {
+    const formatted = findCountryCode('132758793');
+    const expected = {
+      phone: '132758793',
+      code: '60',
+    };
+
+    expect(formatted).toEqual(expected);
+  });
+
+  test('Malaysian: 0132758793', () => {
+    const formatted = findCountryCode('0132758793');
+    const expected = {
+      phone: '132758793',
+      code: '60',
+    };
+
+    expect(formatted).toEqual(expected);
+  });
 });

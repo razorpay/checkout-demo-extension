@@ -47,7 +47,7 @@
     views as addressViews,
     CITY_STATE_REGEX_PATTERN,
   } from 'one_click_checkout/address/constants';
-  import { COUNTRY_POSTALS_MAP } from 'common/countrycodes';
+  import { COUNTRY_CONFIG } from 'common/countrycodes';
   import {
     CATEGORIES,
     ACTIONS,
@@ -353,15 +353,14 @@
       INPUT_FORM[pinIndex][pinSubIndex].type = 'text';
     }
     $selectedCountryISO = iso?.toLowerCase();
-    if (!COUNTRY_POSTALS_MAP[iso]?.pattern) {
+    if (!COUNTRY_CONFIG[iso]?.pattern) {
       INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = true;
     } else {
       INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = false;
       INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
     }
-    pinPattern = new RegExp(COUNTRY_POSTALS_MAP[iso]?.pattern);
-    INPUT_FORM[pinIndex][pinSubIndex].pattern =
-      COUNTRY_POSTALS_MAP[iso]?.pattern;
+    pinPattern = new RegExp(COUNTRY_CONFIG[iso]?.pattern);
+    INPUT_FORM[pinIndex][pinSubIndex].pattern = COUNTRY_CONFIG[iso]?.pattern;
     if (!INPUT_FORM[pinIndex][pinSubIndex].pattern) {
       INPUT_FORM[pinIndex][pinSubIndex].required = false;
       const pincodeEle = document.getElementById('zipcode').parentNode;

@@ -405,7 +405,9 @@ module.exports = {
       page,
       options,
       preferences,
-      isRedesignV15Enabled: preferences.features.one_click_checkout,
+      isRedesignV15Enabled:
+        preferences.features.one_click_checkout ||
+        preferences?.experiments?.checkout_redesign_v1_5,
       ...computed(options, preferences),
       ...interceptorOptions,
       forceTargetInitialization,

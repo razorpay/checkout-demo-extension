@@ -74,6 +74,10 @@ export const isRedesignV15 = (): boolean => {
       allow = false;
     }
 
+    if (getPreferences('merchant_country') === 'MY') {
+      allow = true;
+    }
+
     return allow;
   } catch (error) {
     return false;
