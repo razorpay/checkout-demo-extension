@@ -5860,7 +5860,7 @@ Session.prototype = {
      * - Ask user to verify phone number if not logged in and wants to save card
      * - Show OTP screen after user agrees to fees
      */
-    let isDomesticCustomer = discreet.storeGetter(Store.isIndianCustomer);
+    const isDomesticCustomer = storeGetter(HomeScreenStore.isIndianCustomer);
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         /**
