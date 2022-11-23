@@ -53,6 +53,7 @@ import {
   android,
   AndroidWebView,
   iOS,
+  iosWebView,
 } from 'common/useragent';
 import { getAgentPayload } from 'common/useragentPayload';
 
@@ -595,6 +596,7 @@ const UPI_METHODS = {
     !isPayout() &&
     !global.CheckoutBridge &&
     !AndroidWebView &&
+    !iosWebView &&
     !isFacebookWebView() &&
     getMerchantMethods().upi_intent &&
     Boolean(getPreferences('methods.upi_type.intent', 1)) &&
