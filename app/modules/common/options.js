@@ -48,6 +48,7 @@ export const RazorpayDefaults = {
 
   // cart used by magic checkout
   cart: {},
+  shopify_cart: {}, // cart.js response from shopify
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

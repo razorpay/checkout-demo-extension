@@ -17,7 +17,10 @@ import RazorpayStore, { setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
-import { create1ccShopifyCheckout } from 'checkoutframe/1cc-shopify';
+import {
+  create1ccShopifyCheckout,
+  createShopifyCheckoutId,
+} from 'checkoutframe/1cc-shopify';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
@@ -379,6 +382,14 @@ export const handleMessage = function (message) {
 
     // NOTE: call this before making any XHR or jsonp call
     setParamsForDdosProtection(session);
+
+    // Create shopify checkout_id when cart is passed instead.
+    if (!ObjectUtils.isEmpty(options.shopify_cart)) {
+      createShopifyCheckoutId(options.shopify_cart, options.key).then(() =>
+        fetchPrefs(session)
+      );
+      return;
+    }
 
     fetchPrefs(session);
   }
