@@ -95,6 +95,7 @@ import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
 import { remember } from 'checkoutstore/screens/card';
 import { showTokenisationBenefitModal } from 'card/helper/card';
+import { getLineItemsTotal } from 'one_click_checkout/cart';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1292,7 +1293,14 @@ Session.prototype = {
     this.setPayLater();
     this.setOtpScreen();
     this.setNach();
-    this.setOffers();
+    // Set offers only when order exists. Order might be populated lazily in case of 1CC
+    if (RazorpayHelper.isOneClickCheckout()) {
+      if (this.preferences.order) {
+        this.setOffers();
+      }
+    } else {
+      this.setOffers();
+    }
     this.setFeeLabel();
     // make bottom the last element
     docUtil
@@ -6631,10 +6639,16 @@ Session.prototype = {
     this.preferences = prefs;
     preferences = prefs;
 
-    if (preferences.order && RazorpayHelper.isOneClickCheckout()) {
-      discreet.ChargesHelper.initializeAndReset(
-        parseInt(preferences.order.line_items_total)
-      );
+    if (RazorpayHelper.isOneClickCheckout()) {
+      if (preferences.order) {
+        if (ObjectUtils.isEmpty(RazorpayHelper.getOption('cart'))) {
+          discreet.ChargesHelper.initializeAndReset(
+            parseInt(preferences.order.line_items_total)
+          );
+        }
+      } else if (!ObjectUtils.isEmpty(RazorpayHelper.getOption('cart'))) {
+        discreet.ChargesHelper.initialize(getLineItemsTotal());
+      }
     }
 
     let customer;

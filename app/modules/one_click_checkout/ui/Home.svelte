@@ -43,6 +43,7 @@
   import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+  import { syncPreferences } from 'one_click_checkout/order/controller';
 
   let topbar;
   let isBackEnabled;
@@ -50,6 +51,7 @@
   let contentRef: HTMLDivElement;
 
   onMount(() => {
+    syncPreferences();
     setLineItems(
       getOption('cart')?.line_items || getMerchantOrder().line_items
     );

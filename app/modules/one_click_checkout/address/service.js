@@ -35,6 +35,7 @@ import {
   UPDATE_ADDRESS_LABEL,
   CHECK_PIN_LABEL,
 } from 'one_click_checkout/loader/i18n/labels';
+import { getLazyOrderId } from 'one_click_checkout/order/controller';
 
 const addressCache = {};
 const addressPromiseCache = {};
@@ -201,7 +202,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
  * @param {String} zipcode
  * @returns Promise address with cod and serviceability info
  */
-export function postServiceability(
+export async function postServiceability(
   addresses,
   onSavedAddress,
   withLoader = true
@@ -213,7 +214,7 @@ export function postServiceability(
     is_saved_address: onSavedAddress,
   });
   Events.TrackMetric(AddressEvents.SHIPPING_INFO_API_INITIATED);
-  const order_id = getOrderId();
+  const order_id = await getLazyOrderId();
 
   const serviceabilityApiTimer = timer();
   const formattedPayload = getServiceabilityPayload(

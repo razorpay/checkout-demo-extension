@@ -10,6 +10,7 @@ import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';
 import { get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
 import { isEmailValid } from 'one_click_checkout/order/validators';
+import { getLazyOrderId } from 'one_click_checkout/order/controller';
 
 let inProgress = false;
 let pendingPromise = null;
@@ -17,7 +18,8 @@ let pendingPromise = null;
  * method to fetch coupons for merchant from backend
  * @returns {Array} a list of coupons for the specific merchant.
  */
-export function getCoupons() {
+export async function getCoupons() {
+  const orderId = await getLazyOrderId();
   // return pending promise to avoid hitting rate limiting
   if (inProgress) {
     return pendingPromise;
@@ -42,7 +44,7 @@ export function getCoupons() {
       url: makeAuthUrl('merchant/coupons'),
       data: {
         ...payload,
-        order_id: getOrderId(),
+        order_id: orderId,
       },
       callback: (response) => {
         inProgress = false;

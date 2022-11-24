@@ -9,6 +9,10 @@ import { resetOrderApiCall } from './service';
 import { resetChargesCoupons } from 'one_click_checkout/coupons/store';
 import { resetAddresses } from 'one_click_checkout/address/derived';
 
+export function initialize(line_items_total) {
+  initializeCharges(line_items_total);
+}
+
 /**
  *
  * @param {number} line_items_total The final amount of order

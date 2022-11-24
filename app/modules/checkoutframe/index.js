@@ -17,10 +17,7 @@ import RazorpayStore, { getOption, setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
-import {
-  create1ccShopifyCheckout,
-  createShopifyCheckoutId,
-} from 'checkoutframe/1cc-shopify';
+import { create1ccShopifyCheckout } from 'checkoutframe/1cc-shopify';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
@@ -71,6 +68,7 @@ import {
   setParamsForDdosProtection,
 } from 'checkoutframe/utils';
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
+import { getShopifyCheckoutId } from './1cc-shopify/controller';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -383,9 +381,17 @@ export const handleMessage = function (message) {
 
     // Create shopify checkout_id when cart is passed instead.
     if (!ObjectUtils.isEmpty(options.shopify_cart)) {
-      createShopifyCheckoutId(options.shopify_cart, options.key).then(() =>
-        fetchPrefs(session)
-      );
+      getShopifyCheckoutId({ body: options.shopify_cart, key_id: options.key })
+        .then(() => fetchPrefs(session))
+        .catch((e) => {
+          Razorpay.sendMessage({
+            event: 'event',
+            data: {
+              event: 'shopify_checkout_creation_failed',
+              error: e,
+            },
+          });
+        });
       return;
     }
 

@@ -9,9 +9,6 @@ import type {
   CreateShopifyCheckoutResponse,
 } from 'checkoutframe/1cc-shopify/interface';
 
-export let SHOPIFY_CHECKOUT_ID: string;
-export let SHOPIFY_CHECKOUT_PROMISE: string;
-
 /**
  * Related to the 1cc shopify flow, where the /checkout call
  * returns preferences after creating order
@@ -51,8 +48,8 @@ export function createShopifyCheckoutId({
 }: {
   body: CreateShopifyCheckoutBody;
   key_id: string;
-}) {
-  const SHOPIFY_CHECKOUT_PROMISE = new Promise((resolve, reject) => {
+}): Promise<CreateShopifyCheckoutResponse | any> {
+  return new Promise((resolve, reject) => {
     const apiTimer = _.timer();
     Analytics.track('create_shopify_checkout:start', {
       type: AnalyticsTypes.METRIC,
@@ -68,12 +65,8 @@ export function createShopifyCheckoutId({
         if (response.status_code !== 200 || response.xhr.status !== 200) {
           reject({ error: response.error });
         }
-
-        const data: CreateShopifyCheckoutResponse = response.data;
-        SHOPIFY_CHECKOUT_ID = data.shopify_checkout_id;
-        resolve(data);
+        resolve(response.data as CreateShopifyCheckoutResponse);
       },
     });
   });
-  return SHOPIFY_CHECKOUT_PROMISE;
 }

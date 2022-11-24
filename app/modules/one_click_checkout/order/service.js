@@ -7,13 +7,17 @@ import { getShopifyCheckoutId } from 'razorpay/helper/1cc';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 
 // Analytics imports
-import { Events } from 'analytics';
+import Analytics, { Events } from 'analytics';
 import {
   PARTIAL_ORDER_UPDATE_START,
   PARTIAL_ORDER_UPDATE_END,
   FETCH_SHOPIFY_ORDER_END,
   FETCH_SHOPIFY_ORDER_START,
 } from 'one_click_checkout/order/analytics';
+import { getSession } from 'sessionmanager';
+import { getPreferencesParams } from 'checkoutframe/utils';
+import { isNonNullObject } from 'utils/object';
+import { appendParamsToUrl } from 'utils/_';
 
 export function updateOrder(payload) {
   const orderId = getOrderId();
@@ -46,20 +50,34 @@ export function updateOrder(payload) {
  * @returns Promise making the api call
  */
 export async function createShopifyOrder() {
+  const session = getSession();
+  const params = getPreferencesParams(session);
   const shopifyCheckoutId = await getShopifyCheckoutId();
+
+  if (isNonNullObject(params)) {
+    params['_[request_index]'] = Analytics.updateRequestIndex('preferences');
+  }
 
   const getDuration = timer();
   Events.TrackMetric(FETCH_SHOPIFY_ORDER_START);
-  return new Promise((resolve) => {
+
+  return new Promise((resolve, reject) => {
     fetch.post({
-      url: makeAuthUrl(`magic/checkout/shopify/${shopifyCheckoutId}/order`),
+      url: appendParamsToUrl(makeAuthUrl(`magic/order/shopify`), params),
+      data: {
+        shopify_checkout_id: shopifyCheckoutId,
+      },
       callback: (res) => {
+        const success = res.status_code === 200 || res.xhr.status === 200;
         Events.TrackMetric(FETCH_SHOPIFY_ORDER_END, {
-          success: res.ok ? true : false,
+          success,
           duration: getDuration(),
         });
-        // res contains both order_id and complete prefs
-        resolve(res);
+        if (success) {
+          resolve(res);
+        } else {
+          reject(res);
+        }
       },
     });
   });

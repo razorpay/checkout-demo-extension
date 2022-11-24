@@ -1,5 +1,8 @@
 import Analytics, { Events } from 'analytics';
+import browserstorage from 'browserstorage';
+import { cookieDisabled } from 'common/constants';
 import { isStandardCheckout } from 'common/helper';
+import { getSdkMetaForRequestPayload, makePrefParams } from 'common/Razorpay';
 import fetch from 'utils/fetch';
 import { isEmpty, unflatten } from 'utils/object';
 import * as _ from 'utils/_';
@@ -37,4 +40,31 @@ export function markRelevantPreferencesPayload(prefData) {
       Events.setMeta(prop, prefData[prop]);
     }
   });
+}
+
+export function getPreferencesParams(razorpayInstance) {
+  const prefData = makePrefParams(razorpayInstance);
+  prefData.personalisation = 1;
+  if (cookieDisabled) {
+    prefData.checkcookie = 0;
+  } else {
+    /* set test cookie
+     * if it is not reflected at backend while fetching prefs, disable
+     * cardsaving */
+    prefData.checkcookie = 1;
+    document.cookie = 'checkcookie=1;path=/';
+  }
+  // TODO: make this a const
+  const CREDExperiment = browserstorage.getItem('cred_offer_experiment');
+  if (CREDExperiment) {
+    prefData.cred_offer_experiment = CREDExperiment;
+  }
+  const sdk_meta = getSdkMetaForRequestPayload();
+  if (sdk_meta) {
+    prefData.sdk_meta = sdk_meta;
+  }
+
+  markRelevantPreferencesPayload(prefData);
+
+  return prefData;
 }
