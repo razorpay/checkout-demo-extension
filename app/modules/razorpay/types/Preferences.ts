@@ -1,4 +1,7 @@
 import type { FollowPath, Paths } from 'types/utils';
+import type English from 'i18n/bundles/en';
+
+type BankName = typeof English.banks.long;
 
 interface Theme {
   color: string;
@@ -27,76 +30,8 @@ interface CardSubtype {
   premium: number;
 }
 
-interface Netbanking {
+interface Netbanking extends BankName {
   [bankCode: string]: string;
-  AUBL: string;
-  AIRP: string;
-  ANDB: string;
-  UTIB: string;
-  BBKM: string;
-  BARB_C: string;
-  BARB_R: string;
-  VIJB: string;
-  BKID: string;
-  MAHB: string;
-  CNRB: string;
-  CSBK: string;
-  CBIN: string;
-  CIUB: string;
-  COSB: string;
-  DCBL: string;
-  DEUT: string;
-  DBSS: string;
-  DLXB: string;
-  ESFB: string;
-  FDRL: string;
-  FSFB: string;
-  HDFC_C: string;
-  HSBC: string;
-  ICIC: string;
-  ICIC_C: string;
-  IBKL: string;
-  IDFB: string;
-  IDIB: string;
-  ALLA: string;
-  IDIB_C: string;
-  IOBA: string;
-  INDB: string;
-  JAKA: string;
-  JSFB: string;
-  JSBP: string;
-  KARB: string;
-  KVBL: string;
-  KKBK: string;
-  KKBK_C: string;
-  LAVB_C: string;
-  LAVB_R: string;
-  NKGS: string;
-  NSPB: string;
-  ORBC: string;
-  UTBI: string;
-  PYTM: string;
-  PSIB: string;
-  PUNB_R: string;
-  RATN: string;
-  ABNA: string;
-  SVCB: string;
-  SRCB: string;
-  SIBL: string;
-  SCBL: string;
-  SBBJ: string;
-  SBHY: string;
-  SBIN: string;
-  SBMY: string;
-  STBP: string;
-  SBTR: string;
-  SYNB: string;
-  TMBL: string;
-  TNSC: string;
-  UCBA: string;
-  UBIN: string;
-  CORP: string;
-  YESB: string;
 }
 
 interface Wallet {

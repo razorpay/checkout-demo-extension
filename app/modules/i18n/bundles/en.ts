@@ -1513,4 +1513,4 @@ export default {
     },
   },
   customer_consent_one_cc,
-};
+} as const;
