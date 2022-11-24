@@ -55,17 +55,24 @@ export function createShopifyCheckoutId({
       type: AnalyticsTypes.METRIC,
     });
     fetch.post({
+      headers: {
+        'Content-Type': 'application/json',
+        key_id: key_id,
+      },
       url: _.appendParamsToUrl(makeUrl('magic/checkout/shopify'), { key_id }),
-      data: body,
+      data: JSON.stringify(body),
       callback: function (response) {
         Analytics.track('create_shopify_checkout:end', {
           type: AnalyticsTypes.METRIC,
           data: { time: apiTimer() },
         });
-        if (response.status_code !== 200 || response.xhr.status !== 200) {
+        if (response.status_code !== 200) {
           reject({ error: response.error });
+          return;
         }
-        resolve(response.data as CreateShopifyCheckoutResponse);
+        resolve({
+          shopify_checkout_id: response.shopify_checkout_id,
+        } as CreateShopifyCheckoutResponse);
       },
     });
   });

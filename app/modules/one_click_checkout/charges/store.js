@@ -69,5 +69,5 @@ export function resetCharges() {
 export function initializeCharges(line_items_total) {
   cartAmount.set(line_items_total);
   amount.set(line_items_total);
-  cartDiscount.set();
+  cartDiscount.set(0);
 }

@@ -3,7 +3,7 @@ import { timer } from 'utils/timer';
 import fetch from 'utils/fetch';
 // store imports
 import { getOrderId } from 'razorpay/helper/order';
-import { getShopifyCheckoutId } from 'razorpay/helper/1cc';
+import { getShopifyCheckoutId } from 'checkoutframe/1cc-shopify/controller';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 
 // Analytics imports
@@ -16,8 +16,7 @@ import {
 } from 'one_click_checkout/order/analytics';
 import { getSession } from 'sessionmanager';
 import { getPreferencesParams } from 'checkoutframe/utils';
-import { isNonNullObject } from 'utils/object';
-import { appendParamsToUrl } from 'utils/_';
+import { isNonNullObject, unflatten } from 'utils/object';
 
 export function updateOrder(payload) {
   const orderId = getOrderId();
@@ -63,10 +62,14 @@ export async function createShopifyOrder() {
 
   return new Promise((resolve, reject) => {
     fetch.post({
-      url: appendParamsToUrl(makeAuthUrl(`magic/order/shopify`), params),
-      data: {
-        shopify_checkout_id: shopifyCheckoutId,
+      url: makeAuthUrl(`magic/order/shopify`),
+      headers: {
+        'Content-Type': 'application/json',
       },
+      data: JSON.stringify({
+        shopify_checkout_id: shopifyCheckoutId,
+        preference_params: { ...unflatten(params), send_preferences: true },
+      }),
       callback: (res) => {
         const success = res.status_code === 200 || res.xhr.status === 200;
         Events.TrackMetric(FETCH_SHOPIFY_ORDER_END, {

@@ -47,8 +47,8 @@ export const RazorpayDefaults = {
   disable_emi_ux: null,
 
   // cart used by magic checkout
-  cart: {},
-  shopify_cart: {}, // cart.js response from shopify
+  cart: null,
+  shopify_cart: null, // cart.js response from shopify
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {
