@@ -1984,10 +1984,7 @@ Session.prototype = {
             }
           } else {
             if (this.upiPaymentManualCancelAttempted) {
-              updateLatestPaymentErrorReason(
-                'manual',
-                this.r._payment.payment_id
-              );
+              updateLatestPaymentErrorReason('manual');
               delete this.upiPaymentManualCancelAttempted;
             }
             self.clearRequest();
