@@ -8,7 +8,7 @@ import { getMerchantOrder } from './preferences';
 // Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
 export const isOneClickCheckout = () =>
   Boolean(
-    getMerchantOrder()?.line_items_total &&
+    (getMerchantOrder()?.line_items_total || getOption('cart')) &&
       getPreferences('features.one_click_checkout')
   );
 

@@ -18,24 +18,41 @@
         font-style: normal;
       }
     </style>
-    <link href="/css/checkout.css" type="text/css" rel="stylesheet" />
   </head>
 
   <!-- This script introduces api params for development and is not present in the final bundle -->
   <script src="/config.js"></script>
   <body></body>
-  <!-- Everything till endbuild is bundled into a single js file -->
-  <!-- build:js checkout-frame.js -->
-  <!-- This is equivalent to razorpay.js -->
-
-  <!-- //1 Introduce globals to be used. Ideally should not be present.  -->
-
-  <!-- The generated es6 code -->
-  <script src="/checkout-frame.js"></script>
-  <!-- endbuild -->
 </html>
-<!-- not present in the prod bundle. options are received through handleMessage -->
 <script>
+  var isMagicShopifyFlow =
+    window.location.search.indexOf('magic_shopify_key') !== -1;
+
+  loadCss(isMagicShopifyFlow);
+  loadJs(isMagicShopifyFlow);
+
+  function loadJs(isMagicShopifyFlow) {
+    let frameScriptSource = isMagicShopifyFlow
+      ? '/checkout-frame-lite.js'
+      : '/checkout-frame.js';
+
+    var checkoutFrameScript = document.createElement('script');
+    checkoutFrameScript.src = frameScriptSource;
+    document.body.appendChild(checkoutFrameScript);
+  }
+
+  function loadCss(isMagicShopifyFlow) {
+    if (isMagicShopifyFlow) {
+      // css is loaded by the dynamic import automatically in checkout-frame-lite
+      return;
+    }
+
+    var link = document.createElement('link');
+    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('href', 'css/checkout.css');
+    document.head.appendChild(link);
+  }
+
   var options = {
     // 'key': 'rzp_live_ILgsfZCZoFIKMb',
     key: 'rzp_test_1DP5mmOlF5G5ag',

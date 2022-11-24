@@ -7,6 +7,7 @@ import {
 } from 'experiments';
 import { getAmount, getOrderId } from 'razorpay';
 import type { CustomObject } from 'types';
+import { getQueryParams } from 'utils/_';
 
 /**
  * transforms experiment values received from preferences, based on the below mapping
@@ -114,4 +115,8 @@ export function updateAnalyticsFromPreferences(
   email.subscribe((val) => {
     EventsV2.setContext(ContextProperties.TRAITS_EMAIL, val);
   });
+}
+
+export function isMagicShopifyFlow() {
+  return Boolean(getQueryParams().magic_shopify_key);
 }

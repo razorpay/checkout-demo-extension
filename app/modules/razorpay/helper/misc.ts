@@ -3,7 +3,6 @@
 /**
  * Customer related
  */
-
 import { isOneClickCheckout } from './1cc';
 import { getMerchantOption, getOption, getPreferences } from './base';
 import { hasFeature } from './preferences';

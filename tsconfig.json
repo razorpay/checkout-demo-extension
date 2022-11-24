@@ -5,7 +5,7 @@
     "allowJs": true,
     "target": "es2019",
     "lib": ["dom", "ES2019"],
-    "module": "es6",
+    "module": "esnext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,

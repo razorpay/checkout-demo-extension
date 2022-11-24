@@ -13,7 +13,7 @@ import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import * as ObjectUtils from 'utils/object';
-import RazorpayStore, { setOption } from 'razorpay';
+import RazorpayStore, { getOption, setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
@@ -61,13 +61,16 @@ import {
   AnalyticsV2State,
   INTEGRATION_PLATFORM,
 } from 'analytics-v2';
-import { updateAnalyticsFromPreferences } from 'checkoutframe/helper';
+import {
+  updateAnalyticsFromPreferences,
+  isMagicShopifyFlow,
+} from 'checkoutframe/helper';
 import { isUpiUxExperimentSupported } from 'checkoutstore/native';
-import { fetchPreferencesLite } from 'checkoutframe/preferences_lite';
 import {
   markRelevantPreferencesPayload,
   setParamsForDdosProtection,
 } from 'checkoutframe/utils';
+import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -270,11 +273,6 @@ export const handleMessage = function (message) {
   if (('razorpay_payment_id' in message || 'error' in message) && session) {
     // call coproto to complete the process
     session.r.emit('payment.complete', message);
-    return;
-  }
-
-  if (message.event === 'fetch_preferences_lite') {
-    fetchPreferencesLite(message.extra);
     return;
   }
 
@@ -512,16 +510,31 @@ function getPrefsPromisified(session) {
     } catch (e) {
       // e
     }
+
+    // for magic shopify flows, use the prefetched version of preferences
+    const litePrefs = isMagicShopifyFlow()
+      ? getLitePreferencesFromStorage(getOption('key'))?.preferences
+      : null;
+
+    if (litePrefs) {
+      resolvePreferences(litePrefs);
+      return;
+    }
+
     session.prefCall = Razorpay.payment.getPrefs(
       getPreferencesParams(session.r),
       (preferences) => {
-        resolve(preferences);
-        if (loader) {
-          _El.detach(loader);
-          loader = null;
-        }
+        resolvePreferences(preferences);
       }
     );
+
+    function resolvePreferences(prefs) {
+      resolve(prefs);
+      if (loader) {
+        _El.detach(loader);
+        loader = null;
+      }
+    }
   });
 }
 

@@ -20,6 +20,7 @@ exports.standardCheckoutEntry = {
   entry: {
     checkout: './app/modules/entry/checkout.js',
     'checkout-frame': './app/modules/entry/checkout-frame.js',
+    'checkout-frame-lite': './app/modules/entry/checkout-frame-lite.ts',
   },
 };
 

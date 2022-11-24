@@ -1,4 +1,7 @@
-import { makePrefParams, setIsCheckoutFrameLoaded } from 'common/Razorpay';
+import Razorpay, {
+  makePrefParams,
+  setIsCheckoutFrameLoaded,
+} from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { iPhone, shouldRedirect } from 'common/useragent';
@@ -133,6 +136,13 @@ function makeCheckoutUrl(rzp) {
     traffic_env: TRAFFIC_ENV,
     build: COMMIT_HASH,
   });
+
+  // load light version checkout-frame for magic checkout on shopify
+  if (RazorpayConfig.magic_shopify_key && Razorpay.enableLite) {
+    url = _.appendParamsToUrl(url, {
+      magic_shopify_key: RazorpayConfig.magic_shopify_key,
+    });
+  }
 
   return url;
 }

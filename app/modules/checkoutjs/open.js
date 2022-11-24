@@ -375,21 +375,4 @@ let initRazorpayCheckout = needBody(function () {
   } catch (e) {}
 });
 
-Razorpay.fetchPreferencesLite = function ({
-  key_id,
-  flush_cache = false,
-  currency = 'INR',
-}) {
-  if (preloadedFrame) {
-    preloadedFrame.postMessage({
-      event: 'fetch_preferences_lite',
-      extra: {
-        key_id,
-        flush_cache,
-        currency,
-      },
-    });
-  }
-};
-
 export default initRazorpayCheckout;
