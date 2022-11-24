@@ -27,8 +27,8 @@ WORKDIR /checkout_build
 
 SHELL ["/bin/bash", "-c"]
 
-# because of post install script 
-RUN git init 
+# because of post install script
+RUN git init
 
 RUN cd /checkout_build \
     && npm install \
@@ -60,6 +60,8 @@ ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 ARG AWS_ACCESS_SECRET
 ENV AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_SECRET}
 
+COPY ./scripts /scripts
+
 RUN mkdir -p /app/dist/v1 \
     && mkdir -p /app/dist/v1/css
 
@@ -76,11 +78,7 @@ COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/original/css/
 WORKDIR /app/dist/v1
 
 # Rename *.x.gz to *.x so that we serve gzipped files
-RUN mv checkout.js.gz checkout.js
-RUN mv checkout-1cc.js.gz checkout-1cc.js
-RUN mv checkout-frame.js.gz checkout-frame.js
-RUN mv razorpay.js.gz razorpay.js
-RUN mv css/checkout.css.gz css/checkout.css
+RUN DIST_DIR=/app/dist/v1/ /scripts/rename-compressed
 
 # shell doesn't require [[ ]], it works with []
 RUN if [ -z "$TRAFFIC_ENV" ]; then \
@@ -114,7 +112,7 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     --exclude "*" \
     --include "*.js" \
     --include "*.css"; \
-    fi 
+    fi
 
 FROM c.rzp.io/razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH

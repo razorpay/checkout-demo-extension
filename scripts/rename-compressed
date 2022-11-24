@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "Renaming files"
+
+## rename gzip files to js or css
+cd "$DIST_DIR"
+
+for file in $(find . -name '*.gz'); do
+  #  Rename gzipped css file
+  if [ "${file: -7}" == ".css.gz" ]; then
+    echo "Renaming CSS $file"
+    mv "$file" "$(echo "$file" | sed -r 's|.css.gz|.css|g')"
+  fi
+
+  #  Rename gzipped js file
+  if [ "${file: -6}" == ".js.gz" ]; then
+    echo "Renaming JS $file"
+    mv "$file" "$(echo "$file" | sed -r 's|.js.gz|.js|g')"
+  fi
+done
