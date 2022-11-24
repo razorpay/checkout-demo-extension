@@ -209,16 +209,21 @@ export const getCustomerAddressApiPayload = (
  */
 export const getServiceabilityPayload = (addresses, cache = {}) => {
   let zipcodesProcessed = {};
-  let addPayload = addresses.reduce((acc, { zipcode, country }) => {
-    if (!cache[zipcode] && !zipcodesProcessed[zipcode]) {
-      zipcodesProcessed[zipcode] = true;
-      return acc.concat({
-        zipcode,
-        country,
-      });
-    }
-    return acc;
-  }, []);
+  let addPayload = addresses.reduce(
+    (acc, { zipcode, country, state_code, state }) => {
+      if (!cache[zipcode] && !zipcodesProcessed[zipcode]) {
+        zipcodesProcessed[zipcode] = true;
+        return acc.concat({
+          zipcode: zipcode ?? null,
+          country,
+          state_code: state_code ?? null,
+          state: state ?? null,
+        });
+      }
+      return acc;
+    },
+    []
+  );
   if (addPayload.length === 0) {
     return false;
   }

@@ -902,7 +902,6 @@
     font-size: var(--font-size-small);
     line-height: 14px;
   }
-
   .add-card-fields-label-upper-one-cc {
     background-color: #fff;
     top: -6px;

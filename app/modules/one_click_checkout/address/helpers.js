@@ -256,6 +256,12 @@ export const findItem = (array, id) => {
   }
 };
 
+export const findStateObj = (stateArr, state) => {
+  return stateArr?.filter(
+    (stateObj) => stateObj.name?.toLowerCase() === state.toLowerCase()
+  )?.[0];
+};
+
 export const shouldShowCheckbox = (route) => {
   switch (route) {
     case views.ADD_BILLING_ADDRESS:

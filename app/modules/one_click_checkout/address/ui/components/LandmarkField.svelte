@@ -7,11 +7,7 @@
   import {
     ADD_LANDMARK,
     OPTIONAL,
-    LANDMARK_OPTIONAL_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
-
-  // utils imports
-  import { showOptimisedAddr } from 'razorpay';
 
   export let id;
   export let label = '';
@@ -24,7 +20,6 @@
   export let autofocus;
   export let handleValidation;
   export let showValidations = false;
-  let enabledOptimisedAddr = showOptimisedAddr();
   let showLandmark = !!value;
 
   const handleLandmarkToggle = () => {
@@ -32,10 +27,10 @@
   };
 </script>
 
-{#if showLandmark || value || enabledOptimisedAddr}
+{#if showLandmark || value}
   <AutoCompleteInput
     {id}
-    label={enabledOptimisedAddr ? LANDMARK_OPTIONAL_LABEL : label}
+    {label}
     {value}
     {suggestionsResource}
     {validationText}

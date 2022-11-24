@@ -124,10 +124,16 @@
               on:blur={() => onBlur(subInput.id)}
               items={subInput.items}
               onChange={handleInput}
-              stateName={formData[subInput.id]}
+              stateName={formData[subInput.id] || ''}
               label={`${$t(subInput.label)}${subInput.required ? '*' : ''}`}
               disabled={subInput.disabled}
               readonly={subInput.readonly}
+              extraLabel={INPUT_FORM[2][1]?.unserviceableText}
+              extraLabelClass={INPUT_FORM[2][1]?.unserviceableText ===
+              SERVICEABLE_LABEL
+                ? 'successText'
+                : 'failureText'}
+              showExtraLabel={!formData.zipcode && !INPUT_FORM[2][1]?.required}
               {showValidations}
             />
           {:else if subInput.id === 'country_name'}
@@ -136,15 +142,8 @@
                 onChange={handleInput}
                 on:blur={() => onBlur(subInput.id)}
                 validationText={errors[subInput.id] ? errors[subInput.id] : ''}
-                extraLabel={INPUT_FORM[2][1]?.unserviceableText}
-                showExtraLabel={!formData.zipcode &&
-                  !INPUT_FORM[2][1]?.required}
                 {formData}
                 {addressType}
-                extraLabelClass={INPUT_FORM[2][1]?.unserviceableText ===
-                SERVICEABLE_LABEL
-                  ? 'successText'
-                  : 'failureText'}
                 {showValidations}
               />
             {/if}

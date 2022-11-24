@@ -20,6 +20,9 @@
   export let disabled = false;
   export let readonly = false;
   export let showValidations = false;
+  export let extraLabel;
+  export let extraLabelClass;
+  export let showExtraLabel;
 
   let stateField;
   let id = 'state';
@@ -73,28 +76,55 @@
   }
 </script>
 
-<Field
-  bind:this={stateField}
-  {id}
-  name="state"
-  autocomplete="off"
-  value={stateName}
-  on:click={openStateModal}
-  on:keydown={downArrowHandler}
-  on:focus={handleOnFocus}
-  required
-  icon=""
-  label={label || `${$t(STATE_LABEL)}*`}
-  on:input={(e) => {
-    stateName = e.target.value;
-    onChange(id, e.target.value);
-  }}
-  on:blur
-  {validationText}
-  elemClasses="address-elem dropdown-select"
-  labelClasses="address-label"
-  {disabled}
-  showDropDownIcon={true}
-  {readonly}
-  {showValidations}
-/>
+<div class:field-wrapper={showExtraLabel && extraLabel}>
+  <Field
+    bind:this={stateField}
+    {id}
+    name="state"
+    autocomplete="off"
+    value={stateName || ''}
+    on:click={openStateModal}
+    on:keydown={downArrowHandler}
+    on:focus={handleOnFocus}
+    required
+    icon=""
+    label={label || `${$t(STATE_LABEL)}*`}
+    on:input={(e) => {
+      stateName = e.target.value;
+      onChange(id, e.target.value);
+    }}
+    on:blur
+    {validationText}
+    elemClasses="address-elem dropdown-select"
+    labelClasses="address-label"
+    {disabled}
+    showDropDownIcon={true}
+    {readonly}
+    {showValidations}
+    handleInput
+  />
+  {#if showExtraLabel && extraLabel}
+    <div class={`${extraLabelClass} extralabel`}>
+      {$t(extraLabel)}
+    </div>
+  {/if}
+</div>
+
+<style lang="scss">
+  .field-wrapper .successText {
+    color: var(--positive-text-color);
+  }
+  .field-wrapper .failureText {
+    color: var(--error-validation-color);
+  }
+  .field-wrapper .extralabel {
+    position: absolute;
+    left: 0px;
+    top: 60px;
+    font-size: 11px;
+  }
+  .field-wrapper {
+    position: relative;
+    margin-bottom: 12px;
+  }
+</style>

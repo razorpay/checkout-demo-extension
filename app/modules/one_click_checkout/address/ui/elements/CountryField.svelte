@@ -21,9 +21,6 @@
   import * as _ from 'utils/_';
 
   export let onChange;
-  export let extraLabel;
-  export let extraLabelClass;
-  export let showExtraLabel;
   export let formData;
   export let addressType;
   export let validationText;
@@ -94,35 +91,28 @@
   }
 </script>
 
-<div class:field-wrapper={showExtraLabel && extraLabel}>
-  <Field
-    bind:this={countryField}
-    {id}
-    name="country_name"
-    autocomplete="none"
-    on:click={openCountryModal}
-    on:keydown={downArrowHandler}
-    required
-    icon=""
-    label={`${$t(COUNTRY_LABEL)}*`}
-    on:input={(e) => {
-      countryName = e.target.value;
-      onChange(id, { val: countryName, extra: countryISO });
-    }}
-    on:blur
-    value={countryName}
-    elemClasses="address-elem dropdown-select"
-    labelClasses="address-label"
-    {validationText}
-    {showValidations}
-    showDropDownIcon={true}
-  />
-  {#if showExtraLabel && extraLabel}
-    <div class={`${extraLabelClass} extralabel`}>
-      {$t(extraLabel)}
-    </div>
-  {/if}
-</div>
+<Field
+  bind:this={countryField}
+  {id}
+  name="country_name"
+  autocomplete="none"
+  on:click={openCountryModal}
+  on:keydown={downArrowHandler}
+  required
+  icon=""
+  label={`${$t(COUNTRY_LABEL)}*`}
+  on:input={(e) => {
+    countryName = e.target.value;
+    onChange(id, { val: countryName, extra: countryISO });
+  }}
+  on:blur
+  value={countryName}
+  elemClasses="address-elem dropdown-select"
+  labelClasses="address-label"
+  {validationText}
+  {showValidations}
+  showDropDownIcon={true}
+/>
 
 <CountrySearchModal
   bind:open={searchModalOpen}
@@ -134,22 +124,3 @@
     closeCountryModal();
   }}
 />
-
-<style>
-  .field-wrapper .successText {
-    color: var(--positive-text-color);
-  }
-  .field-wrapper .failureText {
-    color: var(--error-validation-color);
-  }
-  .field-wrapper .extralabel {
-    position: absolute;
-    left: 0px;
-    top: 60px;
-    font-size: 11px;
-  }
-  .field-wrapper {
-    position: relative;
-    margin-bottom: 12px;
-  }
-</style>

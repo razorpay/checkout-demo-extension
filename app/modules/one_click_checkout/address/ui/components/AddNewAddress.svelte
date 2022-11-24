@@ -90,6 +90,7 @@
     findItem,
     validateInputField,
     shouldShowCheckbox,
+    findStateObj,
   } from 'one_click_checkout/address/helpers';
   import { toTitleCase } from 'lib/utils';
   import {
@@ -105,7 +106,6 @@
     hideLoaderView,
     showLoaderView,
   } from 'one_click_checkout/loader/helper';
-  import { showOptimisedAddr } from 'razorpay';
   import { clickOutside, screenScrollTop } from 'one_click_checkout/helper';
   import { flatten } from 'one_click_checkout/common/utils';
 
@@ -113,27 +113,25 @@
   export let formData;
   export let checkServiceability = true;
   export let id = 'addressForm';
-  export let shouldSaveAddress;
-  export let addressType;
+  export let shouldSaveAddress: Boolean;
+  export let addressType: string;
   export let selectedCountryISO;
   export let currentView;
-  export let addressWrapperEle;
+  export let addressWrapperEle: HTMLElement;
 
   let errors = {};
   let selectedTag = $formData.tag;
-  let pinIndex;
+  let pinIndex = 2;
   let pinSubIndex = 1;
-  let stateIndex;
+  let stateIndex = 3;
   let countryIndex = 0;
-  let stateSubIndex = 1;
+  let stateSubIndex = 0;
   let pinPattern = new RegExp(INDIA_PINCODE_REGEX);
   let selectedCountry;
   let phonePattern = new RegExp(PHONE_PATTERN);
-  let stateCode = '';
   let lastUpdateState = '';
   let INPUT_FORM = [];
   let showValidations = false;
-  const enabledOptimisedAddr = showOptimisedAddr();
 
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
@@ -143,12 +141,6 @@
     message: $t(PINCODE_NON_SERVICEABLE_LABEL),
     theme: TOAST_THEME.ERROR,
     screen: TOAST_SCREEN.ONE_CC,
-  };
-
-  const showPincodeUnserviceableToast = (pincode) => {
-    if (pincode) {
-      showToastAfterDelay(pincode_error_toast, 150);
-    }
   };
 
   const PERSONAL_INFO_FORM = [
@@ -187,13 +179,6 @@
     ],
     [
       {
-        id: 'city',
-        label: CITY_LABEL,
-        required: true,
-        autofillToken: 'none',
-        pattern: CITY_STATE_REGEX_PATTERN,
-      },
-      {
         id: 'state',
         label: STATE_LABEL,
         required: true,
@@ -201,6 +186,13 @@
         pattern: CITY_STATE_REGEX_PATTERN,
         disabled: false,
         readonly: false,
+      },
+      {
+        id: 'city',
+        label: CITY_LABEL,
+        required: true,
+        autofillToken: 'none',
+        pattern: CITY_STATE_REGEX_PATTERN,
       },
     ],
     {
@@ -259,17 +251,15 @@
     },
   ];
 
-  if (enabledOptimisedAddr) {
-    pinIndex = 0;
-    stateIndex = 1;
-    INPUT_FORM = [...DELHIVERY_INFO_FORM, ...PERSONAL_INFO_FORM];
-  } else {
-    pinIndex = 2;
-    stateIndex = 3;
-    INPUT_FORM = [...PERSONAL_INFO_FORM, ...DELHIVERY_INFO_FORM];
-  }
+  INPUT_FORM = [...PERSONAL_INFO_FORM, ...DELHIVERY_INFO_FORM];
 
   const dispatch = createEventDispatcher();
+
+  const showPincodeUnserviceableToast = (pincode) => {
+    if (pincode) {
+      showToastAfterDelay(pincode_error_toast, 150);
+    }
+  };
 
   const isFormComplete = () => {
     const { countryCode, phoneNum } = $formData?.contact || {};
@@ -335,9 +325,12 @@
   }
 
   function getStates(iso = INDIA_COUNTRY_ISO_CODE.toLowerCase()) {
-    getStatesList(iso).then((res) => {
-      INPUT_FORM[stateIndex][stateSubIndex].items = res;
-    });
+    setStateDisabledReadonly({ disabled: true });
+    getStatesList(iso)
+      .then((res) => {
+        INPUT_FORM[stateIndex][stateSubIndex].items = res;
+      })
+      .finally(() => setStateDisabledReadonly({ disabled: false }));
   }
 
   function handleCountrySelect(name, iso) {
@@ -355,6 +348,7 @@
     $selectedCountryISO = iso?.toLowerCase();
     if (!COUNTRY_CONFIG[iso]?.pattern) {
       INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = true;
+      INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
     } else {
       INPUT_FORM[pinIndex][pinSubIndex].hideStatusText = false;
       INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
@@ -363,47 +357,15 @@
     INPUT_FORM[pinIndex][pinSubIndex].pattern = COUNTRY_CONFIG[iso]?.pattern;
     if (!INPUT_FORM[pinIndex][pinSubIndex].pattern) {
       INPUT_FORM[pinIndex][pinSubIndex].required = false;
+      INPUT_FORM[pinIndex][pinSubIndex].disabled = true;
       const pincodeEle = document.getElementById('zipcode').parentNode;
       pincodeEle.classList.remove('invalid');
-      const payload = [
-        {
-          zipcode: $selectedCountryISO,
-          country: $selectedCountryISO,
-        },
-      ];
-
-      if (checkServiceability) {
-        postServiceability(payload)
-          .then((res) => {
-            if (res && res[$selectedCountryISO]?.serviceability) {
-              const {
-                cod_fee: codFee,
-                shipping_fee: shippingFee,
-                state_code: selectedStateCode,
-              } = res[$selectedCountryISO];
-              codChargeAmount.set(codFee);
-              dispatch('serviceabilityCheck', { newCharge: shippingFee });
-              stateCode = selectedStateCode;
-              INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
-                SERVICEABLE_LABEL;
-            } else {
-              INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
-                UNSERVICEABLE_LABEL;
-
-              showPincodeUnserviceableToast($formData.zipcode);
-            }
-            $formData.cod = res[$selectedCountryISO]?.cod;
-          })
-          .catch(() => {
-            INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
-              UNSERVICEABLE_LABEL;
-            showPincodeUnserviceableToast($formData.zipcode);
-          });
-      }
+      errors['zipcode'] = null;
     } else {
       INPUT_FORM[pinIndex][pinSubIndex].required = true;
       const pincodeEle = document.getElementById('zipcode').parentNode;
       pincodeEle.classList.add('invalid');
+      INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
     }
 
     getStates($selectedCountryISO);
@@ -436,7 +398,7 @@
     }
   };
 
-  export function onUpdate(key, value, extra) {
+  export function onUpdate(key, value, extra = null) {
     /**
      * onUpdate gets fired twice for every input change.
      * therefore, returning if last state was same.
@@ -484,15 +446,10 @@
           .then((res) => {
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             if (res && res[value]?.serviceability) {
-              const {
-                cod_fee: codFee,
-                shipping_fee: shippingFee,
-                state_code: selectedStateCode,
-              } = res[value];
+              const { cod_fee: codFee, shipping_fee: shippingFee } = res[value];
               codChargeAmount.set(codFee);
               dispatch('serviceabilityCheck', { newCharge: shippingFee });
               isShippingAddedToAmount.set(true);
-              stateCode = selectedStateCode;
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
@@ -594,7 +551,9 @@
         $formData.city = '';
         $formData.state = '';
         $formData.zipcode = '';
-        setStateDisabledReadonly({ disabled: false, readonly: false });
+        if (isShippingAddress) {
+          resetCharges();
+        }
       }
     }
 
@@ -614,6 +573,71 @@
           ? SOURCE.OVERIDDEN
           : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
       });
+
+      const stateObj = findStateObj(
+        INPUT_FORM[stateIndex][stateSubIndex].items,
+        value
+      );
+      const stateCode = stateObj?.state_code?.toLowerCase();
+
+      if (
+        checkServiceability &&
+        !COUNTRY_CONFIG[$selectedCountryISO?.toUpperCase()]?.pattern &&
+        stateObj?.state_code
+      ) {
+        const payload = [
+          {
+            state_code: stateCode,
+            country: $selectedCountryISO,
+            state: value.toLowerCase(),
+            zipcode: stateCode,
+          },
+        ];
+        postServiceability(payload)
+          .then((res) => {
+            if (res && res[stateCode]?.serviceability) {
+              const { cod_fee: codFee, shipping_fee: shippingFee } =
+                res[stateCode];
+              codChargeAmount.set(codFee);
+              dispatch('serviceabilityCheck', { newCharge: shippingFee });
+              isShippingAddedToAmount.set(true);
+              INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
+                SERVICEABLE_LABEL;
+            } else {
+              INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
+                UNSERVICEABLE_LABEL;
+              toggleStateField({ disabled: false });
+              showPincodeUnserviceableToast(stateCode);
+            }
+            $formData.cod = res[stateCode]?.cod;
+            if (isShippingAddress) {
+              if (!res[stateCode].city) {
+                Events.Track(AddressEvents.PINCODE_MISSING_CITY, {
+                  country: $selectedCountryISO,
+                  zipcode: value,
+                });
+              }
+              if (!res[stateCode].state) {
+                Events.Track(AddressEvents.PINCODE_MISSING_STATE, {
+                  country: $selectedCountryISO,
+                  zipcode: value,
+                });
+              }
+            }
+          })
+          .catch(() => {
+            INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
+              UNSERVICEABLE_LABEL;
+            toggleStateField({ disabled: false });
+            showPincodeUnserviceableToast(stateCode);
+          })
+          .finally(() => {
+            hideLoaderView();
+            dispatch('formCompletion', {
+              isComplete: isFormComplete(),
+            });
+          });
+      }
     }
 
     dispatch('formCompletion', {
@@ -693,14 +717,9 @@
       postServiceability(payload)
         .then((res) => {
           if (res && res[zipcode]?.serviceability) {
-            const {
-              cod_fee: codFee,
-              shipping_fee: shippingFee,
-              state_code: selectedStateCode,
-            } = res[zipcode];
+            const { cod_fee: codFee, shipping_fee: shippingFee } = res[zipcode];
             codChargeAmount.set(codFee);
             dispatch('serviceabilityCheck', { newCharge: shippingFee });
-            stateCode = selectedStateCode;
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               SERVICEABLE_LABEL;
             if (!isCityStateAutopopulateDisabled) {
@@ -816,7 +835,7 @@
 
     Events.TrackRender(AddressEvents.NEW_ADDRESS_SCREEN_LOADED_V2, {
       address_type,
-      address_flow_experimentation_enabled: enabledOptimisedAddr,
+      address_flow_experimentation_enabled: false,
     });
     handleFormValidation();
     merchantAnalytics({
@@ -824,10 +843,8 @@
       category: CATEGORIES.ADDRESS,
     });
     changePincodeStateLabel();
-    const el = document.querySelector(
-      enabledOptimisedAddr ? '#zipcode' : '#name'
-    );
-    el.focus();
+    const el = document.getElementById('name');
+    el?.focus();
   });
 
   onDestroy(() => {

@@ -3,11 +3,8 @@ import LandmarkField from 'one_click_checkout/address/ui/components/LandmarkFiel
 import addressLabels from 'one_click_checkout/address/i18n/en';
 import { setupPreferences } from 'tests/setupPreferences';
 
-const {
-  landmark_optional_label: LANDMARK_OPTIONAL_LABEL,
-  landmark_label: LANDMARK_LABEL,
-  add_landmark: ADD_LANDMARK,
-} = addressLabels;
+const { landmark_label: LANDMARK_LABEL, add_landmark: ADD_LANDMARK } =
+  addressLabels;
 
 const razorpayInstance = {
   id: 'id',
@@ -66,26 +63,5 @@ describe('Landmark field on Add New Address Normal(default) flow', () => {
 
     expect(getByText(LANDMARK_LABEL)).toBeInTheDocument();
     expect(landmarkField.textContent).toBe('Salem');
-  });
-});
-describe('Landmark field on Add New Address Optimised flow', () => {
-  beforeEach(() => {
-    setupPreferences('loggedIn', razorpayInstance, {
-      '1cc_address_flow_exp': 'true',
-    });
-  });
-  it('Should render Landmark on the Add New Address', () => {
-    const { getByText } = render(LandmarkField, landmarkFieldProps);
-
-    expect(getByText(LANDMARK_OPTIONAL_LABEL)).toBeInTheDocument();
-  });
-  it('Should render landmark input on typing the Field.', async () => {
-    const { getByText, container } = render(LandmarkField, landmarkFieldProps);
-    const landmarkField = container.querySelector('#landmark');
-
-    expect(landmarkField).toBeInTheDocument();
-    await fireEvent.change(landmarkField, { target: { textContent: 'Salem' } });
-
-    expect(getByText(LANDMARK_OPTIONAL_LABEL)).toBeInTheDocument();
   });
 });
