@@ -28,8 +28,8 @@
   import rtbEvents from 'one_click_checkout/header/analytics';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import RtbIcon from 'rtb/ui/component/RTBIcon.svelte';
-  import { getThemeMeta } from 'checkoutstore/theme';
-  const themeMeta = getThemeMeta();
+  import { constantCSSVars } from 'common/constants';
+  const iconColor = constantCSSVars['primary-text-color'];
 
   $: trustedBadgeHighlights = isRTBEnabled($RTBExperiment);
   onMount(() => {
@@ -55,7 +55,7 @@
         <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-text">{$t(RTB_HEADER)}</div>
-      <Icon icon={info(themeMeta.textColor)} />
+      <Icon icon={info(iconColor)} />
     </div>
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={handleRTBClick}>
@@ -63,7 +63,7 @@
         <RtbIcon height={20} width={20} />
       </div>
       <div class="rtb-down-arrow-wrapper">
-        <Icon icon={arrow_down(14, 14, themeMeta.textColor)} />
+        <Icon icon={arrow_down(14, 14, iconColor)} />
       </div>
     </div>
   {/if}
