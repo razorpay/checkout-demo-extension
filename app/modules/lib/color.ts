@@ -7,8 +7,8 @@ import * as _El from 'utils/DOM';
 // give color like "red" or color with
 // alpha value. need to render on canvas to find
 // resultant color
-const canvas = _El.create('canvas'),
-  ctx = canvas.getContext('2d');
+const canvas = _El.create('canvas') as HTMLCanvasElement,
+  ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 // canvas.getImageData().data returns a Uint8Array with length 4 (r,g,b,a),
 // However, in Brave Browser, if device recognition is blocked,
@@ -21,7 +21,7 @@ const canvasFingerprintingBlocked = () => {
   }
 };
 
-const getPixelDataFallback = (color) => {
+const getPixelDataFallback = (color: string) => {
   const d = document.createElement('div');
   d.style.color = color;
   document.body.appendChild(d);
@@ -30,7 +30,7 @@ const getPixelDataFallback = (color) => {
   return stringToColor(computedColor);
 };
 
-const getPixelData = (color) => {
+const getPixelData = (color: string) => {
   if (canvasFingerprintingBlocked()) {
     return getPixelDataFallback(color);
   }
@@ -63,21 +63,21 @@ const getPixelData = (color) => {
  * @param   Number  b       The blue color value
  * @return  Array           The HSV representation
  */
-export const rgbToHsb = (r, g, b) => {
+export const rgbToHsb = (r: number, g: number, b: number) => {
   (r /= 255), (g /= 255), (b /= 255);
 
-  let max = Math.max(r, g, b),
+  const max = Math.max(r, g, b),
     min = Math.min(r, g, b);
-  let h,
-    s,
-    v = max;
+  let h = 0;
+  const v = max;
 
-  let d = max - min;
-  s = max === 0 ? 0 : d / max;
+  const d = max - min;
+  const s = max === 0 ? 0 : d / max;
 
   if (max === min) {
     h = 0; // achromatic
   } else {
+    // max can be one of rgb
     switch (max) {
       case r:
         h = (g - b) / d + (g < b ? 6 : 0);
@@ -107,17 +107,20 @@ export const rgbToHsb = (r, g, b) => {
  * @param   Number  v       The value
  * @return  Array           The RGB representation
  */
-function hsbToRgb(h, s, v) {
-  let r, g, b;
+function hsbToRgb(h: number, s: number, v: number) {
+  let r = 0,
+    g = 0,
+    b = 0;
 
-  let i = Math.floor(h * 6);
-  let f = h * 6 - i;
-  let p = v * (1 - s);
-  let q = v * (1 - f * s);
-  let t = v * (1 - (1 - f) * s);
+  const i = Math.floor(h * 6);
+  const f = h * 6 - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
 
   switch (i % 6) {
     case 0:
+      r = v;
       (r = v), (g = t), (b = p);
       break;
     case 1:
@@ -140,13 +143,14 @@ function hsbToRgb(h, s, v) {
   return { red: r * 255, green: g * 255, blue: b * 255 };
 }
 
-export const getColorProperties = ((colorCache) => {
+export const getColorProperties = ((colorCache: {
+  [x: string]: ReturnType<typeof getPixelData>;
+}) => {
   /*
    * Different function ask for color propeties of same color
    * storing values in cache
    */
-
-  return (color) => {
+  return (color: string) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -155,8 +159,10 @@ export const getColorProperties = ((colorCache) => {
   };
 })({});
 
-export const getHSB = ((colorCache) => {
-  return (color) => {
+export const getHSB = ((colorCache: {
+  [color: string]: ReturnType<typeof rgbToHsb>;
+}) => {
+  return (color: string) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -168,7 +174,7 @@ export const getHSB = ((colorCache) => {
   };
 })({});
 
-const getColorChannelWithGamma = (channelVal) => {
+const getColorChannelWithGamma = (channelVal: number) => {
   return channelVal <= 10
     ? channelVal / 3294
     : Math.pow(channelVal / 269 + 0.0513, 2.4);
@@ -177,8 +183,10 @@ const getColorChannelWithGamma = (channelVal) => {
 /*
  * ref: https://ux.stackexchange.com/questions/82056/how-to-measure-the-contrast-between-any-given-color-and-white
  */
-export const getRelativeLuminanceWithWhite = ((colorCache) => {
-  return (color) => {
+export const getRelativeLuminanceWithWhite = ((colorCache: {
+  [color: string]: number;
+}) => {
+  return (color: string) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -194,21 +202,26 @@ export const getRelativeLuminanceWithWhite = ((colorCache) => {
   };
 })({});
 
-export const isDark = (color) => {
+export const isDark = (color: string) => {
   const relativeLuminosity = getRelativeLuminanceWithWhite(color);
 
   // tested , and found black text would look good on values < 0.5
   return relativeLuminosity < 0.5;
 };
 
-const getColorString = (red, green, blue, alpha) => {
+const getColorString = (
+  red: number,
+  green: number,
+  blue: number,
+  alpha: number
+) => {
   return `rgba(${Math.round(red)}, ${Math.round(green)}, ${Math.round(
     blue
   )}, ${alpha})`;
 };
 
 // Convert "rgba(255, 255, 255, 1)" to an object.
-const stringToColor = (string) => {
+const stringToColor = (string: string) => {
   const color = {
     red: 0,
     green: 0,
@@ -217,25 +230,26 @@ const stringToColor = (string) => {
   };
   if (string && string.length > 4) {
     const rgb = string.match(/\d+/g);
-    if (rgb.length === 3) {
-      color.red = rgb[0];
-      color.green = rgb[1];
-      color.blue = rgb[2];
+    if (rgb && rgb.length === 3) {
+      color.red = +rgb[0];
+      color.green = +rgb[1];
+      color.blue = +rgb[2];
     }
   }
   return color;
 };
 
-export const transparentify = (color, alphaPercentage = 0) => {
+export const transparentify = (color: string, alphaPercentage = 0) => {
   const { red, green, blue } = getColorProperties(color);
 
   return getColorString(red, green, blue, alphaPercentage / 100);
 };
 
-export const brighten = (color, brightenPercentage) => {
+export const brighten = (color: string, brightenPercentage: number) => {
   const { red, green, blue, alpha } = getColorProperties(color);
-
-  let { hue, saturation, brightness } = rgbToHsb(red, green, blue);
+  const hsb = rgbToHsb(red, green, blue);
+  const { hue, saturation } = hsb;
+  let { brightness } = hsb;
 
   brightness += brightness * (brightenPercentage / 100);
 
@@ -244,15 +258,17 @@ export const brighten = (color, brightenPercentage) => {
   return getColorString(rgb.red, rgb.green, rgb.blue, alpha);
 };
 
-export const getColorVariations = ((colorCache) => {
-  return (color) => {
+export const getColorVariations = ((colorCache: {
+  [color: string]: { foregroundColor: string; backgroundColor: string };
+}) => {
+  return (color: string) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
 
     let bgColorBrightness = 0,
-      fgColorBrightness = 0,
-      relativeLuminance = getRelativeLuminanceWithWhite(color);
+      fgColorBrightness = 0;
+    const relativeLuminance = getRelativeLuminanceWithWhite(color);
 
     if (relativeLuminance >= 0.9) {
       fgColorBrightness = -50;
@@ -290,8 +306,8 @@ export const getColorVariations = ((colorCache) => {
   };
 })({});
 
-export function getColorDistance(color) {
-  let rgb = getColorProperties(color),
+export function getColorDistance(color: string) {
+  const rgb = getColorProperties(color),
     hsb = rgbToHsb(rgb.red, rgb.green, rgb.blue),
     saturation = hsb.saturation * 100,
     brightness = hsb.brightness * 100;
@@ -301,14 +317,14 @@ export function getColorDistance(color) {
   );
 }
 
-export function getHighlightColor(color, defaultColor) {
-  let colorDistance = getColorDistance(color);
+export function getHighlightColor(color: string, defaultColor: string) {
+  const colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return defaultColor;
   }
 
-  let hsb = getHSB(color),
+  const hsb = getHSB(color),
     saturation = hsb.saturation * 100,
     colorVariations = getColorVariations(color);
 
@@ -319,14 +335,18 @@ export function getHighlightColor(color, defaultColor) {
   return colorVariations.foregroundColor;
 }
 
-export function getHoverStateColor(color, variation, defaultColor) {
-  let colorDistance = getColorDistance(color);
+export function getHoverStateColor(
+  color: string,
+  variation: string,
+  defaultColor: string
+) {
+  const colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return transparentify(defaultColor, 3);
   }
 
-  let hsb = getHSB(color),
+  const hsb = getHSB(color),
     brightness = hsb.brightness * 100;
 
   let opacity = 3;
@@ -338,14 +358,18 @@ export function getHoverStateColor(color, variation, defaultColor) {
   return transparentify(variation, opacity);
 }
 
-export function getActiveStateColor(color, variation, defaultColor) {
-  let colorDistance = getColorDistance(color);
+export function getActiveStateColor(
+  color: string,
+  variation: string,
+  defaultColor: string
+) {
+  const colorDistance = getColorDistance(color);
 
   if (colorDistance > 90) {
     return transparentify(defaultColor, 6);
   }
 
-  let hsb = getHSB(color),
+  const hsb = getHSB(color),
     brightness = hsb.brightness * 100;
 
   let opacity = 6;
