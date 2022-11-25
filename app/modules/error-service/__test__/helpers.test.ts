@@ -16,9 +16,9 @@ describe('Test isExtensionError', () => {
   it('Should return false for non extention error', () => {
     const error = {
       stack: `ReferenceError: Intl is not defined
-      at https://checkout-static.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:201084
-      at https://checkout-static.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:201702
-      at https://checkout-static.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:1823605`,
+      at https://checkout-static-next.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:201084
+      at https://checkout-static-next.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:201702
+      at https://checkout-static-next.razorpay.com/build/69dc45b454a9c3c78d3694ff57de6a2bce7f4128/checkout-frame.js:1:1823605`,
     };
     expect(isExtensionError(error)).toBe(false);
   });

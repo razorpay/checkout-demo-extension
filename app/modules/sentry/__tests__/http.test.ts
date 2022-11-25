@@ -36,6 +36,7 @@ jest.mock('utils/fetch', () => ({
 const ERROR_TRACKING_URLS = [
   'https://checkout.razorpay.com',
   'https://checkout-static.razorpay.com',
+  'https://checkout-static-next.razorpay.com',
 ];
 
 describe('isUrlApplicableForTracking: evaluates if error should be captured or not', () => {

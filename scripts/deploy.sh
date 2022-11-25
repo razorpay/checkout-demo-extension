@@ -7,7 +7,7 @@ BUCKET_production="rzp-1415-prod-checkout-static"
 
 DIST_canary="E2RK6LAT9F78JF"
 DIST_baseline="E2C4TJ1SGQAY82"
-DIST_production="E10EFYGUV7S9YQ"
+DIST_production="E5JSQCVZV2J40"
 
 COMMIT=$1
 CANARY=$2

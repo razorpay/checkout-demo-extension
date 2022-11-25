@@ -1,5 +1,5 @@
 (function () {
-  var prefix = 'https://checkout-static.razorpay.com/build/COMMIT';
+  var prefix = 'https://checkout-static-next.razorpay.com/build/COMMIT';
   var env = 'traffic_env=__S_TRAFFIC_ENV__';
   var s = location.search;
   history.pushState(null, null, s ? s + '&' + env : '?' + env);

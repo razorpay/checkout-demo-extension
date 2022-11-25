@@ -9,6 +9,7 @@ import { exceptionFromError } from './parser';
 const ERROR_TRACKING_URLS = [
   'https://checkout.razorpay.com',
   'https://checkout-static.razorpay.com',
+  'https://checkout-static-next.razorpay.com',
 ];
 
 let isErrorCaptureForThisSession = false;

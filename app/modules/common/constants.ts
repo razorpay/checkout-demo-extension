@@ -167,7 +167,7 @@ export const TRAFFIC_ENV = __TRAFFIC_ENV__ || '__S_TRAFFIC_ENV__'; // eslint-dis
 export const COMMIT_HASH = __GIT_COMMIT_HASH__; // eslint-disable-line no-undef
 
 export const STATIC_CDN_PREFIX = BUILD_NUMBER
-  ? `https://checkout-static.razorpay.com/build/${COMMIT_HASH}`
+  ? `https://checkout-static-next.razorpay.com/build/${COMMIT_HASH}`
   : '/dist/v1';
 
 export const FRAME_CSS_URL = STATIC_CDN_PREFIX + '/css/checkout.css';
