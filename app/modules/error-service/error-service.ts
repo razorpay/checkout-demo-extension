@@ -1,4 +1,5 @@
-import { constructErrorObject, filterInvalidError } from './helpers';
+import { isIgnoredErrors } from './filters';
+import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
 import Analytics, {
   ErrorEvents,
@@ -33,17 +34,23 @@ export const capture = (
 ) => {
   try {
     const { event, data, immediately = true } = analytics || {};
+    let ignored = false;
     /**
      * don't track if its not prod
      * if its standard checkout library then check for domain
      * mode check is already available in tracker & availability module
      */
-    if (
-      (Track.props.library !== 'razorpayjs' && !IS_PROD) ||
-      filterInvalidError(error as Error)
-    ) {
+    if (Track.props.library !== 'razorpayjs' && !IS_PROD) {
       return;
     }
+
+    // Still want to keep track of these errors
+    // but don't want to affect the availability
+    if (isIgnoredErrors(error)) {
+      severity = SEVERITY_LEVELS.S3;
+      ignored = true;
+    }
+
     /**
      * Event name to be used for analytics.
      * Defaulting to 'js_error' till we move to the new system of analytics events
@@ -52,7 +59,11 @@ export const capture = (
     if (severity === SEVERITY_LEVELS.S0 || severity === SEVERITY_LEVELS.S1) {
       trackAvailabilty('session_errored', severity);
     }
-    const errorObj = constructErrorObject(error, { severity, unhandled });
+    const errorObj = constructErrorObject(error, {
+      severity,
+      unhandled,
+      ignored,
+    });
     Analytics.track(eventName, {
       data: {
         ...(typeof data === 'object' ? data : {}),

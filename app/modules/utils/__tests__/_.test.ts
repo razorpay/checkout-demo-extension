@@ -166,6 +166,16 @@ describe('_', () => {
     });
   });
 
+  describe('isRegExp', () => {
+    it('determines that value is a regex', () => {
+      isTrue(_.isRegExp(/extensions\//i));
+    });
+
+    it('determines that value is not a regex', () => {
+      isFalse(_.isRegExp('test_string'));
+    });
+  });
+
   describe('isUndefined', () => {
     it('determines undefined element correctly', () => {
       isTrue(_.isUndefined(undefined));

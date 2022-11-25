@@ -89,7 +89,7 @@ export const isNumber = isType('number');
  *
  * @returns {boolean}
  */
-export const isString = isType('string');
+export const isString: (arg: unknown) => arg is string = isType('string');
 
 /**
  * Returns true or false if the argument passed is function or not
@@ -130,6 +130,15 @@ export const isUndefined = isType('undefined');
  * @returns {Boolean}
  */
 export const isNull = (x: any) => x === null;
+
+/**
+ * Tells whether something is a regex
+ * @param {*} x
+ *
+ * @returns {Boolean}
+ */
+export const isRegExp = (x: unknown): x is RegExp =>
+  Object.prototype.toString.call(x) === '[object RegExp]';
 
 /**
  * Tells whether something is of a primitive type

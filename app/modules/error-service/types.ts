@@ -16,6 +16,7 @@ export type Error = {
 export type Tags = {
   severity: string;
   unhandled?: boolean;
+  ignored?: boolean;
 };
 
 export type CustomError = Partial<Error> & {
