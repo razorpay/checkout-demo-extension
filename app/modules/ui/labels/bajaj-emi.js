@@ -11,3 +11,4 @@ export const PAY_FULL_AMOUNT = 'bajaj_finserv.pay_full_amount';
 export const CARD_NOT_SUPPORTED = 'bajaj_finserv.card_not_supported';
 export const BAJAJ_FISNSEV_ISSUED_CARD =
   'bajaj_finserv.bajaj_fisnsev_issued_card';
+export const KNOW_BAJAJ_EMI_CARD = 'bajaj_finserv.know_bajaj_emi_card';

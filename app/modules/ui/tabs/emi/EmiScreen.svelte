@@ -15,6 +15,7 @@
     CARD_DETAILS_HEADER,
     CARD_NOT_SUPPORTED,
     BAJAJ_FISNSEV_ISSUED_CARD,
+    KNOW_BAJAJ_EMI_CARD,
   } from 'ui/labels/bajaj-emi';
 
   import {
@@ -292,6 +293,11 @@
           {BAJAJ_FISNSEV_ISSUED_CARD}
         </span>
       </div>
+      <div class="bajaj-know-card">
+        <span class="know-card-text">
+          {$t(KNOW_BAJAJ_EMI_CARD)}
+        </span>
+      </div>
     </div>
   </div>
   <!-- if card is invalid and emi flow is now and card is enetered
@@ -447,5 +453,12 @@
 
   .card-type-redesigned {
     top: 16px;
+  }
+
+  .bajaj-know-card .know-card-text {
+    font-size: 11px;
+    font-style: italic;
+    color: #333;
+    font-weight: 500;
   }
 </style>

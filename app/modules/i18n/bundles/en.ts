@@ -59,6 +59,8 @@ export default {
     pay_full_amount: 'Pay full amount',
     bajaj_fisnsev_issued_card:
       'You need to have a Bajaj Finserv issued card to continue with this emi option',
+    know_bajaj_emi_card:
+      'To know your Bajaj EMI Card - Give a missed call @ 9210035555 from your registered mobile number',
   },
   bank_transfer: {
     account_label: 'Account',
