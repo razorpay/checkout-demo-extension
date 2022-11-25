@@ -2,12 +2,12 @@ import { getSession } from 'sessionmanager';
 import { resendTimeout } from 'checkoutstore/screens/otp';
 import { getThemeMeta } from 'checkoutstore/theme';
 
-export function isWalletPayment() {
+export function isWalletPayment(): boolean {
   const session = getSession();
   return session.payload && session.payload.method === 'wallet';
 }
 
-export function isHeadless() {
+export function isHeadless(): boolean {
   const session = getSession();
   return session.headless;
 }
