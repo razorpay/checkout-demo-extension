@@ -1,5 +1,6 @@
 import * as TYPES from 'analytics-types';
 import Analytics from './base-analytics';
+import type { GenerateTrackProp, GetEventNameType } from './types';
 
 /**
  * Takes a Object mapping of events name and append prefix
@@ -7,23 +8,33 @@ import Analytics from './base-analytics';
  * @param {Object} events
  * @returns {Object}
  */
-
-export const getEventsName = (prefix, events) => {
+export function getEventsName<
+  T extends Record<string, string>,
+  P extends string
+>(prefix: P, events: T): GetEventNameType<T, P>;
+export function getEventsName<
+  T extends Record<string, string>,
+  P extends undefined
+>(prefix: P, events: T): T;
+export function getEventsName<
+  T extends Record<string, string>,
+  P extends string
+>(prefix: P, events: T): GetEventNameType<T, P> | T {
   if (!prefix) {
     return events;
   }
-  const returnObj = {};
-  Object.keys(events).forEach((key) => {
+  const returnObj: GetEventNameType<T, P> = {} as any;
+  Object.keys(events).forEach((key: keyof T) => {
     const value = events[key];
     if (key === '__PREFIX' && value === '__PREFIX') {
       // this will convert to toUpperCase(prefix) : prefix
-      returnObj[prefix.toUpperCase()] = `${prefix}`;
+      (returnObj as any)[prefix.toUpperCase()] = `${prefix}`;
       return;
     }
-    returnObj[key] = `${prefix}:${value}`;
+    (returnObj as any)[key] = `${prefix}:${value}`;
   });
   return returnObj;
-};
+}
 
 /**
  * Iterate Through the analytics types and return an Object with tracking methods for each type
@@ -41,11 +52,11 @@ export const getEventsName = (prefix, events) => {
  * }}
  */
 export const getTrackMethods = () => {
-  const Events = {};
+  const Events: GenerateTrackProp = {} as GenerateTrackProp;
   Object.keys(TYPES).forEach((key) => {
-    const type = TYPES[key];
+    const type = TYPES[key as keyof typeof TYPES];
     const methodName = `Track${type.charAt(0).toUpperCase()}${type.slice(1)}`;
-    Events[methodName] = function (eventName, data) {
+    (Events as any)[methodName] = function (eventName: string, data: unknown) {
       Analytics.track(eventName, {
         type,
         data,
@@ -65,12 +76,19 @@ export const getTrackMethods = () => {
  * @param {Events} events
  * @returns {Events}
  */
-export const addAnalyticsMethods = (events) => {
+export const addAnalyticsMethods = (
+  events: GenerateTrackProp
+): GenerateTrackProp & {
+  removeMeta: (args: string) => void;
+  setMeta: (key: string, value: unknown) => void;
+  setR: typeof Analytics.setR;
+  updateRequestIndex: (name: string) => number;
+} => {
   return {
     ...events,
     setMeta: Analytics.setMeta,
     removeMeta: Analytics.removeMeta,
-    updateRequestIndex: Analytics.updateRequestIndex,
+    updateRequestIndex: (...args) => Analytics.updateRequestIndex(...args),
     setR: Analytics.setR,
   };
 };

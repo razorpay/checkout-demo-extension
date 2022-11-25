@@ -13,8 +13,7 @@ import Analytics, { Track } from './base-analytics';
 import { trackAvailabilty } from './availability';
 import OfflineChallanEvents from './offline';
 
-let Events = getTrackMethods();
-Events = addAnalyticsMethods(Events);
+const Events = addAnalyticsMethods(getTrackMethods());
 
 export default Analytics;
 
