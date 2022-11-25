@@ -161,7 +161,7 @@
     }
     $shouldOverrideVisibleState = false;
 
-    if (method === 'emi' && isEmiV2()) {
+    if (['emi', 'cardless_emi'].includes(method) && isEmiV2()) {
       // Track EMI method clicked on L0 screen
       // passing whether the no cost label was shown or not
       emiMethodClicked(_showNoCostLabel);
