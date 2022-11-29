@@ -1,4 +1,4 @@
-export const timeConverter = (UNIX_timestamp) => {
+export const timeConverter = (UNIX_timestamp: number) => {
   var a = new Date(UNIX_timestamp * 1000);
   var months = [
     'Jan',
@@ -20,7 +20,7 @@ export const timeConverter = (UNIX_timestamp) => {
   var time = getOrdinalNum(date) + ' ' + month + ', ' + year;
   return time;
 };
-const getOrdinalNum = (n) => {
+const getOrdinalNum = (n: number) => {
   return (
     n +
     (n > 0
