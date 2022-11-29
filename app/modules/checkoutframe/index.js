@@ -14,7 +14,10 @@ import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import * as ObjectUtils from 'utils/object';
 import RazorpayStore, { getOption, setOption } from 'razorpay';
-import { processNativeMessage } from 'checkoutstore/native';
+import {
+  processNativeMessage,
+  shouldShowAllUPIApps,
+} from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer, { checkoutClosesAt } from 'checkoutframe/timer';
 import { create1ccShopifyCheckout } from 'checkoutframe/1cc-shopify';
@@ -62,7 +65,6 @@ import {
   updateAnalyticsFromPreferences,
   isMagicShopifyFlow,
 } from 'checkoutframe/helper';
-import { isUpiUxExperimentSupported } from 'checkoutstore/native';
 import {
   markRelevantPreferencesPayload,
   setParamsForDdosProtection,
@@ -649,7 +651,7 @@ function setSessionPreferences(session, preferences) {
   }
 
   try {
-    if (isUpiUxExperimentSupported('variant_1')) {
+    if (shouldShowAllUPIApps()) {
       additionalSupportedPaymentApps();
       checkForPossibleWebPayments();
     }

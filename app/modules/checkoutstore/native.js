@@ -7,7 +7,6 @@ import {
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 import { appsThatSupportWebPayments } from 'common/webPaymentsApi';
-import { getPreferences } from 'razorpay';
 import { android, isWebView } from 'common/useragent';
 import * as _ from 'utils/_';
 
@@ -46,7 +45,7 @@ export function setUpiApps(apps) {
   );
 
   try {
-    if (isUpiUxExperimentSupported('variant_1')) {
+    if (shouldShowAllUPIApps()) {
       filteredUniqueApps = filteredUniqueApps.filter((a) =>
         appsThatSupportWebPayments.some(
           (b) => a.package_name === b.package_name
@@ -209,7 +208,10 @@ export function processNativeMessage(_message) {
   return message;
 }
 
-export function isUpiUxExperimentSupported(variantName = null) {
+/**
+ * Check if platform supported for showing all UPI apps
+ */
+export function shouldShowAllUPIApps() {
   try {
     const sdkMeta = getSDKMeta();
     const supportedPlatform =
@@ -220,18 +222,7 @@ export function isUpiUxExperimentSupported(variantName = null) {
     if (!supportedPlatform || isWebView) {
       return false;
     }
-
-    if (variantName && variantName === getPreferences('experiments.upi_ux')) {
-      return true;
-    }
-    if (
-      !variantName &&
-      (getPreferences('experiments.upi_ux') === 'variant_1' ||
-        getPreferences('experiments.upi_ux') === 'variant_2')
-    ) {
-      return true;
-    }
-    return false;
+    return true;
   } catch (error) {
     return false;
   }
@@ -239,12 +230,8 @@ export function isUpiUxExperimentSupported(variantName = null) {
 
 function shouldAppsReorder() {
   const sdkMeta = getSDKMeta();
-  if (isUpiUxExperimentSupported()) {
-    return true;
-  } else if (sdkMeta.platform === 'android') {
-    return true;
-  }
-  return false;
+
+  return shouldShowAllUPIApps() || sdkMeta.platform === 'android';
 }
 
 const APP_PREFERENCE_ORDER = ['phonepe', 'google_pay', 'paytm', 'bhim'];

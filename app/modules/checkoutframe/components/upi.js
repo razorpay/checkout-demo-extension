@@ -12,8 +12,11 @@ import {
   appsThatSupportWebPayments,
 } from 'common/webPaymentsApi';
 
-import { getUPIIntentApps, setUpiApps } from 'checkoutstore/native';
-import { isUpiUxExperimentSupported } from 'checkoutstore/native';
+import {
+  getUPIIntentApps,
+  setUpiApps,
+  shouldShowAllUPIApps,
+} from 'checkoutstore/native';
 import UpiTab from 'ui/tabs/upi/index.svelte';
 import { querySelector } from 'utils/doc';
 const UPI_KEY = 'upiTab';
@@ -36,7 +39,7 @@ export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
     .filter((app) => app.method === 'upi')
     .forEach((app) => {
-      if (isUpiUxExperimentSupported('variant_1')) {
+      if (shouldShowAllUPIApps()) {
         saveUpiApps(app);
       } else {
         checkWebPaymentsForApp(app.package_name)
