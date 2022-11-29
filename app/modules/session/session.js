@@ -1055,7 +1055,8 @@ Session.prototype = {
               self.successHandler(response);
             } else {
               let errorObj = response.error;
-              if (!_.isNonNullObject(errorObj) && !errorObj.description) {
+              if (!errorObj?.description) {
+                //if error description not present generating an error response with Payment failed description
                 response = discreet.error('Payment failed');
               }
 
@@ -4722,7 +4723,7 @@ Session.prototype = {
     if (!screen) {
       if (this.checkCommonValidAndTrackIfInvalid()) {
         // switch to methods tab
-        if (this.homeTab.onDetailsScreen()) {
+        if (this.homeTab?.onDetailsScreen()) {
           Analytics.track('contact_details:cta_click', {
             type: AnalyticsTypes.BEHAV,
           });
