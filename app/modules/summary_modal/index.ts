@@ -6,7 +6,13 @@ import SummaryModal from 'summary_modal/ui/SummaryModal.svelte';
  * @param {boolean} withCta Flag which indicates if confirm CTA should be shown or not
  * @returns
  */
-export function showSummaryModal({ withCta, withCart = true }) {
+export function showSummaryModal({
+  withCta,
+  withCart = true,
+}: {
+  withCta: boolean;
+  withCart?: boolean;
+}) {
   pushOverlay({
     component: SummaryModal,
     props: {

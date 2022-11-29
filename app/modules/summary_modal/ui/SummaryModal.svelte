@@ -64,16 +64,18 @@
   let showShadow = false;
   let offerAmount = 0;
 
-  let tableHeight;
-  let backdropHeight;
+  let tableHeight: number;
+  let backdropHeight: number;
   let currency = getCurrency();
   const spaceAmountWithSymbol = false;
   let priceBeforeScriptDisc = $cartAmount;
-  let scriptCouponDiscount = null;
+  let scriptCouponDiscount: number | null = null;
 
   afterUpdate(() => {
-    tableHeight = document.getElementById('summary-table').offsetHeight;
-    backdropHeight = document.getElementById('overlay').offsetHeight;
+    tableHeight = (document.getElementById('summary-table') as HTMLElement)
+      .offsetHeight;
+    backdropHeight = (document.getElementById('overlay') as HTMLElement)
+      .offsetHeight;
 
     const cartListEle = document.querySelector('#cart-list');
 
@@ -148,7 +150,8 @@
   $: {
     if (scriptCouponApplied()) {
       priceBeforeScriptDisc = $cartItems.reduce(
-        (acc, curr) => acc + curr.quantity * +curr.price,
+        (acc: number, curr: { quantity: number; price: number | string }) =>
+          acc + curr.quantity * +curr.price,
         0
       );
       scriptCouponDiscount = priceBeforeScriptDisc - $cartAmount;
@@ -285,6 +288,7 @@
           </div>
         </div>
       {/if}
+      <!-- Todo to fix this after dynamicfee.js move to TS -->
       {#if $dynamicFeeObject?.convenience_fee}
         <div class="summary-row">
           <div>

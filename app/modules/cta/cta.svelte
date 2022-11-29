@@ -26,7 +26,7 @@
     (Events as any).TrackBehav(CTAEvents.VIEW_DETAILS_CLICKED, {
       screen_name: getCurrentScreen(),
     });
-    showSummaryModal({ withCta: false } as any);
+    showSummaryModal({ withCta: false });
   }
 
   export let onSubmit: (...args: any) => void = defaultCTAAction;
