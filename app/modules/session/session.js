@@ -36,6 +36,7 @@ import {
   moveControlToSession,
   popStack,
   isMainStackPopulated,
+  clearStack,
 } from 'navstack';
 import { isQRPaymentCancellable, avoidSessionSubmit } from 'upi/helper';
 import { initUpiQrV2 } from 'upi/features';
@@ -96,6 +97,7 @@ import { WalletTracker } from 'wallet/analytics/events';
 import { remember } from 'checkoutstore/screens/card';
 import { showTokenisationBenefitModal } from 'card/helper/cards';
 import { getLineItemsTotal } from 'one_click_checkout/cart';
+import { selectedPlan } from 'checkoutstore/emi';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -4311,6 +4313,14 @@ Session.prototype = {
   closeModal: function () {
     let session = this;
 
+    // If we have navstack populated we need to clear the stack and the respective states
+    // with respect to the screen rendered via navstack
+    clearStack();
+    // Note: As of now EMI screens are rendered via navstack hence clearing only those state
+    // Can conditionalise further once more payment methods are migrated to navstack
+    selectedBank.set(null);
+    selectedPlan.set(null);
+
     if (session.get('modal.confirm_close')) {
       Confirm.confirmClose().then(function (close) {
         if (close) {
@@ -6455,6 +6465,7 @@ Session.prototype = {
       if (this.mainModal) {
         this.mainModal.$destroy();
       }
+
       this.tab = this.screen = '';
       tabStore.set(this.tab);
       screenStore.set(this.screen);

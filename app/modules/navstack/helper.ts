@@ -147,3 +147,12 @@ export function moveControlToSession(shouldMove: boolean) {
 export function controlledViaSession() {
   return get(isSessionControlled);
 }
+
+/**
+ * Navstack helper function to clear the stack elements
+ * The function clears all the elements and set the reference to null
+ */
+export function clearStack() {
+  elementRef.set(null);
+  elements.set([]);
+}
