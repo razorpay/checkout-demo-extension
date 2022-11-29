@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import Config from 'config/index.js';
+import Config from 'config';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { selectedInstrument } from 'checkoutstore/screens/home';
 import { getCardMetadata } from 'common/card';
