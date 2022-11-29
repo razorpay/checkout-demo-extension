@@ -51,6 +51,20 @@ describe('test PaymentState', () => {
     expect(PaymentState.persistentState.has(JSON.stringify(key))).toBeTruthy();
   });
 
+  test('#setPersistentState error response', async () => {
+    const errorRes = {
+      error: {
+        description: 'Network error',
+      },
+      xhr: {
+        status: 0,
+      },
+    };
+    await expect(PaymentState.setPersistentState(dummyRequest, errorRes)).toBe(
+      undefined
+    );
+  });
+
   test('#getPersistentPayment', async () => {
     //setting up
     await PaymentState.setPersistentState(dummyRequest, response);
@@ -58,6 +72,25 @@ describe('test PaymentState', () => {
     expect(data).toMatchObject(response);
   });
 
+  test('#getPersistentPayment with extra metadata', async () => {
+    //setting up
+    await PaymentState.setPersistentState(
+      { ...dummyRequest, _source: 'checkout' },
+      response
+    );
+    const persistentState = new Map();
+    persistentState.set(
+      '{"email":"test@example.com","method":"upi","phone":"8888888888"}',
+      {
+        response: { success: true, payment_id: 'helloworld' },
+      }
+    );
+    const data = await PaymentState.getPersistentPayment.call(
+      { persistentState },
+      dummyRequest
+    );
+    expect(data).toBeNull();
+  });
   test('#getPersistentPayment with extra metadata', async () => {
     //setting up
     await PaymentState.setPersistentState(

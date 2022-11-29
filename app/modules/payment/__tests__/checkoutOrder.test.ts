@@ -83,6 +83,27 @@ describe('Checkout Order Utils', () => {
       version: 1,
     });
   });
+  test('#processCheckoutOrder success response during request key is missing from QRResponse', () => {
+    const context = {};
+    delete (sampleQRResponse as any).request;
+    processCheckoutOrder.call(context, sampleQRResponse);
+    expect(processPaymentCreate).toHaveBeenCalledTimes(1);
+    expect(processPaymentCreate).toHaveBeenCalledWith({
+      data: {
+        intent_url: sampleQRResponse.qr_code.image_content,
+      },
+      is_checkout_order: true,
+      method: 'upi',
+      payment_id: sampleQRResponse.id,
+      provider: null,
+      request: {
+        method: 'GET',
+        url: 'https://api.razorpay.com/v1/checkout/qr_code/qr_KMoQ0LP7jw2g0c/payment/status',
+      },
+      type: 'intent',
+      version: 1,
+    });
+  });
   test('#processCheckoutOrder failure response', () => {
     const context = {};
     processCheckoutOrder.call(context, {} as any);

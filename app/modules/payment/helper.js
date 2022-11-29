@@ -149,7 +149,7 @@ export function assertPaymentSuccessMetadata(data) {
   }
 }
 
-function raiseValidationError({ entity, data, severity }) {
+export function raiseValidationError({ entity, data, severity }) {
   const analytics = {
     event: 'validation:failed',
     data: {

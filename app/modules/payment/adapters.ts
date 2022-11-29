@@ -7,8 +7,6 @@ import {
 } from 'upi/constants';
 import { isBraveBrowser, samsungBrowser } from 'common/useragent';
 
-const PaymentRequest = global.PaymentRequest;
-
 export const supportedWebPaymentsMethodsForApp = {
   [PHONE_PE_PACKAGE_NAME]: 'https://mercury.phonepe.com/transact/pay',
   [CRED_PACKAGE_NAME]: ['https://cred.club/checkout/pay'],
@@ -28,11 +26,11 @@ export const ADAPTER_CHECKERS = {
  *
  * @return {Promise}
  */
-export function checkPaymentAdapter(adapter, data = {}) {
-  const checker = ADAPTER_CHECKERS[adapter];
+export function checkPaymentAdapter(adapter: string) {
+  const checker = ADAPTER_CHECKERS[adapter as keyof typeof ADAPTER_CHECKERS];
 
   if (checker) {
-    return checker(data);
+    return checker();
   }
 
   return Promise.reject({
@@ -40,14 +38,14 @@ export function checkPaymentAdapter(adapter, data = {}) {
   });
 }
 
-function phonepePaymentRequestAdapter() {
-  return new Promise((resolve, reject) => {
+export function phonepePaymentRequestAdapter() {
+  return new Promise<void>((resolve, reject) => {
     try {
       /**
        * PaymentRequest API is only available in the modern browsers which
        * have Promise API.
        */
-      new PaymentRequest(
+      new (global as any).PaymentRequest(
         [
           {
             supportedMethods:
@@ -65,7 +63,7 @@ function phonepePaymentRequestAdapter() {
         }
       )
         .canMakePayment()
-        .then((isAvailable) => {
+        .then((isAvailable: boolean) => {
           if (isAvailable) {
             resolve();
           } else {
@@ -82,43 +80,50 @@ function phonepePaymentRequestAdapter() {
 }
 
 /**
+ * Returns a Promise that resolves if it is Brave browser and rejects if Samsung browser is present.
+ * @return {Promise}
+ */
+export const isBrowserAllowedByGpay = () => {
+  return new Promise<void>((resolve, reject) => {
+    if (samsungBrowser) {
+      // reject because Gpay does not work with samsung browser
+      // The Gpay app opens and the payment fails at Gpay's end
+      reject();
+    }
+    isBraveBrowser().then((result) => {
+      if (!result) {
+        resolve();
+      } else {
+        // Reject because of the same reason as Samsung
+        // Gpay Mweb intent does not work with Brave Browser
+        reject();
+      }
+    });
+  });
+};
+
+/**
  * Returns a Promise that resolves if Google Pay is present.
  * @return {Promise}
  */
 export function gpayPaymentRequestAdapter() {
-  const isBrowserAllowedByGpay = () => {
-    return new Promise((resolve, reject) => {
-      if (samsungBrowser) {
-        // reject because Gpay does not work with samsung browser
-        // The Gpay app opens and the payment fails at Gpay's end
-        reject();
-      }
-      isBraveBrowser().then((result) => {
-        if (!result) {
-          resolve();
-        } else {
-          // Reject because of the same reason as Samsung
-          // Gpay Mweb intent does not work with Brave Browser
-          reject();
-        }
-      });
-    });
-  };
-
   return new Promise((resolve, reject) => {
     try {
       /**
        * PaymentRequest API is only available in the modern browsers which
        * have Promise API.
        */
-      new PaymentRequest([{ supportedMethods: googlePaySupportedMethods }], {
-        total: {
-          label: '_',
-          amount: { currency: 'INR', value: 0 },
-        },
-      })
+      new (global as any).PaymentRequest(
+        [{ supportedMethods: googlePaySupportedMethods }],
+        {
+          total: {
+            label: '_',
+            amount: { currency: 'INR', value: 0 },
+          },
+        }
+      )
         .canMakePayment()
-        .then((isAvailable) => {
+        .then((isAvailable: boolean) => {
           if (isAvailable) {
             isBrowserAllowedByGpay()
               .then(resolve)
@@ -141,17 +146,17 @@ export function gpayPaymentRequestAdapter() {
 }
 
 /**
- * Returns a Promise that resolves if Google Pay is present.
+ * Returns a Promise that resolves if Cred is present.
  * @return {Promise}
  */
 export function credPaymentRequestAdapter() {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     try {
       /**
        * PaymentRequest API is only available in the modern browsers which
        * have Promise API.
        */
-      new PaymentRequest(
+      new (global as any).PaymentRequest(
         [
           {
             supportedMethods:
@@ -166,7 +171,7 @@ export function credPaymentRequestAdapter() {
         }
       )
         .canMakePayment()
-        .then((isAvailable) => {
+        .then((isAvailable: boolean) => {
           if (isAvailable) {
             resolve();
           } else {

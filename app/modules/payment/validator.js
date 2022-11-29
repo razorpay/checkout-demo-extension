@@ -22,7 +22,7 @@ export const formatPayment = function (payment) {
   validateData(payment.data);
 };
 
-function validateData(data) {
+export function validateData(data) {
   const cardHolderName = data?.['card[name]'];
   if (Number(cardHolderName) === 0) {
     return;
