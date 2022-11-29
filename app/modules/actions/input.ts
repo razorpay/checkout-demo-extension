@@ -1,29 +1,30 @@
 import { iPhone } from 'common/useragent';
-import Razorpay from 'common/Razorpay';
 import { scrollIntoView } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import * as _ from 'utils/_';
 
-function onFocus(event) {
-  _El.addClass(event.target.parentNode, 'focused');
+function onFocus(event: FocusEvent) {
+  const target = event.target as HTMLElement;
+
+  _El.addClass(target.parentNode, 'focused');
 
   setTimeout(function () {
-    scrollIntoView(event.target);
+    scrollIntoView(target);
   }, 1000);
 
   if (iPhone) {
-    Razorpay.sendMessage({ event: 'focus' });
+    global.Razorpay.sendMessage({ event: 'focus' });
   }
 }
 
-function onBlur(event) {
-  const parent = event.target.parentNode;
+function onBlur(event: FocusEvent) {
+  const parent = (event.target as HTMLElement).parentNode;
 
   _El.removeClass(parent, 'focused');
   _El.addClass(parent, 'mature');
 
   if (iPhone) {
-    Razorpay.sendMessage({ event: 'blur' });
+    global.Razorpay.sendMessage({ event: 'blur' });
   }
 }
 
@@ -33,9 +34,9 @@ function onBlur(event) {
  *
  * @returns {boolean}
  */
-function validateOnMinMax(el) {
-  let min = parseFloat(_El.getAttribute(el, 'min'));
-  let max = parseFloat(_El.getAttribute(el, 'max'));
+function validateOnMinMax(el: HTMLInputElement) {
+  const min = parseFloat(_El.getAttribute(el, 'min'));
+  const max = parseFloat(_El.getAttribute(el, 'max'));
   const parsed = parseFloat(el.value);
 
   if (!isNaN(parsed) && (!isNaN(min) || !isNaN(max))) {
@@ -57,8 +58,8 @@ function validateOnMinMax(el) {
   return true;
 }
 
-function onInput(event) {
-  const el = event.target;
+function onInput(event: Event | { target: HTMLInputElement }) {
+  const el = event.target as HTMLInputElement;
   const value = el.value;
   const required = _.isString(el.getAttribute('required'));
   const pattern = el.getAttribute('pattern');
@@ -90,7 +91,7 @@ function onInput(event) {
   _El.keepClass(parent, 'invalid', !valid);
 }
 
-export function focus(node, condition = true) {
+export function focus(node: HTMLInputElement, condition = true) {
   if (!condition) {
     return;
   }
@@ -101,7 +102,7 @@ export function focus(node, condition = true) {
   };
 }
 
-export function blur(node, condition = true) {
+export function blur(node: HTMLInputElement, condition = true) {
   if (!condition) {
     return;
   }
@@ -112,7 +113,7 @@ export function blur(node, condition = true) {
   };
 }
 
-export function input(node, condition = true) {
+export function input(node: HTMLInputElement, condition = true) {
   if (!condition) {
     return;
   }

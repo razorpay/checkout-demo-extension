@@ -51,7 +51,6 @@
   import { getPreferredBanks } from 'common/bank';
   import { isRecurring, isCAW } from 'razorpay';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
-  import * as InputActions from 'actions/input';
   import {
     hasMultipleOptions,
     getRetailOption,
@@ -107,11 +106,6 @@
   // Refs
   let radioContainer;
   let bankSelect;
-
-  // Actions
-  const focus = InputActions.focus;
-  const blur = InputActions.blur;
-  const input = InputActions.input;
 
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
