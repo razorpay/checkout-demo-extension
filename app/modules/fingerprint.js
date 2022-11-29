@@ -53,13 +53,17 @@ export function generateFingerprint() {
 }
 
 export function sha(str) {
-  // We transform the string into an arraybuffer.
-  var buffer = new global.TextEncoder('utf-8').encode(str);
+  try {
+    // We transform the string into an arraybuffer.
+    var buffer = new global.TextEncoder('utf-8').encode(str);
 
-  // doesn't work on "http"
-  return global.crypto.subtle
-    .digest('SHA-1', buffer)
-    .then((hash) => (fingerPrint = hex(hash)));
+    // doesn't work on "http"
+    return global.crypto.subtle
+      .digest('SHA-1', buffer)
+      .then((hash) => (fingerPrint = hex(hash)));
+  } catch (e) {
+    return Promise.resolve();
+  }
 }
 
 function hex(buffer) {

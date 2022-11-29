@@ -49,7 +49,7 @@ class PaymentState {
     return new Promise<null | Record<string, any>>((resolve, reject) => {
       getHashKey(payload)
         .then((hashKey) => {
-          if (this.persistentState.has(hashKey)) {
+          if (hashKey && this.persistentState.has(hashKey)) {
             const responseData = this.persistentState.get(hashKey);
             if (
               !responseData?.expiredIn ||
@@ -74,11 +74,13 @@ class PaymentState {
     if (typeof responsePayload.error !== 'undefined') {
       return;
     }
-    getHashKey(request).then((hashKey: string) => {
-      this.persistentState.set(hashKey, {
-        response: responsePayload,
-        expiredIn: new Date().getTime() + PERSISTENT_PAYMENT_EXPIRY_LIMIT,
-      });
+    getHashKey(request).then((hashKey) => {
+      if (hashKey) {
+        this.persistentState.set(hashKey, {
+          response: responsePayload,
+          expiredIn: new Date().getTime() + PERSISTENT_PAYMENT_EXPIRY_LIMIT,
+        });
+      }
     });
   }
 
