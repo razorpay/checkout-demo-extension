@@ -28,4 +28,4 @@ export const SEVERITY_LEVELS = {
    * E.g. Vernacular flows, Unable to run AB experiments etc
    */
   S3: 'S3', // Trivial
-};
+} as const;

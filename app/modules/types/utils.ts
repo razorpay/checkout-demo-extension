@@ -37,3 +37,5 @@ export type FollowPath<T, P> = P extends `${infer U}.${infer R}`
   : P extends keyof T
   ? T[P]
   : unknown;
+
+export type ValueOf<T> = T[keyof T];

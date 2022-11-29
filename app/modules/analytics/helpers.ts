@@ -56,7 +56,7 @@ export const getTrackMethods = () => {
   Object.keys(TYPES).forEach((key) => {
     const type = TYPES[key as keyof typeof TYPES];
     const methodName = `Track${type.charAt(0).toUpperCase()}${type.slice(1)}`;
-    (Events as any)[methodName] = function (eventName: string, data: unknown) {
+    (Events as any)[methodName] = function (eventName: string, data: any) {
       Analytics.track(eventName, {
         type,
         data,
@@ -79,8 +79,8 @@ export const getTrackMethods = () => {
 export const addAnalyticsMethods = (
   events: GenerateTrackProp
 ): GenerateTrackProp & {
-  removeMeta: (args: string) => void;
-  setMeta: (key: string, value: unknown) => void;
+  removeMeta: typeof Analytics.removeMeta;
+  setMeta: typeof Analytics.setMeta;
   setR: typeof Analytics.setR;
   updateRequestIndex: (name: string) => number;
 } => {

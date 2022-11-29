@@ -4,13 +4,26 @@ import fetch from 'utils/fetch';
 import { syncAvailability } from 'common/meta';
 import Interface from 'common/interface';
 import { TRAFFIC_ENV } from 'common/constants';
+import type { SEVERITY_LEVELS } from 'error-service/models';
+import type { ValueOf } from 'types/utils';
+
+type Metrics = {
+  name: string;
+  labels: {
+    type: EventType;
+    env: string;
+    severity?: SeverityValue;
+  }[];
+};
 
 const SESSION_CREATED = 'session_created';
 const SESSION_ERRORED = 'session_errored';
 let sessionCreated = false;
 let sessionErrored = false;
+type EventType = typeof SESSION_CREATED | typeof SESSION_ERRORED;
+type SeverityValue = ValueOf<typeof SEVERITY_LEVELS>;
 
-let env = TRAFFIC_ENV;
+let env = TRAFFIC_ENV as string;
 try {
   if (
     location.href.indexOf('https://api.razorpay.com/v1/checkout/public') === 0
@@ -26,15 +39,15 @@ try {
   }
 } catch (e) {}
 
-function getEventName(event) {
+function getEventName(event: EventType) {
   if (event === SESSION_CREATED) {
     return `checkout.${env}.sessionCreated.metrics`.replace('.production', '');
   }
   return `checkout.${env}.sessionErrored.metrics`.replace('.production', '');
 }
-function createEventObject(event, severity) {
+function createEventObject(event: EventType, severity: SeverityValue) {
   const name = getEventName(event);
-  const metrics = [
+  const metrics: Metrics[] = [
     {
       name,
       labels: [
@@ -51,7 +64,7 @@ function createEventObject(event, severity) {
   return metrics;
 }
 
-function trackAvailabilty(event, severity) {
+function trackAvailabilty(event: EventType, severity: SeverityValue) {
   // Use sendBeacon if supported.
   const useBeacon = hasProp(navigator, 'sendBeacon');
 

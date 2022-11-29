@@ -6,6 +6,7 @@ import {
   getRegisteredExperiments,
 } from 'experiments';
 import { getAmount, getOrderId } from 'razorpay';
+import type { PreferencesObject } from 'razorpay/types/Preferences';
 import type { CustomObject } from 'types';
 import { getQueryParams } from 'utils/_';
 
@@ -46,17 +47,11 @@ function formatPrefExperiments(
  * sets meta/context properties for Events post prefs call
  * @param preferences
  */
-export function updateAnalyticsFromPreferences(
-  preferences: CustomObject<unknown>
-) {
+export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
   EventsV2.setContext(ContextProperties.AMOUNT, getAmount());
 
   Events.setMeta(MetaProperties.FEATURES, preferences.features);
   EventsV2.setContext(ContextProperties.FEATURES, preferences.features);
-  if (preferences && preferences.merchant_id) {
-    Events.setMeta(MetaProperties.MERCHANT_ID, preferences.merchant_id);
-    EventsV2.setContext(ContextProperties.MERCHANT_ID, preferences.merchant_id);
-  }
   if (preferences && preferences.merchant_key) {
     Events.setMeta(MetaProperties.MERCHANT_KEY, preferences.merchant_key);
     EventsV2.setContext(

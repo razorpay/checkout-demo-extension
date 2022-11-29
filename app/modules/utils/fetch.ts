@@ -20,7 +20,7 @@ export type FetchPrototype = {
     url: string;
     headers?: Common.Object<string>;
     method?: string;
-    callback: (response: any) => void;
+    callback?: (response: any) => void;
     data?: string | Record<string, any>;
   };
 };
@@ -269,7 +269,7 @@ const fetchPrototype: FetchPrototype = {
       if (xhr.readyState === 4 && xhr.status) {
         // using xhr.getResponseHeader because xhr.responseType is '' for all api calls
         if (xhr.getResponseHeader('content-type')?.includes('text')) {
-          callback({
+          callback?.({
             status_code: xhr.status,
             xhr: { status: xhr.status, text: xhr.responseText },
           });
@@ -302,11 +302,11 @@ const fetchPrototype: FetchPrototype = {
 
           json['status_code'] = xhr.status;
 
-          callback(json);
+          callback?.(json);
           return;
         }
         const response = { status_code: xhr.status };
-        callback(response);
+        callback?.(response);
       }
     };
     xhr.onerror = function () {
@@ -328,7 +328,7 @@ const fetchPrototype: FetchPrototype = {
         })
       );
 
-      callback(resp);
+      callback?.(resp);
     };
 
     if (sessionId) {
@@ -493,7 +493,7 @@ function jsonp(options: options): FetchPrototype {
 
     const req = (global.Razorpay[callbackName] = function (data: any) {
       delete data['http_status_code'];
-      cb(data);
+      cb?.(data);
       delete global.Razorpay[callbackName];
     });
 
@@ -517,7 +517,7 @@ function jsonp(options: options): FetchPrototype {
     Object.assign(script, {
       src,
       async: true,
-      onerror: () => cb(networkError),
+      onerror: () => cb?.(networkError),
       onload,
       onreadystatechange: onload,
     });

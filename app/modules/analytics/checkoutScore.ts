@@ -35,7 +35,7 @@ const score = {
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
   hadMethodPrefilled: 4,
-  switchingTabs: ({ tabsCount }) => {
+  switchingTabs: ({ tabsCount }: { tabsCount: number }) => {
     if (tabsCount > 20) {
       return -2;
     }
@@ -119,7 +119,7 @@ const reasons = {
   paidViaSavedVpa: 'Used a saved vpa',
   vpaPrefilled: 'Had his vpa prefilled',
   hadMethodPrefilled: 'Render had the method pre-decided',
-  switchingTabs: ({ tabsCount }) => {
+  switchingTabs: ({ tabsCount }: { tabsCount: number }) => {
     if (tabsCount > 3 && tabsCount <= 5) {
       return 'Switched more then 3 tabs';
     }
@@ -140,7 +140,10 @@ const reasons = {
 let calculatedScore = 0;
 let reasonEncountered = '';
 
-const updateScore = function (type, obj) {
+const updateScore = function (
+  type: keyof typeof score,
+  obj?: { tabsCount?: number }
+) {
   if (!score[type]) {
     // sanity check if we send the wrong key
     console.warn('incorrect key sent for score updatation');
@@ -149,12 +152,12 @@ const updateScore = function (type, obj) {
 
   // Most scores are numbers
   if (typeof score[type] === 'number') {
-    calculatedScore += score[type];
-    reasonEncountered += reasons[type] + ' | ';
+    calculatedScore += score[type] as number;
+    reasonEncountered += `${reasons[type] as string} | `;
     // Some scores are functions which depend on other data
-  } else {
-    calculatedScore += score[type](obj);
-    reasonEncountered += reasons[type](obj) + ' | ';
+  } else if (typeof score[type] === 'function') {
+    calculatedScore += (score[type] as Function)(obj);
+    reasonEncountered += `${(reasons[type] as Function)(obj)} | `;
   }
 
   Analytics.setMeta('scoreVersion', 1.0);

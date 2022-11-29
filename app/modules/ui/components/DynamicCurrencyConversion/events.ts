@@ -15,8 +15,8 @@ enum DCCEventNames {
 export const trackRender = () => Events.TrackRender(DCCEventNames.render);
 
 export const addMetaProperties = (
-  type?: string,
-  data?: DCC.EventTrackDataType
+  type: string,
+  data: DCC.EventTrackDataType
 ) => {
   Events.setMeta(
     `${<string>(MetaProperties.DCC_DATA as unknown)}_${type || 'UNKNOWN'}`,

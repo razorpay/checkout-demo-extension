@@ -4,18 +4,23 @@ import * as _ from 'utils/_';
 import { constructErrorObject } from 'error-service/helpers';
 import { SEVERITY_LEVELS } from 'error-service/models';
 import ErrorEvents from 'analytics/errors/events';
+import type RazorpayStore from 'razorpay';
+import type * as AnalyticsTypes from 'analytics-types';
+import type { ValueOf } from 'types/utils';
 
-const META = {};
-const REQUEST_INDEX = {};
+type AnalyticsType = ValueOf<typeof AnalyticsTypes>;
 
-let rInstance;
+const META: Record<string, any> = {};
+const REQUEST_INDEX: Record<string, Record<string, number>> = {};
+
+let rInstance: typeof RazorpayStore.instance;
 
 /**
  * @param {Object} _m
  *
  * @return {Object} m
  */
-const calculateMeta = (_m) => {
+const calculateMeta = (_m: typeof META) => {
   const meta = ObjectUtils.flatten(_m);
 
   ObjectUtils.loop(meta, (val, key) => {
@@ -27,7 +32,7 @@ const calculateMeta = (_m) => {
   return meta;
 };
 
-const sanitizeEventData = (data) => {
+const sanitizeEventData = (data: Record<string, unknown>) => {
   const keysToMask = ['token'];
 
   const _data = ObjectUtils.clone(data || {});
@@ -45,7 +50,7 @@ const Analytics = () => ({
   /**
    * @param {Razorpay} r
    */
-  setR: function (r) {
+  setR: function (r: typeof RazorpayStore.instance) {
     rInstance = r;
     Track.dispatchPendingEvents(r);
   },
@@ -59,8 +64,25 @@ const Analytics = () => ({
    *  @prop {Boolean} immediately
    */
   track: function (
-    name,
-    { type, data = {}, r = rInstance, immediately = false, isError } = {}
+    name: string,
+    {
+      type,
+      data = {},
+      r = rInstance,
+      immediately = false,
+      isError = false,
+    }: {
+      type?: AnalyticsType | undefined;
+      isError?: boolean;
+      immediately?: boolean;
+      data?: {
+        [x: string]: any;
+        meta?: ReturnType<typeof calculateMeta> & {
+          request_index?: typeof REQUEST_INDEX[string] | null;
+        };
+      };
+      r?: typeof RazorpayStore.instance;
+    } = {}
   ) {
     try {
       // when we get any error on mount of script we don't have r instance
@@ -71,7 +93,7 @@ const Analytics = () => ({
         r = {
           id: Track.id,
           getMode: () => 'live',
-          get: (arg) => {
+          get: (arg: string) => {
             if (typeof arg === 'string') {
               return false;
             }
@@ -113,7 +135,7 @@ const Analytics = () => ({
         ErrorEvents.JS_ERROR,
         {
           data: {
-            error: constructErrorObject(e, {
+            error: constructErrorObject(e as Error, {
               severity: SEVERITY_LEVELS.S2,
               unhandled: false,
             }),
@@ -128,14 +150,14 @@ const Analytics = () => ({
    * @param {String} key
    * @param {*} val
    */
-  setMeta: function (key, val) {
+  setMeta: function (key: string, val: string | number | boolean | object) {
     META[key] = val;
   },
 
   /**
    * @param {String} key
    */
-  removeMeta: function (key) {
+  removeMeta: function (key: string) {
     delete META[key];
   },
 
@@ -151,7 +173,7 @@ const Analytics = () => ({
    * @param name
    * @returns {number}
    */
-  updateRequestIndex(name) {
+  updateRequestIndex(name: string) {
     if (!rInstance || !name) {
       return 0;
     }

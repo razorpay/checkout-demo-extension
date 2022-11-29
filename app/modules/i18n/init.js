@@ -11,7 +11,7 @@ import {
 import fetch from 'utils/fetch';
 import { get } from 'svelte/store';
 
-import en from './bundles/en';
+import en from './bundles/en.ts';
 
 import { getSession } from 'sessionmanager';
 import {
