@@ -6,7 +6,7 @@ import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
 import { querySelectorAll, form2obj } from 'utils/doc';
 import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
-import { isBraveBrowser } from 'common/useragent';
+import { isBraveBrowser, isMobile } from 'common/useragent';
 import { appendFormInput, flatten } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
@@ -302,7 +302,7 @@ RazorProto.open = needBody(function () {
   this.metadata.openedAt = Date.now();
 
   let frame = (this.checkoutFrame = getPreloadedFrame(this));
-  Track(this, 'open');
+  Track(this, 'open', { meta: { is_mobile: isMobile() } });
   try {
     MiscTracker.INVOKED({
       prefill: {
