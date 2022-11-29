@@ -186,7 +186,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
 
     Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK, {
       data: {
-        currentScreen: this.screen,
+        currentScreen: that.screen,
       },
       immediately: true,
     });
