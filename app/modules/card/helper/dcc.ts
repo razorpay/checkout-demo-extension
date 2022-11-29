@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { getCurrencies as getCurrenciesData, getCurrency } from 'razorpay';
 import { amountAfterOffer } from 'offers/store/store';
+import type { CurrenciesPayload } from 'card/types';
 
 /**
  * Fetch all DCC currencies with /flows api
@@ -15,8 +16,8 @@ export const getCurrencies = ({
   walletCode,
   amount,
   provider,
-}) => {
-  return getCurrenciesData({
+}: CurrenciesPayload) =>
+  getCurrenciesData({
     iin,
     tokenId,
     cardNumber,
@@ -25,4 +26,3 @@ export const getCurrencies = ({
     currency: getCurrency(), // Entity currency
     provider,
   });
-};

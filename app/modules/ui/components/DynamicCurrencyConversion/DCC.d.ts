@@ -88,6 +88,8 @@ declare namespace DCC {
     show_markup?: boolean;
     currency_request_id: string;
     avs_required: boolean;
+    address_name_required: boolean;
+    recurring: boolean;
   };
 
   export type CurrencyMetaDataType = GetCurrenciesResponseType & {

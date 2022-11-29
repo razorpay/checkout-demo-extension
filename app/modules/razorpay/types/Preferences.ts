@@ -108,7 +108,7 @@ interface Debit {
   [bankCode: string]: string;
 }
 
-interface Card {
+interface RecurringCard {
   credit: string[];
   prepaid: string[];
   debit: Debit;
@@ -122,7 +122,7 @@ interface Emandate {
 }
 
 interface Recurring {
-  card: Card;
+  card: RecurringCard;
   emandate: Emandate;
   upi: boolean;
   nach: boolean;
@@ -328,13 +328,12 @@ interface Address {
   source_type: any;
 }
 
-interface Tokens {
+export interface Tokens {
   entity: string;
   count: number;
-  items: Item[];
+  items: TokenItem[];
 }
-
-interface Item {
+export interface TokenItem {
   id: string;
   entity: string;
   token: string;
@@ -355,6 +354,10 @@ interface Item {
   dcc_enabled: boolean;
   billing_address: any;
   compliant_with_tokenisation_guidelines: boolean;
+  cvvDigits?: number;
+  debitPin?: boolean;
+  plans?: boolean;
+  vpa?: any;
 }
 
 interface Card {
@@ -368,8 +371,8 @@ interface Card {
   emi: boolean;
   sub_type: string;
   token_iin: any;
-  expiry_month: number;
-  expiry_year: number;
+  expiry_month: number | string;
+  expiry_year: number | string;
   flows: Flows;
   country: string;
 }

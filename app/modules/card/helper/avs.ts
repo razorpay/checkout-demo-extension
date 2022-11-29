@@ -2,13 +2,20 @@ import { get } from 'svelte/store';
 import { Views } from 'ui/tabs/card/constant';
 import { getCurrencies } from './dcc';
 import { AVSBillingAddress, AVSScreenMap } from 'checkoutstore/screens/card';
-import { getCardByTokenId } from './card';
+import { getCardByTokenId } from './cards';
+import type {
+  UpdateAVSFormDataParam,
+  CurrenciesPayload,
+  SelectedCardTokenIdParam,
+  AVSEntityParam,
+  AVSBillingAddressData,
+} from 'card/types';
 
-export const fetchAVSFlagForCard = (params = {}) => {
+export const fetchAVSFlagForCard = (params: CurrenciesPayload = {}) => {
   const key = params.iin || params.tokenId;
   if (key) {
     getCurrencies(params)
-      .then((currencyPayload) => {
+      .then((currencyPayload: DCC.GetCurrenciesResponseType) => {
         updateAVSScreenMap(key, !!currencyPayload.avs_required);
       })
       .catch(() => {
@@ -28,7 +35,7 @@ export const getIntSelectedCardTokenId = ({
   selectedCard,
   selectedInstrument,
   tokens,
-}) => {
+}: SelectedCardTokenIdParam) => {
   let preSelectedCard = null;
 
   // First check with the selectedCard store
@@ -60,7 +67,7 @@ export const getEntityForAVSMap = ({
   iin,
   selectedCard,
   selectedCardFromHome,
-}) => {
+}: AVSEntityParam) => {
   if (currentView === Views.SAVED_CARDS) {
     return selectedCard ? selectedCard.id : null;
   }
@@ -74,11 +81,12 @@ export const resetAVSBillingAddressData = () => {
   AVSBillingAddress.set(null);
 };
 
-export const setAVSBillingAddressData = (data) => {
-  AVSBillingAddress.set(data);
+export const setAVSBillingAddressData = (data: AVSBillingAddressData) => {
+  // TODO: need to remove any type after checkoutstore/screens/card migrated to ts
+  AVSBillingAddress.set(data as any);
 };
 
-export const updateAVSScreenMap = (key, value) => {
+export const updateAVSScreenMap = (key: string, value: boolean) => {
   AVSScreenMap.update((prevValue) => ({
     ...prevValue,
     [key]: value,
@@ -90,15 +98,19 @@ export const updateAVSFormDataForCardView = ({
   direct,
   selectedCard,
   selectedCardFromHome,
-}) => {
+}: UpdateAVSFormDataParam) => {
   if (lastView !== Views.ADD_CARD) {
-    let billingAddress = null;
+    let billingAddress: AVSBillingAddressData = null;
     if (direct && selectedCardFromHome?.billing_address) {
       // directly come from home screen
-      billingAddress = { ...selectedCardFromHome.billing_address };
+      billingAddress = {
+        ...selectedCardFromHome.billing_address,
+      };
     } else if (!direct && selectedCard?.billing_address) {
       // from card screen
-      billingAddress = { ...selectedCard.billing_address };
+      billingAddress = {
+        ...selectedCard.billing_address,
+      };
     }
     setAVSBillingAddressData(billingAddress);
   } else if (get(AVSBillingAddress)) {

@@ -1,4 +1,4 @@
-import { createExperiment } from 'experiments';
+import { createExperiment, CreateExperimentOptions } from 'experiments';
 
 /**
  * Experiment: Card Separation
@@ -6,7 +6,7 @@ import { createExperiment } from 'experiments';
  */
 const delayOTP = createExperiment('delay_login_otp', 1, {
   overrideFn: () => false,
-});
+} as CreateExperimentOptions);
 
 /**
  * Experiment: Card Separation
@@ -14,6 +14,6 @@ const delayOTP = createExperiment('delay_login_otp', 1, {
  */
 const cardsSeparation = createExperiment('cards_separation', 1, {
   overrideFn: () => false,
-}); // disabled
+} as CreateExperimentOptions); // disabled
 
 export { cardsSeparation, delayOTP };

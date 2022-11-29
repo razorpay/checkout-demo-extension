@@ -94,7 +94,7 @@ import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
 import { remember } from 'checkoutstore/screens/card';
-import { showTokenisationBenefitModal } from 'card/helper/card';
+import { showTokenisationBenefitModal } from 'card/helper/cards';
 import { getLineItemsTotal } from 'one_click_checkout/cart';
 
 let emo = {};

@@ -3,11 +3,11 @@ import BrowserStorage from 'browserstorage';
 /** Don't change below */
 const STORAGE_KEY = 'rzp_checkout_exp';
 
-type CreateExperimentOptions = {
+export type CreateExperimentOptions = {
   /**
    * Argument for evaluator fn
    */
-  evaluatorArg: number | string;
+  evaluatorArg?: number | string;
 
   /**
    * Function to override evaluation

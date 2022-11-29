@@ -14,6 +14,8 @@ import { getSession } from 'sessionmanager';
 import { isIndianCustomer } from 'checkoutstore/screens/home';
 import { isRemoveDefaultTokenizationSupported } from 'razorpay/helper/experiment';
 import { shouldRememberCard } from 'ui/tabs/card/utils';
+import type { Tokens } from 'razorpay/types/Preferences';
+import type { TokenisationOverlayProps } from 'card/types';
 
 export function delayLoginOTPExperiment() {
   /**
@@ -25,7 +27,10 @@ export function delayLoginOTPExperiment() {
   return delayOTP.enabled();
 }
 
-export const getCardByTokenId = (tokens, tokenId) => {
+export const getCardByTokenId = (
+  tokens: Tokens | null,
+  tokenId: string | undefined
+) => {
   if (!tokenId) {
     return null;
   }
@@ -38,26 +43,29 @@ export const getCardByTokenId = (tokens, tokenId) => {
   return tokens.items.find((token) => token.id === tokenId);
 };
 
+export const authOverlayOnContinue = () => {
+  popStack();
+  Events.TrackBehav('native_otp:3ds_required:click');
+  RazorpayStore.razorpayInstance?._payment?.gotoBank();
+};
+
 // 3ds overlay
 export const showAuthOverlay = () => {
   pushOverlay({
     component: AuthOverlay,
     props: {
-      onContinue: () => {
-        popStack();
-        Events.TrackBehav('native_otp:3ds_required:click');
-        RazorpayStore.razorpayInstance?._payment?.gotoBank();
-      },
+      onContinue: authOverlayOnContinue,
     },
   });
 };
 
-const showConsentOverlay = (props) => {
+export const showConsentOverlay = (props: TokenisationOverlayProps) => {
   pushOverlay({
     component: CardTokenisationOverlaySvelte,
     props,
   });
-  Events.TrackBehav(CardEvents.TOKENIZATION_BENEFITS_MODAL_SHOWN);
+  // TODO: need to remove any, once card events file migrated to ts
+  Events.TrackBehav((CardEvents as any).TOKENIZATION_BENEFITS_MODAL_SHOWN);
 };
 
 //using promise here as we don't need its value and have to perform a common action on both click and give command back to function
@@ -65,6 +73,7 @@ export const openConsentOverlay = (isSavedCardScreen = false) =>
   new Promise(function (resolve) {
     showConsentOverlay({
       onPositiveClick: () => {
+        console.log('isSavedCardScreen ++++ ', isSavedCardScreen);
         if (isSavedCardScreen) {
           userConsentForTokenization.set(true);
         } else {
@@ -81,7 +90,7 @@ export const openConsentOverlay = (isSavedCardScreen = false) =>
  * will not ask for international card as we don't tokenized them in backend
  */
 
-export const showTokenisationBenefitModal = () => {
+export const showTokenisationBenefitModal = (): boolean => {
   const session = getSession();
 
   const isSavedCardScreen = session.svelteCardTab?.isOnSavedCardsScreen();
