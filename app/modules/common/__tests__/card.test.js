@@ -86,6 +86,7 @@ describe('common/card', () => {
     expect(luhnCheck(testCards.maestro)).toBe(true);
     expect(luhnCheck('4242424242424246')).toBe(false);
   });
+
   //isCountryInAllowedList restrict through country codes
   test('isCountryInAllowedList', function () {
     expect(Card.isCountryInAllowedList('US', ['non_IN'])).toBe(true);
@@ -95,5 +96,53 @@ describe('common/card', () => {
     expect(Card.isCountryInAllowedList('IN', ['BR'])).toBe(false);
     expect(Card.isCountryInAllowedList('IN', ['non_IN', 'non_US'])).toBe(false);
     expect(Card.isCountryInAllowedList('IN', ['non_IN', 'IN'])).toBe(true);
+  });
+
+  test('getCardEntityFromPayload', () => {
+    expect(Card.getCardEntityFromPayload({ iin: '4111111' })).toBe('411111');
+    expect(Card.getCardEntityFromPayload({ tokenId: '8bYRD2x6PTFvav' })).toBe(
+      '8bYRD2x6PTFvav'
+    );
+    expect(Card.getCardEntityFromPayload({ cardNumber: testCards.visa })).toBe(
+      '424242'
+    );
+    expect(
+      Card.getCardEntityFromPayload({ 'card[number]': testCards.visa })
+    ).toBe('424242');
+    expect(
+      Card.getCardEntityFromPayload({ number: testCards.visa })
+    ).toBeFalsy();
+    expect(Card.getCardEntityFromPayload({ iin: '4111' })).toBe('4111');
+  });
+
+  test('getFullNetworkLogo', () => {
+    expect(Card.getFullNetworkLogo('SBIN')).toBe(
+      'https://cdn.razorpay.com/acs/network/SBIN.svg'
+    );
+    expect(Card.getFullNetworkLogo('ICICI')).toBe(
+      'https://cdn.razorpay.com/acs/network/ICICI.svg'
+    );
+  });
+
+  test('findNetworkNameByCode', () => {
+    expect(Card.findNetworkNameByCode('amex')).toBe('American Express');
+    expect(Card.findNetworkNameByCode('mastercard')).toBe('MasterCard');
+    expect(Card.findNetworkNameByCode('bajaj')).toBe('Bajaj Finserv');
+    expect(Card.findNetworkNameByCode('unknown')).toBe('unknown');
+  });
+
+  test('isAmex', () => {
+    expect(Card.isAmex(testCards.amex)).toBe(true);
+    expect(Card.isAmex(testCards.visa)).toBe(false);
+    expect(Card.isAmex(testCards.mastercard)).toBe(false);
+    expect(Card.isAmex(testCards.bajaj)).toBe(false);
+  });
+
+  test('isIinValid', () => {
+    expect(Card.isIinValid(testCards.amex)).toBe(true);
+    expect(Card.isIinValid(testCards.visa)).toBe(true);
+    expect(Card.isIinValid(testCards.mastercard)).toBe(true);
+    expect(Card.isIinValid(testCardsWithSpacing.visa)).toBe(true);
+    expect(Card.isIinValid('41111')).toBe(false);
   });
 });
