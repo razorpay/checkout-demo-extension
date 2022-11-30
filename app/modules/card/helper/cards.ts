@@ -73,7 +73,6 @@ export const openConsentOverlay = (isSavedCardScreen = false) =>
   new Promise(function (resolve) {
     showConsentOverlay({
       onPositiveClick: () => {
-        console.log('isSavedCardScreen ++++ ', isSavedCardScreen);
         if (isSavedCardScreen) {
           userConsentForTokenization.set(true);
         } else {
@@ -91,20 +90,23 @@ export const openConsentOverlay = (isSavedCardScreen = false) =>
  */
 
 export const showTokenisationBenefitModal = (): boolean => {
-  const session = getSession();
+  try {
+    const session = getSession();
+    const isSavedCardScreen = session.svelteCardTab?.isOnSavedCardsScreen();
+    const rememberCardCheck = isSavedCardScreen
+      ? get(userConsentForTokenization)
+      : get(remember);
 
-  const isSavedCardScreen = session.svelteCardTab?.isOnSavedCardsScreen();
-  const rememberCardCheck = isSavedCardScreen
-    ? get(userConsentForTokenization)
-    : get(remember);
-
-  if (
-    session.screen === 'card' &&
-    !rememberCardCheck &&
-    shouldRememberCard(get(isIndianCustomer)) &&
-    isRemoveDefaultTokenizationSupported()
-  ) {
-    return true;
+    if (
+      session.screen === 'card' &&
+      !rememberCardCheck &&
+      shouldRememberCard(get(isIndianCustomer)) &&
+      isRemoveDefaultTokenizationSupported()
+    ) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
   }
-  return false;
 };

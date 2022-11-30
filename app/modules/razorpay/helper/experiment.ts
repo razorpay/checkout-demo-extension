@@ -12,5 +12,5 @@ export function isRemoveDefaultTokenizationSupported() {
   const tokenization_flag = !!getPreferences(
     'experiments.remove_default_tokenization_flag'
   );
-  return tokenization_flag && isRedesignV15();
+  return tokenization_flag;
 }

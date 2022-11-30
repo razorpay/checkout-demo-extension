@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy, onMount } from 'svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
   import { getMerchantName } from 'razorpay';
@@ -15,6 +16,7 @@
   import { formatTemplateWithLocale } from 'i18n';
   import { popStack } from 'navstack';
   import { CardEvents, Events } from 'analytics';
+  import { hideCta, showCta } from 'cta';
 
   const name = getMerchantName() || 'this Merchant';
   const cardTokenisationWarning = formatTemplateWithLocale(
@@ -25,6 +27,14 @@
 
   export let onPositiveClick: () => void;
   export let onNegativeClick: () => void;
+
+  onMount(() => {
+    hideCta();
+  });
+
+  onDestroy(() => {
+    showCta();
+  });
 
   function clickedPositive() {
     popStack();

@@ -27,12 +27,16 @@ jest.mock('card/helper/dcc', () => ({
   getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
 }));
 
-jest.mock('razorpay', () => ({
-  __esModule: true,
-  isGlobalVault: jest.fn((cb) => (cb ? cb() : true)),
-  getCurrency: jest.fn(() => 'INR'),
-  getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
-}));
+jest.mock('razorpay', () => {
+  const originalModule = jest.requireActual('razorpay');
+  return {
+    ...originalModule,
+    __esModule: true,
+    isGlobalVault: jest.fn((cb) => (cb ? cb() : true)),
+    getCurrency: jest.fn(() => 'INR'),
+    getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
+  };
+});
 
 jest.mock('card/experiments', () => ({
   delayOTP: {
