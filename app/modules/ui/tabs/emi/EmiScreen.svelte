@@ -81,6 +81,12 @@
 
     bajajTCAccepted.set(true);
 
+    // In case we don't have session defined
+    // we dont need to run the session delegator function
+    if (!session) {
+      return;
+    }
+
     session.delegator
       .add('card', emi_el_card)
       .on('network', function () {
