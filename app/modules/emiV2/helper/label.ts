@@ -1,3 +1,4 @@
+import { DEBIT_EMI_BANKS, DEBIT_EMI_ISSUERS } from 'common/bank';
 import { getEligibleBanksBasedOnMinAmount } from 'common/emi';
 import type {
   EmiPlan,
@@ -26,6 +27,18 @@ export const isNoCostPlan = (plan: EmiPlan): boolean => {
 };
 
 /**
+ * Helper function that takes in emi plan object and return whether
+ * a no cost emi plan is present or not
+ * @param plans
+ * @returns
+ */
+export const fincNoCostEmiPlan = (plans: EmiPlanObject): boolean => {
+  return Object.keys(plans).some((plan: string) => {
+    return isNoCostPlan(plans[plan]);
+  });
+};
+
+/**
  * Returns whether the bank offers no cost EMI
  * @returns {Boolean}
  */
@@ -38,13 +51,21 @@ export function isNoCostEMI(amount: number, providerCode: string) {
 
   const EmiPlans = banks[providerCode];
 
-  if (!EmiPlans) {
-    return false;
+  let isNcEmi = false;
+
+  // Check for NC EMI offer in credit emi plans
+  if (EmiPlans) {
+    isNcEmi = fincNoCostEmiPlan(EmiPlans);
   }
-  const isNcEmi = Object.keys(EmiPlans).some((plan: string) => {
-    const planObject: EmiPlan = EmiPlans[plan];
-    return isNoCostPlan(planObject);
-  });
+
+  // if there is no nocost emi plan in credit emi plan
+  // check in debit emi plans if debit emi exists
+  const debitProviderCode = `${providerCode}_DC`;
+  const debitEmiPlans = banks[debitProviderCode];
+
+  if (!isNcEmi && debitEmiPlans) {
+    isNcEmi = fincNoCostEmiPlan(debitEmiPlans);
+  }
   return isNcEmi;
 }
 
