@@ -27,20 +27,22 @@
   }
 
   function handleCVVBlur() {
-    // Track CVV Change
-    trackCVVEnteredForSavedCards({
-      provider_name: $selectedBank?.code || 'NA',
-      tab_name: $selectedTab,
-      emi_plan: {
-        nc_emi_tag: $selectedPlan.subvention === 'merchant',
-        tenure: $selectedPlan.duration,
-      },
-      saved_card: {
-        card_type: card.type,
-        card_network: card.network,
-        card_issuer: card.issuer,
-      },
-    });
+    if ($selectedPlan) {
+      // Track CVV Change
+      trackCVVEnteredForSavedCards({
+        provider_name: $selectedBank?.code || 'NA',
+        tab_name: $selectedTab,
+        emi_plan: {
+          nc_emi_tag: $selectedPlan.subvention === 'merchant',
+          tenure: $selectedPlan.duration,
+        },
+        saved_card: {
+          card_type: card.type,
+          card_network: card.network,
+          card_issuer: card.issuer,
+        },
+      });
+    }
   }
 
   const isRedesignV15Enabled: boolean = isRedesignV15();
