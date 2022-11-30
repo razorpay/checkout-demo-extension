@@ -96,7 +96,10 @@ import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
 import { remember } from 'checkoutstore/screens/card';
-import { showTokenisationBenefitModal } from 'card/helper/cards';
+import {
+  isOTPSupported,
+  showTokenisationBenefitModal,
+} from 'card/helper/cards';
 import { getLineItemsTotal } from 'one_click_checkout/cart';
 import { selectedPlan } from 'checkoutstore/emi';
 
@@ -2666,6 +2669,7 @@ Session.prototype = {
       // if user has saved cards show otp screen
       // and user is not coming from cardless_emi config block
       if (
+        isOTPSupported() &&
         !skipOTPFlow &&
         customer.haveSavedCard &&
         !customer.logged &&
@@ -3431,6 +3435,7 @@ Session.prototype = {
      */
     let activeEmiPlan = EmiStore.getEmiDurationForNewCard();
     if (
+      isOTPSupported() &&
       !skipOTPFlow &&
       customer.haveSavedCard &&
       !customer.logged &&

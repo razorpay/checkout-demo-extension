@@ -493,7 +493,7 @@ async function makeCardPayment(context, features) {
     (features.addresses?.length && !features.skipAccessOTP);
 
   await selectPaymentMethod(context, 'card');
-  if (!loggedIn) {
+  if (!loggedIn && !features.internationalPhoneNumber) {
     await handleCustomerCardStatusRequest(context);
     await handleTypeOTP(context);
     await proceedOneCC(context);

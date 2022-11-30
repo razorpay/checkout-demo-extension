@@ -17,6 +17,8 @@ import { Views } from 'ui/tabs/card/constant';
 import { customerTokens } from '../__mocks__/customerToken';
 import CardTokenisationOverlaySvelte from 'ui/components/CardTokenisationOverlay.svelte';
 import { pushOverlay } from 'navstack';
+import { country, phone } from 'checkoutstore/screens/home';
+import { isOTPSupported } from 'card/helper/cards';
 
 jest.mock('checkoutstore/index.js', () => ({
   shouldRememberCustomer: jest.fn((cb) => (cb ? cb() : true)),
@@ -35,6 +37,7 @@ jest.mock('razorpay', () => {
     isGlobalVault: jest.fn((cb) => (cb ? cb() : true)),
     getCurrency: jest.fn(() => 'INR'),
     getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
+    isRemoveDefaultTokenizationSupported: jest.fn(() => false),
   };
 });
 
@@ -277,5 +280,19 @@ describe('openConsentOverlay', () => {
         component: CardTokenisationOverlaySvelte,
       })
     );
+  });
+});
+
+describe('isOTPSupported', () => {
+  test('with indian number', () => {
+    phone.set('8888888888');
+    country.set('+91');
+    expect(isOTPSupported()).toBe(true);
+  });
+
+  test('with international number', () => {
+    phone.set('8888888888');
+    country.set('+44');
+    expect(isOTPSupported()).toBe(false);
   });
 });

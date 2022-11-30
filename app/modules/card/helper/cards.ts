@@ -110,3 +110,9 @@ export const showTokenisationBenefitModal = (): boolean => {
     return false;
   }
 };
+
+// as of now we only send OTP for indian customer from backend
+export const isOTPSupported = () => {
+  const isDomesticCustomer = get(isIndianCustomer);
+  return isDomesticCustomer;
+};
