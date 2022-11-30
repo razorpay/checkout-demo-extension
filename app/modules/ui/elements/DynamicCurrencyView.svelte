@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { capture, SEVERITY_LEVELS } from 'error-service';
   import { tick, onDestroy } from 'svelte';
 
   // Store
@@ -214,11 +215,18 @@
     if (entity) {
       if (!currencyCache[entityWithAmount]) {
         currencies = null;
-        getCurrencies(prop).then((currencyPayload) => {
-          currencyCache[entityWithAmount] = currencyPayload;
-          // update selected currency payload [only used by offers in session.js]
-          setDCCPayload({ currencyPayload, entityWithAmount });
-        });
+        getCurrencies(prop)
+          .then((currencyPayload) => {
+            currencyCache[entityWithAmount] = currencyPayload;
+            // update selected currency payload [only used by offers in session.js]
+            setDCCPayload({ currencyPayload, entityWithAmount });
+          })
+          .catch(() => {
+            capture(new Error('payment/flows API call failed'), {
+              severity: SEVERITY_LEVELS.S2,
+              unhandled: true,
+            });
+          });
       } else if (tabVisible) {
         // update selected currency payload [only used by offers in session.js]
         setDCCPayload({
