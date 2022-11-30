@@ -1,6 +1,7 @@
 import card from './card';
 import emi from './emi';
 import netbanking from './netbanking';
+import fpx from './fpx';
 import upi from './upi';
 import wallet from './wallet';
 import othermethods from './othermethods';
@@ -120,6 +121,9 @@ function getIconFn(iconName: IconSupported) {
 
     case 'netbanking':
       return netbanking;
+
+    case 'fpx':
+      return fpx;
 
     case 'upi':
       return upi;

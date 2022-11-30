@@ -10,6 +10,7 @@ import {
   getNetbankingBanks,
   isApplicationEnabled,
   isCardLessEmiProviderEnabled,
+  getFPXBanks,
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 import * as ObjectUtils from 'utils/object';
@@ -18,6 +19,7 @@ import * as _ from 'utils/_';
 import { highlightUPIIntentOnDesktop } from 'upi/experiments';
 import { get } from 'svelte/store';
 import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
+import { checkOffline } from 'fpx/helper';
 
 /**
  * Map of filter fn for each method
@@ -87,6 +89,17 @@ const METHOD_FILTERS = {
     }
 
     return Boolean(getNetbankingBanks()[bank]);
+  },
+
+  fpx: (instrument) => {
+    const { bank } = instrument || {};
+
+    if (!isMethodEnabled('fpx')) {
+      return;
+    }
+
+    // return true only if bank exists in the list and is not offline
+    return Boolean(getFPXBanks()[bank]) && !checkOffline(bank);
   },
 
   upi: (instrument, { customer }) => {

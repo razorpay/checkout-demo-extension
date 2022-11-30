@@ -112,3 +112,8 @@ export function setThemeColor(color: string) {
     ...constantCSSVars,
   });
 }
+
+export function getIcons() {
+  const themeMeta = getThemeMeta();
+  return themeMeta.icons;
+}

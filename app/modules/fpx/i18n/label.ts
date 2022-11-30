@@ -1,0 +1,10 @@
+export const FPX_SELECT_LABEL = 'fpx.select_label';
+export const FPX_SELECT_HELP = 'fpx.select_help';
+export const FPX_SELECTION_RADIO_TEXT = 'fpx.selection_radio_text';
+export const FPX_CORPORATE_RADIO_LABEL = 'fpx.corporate_label';
+export const FPX_RETAIL_RADIO_LABEL = 'fpx.retail_label';
+export const FPX_SEARCH_PLACEHOLDER = 'fpx.search_placeholder';
+export const FPX_SEARCH_ALL = 'fpx.search_all';
+export const FPX_SELECT_BANK = 'fpx.select_bank';
+export const FPX_OFFLINE_BANK = 'fpx.offline_bank';
+export const FPX_TERMS_AND_CONDITIONS = 'fpx.terms_and_conditions';

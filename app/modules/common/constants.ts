@@ -103,6 +103,7 @@ export const AVAILABLE_METHODS = [
   'cod',
   'international',
   'intl_bank_transfer',
+  'fpx',
 ] as const;
 
 /* VPA regex, copied from API */

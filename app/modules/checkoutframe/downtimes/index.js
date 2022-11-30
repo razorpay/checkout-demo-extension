@@ -61,9 +61,19 @@ export function groupDowntimesByMethod(allDowntimes) {
 }
 
 /**
+ * Downtime supported methods
+ */
+const DOWNTIME_METHODS = {
+  cards: 'card',
+  upi: 'upi',
+  netbanking: 'netbanking',
+  fpx: 'fpx',
+};
+
+/**
  * Get downtimes from preferences.
  *
- * @return {{ upi, netbanking, cards}}
+ * @return {{ upi, netbanking, cards, fpx}}
  */
 export function getDowntimes() {
   const hasDowntimes = getPreferences('payment_downtime.items.length');
@@ -80,11 +90,13 @@ export function getDowntimes() {
     groupDowntimesByMethod(downtimeItems)
   );
 
-  return {
-    cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },
-    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi') },
-    netbanking: { ...getDowntimesByMethod(groupedDowntimes, 'netbanking') },
-  };
+  return Object.entries(DOWNTIME_METHODS).reduce((acc, curr) => {
+    const key = curr[0];
+    const method = curr[1];
+    acc[key] = getDowntimesByMethod(groupedDowntimes, method);
+
+    return acc;
+  }, {});
 }
 
 const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {

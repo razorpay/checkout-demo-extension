@@ -20,6 +20,7 @@ declare namespace Downtime {
     preferences?: {
       methods: {
         netbanking: Common.Object<string>;
+        fpx: Common.Object<string>;
       };
     },
     methodDowntimes?: RawDowntime[],

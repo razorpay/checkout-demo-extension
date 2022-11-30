@@ -4,8 +4,8 @@ import type { Personalization } from './personalization';
 
 export const ALLOWED_METHODS_BY_DEVICE: Record<'desktop' | 'mobile', Method[]> =
   {
-    desktop: ['upi', 'card', 'netbanking'],
-    mobile: ['upi', 'card'],
+    desktop: ['upi', 'card', 'netbanking', 'fpx'],
+    mobile: ['upi', 'card', 'fpx'],
   };
 
 /**
@@ -20,12 +20,17 @@ export const ALLOWED_METHODS_GT_PIVOT_AMOUNT: Method[] = [
   'upi',
   'card',
   'netbanking',
+  'fpx',
 ];
 
 /**
  * Allowed methods if amount is less than or equal (LTE) to PIVOT_AMOUNT
  */
-export const ALLOWED_METHODS_LTE_PIVOT_AMOUNT: Method[] = ['upi', 'card'];
+export const ALLOWED_METHODS_LTE_PIVOT_AMOUNT: Method[] = [
+  'upi',
+  'card',
+  'fpx',
+];
 
 /**
  * The default instrument P13N V2 API instrument that denotes Phonepe UPI

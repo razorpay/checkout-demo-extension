@@ -47,6 +47,19 @@ function netbanking(instrument) {
 }
 
 /**
+ * Extracts config data related to fpx from the preferred instrument.
+ *
+ * @param {Object} instrument
+ * @return {Object}
+ */
+function fpx(instrument) {
+  return {
+    method: 'fpx',
+    banks: [instrument.bank],
+  };
+}
+
+/**
  * Extracts config data related to saved card from the preferred instrument.
  *
  * @param {Object} instrument
@@ -117,6 +130,7 @@ function intl_bank_transfer(instrument) {
 export default {
   upi,
   netbanking,
+  fpx,
   card,
   wallet,
   paypal,

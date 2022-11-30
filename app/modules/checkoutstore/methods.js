@@ -28,6 +28,7 @@ import {
   isRecurringQRIntentExperimentEnabled,
   isEmiV2,
   reusePaymentIdExperimentEnabled,
+  getMerchantOption,
 } from 'razorpay';
 
 import {
@@ -150,6 +151,20 @@ const ALL_METHODS = {
           !isInternational() &&
           getOption('method.netbanking') !== false &&
           getNetbankingBanks()) ||
+          {}
+      )
+    );
+  },
+
+  fpx() {
+    return _.lengthOf(
+      Object.keys(
+        (getAmount() &&
+          !isRecurring() &&
+          !isInternational() & (getOption('method.fpx') !== false) &&
+          // disable FPX if redirect option is explicitly false
+          getMerchantOption('redirect') !== false &&
+          getFPXBanks()) ||
           {}
       )
     );
@@ -772,6 +787,18 @@ export function getCardNetworks() {
 
 export function getNetbankingBanks() {
   const banks = getMerchantMethods().netbanking;
+  if (ObjectUtils.isEmpty(banks)) {
+    return {};
+  }
+  return banks;
+}
+
+/**
+ * returns list of FPX banks received from the preferences
+ * @returns {[key: string]: string}
+ */
+export function getFPXBanks() {
+  const banks = getMerchantMethods().fpx;
   if (ObjectUtils.isEmpty(banks)) {
     return {};
   }

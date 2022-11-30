@@ -62,6 +62,8 @@ import {
 import { ContextProperties, EventsV2, AnalyticsV2State } from 'analytics-v2';
 import { PaymentTracker } from 'payment/analytics/events';
 import { RetryTracker } from 'misc/analytics/events';
+import { checkRedirectForFpx } from 'fpx/helper';
+import { FPX_INTEGRATION_ERROR_MSG } from 'fpx/constants';
 
 const RAZORPAY_COLOR = '#528FF0';
 let pollingInterval;
@@ -385,6 +387,10 @@ export default function Payment(data, params = {}, r) {
         avoidPopup = true;
       }
     }
+
+    if (data.method === 'fpx') {
+      avoidPopup = true;
+    }
   }
   // in force iframe always avoid popup
   const forceIframeFlow = checkValidFlow(data, FLOWS.FORCE_IFRAME); // iframe flow only in Standard checkout
@@ -454,14 +460,20 @@ Payment.prototype = {
   },
 
   checkRedirect: function () {
-    if (!this.iframe && getOption('redirect')) {
+    // allow redirect flow for valid FPX flow
+    const isValidFpxFlow = this.data.method === 'fpx' && checkRedirectForFpx();
+    if (!this.iframe && (getOption('redirect') || isValidFpxFlow)) {
       let data = this.data;
       // add callback_url if redirecting
       let callback_url = getOption('callback_url');
       if (callback_url) {
         data.callback_url = callback_url;
       }
-      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame())) {
+      if (
+        !this.avoidPopup ||
+        (data.method === 'upi' && !isRazorpayFrame()) ||
+        isValidFpxFlow
+      ) {
         docUtil.redirectTo({
           url: makeRedirectUrl(this.feesRedirect),
           content: data,
@@ -530,6 +542,10 @@ Payment.prototype = {
       }, 100);
     }
 
+    if (this.data.method === 'fpx' && !checkRedirectForFpx()) {
+      this.emit('error', _.rzpError(FPX_INTEGRATION_ERROR_MSG));
+      return;
+    }
     if (this.shouldPopup() && !this.popup && getOption('callback_url')) {
       this.r.set('redirect', true);
     }

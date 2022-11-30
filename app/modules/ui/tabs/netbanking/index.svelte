@@ -2,7 +2,6 @@
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { onMount } from 'svelte';
 
   // Store
@@ -19,11 +18,9 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTAOld from 'ui/elements/CTA.svelte';
-  import { truncateString } from 'utils/strings';
+  import BankDropdownSelect from 'ui/components/BankDropdownSelect.svelte';
 
-  import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
-  import * as ObjectUtils from 'utils/object';
   import * as _ from 'utils/_';
 
   // i18n
@@ -41,14 +38,19 @@
 
   import { t, locale } from 'svelte-i18n';
 
-  import { getShortBankName, getLongBankName } from 'i18n';
+  import { getShortBankName, formatMessageWithLocale } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
-  import { getPreferredBanks } from 'common/bank';
+  import {
+    computeBankData,
+    computeTranslatedBanks,
+    getPreferredBanks,
+    handleEnterOnBanking,
+  } from 'common/bank';
   import { isRecurring, isCAW } from 'razorpay';
   import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import {
@@ -86,22 +88,10 @@
   let showCorporateRadio;
   let maxGridCount;
   let corporateSelected;
-  let banksArr;
   let invalid;
   let netbanks;
   let downtimeSeverity = false;
-  let selectedBankName;
   let translatedBanksArr;
-
-  $: {
-    if ($selectedBank) {
-      selectedBankName = banksArr.find(
-        (bank) => bank.code === $selectedBank
-      ).name;
-    } else {
-      selectedBankName = null;
-    }
-  }
 
   // Refs
   let radioContainer;
@@ -152,19 +142,6 @@
     }
   }
 
-  /**
-   * Handle when the user presses Enter while focused
-   * on button#bank-select
-   */
-  function handleEnterOnButton(event) {
-    // 13 = Enter
-    if (_.getKeyFromEvent(event) === 13) {
-      event.preventDefault();
-
-      getSession().preSubmit();
-    }
-  }
-
   function setRetailOption() {
     const retailOption = getRetailOption($selectedBank, filteredBanks);
     if (retailOption) {
@@ -172,51 +149,14 @@
     }
   }
 
-  /**
-   * Filters banks against the given instrument.
-   * Only allows those banks that match the given instruments.
-   *
-   * @param {Object} banks
-   * @param {Instrument} instrument
-   *
-   * @returns {Object}
-   */
-  function filterBanksAgainstInstrument(banks, instrument) {
-    if (!instrument || instrument.method !== method) {
-      return banks;
-    }
-
-    if (!instrument.banks) {
-      return banks;
-    }
-
-    let filteredBanks = {};
-
-    instrument.banks.forEach((code) => {
-      if (banks[code]) {
-        filteredBanks[code] = banks[code];
-      }
-    });
-
-    return filteredBanks;
-  }
-
-  function filterHiddenBanksUsingConfig(banks, hiddenBanks) {
-    banks = ObjectUtils.clone(banks);
-    hiddenBanks.forEach((hiddenBank) => {
-      delete banks[hiddenBank];
-    });
-
-    return banks;
-  }
-
   $: {
-    filteredBanks = filterBanksAgainstInstrument(banks, $methodInstrument);
-
-    filteredBanks = filterHiddenBanksUsingConfig(
-      filteredBanks,
-      $hiddenBanksUsingConfig
-    );
+    const { bankList } = computeBankData({
+      banks,
+      instrument: $methodInstrument,
+      hiddenBanks: $hiddenBanksUsingConfig,
+      method,
+    });
+    filteredBanks = bankList;
 
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
@@ -238,17 +178,9 @@
     !recurring && hasMultipleOptions($selectedBank, filteredBanks);
   $: corporateSelected = isCorporateCode($selectedBank);
   $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = Object.entries(filteredBanks).map((entry) => ({
-    code: entry[0],
-    name: entry[1],
-    downtime: downtimes[entry[0]],
-  }));
-  $: translatedBanksArr = banksArr.map((bank) => ({
-    code: bank.code,
-    original: bank.name,
-    name: getLongBankName(bank.code, $locale, bank.name),
-    _key: bank.code,
-  }));
+  $: {
+    translatedBanksArr = computeTranslatedBanks(filteredBanks);
+  }
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
     0,
@@ -374,64 +306,27 @@
         {/each}
       </div>
 
-      <div class="elem-wrap pad">
-        <div
-          id="nb-elem"
-          class="elem select"
-          class:invalid
-          class:nb-one-cc-wrapper={isRedesignV15Enabled}
-        >
-          {#if !isRedesignV15Enabled}
-            <i class="select-arrow"></i>
-          {/if}
-
-          <!-- LABEL: Please select a bank -->
-          <div class="help">
-            {$t(NETBANKING_SELECT_HELP)}
-          </div>
-          {#if $selectedBank && isRedesignV15Enabled}
-            <span class="nb-select-bank-text"
-              >{$t(NETBANKING_SELECT_LABEL)}</span
-            >
-          {/if}
-
-          {#if isRedesignV15Enabled}
-            <span class="drop-down-icon-wrapper">
-              <Icon icon={solid_down_arrow} />
-            </span>
-          {/if}
-
-          <button
-            aria-label={`${
-              $selectedBank
-                ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}`
-                : $t(NETBANKING_SELECT_LABEL)
-            }`}
-            class="input dropdown-like dropdown-bank"
-            class:nb-one-cc-button={isRedesignV15Enabled}
-            type="button"
-            id="bank-select"
-            bind:this={bankSelect}
-            on:click={showSearch}
-            on:keypress={handleEnterOnButton}
-          >
-            {#if $selectedBank}
-              <div>
-                {truncateString(selectedBankName, 28)}
-              </div>
-              {#if !!downtimeSeverity}
-                <div>
-                  <DowntimeIcon severe={downtimeSeverity} />
-                </div>
-              {/if}
-            {:else}
-              <!-- LABEL: Select a different bank -->
-              {$t(NETBANKING_SELECT_LABEL)}
-            {/if}
-          </button>
-        </div>
+      <div class="pad">
+        <BankDropdownSelect
+          selectLabel={formatMessageWithLocale(
+            NETBANKING_SELECT_LABEL,
+            $locale
+          )}
+          selectHelpLabel={formatMessageWithLocale(
+            NETBANKING_SELECT_HELP,
+            $locale
+          )}
+          selectedBank={$selectedBank}
+          bankList={translatedBanksArr}
+          {downtimeSeverity}
+          invalid={!$selectedBank}
+          on:click={showSearch}
+          on:keypress={({ detail }) => {
+            handleEnterOnBanking(detail);
+          }}
+          bind:this={bankSelect}
+        />
       </div>
-
       {#if showCorporateRadio}
         <div
           class="pad ref-radiocontainer"
@@ -514,70 +409,17 @@
     margin-top: 4px;
   }
 
-  .dropdown-like {
-    width: 100%;
-
-    /* Fallback for IE */
-    text-align: left;
-    text-align: start;
-  }
-  .dropdown-bank {
-    display: flex;
-    justify-content: space-between;
-    width: 90%;
-  }
-
-  #bank-select {
-    padding-top: 0;
-    margin-top: 12px;
-  }
   .downtime-wrapper {
     width: 86%;
     margin: auto;
   }
 
-  .nb-one-cc-wrapper {
-    border: 1px solid var(--light-dark-color);
-    margin-top: 20px;
-    border-radius: 4px;
-    padding: 0px 12px;
-    height: 48px;
-    padding: 12px 16px;
-    box-sizing: border-box;
-    color: var(--primary-text-color);
-  }
-
-  .nb-one-cc-button {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    height: 100%;
-    display: flex;
-    margin-top: 2px !important;
-    color: var(--tertiary-text-color);
-  }
-
-  .nb-one-cc-wrapper::after {
-    border-bottom: none !important;
-  }
-
-  .nb-select-bank-text {
-    position: absolute;
-    top: -10px;
-    background: white;
-    padding: 0px 2px;
-  }
   .screen-one-cc {
     min-height: 100%;
   }
 
   .netb-banks-one-cc {
     border-top: 1px solid var(--light-dark-color);
-  }
-
-  .drop-down-icon-wrapper {
-    position: absolute;
-    right: 14px;
-    top: 14px;
   }
 
   .header-title {

@@ -149,6 +149,28 @@ describe('Module: personalization', () => {
       });
     });
 
+    test('translates fpx instrument correctly', () => {
+      const instrument = {
+        bank: 'CITI',
+        method: 'fpx',
+        timestamp: 1574062745851,
+        success: true,
+        frequency: 2,
+        id: 'Dhh86QTueOpyWX',
+      };
+
+      const actual = translateInstrumentToConfig(instrument);
+
+      expect(actual).toEqual({
+        id: 'Dhh86QTueOpyWX',
+        method: 'fpx',
+        banks: ['CITI'],
+        meta: {
+          preferred: true,
+        },
+      });
+    });
+
     test('returns undefined for empty instrument', () => {
       const instrument = {};
 
@@ -194,6 +216,22 @@ describe('Module: personalization', () => {
       expect(actual).toEqual({
         method: 'netbanking',
         bank: 'KKBK',
+        score: 1,
+      });
+    });
+
+    test('transforms a fpx instrument correctly', () => {
+      const instrument = {
+        method: 'fpx',
+        instrument: 'CITI',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      expect(actual).toEqual({
+        method: 'fpx',
+        bank: 'CITI',
         score: 1,
       });
     });

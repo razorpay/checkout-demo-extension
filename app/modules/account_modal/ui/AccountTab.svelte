@@ -25,6 +25,7 @@
   const { rzp_brand_logo } = getIcons();
 
   export let showBottomSeparator = false;
+  export let logos = [rzp_brand_logo];
 
   function handleAccountModal() {
     Events.TrackBehav(AccountEvents.ACCOUNT_CTA_CLICKED, {
@@ -46,7 +47,7 @@
     <div class="separator" />
     <div class="account-tab-container">
       <div class="account-wrapper" class:no-foh={!showMerchantPolicyBtn}>
-        <div class="details-wrapper">
+        <div class="d-flex align-center">
           <div
             data-test-id="account-tab-btn"
             class="account-section"
@@ -76,15 +77,20 @@
             </div>
           {/if}
         </div>
-        <div
-          class="rzp-icon-section {showMerchantPolicyBtn
-            ? 'rzp-column'
-            : 'rzp-row'}"
-        >
+        <div class="d-flex {showMerchantPolicyBtn ? 'rzp-column' : 'rzp-row'}">
           <span class={showMerchantPolicyBtn ? 'brand-text' : 'brand-text-row'}
             >{$t(SECURED_BY)}</span
           >
-          <Icon icon={rzp_brand_logo} />
+          {#if logos.length}
+            <div class="d-flex align-center">
+              {#each logos as logo, index}
+                <Icon icon={logo} />
+                {#if index !== logos.length - 1}
+                  <div class="vertical-separator bg-gray" />
+                {/if}
+              {/each}
+            </div>
+          {/if}
         </div>
       </div>
     </div>
@@ -128,11 +134,6 @@
     align-items: center;
   }
 
-  .details-wrapper {
-    display: flex;
-    align-items: center;
-  }
-
   .divider {
     width: 1px;
     height: 30px;
@@ -147,8 +148,12 @@
     margin-right: 6px;
   }
 
-  .rzp-icon-section {
+  .d-flex {
     display: flex;
+  }
+
+  .align-center {
+    align-items: center;
   }
   .rzp-column {
     flex-direction: column;
@@ -176,5 +181,15 @@
   .separator {
     height: 8px;
     background-color: var(--background-color-magic);
+  }
+
+  .vertical-separator {
+    height: 12px;
+    width: 1px;
+    margin: 0px 4px;
+  }
+
+  .bg-gray {
+    background-color: #ebebeb;
   }
 </style>

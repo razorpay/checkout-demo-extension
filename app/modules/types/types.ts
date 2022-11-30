@@ -20,4 +20,5 @@ export type Method =
   | 'qr'
   | 'nach'
   | 'emandate'
-  | 'app';
+  | 'app'
+  | 'fpx';

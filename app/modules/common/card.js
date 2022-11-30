@@ -353,7 +353,7 @@ export function updateCardTokenMetadata(token, data = {}) {
 /**
  * Returns card metadata if it was cached earlier
  * @param entity IIN/Token ID/Card Number
- * @returns {{}}
+ * @returns {Record<string, any>}
  */
 export function getCardMetadata(entity) {
   const isToken = /^token_/.test(entity);

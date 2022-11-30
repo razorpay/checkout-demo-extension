@@ -4,9 +4,15 @@
   export let item: {
     name: string;
     code: string;
+    disabledText?: string;
+    logoCode: string;
   };
   let showLogo = true;
   let logoError = false;
+
+  // display a bank as disabled (offline) if item has disabled text
+  let itemDisabled = false;
+  $: itemDisabled = !!item?.disabledText;
 
   const isRedesignV15Enabled = isRedesignV15();
   function getCharacter() {
@@ -30,13 +36,17 @@
     <div class="logo-wrapper">
       {#if showLogo}
         {#if logoError}
-          <div class="bank-logo auto-generated">
+          <div
+            class="bank-logo auto-generated"
+            class:gray-filter={itemDisabled}
+          >
             {getCharacter()}
           </div>
         {:else}
           <img
             class="bank-logo"
-            src={`${RazorpayConfig.cdn}bank/${item.code}.gif`}
+            src={`${RazorpayConfig.cdn}bank/${item.logoCode || item.code}.gif`}
+            class:gray-filter={itemDisabled}
             alt={item.name}
             on:error={onError}
           />
@@ -44,7 +54,12 @@
       {/if}
     </div>
   {/if}
-  <span>{item.name}</span>
+  <div>
+    <span class:disabled-name={itemDisabled}>{item.name}</span>
+    {#if itemDisabled}
+      <p class="disabled-text">{item.disabledText}</p>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -73,5 +88,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .disabled-name {
+    color: #808080;
+  }
+
+  .disabled-text {
+    margin: 0px;
+    font-style: italic;
+    color: #ff0000;
+    font-size: 11px;
+  }
+
+  .gray-filter {
+    filter: grayscale(100%);
   }
 </style>

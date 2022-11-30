@@ -10,10 +10,9 @@ export type GetEventNameType<
     }
   : {
       [x in Uppercase<P>]: P;
-    } &
-      {
-        [K in Exclude<keyof T, '__PREFIX'>]: `${P}:${T[K]}`;
-      };
+    } & {
+      [K in Exclude<keyof T, '__PREFIX'>]: `${P}:${T[K]}`;
+    };
 
 export type GenerateTrackProp<T extends object = typeof TYPES> = {
   [K in keyof T as K extends string

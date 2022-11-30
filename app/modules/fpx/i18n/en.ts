@@ -1,0 +1,18 @@
+export default {
+  corporate_label: 'Business Banking',
+  retail_label: 'Personal Banking',
+  search_all: 'All banks',
+  search_placeholder: 'Search for bank',
+  search_title: 'Select bank to pay',
+  select_bank: 'Select Bank',
+  select_help: 'Please select a bank',
+  select_label: 'Select a different bank',
+  selection_radio_text: 'Complete Payment Using',
+  cancellation_modal_title: 'Please share a reason for cancelling this payment',
+  wrong_bank_selected: 'Wrong bank selected',
+  forgot_username_password: 'Forgot username or password',
+  bank_page_error: 'Error on bank page',
+  other: 'Other',
+  offline_bank: 'Offline',
+  terms_and_conditions: `By clicking on the <strong>"Pay now"</strong> button, you hereby agree with FPX's <a class="theme" href="{url}" target="_blank">Terms & Conditions</a>`,
+};

@@ -18,11 +18,13 @@ import {
   getCardNetworks,
   getAppProviders,
   getEMandateBanks,
+  getFPXBanks,
 } from 'checkoutstore/methods';
 
 import { getMerchantMethods, isRecurring, getOption } from 'razorpay';
 
 import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
+import { checkOffline } from 'fpx/helper';
 
 /**
  * Returns the available methods
@@ -130,6 +132,22 @@ function removeNonApplicableInstrumentFlows(instrument) {
             : getEMandateBanks();
         const shownBanks = instrument.banks.filter(
           (bank) => enabledBanks[bank]
+        );
+
+        instrument.banks = shownBanks;
+      }
+
+      return instrument;
+    }
+
+    case 'fpx': {
+      const hasBanks = Boolean(instrument.banks);
+
+      if (hasBanks) {
+        const enabledBanks = getFPXBanks();
+        // filter out offline banks from blocks
+        const shownBanks = instrument.banks.filter(
+          (bank) => enabledBanks[bank] && !checkOffline(bank)
         );
 
         instrument.banks = shownBanks;

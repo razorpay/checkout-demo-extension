@@ -1,7 +1,10 @@
 import type { FollowPath, Paths } from 'types/utils';
 import type English from 'i18n/bundles/en';
 
-type BankName = typeof English.banks.long;
+export type BankCodes = keyof typeof English.banks.long;
+type BankName = {
+  [k in BankCodes]: string;
+};
 
 interface Theme {
   color: string;
@@ -30,7 +33,7 @@ interface CardSubtype {
   premium: number;
 }
 
-interface Netbanking extends BankName {
+export interface Banks extends BankName {
   [bankCode: string]: string;
 }
 
@@ -157,7 +160,8 @@ interface Methods {
   card_networks: CardNetworks;
   card_subtype: CardSubtype;
   amex: boolean;
-  netbanking: Netbanking;
+  netbanking: Banks;
+  fpx: Banks;
   wallet: Wallet;
   emi: boolean;
   upi: boolean;
@@ -456,6 +460,14 @@ export interface PreferencesObject {
   merchant_policy: {
     url: string;
     display_name: string;
+  };
+  terms: {
+    display_name: string;
+    url: string;
+  };
+  privacy: {
+    display_name: string;
+    url: string;
   };
   feature_overrides: {
     features: {

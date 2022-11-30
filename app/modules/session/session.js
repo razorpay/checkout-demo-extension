@@ -53,6 +53,7 @@ import {
 import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
 import { getDeviceId } from 'fingerprint';
 import renderEmiOptions from 'emiV2';
+import renderFPXTab from 'fpx';
 import { handleEmiPaymentV2 } from 'emiV2/payment';
 
 import { avoidSubmitViaSession, initiateEmiFlow } from 'emiV2/helper/emi';
@@ -3283,6 +3284,9 @@ Session.prototype = {
     }
     if (tab === 'netbanking') {
       discreet.netbankingTab.render();
+    }
+    if (tab === 'fpx') {
+      renderFPXTab();
     }
     if (tab === 'wallet') {
       discreet.walletTab.render();

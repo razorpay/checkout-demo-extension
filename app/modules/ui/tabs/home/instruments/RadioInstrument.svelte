@@ -33,6 +33,7 @@
   import {
     isDebitEMIEnabled,
     isContactRequiredForInstrument,
+    getFPXBanks,
   } from 'checkoutstore/methods';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import { isEligibilityCheckInProgress } from 'checkoutframe/cred';
@@ -109,15 +110,24 @@
     };
   }
 
-  function getDetailsForNetbankingInstrument(instrument, locale) {
-    const banks = getBanks();
+  function getDetailsForBankingInstrument(
+    instrument,
+    locale,
+    method = 'netbanking'
+  ) {
+    let banks = {};
+    if (method === 'netbanking') {
+      banks = getBanks();
+    } else if (method === 'fpx') {
+      banks = getFPXBanks();
+    }
     const bankName = getLongBankName(
       instrument.bank,
       locale,
       banks[instrument.bank]
     );
     return {
-      title: getInstrumentTitle('netbanking', bankName, locale),
+      title: getInstrumentTitle(method, bankName, locale),
       icon: getBankLogo(instrument.bank),
     };
   }
@@ -213,7 +223,12 @@
         return getDetailsForPaypalInstrument(instrument, locale);
 
       case 'netbanking':
-        return getDetailsForNetbankingInstrument(instrument, locale);
+      case 'fpx':
+        return getDetailsForBankingInstrument(
+          instrument,
+          locale,
+          instrument.method
+        );
 
       case 'wallet':
         return getDetailsForWalletInstrument(instrument, locale);

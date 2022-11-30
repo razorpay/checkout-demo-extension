@@ -25,4 +25,4 @@ export const OTP_TEMPLATES = {
   edit_contact: 'access_address',
 };
 
-export const RESEND_OTP_INTERVAL = (30 * 1000);
+export const RESEND_OTP_INTERVAL = 30 * 1000;

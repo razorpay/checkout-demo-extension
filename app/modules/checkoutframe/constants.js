@@ -6,4 +6,5 @@ export const METHODS = {
   PAYLATER: 'paylater',
   EMI_PLANS: 'emiplans',
   NETBANKING: 'netbanking',
+  FPX: 'fpx',
 };

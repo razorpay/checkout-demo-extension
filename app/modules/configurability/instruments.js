@@ -26,6 +26,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   card: ['issuers', 'networks', 'types', 'iins', 'countries'],
   emi: ['issuers', 'networks', 'types', 'iins', 'durations'],
   netbanking: ['banks'],
+  fpx: ['banks'],
   emandate: ['banks'],
   wallet: ['wallets'],
   upi: ['flows', 'apps'],

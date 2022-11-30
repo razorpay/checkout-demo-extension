@@ -39,7 +39,9 @@ export function updateOrderWithCustomerDetails(
 }
 
 export async function getLazyOrderId() {
-  if (getOrderId()) {return Promise.resolve(getOrderId());}
+  if (getOrderId()) {
+    return Promise.resolve(getOrderId());
+  }
 
   const response = await getShopifyOrder();
   return response.order_id;

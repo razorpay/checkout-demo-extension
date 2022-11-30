@@ -467,6 +467,9 @@ const config = {
   // TODO: Pending methods: emi
 };
 
+// FPX and netbanking share same config
+config.fpx = config.netbanking;
+
 // EMI and Cards are the same for now.
 config.emi = config.card;
 config.credit_card = config.card;

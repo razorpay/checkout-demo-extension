@@ -211,6 +211,15 @@ export function getInstrumentsForCustomer(customer) {
   return getInstrumentsFromApi(customer);
 }
 
+function formatInstrumentByType(instrument, type, fallbackValue) {
+  instrument[type] = instrument.instrument;
+  // adding fallback only if present to preserve existing values for methods
+  if (!instrument[type] && fallbackValue) {
+    instrument[type] = fallbackValue;
+  }
+  delete instrument.instrument;
+}
+
 // changes needed to translate api format instruments to storage format
 // instrument.instrument contains the primary payment instrument data
 const API_INSTRUMENT_PAYMENT_ADDONS = {
@@ -222,8 +231,8 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       instrument.instrument = '';
       return;
     }
-    instrument.vpa = instrument.instrument;
-    delete instrument.instrument;
+
+    formatInstrumentByType(instrument, 'vpa');
     const validVpa = VPA_REGEX.test(instrument.vpa);
     if (validVpa) {
       // valid collect instrument
@@ -252,30 +261,27 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     }
   },
   wallet: (instrument) => {
-    instrument.wallet = instrument.instrument;
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'wallet');
   },
   netbanking: (instrument) => {
-    instrument.bank = instrument.instrument;
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'bank');
+  },
+  fpx: (instrument) => {
+    formatInstrumentByType(instrument, 'bank');
   },
   card: (instrument) => {
     // Use a dummy value if API returns `null` as this value needs to be truthy to
     // act as a saved card instrument
-    instrument.token_id = instrument.instrument || 'token_dummy';
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'token_id', 'token_dummy');
   },
   app: (instrument) => {
-    instrument.provider = instrument.instrument;
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'provider');
   },
   cardless_emi: (instrument) => {
-    instrument.provider = instrument.instrument;
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'provider');
   },
   intl_bank_transfer: (instrument) => {
-    instrument.provider = instrument.instrument;
-    delete instrument.instrument;
+    formatInstrumentByType(instrument, 'provider');
   },
 };
 

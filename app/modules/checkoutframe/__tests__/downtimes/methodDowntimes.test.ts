@@ -1,3 +1,4 @@
+import { getDowntimes } from 'checkoutframe/downtimes';
 import { getMethodDowntimes } from 'checkoutframe/downtimes/methodDowntimes';
 import { getPreferences } from 'razorpay';
 jest.mock('razorpay', () => ({
@@ -73,6 +74,9 @@ const mockPrefs = {
       CNRB: 'Canara Bank',
       KKBK: 'Kotak Mahindra Bank',
     },
+    fpx: {
+      HSBC: 'HSBC Bank',
+    },
   },
   payment_downtime: {
     entity: 'collection',
@@ -80,6 +84,30 @@ const mockPrefs = {
     items: [],
   },
 };
+
+const DOWNTIMES_DATA = {
+  cards: {
+    high: [],
+    medium: [],
+    low: [],
+  },
+  netbanking: {
+    high: [],
+    medium: [],
+    low: [],
+  },
+  fpx: {
+    high: [],
+    medium: [],
+    low: [],
+  },
+  upi: {
+    high: [],
+    medium: [],
+    low: [],
+  },
+};
+
 describe('getMethodDowntimes method tests', () => {
   it('should return high and low downtime methods as a object', () => {
     (getPreferences as unknown as jest.Mock).mockReturnValue(mockPrefs);
@@ -173,5 +201,29 @@ describe('getMethodDowntimes method tests', () => {
       high: [],
       low: [],
     });
+  });
+});
+
+describe('getDowntimes', () => {
+  test('should return correct downtimes for supported methods when prefs has payment.downtimes', () => {
+    (getPreferences as unknown as jest.Mock)
+      .mockReturnValueOnce(2)
+      .mockReturnValueOnce(netBankingDowntimes);
+
+    const downtimes = getDowntimes();
+    expect(downtimes).toEqual({
+      ...DOWNTIMES_DATA,
+      netbanking: {
+        high: netBankingDowntimes,
+        medium: [],
+        low: [],
+      },
+    });
+  });
+  test('should return correct downtimes for supported methods when prefs has no payment.downtimes', () => {
+    (getPreferences as unknown as jest.Mock).mockReturnValueOnce(null);
+
+    const downtimes = getDowntimes();
+    expect(downtimes).toEqual(DOWNTIMES_DATA);
   });
 });

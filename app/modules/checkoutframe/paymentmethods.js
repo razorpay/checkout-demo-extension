@@ -212,6 +212,7 @@ const DESCRIPTIONS = {
   emandate: (locale) => getRawMethodDescription('emandate', locale),
   emi: (locale) => getRawMethodDescription('emi', locale),
   netbanking: (locale) => getRawMethodDescription('netbanking', locale),
+  fpx: (locale) => getRawMethodDescription('fpx', locale),
   paylater: (locale) => {
     const providers = getPayLaterProviders().map((p) => p.code);
     // Get the providers names to show
