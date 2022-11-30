@@ -25,7 +25,6 @@ import {
   getRawMethodDescription,
   getWalletName,
   formatTemplateWithLocale,
-  formatMessageWithLocale,
 } from 'i18n';
 
 import {
@@ -383,42 +382,4 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
     default:
       return getMethodTitle(method, locale);
   }
-}
-
-/**
- * Returns the downtime description for the given method.
- * @param {string} method
- * @param {string} locale
- * @param {Object} param1
- *  @prop {Array} availableMethods
- */
-export function getMethodDowntimeDescription(
-  method,
-  locale,
-  { availableMethods = [], downMethods = [] } = {}
-) {
-  const prefix = getTranslatedMethodPrefix(method, locale);
-  const pluralPrefix = /s$/i.test(prefix);
-
-  const templateLabel = pluralPrefix
-    ? 'misc.downtime_multiple_methods'
-    : 'misc.downtime_single_method';
-
-  const sentences = [
-    formatTemplateWithLocale(templateLabel, { method: prefix }, locale),
-  ];
-
-  // Check if there's another method available that is not down.
-  const isAnotherMethodAvailable = availableMethods.some(
-    (enabledMethod) => !downMethods.includes(enabledMethod)
-  );
-
-  // If there's another method available, ask user to select it.
-  if (isAnotherMethodAvailable) {
-    sentences.push(
-      formatMessageWithLocale('misc.select_another_method', locale)
-    );
-  }
-
-  return sentences.join(' ');
 }
