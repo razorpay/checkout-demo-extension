@@ -1,9 +1,10 @@
-import type { ContextValues } from 'analytics-v2/types';
+import type { ContextValues, LastEvent } from 'analytics-v2/types';
 import { isIframe } from 'common/constants';
 import Interface from 'common/interface';
 import type { CustomObject } from 'types';
 import AnalyticsV2 from './init';
 import type { PayloadOptions } from './library/common/types';
+import { ERROR } from 'analytics-types';
 
 /**
  * sync context between checkoutjs and checkoutframe
@@ -21,7 +22,7 @@ function syncContext(key: ContextValues, value: unknown) {
 /**
  * stores last event by type (render/api/behav/integration/metric/debug)
  */
-const LAST_EVENT: CustomObject<unknown> = {};
+let LAST_EVENT: LastEvent = {};
 
 /**
  * sets key value in context
@@ -70,8 +71,11 @@ function getTrackMethod<
       let eventName = event.name;
       if (event.type) {
         eventName = `${event.type} ${eventName}`;
-        LAST_EVENT[event.type] = {
+      }
+      if (event.type !== ERROR) {
+        LAST_EVENT = {
           event: eventName,
+          funnel,
         };
       }
       AnalyticsV2.track(eventName, payload, options);

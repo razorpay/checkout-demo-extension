@@ -30,3 +30,8 @@ export type MethodAndInstrument = {
   method: Method;
   instrument: Instrument;
 };
+
+export type LastEvent = {
+  event?: string;
+  funnel?: string;
+};
