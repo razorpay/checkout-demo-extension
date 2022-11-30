@@ -106,11 +106,15 @@ export const isCardValidForOffer: Readable<boolean> = derived(
                 bank.code === 'AMEX' ? 'payment_network' : 'issuer'
               ];
 
+            // Since for DC EMI we have bank code stored with _DC suffix
+            // Resulting in the condition to fail therefore need to remove the _DC suffix
+            const bankCode = bank.code.replace('_DC', '');
+
             // Validate if a issuer specific order is applied
             // If card issuer and offer issuer do not match set false
             // If the card entered has a co-branding provider set false
             // Since for co-branding cards issuer specific offers do not work
-            if (issuer && (issuer !== bank.code || bank.cobrandingPartner)) {
+            if (issuer && (issuer !== bankCode || bank.cobrandingPartner)) {
               set(false);
             }
             // Validate if the offer applied is on a specific network

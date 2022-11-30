@@ -320,6 +320,21 @@ describe('$isCardValidForOffer', () => {
     });
     await tick();
     expect(get(isCardValidForOffer)).toBeFalsy();
+
+    (getBankFromCardCache as jest.Mock).mockImplementationOnce(() => ({
+      name: 'Kotak Debit card',
+      code: 'KKBK_DC',
+      logo: '',
+      network: 'VISA',
+    }));
+    await tick();
+    appliedOffer.set({
+      ...sampleOffer,
+      payment_method: 'emi',
+      issuer: 'KKBK',
+    });
+    await tick();
+    expect(get(isCardValidForOffer)).toBeTruthy();
   });
 
   test('Valid emi offer + card with cobranding partner', async () => {
