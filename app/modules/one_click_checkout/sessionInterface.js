@@ -3,7 +3,10 @@ import { getSession } from 'sessionmanager';
 
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
-import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+import {
+  getCustomerDetails,
+  isUserLoggedIn,
+} from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 
 // store imports
@@ -110,7 +113,14 @@ export const handleBack = () => {
     });
     return;
   }
-  navigator.navigateBack();
+  if (
+    !isUserLoggedIn() &&
+    navigator.currentActiveRoute.name === views.DETAILS
+  ) {
+    navigator.navigateTo({ path: views.COUPONS });
+  } else {
+    navigator.navigateBack();
+  }
   if (navigator.currentActiveRoute.name === views.METHODS) {
     redirectToMethods();
   }
