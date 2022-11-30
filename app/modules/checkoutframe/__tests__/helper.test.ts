@@ -12,7 +12,7 @@ describe('Module: checkoutframe/helper', () => {
   it('should set AnalyticsV2 context amount', () => {
     const preferences = {};
     (getAmount as unknown as jest.Mock).mockReturnValue(60000);
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedContextAmount = 60000;
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.amount).toEqual(expectedContextAmount);
@@ -29,29 +29,17 @@ describe('Module: checkoutframe/helper', () => {
         show_mor_tnc: true,
       },
     };
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedContextFeatures = preferences.features;
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.features).toEqual(expectedContextFeatures);
-  });
-
-  it('should set AnalyticsV2 context merchant id', () => {
-    const preferences = {
-      merchant_id: 'GQgZEqJccwkBnF',
-    };
-    helper.updateAnalyticsFromPreferences(preferences);
-    const expectedContextMerchantId = 'GQgZEqJccwkBnF';
-    const state = EventsV2.getState() as any;
-    expect(state.context.checkout.merchant.id).toEqual(
-      expectedContextMerchantId
-    );
   });
 
   it('should set AnalyticsV2 context merchant key', () => {
     const preferences = {
       merchant_key: 'rzp_test_1DP5mmOlF5G5ag',
     };
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedMerchantKey = 'rzp_test_1DP5mmOlF5G5ag';
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.merchant.key).toEqual(expectedMerchantKey);
@@ -61,7 +49,7 @@ describe('Module: checkoutframe/helper', () => {
     const preferences = {
       merchant_name: 'Rzp Test QA KNSFPK',
     };
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedMerchantName = 'Rzp Test QA KNSFPK';
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.merchant.name).toEqual(expectedMerchantName);
@@ -71,7 +59,7 @@ describe('Module: checkoutframe/helper', () => {
     const preferences = {
       mode: 'test',
     };
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedMode = 'test';
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.mode).toEqual(expectedMode);
@@ -81,7 +69,7 @@ describe('Module: checkoutframe/helper', () => {
     (getOrderId as unknown as jest.Mock).mockReturnValue(
       'order_K9u6Ysp8XTNqj4'
     );
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const expectedOrderId = 'order_K9u6Ysp8XTNqj4';
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.order.id).toEqual(expectedOrderId);
@@ -93,7 +81,7 @@ describe('Module: checkoutframe/helper', () => {
       .mockImplementation(() => {
         return mock.storageExperiments;
       });
-    helper.updateAnalyticsFromPreferences(mock.experimentPreferences);
+    helper.updateAnalyticsFromPreferences(mock.experimentPreferences as any);
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.experiments).toEqual(
       mock.expectedExperiments
@@ -104,7 +92,7 @@ describe('Module: checkoutframe/helper', () => {
       return mock.registeredExperiments;
     });
     const preferences = {};
-    helper.updateAnalyticsFromPreferences(preferences);
+    helper.updateAnalyticsFromPreferences(preferences as any);
     const state = EventsV2.getState() as any;
     expect(state.context.checkout.experimentConfigs).toEqual(
       mock.expectedExperimentConfigs

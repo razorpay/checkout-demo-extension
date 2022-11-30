@@ -18,6 +18,7 @@ export const allMethodsExpectedValue = [
   'cod',
   'international',
   'intl_bank_transfer',
+  'fpx',
 ];
 
 export const emiBanks = {
