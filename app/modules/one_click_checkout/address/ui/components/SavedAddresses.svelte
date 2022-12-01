@@ -72,16 +72,10 @@
         address_source: addressSource || defaultAddressType,
         selection_type: 'manual',
       });
-      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
-        top_shown_address: !index,
-      });
     } else {
       Events.TrackBehav(AddressEvents.SAVED_BILLING_ADDRESS_SELECTED, {
         address_id: id,
         address_position_index: index,
-      });
-      Events.TrackBehav(AddressEvents.TOP_SHOWN_BILLING_ADDRESS, {
-        top_shown_address: !index,
       });
     }
     selectedAddressId.set(id);
@@ -115,9 +109,6 @@
         address_id: $selectedBillingAddressId,
         address_position_index: 0,
       });
-      Events.TrackBehav(AddressEvents.TOP_SHOWN_BILLING_ADDRESS, {
-        top_shown_address: true,
-      });
     }
     if (
       $activeRoute?.name === views.SAVED_ADDRESSES &&
@@ -132,9 +123,6 @@
         address_source:
           $selectedShippingAddress?.source_type || defaultAddressType,
         selection_type: 'default',
-      });
-      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
-        top_shown_address: true,
       });
       postAddressSelection();
     }

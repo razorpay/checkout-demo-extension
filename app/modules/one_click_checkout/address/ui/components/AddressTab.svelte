@@ -214,6 +214,15 @@
         address_position_index: selectedAddrIndex,
         top_shown_address: !selectedAddrIndex,
       });
+
+      let addrUsedEventName = AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS;
+      if (addressType === ADDRESS_TYPES.BILLING_ADDRESS) {
+        addrUsedEventName = AddressEvents.TOP_SHOWN_BILLING_ADDRESS;
+      }
+      Events.TrackBehav(addrUsedEventName, {
+        top_shown_address: !selectedAddrIndex,
+      });
+
       merchantAnalytics({
         event: `saved_address_${ACTIONS.CTA_CLICKED}`,
         category: CATEGORIES.ADDRESS,
