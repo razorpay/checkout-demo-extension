@@ -25,13 +25,14 @@ import {
   EMI_MIN_BALANCE,
   FULL_AMOUNT_EMI_MESSAGE,
   ICICI_BANK_EMI,
+  PROCESSING_FEE_MSG,
 } from 'ui/labels/emi';
 import {
   banksWithConvenienveFee,
   banksWithUpdatedFee,
   EmiBanksCode,
 } from 'emiV2/constants';
-import { formatTemplateWithLocale } from 'i18n';
+import { formatTemplateWithLocale, getShortBankName } from 'i18n';
 import { getMerchantMethods } from 'razorpay';
 import { capture, SEVERITY_LEVELS } from 'error-service';
 
@@ -185,6 +186,17 @@ export const handlePlanDescription = (
   if (bank === EmiBanksCode.AXIS_BANK_CODE) {
     descriptionText.push(
       formatTemplateWithLocale(AXIS_CONVENINENCE_FEE, {}, locale)
+    );
+  } else if (bank === EmiBanksCode.INDB_BANK_CODE) {
+    descriptionText.push(
+      formatTemplateWithLocale(
+        PROCESSING_FEE_MSG,
+        {
+          fee: getProcessingFeeForEmi(bank),
+          bank: getShortBankName(bank, locale),
+        },
+        locale
+      )
     );
   } else if (banksWithConvenienveFee.includes(bank)) {
     descriptionText.push(

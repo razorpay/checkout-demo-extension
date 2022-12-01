@@ -76,3 +76,4 @@ export const CREDIT = 'emi.credit';
 export const DEBIT = 'emi.debit';
 export const CARDLESS = 'emi.cardless';
 export const DEBIT_AND_CARDLESS = 'emi.debit_and_cardless';
+export const PROCESSING_FEE_MSG = 'emi.processing_fee_text';

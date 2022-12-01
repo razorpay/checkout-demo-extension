@@ -251,6 +251,7 @@ export default {
       SCBL: 'Standard Chartered',
       BARB: 'Bank of Baroda',
       ONECARD: 'OneCard',
+      INDB_DC: 'IndusInd',
     },
   },
   callouts: {
@@ -863,6 +864,8 @@ export default {
     debit: 'Debit',
     cardless: 'Cardless',
     debit_and_cardless: 'Debit & Cardless',
+    processing_fee_text:
+      '₹{fee} processing fee + GST will be charged by {bank} bank on all EMI plans',
   },
   emi_details: {
     effective_interest_info:
@@ -899,6 +902,7 @@ export default {
     UTIB: 'Axis Bank',
     YESB: 'Yes Bank',
     KKBK_DC: 'Kotak Debit Cards',
+    INDB_DC: 'IndusInd Debit Cards',
   },
   emi_modal: {
     emi_tenure: '{duration} Months',

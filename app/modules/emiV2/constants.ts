@@ -33,6 +33,7 @@ export const EmiBanksCode = {
   ICICI_BANK_DEBIT_CODE,
   RBL_BANK_CODE,
   INDB_DEBIT_CODE,
+  INDB_BANK_CODE,
 };
 
 // Constants
