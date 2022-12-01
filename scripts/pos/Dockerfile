@@ -1,4 +1,4 @@
-FROM alpine:3.16.1
+FROM alpine:3.17.0
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
