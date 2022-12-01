@@ -95,6 +95,15 @@ import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
+import {
+  internationalTabRender,
+  isInternationalAVSView,
+  showInternationalAVS,
+  internationalTabBackPress,
+  INTERNATIONAL_TAB_NAME,
+  getInternationalTabData,
+  updateInternationalProvider,
+} from 'checkoutframe/components/international';
 import { remember } from 'checkoutstore/screens/card';
 import {
   isOTPSupported,
@@ -1271,14 +1280,6 @@ Session.prototype = {
 
   setSvelteCardTab: function () {
     this.svelteCardTab = new cardTab.render();
-  },
-
-  setInternationalTab: function (props) {
-    this.internationalTab = new discreet.internationalTab.render(props);
-  },
-
-  showInternationalTab: function () {
-    this.setScreen('international');
   },
 
   setSvelteComponents: function () {
@@ -2941,9 +2942,6 @@ Session.prototype = {
       type: AnalyticsTypes.BEHAV,
     });
 
-    let isNVSFormHomeScreenView = discreet.storeGetter(
-      discreet.InternationalStores.isNVSFormHomeScreenView
-    );
     if (thisTab === 'home-1cc' || this.screen === 'home-1cc') {
       discreet.OneClickCheckoutInterface.handleBack();
       return;
@@ -3052,17 +3050,10 @@ Session.prototype = {
       if (this.emandateView?.onBack()) {
         return;
       }
-    } else if (this.tab === 'international') {
-      if (
-        this.internationalTab &&
-        this.internationalTab.onBack() &&
-        !isNVSFormHomeScreenView
-      ) {
+    } else if (this.tab === INTERNATIONAL_TAB_NAME) {
+      if (internationalTabBackPress()) {
         return;
       }
-      // destroy the international tab view
-      discreet.internationalTab.destroy();
-      this.internationalTab = null;
     } else if (this.tab === 'offline_challan') {
       discreet.offlineChallanTab.destroy();
     } else if (this.tab === discreet.IntlBankTransferTab.TAB_NAME) {
@@ -3295,9 +3286,6 @@ Session.prototype = {
     if (tab === 'wallet') {
       discreet.walletTab.render();
     }
-    if (tab === 'international') {
-      this.setInternationalTab(payload);
-    }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
@@ -3336,8 +3324,9 @@ Session.prototype = {
       this.setScreen('wallet');
     }
 
-    if (tab === 'international') {
-      this.showInternationalTab();
+    if (tab === INTERNATIONAL_TAB_NAME) {
+      internationalTabRender(payload);
+      this.setScreen(INTERNATIONAL_TAB_NAME);
     }
 
     if (
@@ -4668,9 +4657,6 @@ Session.prototype = {
       delete value[provider];
     });
   },
-  isOnNVSForm: function () {
-    return this.internationalTab && this.internationalTab.isOnNVSForm();
-  },
 
   /**
    * Attempts a payment
@@ -4790,13 +4776,8 @@ Session.prototype = {
     let isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
     // NVS (Name address Verification System)
-    let NVSRequired = false;
-    let NVSEntities =
-      discreet.storeGetter(discreet.InternationalStores.NVSEntities) || {};
-    let isOnNVSForm = this.isOnNVSForm();
-    let isNVSFormHomeScreenView = discreet.storeGetter(
-      discreet.InternationalStores.isNVSFormHomeScreenView
-    );
+    let { NVSRequired, isNVSFormHomeScreenView } = getInternationalTabData();
+    let isOnNVSForm = isInternationalAVSView();
 
     let tpv = MethodStore.getTPV();
     if (tpv && tpv.invalid && this.homeTab && this.homeTab.validateTPVOrder) {
@@ -4972,15 +4953,6 @@ Session.prototype = {
         }
       }
 
-      if (screen === 'international') {
-        let selectedInternationalProvider = discreet.storeGetter(
-          discreet.InternationalStores.selectedInternationalProvider
-        );
-        if (selectedInternationalProvider) {
-          NVSRequired = NVSEntities[selectedInternationalProvider];
-        }
-      }
-
       // perform the actual validation
       if (screen === 'upi' || screen === 'upi_otm') {
         // Event triggered when user enters UPI ID and clicks submit
@@ -5089,11 +5061,10 @@ Session.prototype = {
         !isOnNVSForm &&
         discreet.isInternationalInPreferredInstrument(selectedInstrument)
       ) {
-        discreet.InternationalStores.updateSelectedProvider(
+        NVSRequired = updateInternationalProvider(
           selectedInstrument.providers[0]
         );
-        NVSRequired = NVSEntities[selectedInstrument.providers[0]];
-        this.switchTab('international', {
+        this.switchTab(INTERNATIONAL_TAB_NAME, {
           directlyToNVS: NVSRequired,
         });
       }
@@ -5174,11 +5145,11 @@ Session.prototype = {
       }
       // verify AVS needed
       this.svelteCardTab.showAVSView(directlyToAVS);
-    } else if (!isOnNVSForm && NVSRequired && this.internationalTab) {
-      if (screen !== 'international') {
-        this.showInternationalTab();
+    } else if (!isOnNVSForm && NVSRequired) {
+      if (screen !== INTERNATIONAL_TAB_NAME) {
+        this.setScreen(INTERNATIONAL_TAB_NAME);
       }
-      this.internationalTab.showNVSForm(screen !== 'international');
+      showInternationalAVS(screen !== INTERNATIONAL_TAB_NAME);
     } else if (!downtimeInstrument) {
       this.submit();
     } else {
@@ -5375,14 +5346,13 @@ Session.prototype = {
 
     let AVSRequired = avsEntity ? Boolean(AVSMap[avsEntity]) : false;
 
-    let NVSEntity = discreet.storeGetter(
-      discreet.InternationalStores.selectedInternationalProvider
-    );
-
-    let isNVSFormHomeScreenView = discreet.storeGetter(
-      discreet.InternationalStores.isNVSFormHomeScreenView
-    );
-
+    let {
+      selectedInternationalProvider,
+      isNVSFormHomeScreenView,
+      NVSRequired,
+      NVSFormData,
+    } = getInternationalTabData();
+    let isOnNVSForm = isInternationalAVSView();
     /**
      * If user selects the card from p13n user will be auto-redirected to saved cards screen
      * And in both cases i.e, p13n card selection and saved card selection both will have
@@ -5437,8 +5407,8 @@ Session.prototype = {
           this.getCustomer(getPhone())
         );
 
-        NVSEntity =
-          this.screen === 'international' && isNVSFormHomeScreenView
+        selectedInternationalProvider =
+          this.screen === INTERNATIONAL_TAB_NAME && isNVSFormHomeScreenView
             ? data.provider
             : null;
 
@@ -5795,8 +5765,11 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data);
     }
 
-    if (data.method === 'international' && NVSEntity) {
-      data.provider = NVSEntity;
+    if (
+      data.method === INTERNATIONAL_TAB_NAME &&
+      selectedInternationalProvider
+    ) {
+      data.provider = selectedInternationalProvider;
     }
 
     // for paypal and trustly dcc enable is not required
@@ -5804,7 +5777,8 @@ Session.prototype = {
       discreet.storeGetter(CardScreenStore.currencyRequestId) &&
       ((data.method === 'card' && RazorpayHelper.isDCCEnabled()) ||
         (data.method === 'wallet' && data.wallet === 'paypal') ||
-        (data.method === 'international' && data.provider === NVSEntity))
+        (data.method === INTERNATIONAL_TAB_NAME &&
+          data.provider === selectedInternationalProvider))
     ) {
       data.currency_request_id = discreet.storeGetter(
         CardScreenStore.currencyRequestId
@@ -5849,15 +5823,9 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'international') {
+    if (data.method === INTERNATIONAL_TAB_NAME) {
       data.method = 'app';
-      if (this.isOnNVSForm() && NVSEntity) {
-        let NVSEntitiesMap =
-          discreet.storeGetter(discreet.InternationalStores.NVSEntities) || {};
-        let NVSFormData =
-          discreet.storeGetter(discreet.InternationalStores.NVSFormData) || {};
-        let NVSRequired = NVSEntitiesMap[NVSEntity];
-
+      if (isOnNVSForm && selectedInternationalProvider) {
         /**
          * International method namespace is only used on frontend. On backend it is treated as "app".
          */

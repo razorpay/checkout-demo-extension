@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 
 // type string
 export const selectedInternationalProvider = writable('');
@@ -56,4 +56,28 @@ export const resetNVSFormData = () => {
 
 export const setIsNVSFormHomeScreenView = (value) => {
   isNVSFormHomeScreenView.set(value);
+};
+
+export const getIsNVSFormHomeScreenView = () => get(isNVSFormHomeScreenView);
+
+/**
+ * Get Form data and Entities
+ * @returns {{ NVSEntities: { [key in string]: boolean } | null, NVSFormData: { [key in string]: string } | null, selectedInternationalProvider: string }}
+ */
+export const getFormDataAndEntities = () => ({
+  NVSFormData: get(NVSFormData),
+  NVSEntities: get(NVSEntities),
+  selectedInternationalProvider: get(selectedInternationalProvider),
+});
+
+/**
+ * Get is nvs required or not
+ * @returns {boolean}
+ */
+export const isNVSRequired = () => {
+  const nvsEntities = get(NVSEntities);
+  const selectedProvider = get(selectedInternationalProvider);
+  return nvsEntities && selectedProvider
+    ? nvsEntities[selectedProvider]
+    : false;
 };

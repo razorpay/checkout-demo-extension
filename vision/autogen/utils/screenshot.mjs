@@ -217,9 +217,7 @@ export async function report() {
     },
   });
 
-  const testSuccess = !Boolean(
-    missing + notMatched.length + newShots.length
-  );
+  const testSuccess = !Boolean(missing + notMatched.length + newShots.length);
   console.log(`Test ${testSuccess ? 'was successful' : 'failed'}`);
 
   map.matches = {
