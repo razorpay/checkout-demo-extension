@@ -334,7 +334,6 @@
   });
 </script>
 
-<!-- To Do: Refatoring Fields.js for 1cc post demo-->
 {#if isRedesignV15Enabled}
   <div
     bind:this={wrap}
