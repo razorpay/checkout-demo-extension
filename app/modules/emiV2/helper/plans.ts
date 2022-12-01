@@ -26,7 +26,11 @@ import {
   FULL_AMOUNT_EMI_MESSAGE,
   ICICI_BANK_EMI,
 } from 'ui/labels/emi';
-import { banksWithConvenienveFee, EmiBanksCode } from 'emiV2/constants';
+import {
+  banksWithConvenienveFee,
+  banksWithUpdatedFee,
+  EmiBanksCode,
+} from 'emiV2/constants';
 import { formatTemplateWithLocale } from 'i18n';
 import { getMerchantMethods } from 'razorpay';
 import { capture, SEVERITY_LEVELS } from 'error-service';
@@ -38,8 +42,7 @@ import { capture, SEVERITY_LEVELS } from 'error-service';
  * @param {string} bank name of the bank to get processing fee for
  */
 export const getProcessingFeeForEmi = (bank: string): string => {
-  const { RBL_BANK_CODE, KOTAK_DEBIT_CODE, INDB_DEBIT_CODE } = EmiBanksCode;
-  if ([RBL_BANK_CODE, KOTAK_DEBIT_CODE, INDB_DEBIT_CODE].includes(bank)) {
+  if (banksWithUpdatedFee.includes(bank)) {
     return '199';
   }
   return '99';

@@ -19,6 +19,7 @@ const ICICI_BANK_DEBIT_CODE = 'ICIC_DC';
 const RBL_BANK_CODE = 'RATN';
 const ONE_CARD_CODE = 'onecard';
 const INDB_DEBIT_CODE = 'INDB_DC';
+const INDB_BANK_CODE = 'INDB';
 
 export const EmiBanksCode = {
   HDFC_BANK_CODE,
@@ -106,6 +107,7 @@ export const banksWithConvenienveFee: string[] = [
   AXIS_BANK_CODE,
   RBL_BANK_CODE,
   INDB_DEBIT_CODE,
+  INDB_BANK_CODE,
 ];
 
 // Emi providers that support redirect based flow
@@ -126,3 +128,10 @@ export const otherCardEmiProviders: string[] = [BAJAJ_CODE, ONE_CARD_CODE];
  * Eg. Onecard
  */
 export const coBrandingEmiProviders: string[] = [ONE_CARD_CODE];
+
+export const banksWithUpdatedFee: string[] = [
+  RBL_BANK_CODE,
+  KOTAK_DEBIT_CODE,
+  INDB_DEBIT_CODE,
+  INDB_BANK_CODE,
+];
