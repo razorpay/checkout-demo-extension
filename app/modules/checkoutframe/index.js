@@ -70,7 +70,7 @@ import {
   setParamsForDdosProtection,
 } from 'checkoutframe/utils';
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
-import { getShopifyCheckoutId } from './1cc-shopify/controller';
+import { initShopifyCheckout } from './1cc-shopify';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -254,6 +254,10 @@ const setTrackingProps = (message) => {
   }
 };
 
+/**
+ * all the postMessage events fired from outside to checkoutframe are handled by
+ * this function
+ */
 export const handleMessage = function (message) {
   if (
     ('id' in message && !validUID(message.id)) ||
@@ -383,18 +387,12 @@ export const handleMessage = function (message) {
 
     // Create shopify checkout_id when cart is passed instead.
     if (!ObjectUtils.isEmpty(options.shopify_cart)) {
-      getShopifyCheckoutId({ body: options.shopify_cart, key_id: options.key })
-        .then(() => fetchPrefs(session))
-        .catch((e) => {
-          Razorpay.sendMessage({
-            event: 'event',
-            data: {
-              event: 'shopify_checkout_creation_failed',
-              error: e,
-            },
-          });
-        });
-      return;
+      initShopifyCheckout({
+        body: options.shopify_cart,
+        key_id: options.key,
+      }).catch((e) => {
+        Razorpay.sendMessage({ event: 'fault', data: e });
+      });
     }
 
     fetchPrefs(session);
@@ -509,39 +507,32 @@ function createShopifyCheckout(body, session) {
 }
 
 function getPrefsPromisified(session) {
-  return new Promise((resolve) => {
-    let loader;
-    try {
-      loader = Bridge.hasCheckoutBridge()
-        ? appendLoader(document.body, false, Boolean(CheckoutBridge))
-        : null;
-    } catch (e) {
-      // e
-    }
-
-    // for magic shopify flows, use the prefetched version of preferences
-    const litePrefs = isMagicShopifyFlow()
-      ? getLitePreferencesFromStorage(getOption('key'))?.preferences
+  let loader;
+  try {
+    loader = Bridge.hasCheckoutBridge()
+      ? appendLoader(document.body, false, Boolean(CheckoutBridge))
       : null;
+  } catch (e) {
+    // e
+  }
 
-    if (litePrefs) {
-      resolvePreferences(litePrefs);
-      return;
+  return new Promise((resolve) => {
+    if (isMagicShopifyFlow()) {
+      const litePrefs = getLitePreferencesFromStorage(
+        getOption('key')
+      )?.preferences;
+      if (litePrefs) {
+        return resolve(litePrefs);
+      }
     }
-
     session.prefCall = Razorpay.payment.getPrefs(
       getPreferencesParams(session.r),
-      (preferences) => {
-        resolvePreferences(preferences);
-      }
+      resolve
     );
-
-    function resolvePreferences(prefs) {
-      resolve(prefs);
-      if (loader) {
-        _El.detach(loader);
-        loader = null;
-      }
+  }).finally(() => {
+    if (loader) {
+      _El.detach(loader);
+      loader = null;
     }
   });
 }

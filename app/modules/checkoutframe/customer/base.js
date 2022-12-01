@@ -12,6 +12,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
 import RazorpayStore, {
+  getOption,
   getPrefilledName,
   getRecurringMethods,
   isOneClickCheckout,
@@ -27,6 +28,7 @@ import { ContextProperties, EventsV2 } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
+import { removeLitePreferencesFromStorage } from 'checkout-frame-lite/controller';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -149,6 +151,7 @@ Customer.prototype = {
       payload.email = get(email);
     }
     EventsV2.Identify(get(phone), payload);
+    removeLitePreferencesFromStorage(getOption('key'));
   },
 
   // NOTE: status check api also sends otp if customer exist

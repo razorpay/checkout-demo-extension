@@ -17,7 +17,7 @@ import { startSentryMonitoring } from 'sentry/http';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import { startAnalyticsSyncing } from 'checkoutframe/analytics';
 
-function init() {
+export default function init() {
   setSessionConstructor(Session);
 
   const library = 'checkoutjs';
@@ -36,5 +36,3 @@ function init() {
   initIframe();
   startAnalyticsSyncing();
 }
-
-init();

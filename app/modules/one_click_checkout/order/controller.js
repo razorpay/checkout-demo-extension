@@ -5,11 +5,18 @@ import {
   isContactValid,
   isEmailValid,
 } from 'one_click_checkout/order/validators';
-import RazorpayStore, { getOrderId, setShopifyOrderId } from 'razorpay';
+import RazorpayStore, {
+  getOption,
+  getOrderId,
+  setShopifyOrderId,
+} from 'razorpay';
 import { getSession } from 'sessionmanager';
 
-let FINAL_PREFERENCES_SYNCED = false;
-let CREATE_SHOPIFY_ORDER_PROMISE;
+/**
+ * resolves to order id
+ * @type Promise<string>
+ */
+let SHOPIFY_ORDER_PROMISE;
 let hash = null;
 
 export function updateOrderWithCustomerDetails(
@@ -38,40 +45,37 @@ export function updateOrderWithCustomerDetails(
   }
 }
 
-export async function getLazyOrderId() {
-  if (getOrderId()) {
-    return Promise.resolve(getOrderId());
-  }
-
-  const response = await getShopifyOrder();
-  return response.order_id;
+/**
+ * @returns {string|Promise<string>}
+ */
+export function getLazyOrderId() {
+  return getOrderId() || SHOPIFY_ORDER_PROMISE;
 }
 
-export function getShopifyOrder() {
-  if (CREATE_SHOPIFY_ORDER_PROMISE) {
-    return CREATE_SHOPIFY_ORDER_PROMISE;
-  }
+export function createShopifyOrder(shopifyCheckoutPromise) {
+  setShopifyOrderId(''); // nullify existing shopify order id
+  SHOPIFY_ORDER_PROMISE = shopifyCheckoutPromise
+    .then(Service.createShopifyOrder)
+    .then(({ order_id, preferences }) => {
+      setShopifyOrderId(order_id);
+      const session = getSession();
 
-  CREATE_SHOPIFY_ORDER_PROMISE = Service.createShopifyOrder();
-  return CREATE_SHOPIFY_ORDER_PROMISE;
-}
+      if (session.isOpen) {
+        const razorpayInstance = session.r;
+        razorpayInstance.preferences = preferences;
+        RazorpayStore.updateInstance(razorpayInstance);
 
-export async function syncPreferences() {
-  if (getOrderId() || FINAL_PREFERENCES_SYNCED) {
-    return;
-  }
+        session.setPreferences(preferences);
+        session.setOffers();
 
-  const response = await getShopifyOrder();
+        Service.updateShopifyCartUrl({
+          order_id,
+          cart_note: getOption('shopify_cart').cart.note ?? null,
+        });
+      }
 
-  setShopifyOrderId(response.order_id);
+      return order_id;
+    });
 
-  const session = getSession();
-  const razorpayInstance = session.r;
-  razorpayInstance.preferences = response.preferences;
-  RazorpayStore.updateInstance(razorpayInstance);
-
-  session.setPreferences(response.preferences);
-  session.setOffers();
-
-  FINAL_PREFERENCES_SYNCED = true;
+  return SHOPIFY_ORDER_PROMISE;
 }

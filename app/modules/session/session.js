@@ -111,6 +111,7 @@ import {
 } from 'card/helper/cards';
 import { getLineItemsTotal } from 'one_click_checkout/cart';
 import { selectedPlan } from 'checkoutstore/emi';
+import { sendDismissEvent } from 'checkoutframe/helper';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1874,10 +1875,7 @@ Session.prototype = {
       this.modal = new window.Modal(this.el, {
         animation: this.mainModal.animation(),
         onhide: function () {
-          Razorpay.sendMessage({
-            event: 'dismiss',
-            data: self.dismissReason,
-          });
+          sendDismissEvent(self.dismissReason);
         },
         onhidden: function () {
           this.saveAndClose();
@@ -6465,10 +6463,7 @@ Session.prototype = {
     this.saveAndClose();
 
     if (wasShown) {
-      Razorpay.sendMessage({
-        event: 'dismiss',
-        data: this.dismissReason,
-      });
+      sendDismissEvent(this.dismissReason);
     }
   },
 

@@ -4,11 +4,12 @@ import { makeUrl } from '../common/helper';
 import {
   getLitePreferencesFromStorage,
   setLitePreferencesToStorage,
+  removeLitePreferencesFromStorage as remove,
 } from './service';
 import { setParamsForDdosProtection } from '../checkoutframe/utils';
-import { BUILD_NUMBER } from '../common/constants';
-import Track from '../analytics/tracker';
+import { BUILD_NUMBER, LIBRARY, PLATFORM } from '../common/constants';
 import type { Preferences } from '../razorpay/types/Preferences';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 function fetchPrefsFromApi(options: any): Promise<Preferences> {
   setParamsForDdosProtection({});
@@ -18,15 +19,19 @@ function fetchPrefsFromApi(options: any): Promise<Preferences> {
     currency: [options.currency ?? 'INR'],
     '_[preference_source]': 'checkout_frame_lite',
     '_[build]': BUILD_NUMBER,
-    '_[library]': Track.props.library,
-    '_[platform]': Track.props.platform,
-    '_[checkout_id]': Track.id,
+    '_[library]': LIBRARY,
+    '_[platform]': PLATFORM,
   };
 
-  return new Promise((resolve) => {
+  RazorpayConfig.api = '/';
+
+  return new Promise((resolve, reject) => {
     fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), params),
       callback: function (prefsResponse) {
+        if (prefsResponse.status_code && prefsResponse.status_code !== 200) {
+          reject();
+        }
         resolve(prefsResponse);
       },
     });
@@ -46,6 +51,8 @@ export function fetchPreferences(prefOptions: { key_id: string }) {
    * also updates the localstorage cache
    */
   if (isStalePreference(existingPrefs)) {
+    remove(prefOptions.key_id);
+
     return fetchPrefsFromApi(prefOptions).then((apiPrefs) => {
       setLitePreferencesToStorage(apiPrefs, prefOptions.key_id);
       return apiPrefs;
@@ -53,6 +60,10 @@ export function fetchPreferences(prefOptions: { key_id: string }) {
   }
 
   return Promise.resolve(existingPrefs?.preferences);
+}
+
+export function removeLitePreferencesFromStorage(key: string) {
+  remove(key);
 }
 
 function isStalePreference(

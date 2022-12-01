@@ -1,6 +1,8 @@
 import { getSession } from 'sessionmanager';
 import { Customer, getCustomer } from './base';
 import { customer as customerStore } from 'checkoutstore/customer.js';
+import { removeLitePreferencesFromStorage } from 'checkout-frame-lite/controller';
+import { getOption } from 'razorpay';
 
 /**
  * logout the customer instance on client by removing logged in status and clearing existing tokens
@@ -15,6 +17,7 @@ export function logoutUserOnClient(customer: Customer) {
    * can't use getView('topbar') because of circular dep
    */
   session.topBar.setLogged(false);
+  removeLitePreferencesFromStorage(getOption('key'));
 }
 
 /**
@@ -33,6 +36,7 @@ export function logUserOut(
 ) {
   const customer: Customer = getCustomer(phone);
   const session = getSession();
+
   function logoutSuccessCallback(data: any) {
     logoutUserOnClient(customer);
 

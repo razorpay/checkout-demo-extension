@@ -231,7 +231,9 @@
   }
 
   function onSelectHandler(result) {
-    if (result.disabledText) {return;}
+    if (result.disabledText) {
+      return;
+    }
     if (onSelect) {
       onSelect(result);
     }

@@ -3,7 +3,7 @@ import { getOrderId, getPreferences } from 'razorpay';
 import { trackAvailabilty } from './availability';
 import * as ObjectUtils from 'utils/object';
 import fetch from 'utils/fetch';
-import { BUILD_NUMBER } from 'common/constants';
+import { BUILD_NUMBER, PLATFORM, LIBRARY } from 'common/constants';
 import * as _ from 'utils/_';
 import { getDeviceId } from 'fingerprint';
 import { isNonNullObject } from 'utils/object';
@@ -61,8 +61,8 @@ function makeUid() {
 let _uid = makeUid();
 
 let trackingProps = {
-  library: 'checkoutjs',
-  platform: 'browser',
+  library: LIBRARY,
+  platform: PLATFORM,
   referer: location.href,
   env: '',
 };

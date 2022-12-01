@@ -34,9 +34,7 @@ describe('fetch preferences', () => {
       expect(prefs).toEqual(expected.preferences);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toBeCalledWith({
-        url: expect.stringContaining(
-          'https://api.razorpay.com/v1/preferences?key_id=dummyKey'
-        ),
+        url: expect.stringContaining('/v1/preferences?key_id=dummyKey'),
         callback: expect.anything(),
       });
 

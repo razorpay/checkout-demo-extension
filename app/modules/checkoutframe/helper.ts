@@ -9,6 +9,7 @@ import { getAmount, getOrderId } from 'razorpay';
 import type { PreferencesObject } from 'razorpay/types/Preferences';
 import type { CustomObject } from 'types';
 import { getQueryParams } from 'utils/_';
+import { updateShopifyAbandonedCartUrl } from './1cc-shopify/service';
 
 /**
  * transforms experiment values received from preferences, based on the below mapping
@@ -114,4 +115,16 @@ export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
 
 export function isMagicShopifyFlow() {
   return Boolean(getQueryParams().magic_shopify_key);
+}
+
+export function sendDismissEvent(data: any) {
+  const orderId = getOrderId();
+  if (orderId && isMagicShopifyFlow()) {
+    updateShopifyAbandonedCartUrl(orderId);
+  }
+
+  window.Razorpay.sendMessage({
+    event: 'dismiss',
+    data,
+  });
 }

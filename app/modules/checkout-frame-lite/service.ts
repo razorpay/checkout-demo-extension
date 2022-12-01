@@ -32,3 +32,7 @@ export function setLitePreferencesToStorage(
     })
   );
 }
+
+export function removeLitePreferencesFromStorage(merchantKey: string) {
+  Browserstorage.removeItem(generateLitePreferencesStorageKey(merchantKey));
+}

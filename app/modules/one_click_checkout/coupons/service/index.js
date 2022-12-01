@@ -2,65 +2,61 @@ import fetch from 'utils/fetch';
 import { Events } from 'analytics';
 import { timer } from 'utils/timer';
 import { getOrderId } from 'razorpay/helper/order';
-import { getShopifyCheckoutId } from 'razorpay/helper/1cc';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
-import { getCache, setCache } from 'one_click_checkout/coupons/service/cache';
 import { get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
 import { isEmailValid } from 'one_click_checkout/order/validators';
 import { getLazyOrderId } from 'one_click_checkout/order/controller';
 
-let inProgress = false;
-let pendingPromise = null;
+let ORDER_ID_FOR_COUPONS;
+let CONTACT_FOR_COUPONS;
+let EMAIL_FOR_COUPONS;
+
+let SHOPIFY_COUPON_PROMISE;
 /**
  * method to fetch coupons for merchant from backend
  * @returns {Array} a list of coupons for the specific merchant.
  */
 export async function getCoupons() {
   const orderId = await getLazyOrderId();
-  // return pending promise to avoid hitting rate limiting
-  if (inProgress) {
-    return pendingPromise;
+  const payload = getContactPayload();
+
+  if (
+    orderId !== ORDER_ID_FOR_COUPONS ||
+    CONTACT_FOR_COUPONS !== payload.contact ||
+    EMAIL_FOR_COUPONS !== payload.email
+  ) {
+    const getDuration = timer();
+    Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
+
+    ORDER_ID_FOR_COUPONS = orderId;
+    CONTACT_FOR_COUPONS = payload.contact;
+    EMAIL_FOR_COUPONS = payload.email;
+
+    SHOPIFY_COUPON_PROMISE = new Promise((resolve, reject) => {
+      fetch.post({
+        url: makeAuthUrl('merchant/coupons'),
+        data: {
+          ...payload,
+          order_id: orderId,
+        },
+        callback: (response) => {
+          Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
+            time: getDuration(),
+          });
+          if (Array.isArray(response.promotions)) {
+            resolve(response.promotions);
+          } else {
+            reject(response);
+          }
+        },
+      });
+    });
   }
 
-  const getDuration = timer();
-  Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
-
-  pendingPromise = new Promise((resolve, reject) => {
-    const payload = getContactPayload();
-
-    const key = payload.contact || 'default';
-    const cachedValue = getCache(key);
-
-    if (cachedValue) {
-      resolve(cachedValue);
-      return;
-    }
-
-    inProgress = true;
-    fetch.post({
-      url: makeAuthUrl('merchant/coupons'),
-      data: {
-        ...payload,
-        order_id: orderId,
-      },
-      callback: (response) => {
-        inProgress = false;
-        Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
-          time: getDuration(),
-        });
-        if (Array.isArray(response.promotions)) {
-          setCache(key, response.promotions);
-          resolve(response.promotions);
-        } else {
-          reject(response);
-        }
-      },
-    });
-  });
-  return pendingPromise;
+  return SHOPIFY_COUPON_PROMISE;
 }
 
 /**
@@ -129,44 +125,6 @@ export function removeCoupon(code) {
           time: getDuration(),
         });
         resolve(response);
-      },
-    });
-  });
-}
-
-export async function getCouponsForShopify() {
-  if (inProgress) {
-    return pendingPromise;
-  }
-  const shopifyCheckoutId = await getShopifyCheckoutId();
-  const payload = getContactPayload();
-
-  const getDuration = timer();
-  Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
-  pendingPromise = new Promise((resolve, reject) => {
-    const key = payload.contact || 'default';
-    const cachedValue = getCache(key);
-
-    if (cachedValue) {
-      resolve(cachedValue);
-      return;
-    }
-
-    inProgress = true;
-    fetch({
-      url: makeAuthUrl(`magic/checkout/shopify/${shopifyCheckoutId}/coupons`),
-      callback: (res) => {
-        inProgress = false;
-        Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
-          success: res.ok ? true : false,
-          duration: getDuration(),
-        });
-        if (Array.isArray(res.promotions)) {
-          setCache(key, res.promotions);
-          resolve(res.promotions);
-        } else {
-          reject(res);
-        }
       },
     });
   });

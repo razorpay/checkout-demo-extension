@@ -5,24 +5,18 @@ import { getQueryParams } from '../utils/_';
 function loadLitePreferences() {
   const key_id = getQueryParams().magic_shopify_key;
 
-  if (!key_id) {
-    return;
+  if (key_id) {
+    return fetchPreferences({ key_id });
   }
-
-  return new Promise((resolve) => {
-    fetchPreferences({ key_id }).then((litePreferences) => {
-      resolve(litePreferences);
-    });
-  });
-}
-
-function loadCheckoutFrame() {
-  import('../checkout-frame-lite/checkout-frame-core.js');
 }
 
 function init() {
-  loadLitePreferences();
-  loadCheckoutFrame();
+  const litePrefsPromise = loadLitePreferences();
+  import('../checkout-frame-lite/checkout-frame-core.js').then((core) => {
+    litePrefsPromise?.finally(() => {
+      core.default();
+    });
+  });
 }
 
 init();

@@ -3,7 +3,6 @@ import { timer } from 'utils/timer';
 import fetch from 'utils/fetch';
 // store imports
 import { getOrderId } from 'razorpay/helper/order';
-import { getShopifyCheckoutId } from 'checkoutframe/1cc-shopify/controller';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 
 // Analytics imports
@@ -44,14 +43,13 @@ export function updateOrder(payload) {
 
 /**
  * Lazily get the order_id and prefs for the checkout session
- * usiing the corresponding shopify checkout ID
+ * using the corresponding shopify checkout ID
  * ref: https://docs.google.com/document/d/1vXnXFOAZJU1VjMzFm4g_juSsSNz4huxZXXEvNioho8c/edit#heading=h.93xu2hw1mf9b
  * @returns Promise making the api call
  */
-export async function createShopifyOrder() {
+export function createShopifyOrder(shopifyCheckoutId) {
   const session = getSession();
   const params = getPreferencesParams(session);
-  const shopifyCheckoutId = await getShopifyCheckoutId();
 
   if (isNonNullObject(params)) {
     params['_[request_index]'] = Analytics.updateRequestIndex('preferences');
@@ -83,5 +81,16 @@ export async function createShopifyOrder() {
         }
       },
     });
+  });
+}
+
+export function updateShopifyCartUrl(data) {
+  fetch.post({
+    url: makeAuthUrl(`1cc/shopify/checkout/url`),
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'text/plain',
+    },
+    data: JSON.stringify(data),
   });
 }

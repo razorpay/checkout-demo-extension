@@ -8,6 +8,7 @@ import type {
   CreateShopifyCheckoutBody,
   CreateShopifyCheckoutResponse,
 } from 'checkoutframe/1cc-shopify/interface';
+import { createShopifyOrder } from 'one_click_checkout/order/controller';
 
 /**
  * Related to the 1cc shopify flow, where the /checkout call
@@ -42,13 +43,25 @@ export function create1ccShopifyCheckout(
   });
 }
 
-export function createShopifyCheckoutId({
+export function initShopifyCheckout({
   body,
   key_id,
 }: {
   body: CreateShopifyCheckoutBody;
   key_id: string;
-}): Promise<CreateShopifyCheckoutResponse | any> {
+}) {
+  const shopifyCheckoutPromise = createShopifyCheckout({ body, key_id });
+  createShopifyOrder(shopifyCheckoutPromise);
+  return shopifyCheckoutPromise;
+}
+
+function createShopifyCheckout({
+  body,
+  key_id,
+}: {
+  body: CreateShopifyCheckoutBody;
+  key_id: string;
+}): Promise<string> {
   return new Promise((resolve, reject) => {
     const apiTimer = _.timer();
     Analytics.track('create_shopify_checkout:start', {
@@ -68,11 +81,11 @@ export function createShopifyCheckoutId({
         });
         if (response.status_code !== 200) {
           reject({ error: response.error });
-          return;
+        } else if (!response.shopify_checkout_id) {
+          reject();
+        } else {
+          resolve(response.shopify_checkout_id);
         }
-        resolve({
-          shopify_checkout_id: response.shopify_checkout_id,
-        } as CreateShopifyCheckoutResponse);
       },
     });
   });

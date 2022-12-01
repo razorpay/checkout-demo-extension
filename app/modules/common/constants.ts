@@ -159,6 +159,9 @@ export const PAYMENT_CANCEL_REASONS = {
 export const SIFT_BEACON_KEY = '4dbbb1f7b6';
 export const CYBER_SOURCE_RZP_ORG_ID = 'k8vif92e';
 
+export const PLATFORM = 'browser';
+export const LIBRARY = 'checkoutjs';
+
 export const BUILD_NUMBER = __BUILD_NUMBER__; // eslint-disable-line no-undef
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
