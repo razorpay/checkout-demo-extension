@@ -7,6 +7,7 @@
   // UI imports
   import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
   import RazorpayCluster from 'ui/tabs/home/RazorpayCluster.svelte';
+  import GiftCardBanner from 'one_click_checkout/gift_card/ui/GiftCardBanner.svelte';
 
   // Utils imports
   import { showCtaWithDefaultText, hideCta } from 'cta';
@@ -77,6 +78,8 @@
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
     <RazorpayCluster {block} on:selectInstrument />
+  {:else if block.code === 'rzp.giftcard'}
+    <GiftCardBanner />
   {:else}
     <div
       class="methods-block"

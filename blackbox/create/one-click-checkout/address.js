@@ -64,7 +64,9 @@ const CONTACT_ERROR_LABEL = 'Enter a valid mobile number.';
  * @param {*} testFeatures.addLandmark add landmark in new address
  * @param {*} testFeatures.addresses user saved addresses
  * @param {*} testFeatures.mandatoryLogin user has to login after details/summary screen
- *
+ * @param {*} testFeatures.singleGC used to apply single gift card
+ * @param {*} testFeatures.multipleGC used to apply multiple gift card
+ * @param {*} testFeatures.restrictOffer used to check Offer & gift card flow
  */
 module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -88,6 +90,9 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     invalidAddress,
     mandatoryLogin,
     shippingFee,
+    singleGC,
+    multipleGC,
+    restrictOffer,
     manageAddress,
     selectUnserviceable,
     consentBannerViews,
@@ -112,7 +117,28 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
       }
       test(title, async () => {
         preferences.methods.upi = true;
+        preferences.methods.cod = true;
 
+        if (singleGC || multipleGC) {
+          preferences['1cc'] = {
+            configs: {
+              one_cc_gift_card: singleGC || multipleGC,
+              one_cc_multiple_gift_card: multipleGC,
+            },
+          };
+        }
+
+        if (restrictOffer) {
+          preferences.offers = [
+            {
+              display_text: 'Offer of 10%',
+              id: 'offer_KHg8TOrzYH7aV1',
+              name: 'Offer of 10%',
+              payment_method: 'upi',
+              type: 'deferred',
+            },
+          ];
+        }
         /**
          * L1 QRv2 has to be disable, for old flow to work
          */

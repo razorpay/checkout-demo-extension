@@ -14,6 +14,7 @@
   // Utils imports
   import { popStack } from 'navstack';
   import { isOneClickCheckout } from 'razorpay';
+  import { appliedGiftCards } from 'one_click_checkout/gift_card/store';
 
   // Analytics imports
   import { CLOSE_MODAL_OPTIONS } from 'one_click_checkout/analytics/constants';
@@ -38,6 +39,7 @@
     popStack();
     onPositiveClick();
     if (isOneCCEnabled) {
+      appliedGiftCards.set([]);
       Events.TrackBehav(OneCCEvents.CLOSE_MODAL_OPTION, {
         screen_name: getCurrentScreen(),
         option_selected: CLOSE_MODAL_OPTIONS.POSITIVE,

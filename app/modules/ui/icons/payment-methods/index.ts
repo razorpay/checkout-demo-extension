@@ -26,6 +26,7 @@ import lock from './lock';
 import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
+import giftCard from 'one_click_checkout/gift_card/icons/giftcard';
 import internationalIcon from './international';
 import intlBankTransferIcon from './intl_bank_transfer';
 import close from 'one_click_checkout/coupons/icons/close';
@@ -46,7 +47,7 @@ import back_arrow from 'icons/back_arrow';
 import double_arrow from 'one_click_checkout/topbar/icons/double_arrow';
 import rzp_brand_logo from 'account_modal/icons/rzp_brand_logo';
 import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
-import rtb_close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+import rtb_close from './rtb_close';
 import edit_pen from 'one_click_checkout/otp/icons/edit_pen';
 import edit_paper from 'ui/icons/payment-methods/edit_paper';
 import user from 'one_click_checkout/contact_widget/icons/user';
@@ -106,6 +107,7 @@ const availIconNames = [
   'caret_circle_right',
   'solid_down_arrow',
   'consent_location',
+  'giftCard',
 ] as const;
 
 type IconSupported = typeof availIconNames[number];
@@ -145,6 +147,9 @@ function getIconFn(iconName: IconSupported) {
 
     case 'bank_transfer':
       return bank_transfer;
+
+    case 'giftCard':
+      return giftCard;
 
     case 'emandate':
     case 'nach':

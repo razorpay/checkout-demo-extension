@@ -19,6 +19,7 @@ export const formatLineItems = (lineItems) => {
       image_url,
       variant_id,
       product_url,
+      type,
       offer_price,
     } = item;
     return {
@@ -29,6 +30,7 @@ export const formatLineItems = (lineItems) => {
       image_url,
       variant_id,
       product_url,
+      type,
       offer_price,
     };
   });

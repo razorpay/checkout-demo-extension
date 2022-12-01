@@ -30,6 +30,8 @@ import { locale } from 'svelte-i18n';
 import { get } from 'svelte/store';
 import { MiscTracker } from 'misc/analytics/events';
 import { getPreferences } from 'razorpay';
+import { isOneClickCheckout, showGiftCard } from 'razorpay';
+import { GIFT_CARD_BLOCK } from 'one_click_checkout/gift_card/constants';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -438,6 +440,9 @@ export function setBlocks(
 
   hiddenMethods.set(parsedConfig.display.hide.methods);
   hiddenInstruments.set(parsedConfig.display.hide.instruments);
+  if (isOneClickCheckout() && showGiftCard()) {
+    allBlocks.push(GIFT_CARD_BLOCK);
+  }
   blocks.set(allBlocks);
   sequence.set(parsedConfig.display.sequence);
 

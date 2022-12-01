@@ -17,6 +17,7 @@ import {
   ACTIONS,
 } from 'one_click_checkout/merchant-analytics/constant';
 import otpEvents from 'otp/analytics';
+import GiftCardEvents from 'one_click_checkout/gift_card/analytics';
 
 // i18n imports
 import { formatTemplateWithLocale } from 'i18n';
@@ -48,9 +49,14 @@ import {
   getPrefilledCouponCode,
 } from 'razorpay';
 import { shouldShowCoupons } from 'one_click_checkout/store';
+import { appliedGiftCards } from 'one_click_checkout/gift_card/store';
 
 // utils imports
-import { getCurrency, isMandatoryLoginEnabled } from 'razorpay';
+import {
+  getCurrency,
+  isMandatoryLoginEnabled,
+  enabledRestrictCoupon,
+} from 'razorpay';
 import { screensHistory as history } from 'one_click_checkout/routing/History';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
 import {
@@ -69,6 +75,7 @@ import validateEmailAndContact from 'one_click_checkout/common/validators/valida
 import { pushOverlay } from 'navstack';
 import { showAddressConsentModal } from 'one_click_checkout/address/consent';
 import { resetAddresses } from 'one_click_checkout/address/derived';
+import { removeGCAnalytics } from 'one_click_checkout/gift_card/helpers';
 
 // constant imports
 import { RESEND_OTP_INTERVAL, OTP_TEMPLATES, otpReasons } from 'otp/constants';
@@ -77,6 +84,7 @@ import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
 import { views } from 'one_click_checkout/routing/constants';
 import { showLoader } from 'one_click_checkout/loader/store';
 import { mandatoryLoginOTPOverrides } from 'one_click_checkout/address/config';
+import { COUPON_GC_SOURCE } from 'one_click_checkout/gift_card/constants';
 
 export function nextView() {
   const { DETAILS, ADDRESS } = views;
@@ -138,6 +146,17 @@ export function applyCouponCode(code) {
   if (input) {
     applyCoupon(input, source, {
       onValid: () => {
+        if (enabledRestrictCoupon() && get(appliedGiftCards)?.length) {
+          const selectedGiftCards = get(appliedGiftCards)?.map(
+            ({ giftCardNumber }) => giftCardNumber
+          );
+          removeGCAnalytics({
+            event: GiftCardEvents.GC_REMOVED,
+            selectedGiftCards,
+            rmvSource: COUPON_GC_SOURCE,
+          });
+          appliedGiftCards.set([]);
+        }
         Analytics.setMeta('is_coupon_valid', true);
         Analytics.setMeta('coupon_code', input);
         merchantAnalytics({

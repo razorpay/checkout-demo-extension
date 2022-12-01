@@ -18,6 +18,7 @@ import {
   couponRemovedIndex,
   couponInputSource,
   availableCoupons,
+  prevAppliedCoupon,
 } from 'one_click_checkout/coupons/store';
 import {
   removeCoupon,
@@ -41,7 +42,12 @@ import { ERROR_INPUT_VALIDATION_FAILED } from 'one_click_checkout/coupons/consta
  * @param {string} source the source of coupon input (manual_entry/selection)
  * @param {object} callback methods which are called when a coupon application is successful/error
  */
-export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
+export function applyCoupon(
+  couponCode,
+  source,
+  { onValid, onInvalid } = {},
+  hideLoader = false
+) {
   if (couponCode) {
     couponInputValue.set(couponCode);
   }
@@ -51,7 +57,9 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
     input_source: source,
   });
   couponState.set('loading');
-  showLoaderView(APPLY_COUPON);
+  if (!hideLoader) {
+    showLoaderView(APPLY_COUPON);
+  }
   validateCoupon(code, source)
     .then((response) => {
       applyCouponInStore(code, response);
@@ -89,6 +97,7 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
         success,
       });
       showLoader.set(false);
+      prevAppliedCoupon.set({});
     });
 }
 
@@ -121,7 +130,7 @@ export function removeCouponCode(callback) {
       },
     });
     couponState.set('idle');
-    removeCouponInStore(response.amount);
+    removeCouponInStore();
     // If amount read from preferences is same as discounted amount, reset the amount
     if (typeof callback === 'function') {
       callback();

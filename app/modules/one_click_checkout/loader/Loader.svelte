@@ -1,15 +1,34 @@
 <script lang="ts">
-  import { t } from 'svelte-i18n';
-  import { fly, fade } from 'svelte/transition';
-  import { loaderLabel, showLoader } from 'one_click_checkout/loader/store';
-  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
+  // svelte imports
   import { onMount } from 'svelte';
+  import { fly, fade } from 'svelte/transition';
+
+  // i18n imports
+  import { t } from 'svelte-i18n';
+  import { LOADING_LABEL } from 'one_click_checkout/loader/i18n/labels';
+
+  // store imports
+  import {
+    loaderLabel,
+    showLoader,
+    loaderClass,
+  } from 'one_click_checkout/loader/store';
+
+  // utils imports
   import { isMobile } from 'common/useragent';
 
   let resizeBackdrop = false;
   let isKeyboardOpen = false;
   let layoutHeight;
 
+  $: {
+    if ($showLoader) {
+      resizeBackdrop = !!document.getElementById('one-cc-cta');
+    }
+  }
+
+  const getLoaderClass = (className) =>
+    `${className} ${$loaderClass ? `${$loaderClass}-${className}` : ''}`;
   $: {
     if ($showLoader) {
       resizeBackdrop = !!document.getElementById('one-cc-cta');
@@ -31,13 +50,13 @@
 
 {#if $showLoader}
   <div
-    class="loader-backdrop"
+    class={getLoaderClass('loader-backdrop')}
     class:resize-backdrop={resizeBackdrop && !isKeyboardOpen}
     in:fade={{ duration: 250 }}
     out:fade={{ duration: 200 }}
   />
   <div
-    class="card"
+    class={getLoaderClass('card')}
     class:card-absolute={isKeyboardOpen}
     out:fly={{ duration: 200, y: 10 }}
   >

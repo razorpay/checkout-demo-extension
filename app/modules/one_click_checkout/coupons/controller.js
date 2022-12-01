@@ -30,6 +30,7 @@ import {
   isGoogleAnalyticsEnabled,
   isFacebookAnalyticsEnabled,
   isMandatoryLoginEnabled,
+  showGiftCard,
   enabledGSTIN,
   enabledOrderInstruction,
 } from 'razorpay';
@@ -52,6 +53,7 @@ export function initSummaryMetaAnalytics() {
   Analytics.setMeta('google_analytics', isGoogleAnalyticsEnabled());
   Analytics.setMeta('facebook_pixel', isFacebookAnalyticsEnabled());
   Analytics.setMeta('magic_checkout', true);
+  Analytics.setMeta('gc_enabled', showGiftCard());
   Analytics.setMeta('gstin_enabled', enabledGSTIN());
   Analytics.setMeta('order_instructions_enabled', enabledOrderInstruction());
 }

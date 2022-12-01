@@ -41,9 +41,13 @@
     APPLY_OFFER_CTA,
     YOU_APPLIED_NO_COST,
   } from 'ui/labels/offers';
+  import { DISABLE_OFFER_REASON } from 'one_click_checkout/gift_card/i18n/labels';
 
+  import Tooltip from 'ui/elements/Tooltip.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import info from 'ui/icons/payment-methods/info';
   import {
     selectedInstrument,
     methodInstrument,
@@ -56,8 +60,12 @@
     offerWindowOpen,
     showOffers,
   } from 'offers/store/store';
+  import { appliedGiftCards } from 'one_click_checkout/gift_card/store';
   import { querySelector } from 'utils/doc';
   import { getSession } from 'sessionmanager';
+  import { clickOutside } from 'one_click_checkout/helper';
+  import { isMobile } from 'common/useragent';
+  import { constantCSSVars } from 'common/constants';
   import { offerFade } from 'header/store';
 
   export let applicableOffers: Offers.OffersList; // eligible offers array
@@ -74,7 +82,10 @@
   let discount;
   let previousApplied = {};
   let currentTab;
+  let disableOffer = !!$appliedGiftCards?.length;
+  let showOfferGCTooltip = false;
 
+  $: disableOffer = !!$appliedGiftCards?.length;
   let OfferCTAState = {
     show: false,
     disabled: true,
@@ -96,6 +107,28 @@
     $appliedOffer && $appliedOffer.original_amount - $appliedOffer.amount;
 
   $: $isCardValidForOffer, setAppliedOffer($appliedOffer);
+
+  const handleShowTooltip = () => {
+    if (isMobile()) {
+      showOfferGCTooltip = true;
+    }
+  };
+
+  const showTooltipOnHover = () => {
+    if (!isMobile()) {
+      showOfferGCTooltip = true;
+    }
+  };
+
+  const hideTooltipOnHover = () => {
+    if (!isMobile()) {
+      showOfferGCTooltip = false;
+    }
+  };
+
+  const handleHideTooltip = () => {
+    showOfferGCTooltip = false;
+  };
 
   function switchInstrument() {
     if (!currentTab) {
@@ -194,7 +227,7 @@
     // If applied offer is no cost emi offer
     // And belongs to new emi flow we don't allow the click
 
-    if (isNoCostOfferApplied) {
+    if (isNoCostOfferApplied || disableOffer) {
       return;
     }
 
@@ -293,13 +326,17 @@
     hidden={applicableOffers.length + otherOffers.length === 0 &&
       !$appliedOffer}
     class:has-error={error}
+    class:disable-offer={disableOffer}
   >
     <header
       on:click={showList}
       class:applied={$appliedOffer && $isCardValidForOffer}
       class:offer-nc-applied={isNoCostOfferApplied}
     >
-      <span class:bold={isRedesignV15Enabled}>
+      <span
+        class:bold={isRedesignV15Enabled}
+        class:disable-offer-text={disableOffer}
+      >
         {#if $appliedOffer}
           {#if !$isCardValidForOffer}
             <!-- LABEL: Offer is not applicable on this card. -->
@@ -338,6 +375,34 @@
             { count: applicableOffers.length + otherOffers.length },
             $locale
           )}
+        {/if}
+        {#if disableOffer}
+          <span
+            class="tooltip-wrapper"
+            use:clickOutside
+            on:click_outside={handleHideTooltip}
+          >
+            <span
+              on:mouseover={showTooltipOnHover}
+              on:mouseout={hideTooltipOnHover}
+              on:click|stopPropagation={handleShowTooltip}
+              class="info-icon has-tooltip"
+            >
+              <Icon icon={info(constantCSSVars['tertiary-text-color'])} />
+              {#if showOfferGCTooltip}
+                <span class="tip" />
+              {/if}
+            </span>
+            <div>
+              <Tooltip
+                className="gc-tooltip"
+                align={['bottom']}
+                shown={showOfferGCTooltip}
+              >
+                <div class="tooltip-text">{$t(DISABLE_OFFER_REASON)}</div>
+              </Tooltip>
+            </div>
+          </span>
         {/if}
         {#if !isNoCostOfferApplied}
           <span class="offer-action theme-highlight">
@@ -630,7 +695,6 @@
   legend span {
     cursor: pointer;
   }
-
   .bold {
     font-weight: 700;
     font-size: 13px;
@@ -678,6 +742,8 @@
       font-size: 14px;
       font-weight: 700;
       line-height: 36px;
+      display: flex;
+      align-items: center;
 
       &.close-offerlist {
         line-height: 45px;
@@ -722,6 +788,78 @@
     .offer-cta[disabled] {
       background-color: var(--light-dark-color);
       color: var(--tertiary-text-color);
+    }
+    .offers-container {
+      z-index: 3;
+    }
+  }
+  .disable-offer {
+    background-color: var(--light-dark-color);
+    cursor: not-allowed;
+    header {
+      cursor: not-allowed;
+      color: var(--tertiary-text-color);
+
+      &:after {
+        color: var(--tertiary-text-color);
+      }
+      &:before {
+        color: var(--tertiary-text-color);
+      }
+      span {
+        color: var(--tertiary-text-color);
+      }
+    }
+    .disable-offer-text,
+    .offer-action {
+      color: var(--tertiary-text-color);
+    }
+    :global(.gc-tooltip) {
+      z-index: 3;
+      bottom: 25px;
+      font-size: var(--font-size-small);
+      width: 220px;
+
+      &:before {
+        display: none;
+      }
+    }
+    :global(.gc-tooltip.tooltip-shown) {
+      opacity: 1;
+    }
+    :global(.gc-tooltip.tooltip-bottom),
+    :global(.gc-tooltip.tooltip-top) {
+      transform: translateX(-50%);
+    }
+    .tooltip-wrapper {
+      display: inline-flex;
+      height: 30px;
+      width: 16px;
+
+      .info-icon {
+        left: 2px;
+        position: relative;
+        top: 1px;
+      }
+
+      .tooltip-text {
+        white-space: normal;
+        line-height: 15px;
+        font-size: var(--font-size-small);
+        font-weight: var(--font-weight-regular);
+      }
+      .tip {
+        display: block;
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-bottom: 6px solid transparent;
+        border-top: 6px solid transparent;
+        border-right: 6px solid rgba(0, 0, 0, 0.8);
+        transform: translateY(-50%) rotate(90deg);
+        top: 26px;
+        left: 3px;
+      }
     }
   }
 </style>

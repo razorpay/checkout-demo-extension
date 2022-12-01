@@ -201,6 +201,7 @@
   import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
+  import { showGCErrMsg } from 'one_click_checkout/gift_card/helpers';
   import { isValidContact } from 'helper/validation';
   import { showBackArrow } from 'topbar/store';
   import {
@@ -876,9 +877,19 @@
     });
   }
 
+  function default1ccCTAState() {
+    CTAState.variant = 'disabled';
+    CTAState.disabled = false;
+    CTAState.onSubmit = showGCErrMsg;
+  }
+
   export function onShown() {
     $headerVisible = true;
 
+    if (isOneCCEnabled) {
+      selectedMethod = '';
+      default1ccCTAState();
+    }
     if (!isOneCCEnabled) {
       showHome = true;
     }
@@ -1292,14 +1303,17 @@
   let CTAState: {
     disabled: boolean;
     label: string;
+    onViewDetailsClick?: () => void;
     onSubmit?: () => void;
     showAmount: boolean;
     labelData?: Record<string, string>;
+    variant: 'disabled' | '';
   } = {
     disabled: true,
     label: '',
     onSubmit: undefined,
     showAmount: true,
+    variant: '',
   };
 
   $: {
@@ -1308,8 +1322,11 @@
         CTAState.onSubmit = undefined;
         CTAState.showAmount = true;
         CTAState.disabled = isRedesignV15Enabled ? ctaV15Disabled : false;
-        if (selectedMethod === 'cod') {
+        if (selectedMethod) {
+          CTAState.variant = '';
           CTAState.disabled = false;
+        } else {
+          default1ccCTAState();
         }
         CTAState.label =
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
@@ -1448,6 +1465,8 @@
       screen="home"
       tab={'tab'}
       disabled={CTAState.disabled}
+      variant={CTAState.variant}
+      onSubmit={CTAState.onSubmit}
       label={CTAState.label}
       labelData={CTAState.labelData}
       show

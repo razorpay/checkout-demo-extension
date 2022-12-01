@@ -342,14 +342,14 @@
     class:with-prediction={isPredictionEnable}
   >
     {#if showServicableIcon}
-      <span class="servicibility-icon-wrapper"
-        ><Icon icon={circle_check()} /></span
-      >
+      <span class="servicibility-icon-wrapper">
+        <Icon icon={circle_check()} />
+      </span>
     {/if}
     {#if showDropDownIcon}
-      <span class="drop-down-icon-wrapper"
-        ><Icon icon={solid_down_arrow} /></span
-      >
+      <span class="drop-down-icon-wrapper">
+        <Icon icon={solid_down_arrow} />
+      </span>
     {/if}
     {#if leftImage}
       <img alt="left-img" class="left-img" src={leftImage} />

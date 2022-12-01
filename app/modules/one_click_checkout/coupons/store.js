@@ -47,7 +47,7 @@ export function applyCouponInStore(code, response) {
   disabledMethods.set(response.promotions[0].disabled_methods || []);
   appliedCoupon.set(code);
   const cartValue = get(cartAmount);
-  let couponValue = response.promotions[0].value;
+  let couponValue = response?.promotions?.[0]?.value;
   /* if coupon amount is greater than or equal to cart amount & shipping charge is available,
    * The maximum consumable coupon amount is equal to cart amount
    */
@@ -89,5 +89,6 @@ export function resetChargesCoupons() {
 }
 
 export const couponListTimer = writable('');
+export const prevAppliedCoupon = writable({});
 
 export const disabledMethods = writable([]);

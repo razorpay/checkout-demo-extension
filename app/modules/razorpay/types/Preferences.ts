@@ -304,6 +304,13 @@ interface OneCC {
     one_cc_international_shipping: boolean;
     one_cc_auto_fetch_coupons: boolean;
     one_cc_buy_now_button: boolean;
+    one_cc_gift_card: boolean;
+    one_cc_gift_card_restrict_coupon: boolean;
+    one_cc_gift_card_pin: boolean;
+    one_cc_multiple_gift_card: boolean;
+    one_cc_buy_gift_card: boolean;
+    one_cc_gift_card_cod_restrict: boolean;
+    one_cc_restrict_cod: boolean;
     one_cc_capture_gstin: boolean;
     one_cc_capture_order_instructions: boolean;
   };

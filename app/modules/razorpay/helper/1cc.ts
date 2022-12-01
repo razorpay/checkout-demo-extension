@@ -68,6 +68,21 @@ export const consumerConsentDefaultDeny = () =>
 export const isCustomerConsentFeatureEnabled = () =>
   customerConsentDefaultAccept() || consumerConsentDefaultDeny();
 
+export const showGiftCard = () =>
+  getPreferences('1cc.configs.one_cc_gift_card') || false;
+
+export const enabledRestrictCoupon = () =>
+  getPreferences('1cc.configs.one_cc_gift_card_restrict_coupon') || false;
+
+export const enabledMultipleGiftCard = () =>
+  getPreferences('1cc.configs.one_cc_multiple_gift_card') || false;
+
+export const enabledBuyGiftCard = () =>
+  getPreferences('1cc.configs.one_cc_buy_gift_card') || false;
+
+export const enabledRestrictCOD = () =>
+  getPreferences('1cc.configs.one_cc_gift_card_cod_restrict') || false;
+
 export const disableEmailAsCookie = () => {
   return getPreferences('features.one_cc_disableemailcookie') || false;
 };

@@ -20,7 +20,12 @@ const {
   assertHidden,
 } = require('../../util');
 const { fillUserDetails } = require('../home-page-actions');
-const { submit, handleMockSuccessDialog } = require('../shared-actions');
+const {
+  selectBank,
+  handleMockSuccessDialog,
+  submit,
+} = require('../shared-actions');
+const { handleGiftCard } = require('./gift-card');
 const { handleCODPayment } = require('./cod');
 const {
   selectSavedCardAndTypeCvv,
@@ -461,6 +466,7 @@ async function mockPaymentSteps(
   await delay(200);
   if (method !== 'cod') {
     await handleFeeSummary(context, features);
+    await handleGiftCard(context, features);
   }
 
   switch (method) {

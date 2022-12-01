@@ -46,6 +46,9 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     personalised,
     discountAmount,
     saveAddress,
+    singleGC,
+    multipleGC,
+    restrictCoupon,
     showCoupons,
     couponsDisabled,
   } = features;
@@ -62,6 +65,16 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
       preferences.methods.upi = true;
 
       test(title, async () => {
+        if (singleGC || multipleGC) {
+          preferences['1cc'] = {
+            configs: {
+              one_cc_auto_fetch_coupons: true,
+              one_cc_gift_card: singleGC || multipleGC,
+              one_cc_multiple_gift_card: multipleGC,
+              one_cc_gift_card_restrict_coupon: restrictCoupon,
+            },
+          };
+        }
         features.isSelectCOD = method === 'cod';
 
         const context = await openCheckoutWithNewHomeScreen({
@@ -72,7 +85,6 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
         if (couponsDisabled) {
           await verifyCouponWidgetHidden(context);
         }
-
         if (showCoupons) {
           await handleAvailableCouponReq(context, availableCoupons);
         } else {

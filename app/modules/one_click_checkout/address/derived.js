@@ -17,19 +17,18 @@ import {
   shouldSaveAddress as shouldSaveBillingAddress,
   resetAddress as resetBillingAddress,
 } from 'one_click_checkout/address/billing_address/store';
-import {
-  appliedCoupon,
-  isCouponApplied,
-} from 'one_click_checkout/coupons/store';
+import { isCouponApplied } from 'one_click_checkout/coupons/store';
 import { isCodApplicableOnCoupon } from 'one_click_checkout/address/helpersExtra';
+import { disableCOD } from 'one_click_checkout/gift_card/store';
 
 export const isCodAvailable = derived(
-  [selectedShippingAddress, appliedCoupon, isCouponApplied],
-  ([$selectedShippingAddress, $isCouponApplied]) => {
+  [selectedShippingAddress, isCouponApplied, disableCOD],
+  ([$selectedShippingAddress, $isCouponApplied, $disableCOD]) => {
     if (
-      !isCodApplicableOnCoupon() &&
-      $isCouponApplied &&
-      getPreferences('merchant_key') === 'rzp_live_doOidGOxQnkbe5'
+      (!isCodApplicableOnCoupon() &&
+        $isCouponApplied &&
+        getPreferences('merchant_key') === 'rzp_live_doOidGOxQnkbe5') ||
+      $disableCOD
     ) {
       return false;
     }

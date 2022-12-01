@@ -33,12 +33,14 @@
     COD_CHARGES_DESCRIPTION,
   } from 'one_click_checkout/address/i18n/labels';
   import { codChargeAmount } from 'one_click_checkout/charges/store';
+  import { disableCOD } from 'one_click_checkout/gift_card/store';
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { isNoCostEmiAvailable } from 'emiV2/store';
   import { enableUPITiles } from 'upi/features';
   import { UPIAppStack } from 'upi/ui/components/UPIAppStack';
 
   import { PAY_WITH_INSTALLED_OR_OTHERS } from 'upi/i18n/labels';
+  import { RESTRICT_COD } from 'one_click_checkout/gift_card/i18n/labels';
   import { captureFeature } from 'upi/events';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatAmountWithSymbol } from 'common/currency';
@@ -143,7 +145,7 @@
 
   $: if (isMethodCOD) {
     disabled = !$isCodAvailable || $showCodLoader;
-    errorLabel = COD_DISABLED_LABEL;
+    errorLabel = $disableCOD ? RESTRICT_COD : COD_DISABLED_LABEL;
     error = $codReason;
   }
 

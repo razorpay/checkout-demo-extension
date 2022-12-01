@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { MIN_REQ_AMOUNT } from 'one_click_checkout/coupons/constants';
+import { totalAppliedGCAmt } from 'one_click_checkout/gift_card/store';
 
 // Store to keep track of shipping charge
 export const shippingCharge = writable(null);
@@ -38,7 +39,12 @@ export const isShippingAddedToAmount = writable(null);
 
 isShippingAddedToAmount.subscribe((isAdded) => {
   if (isAdded === true) {
-    amount.set(get(cartAmount) - get(cartDiscount) + get(shippingCharge));
+    amount.set(
+      get(cartAmount) -
+        get(cartDiscount) +
+        get(shippingCharge) -
+        get(totalAppliedGCAmt)
+    );
   } else if (isAdded === false) {
     amount.set(get(amount) - get(shippingCharge));
   }
@@ -57,7 +63,12 @@ export const setCartDiscount = (shippingAmount) => {
 
 shippingCharge.subscribe((shippingAmount) => {
   setCartDiscount(shippingAmount);
-  amount.set(get(cartAmount) - get(cartDiscount) + (shippingAmount || 0));
+  amount.set(
+    get(cartAmount) -
+      get(cartDiscount) +
+      (shippingAmount || 0) -
+      get(totalAppliedGCAmt)
+  );
 });
 // Stores to keep track of charges from api
 export function resetCharges() {

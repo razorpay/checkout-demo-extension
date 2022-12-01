@@ -3,6 +3,8 @@
 
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
+  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
+
   //i18n Imports
   import {
     RTB_HEADER,

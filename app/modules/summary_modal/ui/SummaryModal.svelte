@@ -21,6 +21,7 @@
     OFFER_LABEL,
     SCRIPT_COUPON_DISCOUNT_LABEL,
   } from 'summary_modal/i18n/labels';
+  import { GIFT_CARD } from 'one_click_checkout/gift_card/i18n/labels';
 
   // store imports
   import {
@@ -38,6 +39,7 @@
   } from 'one_click_checkout/coupons/store';
   import { appliedOffer } from 'offers/store/store';
   import { cartItems, enableCart } from 'one_click_checkout/cart/store';
+  import { totalAppliedGCAmt } from 'one_click_checkout/gift_card/store';
   import {
     getAmount,
     getCurrency,
@@ -267,6 +269,18 @@
           </div>
         </div>
       {/if}
+      {#if $totalAppliedGCAmt}
+        <div class="summary-row">
+          <div>{$t(GIFT_CARD)}</div>
+          <div class="text-green">
+            -{formatAmountWithSymbol(
+              $totalAppliedGCAmt,
+              currency,
+              spaceAmountWithSymbol
+            )}
+          </div>
+        </div>
+      {/if}
       {#if $appliedOffer?.amount}
         <div class="summary-row">
           <div data-test-id="offer-label">
@@ -391,7 +405,7 @@
   hr {
     border: 1px solid #e1e5ea;
     border-bottom: none;
-    margin: 12px 16px;
+    margin: 12px 0;
   }
 
   .total-charges-text {

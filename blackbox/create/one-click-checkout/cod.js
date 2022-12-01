@@ -31,6 +31,10 @@ const {
   handleCODPayment,
   checkDisabledCOD,
 } = require('../../actions/one-click-checkout/cod');
+const {
+  handleGiftCard,
+  checkGCDisabledOnCOD,
+} = require('../../actions/one-click-checkout/gift-card');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -70,9 +74,16 @@ module.exports = function (testFeatures) {
     isCODEligible,
     serviceable,
     codFee,
+    isThirdWatchEligible,
+    singleGC,
+    multipleGC,
+    restrictCOD,
+    restrictGC,
     couponValid,
     shippingFee,
     availableCoupons,
+    showCoupons,
+    billingEnabled,
   } = features;
 
   describe.each(
@@ -83,13 +94,29 @@ module.exports = function (testFeatures) {
   )('One Click Checkout COD test', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.cod = true;
+
+      if (singleGC || multipleGC) {
+        preferences = {
+          ...preferences,
+          '1cc': {
+            configs: {
+              one_cc_auto_fetch_coupons: !!showCoupons,
+              one_cc_capture_billing_address: !!billingEnabled,
+              one_cc_gift_card: singleGC || multipleGC,
+              one_cc_multiple_gift_card: multipleGC,
+              one_cc_gift_card_cod_restrict: restrictCOD || restrictGC,
+            },
+          },
+        };
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
       });
 
-      if (features.showCoupons) {
+      if (showCoupons) {
         await handleAvailableCouponReq(context, availableCoupons);
       }
       if (couponValid) {
@@ -126,11 +153,16 @@ module.exports = function (testFeatures) {
       if (isCODEligible) {
         features.isSelectCOD = true;
         await delay(200);
-        await selectPaymentMethod(context, 'cod');
-        await proceedOneCC(context, false);
-        await delay(200);
-        await handleFeeSummary(context, features);
-        await handleCODPayment(context);
+        if (restrictCOD) {
+          await handleGiftCard(context, features);
+        } else {
+          await selectPaymentMethod(context, 'cod');
+          await checkGCDisabledOnCOD(context, features);
+          await proceedOneCC(context, false);
+          await delay(200);
+          await handleFeeSummary(context, features);
+          await handleCODPayment(context);
+        }
       } else {
         await checkDisabledCOD(context);
       }

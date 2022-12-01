@@ -88,6 +88,7 @@ import { selectedTab } from 'components/Tabs/tabStore';
 import { isCardlessTab } from 'emiV2/helper/tabs';
 import { EventsV2, ContextProperties, AnalyticsV2State } from 'analytics-v2';
 import { MiscTracker } from 'misc/analytics/events';
+import { totalAppliedGCAmt } from 'one_click_checkout/gift_card/store';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
 import { UPITracker } from 'upi/analytics/events';
@@ -5768,6 +5769,11 @@ Session.prototype = {
       selectedInternationalProvider
     ) {
       data.provider = selectedInternationalProvider;
+    }
+
+    // for 1cc sending gc_used property on submit analytics event
+    if (RazorpayHelper.isOneClickCheckout()) {
+      data.gc_used = !!discreet.storeGetter(totalAppliedGCAmt);
     }
 
     // for paypal and trustly dcc enable is not required

@@ -33,7 +33,7 @@
 
   const isRTBEnabled = RTBEnabled($RTBExperiment);
   const merchantName = truncateString(getMerchantName(), 20);
-  const closeIcon = close(themeMeta.textColor);
+  const closeIcon = close(20, 20, HEADER_ELEMENTS_COLOR);
 
   $: routeName = $activeRoute?.name;
 </script>

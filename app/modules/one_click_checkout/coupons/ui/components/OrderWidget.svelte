@@ -26,6 +26,7 @@
     cartItems,
     enableCart,
   } from 'one_click_checkout/cart/store';
+  import { totalAppliedGCAmt } from 'one_click_checkout/gift_card/store';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -40,6 +41,7 @@
     FREE_LABEL,
     SCRIPT_COUPON_DISCOUNT_LABEL,
   } from 'summary_modal/i18n/labels';
+  import { GIFT_CARD } from 'one_click_checkout/gift_card/i18n/labels';
 
   // session imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -73,9 +75,11 @@
     showTotal =
       $isShippingAddedToAmount || $isCouponApplied || !!scriptCouponDiscount;
     if ($savedAddresses?.length && $shippingCharge) {
-      amount.set($cartAmount - $cartDiscount + $shippingCharge);
+      amount.set(
+        $cartAmount - $cartDiscount + $shippingCharge - $totalAppliedGCAmt
+      );
     } else {
-      amount.set($cartAmount - $cartDiscount);
+      amount.set($cartAmount - $cartDiscount - $totalAppliedGCAmt);
     }
   }
 
@@ -176,6 +180,20 @@
             : $t(FREE_LABEL)}
         </p>
       {/if}
+    </div>
+  {/if}
+  {#if $totalAppliedGCAmt}
+    <div class="row justify-between color-gray">
+      <p>
+        {$t(GIFT_CARD)}
+      </p>
+      <p class="color-green">
+        - {formatAmountWithSymbol(
+          $totalAppliedGCAmt,
+          currency,
+          spaceAmountWithSymbol
+        )}
+      </p>
     </div>
   {/if}
   {#if showTotal}

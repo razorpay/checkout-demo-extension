@@ -197,6 +197,11 @@ function trackNewPayment(data, params, r, returnFunction = false) {
     delete data.default_dcc_currency;
   }
 
+  // gc_used used for only analytics by 1cc
+  if (data.gc_used !== undefined) {
+    delete data.gc_used;
+  }
+
   const flowCode = calculateFlow({
     downtimeSeverity: params.downtimeSeverity,
     ...data,
