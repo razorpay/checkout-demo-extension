@@ -1,4 +1,4 @@
-FROM openresty/openresty:1.19.9.1-12-alpine
+FROM openresty/openresty:1.21.4.1-4-alpine
 
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
