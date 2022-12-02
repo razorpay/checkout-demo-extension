@@ -4,7 +4,12 @@ local js = "https://checkout.razorpay.com/v1/sdk-loader.js"
 if (ngx.var.arg_build) then
   local base = "https://checkout-static-next.razorpay.com/build/" .. ngx.var.arg_build:gsub('%W','')
   js = base .. "/checkout-frame.js"
-  css = '<link rel="stylesheet" href="' .. base .. '/css/checkout.css">'
+
+  if (ngx.var.arg_magic_shopify_key) then
+    js = base .. "/checkout-frame-lite.js"
+  else
+    css = '<link rel="stylesheet" href="' .. base .. '/css/checkout.css">'
+  end
 end
 
 response = [[
