@@ -16,7 +16,7 @@ import { getSession } from 'sessionmanager';
  * resolves to order id
  * @type Promise<string>
  */
-let SHOPIFY_ORDER_PROMISE;
+export let SHOPIFY_ORDER_PROMISE;
 let hash = null;
 
 export function updateOrderWithCustomerDetails(

@@ -13,7 +13,7 @@
   } from 'one_click_checkout/address/i18n/labels';
 
   // constant imports
-  import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
+  import Shimmer from 'ui/components/Shimmer';
 
   // utils imports
   import { findCountryCode } from 'common/countrycodes';

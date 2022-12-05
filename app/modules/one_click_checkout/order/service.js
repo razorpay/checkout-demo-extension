@@ -69,7 +69,7 @@ export function createShopifyOrder(shopifyCheckoutId) {
         preference_params: { ...unflatten(params), send_preferences: true },
       }),
       callback: (res) => {
-        const success = res.status_code === 200 || res.xhr.status === 200;
+        const success = res.status_code === 200;
         Events.TrackMetric(FETCH_SHOPIFY_ORDER_END, {
           success,
           duration: getDuration(),

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Events } from 'analytics';
-  import CTAStore from './store';
+  import CTAStore, { CTAState } from './store';
   import CTAEvents from 'cta/analytics';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { getSession } from 'sessionmanager';
@@ -15,6 +15,7 @@
   export let label = PAY_NOW_CTA_LABEL;
   export let labelData = {};
   export let showAmount = true;
+  export let showAmountVariant: CTAState['showAmountVariant'] = '';
   export let variant: 'disabled' | '' = '';
 
   function defaultCTAAction(e?: Event) {
@@ -50,6 +51,7 @@
         disabled,
         show,
         showAmount,
+        showAmountVariant,
         label: label || PAY_NOW_CTA_LABEL,
         variant,
         onSubmit: onSubmit || defaultCTAAction,

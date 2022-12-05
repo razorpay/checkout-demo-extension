@@ -1,8 +1,9 @@
 import { get, Writable, writable } from 'svelte/store';
 import { getAmount, getCurrency } from 'razorpay';
 
-type CTAState = {
+export type CTAState = {
   showAmount?: boolean;
+  showAmountVariant?: 'loading' | '';
   show?: boolean;
   label?: string;
   disabled?: boolean;

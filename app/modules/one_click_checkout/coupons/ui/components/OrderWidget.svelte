@@ -1,7 +1,7 @@
 <script lang="ts">
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
-  import Shimmer from 'one_click_checkout/common/ui/Shimmer.svelte';
+  import Shimmer from 'ui/components/Shimmer';
   import CartItemList from 'one_click_checkout/cart/ui/CartItemList.svelte';
   import CartCta from 'one_click_checkout/coupons/ui/components/CartCta.svelte';
 

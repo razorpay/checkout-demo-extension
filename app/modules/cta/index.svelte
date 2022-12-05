@@ -3,8 +3,11 @@
   import { locale, t } from 'svelte-i18n';
   import { CTA_LABEL, VIEW_DETAILS_LABEL } from 'cta/i18n';
 
+  // UI imports
+  import Shimmer from 'ui/components/Shimmer';
+
   // helpers/store imports
-  import CTAStore from 'cta/store';
+  import CTAStore, { CTAState } from 'cta/store';
   import {
     getAmount,
     getCurrency,
@@ -43,7 +46,7 @@
   let onViewDetailsClick = CTAStore.onViewDetailsClick.bind(CTAStore);
   let activeScreenStore = CTAStore.activeCTAScreen;
   let activeScreen = 'default-tab';
-  let state: any;
+  let state: CTAState;
   let label: string;
   $: {
     activeScreen = $activeScreenStore;
@@ -77,49 +80,56 @@
   class:reduce-amount-size={reduceAmountSize}
 >
   {#if state.showAmount}
-    <div class="flex-column">
-      {#if offerAmount > 0 && !isOneCCEnabled}
-        <span class="offer-original-amount">
-          {formatAmountWithSymbol(
-            $appliedOffer?.original_amount || getAmount(),
-            $store.currency || getCurrency(),
-            true
-          )}
-        </span>
-      {/if}
-      <span class="price-label">
+    {#if state.showAmountVariant === 'loading'}
+      <div class="flex-column amount-loading">
+        <Shimmer width={60} height={20} />
+        <Shimmer width={40} height={15} />
+      </div>
+    {:else}
+      <div class="flex-column">
         {#if offerAmount > 0 && !isOneCCEnabled}
-          {formatAmountWithSymbol(
-            $appliedOffer?.amount || getAmount(),
-            $store.currency || getCurrency(),
-            true
-          )}
-        {:else}
-          {@html $store.rawAmount ||
-            formatAmountWithSymbol(
-              $store.amount || getAmount(),
+          <span class="offer-original-amount">
+            {formatAmountWithSymbol(
+              $appliedOffer?.original_amount || getAmount(),
               $store.currency || getCurrency(),
               true
             )}
-        {/if}
-      </span>
-      {#if isCustomerFeeBearer()}
-        <span id="fee-wrapper">
-          <span class="fee">
-            <FeeLabel bind:visible={feeLabelVisible} />
           </span>
+        {/if}
+        <span class="price-label">
+          {#if offerAmount > 0 && !isOneCCEnabled}
+            {formatAmountWithSymbol(
+              $appliedOffer?.amount || getAmount(),
+              $store.currency || getCurrency(),
+              true
+            )}
+          {:else}
+            {@html $store.rawAmount ||
+              formatAmountWithSymbol(
+                $store.amount || getAmount(),
+                $store.currency || getCurrency(),
+                true
+              )}
+          {/if}
         </span>
-      {/if}
-      {#if !feeLabelVisible}
-        <button
-          type="button"
-          id="cta-view-details"
-          data-test-id="cta-view-details"
-          on:click|preventDefault={onViewDetailsClick}
-          >{$t(VIEW_DETAILS_LABEL)}</button
-        >
-      {/if}
-    </div>
+        {#if isCustomerFeeBearer()}
+          <span id="fee-wrapper">
+            <span class="fee">
+              <FeeLabel bind:visible={feeLabelVisible} />
+            </span>
+          </span>
+        {/if}
+        {#if !feeLabelVisible}
+          <button
+            type="button"
+            id="cta-view-details"
+            data-test-id="cta-view-details"
+            on:click|preventDefault={onViewDetailsClick}
+            >{$t(VIEW_DETAILS_LABEL)}</button
+          >
+        {/if}
+      </div>
+    {/if}
   {/if}
   <div class="redesign-v15-cta-wrapper" class:full-width={!showAmount}>
     <button
@@ -212,6 +222,12 @@
     font-size: 10px;
     color: #8d97a1;
     text-decoration: line-through;
+  }
+
+  .amount-loading {
+    & > :global(*) {
+      margin-top: 5px;
+    }
   }
 
   #redesign-v15-cta {

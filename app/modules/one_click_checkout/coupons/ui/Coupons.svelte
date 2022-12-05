@@ -9,7 +9,7 @@
   import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
   import GstinForm from 'one_click_checkout/gstin/ui/GstinForm.svelte';
-  import CTA from 'cta';
+  import CTA, { CTAState } from 'cta';
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
@@ -72,7 +72,10 @@
   import { hideToast } from 'one_click_checkout/Toast';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { getPhoneNumberRegex } from 'one_click_checkout/helper';
-  import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
+  import {
+    SHOPIFY_ORDER_PROMISE,
+    updateOrderWithCustomerDetails,
+  } from 'one_click_checkout/order/controller';
   import {
     getPrefilledContact,
     getPrefilledEmail,
@@ -90,6 +93,7 @@
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { CTA_LABEL } from 'cta/i18n';
   import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
+  import { isMagicShopifyFlow } from 'checkoutframe/helper';
 
   const showCoupons = shouldShowCoupons();
   const couponsWidgetExperiment = getCouponWidgetExperiment();
@@ -97,11 +101,13 @@
   let ctaDisabled = false;
   let orderWidget;
   let showValidations = $contact || $email;
+  let showAmountVariant: CTAState['showAmountVariant'] = '';
 
   $: ctaDisabled =
     ($savedAddresses.length && !$selectedAddress?.serviceability) ||
     !$isContactAndEmailValid ||
-    !$isGstInValid;
+    !$isGstInValid ||
+    showAmountVariant === 'loading';
 
   function onSubmitLoggedInUser() {
     updateCustomerConsent($customerConsentCheckboxState);
@@ -219,6 +225,15 @@
     if (couponsPromise) {
       promiseList.push(couponsPromise);
     }
+
+    // for magic shopify flows, order creation happens
+    // after UI is created
+    if (isMagicShopifyFlow()) {
+      showAmountVariant = 'loading';
+      SHOPIFY_ORDER_PROMISE.then(() => (showAmountVariant = ''));
+      promiseList.push(SHOPIFY_ORDER_PROMISE);
+    }
+
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -226,6 +241,7 @@
         page_title: CATEGORIES.COUPONS,
       },
     });
+
     Promise.all(promiseList).finally(summaryLoadedEvent);
   });
 
@@ -297,6 +313,7 @@
     label={CTA_LABEL}
     onSubmit={handleOnSubmit}
     {onViewDetailsClick}
+    {showAmountVariant}
   />
 </Screen>
 
