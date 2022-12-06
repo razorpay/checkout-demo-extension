@@ -268,7 +268,10 @@ const fetchPrototype: FetchPrototype = {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
         // using xhr.getResponseHeader because xhr.responseType is '' for all api calls
-        if (xhr.getResponseHeader('content-type')?.includes('text')) {
+        if (
+          xhr.getResponseHeader('content-type')?.includes('text') ||
+          typeof ObjectUtils.parse(xhr.responseText) === 'string'
+        ) {
           callback?.({
             status_code: xhr.status,
             xhr: { status: xhr.status, text: xhr.responseText },
@@ -300,7 +303,9 @@ const fetchPrototype: FetchPrototype = {
             );
           }
 
-          json['status_code'] = xhr.status;
+          if (typeof json === 'object') {
+            json['status_code'] = xhr.status;
+          }
 
           callback?.(json);
           return;
