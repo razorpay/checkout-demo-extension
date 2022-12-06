@@ -2,22 +2,27 @@
   import { getCommonBankName } from 'common/bank';
   import RazorpayConfig from 'common/RazorpayConfig';
 
-  import { getCardlessEmiProviderName } from 'i18n';
+  import { getCardlessEmiProviderData, getCardlessEmiProviderName } from 'i18n';
   import { NO_COST_EMI } from 'ui/labels/offers';
   import { locale } from 'svelte-i18n';
   import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import StartingFromLabel from 'components/Label/StartingFromLabel.svelte';
   import type { EMIBANKS } from 'emiV2/types';
+  import Label from 'components/Label/Label.svelte';
 
   export let emi: EMIBANKS;
   export let type: string;
   export let selected: boolean;
 
   let code: string;
+  let sideLabel: string;
   $: code = emi.code;
   $: isNoCost = emi.isNoCostEMI;
   $: startingAt = emi.startingFrom;
   const src = emi.icon || `${RazorpayConfig.cdn}/bank/${code}.gif`;
+
+  // For providers like Axio we need to show a sideLabel text
+  $: sideLabel = getCardlessEmiProviderData(code, 'sideLabel', $locale);
 </script>
 
 <div
@@ -40,6 +45,8 @@
         <NoCostLabel text={NO_COST_EMI} expanded={true} />
       {:else if startingAt}
         <StartingFromLabel {startingAt} expanded={true} />
+      {:else if sideLabel}
+        <Label text={sideLabel} expanded={true} type={'secondary'} />
       {/if}
     </div>
   </div>

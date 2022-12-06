@@ -437,7 +437,7 @@ export default {
     walnut369: {
       subtitle: 'Quick and easy EMI approvals',
       highlightLabel: 'Quicker and higher chances of getting an EMI',
-      sideLabel: '(Easy Signup)',
+      sideLabel: 'Easy Signup',
     },
     select_option_title: 'Select an option',
     select_recommended_title: 'Recommended',
