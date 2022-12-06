@@ -3,10 +3,23 @@ import {
   isOtherCardEmiProvider,
   isSelectedBankBajaj,
   shouldEmiOptionRender,
+  showTokenisationBenefitModal,
 } from 'emiV2/helper/helper';
 import { selectedBank } from 'emiV2/store';
+import { shouldRememberCard } from 'ui/tabs/card/utils';
 import { getEMIStartingAt, isNoCostEMI } from '../helper/label';
 import { filterTabsAgainstInstrument, getEmiTabs } from '../helper/tabs';
+import { remember } from 'checkoutstore/screens/card';
+
+jest.mock('ui/tabs/card/utils', () => ({
+  __esModule: true,
+  shouldRememberCard: jest.fn(() => true),
+}));
+
+jest.mock('razorpay/helper/experiment', () => ({
+  __esModule: true,
+  isRemoveDefaultTokenizationSupported: jest.fn(() => true),
+}));
 
 const testPlans = {
   3: {
@@ -499,4 +512,43 @@ describe('Validate: shouldEmiOptionRender', () => {
   expect(shouldEmiOptionRender(emiOptions, savedCards)).toBe(true);
 
   expect(shouldEmiOptionRender(null, [])).toBe(false);
+});
+
+describe('Validate: showTokenisationBenefitModal', () => {
+  test('showTokenisationBenefitModal false in case of cardless', () => {
+    shouldRememberCard.mockReturnValue(true);
+    expect(showTokenisationBenefitModal({ action: 'cardless' })).toBe(false);
+  });
+
+  test('showTokenisationBenefitModal true in case of non bajaj card ', () => {
+    shouldRememberCard.mockReturnValue(true);
+    selectedBank.set({
+      code: 'HDFC',
+    });
+    expect(showTokenisationBenefitModal({ action: 'card' })).toBe(true);
+  });
+
+  test('showTokenisationBenefitModal false in case of shouldRemember card is false', () => {
+    shouldRememberCard.mockReturnValue(false);
+    selectedBank.set({
+      code: 'HDFC',
+    });
+    expect(showTokenisationBenefitModal({ action: 'card' })).toBe(false);
+  });
+
+  test('showTokenisationBenefitModal false in case of bajaj', () => {
+    shouldRememberCard.mockReturnValue(true);
+    selectedBank.set({
+      code: 'bajaj',
+    });
+    expect(showTokenisationBenefitModal({ action: 'card' })).toBe(false);
+  });
+
+  test('showTokenisationBenefitModal false in case of remeber is true', () => {
+    selectedBank.set({
+      code: 'HDFC',
+    });
+    remember.set(true);
+    expect(showTokenisationBenefitModal({ action: 'card' })).toBe(false);
+  });
 });

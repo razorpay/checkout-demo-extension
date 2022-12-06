@@ -1,5 +1,8 @@
 import { shouldRememberCustomer } from 'checkoutstore/index.js';
-import RazorpayStore, { isGlobalVault } from 'razorpay';
+import RazorpayStore, {
+  isGlobalVault,
+  isRemoveDefaultTokenizationSupported,
+} from 'razorpay';
 import { delayOTP } from 'card/experiments';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import { popStack, pushOverlay } from 'navstack';
@@ -12,7 +15,6 @@ import {
 import CardTokenisationOverlaySvelte from 'ui/components/CardTokenisationOverlay.svelte';
 import { getSession } from 'sessionmanager';
 import { isIndianCustomer } from 'checkoutstore/screens/home';
-import { isRemoveDefaultTokenizationSupported } from 'razorpay/helper/experiment';
 import { shouldRememberCard } from 'ui/tabs/card/utils';
 import type { Tokens } from 'razorpay/types/Preferences';
 import type { TokenisationOverlayProps } from 'card/types';

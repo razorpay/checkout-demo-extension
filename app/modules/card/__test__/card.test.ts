@@ -6,13 +6,14 @@ import {
 } from 'card/helper/cards';
 import { popStack, pushOverlay } from 'navstack';
 import { Events } from 'analytics';
-import { userConsentForTokenization } from 'checkoutstore/screens/card';
+import { remember } from 'checkoutstore/screens/card';
 import {
   customerTokens,
   selctedTokenId,
   selctedToken,
 } from '../__mocks__/card';
 import { getSession } from 'sessionmanager';
+import { isRemoveDefaultTokenizationSupported } from 'razorpay';
 
 jest.mock('sessionmanager', () => ({
   __esModule: true,
@@ -35,10 +36,14 @@ jest.mock('analytics', () => ({
   },
 }));
 
-jest.mock('razorpay/helper/experiment', () => ({
-  __esModule: true,
-  isRemoveDefaultTokenizationSupported: () => true,
-}));
+jest.mock('razorpay', () => {
+  const originalModule = jest.requireActual('razorpay');
+  return {
+    __esModule: true,
+    ...originalModule,
+    isRemoveDefaultTokenizationSupported: jest.fn(() => true),
+  };
+});
 
 jest.mock('ui/tabs/card/utils', () => ({
   __esModule: true,
@@ -81,6 +86,7 @@ describe('Test authOverlayOnContinue', () => {
     );
   });
 });
+
 describe('Test showTokenisationBenefitModal', () => {
   test('should return false on L0 screen', () => {
     expect(showTokenisationBenefitModal()).toBe(false);
@@ -89,10 +95,44 @@ describe('Test showTokenisationBenefitModal', () => {
     (getSession as any).mockReturnValue({
       screen: 'card',
       svelteCardTab: {
-        isOnSavedCardsScreen: () => true,
+        isOnSavedCardsScreen: () => false,
       },
     });
-    userConsentForTokenization.set(false);
+    (isRemoveDefaultTokenizationSupported as any).mockReturnValue(true);
     expect(showTokenisationBenefitModal()).toBe(true);
+  });
+
+  test('should return false as experiment is false', () => {
+    (getSession as any).mockReturnValue({
+      screen: 'card',
+      svelteCardTab: {
+        isOnSavedCardsScreen: () => false,
+      },
+    });
+    (isRemoveDefaultTokenizationSupported as any).mockReturnValue(false);
+    expect(showTokenisationBenefitModal()).toBe(false);
+  });
+
+  test('should return true on card screen', () => {
+    (getSession as any).mockReturnValue({
+      screen: 'card',
+      svelteCardTab: {
+        isOnSavedCardsScreen: () => false,
+      },
+    });
+    (isRemoveDefaultTokenizationSupported as any).mockReturnValue(true);
+    remember.set(false);
+    expect(showTokenisationBenefitModal()).toBe(true);
+  });
+
+  test('should return false as remember is true', () => {
+    (getSession as any).mockReturnValue({
+      screen: 'card',
+      svelteCardTab: {
+        isOnSavedCardsScreen: () => false,
+      },
+    });
+    remember.set(true);
+    expect(showTokenisationBenefitModal()).toBe(false);
   });
 });
