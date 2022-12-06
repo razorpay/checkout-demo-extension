@@ -868,8 +868,12 @@
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
     if ($hideExpiryCvvFields) {
-      payload['card[expiry]'] = '12 / 21';
-      payload['card[cvv]'] = '000';
+      // For expiry year we are sending some future year(current year + 5 years)
+      try {
+        const futureYear = (new Date().getFullYear() + 20) % 100;
+        payload['card[expiry]'] = `12 / ${futureYear}`;
+        payload['card[cvv]'] = '000';
+      } catch (err) {}
     }
     if ($remember && isSavedCardsEnabled) {
       payload.save = 1;
