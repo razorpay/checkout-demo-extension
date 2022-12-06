@@ -319,7 +319,7 @@
           selectedBank={$selectedBank}
           bankList={translatedBanksArr}
           {downtimeSeverity}
-          invalid={!$selectedBank}
+          {invalid}
           on:click={showSearch}
           on:keypress={({ detail }) => {
             handleEnterOnBanking(detail);
