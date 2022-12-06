@@ -11,9 +11,6 @@ import { appendFormInput, flatten } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import Interface from 'common/interface';
-import { ContextProperties, EventsV2 } from 'analytics-v2';
-import { shouldUseVernacular } from 'checkoutstore/methods';
-import { getValidLocaleFromConfig, getValidLocaleFromStorage } from 'i18n/init';
 import { MiscTracker } from 'misc/analytics/events';
 import { getOption } from 'razorpay';
 // import { setupFreezeCheck } from './freeze';
@@ -312,13 +309,6 @@ RazorProto.open = needBody(function () {
       },
     });
   } catch {}
-  const isVernacularEnabled = shouldUseVernacular();
-  let initialLocale;
-  if (isVernacularEnabled) {
-    initialLocale =
-      getValidLocaleFromStorage() || getValidLocaleFromConfig() || 'en';
-  }
-  EventsV2.setContext(ContextProperties.LOCALE, initialLocale);
 
   // setupFreezeCheck();
 
