@@ -22,3 +22,15 @@ export type Method =
   | 'emandate'
   | 'app'
   | 'fpx';
+
+export type History = {
+  isInitialized: boolean;
+  config: any;
+  previousRoute: () => any;
+  pop: (currentView: any) => any;
+  push: (nextView: any) => void;
+  replace: (newView: any, history: any) => void;
+  initialize: (view: any) => void;
+  setConfig: (config: any) => void;
+  popUntil: (view: any) => void;
+};
