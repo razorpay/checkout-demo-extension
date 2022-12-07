@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import { processInstrument } from 'checkoutframe/personalization';
 import { isGpayMergedFlowEnabled } from 'checkoutstore/methods';
 import {
@@ -217,7 +218,7 @@ function creatUPIPaymentV2(
 
   // added rewardIds to the create payment request
   // var reward = storeGetter(rewardsStore);
-  const { reward_id } = (reward || {}) as any;
+  const { reward_id } = (get(reward) || {}) as any;
   if (reward_id && !isEmailOptional()) {
     paymentPayload.reward_ids = [reward_id];
   }
