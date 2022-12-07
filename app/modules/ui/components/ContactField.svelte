@@ -33,7 +33,10 @@
   import { isContactValid } from 'one_click_checkout/common/details/store';
   import autotest from 'autotest';
   import { getIndErrLabel } from 'one_click_checkout/helper';
-  import { COUNTRY_CONFIG } from 'common/countrycodes';
+  import {
+    COUNTRY_CONFIG,
+    COUNTRY_TO_PHONE_CODE_MAP,
+  } from 'common/countrycodes';
 
   // Refs
   let countryField;
@@ -48,6 +51,8 @@
   export let showValidations = false;
 
   const isRedesignV15Enabled = isRedesignV15();
+
+  let selectedCountry = getPreferences('merchant_country') || 'IN';
 
   const dispatch = createEventDispatcher();
 
@@ -78,13 +83,13 @@
 
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
-      if (country === '+91') {
-        if (phone.startsWith('0')) {
-          phone = phone.slice(1);
-        }
-
-        if (phone.startsWith('+91')) {
-          phone = phone.slice(3);
+      const prefixCodesList = COUNTRY_TO_PHONE_CODE_MAP[selectedCountry];
+      if (prefixCodesList && prefixCodesList.length > 0) {
+        for (const code of prefixCodesList) {
+          const codeLength = code.length;
+          if (phone.startsWith(code)) {
+            phone = phone.slice(codeLength);
+          }
         }
       }
     });
@@ -231,6 +236,7 @@
   on:close={closeSearch}
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;
+    selectedCountry = detail.country;
     dispatch('countrySelect', {
       country_code: country,
       country: detail.country,

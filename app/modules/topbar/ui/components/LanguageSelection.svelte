@@ -10,10 +10,18 @@
   // Other Imports
   import { showAccountModal } from 'account_modal';
   import { ACCOUNT_VARIANT } from 'account_modal/constants';
+  import { isMerchantCountry } from 'checkoutstore/methods';
 
   export let color: string;
 
   function handleAccountModal() {
+    /**
+     * Don't show language modal for MY merchants as we only support ENG for now.
+     * Should be removed once regional lang supports are added.
+     */
+    if (isMerchantCountry('MY')) {
+      return;
+    }
     showAccountModal({
       variant: ACCOUNT_VARIANT.LANGUAGE_ONLY,
     });
@@ -28,7 +36,9 @@
   <span data-test-id="vernacular-text" class="selected-language"
     >{getLocaleName($locale)}</span
   >
-  <Icon icon={arrow_down('14', '14', color)} />
+  {#if !isMerchantCountry('MY')}
+    <Icon icon={arrow_down('14', '14', color)} />
+  {/if}
 </div>
 
 <style>

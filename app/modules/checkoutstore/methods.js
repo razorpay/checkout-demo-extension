@@ -1238,7 +1238,8 @@ export function shouldUseVernacular() {
   return (
     !hasFeature('checkout_disable_i18n') &&
     !isPayout() &&
-    !isMethodEnabled('nach')
+    !isMethodEnabled('nach') &&
+    !isMerchantCountry('MY')
   );
 }
 
@@ -1270,18 +1271,14 @@ export function getInternationalProviders() {
 }
 
 /**
- * This is a temporary check added for MY merchants
- * as we will only support english as vernacular for v1.
- * We will remove this once more regional languages supports
- * are added.
- * @returns {any[]}
+ * Temporary check to identify country merchants as part of v1.
+ * Will be removed later.
+ * @returns {boolean}
  */
-export function filterVernacular(localesList) {
-  const engLangList = localesList.find((lang) => lang === 'en');
-  if (localesList.length > 0 && engLangList) {
-    if (getPreferences('merchant_country') === 'MY') {
-      return [engLangList];
-    }
+
+export function isMerchantCountry(country) {
+  if (getPreferences('merchant_country') === country) {
+    return true;
   }
-  return localesList;
+  return false;
 }

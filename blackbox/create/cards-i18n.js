@@ -47,7 +47,7 @@ module.exports = function (testFeatures) {
       });
 
       let email = 'harshil@razorpay.com';
-      let contactToType = '132758793';
+      let contactToType = '+60132758793';
       const contactDropdown = await context.page.waitForSelector(
         '#country-code'
       );

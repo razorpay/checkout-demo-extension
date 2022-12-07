@@ -15,7 +15,7 @@
   import Razorpay from 'common/Razorpay';
 
   // store imports
-  import { shouldUseVernacular, filterVernacular } from 'checkoutstore/methods';
+  import { shouldUseVernacular } from 'checkoutstore/methods';
   import { contact as contactStore } from 'checkoutstore/screens/home';
   import { constantCSSVars } from 'common/constants';
 
@@ -61,8 +61,6 @@
 
   let currentLocaleLanguage: string;
   $: currentLocaleLanguage = getLocaleName($locale as string);
-
-  const localesList: typeof $locales = filterVernacular($locales);
 
   let variant: ValueOf<typeof ACCOUNT_VARIANT> | undefined =
     ACCOUNT_VARIANT.DEFAULT;
@@ -171,7 +169,6 @@
 <div
   class="account-container"
   class:only-language={variant === ACCOUNT_VARIANT.LANGUAGE_ONLY}
-  class:single-language={localesList.length === 1}
 >
   {#if variant === ACCOUNT_VARIANT.LANGUAGE_ONLY}
     <div class="account-heading-container">
@@ -184,7 +181,7 @@
     </div>
     <hr />
     <ul class="language-container">
-      {#each localesList as locale}
+      {#each $locales as locale}
         <li class="list-item">
           <button
             class="account-menu"
@@ -217,7 +214,7 @@
         <span class="back-btn-text">{$t(BACK)}</span>
       </button>
       <ul class="language-container">
-        {#each localesList as locale}
+        {#each $locales as locale}
           <li class="list-item">
             <button
               class="account-menu"
@@ -382,14 +379,6 @@
 
   .only-language {
     height: 320px;
-
-    .language-container {
-      max-height: 250px;
-    }
-  }
-
-  .single-language {
-    height: auto;
 
     .language-container {
       max-height: 250px;

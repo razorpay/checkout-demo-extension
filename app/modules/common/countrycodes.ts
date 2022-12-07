@@ -1698,3 +1698,10 @@ export const COUNTRY_TO_CODE_MAP = Object.keys(COUNTRY_CONFIG).reduce(
   },
   {}
 );
+
+export const COUNTRY_TO_PHONE_CODE_MAP: {
+  [countryISO in keyof typeof COUNTRY_CONFIG]: [string, string];
+} = {
+  IN: ['0', '+91'],
+  MY: ['+60', '0'],
+};
