@@ -1,6 +1,5 @@
 <script lang="ts">
   // UI imports
-  import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 

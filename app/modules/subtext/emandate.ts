@@ -1,23 +1,17 @@
 import { getShortBankName } from 'i18n';
 import { generateTextFromList } from 'i18n/text-utils';
 import { getEMandateBanks } from 'checkoutstore/methods';
-
-type instrument = {
-  banks: Array<string>;
-  id: string;
-  method: string;
-  _type: string;
-};
+import type { BankInstrument } from './type';
 
 /**
  * Generates subtext for emandate instrument
- * @param {Instrument} instrument
+ * @param {BankInstrument} instrument
  * @param {string} locale
  *
  * @returns {string}
  */
 export function generateSubtextForEmandateInstrument(
-  instrument: instrument,
+  instrument: BankInstrument,
   locale: string
 ) {
   if (!instrument.banks) {

@@ -1479,18 +1479,6 @@
       {#if (isDCCEnabled() || isDCCEnabledForProvider(dccView)) && !isDynamicFeeBearer()}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
-      <!-- {#if showRecurringCallout}
-        <Callout>
-          {generateSubtextForRecurring({
-            types: getCardTypesForRecurring(),
-            networks: getCardNetworksForRecurring('credit'),
-            issuers: getCardIssuersForRecurring(),
-            subscription: session.get('subscription_id'),
-            offer: cardOffer,
-          })}
-        </Callout>
-      {/if} -->
-
       {#if showSecuredByMessage}
         <SecuredMessage />
       {/if}

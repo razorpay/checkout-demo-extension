@@ -1,5 +1,6 @@
 import * as CardSubtext from 'subtext/card';
 import { addDefaultMessages } from 'i18n/init';
+import type { CardInstrument } from 'subtext/type';
 
 addDefaultMessages();
 
@@ -8,14 +9,15 @@ describe('Module: subtext/card', () => {
     test('method: card', () => {
       let instrument;
 
-      // -----------------
-
       instrument = {
         method: 'card',
       };
 
       expect('All cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -24,7 +26,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only 524192 accepted').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -33,7 +38,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only 524192 and 524193 accepted').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -42,7 +50,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only 524192, 524193, and 524194 accepted').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -51,7 +62,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select BINs accepted').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -60,7 +74,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -69,7 +86,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only MasterCard cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -79,7 +99,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only MasterCard credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -88,7 +111,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only MasterCard and Visa cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -98,7 +124,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only MasterCard and Visa credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -107,7 +136,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select networks supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -117,7 +149,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select network credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       // -----------------
@@ -128,7 +163,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -138,7 +176,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -148,7 +189,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC MasterCard cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -159,7 +203,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC MasterCard credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -169,7 +216,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select HDFC cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -180,7 +230,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select HDFC credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -190,7 +243,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select HDFC cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -201,7 +257,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select HDFC credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       // -----------------
@@ -212,7 +271,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and Axis cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -222,7 +284,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and Axis credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -232,7 +297,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and Axis MasterCard cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -243,7 +311,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select HDFC and Axis credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -253,7 +324,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -264,7 +338,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -274,7 +351,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -285,7 +365,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       // -----------------
@@ -296,7 +379,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -306,7 +392,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -316,7 +405,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select MasterCard cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -327,7 +419,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select MasterCard credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -337,7 +432,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -348,7 +446,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -358,7 +459,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -369,7 +473,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       // -----------------
@@ -380,7 +487,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -390,7 +500,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -400,7 +513,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and ICICI international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -411,7 +527,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and ICICI Visa international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
       instrument = {
         method: 'card',
@@ -421,7 +540,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -433,7 +555,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only select credit international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -443,7 +568,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only credit international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -454,7 +582,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC and ICICI credit international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
       instrument = {
         method: 'card',
@@ -464,7 +595,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only HDFC credit international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
 
       instrument = {
@@ -474,138 +608,10 @@ describe('Module: subtext/card', () => {
       };
 
       expect('Only credit international cards supported').toBe(
-        CardSubtext.generateSubtextForCardInstrument(instrument, 'en')
-      );
-    });
-  });
-
-  describe('CardSubtext.generateSubtextForRecurring', () => {
-    const allNetworks = { mastercard: true, visa: true, amex: true };
-    const allTypes = { credit: true, debit: true };
-    const allIssuers = {
-      CITI: 'CITI Bank',
-      CNRB: 'Canara Bank',
-      ICIC: 'ICICI Bank',
-      KKBK: 'Kotak Mahindra Bank',
-    };
-
-    const allNetworksText = 'Visa, Mastercard, and American Express';
-    const debitCardBanksText =
-      'CITI Bank, Canara Bank, ICICI Bank, and Kotak Mahindra Bank';
-
-    test('type: subscription', () => {
-      expect(
-        'Subscription payments are supported on ' +
-          allNetworksText +
-          ' credit cards and debit cards from ' +
-          debitCardBanksText +
-          '.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: allTypes,
-          networks: allNetworks,
-          issuers: allIssuers,
-          subscription: 'subscription_id',
-          locale: 'en',
-        })
-      );
-
-      expect(
-        'Subscription payments are supported on debit cards from ' +
-          debitCardBanksText +
-          '.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { debit: true },
-          networks: allNetworks,
-          issuers: allIssuers,
-          subscription: 'subscription_id',
-          locale: 'en',
-        })
-      );
-
-      expect(
-        'Subscription payments are supported on Mastercard and American Express credit cards.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { credit: true },
-          networks: { mastercard: true, amex: true },
-          subscription: 'subscription_id',
-          locale: 'en',
-        })
-      );
-    });
-
-    test('type: offer', () => {
-      const offer = { issuer: 'HDFC' };
-
-      expect('All HDFC cards are supported for this payment.').toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: allTypes,
-          subscription: false,
-          offer: offer,
-          locale: 'en',
-        })
-      );
-
-      expect('All HDFC credit cards are supported for this payment.').toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { credit: true },
-          subscription: false,
-          offer: offer,
-          locale: 'en',
-        })
-      );
-
-      expect('All HDFC debit cards are supported for this payment.').toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { debit: true },
-          subscription: false,
-          offer: offer,
-          locale: 'en',
-        })
-      );
-    });
-
-    test('type: without subscription or offer', () => {
-      expect(
-        '' +
-          allNetworksText +
-          ' credit cards and debit cards from ' +
-          debitCardBanksText +
-          ' are supported for this payment.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: allTypes,
-          networks: allNetworks,
-          issuers: allIssuers,
-          locale: 'en',
-        })
-      );
-
-      expect(
-        'Only debit cards from ' +
-          debitCardBanksText +
-          ' are supported for this payment.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { debit: true },
-          networks: allNetworks,
-          issuers: allIssuers,
-          locale: 'en',
-        })
-      );
-
-      expect(
-        'Only ' +
-          allNetworksText +
-          ' credit cards are supported for this payment.'
-      ).toBe(
-        CardSubtext.generateSubtextForRecurring({
-          types: { credit: true },
-          networks: allNetworks,
-          locale: 'en',
-        })
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
       );
     });
   });

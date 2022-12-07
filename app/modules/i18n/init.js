@@ -27,7 +27,7 @@ import { showLoader } from 'account_modal/store';
 import { querySelector } from 'utils/doc';
 import { ContextProperties, EventsV2 } from 'analytics-v2';
 
-const LOCALES = {
+export const LOCALES = {
   en: 'English',
   ben: 'বাংলা',
   hi: 'हिंदी',
