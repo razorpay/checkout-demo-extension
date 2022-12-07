@@ -5,7 +5,7 @@ declare namespace NavStack {
   export type StackElement = {
     component: any;
     props?: { [x: string]: any };
-    overlay?: boolean = false;
+    overlay?: boolean;
   };
 
   export type ElementRef = SvelteComponent & {

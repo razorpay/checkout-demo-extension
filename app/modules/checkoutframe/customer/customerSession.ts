@@ -30,7 +30,7 @@ export function logoutUserOnClient(customer: Customer) {
  * @param {function} callback Callback to invoke after logout is success.
  */
 export function logUserOut(
-  phone: number,
+  phone: string,
   outOfAllDevices: boolean,
   callback: (data: any) => void
 ) {

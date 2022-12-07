@@ -97,6 +97,20 @@ export default function Razorpay(overrides) {
   this.postInit();
 }
 
+/**
+ * Temporary placeholder for sendMessage until common/Razorpay gets converted to TS
+ * Ideally, this function should never be executed as is
+ * It's gets overriden by entry/Razorpay.js and checkoutframe/index.js
+ * depending on the standard/sdk checkout.
+ * having this placeholder function helps with enforcing types to this method via JSDoc Comment
+ * TODO - convert Razorpay.js to typescript and possibly combine the sendMessage implementations
+ * @param {{event: string; data?: unknown; id?: string; source?: string}} message
+ * @return {void}
+ */
+Razorpay.sendMessage = function (message) {
+  throw new Error(`override missing for event - ${message.event}`);
+};
+
 let RazorProto = (Razorpay.prototype = new Eventer());
 
 RazorProto.postInit = returnAsIs;

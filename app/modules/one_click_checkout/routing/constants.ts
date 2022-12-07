@@ -12,4 +12,4 @@ export const views = {
   SAVED_BILLING_ADDRESS: 'savedBillingAddress',
   EDIT_BILLING_ADDRESS: 'editBillingAddress',
   METHODS: 'methods',
-};
+} as const;

@@ -1274,6 +1274,7 @@ export function getInternationalProviders() {
  * as we will only support english as vernacular for v1.
  * We will remove this once more regional languages supports
  * are added.
+ * @returns {any[]}
  */
 export function filterVernacular(localesList) {
   const engLangList = localesList.find((lang) => lang === 'en');

@@ -1,7 +1,7 @@
 <script lang="ts">
   // svelte imports
   import { onDestroy, onMount, tick } from 'svelte';
-  import { get } from 'svelte/store';
+  import { get, Readable } from 'svelte/store';
 
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
@@ -53,17 +53,23 @@
     isRedesignV15,
   } from 'razorpay';
   import Details from 'one_click_checkout/coupons/ui/components/Details.svelte';
+  import type { ValueOf } from 'types/utils';
 
-  export let options;
+  export let options: { variant: ValueOf<typeof ACCOUNT_VARIANT> };
   let isLoggedIn: boolean;
-  let showLanguageList;
-  const localesList = filterVernacular($locales);
+  let showLanguageList: boolean;
 
-  let variant = ACCOUNT_VARIANT.DEFAULT;
+  let currentLocaleLanguage: string;
+  $: currentLocaleLanguage = getLocaleName($locale as string);
+
+  const localesList: typeof $locales = filterVernacular($locales);
+
+  let variant: ValueOf<typeof ACCOUNT_VARIANT> | undefined =
+    ACCOUNT_VARIANT.DEFAULT;
 
   const showChangeLanguage = shouldUseVernacular();
   const session = getSession();
-  let screen_name;
+  let screen_name: ReturnType<typeof getCurrentScreen>;
   const privacy = getPreferences('privacy') || {};
   const terms = getPreferences('terms') || {};
 
@@ -108,11 +114,11 @@
   function handleChangeLanguage() {
     showLanguageList = true;
     Events.TrackBehav(AccountEvents.CHANGE_LANGUAGE, {
-      current_language: getLocaleName($locale),
+      current_language: currentLocaleLanguage,
     });
   }
 
-  function selectLanguage(code) {
+  function selectLanguage(code: string) {
     if (variant === ACCOUNT_VARIANT.LANGUAGE_ONLY) {
       Events.TrackBehav(CouponEvents.SUMMARY_LANGUAGE_CHANGED, {
         new_language_selected: code,
@@ -253,7 +259,7 @@
           class="account-menu"
           on:click={handleChangeLanguage}
         >
-          {$t(CHANGE_LANGUAGE)}: {getLocaleName($locale)}
+          {$t(CHANGE_LANGUAGE)}: {currentLocaleLanguage}
           <span class="language-btn">
             <Icon
               icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}

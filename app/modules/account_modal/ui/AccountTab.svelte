@@ -22,7 +22,7 @@
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
 
-  const { rzp_brand_logo } = getIcons();
+  const rzp_brand_logo = getIcons().rzp_brand_logo as string;
 
   export let showBottomSeparator = false;
   export let logos = [rzp_brand_logo];

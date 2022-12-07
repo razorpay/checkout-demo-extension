@@ -34,9 +34,9 @@ export const SCREEN_LIST = {
   [EMI_PLANS]: 'payment_l1_screen',
   [NETBANKING]: 'payment_l1_screen',
   [QR]: 'payment_l1_screen',
-};
+} as const;
 
 export const CLOSE_MODAL_OPTIONS = {
   POSITIVE: 'yes',
   NEGATIVE: 'no',
-};
+} as const;

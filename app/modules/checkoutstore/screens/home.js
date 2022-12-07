@@ -48,6 +48,7 @@ export const getCustomerDetails = () => {
 export const country = writable('');
 export const phone = writable('');
 export const countryISOCode = writable('');
+
 export const contact = derived([country, phone], ([$country, $phone]) => {
   if ($phone) {
     return $country + $phone;

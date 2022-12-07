@@ -11,6 +11,6 @@ const events = {
   ABOUT_MERCHANT_CLICKED: 'merchant_cta_click',
   FOH_ABOUT_MERCHANT_DISMISSED: 'foh_merchant_details_page_close',
   FOH_IFRAME_RENDERING_COMPLETE: 'foh_merchant_details_page',
-};
+} as const;
 
 export default events;
