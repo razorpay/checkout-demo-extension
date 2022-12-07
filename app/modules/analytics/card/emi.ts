@@ -20,6 +20,6 @@ const emiPlans = {
   EMI_CONTACT: 'contact',
   /** EMI Contact filled */
   EMI_CONTACT_FILLED: 'contact:filled',
-};
+} as const;
 
 export default getEventsName('emi', emiPlans);

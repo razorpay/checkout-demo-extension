@@ -9,6 +9,6 @@ const events = {
   ELIGIBILITY_CHECK: 'eligibility_check',
   SUBTEXT_OFFER_EXPERIMENT: 'subtext_offer_experiment',
   EXPERIMENT_OFFER_SELECTED: 'experiment_offer_selected',
-};
+} as const;
 
 export default getEventsName('cred', events);

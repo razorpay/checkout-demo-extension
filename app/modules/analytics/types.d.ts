@@ -23,3 +23,28 @@ export type GenerateTrackProp<T extends object = typeof TYPES> = {
 };
 
 /** end of helper types */
+
+/** track-error types */
+export type NetworkErrorDetails = {
+  method: string;
+  url: string;
+  baseUrl: string;
+  status: string;
+  xhrErrored: boolean;
+  response: Record<string, any>;
+};
+
+export type NetworkError = {
+  detail: NetworkErrorDetails;
+};
+
+export type Error = {
+  name: string;
+  message: string;
+  stack?: string;
+};
+
+export type RzpError = {
+  detail: Error;
+};
+/** end of track-error types */

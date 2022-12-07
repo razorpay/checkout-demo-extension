@@ -27,6 +27,6 @@ const savedCardEvents = {
   SECURE_CARD_CLICKED: 'secure_card_clicked',
   /** maybe later is clicked in tokenisation benefits modal */
   MAYBE_LATER_CLICKED: 'maybe_later_clicked',
-};
+} as const;
 
 export default getEventsName('saved_cards', savedCardEvents);

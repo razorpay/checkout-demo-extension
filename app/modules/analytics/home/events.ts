@@ -15,18 +15,18 @@ const homeScreen = {
   PROCEED: 'proceed',
   CONTACT_SCREEN_LOAD: 'complete:contact_details',
   PAYPAL_RENDERED: 'paypal:render',
-};
+} as const;
 
 // All card related events
 const events = {
   ...homeScreen,
-};
+} as const;
 
 const COD_EVENTS = {
   COD_METHOD: 'checkoutCODOptionShown',
   COD_SHOWN_V2: '1cc_payment_home_screen_cod_option_shown',
   COD_METHOD_SELECTED: 'checkoutCODOptionSelected',
-};
+} as const;
 
 export default getEventsName('home', events);
 

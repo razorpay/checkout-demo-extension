@@ -5,12 +5,12 @@ const avsScreenEvents = {
   LOAD_AVS_FORM: 'avs_screen:load_form',
   AVS_FORM_DATA_INPUT: 'avs_screen:form_data_input',
   AVS_FORM_SUBMIT: 'avs_screen:form_submit',
-};
+} as const;
 
 /** Events for Add Cards */
 const addCardsEvents = {
   HIDE_ADD_CARD_SCREEN: 'add_cards:hide',
-};
+} as const;
 
 const retryPaymentWithPaypalEvents = {
   SHOW_PAYPAL_RETRY_SCREEN: 'paypal_retry:show',
@@ -18,7 +18,7 @@ const retryPaymentWithPaypalEvents = {
   PAYPAL_RETRY_CANCEL_BTN_CLICK: 'paypal_retry:cancel_click',
   PAYPAL_RETRY_PAYPAL_BTN_CLICK: 'paypal_retry:paypal_click',
   PAYPAL_RETRY_PAYPAL_ENABLED: 'paypal_retry:paypal_enabled',
-};
+} as const;
 
 export default {
   ...avsScreenEvents,
