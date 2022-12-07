@@ -3,6 +3,6 @@ const events = {
   CONTACT_INPUT: 'checkoutConsumerContactEntered',
   CONTACT_EMAIL_INPUT: 'checkoutConsumerEmailtEntered',
   CONTACT_DETAILS_SUBMIT: '1cc_clicked_change_contact_continue_cta',
-};
+} as const;
 
 export default events;

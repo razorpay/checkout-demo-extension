@@ -41,7 +41,7 @@
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
 
-  let showUserDetailsStrip;
+  let showUserDetailsStrip = false;
   let showEditUserDetails = false;
   let phoneCode = '';
   let phoneNum = '';
@@ -54,14 +54,14 @@
 
   $: {
     showUserDetailsStrip =
-      ($isContactPresent || $email) && !isContactEmailHidden();
+      Boolean($isContactPresent || $email) && !isContactEmailHidden();
   }
 
   $: {
     ({ code: phoneCode, phone: phoneNum } = findCountryCode($contact));
   }
 
-  const { user } = getIcons();
+  const userIcon = getIcons().user as string;
 
   function editContact() {
     Events.TrackBehav(SummaryEvents.SUMMARY_CONTACT_CHANGE_CLICKED);
@@ -76,7 +76,7 @@
   <div class="contact-container">
     <div class="contact-header">
       <div class="contact-title">
-        <Icon icon={user} />
+        <Icon icon={userIcon} />
         <span class="contact-text">{$t(CONTACT_LABEL)}</span>
       </div>
       {#if !showEditUserDetails}

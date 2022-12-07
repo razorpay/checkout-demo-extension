@@ -98,8 +98,8 @@
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
 
   // Props
-  export let tpv;
-  export let onSubmit;
+  export let tpv = undefined;
+  export let onSubmit = undefined;
   export let showValidations = false;
 
   const order = getMerchantOrder();
