@@ -7,35 +7,39 @@ import { getOption, getOrderId } from 'razorpay';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 import * as _ from 'utils/_';
-export const formatPayment = function (payment) {
-  let params = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'].reduce(
-    (allParams, param) => {
-      if (payment.hasOwnProperty(param)) {
-        allParams[param] = payment[param];
-      }
-      return allParams;
-    },
-    {}
-  );
+import type { PaymentData, PaymentRequestData } from 'payment/types';
+
+export const formatPayment = function (payment: PaymentData) {
+  const flows = ['feesRedirect', 'tez', 'gpay', 'avoidPopup'];
+  const params = flows.reduce((allParams, param) => {
+    if (payment.hasOwnProperty(param)) {
+      const keyParam = param as keyof PaymentData;
+      allParams[keyParam] = payment[keyParam];
+    }
+    return allParams;
+  }, {} as Record<keyof PaymentData, any>);
 
   payment.data = formatPayload(payment.data, params);
   validateData(payment.data);
 };
 
-export function validateData(data) {
+export function validateData(data: PaymentRequestData) {
   const cardHolderName = data?.['card[name]'];
   if (Number(cardHolderName) === 0) {
     return;
   } // if name input is only zero prevent throw error
-  if (cardHolderName && luhnCheck(cardHolderName)) {
+  if (cardHolderName && luhnCheck(cardHolderName as number)) {
     _.throwMessage(
       'Error in integration. Card holder name is not valid, Please contact Razorpay for assistance'
     );
   }
 }
 
-export const formatPayload = function (payload, params = {}) {
-  let data = ObjectUtils.clone(payload);
+export const formatPayload = function (
+  payload: PaymentRequestData,
+  params: Partial<PaymentData> = {}
+) {
+  const data = ObjectUtils.clone(payload);
 
   // won't affect origin payload. as it is cloned
   if (data.default_dcc_currency) {
@@ -78,7 +82,7 @@ export const formatPayload = function (payload, params = {}) {
     }
   });
 
-  let key_id = getOption('key');
+  const key_id = getOption('key');
   if (!data.key_id && key_id) {
     data.key_id = key_id;
   }
@@ -108,12 +112,12 @@ export const formatPayload = function (payload, params = {}) {
     }
   });
 
-  let fingerprint = getFingerprint();
+  const fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
   }
 
-  let deviceId = getDeviceId();
+  const deviceId = getDeviceId();
   if (deviceId) {
     data['_[device_id]'] = deviceId;
   }
@@ -128,7 +132,7 @@ export const formatPayload = function (payload, params = {}) {
   flattenProp(data, 'notes', '[]');
   flattenProp(data, 'card', '[]');
 
-  let expiry = data['card[expiry]'];
+  const expiry = data['card[expiry]'];
   if (_.isString(expiry)) {
     data['card[expiry_month]'] = expiry.slice(0, 2);
     data['card[expiry_year]'] = expiry.slice(-2);

@@ -1,6 +1,7 @@
 import { validateData, formatPayload, formatPayment } from 'payment/validator';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'upi/constants';
 import { throwMessage } from 'utils/_';
+import type { PaymentData } from 'payment/types';
 
 jest.mock('utils/_', () => ({
   ...jest.requireActual('utils/_'),
@@ -62,7 +63,7 @@ const paymentData: Record<string, any> = {
 
 describe('Test formatPayment', () => {
   it('Test formatPayment', async () => {
-    formatPayment(paymentData);
+    formatPayment(paymentData as unknown as PaymentData);
     expect(throwMessage).toHaveBeenCalledTimes(1);
     expect(throwMessage).toHaveBeenCalledWith(
       'Error in integration. Card holder name is not valid, Please contact Razorpay for assistance'
@@ -156,7 +157,7 @@ describe('Test formatPayload', () => {
       '_[platform]': 'browser',
       '_[referer]': 'http://localhost:8000/',
       '_[request_index]': 0,
-    };
+    } as const;
     const payloadData = {
       ...paymentData,
       data,
