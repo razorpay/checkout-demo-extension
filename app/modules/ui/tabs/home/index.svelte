@@ -1152,7 +1152,6 @@
   }
 
   export function selectMethod(method) {
-    selectedMethod = method;
     Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
       method,
     });
@@ -1258,6 +1257,8 @@
 
     updateScore('instrumentSelected');
 
+    selectedMethod = instrument.method;
+
     $selectedInstrumentId = instrument.id;
     if (instrument.method === 'wallet' && instrument.wallets?.length > 0) {
       dccView = instrument.wallets[0];
@@ -1326,7 +1327,7 @@
           CTAState.variant = '';
           CTAState.disabled = false;
         } else {
-          default1ccCTAState();
+          if (isOneClickCheckout()) {default1ccCTAState();}
         }
         CTAState.label =
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;

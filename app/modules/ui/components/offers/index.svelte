@@ -742,8 +742,6 @@
       font-size: 14px;
       font-weight: 700;
       line-height: 36px;
-      display: flex;
-      align-items: center;
 
       &.close-offerlist {
         line-height: 45px;
@@ -788,9 +786,6 @@
     .offer-cta[disabled] {
       background-color: var(--light-dark-color);
       color: var(--tertiary-text-color);
-    }
-    .offers-container {
-      z-index: 3;
     }
   }
   .disable-offer {
