@@ -11,6 +11,7 @@ const common = (buildArgs) =>
     parts.preventCircularDep,
     parts.defineConstants(buildArgs),
     parts.sourceMap(buildArgs),
+    parts.retryAsyncChunks,
   ]);
 
 const commonDevelopment = merge([]);

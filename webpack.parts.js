@@ -13,6 +13,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const SvelteCheckPlugin = require('svelte-check-plugin');
 const bodyParser = require('body-parser');
 const TerserPlugin = require('terser-webpack-plugin');
+const { RetryChunkLoadPlugin } = require('webpack-retry-chunk-load-plugin');
 
 /** @type {import('webpack').Configuration} */
 exports.standardCheckoutEntry = {
@@ -421,3 +422,8 @@ exports.persistentCache = (cacheName) => ({
     },
   },
 });
+
+/** @type {import('webpack').Configuration} */
+exports.retryAsyncChunks = {
+  plugins: [new RetryChunkLoadPlugin({ maxRetries: 5, retryDelay: 100 })],
+};
