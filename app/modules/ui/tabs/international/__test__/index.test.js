@@ -10,6 +10,11 @@ jest.mock('checkoutstore/theme', () => ({
   }),
 }));
 
+jest.mock('account_modal/helper.ts', () => ({
+  ...jest.requireActual('account_modal/helper.ts'),
+  getLogoByCountry: jest.fn(),
+}));
+
 jest.mock('cta', () => ({
   ...jest.requireActual('cta'),
   __esModule: true,

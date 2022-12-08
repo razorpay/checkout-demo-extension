@@ -1699,8 +1699,29 @@ export const COUNTRY_TO_CODE_MAP = Object.keys(COUNTRY_CONFIG).reduce(
   {}
 );
 
+export type countryCodesType = keyof typeof COUNTRY_CONFIG;
+
+/**
+ * creates a constant COUNTRY_CODES
+ * @type {Record<countryCodesType, countryCodesType>}
+ * eg @constant {{
+ *  IN: 'IN',
+ *  MY: 'MY',
+ *  ... all country codes
+ * }}
+ */
+export const COUNTRY_CODES: Record<countryCodesType, countryCodesType> = (
+  Object.keys(COUNTRY_CONFIG) as countryCodesType[]
+).reduce(
+  (acc: Record<countryCodesType, countryCodesType>, curr: countryCodesType) => {
+    acc[curr] = curr;
+    return acc;
+  },
+  {} as Record<countryCodesType, countryCodesType>
+);
+
 export const COUNTRY_TO_PHONE_CODE_MAP: {
-  [countryISO in keyof typeof COUNTRY_CONFIG]: [string, string];
+  [countryISO in countryCodesType]: [string, string];
 } = {
   IN: ['0', '+91'],
   MY: ['+60', '0'],

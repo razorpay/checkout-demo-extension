@@ -4,7 +4,6 @@ const enLabels = {
   merchant: 'Merchant',
   about: 'About',
   privacy_policy: 'Privacy Policy',
-  terms_of_use: 'Terms & Conditions',
 } as const;
 
 export default enLabels;

@@ -1327,7 +1327,9 @@
           CTAState.variant = '';
           CTAState.disabled = false;
         } else {
-          if (isOneClickCheckout()) {default1ccCTAState();}
+          if (isOneClickCheckout()) {
+            default1ccCTAState();
+          }
         }
         CTAState.label =
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;

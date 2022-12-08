@@ -31,7 +31,6 @@
     ACCOUNT,
     CHANGE_LANGUAGE,
     BACK,
-    TERMS_OF_USE,
     PRIVACY_POLICY,
   } from 'account_modal/i18n/labels';
   import { logUserOut } from 'checkoutframe/customer';
@@ -69,7 +68,6 @@
   const session = getSession();
   let screen_name: ReturnType<typeof getCurrentScreen>;
   const privacy = getPreferences('privacy') || {};
-  const terms = getPreferences('terms') || {};
 
   onDestroy(() => {
     Events.TrackBehav(AccountEvents.SCREEN_DISMISSED, { screen_name });
@@ -236,19 +234,10 @@
           {$t(EDIT_CONTACT_ACTION)}
         </p>
       {/if}
-      {#if privacy.url || terms.url}
-        <hr class="border-light-gray" />
-        {#if terms.url}
-          <a class="account-menu" href={terms.url} target="_blank">
-            {terms.display_name || $t(TERMS_OF_USE)}
-          </a>
-        {/if}
-        {#if privacy.url}
-          <a class="account-menu" href={privacy.url} target="_blank">
-            {privacy.display_name || $t(PRIVACY_POLICY)}
-          </a>
-        {/if}
-        <hr class="border-light-gray" />
+      {#if privacy.url}
+        <a class="account-menu" href={privacy.url} target="_blank">
+          {privacy.display_name || $t(PRIVACY_POLICY)}
+        </a>
       {/if}
       {#if showChangeLanguage}
         <p

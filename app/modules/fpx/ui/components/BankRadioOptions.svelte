@@ -31,6 +31,7 @@
   <div class="flex-row">
     <div class="input-radio">
       <input
+        data-testid="fpx_type_retail"
         type="radio"
         id="fpx_type_retail"
         checked={activeType === BANK_TYPES.RETAIL}
@@ -49,6 +50,7 @@
     </div>
     <div class="input-radio">
       <input
+        data-testid="fpx_type_corporate"
         type="radio"
         id="fpx_type_corporate"
         disabled={corporateDisabled}

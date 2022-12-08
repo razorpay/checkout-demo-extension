@@ -6,13 +6,15 @@
   // i18n imports
   import { t } from 'svelte-i18n';
   import { ACCOUNT, SECURED_BY } from 'account_modal/i18n/labels';
+  import type English from 'i18n/bundles/en';
 
   // utils Imports
   import { isRedesignV15, getPreferences, hasMerchantPolicy } from 'razorpay';
-  import { getIcons } from 'one_click_checkout/sessionInterface';
   import { showAccountModal, showMerchantFrame } from 'account_modal';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { constantCSSVars } from 'common/constants';
+  import { getLogoByCountry } from 'account_modal/helper';
+  import type { countryCodesType } from 'common/countrycodes';
 
   // analytics imports
   import { Events } from 'analytics';
@@ -22,10 +24,11 @@
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
 
-  const rzp_brand_logo = getIcons().rzp_brand_logo as string;
-
   export let showBottomSeparator = false;
-  export let logos = [rzp_brand_logo];
+
+  export let logos = getLogoByCountry(
+    getPreferences('merchant_country') as countryCodesType
+  );
 
   function handleAccountModal() {
     Events.TrackBehav(AccountEvents.ACCOUNT_CTA_CLICKED, {

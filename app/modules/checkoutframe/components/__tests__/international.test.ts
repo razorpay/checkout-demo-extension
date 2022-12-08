@@ -24,6 +24,11 @@ jest.mock('cta', () => {
 });
 jest.mock('../');
 
+jest.mock('account_modal/helper.ts', () => ({
+  ...jest.requireActual('account_modal/helper.ts'),
+  getLogoByCountry: jest.fn(),
+}));
+
 const cleanup = () => {
   const formFields = document.getElementById('form-fields');
   if (formFields) {

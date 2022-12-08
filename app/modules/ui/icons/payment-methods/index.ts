@@ -46,6 +46,7 @@ import info from 'ui/icons/payment-methods/info';
 import back_arrow from 'icons/back_arrow';
 import double_arrow from 'one_click_checkout/topbar/icons/double_arrow';
 import rzp_brand_logo from 'account_modal/icons/rzp_brand_logo';
+import curlec_logo from 'account_modal/icons/curlec_logo';
 import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 import rtb_close from './rtb_close';
 import edit_pen from 'one_click_checkout/otp/icons/edit_pen';
@@ -91,6 +92,7 @@ const availIconNames = [
   'back_arrow',
   'double_arrow',
   'rzp_brand_logo',
+  'curlec_logo',
   'circle_check',
   'rtb_close',
   'circle_arrow_next',
@@ -250,6 +252,9 @@ function getIconFn(iconName: IconSupported) {
 
     case 'rzp_brand_logo':
       return rzp_brand_logo;
+
+    case 'curlec_logo':
+      return curlec_logo;
 
     case 'circle_check':
       return circle_check;

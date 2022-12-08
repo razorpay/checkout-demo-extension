@@ -14,6 +14,7 @@ jest.mock('cta', () => ({
 
 jest.mock('checkoutstore/theme', () => ({
   ...jest.requireActual('checkoutstore/theme'),
+  getIcons: jest.fn(() => ({})),
   getThemeMeta: jest.fn(() => ({
     icons: {
       user_protect: 'icon',

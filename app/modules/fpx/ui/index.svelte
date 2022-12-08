@@ -52,7 +52,7 @@
   export let banks: Banks = getMerchantMethods().fpx;
   /* --- props end --- */
 
-  const { fpx, rzp_brand_logo } = getIcons();
+  const { fpx, curlec_logo } = getIcons();
 
   // active bank list filtered by type, enabled, config
   let filteredBanks: Partial<Banks> = banks;
@@ -185,7 +185,7 @@
       />
     </div>
   </div>
-  <AccountTab logos={[rzp_brand_logo, fpx]} />
+  <AccountTab logos={[curlec_logo, fpx]} />
   <div class="fpx-terms">
     <p class="fpx-terms-text">
       {@html formatTemplateWithLocale(
