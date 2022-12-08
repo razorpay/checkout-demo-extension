@@ -14,9 +14,9 @@ export const setShopifyOrderId = (orderId: string) =>
  * // if invoice then pick order Id from preference else from option
  */
 export const getOrderId = () =>
-  SHOPIFY_ORDER_ID ||
   getPreferences('invoice.order_id') ||
-  getOption('order_id');
+  getOption('order_id') ||
+  SHOPIFY_ORDER_ID;
 
 export const isInvoicePayment = () => !!getPreferences('invoice');
 

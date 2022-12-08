@@ -5,7 +5,7 @@ import {
   getExperimentsFromStorage,
   getRegisteredExperiments,
 } from 'experiments';
-import { getAmount, getOrderId } from 'razorpay';
+import { getAmount, getOrderId, getOption } from 'razorpay';
 import type { PreferencesObject } from 'razorpay/types/Preferences';
 import type { CustomObject } from 'types';
 import { getQueryParams } from 'utils/_';
@@ -114,7 +114,7 @@ export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
 }
 
 export function isMagicShopifyFlow() {
-  return Boolean(getQueryParams().magic_shopify_key);
+  return !getOption('order_id') && Boolean(getQueryParams().magic_shopify_key);
 }
 
 export function sendDismissEvent(data: any) {

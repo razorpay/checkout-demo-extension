@@ -60,7 +60,7 @@ export function createShopifyOrder(shopifyCheckoutId) {
 
   return new Promise((resolve, reject) => {
     fetch.post({
-      url: makeAuthUrl(`magic/order/shopify`),
+      url: `/v1/magic/order/shopify?key_id=${params.key_id}`,
       headers: {
         'Content-Type': 'application/json',
       },

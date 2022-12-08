@@ -580,6 +580,6 @@ Razorpay.hasCheckoutFrameLoaded = function () {
 Razorpay.defaults = RazorpayDefaults;
 
 // Assign true to enable magic shopify flow. Also requires magic_shopify_key to be set
-Razorpay.enableLite = false;
+Razorpay.enableLite = true;
 
 global.Razorpay = Razorpay;

@@ -72,7 +72,7 @@ function createShopifyCheckout({
         'Content-Type': 'application/json',
         key_id: key_id,
       },
-      url: _.appendParamsToUrl(makeUrl('magic/checkout/shopify'), { key_id }),
+      url: _.appendParamsToUrl('/v1/magic/checkout/shopify', { key_id }),
       data: JSON.stringify(body),
       callback: function (response) {
         Analytics.track('create_shopify_checkout:end', {
