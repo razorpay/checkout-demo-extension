@@ -52,10 +52,10 @@
     }
   }
 
-  export let expanded = -1;
+  export let expanded = '-1';
 
-  export function expand(plan: EmiPlan) {
-    expanded = plan.duration;
+  export function expand(plan: EmiPlan, key: string) {
+    expanded = key;
     $selectedPlan = plan;
     handlePlanOffer();
   }
@@ -106,10 +106,10 @@
       {/if}
     </div>
     {#if plans}
-      {#each plans as plan (plan.duration)}
+      {#each plans as plan, index (`${$selectedBank?.code}-${index}`)}
         <EmiPlanCard
           {plan}
-          expanded={plan.duration === expanded}
+          expanded={`${$selectedBank?.code}-${index}` === expanded}
           bank={$selectedBank?.code}
           on:click={() => {
             // Track EMI plan selected
@@ -122,7 +122,7 @@
               },
               emi_via_cards_screen: $emiViaCards,
             });
-            expand(plan);
+            expand(plan, `${$selectedBank?.code}-${index}`);
           }}
         />
       {/each}
