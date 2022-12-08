@@ -1,3 +1,4 @@
+import Razorpay from 'common/Razorpay';
 import {
   isGoogleAnalyticsEnabled,
   isFacebookAnalyticsEnabled,
@@ -8,7 +9,7 @@ import {
 function getCartInfo() {
   const { content_type, contents, currency, value } = getCustomerCart() || {};
   return {
-    content_ids: contents?.map((item) => item.id),
+    content_ids: contents?.map((item) => item.variant_id),
     content_type,
     contents,
     currency,
@@ -20,13 +21,13 @@ function getCartInfo() {
 export function merchantAnalytics(params) {
   if (isOneClickCheckout()) {
     if (isGoogleAnalyticsEnabled()) {
-      global.Razorpay.sendMessage({
+      Razorpay.sendMessage({
         event: 'gaevent',
         data: params,
       });
     }
     if (isFacebookAnalyticsEnabled()) {
-      global.Razorpay.sendMessage({
+      Razorpay.sendMessage({
         event: 'fbaevent',
         data: params,
       });
@@ -42,7 +43,7 @@ export function merchantFBStandardAnalytics(data) {
     Object.keys(getCustomerCart())?.length
   ) {
     data.params = getCartInfo();
-    global.Razorpay.sendMessage({
+    Razorpay.sendMessage({
       event: 'fbaevent',
       eventType: 'track',
       data,
