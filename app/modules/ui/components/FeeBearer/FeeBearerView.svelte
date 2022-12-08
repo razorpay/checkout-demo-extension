@@ -8,7 +8,11 @@
   import close from 'one_click_checkout/coupons/icons/close.js';
 
   // Store imports
-  import { isCustomerFeeBearer, isDynamicFeeBearer } from 'razorpay';
+  import {
+    getMerchantName,
+    isCustomerFeeBearer,
+    isDynamicFeeBearer,
+  } from 'razorpay';
   import { showFeeLabel } from 'checkoutstore/fee';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
@@ -32,6 +36,7 @@
     GATEWAY_CHARGES_LABEL,
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
+    FEE_TOOLTIP_MESSAGE,
     CLOSE_ACTION,
     CONFIRM_AND_PAY,
   } from 'ui/labels/fees';
@@ -45,14 +50,24 @@
   } from './events';
   import { hideCta, showCta } from 'cta';
   import { cfbAmount } from 'checkoutstore/screens/upi';
+  import info from 'ui/icons/payment-methods/info';
+  import { clickOutside } from 'one_click_checkout/helper';
+  import type { FeeBearerResponse } from './type';
 
   // Props
   export let loading = true;
-  export let feeBreakup = null;
-  export let bearer = null;
-  export let paymentData;
-  export let onContinue;
+  export let feeBreakup: FeeBearerResponse['display'] | null = null;
+  export let bearer: FeeBearerResponse['input'] | null = null;
+  export let paymentData: Partial<FeeBearerResponse['input']>;
+  export let onContinue: (arg: typeof bearer) => void;
   export let navstack;
+
+  let showToolTip = false;
+
+  let merchantName =
+    getMerchantName().length > 26
+      ? `${getMerchantName().slice(0, 24)}...`
+      : getMerchantName();
 
   /**
    * INR as default currency Symbol for Fees
@@ -70,7 +85,8 @@
     tax: GST_LABEL,
     amount: TOTAL_CHARGES_LABEL,
   };
-  const dynamic_fee_label = $dynamicFeeObject?.checkout_label || '';
+  // TODO update DFB types
+  const dynamic_fee_label = ($dynamicFeeObject as any)?.checkout_label || '';
 
   onMount(() => {
     hideCta();
@@ -78,7 +94,10 @@
     trackShown();
   });
 
-  export function onSuccess(response) {
+  let timer: ReturnType<typeof setTimeout>;
+  let infoIcon: HTMLSpanElement;
+
+  export function onSuccess(response: FeeBearerResponse) {
     feeBreakup = response.display;
     showFeesIncl.update((obj) =>
       Object.assign({}, obj, {
@@ -135,10 +154,13 @@
     showCta();
   });
 
-  export function onError(response) {
+  // for ts casting extracted to variable
+  $: selectedLocale = $locale as string;
+
+  export function onError(response: Common.ErrorResponse) {
     const errorDescription = response?.error?.description;
     const errorMessage = errorDescription
-      ? translateErrorDescription(errorDescription, $locale)
+      ? translateErrorDescription(errorDescription, selectedLocale)
       : '';
     if (isOverlay) {
       popStack(); // @TODO future - replaceStack(ErrorScreen);
@@ -152,14 +174,17 @@
     });
   }
 
-  export function fetchFees(paymentData) {
+  export function fetchFees(paymentData: Partial<FeeBearerResponse['input']>) {
     paymentData.amount = session.getAppliedOffer()
       ? session.getAppliedOffer().amount
       : session.get('amount');
     paymentData.currency = session.get('currency');
     if (isDynamicFeeBearer()) {
       if ('convenience_fee' in $dynamicFeeObject) {
-        paymentData['convenience_fee'] = $dynamicFeeObject['convenience_fee'];
+        // TODO update DFB types
+        paymentData['convenience_fee'] = ($dynamicFeeObject as any)[
+          'convenience_fee'
+        ];
       }
     }
     loading = true;
@@ -181,9 +206,17 @@
   const continueAction = isRedesignV15Enabled
     ? CONFIRM_AND_PAY
     : CONTINUE_ACTION;
+
+  function getDisplayLabel(type: string) {
+    return $t(displayLabels[type as keyof typeof displayLabels]);
+  }
 </script>
 
-<div class="fee-bearer" class:checkout-redesign={isRedesignV15Enabled}>
+<div
+  class="fee-bearer"
+  class:checkout-redesign={isRedesignV15Enabled}
+  class:is-not-overlay={!isOverlay}
+>
   {#if isRedesignV15Enabled && isOverlay}
     <span class="fee-bearer-close" on:click={onClose}>
       <Icon icon={close('#757575')} />
@@ -201,10 +234,64 @@
     <div class="fees-container">
       {#each Object.entries(feeBreakup) as [type, amount] (type)}
         {#if allowedKeys.includes(type)}
-          <div class="fee">
+          <div
+            on:mouseleave={() => {
+              if (type === 'razorpay_fee') {
+                if (timer) {
+                  clearTimeout(timer);
+                }
+                // timer = setTimeout(() => (showToolTip = false), 2000);
+              }
+            }}
+            use:clickOutside={type === 'razorpay_fee'}
+            on:click_outside={() => {
+              showToolTip = false;
+            }}
+            class="fee"
+          >
             <div class="fee-title">
               {#if type === 'razorpay_fee'}
-                {dynamic_fee_label || fee_label || $t(GATEWAY_CHARGES_LABEL)}
+                <span>
+                  {dynamic_fee_label || fee_label || $t(GATEWAY_CHARGES_LABEL)}
+                </span>
+
+                <span
+                  bind:this={infoIcon}
+                  class="info-icon"
+                  on:click={() => {
+                    if (timer) {
+                      clearTimeout(timer);
+                    }
+                    showToolTip = true;
+                  }}
+                >
+                  <Icon icon={info('#8d97a1')} />
+                </span>
+                {#if showToolTip}
+                  <span class="fee-tooltip">
+                    <span
+                      class="pointer"
+                      style={`left:${(infoIcon?.offsetLeft || 0) + 1}px;`}
+                    />
+                    <div>
+                      {formatTemplateWithLocale(
+                        FEE_TOOLTIP_MESSAGE,
+                        {
+                          merchantName,
+                        },
+                        selectedLocale
+                      )}
+                    </div>
+                    <div
+                      class="cross"
+                      on:click={() => {
+                        showToolTip = false;
+                      }}
+                    >
+                      <Icon icon={close('#ffffffde')} />
+                    </div>
+                  </span>
+                {/if}
               {:else if type === 'tax'}
                 {formatTemplateWithLocale(
                   displayLabels[type],
@@ -214,9 +301,11 @@
                       fee_label ||
                       $t(GATEWAY_CHARGES_LABEL),
                   },
-                  $locale
+                  selectedLocale
                 )}
-              {:else}{$t(displayLabels[type])}{/if}
+              {:else}
+                {getDisplayLabel(type)}
+              {/if}
             </div>
             <div class="fee-amount">
               {formatAmountWithSymbol(amount * 100, currency || 'INR', true)}
@@ -243,6 +332,7 @@
       .fee {
         padding: 8px 0;
         width: 100%;
+        position: relative;
 
         &:last-of-type {
           border-top: 1px solid #ebedf0;
@@ -255,6 +345,50 @@
           display: inline-block;
           text-align: left;
           width: calc(50% - 2px);
+        }
+
+        .info-icon {
+          position: relative;
+          top: 2px;
+          cursor: pointer;
+          margin-left: 6px;
+        }
+
+        .fee-tooltip {
+          z-index: 1;
+          font-weight: 500;
+          font-size: 11px;
+          line-height: 16px;
+          color: rgba(255, 255, 255, 0.87);
+          position: absolute;
+          left: 0;
+          width: calc(100% - 20px);
+          bottom: -34px;
+          align-items: center;
+          background: #515461;
+          border-radius: 4px;
+          padding: 10px;
+          display: flex;
+          justify-content: space-between;
+
+          .pointer {
+            content: '';
+            height: 10px;
+            width: 10px;
+            position: absolute;
+            top: -4px;
+            background: #525461;
+            transform: rotate(45deg);
+          }
+
+          .cross {
+            display: flex;
+            cursor: pointer;
+            :global(svg) {
+              height: 8px;
+              width: 8px;
+            }
+          }
         }
 
         .fee-amount {
@@ -304,5 +438,11 @@
   }
   :global(#modal.one-cc) .fee-bearer .btn {
     text-transform: capitalize;
+  }
+
+  // for UPI QR at L2 we show fee in content instead of modal
+  .fee-bearer.is-not-overlay {
+    padding: 5px;
+    width: 100%;
   }
 </style>

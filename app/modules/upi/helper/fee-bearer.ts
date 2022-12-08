@@ -1,11 +1,10 @@
 import showFeeBearer from 'ui/components/FeeBearer';
+import type { FeeBearerResponse } from 'ui/components/FeeBearer/type';
 import { trackTrace, TRACES } from 'upi/events';
-
-type FeeData = { amount: number; fee: number };
 
 export const handleFeeBearer = (
   originalPaymentData: Partial<UPI.UPIPaymentPayload>,
-  callback: (feeData: FeeData) => void
+  callback: (feeData: FeeBearerResponse['input']) => void
 ) => {
   /**
    * API Doesn't accept upi_app param
@@ -14,7 +13,7 @@ export const handleFeeBearer = (
   trackTrace(TRACES.FEE_MODAL_TRIGGERED);
   showFeeBearer({
     paymentData,
-    onContinue: function (bearer: FeeData) {
+    onContinue: function (bearer: FeeBearerResponse['input']) {
       callback(bearer);
     },
   });

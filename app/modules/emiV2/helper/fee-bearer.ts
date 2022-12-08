@@ -1,15 +1,14 @@
 import type { EMIPayload } from 'emiV2/payment/types/payment';
 import showFeeBearer from 'ui/components/FeeBearer';
-
-type FeeData = { amount: number; fee: number };
+import type { FeeBearerResponse } from 'ui/components/FeeBearer/type';
 
 export const handleFeeBearer = (
   paymentData: EMIPayload,
-  callback: (feeData: FeeData) => void
+  callback: (feeData: FeeBearerResponse['input']) => void
 ) => {
   showFeeBearer({
     paymentData,
-    onContinue: function (bearer: FeeData) {
+    onContinue: function (bearer) {
       callback(bearer);
     },
   });

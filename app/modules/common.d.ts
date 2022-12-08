@@ -13,4 +13,22 @@ declare namespace Common {
   > = DataRequired extends 1
     ? (data: DataType) => ReturnType
     : (data: DataType) => ReturnType;
+
+  export interface Metadata {
+    payment_id: string;
+  }
+
+  export interface Error {
+    code: string;
+    description: string;
+    source: string;
+    step: string;
+    reason: string;
+    metadata: Metadata;
+    action: string;
+  }
+
+  export interface ErrorResponse {
+    error: Error;
+  }
 }

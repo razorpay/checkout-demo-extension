@@ -10,6 +10,7 @@
   import { showFeeBearerToolTip } from 'store/feebearer';
 
   import {
+    getMerchantName,
     isCustomerFeeBearer,
     isDynamicFeeBearer,
     isRedesignV15,
@@ -17,11 +18,12 @@
 
   import { clickOutside } from 'one_click_checkout/helper';
 
-  const FEE_BEARER_VIEW_TIME = 6000;
+  const FEE_BEARER_VIEW_TIME = 4000;
   const isFeeBearer = isCustomerFeeBearer();
   const isRedesignV15Enabled = isRedesignV15();
   let showFeeDetails = false;
-  let timeout;
+  const merchantName = getMerchantName();
+  let timeout: ReturnType<typeof setTimeout>;
 
   export let visible = false;
   function triggerToolTip() {
@@ -66,8 +68,8 @@
             align={isRedesignV15Enabled ? ['top', 'right'] : ['bottom']}
             shown={showFeeDetails}
           >
-            A convenience fee will be charged depending on your choice of
-            payment method.
+            A convenience fee will be charged by {merchantName} depending on your
+            choice of payment method.
           </Tooltip>
         </span>
       </div>

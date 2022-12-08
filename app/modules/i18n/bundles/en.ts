@@ -922,6 +922,7 @@ export default {
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',
     total_charges_label: 'Total Charges',
+    tooltip: 'This fee is charged by {merchantName}',
     shipping_charges_label: 'Shipping Charges',
     cod_charges_label: 'COD Charge',
     coupon_discount_label: 'Coupon {code}',

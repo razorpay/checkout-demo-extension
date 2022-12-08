@@ -36,7 +36,7 @@ class Timer {
     return this.readableTimeLeft;
   }
   public clearTimer() {
-    clearInterval(this.interval as unknown as NodeJS.Timeout);
+    clearInterval(this.interval);
     this.timeoutAt = 0;
     this.readableTimeLeft = '';
     if (this.onChange) {

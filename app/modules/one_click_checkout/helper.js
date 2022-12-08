@@ -33,7 +33,10 @@ import {
   INDIA_CONTACT_ERROR_LABEL,
 } from 'one_click_checkout/address/i18n/labels';
 
-export function clickOutside(node) {
+export function clickOutside(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   const handleClick = (event) => {
     if (
       node &&

@@ -4,7 +4,7 @@
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  import FeeBearer from 'ui/components/FeeBearer/index.svelte';
+  import FeeBearer from 'ui/components/FeeBearer/FeeBearerView.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Utils imports
@@ -209,11 +209,6 @@
     padding-top: 12px;
   }
 
-  :global {
-    .redesign #form-qr .fee-bearer {
-      width: 80%;
-    }
-  }
   .message {
     background: no-repeat center bottom;
     background-size: 124px;

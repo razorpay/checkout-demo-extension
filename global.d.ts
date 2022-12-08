@@ -13,3 +13,9 @@ interface Window {
 declare const global: Window;
 
 declare var Razorpay: Window['Razorpay'];
+
+declare namespace svelte.JSX {
+  interface HTMLAttributes<T> {
+    onclick_outside: () => void;
+  }
+}

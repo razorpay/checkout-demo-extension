@@ -2,7 +2,7 @@ import $ from 'lib/$';
 import { resetQRState } from 'upi/ui/components/QR/store';
 
 export function Modal() {
-  let timeout: NodeJS.Timeout | null;
+  let timeout: ReturnType<typeof setTimeout> | null;
 
   const clearTimeOut = function () {
     if (timeout) {

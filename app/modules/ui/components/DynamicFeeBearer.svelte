@@ -5,7 +5,7 @@
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   //Store imports
-  import { isDynamicFeeBearer } from 'razorpay';
+  import { getMerchantName, isDynamicFeeBearer } from 'razorpay';
   import { showFeeBearerToolTip } from 'store/feebearer';
 
   import {
@@ -24,10 +24,10 @@
   const isRedesignV15Enabled = isRedesignV15();
   // Remove the space between Amount and symbol on Magic Checkout Flow
   const spaceAmountWithSymbol = isRedesignV15Enabled;
-
-  let label;
+  const merchantName = getMerchantName();
+  let label: string;
   let showFeeDetails = false;
-  let timeout;
+  let timeout: ReturnType<typeof setTimeout>;
 
   const handleHideTooltip = () => {
     timeout ? clearTimeout(timeout) : null;
@@ -56,7 +56,7 @@
         const offer = session.getAppliedOffer();
         if (!offer || !offer.amount) {
           session.updateAmountInHeader(
-            getAmount() + $dynamicFeeObject.convenience_fee,
+            getAmount() + ($dynamicFeeObject.convenience_fee as number),
             false
           );
           return;
@@ -67,10 +67,12 @@
       }
     });
   };
-  const unSub = dynamicFeeObject.subscribe((_val) => {
-    showBreakUpTooltip();
-    label = _val['checkout_label'];
-  });
+  const unSub = dynamicFeeObject.subscribe(
+    (_val: { checkout_label?: string }) => {
+      showBreakUpTooltip();
+      label = _val['checkout_label'] || '';
+    }
+  );
 
   onDestroy(unSub);
 </script>
@@ -111,33 +113,34 @@
           <div class="dynamic-fee-breakup-block">
             <div class="dynamic-fee-breakup">
               <span>Amount</span>
-              <span
-                >{formatAmountWithSymbol(
+              <span>
+                {formatAmountWithSymbol(
                   getAmount(),
                   getCurrency(),
                   spaceAmountWithSymbol
-                )}</span
-              >
+                )}
+              </span>
             </div>
             <div class="dynamic-fee-breakup">
-              <span
-                >{label && label.trim() !== ''
-                  ? label
-                  : 'Additional Fees'}</span
-              >
-              <span
-                >{formatAmountWithSymbol(
+              <span>
+                {label && label.trim() !== '' ? label : 'Additional Fees'}
+              </span>
+              <span>
+                {formatAmountWithSymbol(
                   $dynamicFeeObject['convenience_fee'],
                   getCurrency(),
                   spaceAmountWithSymbol
-                )}</span
-              >
+                )}
+              </span>
             </div>
+            <p class="fee-merchant-name">
+              Note: This fee is charged by {merchantName}
+            </p>
           </div>
         {:else}
           <p>
-            A convenience fee will be charged depending on your choice of
-            payment method.
+            A convenience fee will be charged by {merchantName} depending on your
+            choice of payment method.
           </p>
         {/if}
         {#if $merchantMessage && $merchantMessage.trim() !== ''}
@@ -172,8 +175,14 @@
     width: 217px;
     height: 0px;
   }
-  .dynamic-optional-message {
+  .dynamic-optional-message,
+  .fee-merchant-name {
     color: rgba(255, 255, 255, 0.7);
+  }
+
+  .fee-merchant-name {
+    font-style: italic;
+    margin-top: 0;
   }
 
   .dynamic-fee-breakup-block {

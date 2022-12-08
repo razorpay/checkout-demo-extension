@@ -7,3 +7,4 @@ export const CONTINUE_ACTION = 'fees.continue_action';
 export const CONFIRM_AND_PAY = 'fees.confirm_and_pay';
 export const CLOSE_ACTION = 'fees.close_action';
 export const TOTAL_CHARGES_LABEL = 'fees.total_charges_label';
+export const FEE_TOOLTIP_MESSAGE = 'fees.tooltip';
