@@ -43,11 +43,6 @@ import {
   consentGiven,
 } from 'one_click_checkout/address/store';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
-import {
-  isEnableAutoFetchCoupons,
-  scriptCouponApplied,
-  getPrefilledCouponCode,
-} from 'razorpay';
 import { shouldShowCoupons } from 'one_click_checkout/store';
 import { appliedGiftCards } from 'one_click_checkout/gift_card/store';
 
@@ -56,6 +51,9 @@ import {
   getCurrency,
   isMandatoryLoginEnabled,
   enabledRestrictCoupon,
+  isEnableAutoFetchCoupons,
+  scriptCouponApplied,
+  getPrefilledCouponCode,
 } from 'razorpay';
 import { screensHistory as history } from 'one_click_checkout/routing/History';
 import { mergeObjOnKey } from 'one_click_checkout/common/utils';
@@ -110,7 +108,6 @@ export function fetchCoupons() {
       if (!coupons.length) {
         return;
       }
-      Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, coupons.length);
       availableCoupons.set(coupons);
     })
     .catch((e) => {
@@ -119,11 +116,13 @@ export function fetchCoupons() {
       });
     })
     .finally(() => {
+      const countOfCoupons = getAvailableCouponsLength();
+      Analytics.setMeta(MetaProperties.AVAILABLE_COUPONS_COUNT, countOfCoupons);
       Events.TrackRender(CouponEvents.COUPONS_SCREEN, {
-        coupons_count: get(availableCoupons).length,
+        coupons_count: countOfCoupons,
       });
       Events.TrackRender(CouponEvents.SUMMARY_COUPONS_COUNT, {
-        count_coupons_available: get(availableCoupons)?.length,
+        count_coupons_available: countOfCoupons,
       });
     });
 }
@@ -132,19 +131,19 @@ export function fetchCoupons() {
  * Calls backend to verify if coupon code is valid.
  * @param {string} code The coupon code enetered/selected by the user
  */
-export function applyCouponCode(code) {
+export function applyCouponCode(code, couponSource = '') {
   if (scriptCouponApplied()) {
     // to handle prefilled coupon case and such
     return;
   }
-  const source = code ? 'selection' : 'manual_entry';
+  const source = code ? 'merchant' : 'manual';
   const input = code || get(couponInputValue);
 
-  couponInputSource.set(source);
+  couponInputSource.set(couponSource ?? source);
   couponAppliedIndex.set(get(couponAppliedIndex) + 1);
 
   if (input) {
-    applyCoupon(input, source, {
+    applyCoupon(input, couponSource ?? source, {
       onValid: () => {
         if (enabledRestrictCoupon() && get(appliedGiftCards)?.length) {
           const selectedGiftCards = get(appliedGiftCards)?.map(
@@ -167,15 +166,10 @@ export function applyCouponCode(code) {
             coupon_code: input,
           },
         });
-        Events.TrackBehav(CouponEvents.COUPON_APPLIED, {
-          index: get(couponAppliedIndex),
-          meta: {
-            is_coupon_applied: true,
-            coupon_code: input,
-          },
-        });
         Events.TrackMetric(CouponEvents.COUPON_VALIDATION_COMPLETED, {
           is_coupon_valid: true,
+          code: input,
+          source: couponSource ?? source,
         });
         navigator.navigateTo({ path: views.COUPONS });
         showToastAfterDelay(
@@ -329,6 +323,12 @@ export function onSubmitLogoutUser() {
 
 export function applyPrefilledCoupon() {
   if (getPrefilledCouponCode()) {
-    applyCouponCode(getPrefilledCouponCode());
+    applyCouponCode(getPrefilledCouponCode(), 'auto');
   }
+}
+
+function getAvailableCouponsLength() {
+  return getPrefilledCouponCode()
+    ? get(availableCoupons).length + 1
+    : get(availableCoupons).length;
 }
