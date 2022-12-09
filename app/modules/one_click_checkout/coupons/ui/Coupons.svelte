@@ -1,6 +1,8 @@
 <script lang="ts">
   // svelte imports
   import { onMount, onDestroy } from 'svelte';
+  import { fly, slide } from 'svelte/transition';
+  import { sineOut } from 'svelte/easing';
 
   // UI Imports
   import AvailableCouponsButton from 'one_click_checkout/coupons/ui/components/AvailableCouponsButton.svelte';
@@ -70,6 +72,7 @@
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { hideToast } from 'one_click_checkout/Toast';
+  import { getAnimationOptions } from 'svelte-utils';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { getPhoneNumberRegex } from 'one_click_checkout/helper';
   import {
@@ -102,6 +105,7 @@
   let orderWidget;
   let showValidations = $contact || $email;
   let showAmountVariant: CTAState['showAmountVariant'] = '';
+  let couponsPromise: void | Promise<void>;
 
   $: ctaDisabled =
     ($savedAddresses.length && !$selectedAddress?.serviceability) ||
@@ -221,7 +225,7 @@
     toggleHeader(true);
     updateOrderWithCustomerDetails();
     const promiseList = [];
-    const couponsPromise = fetchCoupons();
+    couponsPromise = fetchCoupons();
     if (couponsPromise) {
       promiseList.push(couponsPromise);
     }
@@ -259,6 +263,13 @@
     updateCustomerConsent($customerConsentCheckboxState);
     navigator.navigateTo({ path: views.SAVED_ADDRESSES });
   }
+
+  const couponAnimation = getAnimationOptions({
+    duration: 500,
+    easing: sineOut,
+    x: -100,
+    delay: 350,
+  });
 </script>
 
 <Screen pad={false}>
@@ -285,11 +296,19 @@
 
     <!-- Coupons Widget if merchant coupons are available and experiment is true -->
     {#if showCoupons && couponsWidgetExperiment && $availableCoupons.length > 0}
-      <div class="widget-wrapper">
-        <AvailableCouponsButton removeCoupon={removeCouponCode} />
-      </div>
-      <div class="separator" />
+      {#await couponsPromise then _}
+        <div
+          in:slide={getAnimationOptions({ duration: 350 })}
+          class="coupon-animation-container"
+        >
+          <div class="widget-wrapper" in:fly={couponAnimation}>
+            <AvailableCouponsButton removeCoupon={removeCouponCode} />
+          </div>
+          <div class="separator" />
+        </div>
+      {/await}
     {/if}
+
     <div class="widget-wrapper" id="order-widget" bind:this={orderWidget}>
       <OrderWidget />
     </div>
@@ -297,10 +316,17 @@
 
     <!-- Coupons Widget if merchant coupons are not available  and experiment is true -->
     {#if showCoupons && couponsWidgetExperiment && $availableCoupons.length <= 0}
-      <div class="separator" />
-      <div class="widget-wrapper">
-        <AvailableCouponsButton removeCoupon={removeCouponCode} />
-      </div>
+      {#await couponsPromise then _}
+        <div
+          in:slide={getAnimationOptions({ duration: 350 })}
+          class="coupon-animation-container"
+        >
+          <div class="separator" />
+          <div class="widget-wrapper" in:fly={couponAnimation}>
+            <AvailableCouponsButton removeCoupon={removeCouponCode} />
+          </div>
+        </div>
+      {/await}
     {/if}
   </div>
   <CTA
@@ -330,6 +356,9 @@
 
   .coupon-container {
     min-height: 100%;
+  }
+  .coupon-animation-container {
+    background-color: var(--background-color-magic);
   }
 
   #order-widget {
