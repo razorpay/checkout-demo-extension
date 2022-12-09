@@ -7,7 +7,7 @@ import {
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from 'common/constants';
 import { appsThatSupportWebPayments } from 'common/webPaymentsApi';
-import { android, isWebView } from 'common/useragent';
+// import { android, isWebView } from 'common/useragent';
 import * as _ from 'utils/_';
 
 let message;
@@ -212,20 +212,22 @@ export function processNativeMessage(_message) {
  * Check if platform supported for showing all UPI apps
  */
 export function shouldShowAllUPIApps() {
-  try {
-    const sdkMeta = getSDKMeta();
-    const supportedPlatform =
-      (sdkMeta.platform === 'web' && android) ||
-      sdkMeta.platform === 'android' ||
-      sdkMeta.platform === 'ios';
+  // disabling as it impacting p13n upi intent in mweb
+  return false;
+  // try {
+  //   const sdkMeta = getSDKMeta();
+  //   const supportedPlatform =
+  //     (sdkMeta.platform === 'web' && android) ||
+  //     sdkMeta.platform === 'android' ||
+  //     sdkMeta.platform === 'ios';
 
-    if (!supportedPlatform || isWebView) {
-      return false;
-    }
-    return true;
-  } catch (error) {
-    return false;
-  }
+  //   if (!supportedPlatform || isWebView) {
+  //     return false;
+  //   }
+  //   return true;
+  // } catch (error) {
+  //   return false;
+  // }
 }
 
 function shouldAppsReorder() {
