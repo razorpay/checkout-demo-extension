@@ -1011,6 +1011,9 @@
     margin-top: 0;
     margin-bottom: 6px;
   }
+  :global(.input-one-click-checkout):disabled {
+    background: var(--bg-color-disabled);
+  }
 
   @media (max-width: 340px) {
     .save-address-tooltip {

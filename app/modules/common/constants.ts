@@ -199,6 +199,7 @@ export const constantCSSVars = {
   // colors
   'background-color-magic': '#f0f0f4',
   'light-dark-color': '#d9dadb',
+  'bg-color-disabled': '#0000000d',
 };
 
 function isProd() {
