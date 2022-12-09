@@ -30,7 +30,7 @@ function fetchPrefsFromApi(options: any): Promise<Preferences> {
       url: _.appendParamsToUrl(makeUrl('preferences'), params),
       callback: function (prefsResponse) {
         if (prefsResponse.status_code && prefsResponse.status_code !== 200) {
-          reject();
+          reject(prefsResponse);
         }
         resolve(prefsResponse);
       },

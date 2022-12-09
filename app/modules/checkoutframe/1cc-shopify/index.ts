@@ -9,6 +9,8 @@ import type {
   CreateShopifyCheckoutResponse,
 } from 'checkoutframe/1cc-shopify/interface';
 import { createShopifyOrder } from 'one_click_checkout/order/controller';
+import { capture, SEVERITY_LEVELS } from '../../error-service';
+import { throwMessage } from 'utils/_';
 
 /**
  * Related to the 1cc shopify flow, where the /checkout call
@@ -51,7 +53,17 @@ export function initShopifyCheckout({
   key_id: string;
 }) {
   const shopifyCheckoutPromise = createShopifyCheckout({ body, key_id });
-  createShopifyOrder(shopifyCheckoutPromise);
+  createShopifyOrder(shopifyCheckoutPromise).catch((err) => {
+    if (typeof err === 'object' && !(err instanceof Error)) {
+      err.message = err.message ?? 'shopify order creation failed';
+    }
+    capture(err, {
+      unhandled: true,
+      severity: SEVERITY_LEVELS.S1,
+    });
+
+    throw err;
+  });
   return shopifyCheckoutPromise;
 }
 
@@ -80,9 +92,9 @@ function createShopifyCheckout({
           data: { time: apiTimer() },
         });
         if (response.status_code !== 200) {
-          reject({ error: response.error });
+          reject(response.error);
         } else if (!response.shopify_checkout_id) {
-          reject();
+          reject(throwMessage('shopify checkout id not present'));
         } else {
           resolve(response.shopify_checkout_id);
         }
