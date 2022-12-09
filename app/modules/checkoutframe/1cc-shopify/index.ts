@@ -53,18 +53,21 @@ export function initShopifyCheckout({
   key_id: string;
 }) {
   const shopifyCheckoutPromise = createShopifyCheckout({ body, key_id });
-  createShopifyOrder(shopifyCheckoutPromise).catch((err) => {
-    if (typeof err === 'object' && !(err instanceof Error)) {
+
+  return createShopifyOrder(shopifyCheckoutPromise).catch((err) => {
+    if (!err) {
+      err = { message: 'shopify order creation failed' };
+    } else if (typeof err === 'object' && !(err instanceof Error)) {
       err.message = err.message ?? 'shopify order creation failed';
     }
+
     capture(err, {
       unhandled: true,
-      severity: SEVERITY_LEVELS.S1,
+      severity: SEVERITY_LEVELS.S2,
     });
 
     throw err;
   });
-  return shopifyCheckoutPromise;
 }
 
 function createShopifyCheckout({
