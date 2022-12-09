@@ -122,7 +122,7 @@
   >
     <p>{$t(AMOUNT_LABEL)}</p>
     {#if priceBeforeScriptDisc}
-      <p>
+      <p data-testid="cart-amount">
         {formatAmountWithSymbol(
           priceBeforeScriptDisc,
           currency,
@@ -130,7 +130,7 @@
         )}
       </p>
     {:else}
-      <p data-test-id="cart-amount">
+      <p data-test-id="cart-amount" data-testid="cart-amount">
         {formatAmountWithSymbol($cartAmount, currency, spaceAmountWithSymbol)}
       </p>
     {/if}
@@ -154,7 +154,11 @@
       <p>
         {$t(COUPON_DISCOUNT_LABEL, { values: { code: $appliedCoupon } })}
       </p>
-      <p data-test-id="discount-amount" class="color-green">
+      <p
+        data-test-id="discount-amount"
+        data-testid="discount-amount"
+        class="color-green"
+      >
         - {formatAmountWithSymbol(
           $cartDiscount,
           currency,
@@ -170,7 +174,7 @@
         <Shimmer width="20%" />
       {:else}
         <p>{$t(SHIPPING_CHARGES_LABEL)}</p>
-        <p data-test-id="shipping-amount">
+        <p data-test-id="shipping-amount" data-testid="shipping-amount">
           {$shippingCharge
             ? formatAmountWithSymbol(
                 $shippingCharge,
@@ -204,7 +208,7 @@
         <Shimmer width="20%" />
       {:else}
         <p>{$t(TOTAL_LABEL)}</p>
-        <p data-test-id="total-amount">
+        <p data-test-id="total-amount" data-testid="total-amount">
           {formatAmountWithSymbol($amount, currency, spaceAmountWithSymbol)}
         </p>
       {/if}

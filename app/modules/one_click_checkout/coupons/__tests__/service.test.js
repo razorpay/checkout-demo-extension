@@ -41,12 +41,15 @@ jest.mock('one_click_checkout/coupons/service/cache', () => {
     getCache: jest.fn(),
   };
 });
+
 jest.mock('utils/fetch', () => ({
   post: jest.fn(({ callback }) => {
     callback({ promotions: [] });
   }),
 }));
+
 jest.mock('analytics');
+
 jest.mock('one_click_checkout/store', () => {
   const original = jest.requireActual('one_click_checkout/store');
 
