@@ -70,7 +70,7 @@ import {
   setParamsForDdosProtection,
 } from 'checkoutframe/utils';
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
-import { initShopifyCheckout } from './1cc-shopify';
+import { initShopifyCheckout, clearShopifyCheckout } from './1cc-shopify';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -384,6 +384,9 @@ export const handleMessage = function (message) {
 
     // NOTE: call this before making any XHR or jsonp call
     setParamsForDdosProtection(session);
+
+    // clear promises for shopify checkout and order
+    clearShopifyCheckout();
 
     // Create shopify checkout_id when cart is passed instead.
     if (!ObjectUtils.isEmpty(options.shopify_cart)) {

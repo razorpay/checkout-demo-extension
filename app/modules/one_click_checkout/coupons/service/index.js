@@ -8,9 +8,10 @@ import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
 import { isEmailValid } from 'one_click_checkout/order/validators';
-import { getLazyOrderId } from 'one_click_checkout/order/controller';
+import { getShopifyCheckoutPromise } from 'checkoutframe/1cc-shopify';
+import * as _ from 'utils/_';
 
-let ORDER_ID_FOR_COUPONS;
+let REF_ID_FOR_COUPONS;
 let CONTACT_FOR_COUPONS;
 let EMAIL_FOR_COUPONS;
 
@@ -20,28 +21,36 @@ let SHOPIFY_COUPON_PROMISE;
  * @returns {Array} a list of coupons for the specific merchant.
  */
 export async function getCoupons() {
-  const orderId = await getLazyOrderId();
   const payload = getContactPayload();
 
+  const shopifyCheckoutPromise = getShopifyCheckoutPromise();
+
+  if (shopifyCheckoutPromise) {
+    payload.reference_id = await shopifyCheckoutPromise;
+    payload.reference_type = 'shopify';
+  } else {
+    payload.reference_id = getOrderId();
+    payload.reference_type = 'order';
+  }
+
   if (
-    orderId !== ORDER_ID_FOR_COUPONS ||
+    payload.reference_id !== REF_ID_FOR_COUPONS ||
     CONTACT_FOR_COUPONS !== payload.contact ||
     EMAIL_FOR_COUPONS !== payload.email
   ) {
     const getDuration = timer();
     Events.TrackMetric(CouponEvents.COUPONS_FETCH_START);
 
-    ORDER_ID_FOR_COUPONS = orderId;
+    REF_ID_FOR_COUPONS = payload.reference_id;
     CONTACT_FOR_COUPONS = payload.contact;
     EMAIL_FOR_COUPONS = payload.email;
 
     SHOPIFY_COUPON_PROMISE = new Promise((resolve, reject) => {
-      fetch.post({
-        url: makeAuthUrl('merchant/coupons'),
-        data: {
-          ...payload,
-          order_id: orderId,
-        },
+      fetch({
+        url: _.appendParamsToUrl(
+          makeAuthUrl('magic/checkout/coupons'),
+          payload
+        ),
         callback: (response) => {
           Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
             time: getDuration(),

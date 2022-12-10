@@ -157,11 +157,11 @@ async function verifyInValidCoupon(context, amount) {
 }
 
 async function handleAvailableCouponReq(context, availableCoupons = []) {
-  let req = context.getRequest('/v1/merchant/coupons');
+  let req = context.getRequest('/v1/magic/checkout/coupons');
   if (!req) {
     req = await context.expectRequest();
-    expect(req.url).toContain('merchant/coupons');
-    expect(req.method).toBe('POST');
+    expect(req.url).toContain('magic/checkout/coupons');
+    expect(req.method).toBe('GET');
     await context.respondJSON({ promotions: availableCoupons });
     return;
   }

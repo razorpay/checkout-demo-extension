@@ -8,9 +8,14 @@ import type {
   CreateShopifyCheckoutBody,
   CreateShopifyCheckoutResponse,
 } from 'checkoutframe/1cc-shopify/interface';
-import { createShopifyOrder } from 'one_click_checkout/order/controller';
+import {
+  createShopifyOrder,
+  clearShopifyOrder,
+} from 'one_click_checkout/order/controller';
 import { capture, SEVERITY_LEVELS } from '../../error-service';
 import { throwMessage } from 'utils/_';
+
+let SHOPIFY_CHECKOUT_PROMISE: any;
 
 /**
  * Related to the 1cc shopify flow, where the /checkout call
@@ -45,6 +50,18 @@ export function create1ccShopifyCheckout(
   });
 }
 
+export function getShopifyCheckoutPromise() {
+  return SHOPIFY_CHECKOUT_PROMISE;
+}
+
+export function clearShopifyCheckout() {
+  SHOPIFY_CHECKOUT_PROMISE = null;
+  clearShopifyOrder();
+}
+
+// @TODO move to i18n
+const ERROR_SHOPIFY_ORDER_FAILED = 'Failed to process your order';
+
 export function initShopifyCheckout({
   body,
   key_id,
@@ -52,13 +69,14 @@ export function initShopifyCheckout({
   body: CreateShopifyCheckoutBody;
   key_id: string;
 }) {
-  const shopifyCheckoutPromise = createShopifyCheckout({ body, key_id });
+  const SHOPIFY_CHECKOUT_PROMISE = createShopifyCheckout({ body, key_id });
 
-  return createShopifyOrder(shopifyCheckoutPromise).catch((err) => {
+  return createShopifyOrder(SHOPIFY_CHECKOUT_PROMISE).catch((err) => {
+    // @TODO move to common error processor util
     if (!err) {
-      err = { message: 'shopify order creation failed' };
+      err = { message: ERROR_SHOPIFY_ORDER_FAILED };
     } else if (typeof err === 'object' && !(err instanceof Error)) {
-      err.message = err.message ?? 'shopify order creation failed';
+      err.message = err.message ?? ERROR_SHOPIFY_ORDER_FAILED;
     }
 
     capture(err, {

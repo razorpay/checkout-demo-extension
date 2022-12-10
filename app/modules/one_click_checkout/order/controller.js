@@ -52,8 +52,12 @@ export function getLazyOrderId() {
   return getOrderId() || SHOPIFY_ORDER_PROMISE;
 }
 
+export function clearShopifyOrder() {
+  SHOPIFY_ORDER_PROMISE = null;
+  setShopifyOrderId('');
+}
+
 export function createShopifyOrder(shopifyCheckoutPromise) {
-  setShopifyOrderId(''); // nullify existing shopify order id
   SHOPIFY_ORDER_PROMISE = shopifyCheckoutPromise
     .then(Service.createShopifyOrder)
     .then(({ order_id, preferences }) => {
