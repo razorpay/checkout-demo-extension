@@ -51,6 +51,7 @@
   import {
     CATEGORIES,
     ACTIONS,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
 
   // store import
@@ -71,10 +72,17 @@
   import { country as countryCode } from 'checkoutstore/screens/home';
   import { isAutopopulateDisabled } from 'one_click_checkout/store';
   import { activeRoute } from 'one_click_checkout/routing/store';
+  import {
+    moengageEventsData,
+    updateMoengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
 
   // analytics imports
   import { Events } from 'analytics';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    moengageAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
 
   // utils imports
@@ -755,6 +763,13 @@
       Events.Track(AddressEvents.INPUT_ENTERED_zipcode_V2, {
         country: $selectedCountryISO,
         country_code: $formData?.contact?.countryCode,
+      });
+
+      updateMoengageEventsData({ PinCode: $formData?.zipcode });
+
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.PINCODE_ADDED,
+        eventData: $moengageEventsData,
       });
     } else if (id === 'country_name') {
       Events.Track(AddressEvents.INPUT_ENTERED_country_V2);

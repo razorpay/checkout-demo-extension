@@ -44,6 +44,10 @@
     isGstInValid,
   } from 'one_click_checkout/gstin/store';
   import { customerConsentCheckboxState } from 'one_click_checkout/customer/store';
+  import {
+    moengageEventsData,
+    updateMoengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
 
   // controller imports
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
@@ -57,10 +61,14 @@
   import Analytics, { Events } from 'analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    moengageAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
     ACTIONS,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
 
   // utils imports
@@ -218,6 +226,34 @@
       checked_billing_address_same_as_delivery_address:
         $isBillingSameAsShipping,
     });
+
+    if ($selectedAddressId !== null) {
+      const {
+        name,
+        formattedLine1,
+        formattedLine2,
+        formattedLine3,
+        city,
+        state,
+        zipcode,
+        tag,
+      } = $selectedAddress;
+      const payload = {
+        'Full Name': name,
+        Email: $email,
+        'Full Address': `${formattedLine1} ${formattedLine2} ${formattedLine3}`,
+        City: city,
+        State: state,
+        PinCode: zipcode,
+        'Address Type': tag,
+        'Shipping Method': 'standard',
+      };
+      updateMoengageEventsData(payload);
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.ADDRESS_SELECTED,
+        eventData: $moengageEventsData,
+      });
+    }
   }
 
   onMount(() => {

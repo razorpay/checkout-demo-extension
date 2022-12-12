@@ -13,6 +13,7 @@ import {
   startUpiPaymentPolling,
 } from './postPayment/postPaymentHandlers';
 import { adoptSessionUI } from './postPayment/adoptSessionUI';
+import { updateMoengageEventsData } from 'one_click_checkout/merchant-analytics/store';
 
 function handleUPIPayments(
   config: UPI.PaymentProcessConfiguration,
@@ -104,6 +105,9 @@ function handleUPIPayments(
     event: 'submit',
     data: paymentPayload,
   });
+
+  // it is for the case when qr code is shown on the L0 and we need to capture it for 1cc
+  updateMoengageEventsData({ 'Payment method': 'upi' });
 
   // before we create the payment,
   // since no callbacks are pending reset if any

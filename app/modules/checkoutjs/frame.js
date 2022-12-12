@@ -488,14 +488,14 @@ CheckoutFrame.prototype = {
   ongaevent: function (data) {
     const { event, category, params = {} } = data;
     this.rzp.set('enable_ga_analytics', true);
-    if (window?.gtag && typeof window.gtag === 'function') {
+    if (typeof window.gtag === 'function') {
       window.gtag('event', event, {
         event_category: category,
         ...params,
       });
     }
 
-    if (window?.ga && typeof window.ga === 'function') {
+    if (typeof window.ga === 'function') {
       if (event === ACTIONS.PAGE_VIEW) {
         sendToAll('send', {
           hitType: 'pageview',
@@ -512,12 +512,19 @@ CheckoutFrame.prototype = {
   },
   onfbaevent: function (data) {
     const { eventType = 'trackCustom', event, category, params = {} } = data;
-    if (window?.fbq && typeof window.fbq === 'function') {
+    if (typeof window.fbq === 'function') {
       this.rzp.set('enable_fb_analytics', true);
       if (category) {
         params.page = category;
       }
       window.fbq(eventType, event, params);
+    }
+  },
+
+  onmoengageevent: function (data) {
+    const { eventData = {}, eventName } = data;
+    if (typeof window.Moengage?.track_event === 'function') {
+      window.Moengage.track_event(eventName, eventData);
     }
   },
 

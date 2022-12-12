@@ -42,6 +42,7 @@ export const RazorpayDefaults = {
   mandatory_login: false,
   enable_ga_analytics: false,
   enable_fb_analytics: false,
+  enable_moengage_analytics: false,
   // temporary option, provides the cart information for FB Analytics
   customer_cart: {},
   script_coupon_applied: false,

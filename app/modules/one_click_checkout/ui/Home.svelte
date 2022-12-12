@@ -14,6 +14,8 @@
   import { contact } from 'checkoutstore/screens/home';
   import { getMerchantOrder, getOption } from 'razorpay';
   import { savedAddresses } from 'one_click_checkout/address/store';
+  import { cartItems } from 'one_click_checkout/cart/store';
+  import { cartAmount } from 'one_click_checkout/charges/store';
 
   // Constants import
   import routes from 'one_click_checkout/routing/routes';
@@ -32,17 +34,25 @@
   // analytics imports
   import Analytics, { Events } from 'analytics';
   import {
+    generateInitialMoengagePayload,
     merchantAnalytics,
     merchantFBStandardAnalytics,
+    moengageAnalytics,
   } from 'one_click_checkout/merchant-analytics';
   import {
     CATEGORIES,
     ACTIONS,
     MAGIC_FUNNEL,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
   import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
+  import {
+    moengageEventsData,
+    updateMoengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
+  import { appliedCoupon } from 'one_click_checkout/coupons/store';
 
   let topbar;
   let isBackEnabled;
@@ -62,12 +72,25 @@
       !!$savedAddresses?.length
     );
     Events.TrackRender(CouponEvents.SUMMARY_SCREEN_INITIATED);
+
+    const data = generateInitialMoengagePayload($cartItems);
+
+    updateMoengageEventsData({
+      ...data,
+      'Cart Total Price': $cartAmount / 100,
+      'Promo Code': $appliedCoupon,
+    });
+
     merchantAnalytics({
       event: ACTIONS.MAGIC_CHECKOUT_REQUESTED,
       category: CATEGORIES.MAGIC_CHECKOUT,
     });
     merchantFBStandardAnalytics({
       event: ACTIONS.INITIATECHECKOUT,
+    });
+    moengageAnalytics({
+      eventName: MOENGAGE_EVENTS.CHECKOUT_INITIATED,
+      eventData: $moengageEventsData,
     });
     emitMagicFunnelEvent(MAGIC_FUNNEL.CHECKOUT_RENDERED);
     const checkoutTopbar = document.querySelector('#topbar-wrap');

@@ -4,6 +4,8 @@ import {
   isFacebookAnalyticsEnabled,
   isOneClickCheckout,
   getCustomerCart,
+  isMoEngageAnalyticsEnabled,
+  getCurrency,
 } from 'razorpay';
 
 function getCartInfo() {
@@ -49,4 +51,27 @@ export function merchantFBStandardAnalytics(data) {
       data,
     });
   }
+}
+
+export function moengageAnalytics(data) {
+  if (isOneClickCheckout() && isMoEngageAnalyticsEnabled()) {
+    global.Razorpay.sendMessage({
+      event: 'moengageevent',
+      data,
+    });
+  }
+}
+
+export function generateInitialMoengagePayload(data) {
+  return {
+    'Product Name': data.map((item) => item.name),
+    'Product ID': data.map((item) => item.sku),
+    'Product Quantity': data.map((item) => item.quantity),
+    'Product Variant ID': data.map((item) => item.variant_id),
+    'Product Price': data.map((item) => item.price / 100),
+    'Image URL': data.map((item) => item.image_url),
+    'Product Url': data.map((item) => item.product_url),
+    Currency: getCurrency(),
+    Tag: 'Magic',
+  };
 }

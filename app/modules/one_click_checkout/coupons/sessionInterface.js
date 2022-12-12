@@ -121,7 +121,7 @@ export function removeCouponCode(callback) {
     index: get(couponRemovedIndex),
   });
 
-  removeCoupon(code).then((response) => {
+  removeCoupon(code).then(() => {
     Events.TrackRender(CouponEvents.COUPON_REMOVED, {
       index: get(couponRemovedIndex),
       meta: {

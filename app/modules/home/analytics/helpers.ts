@@ -14,6 +14,13 @@ import { METHODS } from 'checkoutframe/constants';
 import { HOME_EVENTS } from 'analytics/home/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
+import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
+import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
+import {
+  moengageEventsData,
+  updateMoengageEventsData,
+} from 'one_click_checkout/merchant-analytics/store';
+import { get } from 'svelte/store';
 
 const { CARD, NETBANKING, PAYLATER, UPI, EMI, WALLET } = METHODS;
 const Tracker = {
@@ -159,6 +166,11 @@ export function triggerInstAnalytics(instrument: InstrumentType) {
   Events.TrackBehav(HOME_EVENTS.PAYMENT_METHOD_SELECTED_V2, {
     method: instrument.method,
     section: instrument.section,
+  });
+  updateMoengageEventsData({ 'Payment method': instrument.method });
+  moengageAnalytics({
+    eventName: MOENGAGE_EVENTS.PAYMENT_METHOD_SELECTED,
+    eventData: get(moengageEventsData),
   });
 }
 

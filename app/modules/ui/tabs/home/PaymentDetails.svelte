@@ -33,6 +33,10 @@
     isContactValid,
   } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
+  import {
+    moengageEventsData,
+    updateMoengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
 
   // Transitions
   import { fly } from 'svelte/transition';
@@ -61,22 +65,23 @@
   import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import ContactDetailsEvents from 'one_click_checkout/contact_widget/analytics';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    moengageAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
 
   // i18n imports
   import { t } from 'svelte-i18n';
   import { CONTACT_LABEL } from 'one_click_checkout/contact_widget/i18n/labels';
-  import {
-    INDIA_CONTACT_ERROR_LABEL,
-    CONTACT_ERROR_LABEL,
-  } from 'one_click_checkout/address/i18n/labels';
+  import { CONTACT_ERROR_LABEL } from 'one_click_checkout/address/i18n/labels';
   import { getPrefillBankDetails } from 'netbanking/helper';
 
   // Constants imports
   import {
     CATEGORIES,
     ACTIONS,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { views } from 'one_click_checkout/routing/constants';
   import {
@@ -150,6 +155,12 @@
       Events.TrackBehav(CouponEvents.SUMMARY_MOBILE_ENTERED, {
         country_code: $country,
         contact_number: $phone,
+      });
+
+      updateMoengageEventsData({ 'Mobile Number': $phone });
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.MOBILE_ADDED,
+        eventData: $moengageEventsData,
       });
     }
   }

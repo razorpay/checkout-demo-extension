@@ -28,7 +28,7 @@
   // constant
   import { constantCSSVars } from 'common/constants';
 
-  let disabled: boolean = false;
+  let disabled = false;
   function onClose() {
     popStack();
   }

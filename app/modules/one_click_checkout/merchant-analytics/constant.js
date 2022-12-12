@@ -35,3 +35,13 @@ export const MAGIC_FUNNEL = {
   PAYMENTS_SCREEN: 'magic_funnel.payments_screen',
   PAYMENT_ATTEMPT: 'magic_funnel.payment_attempted',
 };
+
+export const MOENGAGE_EVENTS = {
+  CHECKOUT_INITIATED: 'Started_Checkout_MAGIC',
+  MOBILE_ADDED: 'Mobile_Added_MAGIC',
+  PINCODE_ADDED: 'PIN_Code_Added_MAGIC',
+  ADDRESS_ADDED: 'Address_Added_MAGIC',
+  ADDRESS_SELECTED: 'Address_Selected_MAGIC',
+  PAYMENT_METHOD_SELECTED: 'Payment_Method_Selected_MAGIC',
+  PAYMENT_COMPLETED: 'Payment_Complete_MAGIC',
+};

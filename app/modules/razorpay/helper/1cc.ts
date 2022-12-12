@@ -96,3 +96,6 @@ export const enabledRestrictCOD = () =>
 export const disableEmailAsCookie = () => {
   return getPreferences('features.one_cc_disableemailcookie') || false;
 };
+
+export const isMoEngageAnalyticsEnabled = () =>
+  getOption('enable_moengage_analytics');

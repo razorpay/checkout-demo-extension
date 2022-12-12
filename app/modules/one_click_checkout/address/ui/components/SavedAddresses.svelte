@@ -13,6 +13,7 @@
   import { activeRoute } from 'one_click_checkout/routing/store';
   import { showBanner } from 'one_click_checkout/address/store';
   import { shippingCharge } from 'one_click_checkout/charges/store';
+  import { email } from 'checkoutstore/screens/home';
 
   // service import
   import { checkServiceabilityStatus } from 'one_click_checkout/address/shipping_address/store';
@@ -23,13 +24,17 @@
 
   // analytics import
   import { Events } from 'analytics';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    moengageAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
 
   // constant imports
   import {
     CATEGORIES,
     ACTIONS,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
   import { views } from 'one_click_checkout/routing/constants';
@@ -44,6 +49,10 @@
   // util imports
   import { screenScrollTop } from 'one_click_checkout/helper';
   import { showShippingChargeAddedToast } from 'one_click_checkout/address/helpersExtra';
+  import {
+    moengageEventsData,
+    updateMoengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
 
   export let addresses;
   export let checkServiceability = true;
@@ -64,13 +73,43 @@
     });
   }
 
-  function handleRadioClick(id, index, addressSource) {
+  function handleRadioClick(index, address) {
+    const {
+      id,
+      name,
+      formattedLine1,
+      formattedLine2,
+      formattedLine3,
+      city,
+      state,
+      zipcode,
+      tag,
+      source_type,
+    } = address;
     if ($activeRoute?.name === views.SAVED_ADDRESSES) {
       Events.TrackBehav(AddressEvents.SAVED_SHIPPING_ADDRESS_SELECTED, {
         address_id: id,
         address_position_index: index,
-        address_source: addressSource || defaultAddressType,
+        address_source: source_type || defaultAddressType,
         selection_type: 'manual',
+      });
+      const payload = {
+        'Full Name': name,
+        Email: $email,
+        'Full Address': `${formattedLine1} ${formattedLine2} ${formattedLine3}`,
+        City: city,
+        State: state,
+        PinCode: zipcode,
+        'Address Type': tag,
+        'Shipping Method': 'standard',
+      };
+      updateMoengageEventsData(payload);
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.ADDRESS_SELECTED,
+        eventData: $moengageEventsData,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
+        top_shown_address: !index,
       });
     } else {
       Events.TrackBehav(AddressEvents.SAVED_BILLING_ADDRESS_SELECTED, {
@@ -124,6 +163,34 @@
           $selectedShippingAddress?.source_type || defaultAddressType,
         selection_type: 'default',
       });
+      const {
+        name,
+        formattedLine1,
+        formattedLine2,
+        formattedLine3,
+        city,
+        state,
+        zipcode,
+        tag,
+      } = $selectedShippingAddress;
+      const payload = {
+        'Full Name': name,
+        Email: $email,
+        'Full Address': `${formattedLine1} ${formattedLine2} ${formattedLine3}`,
+        City: city,
+        State: state,
+        PinCode: zipcode,
+        'Address Type': tag,
+        'Shipping Method': 'standard',
+      };
+      updateMoengageEventsData(payload);
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.ADDRESS_SELECTED,
+        eventData: $moengageEventsData,
+      });
+      Events.TrackBehav(AddressEvents.TOP_SHOWN_SHIPPING_ADDRESS, {
+        top_shown_address: true,
+      });
       postAddressSelection();
     }
     merchantAnalytics({
@@ -153,7 +220,7 @@
       <div class="address-box">
         <AddressBox
           address={addr}
-          on:select={() => handleRadioClick(addr.id, index, addr?.source_type)}
+          on:select={() => handleRadioClick(index, addr)}
           on:editClick
           isSelected={$selectedAddressId === addr.id}
           {checkServiceability}

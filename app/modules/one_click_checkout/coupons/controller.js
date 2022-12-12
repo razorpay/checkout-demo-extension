@@ -33,6 +33,7 @@ import {
   showGiftCard,
   enabledGSTIN,
   enabledOrderInstruction,
+  isMoEngageAnalyticsEnabled,
 } from 'razorpay';
 import { updateGSTIN, showGSTINErrMsg } from 'one_click_checkout/gstin/helpers';
 
@@ -56,6 +57,7 @@ export function initSummaryMetaAnalytics() {
   Analytics.setMeta('gc_enabled', showGiftCard());
   Analytics.setMeta('gstin_enabled', enabledGSTIN());
   Analytics.setMeta('order_instructions_enabled', enabledOrderInstruction());
+  Analytics.setMeta('moengage_analytics', isMoEngageAnalyticsEnabled());
 }
 
 export const handleGSTIN = (onSubmitUser) => {

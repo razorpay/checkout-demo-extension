@@ -27,7 +27,6 @@
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { popStack } from 'navstack';
   import { truncateString } from 'utils/strings';
-  import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
 
   const { rtb_close } = getIcons();
   const name = getMerchantName();

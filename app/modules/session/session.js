@@ -111,6 +111,9 @@ import {
   showTokenisationBenefitModal,
 } from 'card/helper/cards';
 import { getLineItemsTotal } from 'one_click_checkout/cart';
+import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
+import { moengageEventsData } from 'one_click_checkout/merchant-analytics/store';
+import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
 import { selectedPlan } from 'checkoutstore/emi';
 import { sendDismissEvent } from 'checkoutframe/helper';
 
@@ -762,6 +765,13 @@ function successHandler(response) {
 
   function completeCheckoutFlow() {
     Razorpay.sendMessage({ event: 'complete', data: response });
+    moengageAnalytics({
+      eventName: MOENGAGE_EVENTS.PAYMENT_COMPLETED,
+      eventData: {
+        ...storeGetter(moengageEventsData),
+        'Payment Complete': true,
+      },
+    });
     this.hide();
   }
   this.hideOverlayMessage();

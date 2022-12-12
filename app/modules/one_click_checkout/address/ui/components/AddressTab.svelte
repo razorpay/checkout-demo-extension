@@ -31,12 +31,20 @@
   import { selectedAddressId as selectedBillingAddressId } from 'one_click_checkout/address/billing_address/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import { shippingCharge } from 'one_click_checkout/charges/store';
+  import { email } from 'checkoutstore/screens/home';
+  import {
+    updateMoengageEventsData,
+    moengageEventsData,
+  } from 'one_click_checkout/merchant-analytics/store';
 
   // helpers imports
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import { navigator } from 'one_click_checkout/routing/helpers/routing';
   import { validateInput } from 'one_click_checkout/address/helpers';
-  import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
+  import {
+    merchantAnalytics,
+    moengageAnalytics,
+  } from 'one_click_checkout/merchant-analytics';
   import {
     formatAddressToFormData,
     showShippingChargeAddedToast,
@@ -52,6 +60,7 @@
   import {
     CATEGORIES,
     ACTIONS,
+    MOENGAGE_EVENTS,
   } from 'one_click_checkout/merchant-analytics/constant';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
   import { CTA_LABEL } from 'cta/i18n';
@@ -228,11 +237,28 @@
         category: CATEGORIES.ADDRESS,
       });
     } else {
+      const { name, line1, line2, city, state, zipcode, tag } =
+        $selectedAddress;
       Events.TrackBehav(AddressEvents.ADDRESS_SUBMIT_CLICKED_V2, {
         meta: {
           is_user_opted_to_save_address: !!$shouldSaveAddress,
         },
-        '1cc_category_of_saved_address': $selectedAddress?.tag,
+        '1cc_category_of_saved_address': tag,
+      });
+      const payload = {
+        'Full Name': name,
+        Email: $email,
+        'Full Address': `${line1} ${line2} `,
+        City: city,
+        State: state,
+        PinCode: zipcode,
+        'Address Type': tag,
+        'Shipping Method': 'standard',
+      };
+      updateMoengageEventsData(payload);
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.ADDRESS_ADDED,
+        eventData: $moengageEventsData,
       });
     }
     $shouldOverrideVisibleState = false;
