@@ -73,6 +73,6 @@ function isStalePreference(
     return true;
   }
 
-  const hourInMs = 60 * 60 * 1000;
+  const hourInMs = 30 * 60 * 1000; // 30 mins ttl
   return Date.now() - existingPrefs.updatedAt > hourInMs;
 }
