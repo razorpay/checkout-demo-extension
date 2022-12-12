@@ -1,5 +1,9 @@
 import { setupPreferences } from 'tests/setupPreferences';
-import { shouldShowTnc, shouldRememberCard } from '../utils';
+import {
+  shouldShowTnc,
+  shouldRememberCard,
+  getAppInstrumentSubtext,
+} from 'ui/tabs/card/utils';
 
 const razorpayInstance = {
   id: 'id',
@@ -79,5 +83,13 @@ describe('Test shouldRememberCard function for non recurring', () => {
   });
   test('Should return false if non recurring & domestic phone', () => {
     expect(shouldRememberCard(true)).toBe(false);
+  });
+});
+
+describe('Test getAppInstrumentSubtext function', () => {
+  it('should return correct subtext', () => {
+    expect(getAppInstrumentSubtext('cred', 'en')).toEqual(
+      'exclusive discounts with CRED coins'
+    );
   });
 });
