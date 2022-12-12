@@ -61,7 +61,11 @@
   };
 </script>
 
-<button class="view-items-btn theme btn-theme" on:click={handleClick}>
+<button
+  data-testid="cartCta"
+  class="view-items-btn theme btn-theme"
+  on:click={handleClick}
+>
   {formatTemplateWithLocale(
     i18nCta,
     { count: $cartItems.length - DEFAULT_CART_ITEMS_COUNT },
