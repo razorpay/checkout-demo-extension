@@ -38,6 +38,11 @@ exports.output = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'app', 'dist', 'v1'),
+    chunkFilename: (pathData) => {
+      return pathData.chunk.name
+        ? `${pathData.chunk.runtime}-${pathData.chunk.name}-[id].js`
+        : `${pathData.chunk.runtime}-[id].js`;
+    },
   },
 };
 

@@ -24,7 +24,9 @@ function init() {
     });
   });
 
-  import('../checkout-frame-lite/checkout-frame-core.js').then((core) => {
+  import(
+    /* webpackChunkName: "core" */ '../checkout-frame-lite/checkout-frame-core.js'
+  ).then((core) => {
     litePrefsPromise.finally(() => {
       core.default();
     });
