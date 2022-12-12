@@ -141,6 +141,7 @@ export interface Config {
 }
 
 export interface OptionObject {
+  [experiments: `experiments.${string}`]: string | boolean;
   key: string;
   account_id: string;
   image: string;

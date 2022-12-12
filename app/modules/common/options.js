@@ -1,6 +1,7 @@
 import { shouldRedirect } from 'common/useragent';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
+import { IS_PROD } from './constants';
 
 export const RazorpayDefaults = {
   key: '',
@@ -104,6 +105,13 @@ export function flattenProp(obj, prop, type) {
 export function flatten(obj, defObj) {
   let flatObj = {};
   ObjectUtils.loop(obj, function (objVal, objKey) {
+    if (objKey.includes('experiments.')) {
+      if (IS_PROD) {
+        return;
+      }
+      flatObj[objKey] = objVal;
+      return;
+    }
     if (objKey in flatKeys) {
       ObjectUtils.loop(objVal, function (objSubVal, objSubKey) {
         base_set(flatObj, defObj, objKey + '.' + objSubKey, objSubVal);

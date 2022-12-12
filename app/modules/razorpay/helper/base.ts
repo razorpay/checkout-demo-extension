@@ -30,6 +30,15 @@ export function getPreferences<T extends keyof Preferences>(
   if (!path) {
     return RazorpayStore.preferences;
   }
+  /**
+   * experiments Override by Options
+   */
+  if (
+    path.indexOf('experiments.') === 0 &&
+    typeof getOption(path) !== 'undefined'
+  ) {
+    return getOption(path);
+  }
   return get(RazorpayStore.preferences, path, defaultValue);
 }
 
