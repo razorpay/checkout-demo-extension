@@ -280,6 +280,7 @@ export function thirdWatchCodServiceability(address) {
   const serviceabilityApiTimer = timer();
   Events.TrackMetric(AddressEvents.TW_START);
   Events.TrackMetric(AddressEvents.THRIDWARTCH_API_INITIATED);
+  Events.TrackMetric(AddressEvents.THIRDWATCH_API_INITIATED);
   const orderId = getOrderId();
   const formattedPayload = formatAddress(address);
   const payload = {

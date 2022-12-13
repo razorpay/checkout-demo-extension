@@ -63,6 +63,7 @@ const address = {
   SHIPPING_INFO_API_INITIATED: '1cc_shipping_info_api_call_initiated',
   SHIPPING_INFO_API_COMPLETED: '1cc_shipping_info_api_call_completed',
   THRIDWARTCH_API_INITIATED: '1cc_Thridwartch_API_Call_initiated',
+  THIRDWATCH_API_INITIATED: '1cc_Thirdwatch_API_Call_initiated',
   THRIDWARTCH_API_COMPLETED: '1cc_Thridwartch_API_Call_Completed',
   SAVED_SHIPPING_ADDRESS_LOADED: '1cc_saved_shipping_address_screen_loaded',
   SAVED_SHIPPING_ADDRESS_SELECTED: '1cc_saved_shipping_address_selected',
