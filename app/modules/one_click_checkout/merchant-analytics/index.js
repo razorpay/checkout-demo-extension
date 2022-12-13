@@ -55,7 +55,7 @@ export function merchantFBStandardAnalytics(data) {
 
 export function moengageAnalytics(data) {
   if (isOneClickCheckout() && isMoEngageAnalyticsEnabled()) {
-    global.Razorpay.sendMessage({
+    Razorpay.sendMessage({
       event: 'moengageevent',
       data,
     });
