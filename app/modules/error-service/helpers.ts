@@ -42,6 +42,7 @@ export const constructErrorObject = (
 
     case typeof error === 'object' && isNetworkError(error): {
       customError = {
+        ...customError,
         ...JSON.parse(JSON.stringify(error)),
         message: `[NETWORK ERROR] ${(error as Error).description}`,
       };
