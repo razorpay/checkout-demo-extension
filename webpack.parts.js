@@ -281,6 +281,9 @@ exports.defineConstants = (buildArgs) => ({
 /** @type {(buildArgs) => import('webpack').Configuration} */
 exports.devServer = (buildArgs) => ({
   devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     devMiddleware: {
       writeToDisk: true,
     },
