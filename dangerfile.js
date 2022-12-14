@@ -1,5 +1,9 @@
 // refer file: https://gist.github.com/kkemple/998aad9f2b25520c916b00891abb6543
-import { danger, fail, warn } from 'danger';
+import { danger, fail, warn, markdown } from 'danger';
+const {
+  checkoutTSCoverage,
+  oneCCTSCoverage,
+} = require('./scripts/ts-coverage-helper.js');
 
 const modifiedFiles = danger.git.modified_files;
 const newFiles = danger.git.created_files;
@@ -146,3 +150,15 @@ if (sessionJs) {
     `**${fileUrl}**: is modified !! do check if your logic can be de-coupled. 😇`
   );
 }
+
+const showTSCoverage = (project, coverage) => {
+  markdown(`
+**${project}**
+| Metric                            | Coverage                                                |
+| ---------------------------------- | --------------------------------------------------- |
+| Typescript Coverage          | ${coverage}               |
+`);
+};
+
+showTSCoverage('One Click Checkout', oneCCTSCoverage);
+showTSCoverage('Checkout', checkoutTSCoverage);
