@@ -71,4 +71,4 @@ export const labels = {
   DIPOSITOR_SIGN_LABEL: 'Signature of Depositor',
   AUTH_SIGN_LABEL: 'Authorised Signatory',
   BRANCH_LABEL: 'Branch Stamp',
-};
+} as const;

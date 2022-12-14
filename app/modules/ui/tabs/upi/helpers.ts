@@ -25,7 +25,9 @@ export const getSupportedBankForUPIRecurring = () => {
  * For recurring payments, filtering apps which support
  * autopay intents
  */
-export function filterUPIIntentAppsForAutopayIntent(intentApps) {
+export function filterUPIIntentAppsForAutopayIntent(
+  intentApps: UPI.AppConfiguration[]
+) {
   if (isEnableAllPSPExperimentEnabled()) {
     return intentApps;
   }

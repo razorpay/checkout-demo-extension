@@ -4,6 +4,6 @@ const otpEvents = {
   OTP_RESEND_CLICK: 'checkoutRzpOTPResendClicked',
   OTP_BACK_CLICK: 'checkoutRzpOTPBackClicked',
   OTP_SUBMIT_CLICK: 'checkoutRzpOTPSubmitted',
-};
+} as const;
 
 export default otpEvents;

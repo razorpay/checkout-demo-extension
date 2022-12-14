@@ -12,7 +12,7 @@ export const CHALLAN_FIELDS = {
   ORDER_ID: 'order_id',
   EXPIRY: 'expiry',
   DISCLAIMER: 'disclaimers',
-};
+} as const;
 export const labels = {
   HEADER: 'For RTGS/NEFT/Funds Transfer',
   HDFC_HEADER: 'For RTGS/NEFT/IMPS/Funds Transfer',
@@ -109,7 +109,7 @@ export const labels = {
   DIPOSITOR_SIGN_LABEL: 'Signature of Depositor',
   AUTH_SIGN_LABEL: 'Authorised Signatory',
   BRANCH_LABEL: 'Branch Stamp',
-};
+} as const;
 export const rzpLogo =
   'https://cdn.razorpay.com/static/assets/secured_by_razorpay.png';
 export const hdfcLogo = 'https://cdn.razorpay.com/bank/HDFC.gif';

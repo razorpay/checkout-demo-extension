@@ -1,4 +1,4 @@
-export const AVS_COUNTRIES = ['CA', 'GB', 'US'];
+export const AVS_COUNTRIES = ['CA', 'GB', 'US'] as const;
 
 export const Views = {
   SAVED_CARDS: 'saved-cards',
@@ -6,9 +6,9 @@ export const Views = {
   AVS: 'avs-card',
   CARD_APP: 'card-app',
   HOME_SCREEN: 'home-screen',
-};
+} as const;
 
-export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
+export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'] as const;
 
 export const cardWithRecurringSupport = {
   CIUB: { credit: true, debit: true },
@@ -28,14 +28,14 @@ export const cardWithRecurringSupport = {
   DCBL: { credit: true, debit: false },
   YESB: { credit: true, debit: false },
   // NIYO PAY Global Cards - end
-};
+} as const;
 export const cobrandingPartners = [
   'ONE_CARD',
   'SLICE',
   'RAZORPAYX',
   'JUPITER',
   'NIYO',
-];
+] as const;
 export const supportedNetworksAndProviders = {
   CIUB: {
     credit: [],
@@ -84,4 +84,4 @@ export const supportedNetworksAndProviders = {
     debit: [],
     super_cards: ['VISA'],
   },
-};
+} as const;
