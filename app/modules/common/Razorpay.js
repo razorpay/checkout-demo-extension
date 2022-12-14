@@ -1,6 +1,7 @@
 import Analytics, { Track } from 'analytics';
 import Eventer from 'eventer';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
+import RazorpayConfig from 'common/RazorpayConfig';
 import * as AnalyticsTypes from 'analytics-types';
 import { formatPayload } from 'payment/validator';
 import RazorpayStore, { getOption } from 'razorpay';
@@ -580,6 +581,6 @@ Razorpay.hasCheckoutFrameLoaded = function () {
 Razorpay.defaults = RazorpayDefaults;
 
 // Assign true to enable magic shopify flow. Also requires magic_shopify_key to be set
-Razorpay.enableLite = true;
+Razorpay.enableLite = Boolean(RazorpayConfig.magic_shopify_key);
 
 global.Razorpay = Razorpay;
