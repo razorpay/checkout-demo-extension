@@ -1,7 +1,6 @@
 import fetch from 'utils/fetch';
 import { Events } from 'analytics';
 import { timer } from 'utils/timer';
-import { getOrderId } from 'razorpay/helper/order';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
@@ -10,6 +9,7 @@ import { contact, email } from 'checkoutstore/screens/home';
 import { isEmailValid } from 'one_click_checkout/order/validators';
 import { getShopifyCheckoutPromise } from 'checkoutframe/1cc-shopify';
 import * as _ from 'utils/_';
+import { getLazyOrderId } from 'one_click_checkout/order/controller';
 
 let REF_ID_FOR_COUPONS;
 let CONTACT_FOR_COUPONS;
@@ -21,6 +21,7 @@ let SHOPIFY_COUPON_PROMISE;
  * @returns {Array} a list of coupons for the specific merchant.
  */
 export async function getCoupons() {
+  const orderId = await getLazyOrderId();
   const payload = getContactPayload();
 
   const shopifyCheckoutPromise = getShopifyCheckoutPromise();
@@ -29,7 +30,7 @@ export async function getCoupons() {
     payload.reference_id = await shopifyCheckoutPromise;
     payload.reference_type = 'shopify';
   } else {
-    payload.reference_id = getOrderId();
+    payload.reference_id = orderId;
     payload.reference_type = 'order';
   }
 
@@ -72,7 +73,9 @@ export async function getCoupons() {
  * Method to validate coupon entered by user against backend.
  * @param {string} code coupon code entered by the user
  */
-export function validateCoupon(code, source) {
+export async function validateCoupon(code, source) {
+  const orderId = await getLazyOrderId();
+
   const getDuration = timer();
   Events.TrackMetric(CouponEvents.COUPON_VALIDITY_START, {
     input_source: source,
@@ -92,7 +95,7 @@ export function validateCoupon(code, source) {
       url: makeAuthUrl('merchant/coupon/apply'),
       data: {
         ...payload,
-        order_id: getOrderId(),
+        order_id: orderId,
         code,
       },
       callback: (response) => {
@@ -118,7 +121,9 @@ export function validateCoupon(code, source) {
  * @param {string} code Coupon to be removed
  * @returns {Promise}
  */
-export function removeCoupon(code) {
+export async function removeCoupon(code) {
+  const orderId = await getLazyOrderId();
+
   const getDuration = timer();
   Events.TrackMetric(CouponEvents.COUPON_REMOVE_START);
 
@@ -126,7 +131,7 @@ export function removeCoupon(code) {
     fetch.post({
       url: makeAuthUrl('merchant/coupon/remove'),
       data: {
-        order_id: getOrderId(),
+        order_id: orderId,
         reference_id: code,
       },
       callback: (response) => {
