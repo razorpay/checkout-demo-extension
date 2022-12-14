@@ -13,6 +13,7 @@ export function updateV2FailureState(state: boolean) {
 
 export function autoGenerateQREnabled(): boolean {
   const isExperimentEnable = getPreferences('experiments.upi_qr_v2') as boolean;
+  const isRazorpayOrg = getPreferences('org.isOrgRazorpay');
   /** 
      * Most of the flows already handled in app/modules/upi/features.ts (initUpiQrV2)
      * const status =
@@ -26,5 +27,10 @@ export function autoGenerateQREnabled(): boolean {
     */
   // adding partial payment flow
   const isFlowEnabled = !isPartialPayment() && !getTPV() && !isRecurring();
-  return isExperimentEnable && isFlowEnabled && !anyV2APIAttemptFailed;
+  return (
+    isExperimentEnable &&
+    isFlowEnabled &&
+    !anyV2APIAttemptFailed &&
+    isRazorpayOrg
+  );
 }
