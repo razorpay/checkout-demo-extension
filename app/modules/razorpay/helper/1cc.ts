@@ -5,10 +5,8 @@
 import { isEmpty } from 'utils/object';
 import { getOption, getPreferences } from './base';
 import { getMerchantOrder } from './preferences';
-import type { LineItem } from 'one_click_checkout/cart/interface';
 
-export const hasCart = () =>
-  !isEmpty(getOption('cart')) && !isEmpty(getOption('shopify_cart'));
+export const hasCart = () => getOption('cart') && getOption('shopify_cart');
 
 // Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
 export const isOneClickCheckout = () =>
@@ -59,12 +57,10 @@ export const enabledOrderInstruction = () =>
   getPreferences('1cc.configs.one_cc_capture_order_instructions') || false;
 
 export const scriptCouponApplied = () => {
-  const cart = getOption('cart');
+  const cart = getOption('shopify_cart');
   if (cart) {
     // @TODO cart option is passed in case of optimized load time for shopify
-    return cart.line_items.some(
-      (item: LineItem) => item.offer_price !== item.price
-    );
+    return Boolean(cart.total_discount);
   }
   return getOption('script_coupon_applied');
 };

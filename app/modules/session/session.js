@@ -110,7 +110,6 @@ import {
   isOTPSupported,
   showTokenisationBenefitModal,
 } from 'card/helper/cards';
-import { getLineItemsTotal } from 'one_click_checkout/cart';
 import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
 import { moengageEventsData } from 'one_click_checkout/merchant-analytics/store';
 import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
@@ -6637,14 +6636,15 @@ Session.prototype = {
     preferences = prefs;
 
     if (RazorpayHelper.isOneClickCheckout()) {
+      const shopifyCartOption = RazorpayHelper.getOption('shopify_cart');
       if (preferences.order) {
-        if (ObjectUtils.isEmpty(RazorpayHelper.getOption('cart'))) {
+        if (!shopifyCartOption) {
           discreet.ChargesHelper.initializeAndReset(
             parseInt(preferences.order.line_items_total)
           );
         }
-      } else if (!ObjectUtils.isEmpty(RazorpayHelper.getOption('cart'))) {
-        discreet.ChargesHelper.initialize(getLineItemsTotal());
+      } else if (shopifyCartOption) {
+        discreet.ChargesHelper.initialize(shopifyCartOption.cart.total_price);
       }
     }
 

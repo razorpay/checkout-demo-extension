@@ -389,7 +389,7 @@ export const handleMessage = function (message) {
     clearShopifyCheckout();
 
     // Create shopify checkout_id when cart is passed instead.
-    if (!ObjectUtils.isEmpty(options.shopify_cart)) {
+    if (options.shopify_cart) {
       initShopifyCheckout({
         body: options.shopify_cart,
         key_id: options.key,
