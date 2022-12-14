@@ -65,7 +65,7 @@ import { RetryTracker } from 'misc/analytics/events';
 import { checkRedirectForFpx } from 'fpx/helper';
 import { FPX_INTEGRATION_ERROR_MSG } from 'fpx/constants';
 
-const RAZORPAY_COLOR = '#528FF0';
+const RAZORPAY_COLOR = '#005BF2';
 let pollingInterval;
 
 let createdPaymentsCount = 0;
@@ -1176,7 +1176,6 @@ razorpayProto.isTezAvailable = function (success, error) {
 
 razorpayProto.postInit = function () {
   let themeColor = this.get('theme.color') || RAZORPAY_COLOR;
-
   this.themeMeta = {
     color: themeColor,
     textColor: Color.isDark(themeColor) ? '#FFFFFF' : 'rgba(0, 0, 0, 0.85)',

@@ -2,7 +2,7 @@ import { getSession } from 'sessionmanager';
 import { views } from 'one_click_checkout/routing/constants';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { OTP_TEMPLATES } from 'otp/constants';
-import type { History } from 'types';
+import type { History } from 'types/types';
 
 export function getDefaultOtpTemplate() {
   let template = (screensHistory as History).config[views.OTP].props

@@ -10,7 +10,6 @@ import { isOneClickCheckout, isPayout, isRedesignV15 } from 'razorpay';
 import { backPressed, controlledViaSession, isStackPopulated } from 'navstack';
 import { querySelector } from 'utils/doc';
 import * as ObjectUtils from 'utils/object';
-import { showTopbar } from 'topbar';
 import { showHeader } from 'header';
 
 let componentsMap = {};
@@ -29,25 +28,26 @@ export function render() {
   const session = getSession();
   session.topBar = topbar;
 
+  const onBack = () => {
+    // If navstack is in control use the navstack functions for back press event
+    if (isStackPopulated() && !controlledViaSession()) {
+      backPressed();
+    } else {
+      session.back();
+    }
+  };
+
   if (isOneClickCheckout()) {
     show1CCHeader();
     show1CCTopbar();
   } else if (isRedesignV15()) {
-    showHeader();
-    showTopbar();
+    showHeader(onBack);
   }
 
   if (isPayout()) {
     componentsMap.payoutsView = createPayoutsView({ topbar });
   } else {
-    topbar.$on('back', () => {
-      // If navstack is in control use the navstack functions for back press event
-      if (isStackPopulated() && !controlledViaSession()) {
-        backPressed();
-      } else {
-        session.back();
-      }
-    });
+    topbar.$on('back', onBack);
   }
 }
 

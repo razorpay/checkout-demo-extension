@@ -1,24 +1,31 @@
 import Header from 'header/ui/Header.svelte';
 import { setHeaderBack } from './sessionInterface';
-import { expandedHeader } from './store';
 
-let header;
+let header: Header | undefined;
 
 /**
  * Creates a Header
  */
 function create() {
-  header = new Header({
-    target: document.querySelector('#header-redesign-v15-wrap'),
-  });
+  const headerElement = document.querySelector(
+    '#header-redesign-v15-wrap'
+  ) as Element;
+  if (headerElement) {
+    header = new Header({
+      target: headerElement,
+    });
+  }
 }
 
-export function showHeader() {
+export function showHeader(onBack: () => void) {
   if (header) {
     header?.$destroy?.();
-    header = null;
+    header = undefined;
   }
   create();
+  if (header) {
+    (header as Header).$on('goback', onBack);
+  }
   setHeaderBack(header);
 }
 
@@ -30,11 +37,5 @@ export function destroyHeader() {
     return;
   }
   header.$destroy();
-  header = null;
+  header = undefined;
 }
-
-export function toggleHeaderExpansion(expanded) {
-  expandedHeader.set(expanded);
-}
-
-export { expandedHeader };

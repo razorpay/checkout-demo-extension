@@ -1,3 +1,4 @@
+import { themeStore } from 'checkoutstore/theme';
 import Header from 'one_click_checkout/header/Header.svelte';
 import { render } from '@testing-library/svelte';
 import { activeRoute } from 'one_click_checkout/routing/store';
@@ -7,9 +8,15 @@ import { views } from 'one_click_checkout/routing/constants';
 jest.mock('razorpay', () => ({
   ...jest.requireActual('razorpay'),
   getMerchantName: jest.fn(() => 'Name'),
+  isOneClickCheckout: jest.fn(() => true),
 }));
 
 describe('1CC header', () => {
+  beforeEach(async () => {
+    themeStore.set({
+      textColor: '#FFFFFF',
+    });
+  });
   it('Should be expanded on L0 screen', () => {
     activeRoute.set({ name: views.COUPONS });
     const { getByText } = render(Header);

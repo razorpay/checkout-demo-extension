@@ -196,14 +196,11 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getAllWebPaymentApps } from 'common/webPaymentsApi';
   import { definePlatform } from 'upi/helper';
-  import { toggleHeaderExpansion } from 'header';
-  import { isRTBEnabled } from 'rtb/helper';
-  import { RTBExperiment } from 'rtb/store';
   import { validatePrefilledDetails } from 'one_click_checkout/helper';
   import { setNoCostAvailable } from 'emiV2/store';
   import { showGCErrMsg } from 'one_click_checkout/gift_card/helpers';
   import { isValidContact } from 'helper/validation';
-  import { showBackArrow } from 'topbar/store';
+  import { showBackArrow } from 'header/store';
   import {
     p13nInstrumentShown,
     triggerInstAnalytics,
@@ -1099,16 +1096,6 @@
         ? canGoBack() && initialView !== HOME_VIEWS.METHODS
         : true;
     showBackArrow.set(showTopbarBackArrow);
-    if (
-      isRedesignV15() &&
-      !isOneClickCheckout() &&
-      isRTBEnabled($RTBExperiment)
-    ) {
-      // only in case of rtb we expand or shrink header
-      let expandedHeader =
-        $screenStore === '' ? showHome || view === HOME_VIEWS.DETAILS : false;
-      toggleHeaderExpansion(expandedHeader);
-    }
   }
 
   export function getCurrentView() {

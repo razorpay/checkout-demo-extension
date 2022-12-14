@@ -1,9 +1,9 @@
 const initCustomCheckout = require('blackbox/tests/custom/init.js');
 
 const DEFAULT_THEME_META = {
-  color: '#528FF0',
+  color: '#005BF2',
   textColor: '#FFFFFF',
-  highlightColor: 'rgba(57, 100, 168, 1)',
+  highlightColor: 'rgba(0, 73, 194, 1)',
 };
 
 const verifyThemeMeta = (themeMeta, themeCompareMeta = DEFAULT_THEME_META) => {
@@ -42,7 +42,7 @@ describe('postInit - Custom Checkout UT', () => {
     expect(
       verifyThemeMeta(meta, {
         color: '#000000',
-        highlightColor: '#528FF0',
+        highlightColor: '#005BF2',
         textColor: '#FFFFFF',
       })
     ).toBeTruthy();

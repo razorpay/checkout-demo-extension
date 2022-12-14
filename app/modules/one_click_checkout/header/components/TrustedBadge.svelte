@@ -17,7 +17,7 @@
   import info from 'ui/icons/payment-methods/info';
 
   // Props Import
-  export let expanded;
+  export let expanded = false;
   export let sendAnalytics = true;
 
   // Analytics imports
@@ -28,8 +28,9 @@
   import rtbEvents from 'one_click_checkout/header/analytics';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import RtbIcon from 'rtb/ui/component/RTBIcon.svelte';
-  import { constantCSSVars } from 'common/constants';
-  const iconColor = constantCSSVars['primary-text-color'];
+  import { themeStore } from 'checkoutstore/theme';
+
+  const iconColor = $themeStore.textColor;
 
   $: trustedBadgeHighlights = isRTBEnabled($RTBExperiment);
   onMount(() => {
@@ -52,7 +53,7 @@
   {#if expanded}
     <div class="rtb-expanded-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
-        <RtbIcon height={20} width={20} />
+        <RtbIcon height={16} width={16} />
       </div>
       <div class="rtb-text">{$t(RTB_HEADER)}</div>
       <Icon icon={info(iconColor)} />
@@ -60,10 +61,10 @@
   {:else}
     <div class="rtb-collapsed-wrapper" on:click={handleRTBClick}>
       <div class="rtb-icon-wrapper">
-        <RtbIcon height={20} width={20} />
+        <RtbIcon height={16} width={16} />
       </div>
       <div class="rtb-down-arrow-wrapper">
-        <Icon icon={arrow_down(14, 14, iconColor)} />
+        <Icon icon={arrow_down('14', '14', iconColor)} />
       </div>
     </div>
   {/if}
@@ -71,18 +72,22 @@
 
 <style lang="scss">
   .rtb-icon-wrapper {
-    height: 20px;
+    height: 16px;
   }
 
   /* Styles for expended RTB */
   .rtb-expanded-wrapper {
     background: #e7f7f1;
-    border-radius: 4px;
-    padding: 4px;
+    padding: 2px 4px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 1px;
     display: flex;
     align-items: center;
+  }
+
+  .rtb-expanded-wrapper :global(svg) {
+    height: 8px;
+    width: 8px;
   }
 
   .rtb-text {

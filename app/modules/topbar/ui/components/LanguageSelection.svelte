@@ -10,53 +10,93 @@
   // Other Imports
   import { showAccountModal } from 'account_modal';
   import { ACCOUNT_VARIANT } from 'account_modal/constants';
+  import { themeStore } from 'checkoutstore/theme';
+  import { isOneClickCheckout } from 'razorpay';
+  import LanguageIcon from './languageIcon';
   import { isMerchantCountry } from 'checkoutstore/methods';
 
-  export let color: string;
+  export let color: string = $themeStore.textColor;
+
+  const isOneCC = isOneClickCheckout();
+  const isMYMerchant = isMerchantCountry('MY');
 
   function handleAccountModal() {
     /**
      * Don't show language modal for MY merchants as we only support ENG for now.
      * Should be removed once regional lang supports are added.
      */
-    if (isMerchantCountry('MY')) {
+    if (isMYMerchant) {
       return;
     }
     showAccountModal({
       variant: ACCOUNT_VARIANT.LANGUAGE_ONLY,
     });
   }
+  const languageIcon =
+    color?.toUpperCase() !== '#FFFFFF'
+      ? LanguageIcon.black
+      : LanguageIcon.white;
+  $: selectedLocale = $locale as string;
 </script>
 
 <div
   data-test-id="vernacular-cta"
   class="wrapper"
+  class:is-one-cc={isOneCC}
   on:click|stopPropagation={handleAccountModal}
 >
-  <span data-test-id="vernacular-text" class="selected-language"
-    >{getLocaleName($locale)}</span
-  >
-  {#if !isMerchantCountry('MY')}
-    <Icon icon={arrow_down('14', '14', color)} />
+  <span data-test-id="vernacular-text" class="selected-language">
+    {#if isOneCC || isMYMerchant}
+      {getLocaleName(selectedLocale)}
+    {:else}
+      <Icon icon={languageIcon} />
+    {/if}
+  </span>
+  {#if !isMYMerchant}
+    <span class="down-icon">
+      <Icon icon={arrow_down('13', '13', color, '0 0 16 16')} />
+    </span>
   {/if}
 </div>
 
 <style>
   .wrapper {
-    margin: auto 0px;
     cursor: pointer;
     display: flex;
     align-items: center;
+
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 0;
+    padding: 3px;
+  }
+
+  .wrapper.is-one-cc {
+    background: transparent;
+    padding: 0;
+    margin: 0 0 auto;
   }
   .selected-language {
     margin-right: 2px;
     font-size: var(--font-size-small);
     font-weight: var(--font-weight-semibold);
+    display: inline-flex;
   }
-  :global(.one-click-checkout) .selected-language {
+  .is-one-cc .selected-language {
     color: var(--text-color);
   }
   .wrapper :global(svg) {
+    margin-top: -1px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .wrapper .down-icon {
     margin-top: -2px;
+    height: 15px;
+    :global(svg) {
+      height: 10px;
+      width: 10px;
+    }
   }
 </style>

@@ -27,7 +27,6 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
-  import { expandedHeader } from 'header';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
@@ -45,14 +44,6 @@
   export let escape = true;
 
   $: offerClasses = $computeOfferClass;
-
-  let headerExpanded = $expandedHeader;
-
-  $: {
-    setTimeout(() => {
-      headerExpanded = $expandedHeader;
-    });
-  }
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
@@ -162,7 +153,7 @@
         class:has-fee={offerClasses.hasFee}
         class:has-discount={offerClasses.hasDiscount}
         class:one-cc={isRedesignV15Enabled}
-        class:header-expanded={isOneCC ? $headerVisible : headerExpanded}
+        class:header-expanded={isOneCC ? $headerVisible : true}
       >
         {#if isRedesignV15Enabled}
           <div id="redesign-header" class:offers-fade={$offerFade}>
