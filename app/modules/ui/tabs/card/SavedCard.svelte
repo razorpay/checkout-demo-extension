@@ -127,10 +127,8 @@
     const payload = { cvv: cvvValue };
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then((_) => {
-      if (cvvInput) {
-        if (!avoidFocus) {
-          cvvInput.focus();
-        }
+      if (typeof cvvInput?.focus === 'function' && !avoidFocus) {
+        cvvInput.focus();
       }
     });
 
