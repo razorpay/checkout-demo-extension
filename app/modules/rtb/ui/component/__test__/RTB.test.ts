@@ -11,13 +11,6 @@ jest.mock('razorpay', () => ({
   getPreferences: jest.fn(),
 }));
 
-// Disabling exp for test cases temporarily till we completely move to the new feature
-jest.mock('rtb/experiments', () => ({
-  showRTBBottomSheet: {
-    enabled: jest.fn(() => true),
-  },
-}));
-
 jest.mock('navstack', () => ({
   pushOverlay: jest.fn(),
 }));
