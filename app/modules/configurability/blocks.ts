@@ -4,23 +4,25 @@ import {
 } from './instruments';
 import { getUniqueValues } from 'utils/array';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
+import type { Config, Block, Instruments } from 'configurability/types';
+import type { ErrorParam, Tags } from 'error-service/types';
 
 /**
  *
  * @param {Object} obj
  * @returns object with sorted ordered members and (if: member values arrays with unique values)
  */
-function sortAndUniqObj(obj) {
-  return Object.keys(obj)
+function sortAndUniqObj(obj: Instruments) {
+  return (Object.keys(obj) as Array<keyof Instruments>)
     .sort()
-    .reduce(function (result, key) {
+    .reduce(function (result: Instruments, key) {
       let value = obj[key];
       if (Array.isArray(value)) {
         value = getUniqueValues(value);
       }
       result[key] = value;
       return result;
-    }, {});
+    }, {} as Instruments);
 }
 
 /**
@@ -28,7 +30,7 @@ function sortAndUniqObj(obj) {
  * @param {Instruments} instruments
  * @returns unique instruments
  */
-function removeDuplicateInstruments(instruments) {
+function removeDuplicateInstruments(instruments: Instruments[]) {
   return getUniqueValues(instruments, sortAndUniqObj);
 }
 
@@ -41,18 +43,19 @@ function removeDuplicateInstruments(instruments) {
  *
  * @returns {Object}
  */
-function _createBlock(code, config = {}, validate = false) {
-  const block = {
+function _createBlock(code: string, config: Config = {}, validate = false) {
+  const block: Block = {
     code,
     _type: 'block',
   };
 
   try {
-    let { instruments, name } = config;
+    let { instruments } = config;
+    const { name } = config;
 
     if (instruments) {
       instruments = removeDuplicateInstruments(instruments);
-      block.instruments = instruments
+      block.instruments = (instruments as Instruments[])
         .map(validate ? validateKeysAndCreateInstrument : createInstrument)
         .filter(Boolean);
     }
@@ -63,12 +66,15 @@ function _createBlock(code, config = {}, validate = false) {
 
     return block;
   } catch (error) {
-    captureError(error, {
-      severity: SEVERITY_LEVELS.S2,
-      analytics: {
-        data: { type: 'invalid_config' },
-      },
-    });
+    captureError(
+      error as ErrorParam,
+      {
+        severity: SEVERITY_LEVELS.S2,
+        analytics: {
+          data: { type: 'invalid_config' },
+        },
+      } as Tags
+    );
   }
 }
 
@@ -80,7 +86,7 @@ function _createBlock(code, config = {}, validate = false) {
  *
  * @returns {Object}
  */
-export function createBlock(code, config) {
+export function createBlock(code: string, config: Config) {
   return _createBlock(code, config, false);
 }
 
@@ -93,6 +99,6 @@ export function createBlock(code, config) {
  *
  * @returns {Object}
  */
-export function validateAndCreateBlock(code, config) {
+export function validateAndCreateBlock(code: string, config: Config) {
   return _createBlock(code, config, true);
 }

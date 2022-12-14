@@ -2,6 +2,13 @@ import InstrumentsConfig, {
   genericGroupedToIndividual,
 } from './instruments-config';
 import * as ObjectUtils from 'utils/object';
+import type {
+  Block,
+  Instruments,
+  Ungrouped,
+  InstrumentsConfigMethod,
+} from 'configurability/types';
+import type { Customer } from 'emiV2/types/tokens';
 
 /**
  * Returns individual instruments from an instrument that might contain a group.
@@ -10,9 +17,12 @@ import * as ObjectUtils from 'utils/object';
  *
  * @returns {Array<Instrument>}
  */
-export function getIndividualInstruments(instrument, customer) {
+export function getIndividualInstruments(
+  instrument: Instruments,
+  customer: Customer
+) {
   const method = instrument.method;
-  const config = InstrumentsConfig[method];
+  const config = InstrumentsConfig[method as InstrumentsConfigMethod];
 
   let individuals = config.groupedToIndividual(instrument, customer);
 
@@ -21,7 +31,7 @@ export function getIndividualInstruments(instrument, customer) {
    * However, if they fail to ungroup, we will pass them through the generic function.
    */
   if (individuals.length === 0) {
-    individuals = genericGroupedToIndividual(instrument, customer);
+    individuals = genericGroupedToIndividual(instrument);
   }
 
   return Object.assign(
@@ -39,9 +49,9 @@ export function getIndividualInstruments(instrument, customer) {
  *
  * @returns {Block}
  */
-export function ungroupInstruments(block, customer) {
-  const instruments = block.instruments;
-  let ungrouped = [];
+export function ungroupInstruments(block: Block, customer: Customer) {
+  const instruments = block.instruments as Instruments[];
+  const ungrouped: Ungrouped[] = [];
 
   instruments.forEach((instrument) => {
     const individuals = getIndividualInstruments(instrument, customer);
