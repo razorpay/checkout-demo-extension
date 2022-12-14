@@ -2,7 +2,18 @@ export type CustomObject<T> = {
   [key: string]: T;
 };
 export type EmptyObject = CustomObject<never>;
-export type Razorpay = any;
+// TODO improve
+export type Razorpay = {
+  [x: string]: any;
+  get: (key?: string) => any;
+  metadata: Record<string, string | boolean | number>;
+  set: (key: string, value: any) => void;
+  _evts: {
+    [eventName: string]: (data: any) => void;
+  };
+  modal: Record<string, any>;
+  enableLite?: boolean;
+};
 export type DownTimeSeverity = 'high' | 'low' | boolean;
 export type BaseFunction = (...args: any) => any;
 export type Method =

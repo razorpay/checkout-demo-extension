@@ -186,7 +186,7 @@ setInterval(() => {
  * @param {Object} data
  * @param {Boolean} immediately Whether to send this event immediately.
  */
-export default function Track(r, event, data, immediately) {
+export default function Track(r, event, data, immediately = false) {
   if (!r) {
     PENDING_EVT_Q.push([event, data, immediately]);
     return;

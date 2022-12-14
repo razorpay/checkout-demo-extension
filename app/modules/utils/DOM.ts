@@ -10,7 +10,7 @@ export const ElementConstructor = global.Element;
  *
  * @returns {Element}
  */
-export const create = (tagName: string) =>
+export const create = (tagName = 'div') =>
   document.createElement(tagName || 'div');
 
 /**
@@ -371,15 +371,15 @@ export const matches = _.curry2(
 export const on = (
   event: string,
   callback: (e: unknown) => void,
-  delegate: string | boolean,
-  useCapture: boolean
+  delegate: string | boolean = false,
+  useCapture = false
 ) => {
   if (_.is(event, ElementConstructor)) {
     return console.error(
       "use _El.til.on(e, cb)(el) [import * as _El from 'utils/DOM';]"
     );
   }
-  return (el: Element) => {
+  return (el: Element | Window) => {
     let attachedCallback = callback;
     if (_.isString(delegate)) {
       attachedCallback = function (e: any) {
@@ -393,7 +393,7 @@ export const on = (
         }
       };
     } else {
-      useCapture = delegate as boolean;
+      useCapture = delegate;
     }
 
     // cast to boolean

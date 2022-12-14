@@ -13,11 +13,13 @@ import * as _ from 'utils/_';
 import Interface from 'common/interface';
 import { MiscTracker } from 'misc/analytics/events';
 import { getOption } from 'razorpay';
+import type { Razorpay as RazorpayType } from 'types/types';
+import type { OptionObject } from 'razorpay/types/Options';
 // import { setupFreezeCheck } from './freeze';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
-let body;
+let body: HTMLElement;
 function setBody() {
   body = document.body || document.getElementsByTagName('body')[0];
   if (!body) {
@@ -26,8 +28,8 @@ function setBody() {
 }
 setBody();
 
-function needBody(func) {
-  return function bodyInsurance() {
+function needBody(func: () => void) {
+  return function bodyInsurance(this: RazorpayType) {
     if (!body) {
       setTimeout(bodyInsurance.bind(this), 99);
       return this;
@@ -39,7 +41,7 @@ function needBody(func) {
 const currentScript =
   document.currentScript ||
   (function () {
-    let scripts = querySelectorAll('script');
+    const scripts = querySelectorAll('script');
     return scripts[scripts.length - 1];
   })();
 
@@ -49,15 +51,15 @@ const currentScript =
   @param  {[type]} data [description]
   @return {[type]}    [description]
 */
-function defaultAutoPostHandler(data) {
-  const form = _El.parent(currentScript);
+function defaultAutoPostHandler(data: Record<string, any>) {
+  const form = _El.parent(currentScript) as HTMLFormElement;
   appendFormInput({ form, data: flatten(data) });
   form['onsubmit'] = returnAsIs;
   form.submit();
 }
 
-let addAutoCheckoutButton = function (rzp) {
-  const parent = _El.parent(currentScript);
+const addAutoCheckoutButton = function (rzp: RazorpayType) {
+  const parent = _El.parent(currentScript) as HTMLFormElement;
   const appendNode = _El.append(
     parent,
     Object.assign(_El.create('input'), {
@@ -65,12 +67,12 @@ let addAutoCheckoutButton = function (rzp) {
       value: rzp.get('buttontext'),
       className: 'razorpay-payment-button',
     })
-  );
-  appendNode['onsubmit'] = function (e) {
+  ) as HTMLFormElement;
+  appendNode['onsubmit'] = function (e: Event) {
     e.preventDefault();
-    let form = this;
-    let { action, method, target } = form;
-    let options = rzp.get();
+    const form = this as HTMLFormElement;
+    const { action, method, target } = form;
+    const options = rzp.get();
     // if data-callback_url is not passed
     if (
       // string check, because there may be an input element named "action"
@@ -78,7 +80,7 @@ let addAutoCheckoutButton = function (rzp) {
       action &&
       !options.callback_url
     ) {
-      let request = {
+      const request = {
         url: action,
         content: form2obj(form),
         method: _.isString(method) ? method : 'get',
@@ -86,7 +88,7 @@ let addAutoCheckoutButton = function (rzp) {
       };
 
       try {
-        let data = btoa(
+        const data = btoa(
           JSON.stringify({
             request,
             options: JSON.stringify(options),
@@ -110,7 +112,7 @@ let addAutoCheckoutButton = function (rzp) {
  * If yes, it puts in the button
  */
 function initAutomaticCheckout() {
-  let opts = {};
+  const opts: Record<string, any> = {};
   ObjectUtils.loop(currentScript.attributes, function (attr) {
     let name = attr.name.toLowerCase();
     if (/^data-/.test(name)) {
@@ -133,23 +135,23 @@ function initAutomaticCheckout() {
     }
   });
 
-  let key = opts.key;
+  const key = opts.key;
   if (key && key.length > 0) {
     // passing form action as callback_url
     // var form = _El.parent(currentScript);
     opts.handler = defaultAutoPostHandler;
-    let rzp = Razorpay(opts);
+    const rzp = Razorpay(opts);
     if (!opts.parent) {
-      Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp);
-      addAutoCheckoutButton(rzp);
+      Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp as any);
+      addAutoCheckoutButton(rzp as unknown as RazorpayType);
     }
   }
 }
 
-let frameContainer;
+let frameContainer: HTMLDivElement;
 function createFrameContainer() {
   if (!frameContainer) {
-    const frameContainerElement = _El.create();
+    const frameContainerElement = _El.create() as HTMLDivElement;
     frameContainerElement.className = 'razorpay-container';
     _El.setContents(
       frameContainerElement,
@@ -167,19 +169,25 @@ function createFrameContainer() {
       '-webkit-backface-visibility': 'hidden',
       'overflow-y': 'visible',
     });
-    frameContainer = _El.appendTo(frameContainerElement, body);
-    CheckoutFrame.container = frameContainer;
-    let frameBackdrop = createFrameBackdrop(frameContainer);
-    CheckoutFrame.backdrop = frameBackdrop;
-    let testRibbon = createTestRibbon(frameBackdrop);
-    CheckoutFrame.ribbon = testRibbon;
+    frameContainer = _El.appendTo(
+      frameContainerElement,
+      body
+    ) as HTMLDivElement;
+    // TODO update checkout frame type
+    (CheckoutFrame as any).container = frameContainer;
+    const frameBackdrop = createFrameBackdrop(frameContainer);
+    // TODO update checkout frame type
+    (CheckoutFrame as any).backdrop = frameBackdrop;
+    const testRibbon = createTestRibbon(frameBackdrop);
+    // TODO update checkout frame type
+    (CheckoutFrame as any).ribbon = testRibbon;
   }
 
   return frameContainer;
 }
 
-function createFrameBackdrop(container) {
-  const backDropDiv = _El.create();
+function createFrameBackdrop(container: HTMLDivElement) {
+  const backDropDiv = _El.create() as HTMLDivElement;
   backDropDiv.className = 'razorpay-backdrop';
   const backdropStyle = {
     'min-height': '100%',
@@ -191,13 +199,13 @@ function createFrameBackdrop(container) {
     height: '100%',
   };
   _El.setStyles(backDropDiv, backdropStyle);
-  return _El.appendTo(backDropDiv, container);
+  return _El.appendTo(backDropDiv, container) as HTMLDivElement;
 }
 
-function createTestRibbon(parent) {
+function createTestRibbon(parent: HTMLDivElement) {
   const rotateRule = 'rotate(45deg)';
   const animRule = 'opacity 0.3s ease-in';
-  const ribbonElement = _El.create('span');
+  const ribbonElement = _El.create('span') as HTMLSpanElement;
   ribbonElement.textContent = 'Test Mode';
   _El.setStyles(ribbonElement, {
     'text-decoration': 'none',
@@ -221,10 +229,10 @@ function createTestRibbon(parent) {
     right: '-50px',
     top: '50px',
   });
-  return _El.appendTo(ribbonElement, parent);
+  return _El.appendTo(ribbonElement, parent) as HTMLSpanElement;
 }
 
-let preloadedFrame;
+let preloadedFrame: CheckoutFrame;
 let isBrave = false;
 const affordabilityWidgetFid = getAffordabilityWidgetFingerprint();
 /**
@@ -235,22 +243,25 @@ const affordabilityWidgetFid = getAffordabilityWidgetFingerprint();
 isBraveBrowser().then((r) => {
   isBrave = r;
 });
-function getPreloadedFrame(rzp) {
+function getPreloadedFrame(rzp?: RazorpayType) {
   if (preloadedFrame) {
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
-    Interface.iframeReference = preloadedFrame.el;
+    // TODO update type of preloadedFrame
+    Interface.iframeReference = (preloadedFrame as any).el;
     Interface.setId(Track.id);
-    _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame))(global);
-    _El.append(frameContainer, preloadedFrame.el);
+    const cb = preloadedFrame.onmessage.bind(preloadedFrame);
+    _El.on('message', cb)?.(global);
+    _El.append(frameContainer, (preloadedFrame as any).el);
   }
 
   return preloadedFrame;
 }
 
-Razorpay.open = function (options) {
-  return Razorpay(options).open();
+// TODO update type
+(Razorpay as any).open = function (options: OptionObject) {
+  return (Razorpay(options) as any).open();
 };
 
 RazorProto.postInit = function () {
@@ -261,9 +272,9 @@ RazorProto.postInit = function () {
   }
 };
 
-let onNew = RazorProto.onNew;
+const onNew = RazorProto.onNew;
 
-RazorProto.onNew = function (event, callback) {
+RazorProto.onNew = function (event: string, callback: (data: unknown) => void) {
   if (event === 'payment.error') {
     Track(this, 'event_paymenterror', location.href);
   }
@@ -277,7 +288,7 @@ RazorProto.initAndPrefetchPrefs = function () {
   return this;
 };
 
-RazorProto.createCheckoutAndFetchPrefs = function (reqbody) {
+RazorProto.createCheckoutAndFetchPrefs = function (reqbody: unknown) {
   // for 1cc shopify
   if (!preloadedFrame) {
     // this event is used to determine whether to trigger standard open flow
@@ -287,7 +298,7 @@ RazorProto.createCheckoutAndFetchPrefs = function (reqbody) {
   preloadedFrame.makeCheckoutCallForShopify(this, reqbody);
 };
 
-RazorProto.open = needBody(function () {
+RazorProto.open = needBody(function (this: RazorpayType) {
   if (!this.metadata) {
     this.metadata = {
       isBrave,
@@ -298,7 +309,7 @@ RazorProto.open = needBody(function () {
   }
   this.metadata.openedAt = Date.now();
 
-  let frame = (this.checkoutFrame = getPreloadedFrame(this));
+  const frame = (this.checkoutFrame = getPreloadedFrame(this));
   Track(this, 'open', { meta: { is_mobile: isMobile() } });
   try {
     MiscTracker.INVOKED({
@@ -312,7 +323,8 @@ RazorProto.open = needBody(function () {
 
   // setupFreezeCheck();
 
-  if (!frame.el.contentWindow) {
+  // TODO update type
+  if (!(frame as any).el.contentWindow) {
     frame.close();
     frame.afterClose();
     global.alert(
@@ -320,7 +332,7 @@ RazorProto.open = needBody(function () {
     );
   }
 
-  if (currentScript.src.slice(-7) === '-new.js') {
+  if ((currentScript as HTMLScriptElement).src.slice(-7) === '-new.js') {
     Track(this, 'oldscript', location.href);
   }
 
@@ -332,7 +344,7 @@ RazorProto.open = needBody(function () {
  * Invokes `payment.resume` on the frame.
  * @param {Object} data
  */
-RazorProto.resume = function (data) {
+RazorProto.resume = function (data: Record<string, any>) {
   const frame = this.checkoutFrame;
 
   if (frame) {
@@ -344,13 +356,13 @@ RazorProto.resume = function (data) {
 };
 
 RazorProto.close = function () {
-  let frame = this.checkoutFrame;
+  const frame = this.checkoutFrame;
   if (frame) {
     frame.postMessage({ event: 'close' });
   }
 };
 
-let initRazorpayCheckout = needBody(function () {
+const initRazorpayCheckout = needBody(function () {
   createFrameContainer();
 
   if (window.Intl) {
