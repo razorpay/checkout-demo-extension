@@ -19,7 +19,7 @@ import { getSession } from 'sessionmanager';
 export let SHOPIFY_ORDER_PROMISE;
 let hash = null;
 
-export function updateOrderWithCustomerDetails(
+export async function updateOrderWithCustomerDetails(
   payload = getDefaultCustomerDetails()
 ) {
   if (!Object.keys(payload).length) {
@@ -41,6 +41,7 @@ export function updateOrderWithCustomerDetails(
   if (newHash !== hash) {
     hash = newHash;
 
+    await getLazyOrderId();
     Service.updateOrder(payload);
   }
 }
