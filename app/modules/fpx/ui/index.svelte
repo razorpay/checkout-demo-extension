@@ -33,7 +33,6 @@
   import {
     BANK_TYPES,
     computeBankData,
-    computeTranslatedBanks,
     handleEnterOnBanking,
     isCorporateCode,
   } from 'common/bank';
@@ -47,6 +46,7 @@
 
   // Analytics
   import FPX_EVENTS from 'fpx/analytics/events';
+  import { computeTranslatedBanks } from 'helper/bank';
 
   /* --- props --- */
   export let banks: Banks = getMerchantMethods().fpx;

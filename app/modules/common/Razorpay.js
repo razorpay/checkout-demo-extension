@@ -14,7 +14,6 @@ import {
   formatAmountWithSymbol,
 } from 'common/currency';
 import { getAgentPayload } from 'common/useragentPayload';
-import { checkCREDEligibility } from 'checkoutframe/cred';
 import { backendEntityIds, makeUrl } from './helper';
 import * as ObjectUtils from 'utils/object';
 import { BUILD_NUMBER } from './constants';
@@ -290,14 +289,18 @@ RazorProto.isLiveMode = function () {
 };
 
 RazorProto.getMode = function () {
-  let preferences = this.preferences;
-  if (!this.get('key') && !preferences) {
+  try {
+    let preferences = this.preferences;
+    if (!this.get('key') && !preferences) {
+      return 'pending';
+    }
+    return (!preferences && /^rzp_l/.test(this.get('key'))) ||
+      (preferences && preferences.mode === 'live')
+      ? 'live'
+      : 'test';
+  } catch (e) {
     return 'pending';
   }
-  return (!preferences && /^rzp_l/.test(this.get('key'))) ||
-    (preferences && preferences.mode === 'live')
-    ? 'live'
-    : 'test';
 };
 
 /**
@@ -359,16 +362,6 @@ RazorProto.fetchVirtualAccount = function ({ customer_id, order_id, notes }) {
     });
   });
 };
-
-/**
- * This is a helper API to check the user eligibility for CRED.
- * Since its a utility and doesn't have control over when it is being called,(contact change/ before payment API)
- * it's in hands of consumer ( merchant ) on when to call this.
- * Ideally it should be called before payment API call
- * @param {string} contact contact with country code
- * @returns {Promise} returns a promise with JSON
- */
-RazorProto.checkCREDEligibility = checkCREDEligibility;
 
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {

@@ -160,7 +160,6 @@
     getInternationalProviderName,
     updateInternationalProviders,
     isDCCEnabledForProvider,
-    isCustomerWithIntlPhone,
   } from 'common/international';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
@@ -206,6 +205,7 @@
     triggerInstAnalytics,
   } from 'home/analytics/helpers';
   import { P13NTracker } from 'misc/analytics/events';
+  import { isCustomerWithIntlPhone } from 'helper/international';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());

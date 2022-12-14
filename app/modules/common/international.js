@@ -1,12 +1,5 @@
-import { get } from 'svelte/store';
-
 import { getMerchantMethods } from 'razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
-import {
-  contact as customerContact,
-  getCustomerCountryISOCode,
-} from 'checkoutstore/screens/home';
-import { INDIA_COUNTRY_ISO_CODE } from 'common/constants';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -119,16 +112,4 @@ export const isMerchantInternationalMethodEnabled = () => {
 export const isMerchantInternationalAppEnabled = (app) => {
   const merchantApps = getMerchantMethods()?.app || {};
   return !!merchantApps[app];
-};
-
-export const isCustomerWithIntlPhone = (countryCode) => {
-  return countryCode && countryCode !== INDIA_COUNTRY_ISO_CODE;
-};
-
-export const getCustomerContactNumber = (contact) => {
-  return contact || get(customerContact);
-};
-
-export const isInternationalCustomer = () => {
-  return isCustomerWithIntlPhone(getCustomerCountryISOCode());
 };

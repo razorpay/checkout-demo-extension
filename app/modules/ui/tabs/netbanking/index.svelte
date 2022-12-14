@@ -45,9 +45,9 @@
   import Analytics, { Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
+  import { computeTranslatedBanks } from 'helper/bank';
   import {
     computeBankData,
-    computeTranslatedBanks,
     getPreferredBanks,
     handleEnterOnBanking,
   } from 'common/bank';

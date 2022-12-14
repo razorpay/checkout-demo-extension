@@ -1,0 +1,1 @@
+## Helper function used by Checkout Frame only

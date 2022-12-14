@@ -17,13 +17,13 @@ import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isDesktop } from 'common/useragent';
-import {
-  isCustomerWithIntlPhone,
-  getCustomerContactNumber,
-} from 'common/international';
 
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from './constants';
 import { P13NTracker } from 'misc/analytics/events';
+import {
+  getCustomerContactNumber,
+  isCustomerWithIntlPhone,
+} from 'helper/international';
 
 /**
  * this object is a key/value pair of contact and p13n api data

@@ -3,17 +3,8 @@ import { getCardMetadata } from 'common/card';
 import * as _ from 'utils/_';
 import * as ObjectUtils from 'utils/object';
 import { getSession } from 'sessionmanager';
-import { formatMessageWithLocale, getLongBankName } from 'i18n';
-import { locale } from 'svelte-i18n';
-import { get } from 'svelte/store';
-import { checkOffline } from 'fpx/helper';
-import { FPX_OFFLINE_BANK } from 'fpx/i18n/label';
 import type { Banks } from 'razorpay/types/Preferences';
-import type {
-  Instrument,
-  transformedBank,
-  TranslatedBankType,
-} from './types/bank';
+import type { Instrument, transformedBank } from 'common/types/bank';
 
 // const cdnUrl = '';
 const cdnUrl = RazorpayConfig.cdn;
@@ -457,31 +448,4 @@ export function handleEnterOnBanking(event: KeyboardEvent) {
 
     getSession().preSubmit();
   }
-}
-
-/**
- * return translated Array of banks for Search dropdown menu
- * @param {Partial<Banks>} banks list of banks
- * @param {boolean} isFpx is method FPX or not
- * @returns {array}
- */
-export function computeTranslatedBanks(banks: Partial<Banks>, isFpx = false) {
-  return Object.entries(banks).map((entry) => {
-    const code = entry[0];
-    const name = entry[1] || '';
-    const translatedBank: TranslatedBankType = {
-      code: code,
-      original: name,
-      name: getLongBankName(code, get(locale) as string, name),
-      _key: code,
-    };
-    if (isFpx) {
-      translatedBank.disabledText = checkOffline(code)
-        ? formatMessageWithLocale(FPX_OFFLINE_BANK, get(locale) as string)
-        : '';
-      translatedBank.logoCode = normalizeBankCode(code);
-    }
-
-    return translatedBank;
-  });
 }

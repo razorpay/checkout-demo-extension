@@ -10,6 +10,7 @@ import { returnAsIs } from 'lib/utils';
 import { submitForm } from 'common/form';
 import { EventsV2, ContextProperties } from 'analytics-v2';
 import { COMMIT_HASH } from 'common/constants';
+import { checkCREDEligibility } from 'checkoutframe/cred';
 
 const library = 'razorpayjs';
 Track.props.library = library;
@@ -37,5 +38,15 @@ Razorpay.sendMessage = function (message) {
     });
   }
 };
+
+/**
+ * This is a helper API to check the user eligibility for CRED.
+ * Since its a utility and doesn't have control over when it is being called,(contact change/ before payment API)
+ * it's in hands of consumer ( merchant ) on when to call this.
+ * Ideally it should be called before payment API call
+ * @param {string} contact contact with country code
+ * @returns {Promise} returns a promise with JSON
+ */
+Razorpay.prototype.checkCREDEligibility = checkCREDEligibility;
 
 export default Razorpay;

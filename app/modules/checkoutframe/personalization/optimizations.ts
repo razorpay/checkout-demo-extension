@@ -1,7 +1,7 @@
 import { isDesktop } from 'common/useragent';
 import { getAmount, isInternational } from 'razorpay';
 import type { Method } from 'types/types';
-import { isInternationalCustomer } from 'common/international';
+import { isInternationalCustomer } from 'helper/international';
 import {
   ALLOWED_METHODS_GT_PIVOT_AMOUNT,
   ALLOWED_METHODS_LTE_PIVOT_AMOUNT,
