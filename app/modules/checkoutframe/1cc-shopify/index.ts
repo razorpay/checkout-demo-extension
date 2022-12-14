@@ -69,7 +69,7 @@ export function initShopifyCheckout({
   body: CreateShopifyCheckoutBody;
   key_id: string;
 }) {
-  const SHOPIFY_CHECKOUT_PROMISE = createShopifyCheckout({ body, key_id });
+  SHOPIFY_CHECKOUT_PROMISE = createShopifyCheckout({ body, key_id });
 
   return createShopifyOrder(SHOPIFY_CHECKOUT_PROMISE).catch((err) => {
     // @TODO move to common error processor util

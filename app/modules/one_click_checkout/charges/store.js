@@ -8,12 +8,15 @@ export const shippingCharge = writable(null);
 
 export const amount = writable(0);
 export const offerAmount = writable(0);
-amount.subscribe((amount) => {
+
+function onAmountUpdate(amount) {
   if (amount) {
     const session = getSession();
     session.setAmount(amount, true); // this will automatically set amount in cta
   }
-});
+}
+
+amount.subscribe(onAmountUpdate);
 
 export const cartAmount = writable(0);
 
@@ -81,4 +84,5 @@ export function initializeCharges(line_items_total) {
   cartAmount.set(line_items_total);
   amount.set(line_items_total);
   cartDiscount.set(0);
+  onAmountUpdate(line_items_total);
 }
