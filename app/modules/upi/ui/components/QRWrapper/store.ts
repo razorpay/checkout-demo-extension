@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-interface QrRenderState {
+export interface QrRenderState {
   status: boolean;
   homeScreenQR: boolean;
   upiScreenQR: boolean;

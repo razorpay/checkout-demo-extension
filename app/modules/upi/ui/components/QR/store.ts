@@ -4,7 +4,7 @@
 
 import { get, writable } from 'svelte/store';
 
-interface QrStateType {
+export interface QrStateType {
   /**
    * QR Component current state
    */
@@ -29,7 +29,7 @@ interface QrStateType {
   renderTimer?: boolean;
 }
 
-const initialState: QrStateType = {
+export const initialState: QrStateType = {
   /**
    * Default must be refresh, as in any negative case, user lands and wants to generate new QR, refresh could help
    * And if user tried p13n V1 QR and cancels the payment, he will land back in UPI page, in this case we should

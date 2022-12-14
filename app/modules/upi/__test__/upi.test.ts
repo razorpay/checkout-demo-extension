@@ -4,7 +4,8 @@ import {
   getGridArray,
   definePlatformReturnMethodIdentifier,
   isNativeIntentAvailable,
-} from '../helper/upi';
+  getDowntimeForUPIApp,
+} from 'upi/helper/upi';
 import { enableUPITiles } from 'upi/features';
 import { getSDKMeta, getUPIIntentApps } from 'checkoutstore/native';
 import { isUPIFlowEnabled } from 'checkoutstore/methods';
@@ -19,10 +20,7 @@ import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { selectedUPIAppForPay } from 'checkoutstore/screens/upi';
 import { OTHER_INTENT_APPS, UPI_APPS } from 'upi/constants';
-
-// jest.mock('checkoutstore/screens/upi', () => ({
-//   selectedUPIAppForPay: jest.fn(),
-// }));
+import { checkDowntime } from 'checkoutframe/downtimes';
 
 jest.mock('../experiments', () => ({
   upiNrL0L1Improvements: {
@@ -51,6 +49,33 @@ jest.mock('razorpay', () => ({
   getMerchantOrder: jest.fn(),
   getMerchantKey: jest.fn(() => 'rzp_live_ILgsfZCZoFIKMb'),
   isOneClickCheckout: jest.fn(),
+  updateInstance: jest.fn(),
+}));
+jest.mock('checkoutframe/downtimes', () => ({
+  getDowntimes: jest.fn(() => ({
+    upi: {
+      high: [
+        {
+          id: 'down_DEW7D9S10PEsl1',
+          entity: 'payment.downtime',
+          method: 'upi',
+          begin: 1567686386,
+          end: null,
+          status: 'started',
+          scheduled: false,
+          severity: 'high',
+          instrument: {
+            psp: 'google_pay',
+          },
+          created_at: 1567686387,
+          updated_at: 1567686387,
+        },
+      ],
+      medium: [],
+      low: [],
+    },
+  })),
+  checkDowntime: jest.fn(),
 }));
 jest.mock('common/useragent', () => ({
   ...jest.requireActual('common/useragent'),
@@ -59,6 +84,16 @@ jest.mock('common/useragent', () => ({
   isBrave: false,
   isDesktop: jest.fn(),
 }));
+
+const app = {
+  app_name: 'Google Pay',
+  package_name: 'com.google.android.apps.nbu.paisa.user',
+  app_icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+  handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+  verify_registration: true,
+  shortcode: 'google_pay',
+};
+const normalizeDowntime = true;
 
 describe('definePlatform: Utility test', () => {
   test('definePlatform; android ios', () => {
@@ -247,5 +282,31 @@ describe('#isNativeIntentAvailable', () => {
       ],
     });
     expect(isNativeIntentAvailable('com.phonepe.app')).toBeTruthy();
+  });
+});
+
+describe('#getDowntimeForUPIApp', () => {
+  test('Test getDowntimeForUPIApp without downtime', () => {
+    const result = {
+      downtimeInstrument: 'google_pay',
+      severe: '',
+    };
+    expect(getDowntimeForUPIApp(app, normalizeDowntime)).toMatchObject(result);
+  });
+  test('Test getDowntimeForUPIApp severeity high', () => {
+    (checkDowntime as any).mockReturnValue('high');
+    const result = {
+      downtimeInstrument: 'google_pay',
+      severe: 'medium',
+    };
+    expect(getDowntimeForUPIApp(app, normalizeDowntime)).toMatchObject(result);
+  });
+  test('Test getDowntimeForUPIApp severeity medium', () => {
+    (checkDowntime as any).mockReturnValue('medium');
+    const result = {
+      downtimeInstrument: 'google_pay',
+      severe: 'medium',
+    };
+    expect(getDowntimeForUPIApp(app, normalizeDowntime)).toMatchObject(result);
   });
 });

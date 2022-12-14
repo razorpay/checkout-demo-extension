@@ -17,7 +17,7 @@ import { autoGenerateQREnabled } from './qrV2';
  * Product doesn't want such behavior and we need nearly identical placeholder.
  * @returns string url for QR as close to as real payment
  */
-function getQRPaymentTestUrlForImage() {
+export function getQRPaymentTestUrlForImage() {
   return getPreparedUrl('upi://pay', {
     pa: autoGenerateQREnabled()
       ? 'rpy.qrrazorpay768603936522&ver=01&mode=15&qrMedium=04' // adding extra payload
@@ -73,7 +73,7 @@ export function getQRImage(url?: string, imageSize?: number) {
 export function isQRPaymentActive() {
   return Boolean(get(qrState).url);
 }
-enum QRPaymentCancelStatus {
+export enum QRPaymentCancelStatus {
   ACTIVE_BUT_FAILED_TO_CANCEL = 0,
   NO_ACTIVE_PAYMENT = 1,
   ACTIVE_BUT_AUTO_CANCELLED = 2,
