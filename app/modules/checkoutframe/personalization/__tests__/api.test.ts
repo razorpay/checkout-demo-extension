@@ -1,6 +1,23 @@
-import { overrideAPIInstruments } from '../api';
+import {
+  overrideAPIInstruments,
+  removeDuplicateApiInstruments,
+  trackP13nMeta,
+} from '../api';
 import { DEFAULT_PHONEPE_P13N_V2_INSTRUMENT } from '../constants';
 import type { Personalization } from '../personalization';
+import { P13NTracker } from 'misc/analytics/events';
+
+jest.mock('misc/analytics/events', () => {
+  const originalModule = jest.requireActual('misc/analytics/events');
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    P13NTracker: {
+      P13N_RESPONSE: jest.fn(),
+    },
+  };
+});
 
 const instruments: Personalization.V2_Instrument_Raw[] = [
   {
@@ -71,6 +88,57 @@ describe('Module: personalization', () => {
           ])
         );
       });
+    });
+  });
+  describe('Tests for removeDuplicateApiInstruments under api.js', () => {
+    it('should return unique instruments from a given list of instruments', () => {
+      const data = [
+        {
+          instrument: 'lazypay',
+          method: 'paylater',
+        },
+        {
+          instrument: 'lazypay',
+          method: 'paylater',
+        },
+      ];
+      const expectedReturnValue = [
+        {
+          instrument: 'lazypay',
+          method: 'paylater',
+        },
+      ];
+      expect(removeDuplicateApiInstruments(data)).toEqual(expectedReturnValue);
+    });
+  });
+  describe('Tests for trackP13nMeta under api.js', () => {
+    it('should return undefined if passed empty data', () => {
+      expect(trackP13nMeta({})).toBeUndefined();
+    });
+    it('should call P13NTracker once if passed valid data', () => {
+      const data = {
+        '+918708857906': {
+          instruments: [
+            {
+              instrument: 'lazypay',
+              method: 'paylater',
+            },
+            {
+              instrument: '',
+              method: 'upi',
+            },
+            {
+              method: 'card',
+              token_id: 'card',
+            },
+          ],
+          is_customer_identified: true,
+          user_aggregates_available: true,
+          versionID: 'v1',
+        },
+      };
+      trackP13nMeta(data);
+      expect(P13NTracker.P13N_RESPONSE).toHaveBeenCalled();
     });
   });
 });

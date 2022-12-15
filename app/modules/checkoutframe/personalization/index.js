@@ -44,7 +44,7 @@ INSTRUMENT_PROPS.emi = INSTRUMENT_PROPS.card;
  *
  * @returns {Object|undefined}
  */
-function getExtractedDetails(payment, customer) {
+export function getExtractedDetails(payment, customer) {
   const details = {};
 
   let extractable = INSTRUMENT_PROPS[payment.method];
@@ -154,24 +154,6 @@ function createInstrumentFromExtracted(extracted) {
 }
 
 /**
- * Creates an instrument from the payment.
- * @param {Object} payment Payment payload
- * @param {Customer} customer Instance of customer
- * @param {Object} extra Extra details
- *
- * @returns {Object|undefined}
- */
-export function createInstrumentFromPayment(payment, customer, extra) {
-  const extracted = getExtractedDetails(payment, customer, extra);
-
-  if (!extracted) {
-    return;
-  }
-
-  return createInstrumentFromExtracted(extracted);
-}
-
-/**
  * A map of functions that help get existing tokens for extracted information
  */
 const MAPPERS = {
@@ -226,7 +208,7 @@ const MAPPERS = {
  *
  * @returns {Object|undefined} instrument
  */
-function getOrCreateInstrument(instruments, payment, customer, extra) {
+export function getOrCreateInstrument(instruments, payment, customer, extra) {
   const extracted = getExtractedDetails(payment, customer, extra);
 
   if (!extracted) {
@@ -440,58 +422,6 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
     };
   });
 };
-
-/**
- * Appends the data from the selected instrument
- * to the payment creation payload.
- * @param {Object} payment Payment payload
- * @param {Object} instrument Instrument
- * @param {Array} customer Customer
- *
- * @returns {Boolean} added?
- */
-export function addInstrumentToPaymentData(payment, instrument, customer) {
-  let added = false;
-
-  // Sanity check
-  if (!instrument) {
-    return added;
-  }
-
-  let propsToExtract = INSTRUMENT_PROPS[instrument.method];
-
-  // No props present that can be extracted
-  if (!propsToExtract) {
-    return added;
-  }
-
-  propsToExtract = ['method'].concat(propsToExtract);
-
-  propsToExtract.forEach((prop) => {
-    if (!_.isUndefined(instrument[prop])) {
-      payment[prop] = instrument[prop];
-      added = true;
-    }
-  });
-
-  // Add token to saved card and saved vpa instrument
-  if (['card', 'upi'].includes(payment.method)) {
-    const tokens = customer && ObjectUtils.get(customer, 'tokens.items', []);
-
-    const token = tokens.find((token) => token.id === instrument.token_id);
-
-    if (token) {
-      payment.token = token.token;
-      added = true;
-    }
-  }
-
-  if (payment.method === 'upi' && payment.token) {
-    delete payment.vpa;
-  }
-
-  return added;
-}
 
 /**
  * Does this device have any instruments at all?

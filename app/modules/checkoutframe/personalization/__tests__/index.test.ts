@@ -1,10 +1,37 @@
-import { overrideStorageInstruments } from '../index';
+import {
+  overrideStorageInstruments,
+  getAllInstrumentsForCustomer,
+  getExtractedDetails,
+  getOrCreateInstrument,
+  recordSuccess,
+  hasAnyInstrumentsOnDevice,
+  processInstrument,
+} from 'checkoutframe/personalization';
 import * as UA from 'common/useragent';
-import type { Personalization } from '../personalization';
+import type { Personalization } from 'checkoutframe/personalization/personalization';
+import { customer } from 'checkoutframe/personalization/__mocks__/customer-params';
+import { getAllInstruments } from 'checkoutframe/personalization/utils';
+import { getUPIIntentApps } from 'checkoutstore/native';
+import { getCustomer } from 'checkoutframe/customer';
 
 jest.mock('common/useragent', () => ({
   ...jest.requireActual('common/useragent'),
   isDesktop: jest.fn(),
+}));
+
+jest.mock('checkoutframe/personalization/utils', () => ({
+  ...jest.requireActual('checkoutframe/personalization/utils'),
+  getAllInstruments: jest.fn(() => {}),
+}));
+
+jest.mock('checkoutstore/native', () => ({
+  ...jest.requireActual('checkoutstore/native'),
+  getUPIIntentApps: jest.fn(() => {}),
+}));
+
+jest.mock('checkoutframe/customer', () => ({
+  ...jest.requireActual('checkoutframe/customer'),
+  getCustomer: jest.fn(() => {}),
 }));
 
 const isDesktop = UA.isDesktop as jest.MockedFunction<typeof UA.isDesktop>;
@@ -115,6 +142,266 @@ describe('Module: personalization', () => {
           ])
         );
       });
+    });
+  });
+  describe('Tests for getExtractedDetails under index.js', () => {
+    it('should return all the instruments for a given customer', () => {
+      const instruments = {
+        b5604f31: [
+          {
+            frequency: 2,
+            id: 'KjmhMqjQ3akgU7',
+            success: false,
+            timestamp: 1669273040119,
+            method: 'card',
+            token_id: 'token_KGw40fGGndjddR',
+            type: 'prepaid',
+            issuer: 'STCB',
+            network: 'Visa',
+          },
+        ],
+      };
+      (getAllInstruments as unknown as jest.Mock).mockReturnValue(instruments);
+      expect(getAllInstrumentsForCustomer(customer)).toEqual(
+        instruments.b5604f31
+      );
+    });
+    it('should return details when provided with a customer and payment details using upi qr as method', () => {
+      const expectedReturnValue = {
+        '_[flow]': 'intent',
+        '_[upiqr]': '1',
+        method: 'upi',
+      };
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        method: 'upi',
+        upi: {
+          flow: 'intent',
+        },
+        '_[flow]': 'intent',
+        amount: 600000,
+        '_[upiqr]': '1',
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toEqual(
+        expectedReturnValue
+      );
+    });
+    it('should return details when provided with a customer and payment details using card as method', () => {
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'prabhjeetkalsi00@gmail.com',
+        method: 'card',
+        'card[number]': '4111111111111111',
+        'card[expiry]': '03 / 33',
+        'card[cvv]': '333',
+        'card[name]': 'Prabhjeet Kalsi',
+        amount: 600000,
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toBeUndefined();
+    });
+    it('should return details when provided with a customer and payment details using tokenized card as method', () => {
+      const expectedReturnValue = {
+        method: 'card',
+        token_id: 'token_KpObKSMsmgBxEZ',
+        type: 'debit',
+        issuer: 'SBIN',
+        network: 'Visa',
+      };
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        method: 'card',
+        token: '9yFY5et5rijcsp',
+        'card[cvv]': '111',
+        amount: 100,
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toEqual(
+        expectedReturnValue
+      );
+    });
+    it('should return undefined as provided payment card token is not correct', () => {
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        method: 'card',
+        token: '9yFY5et5rijcsj',
+        'card[cvv]': '111',
+        amount: 100,
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toBeUndefined();
+    });
+    it('should return correct details when provided customer data and payment details using upi intent as method', () => {
+      const expectedReturnValue = {
+        app_icon: undefined,
+        app_name: 'Google Pay',
+        method: 'upi',
+        upi_app: 'gpay',
+      };
+      const paymentDetails = {
+        method: 'upi',
+        upi_app: 'gpay',
+      };
+      (getUPIIntentApps as unknown as jest.Mock).mockReturnValue({
+        all: [{ package_name: 'gpay', app_name: 'Google Pay' }],
+      });
+      expect(getExtractedDetails(paymentDetails, customer)).toEqual(
+        expectedReturnValue
+      );
+    });
+    it('should return undefined as not method is passed in payment details', () => {
+      expect(getExtractedDetails({}, customer)).toBeUndefined();
+    });
+    it('should return correct details when passed customer data and payment details using upi direct pay as method', () => {
+      const expectedReturnValue = {
+        '_[flow]': 'directpay',
+        method: 'upi',
+        token_id: 'token_KEB4PhxxYwqgZK',
+        vpa: 'prabhjeetkalsi00@oksbi',
+      };
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        amount: 100,
+        method: 'upi',
+        token: 'HDgNLcP3NmtD52',
+        '_[flow]': 'directpay',
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toEqual(
+        expectedReturnValue
+      );
+    });
+    it('should return undefined using upi direct pay as method as token is not correct', () => {
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        amount: 100,
+        method: 'upi',
+        token: 'HDgNLcP3rmtD52',
+        '_[flow]': 'directpay',
+      };
+      expect(getExtractedDetails(paymentDetails, customer)).toBeUndefined();
+    });
+  });
+  describe('Tests for getOrCreateInstrument under index.js', () => {
+    it('should return undefined as no payment details have been passed', () => {
+      expect(getOrCreateInstrument([], {}, customer, {})).toBeUndefined();
+    });
+    it('should return the existing payment method', () => {
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        amount: 100,
+        method: 'upi',
+        token: 'HDgNLcP3NmtD52',
+        '_[flow]': 'directpay',
+      };
+      const instruments = [
+        {
+          frequency: 9,
+          id: 'KjscHbhxbaguXc',
+          success: false,
+          timestamp: 1670569101245,
+          '_[flow]': 'directpay',
+          method: 'upi',
+          token_id: 'token_KEB4PhxxYwqgZK',
+          vpa: 'prabhjeetkalsi00@oksbi',
+        },
+      ];
+      expect(
+        getOrCreateInstrument(instruments, paymentDetails, customer, {})
+      ).toEqual(instruments[0]);
+    });
+    it('should return a new instrument', () => {
+      const expectedReturnValue = {
+        frequency: 0,
+        id: expect.anything(),
+        success: false,
+        timestamp: expect.anything(),
+        wallet: 'phonepe',
+        method: 'wallet',
+      };
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        method: 'wallet',
+        wallet: 'phonepe',
+        amount: 100,
+      };
+      expect(getOrCreateInstrument([], paymentDetails, customer, {})).toEqual(
+        expectedReturnValue
+      );
+    });
+  });
+  describe('Tests for recordSuccess under index.js', () => {
+    it('should return undefined for no instruments or no customer data', () => {
+      expect(recordSuccess({}, customer)).toBeUndefined();
+      const instrument = {
+        frequency: 9,
+        id: 'KjscHbhxbaguXc',
+        success: false,
+        timestamp: 1670569101245,
+        '_[flow]': 'directpay',
+        method: 'upi',
+        token_id: 'token_KEB4PhxxYwqgZK',
+        vpa: 'prabhjeetkalsi00@oksbi',
+      };
+      expect(recordSuccess(instrument, {})).toBeUndefined();
+    });
+  });
+  describe('Tests for hasAnyInstrumentsOnDevice under index.js', () => {
+    it('should return true for some saved instruments on the device', () => {
+      const instruments = {
+        b5604f31: [
+          {
+            frequency: 2,
+            id: 'KjmhMqjQ3akgU7',
+            success: false,
+            timestamp: 1669273040119,
+            method: 'card',
+            token_id: 'token_KGw40fGGndjddR',
+            type: 'prepaid',
+            issuer: 'STCB',
+            network: 'Visa',
+          },
+        ],
+      };
+      (getAllInstruments as unknown as jest.Mock).mockReturnValue(instruments);
+      expect(hasAnyInstrumentsOnDevice()).toEqual(true);
+    });
+    it('should return false for no saved instruments on device', () => {
+      (getAllInstruments as unknown as jest.Mock).mockReturnValue({});
+      expect(hasAnyInstrumentsOnDevice()).toEqual(false);
+    });
+  });
+  describe('Tests for processInstrument under index.js', () => {
+    it('should return undefined for invalid payment details', () => {
+      (getCustomer as unknown as jest.Mock).mockReturnValue(customer);
+      expect(processInstrument({}, {})).toBeUndefined();
+    });
+    it('should return correct instrument used for payment', () => {
+      (getCustomer as unknown as jest.Mock).mockReturnValue(customer);
+      const paymentDetails = {
+        contact: '+918708857906',
+        email: 'test@test.com',
+        amount: 100,
+        method: 'upi',
+        token: 'HDgNLcP3NmtD52',
+        '_[flow]': 'directpay',
+      };
+      const expectedReturnValue = {
+        '_[flow]': 'directpay',
+        frequency: 1,
+        id: expect.anything(),
+        method: 'upi',
+        success: false,
+        timestamp: expect.anything(),
+        token_id: 'token_KEB4PhxxYwqgZK',
+        vpa: 'prabhjeetkalsi00@oksbi',
+      };
+      expect(processInstrument(paymentDetails, {})).toEqual(
+        expectedReturnValue
+      );
     });
   });
 });

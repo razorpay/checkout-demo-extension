@@ -2,7 +2,7 @@ import * as helper from 'checkoutframe/helper';
 import { getAmount, getOrderId } from 'razorpay';
 import { EventsV2 } from 'analytics-v2';
 import * as exp from 'experiments';
-import * as mock from './mock/helper';
+import * as mock from './__mocks__/helper';
 jest.mock('razorpay', () => ({
   getAmount: jest.fn(() => {}),
   getOrderId: jest.fn(() => {}),

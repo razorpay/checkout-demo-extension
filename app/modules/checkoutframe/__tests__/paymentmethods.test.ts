@@ -1,6 +1,6 @@
 import * as PaymentMethods from 'checkoutframe/paymentmethods';
 import * as CheckoutStore from 'checkoutstore/methods';
-import * as mock from './mock/paymentmethods';
+import * as mock from './__mocks__/paymentmethods';
 
 describe('Module: checkoutframe/paymentmethods', () => {
   test('PaymentMethods.getTranslatedMethodPrefix', () => {
