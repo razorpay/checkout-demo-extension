@@ -154,6 +154,12 @@
 
   $: validationText = validateContact(country, phone);
   $: $isContactValid = !validationText;
+
+  $: {
+    if (phoneField) {
+      phoneField.setValid($isContactValid);
+    }
+  }
 </script>
 
 <div class="fields-container">
