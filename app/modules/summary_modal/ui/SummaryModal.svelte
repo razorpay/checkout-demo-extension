@@ -60,6 +60,7 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { popStack } from 'navstack';
   import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
+  import { isNumber } from 'utils/_';
 
   export let ctaVisible = false;
   export let cartVisible = false;
@@ -75,13 +76,13 @@
 
   afterUpdate(() => {
     tableHeight = (document.getElementById('summary-table') as HTMLElement)
-      .offsetHeight;
+      ?.offsetHeight;
     backdropHeight = (document.getElementById('overlay') as HTMLElement)
-      .offsetHeight;
+      ?.offsetHeight;
 
     const cartListEle = document.querySelector('#cart-list');
 
-    if (cartListEle) {
+    if (cartListEle && isNumber(tableHeight) && isNumber(backdropHeight)) {
       const maxHeight =
         (MODAL_MAX_HEIGHT / 100) * backdropHeight -
         tableHeight -
