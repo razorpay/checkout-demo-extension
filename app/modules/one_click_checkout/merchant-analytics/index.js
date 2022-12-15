@@ -9,14 +9,14 @@ import {
 } from 'razorpay';
 
 function getCartInfo() {
-  const { content_type, contents, currency, value } = getCustomerCart() || {};
+  const { content_type, content_ids, currency, value, num_items } =
+    getCustomerCart() || {};
   return {
-    content_ids: contents?.map((item) => item.variant_id),
+    content_ids,
     content_type,
-    contents,
     currency,
     value,
-    num_items: contents?.length,
+    num_items,
   };
 }
 
