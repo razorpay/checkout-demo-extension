@@ -9,8 +9,8 @@ export interface Context {
 }
 
 export interface StackFrame {
-  function: string;
-  filename: string;
+  function?: string;
+  filename?: string;
   in_app: boolean;
   lineno: number;
   colno: number;

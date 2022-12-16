@@ -7,9 +7,9 @@ export function filterUnWantedExceptions(exceptions: ExceptionValue[]) {
       exception.stacktrace &&
       exception.stacktrace.frames?.length > 0
     ) {
-      return exception.stacktrace.frames
-        .map((frame) => frame.filename ?? '')
-        .some((filename) => filename.includes('checkout-frame'));
+      return exception.stacktrace.frames[0].filename?.includes(
+        'checkout-frame'
+      );
     }
     // we allow unhandled rejection
     return exception.type === 'UnhandledRejection';

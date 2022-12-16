@@ -1,6 +1,33 @@
 import { filterUnWantedExceptions } from '../helper';
 
 const INPUT = [
+  // error without filename mentioned as it's optional
+  // https://sentry.io/organizations/rzp/issues/3718140599/events/82558d06f3104bc681fbff225dbcae41/?project=4503925471707136
+  {
+    type: 'TypeError',
+    value: "Cannot read properties of undefined (reading 'enabledFeatures')",
+    stacktrace: {
+      frames: [
+        {
+          function: 'isFeatureBroken',
+          lineno: 842,
+          colno: 24,
+          in_app: true,
+        },
+        {
+          lineno: 1187,
+          colno: 16,
+          in_app: true,
+        },
+        {
+          function: 'updateFeaturesInner',
+          lineno: 1186,
+          colno: 24,
+          in_app: true,
+        },
+      ],
+    },
+  },
   {
     // error happened in checkout-frame file
     type: 'ReferenceError',
@@ -50,13 +77,13 @@ const INPUT = [
     },
   },
   {
-    // error happened in vendor function called by checkout-frame-[lite|core].js
+    // error happened in some injected file, should be ignored
     type: 'ReferenceError',
     value: '',
     stacktrace: {
       frames: [
         {
-          filename: 'https://checkout.razorpay.com/835.js',
+          filename: '<anonymous>',
           colno: 2,
           in_app: false,
           lineno: 2,
@@ -98,6 +125,6 @@ const INPUT = [
 
 describe('#filterUnWantedExceptions', () => {
   test('filter checkout-frame & unhandled exception', () => {
-    expect(filterUnWantedExceptions(INPUT).length).toBe(5);
+    expect(filterUnWantedExceptions(INPUT).length).toBe(4);
   });
 });
