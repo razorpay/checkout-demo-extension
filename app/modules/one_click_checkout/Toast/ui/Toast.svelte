@@ -29,6 +29,7 @@
 {#if shown}
   <div
     data-test-id="toast-{theme}"
+    data-testid="toast-{theme}"
     class={`toast-wrapper ${theme || ''}`}
     transition:fly|local={{ y: 30, duration: 500 }}
   >
