@@ -123,8 +123,76 @@ const INPUT = [
   },
 ];
 
+const Error = [
+  {
+    type: 'ReferenceError',
+    value: 'chrome-extension://',
+    stacktrace: {
+      frames: [
+        {
+          filename: 'https://checkout.razorpay.com/dummy.js',
+          colno: 2,
+          in_app: false,
+          lineno: 2,
+          function: 'any',
+        },
+      ],
+    },
+  },
+  {
+    type: 'ReferenceError',
+    value: '',
+    stacktrace: {
+      frames: [
+        {
+          filename: 'https://checkout.razorpay.com/dummy.js',
+          colno: 2,
+          in_app: false,
+          lineno: 2,
+          function: 'moz-extension://',
+        },
+      ],
+    },
+  },
+  {
+    type: 'ReferenceError',
+    value:
+      "Cannot destructure property 'instruments' of 'config' as it is null.",
+    stacktrace: {
+      frames: [
+        {
+          filename: 'https://checkout.razorpay.com/checkout-frame.js',
+          colno: 2,
+          in_app: false,
+          lineno: 2,
+          function: 'Session.render',
+        },
+      ],
+    },
+  },
+  {
+    type: 'ReferenceError',
+    value:
+      "Cannot destructure property 'instruments' of 'config' as it is null.",
+    stacktrace: {
+      frames: [
+        {
+          filename: 'moz-extension://',
+          colno: 2,
+          in_app: false,
+          lineno: 2,
+          function: 'Session.render',
+        },
+      ],
+    },
+  },
+];
+
 describe('#filterUnWantedExceptions', () => {
   test('filter checkout-frame & unhandled exception', () => {
     expect(filterUnWantedExceptions(INPUT).length).toBe(4);
+  });
+  test('filter chrome extension and mozrilla error', () => {
+    expect(filterUnWantedExceptions(Error).length).toBe(1);
   });
 });
