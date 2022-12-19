@@ -70,7 +70,7 @@
       </div>
       {#if isRTBEnabled}
         <div class="header-body-wrapper">
-          <TrustedBadge expanded iconColor={HEADER_ELEMENTS_COLOR} />
+          <TrustedBadge expanded />
           <LanguageSelection color={themeMeta.textColor} />
         </div>
       {/if}

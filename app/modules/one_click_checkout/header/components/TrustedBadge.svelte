@@ -28,9 +28,12 @@
   import rtbEvents from 'one_click_checkout/header/analytics';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import RtbIcon from 'rtb/ui/component/RTBIcon.svelte';
-  import { themeStore } from 'checkoutstore/theme';
+  import { isOneClickCheckout } from 'razorpay';
+  import { getThemeMeta, themeStore } from 'checkoutstore/theme';
 
-  const iconColor = $themeStore.textColor;
+  const iconColor = isOneClickCheckout()
+    ? getThemeMeta().textColor
+    : $themeStore.textColor;
 
   $: trustedBadgeHighlights = isRTBEnabled($RTBExperiment);
   onMount(() => {

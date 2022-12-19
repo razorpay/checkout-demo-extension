@@ -1210,11 +1210,6 @@ Session.prototype = {
       this.fillData();
     }
     if (RazorpayHelper.isOneClickCheckout()) {
-      if (!RazorpayHelper.shouldOverrideBrandColor()) {
-        discreet.Theme.setThemeColor(
-          discreet.Constants.COLORS.MAGIC_BRAND_COLOR
-        );
-      }
       applyPrefilledCoupon();
       this.switchTab('home-1cc');
     }
@@ -1929,12 +1924,19 @@ Session.prototype = {
   },
 
   setTheme: function () {
-    // update r.themeMeta based on prefs color
-    this.r.postInit();
+    if (
+      RazorpayHelper.isOneClickCheckout() &&
+      !RazorpayHelper.shouldOverrideBrandColor()
+    ) {
+      discreet.Theme.setThemeColor(discreet.Constants.COLORS.MAGIC_BRAND_COLOR);
+    } else {
+      // update r.themeMeta based on prefs color
+      this.r.postInit();
 
-    // ThemeMeta in razorpay.js contains only
-    // color, textColor, highlightColor
-    discreet.Theme.setThemeColor(this.r.themeMeta.color);
+      // ThemeMeta in razorpay.js contains only
+      // color, textColor, highlightColor
+      discreet.Theme.setThemeColor(this.r.themeMeta.color);
+    }
   },
 
   hideErrorMessage: function (confirmedCancel) {
