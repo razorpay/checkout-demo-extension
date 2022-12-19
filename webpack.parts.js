@@ -78,6 +78,7 @@ exports.compile = {
           not: [
             // Except for a few of them that needs to be transpiled because they use modern syntax
             /svelte/, // svelte is written in esm, we need to transpile it
+            /svelte-i18n/,
           ],
         },
         use: [

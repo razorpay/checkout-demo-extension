@@ -187,10 +187,12 @@
 
     // Wait for overlay to be hidden before showing it again
     setTimeout(() => {
-      session.showLoadError(
-        translateErrorDescription(error.description, $locale),
-        true
-      );
+      if (error.description) {
+        session.showLoadError(
+          translateErrorDescription(error.description, $locale),
+          true
+        );
+      }
     }, 300);
   }
 

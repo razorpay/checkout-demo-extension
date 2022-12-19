@@ -21,14 +21,14 @@ describe('1CC header', () => {
     activeRoute.set({ name: views.COUPONS });
     const { getByText } = render(Header);
     expect(getByText('Name')).toBeInTheDocument();
-    expect(getByText('en-EN')).toBeInTheDocument();
+    expect(getByText('English')).toBeInTheDocument();
   });
 
   it('Should be collapsed on screens other than L0', () => {
     activeRoute.set({ name: views.METHODS });
     const { queryByText, getByText } = render(Header);
     expect(getByText('Name')).toBeInTheDocument();
-    expect(queryByText('en-EN')).not.toBeInTheDocument();
+    expect(queryByText('English')).not.toBeInTheDocument();
   });
 
   it('Should not be visible if hidden on scroll', () => {

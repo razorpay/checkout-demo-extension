@@ -136,7 +136,7 @@
     "svelte": "3.44.2",
     "svelte-check": "^2.2.10",
     "svelte-check-plugin": "1.0.4",
-    "svelte-i18n": "^3.0.4",
+    "svelte-i18n": "3.1.0",
     "svelte-inline-compile": "^0.2.0",
     "svelte-jester": "^2.3.2",
     "svelte-loader": "3.1.3",
