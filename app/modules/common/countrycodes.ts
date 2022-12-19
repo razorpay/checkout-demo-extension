@@ -1073,8 +1073,7 @@ export const COUNTRY_CONFIG: CountryConfig = {
   MY: {
     pattern: '^[0-9]{5}$',
     name: 'Malaysia',
-    phone_number_regex:
-      '^(\\+?6?01)?[02-46-9]-*[0-9]{7}$|^(\\+?6?01)?[1]-*[0-9]{8}$',
+    phone_number_regex: '^(\\+60|0)?(1)-*[0-9]{8}$|^(\\+60|0)?(11)-*[0-9]{8}$',
     dial_code: '60',
   },
   MV: {
