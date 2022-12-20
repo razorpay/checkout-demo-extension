@@ -14,6 +14,9 @@ describe('Validate: getProcessingFeeForEmi', () => {
 
     bank = 'HDFC';
 
+    expect(getProcessingFeeForEmi(bank)).toBe('199');
+
+    bank = 'SBIN';
     expect(getProcessingFeeForEmi(bank)).toBe('99');
   });
 });

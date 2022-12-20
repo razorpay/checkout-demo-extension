@@ -852,9 +852,9 @@ export default {
     full_amount_emi_message:
       'Full amount of {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
     convenience_fee_msg:
-      'Convenience Fee: ₹{fee} + GST on interest would be charged by the bank.',
+      'A processing fee of ₹{fee} + GST will be applicable on the successful EMI transactions.',
     axis_conveninence_fee:
-      'Convenience fee of 1% of transaction amount or ₹100 whichever is higher + GST on interest would be charged by the bank',
+      'A processing fee of 1% or ₹100, whichever is higher, would be charged by the bank for each EMI order.',
     starting_from_label: 'Starting from {amount}%',
     entered_number_ineligible: 'Entered number is ineligible',
     ineligible_contact_message:

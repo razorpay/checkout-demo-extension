@@ -131,8 +131,12 @@ export const otherCardEmiProviders: string[] = [BAJAJ_CODE, ONE_CARD_CODE];
 export const coBrandingEmiProviders: string[] = [ONE_CARD_CODE];
 
 export const banksWithUpdatedFee: string[] = [
+  ICICI_BANK_CODE,
+  ICICI_BANK_DEBIT_CODE,
   RBL_BANK_CODE,
   KOTAK_DEBIT_CODE,
   INDB_DEBIT_CODE,
   INDB_BANK_CODE,
+  HDFC_BANK_CODE,
+  HDFC_BANK_DEBIT_CODE,
 ];

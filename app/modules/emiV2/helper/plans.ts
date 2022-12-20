@@ -187,17 +187,6 @@ export const handlePlanDescription = (
     descriptionText.push(
       formatTemplateWithLocale(AXIS_CONVENINENCE_FEE, {}, locale)
     );
-  } else if (bank === EmiBanksCode.INDB_BANK_CODE) {
-    descriptionText.push(
-      formatTemplateWithLocale(
-        PROCESSING_FEE_MSG,
-        {
-          fee: getProcessingFeeForEmi(bank),
-          bank: getShortBankName(bank, locale),
-        },
-        locale
-      )
-    );
   } else if (banksWithConvenienveFee.includes(bank)) {
     descriptionText.push(
       formatTemplateWithLocale(
