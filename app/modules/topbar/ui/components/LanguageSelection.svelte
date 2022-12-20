@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
 
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--light-highlight-color);
     border-radius: 2px;
     margin: 0;
     padding: 3px;

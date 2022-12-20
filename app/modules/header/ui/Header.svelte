@@ -53,7 +53,11 @@
   const closeIcon = close(20, 20, $themeStore.textColor);
 </script>
 
-<div id="header-wrapper" class:no-rtb={!isRTBEnabled}>
+<div
+  id="header-wrapper"
+  class:no-rtb={!isRTBEnabled}
+  class:dark-primary-color={$themeStore.isDarkColor}
+>
   <div class="header-container">
     <div class="left-section">
       <span class="back" class:show={$showBackArrow} on:click={handleBackClick}>
@@ -141,11 +145,27 @@
     height: 46px;
     margin-bottom: 0;
     transition: height 0.2s, width 0.2s, margin-left 0.4s ease;
+    position: relative;
 
     img {
       vertical-align: initial;
       border-radius: 2px;
-      box-shadow: 0px 0px 0px 2px #ffffff57;
+      box-shadow: 0px 0px 0px 2px var(--light-highlight-color);
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      margin: auto;
+      width: 100%;
+    }
+  }
+
+  .dark-primary-color {
+    #logo {
+      &.merchant-initials,
+      img {
+        box-shadow: 0px 0px 0px 2px #ffffff57;
+      }
     }
   }
 
@@ -165,7 +185,7 @@
   #logo.merchant-initials {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
-    box-shadow: 0px 0px 0px 2px #ffffff57;
+    box-shadow: 0px 0px 0px 2px var(--light-highlight-color);
     color: var(--text-color);
     font-size: 18px;
     line-height: 46px;
@@ -234,7 +254,7 @@
   .header-title {
     font-weight: 600;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 22px;
     max-width: calc(100% - 25px);
     text-overflow: ellipsis;
     overflow: hidden;
@@ -261,7 +281,7 @@
 
     :global(.rtb-expanded-wrapper) {
       display: inline-flex;
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--light-highlight-color);
     }
   }
 

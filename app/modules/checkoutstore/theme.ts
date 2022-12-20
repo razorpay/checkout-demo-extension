@@ -27,6 +27,8 @@ type Theme = {
   highlightBorderColor: string;
   headerLogoBgColor: string;
   headerLogoTextColor: string;
+  lightHighlightColor: string;
+  isDarkColor: boolean;
 };
 
 const theme: Theme = {} as Theme;
@@ -74,7 +76,9 @@ export function setThemeColor(color: string) {
   theme.color = color;
   theme.backgroundColor = backgroundColor;
   theme.foregroundColor = foregroundColor;
-  theme.textColor = Color.isDark(color) ? TEXT_COLOR_WHITE : TEXT_COLOR_BLACK;
+  const isDarkColor = Color.isDark(color);
+  theme.isDarkColor = isDarkColor;
+  theme.textColor = isDarkColor ? TEXT_COLOR_WHITE : TEXT_COLOR_BLACK;
   theme.hoverStateColor = Color.getHoverStateColor(
     color,
     backgroundColor,
@@ -86,6 +90,9 @@ export function setThemeColor(color: string) {
     RAZORPAY_HOVER_COLOR
   );
   theme.highlightColor = Color.getHighlightColor(color, RAZORPAY_COLOR);
+  theme.lightHighlightColor = isDarkColor
+    ? 'rgba(255,255,255, 0.1)'
+    : 'rgba(107, 107, 107, 0.15)';
   theme.secondaryHighlightColor = theme.hoverStateColor;
   theme.icons = _PaymentMethodIcons.getIcons({
     ...colorVariations,
@@ -103,6 +110,7 @@ export function setThemeColor(color: string) {
     'primary-color': color,
     'text-color': theme.textColor,
     'highlight-color': theme.highlightColor,
+    'light-highlight-color': theme.lightHighlightColor,
     'hover-state-color': theme.hoverStateColor,
     'background-color': theme.backgroundColor,
     'secondary-highlight-color': theme.secondaryHighlightColor,

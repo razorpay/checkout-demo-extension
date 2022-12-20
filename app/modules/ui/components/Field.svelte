@@ -755,7 +755,7 @@
     font-size: var(--font-size-small);
     padding: 0px 4px;
     left: 9px;
-    color: var(--primary-color);
+    color: var(--highlight-color);
     transition: all ease-out 0.2s;
     background-color: #fff;
   }
@@ -786,7 +786,7 @@
   }
 
   .input-one-click-checkout:focus {
-    border-color: var(--primary-color);
+    border-color: var(--highlight-color);
   }
 
   .error-field-one-click-checkout,

@@ -208,15 +208,7 @@ label.sv-checkbox > .stack > input:focus::before {
 
 /** Start: Styles for borders for a vertical list of items */
 
-#content.one-cc {
-  .border-list > * {
-    border: 1px solid var(--light-dark-color);
-  }
-
-  .border-list > *:not(:last-child) {
-    border-bottom: none;
-  }
-
+#content.one-click-checkout {
   .border-list:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
   .border-list > *:focus:not(.uninteractive),
   .border-list > *:focus-within:not(.uninteractive),
@@ -229,6 +221,16 @@ label.sv-checkbox > .stack > input:focus::before {
   .border-list > *:focus-within:not(.uninteractive) + *,
   .border-list > .selected + * {
       border-top-color: var(--primary-color);
+  }
+}
+// .one-cc shared by checkout & 1cc
+#content.one-cc {
+  .border-list > * {
+    border: 1px solid var(--light-dark-color);
+  }
+
+  .border-list > *:not(:last-child) {
+    border-bottom: none;
   }
 
   label.sv-checkbox.checked {
