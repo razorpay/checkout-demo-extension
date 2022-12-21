@@ -92,3 +92,4 @@ export type Hide = {
 export type InstrumentCreators = {
   [type in 'default' | 'upi']: (instrument: Instruments) => Instruments;
 };
+export type AllHiddenInstrument = Array<Instruments | undefined> | [];

@@ -4,6 +4,7 @@ import { optimizeForDevice, optimizeForAmount } from '../optimizations';
 import type { Personalization } from '../personalization';
 
 jest.mock('common/useragent', () => ({
+  ...jest.requireActual('common/useragent'),
   isDesktop: jest.fn(),
 }));
 

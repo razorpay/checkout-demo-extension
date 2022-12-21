@@ -1,4 +1,11 @@
 import * as Instruments from 'configurability/instruments';
+import Analytics from 'analytics';
+
+jest.mock('error-service', () => ({
+  ...jest.requireActual('error-service'),
+  __esModule: true,
+  capture: jest.fn(),
+}));
 
 describe('Module: configurability/instruments', () => {
   describe('Instruments.createInstrument', () => {
@@ -218,6 +225,18 @@ describe('Module: configurability/instruments', () => {
       found = Instruments.isInstrumentForEntireMethod(instrument);
 
       expect(found).toBe(true);
+    });
+  });
+
+  describe('Instrument.sendInvalidConfigEvent', () => {
+    test('should call capture function ', () => {
+      const analytics = (Analytics.track = jest.fn());
+      const error = { message: 'TypeError: map is not an function' };
+      Instruments.sendInvalidConfigEvent(error);
+
+      expect(analytics).toHaveBeenCalledWith('invalid_config', {
+        data: { error: 'TypeError: map is not an function' },
+      });
     });
   });
 });

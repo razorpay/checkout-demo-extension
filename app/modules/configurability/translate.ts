@@ -1,4 +1,8 @@
-import { createInstrument, isInstrumentForEntireMethod } from './instruments';
+import {
+  createInstrument,
+  isInstrumentForEntireMethod,
+  sendInvalidConfigEvent,
+} from './instruments';
 import { validateAndCreateBlock } from './blocks';
 import * as ObjectUtils from 'utils/object';
 import type {
@@ -8,8 +12,10 @@ import type {
   Block,
   Instruments,
   Hide,
+  AllHiddenInstrument,
 } from 'configurability/types';
 import type { Method } from 'types/types';
+import type { ErrorParam } from 'error-service/types';
 
 /**
  * Translates the options
@@ -56,9 +62,16 @@ function _translate(options = {}, external: boolean) {
   /**
    * Create hidden instruments
    */
-  const allHiddenInstruments = (hide as Hide[])
-    .map(createInstrument)
-    .filter(Boolean);
+
+  let allHiddenInstruments: AllHiddenInstrument;
+  try {
+    allHiddenInstruments = (hide as Hide[])
+      .map(createInstrument)
+      .filter(Boolean);
+  } catch (error) {
+    allHiddenInstruments = [];
+    sendInvalidConfigEvent(error as ErrorParam);
+  }
 
   const hiddenInstruments = allHiddenInstruments.filter(
     (instrument: Instruments | undefined) =>

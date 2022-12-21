@@ -1,16 +1,16 @@
 import {
   validateKeysAndCreateInstrument,
   createInstrument,
+  sendInvalidConfigEvent,
 } from './instruments';
 import { getUniqueValues } from 'utils/array';
-import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
 import type {
   Config,
   Block,
   Instruments,
   PartialInstrumentKey,
 } from 'configurability/types';
-import type { ErrorParam, Tags } from 'error-service/types';
+import type { ErrorParam } from 'error-service/types';
 
 /**
  *
@@ -71,15 +71,7 @@ function _createBlock(code: string, config: Config = {}, validate = false) {
 
     return block;
   } catch (error) {
-    captureError(
-      error as ErrorParam,
-      {
-        severity: SEVERITY_LEVELS.S2,
-        analytics: {
-          data: { type: 'invalid_config' },
-        },
-      } as Tags
-    );
+    sendInvalidConfigEvent(error as ErrorParam);
   }
 }
 

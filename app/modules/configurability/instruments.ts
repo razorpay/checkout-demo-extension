@@ -8,6 +8,8 @@ import type {
 import type { Method } from 'types/types';
 import type { Customer } from 'emiV2/types/tokens';
 import type { Ungrouped } from 'home/analytics/types';
+import type { ErrorParam } from 'error-service/types';
+import Analytics from 'analytics';
 
 /**
  * Adds a type and category to an instrument
@@ -311,3 +313,12 @@ export function isInstrumentGrouped(instrument: Instruments) {
 
   return (instrument._ungrouped as Ungrouped[]).length > 1;
 }
+/**
+ * send event for invalid config
+ * @param {ErrorParam} error
+ */
+export const sendInvalidConfigEvent = (error: ErrorParam) => {
+  Analytics.track('invalid_config', {
+    data: { error: (error as Error)?.message || '' },
+  });
+};
