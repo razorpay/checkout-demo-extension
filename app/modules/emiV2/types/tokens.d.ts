@@ -32,7 +32,7 @@ export type Card = {
   downtimeSeverity: boolean;
   isNoCostEMI?: boolean;
   startingFrom?: number;
-  cobranding_partner: string;
+  cobranding_partner?: string | null;
 };
 
 export type Tokens = {

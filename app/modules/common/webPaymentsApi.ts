@@ -1,13 +1,12 @@
 import * as Bridge from 'bridge';
-
+import RazorpayStore from 'razorpay';
 import {
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
   CRED_PACKAGE_NAME,
   PAYTM_PACKAGE_NAME,
 } from 'upi/constants';
-
-import RazorpayStore from 'razorpay';
+import type { WebPaymentsType } from 'common/types/types';
 
 export let appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
@@ -23,7 +22,7 @@ export function additionalSupportedPaymentApps() {
   ];
 }
 
-const webPaymentsApps = {};
+const webPaymentsApps: WebPaymentsType = {};
 
 appsThatSupportWebPayments.forEach((app) => {
   webPaymentsApps[app.package_name] = false;
@@ -36,7 +35,7 @@ appsThatSupportWebPayments.forEach((app) => {
  *
  * @returns {boolean}
  */
-export function isWebPaymentsApiAvailable(app) {
+export function isWebPaymentsApiAvailable(app: string) {
   // BE sends cred as provider, which needs to be checked here
   if (app === 'cred') {
     app = CRED_PACKAGE_NAME;
@@ -49,7 +48,7 @@ export function isWebPaymentsApiAvailable(app) {
  * @param {string} app package name of the application
  * @returns
  */
-export const checkWebPaymentsForApp = (app) => {
+export const checkWebPaymentsForApp = (app: string) => {
   /* disable Web payments API for SDK as we have native intent there */
   if (Bridge.checkout.exists()) {
     return Promise.resolve(false);

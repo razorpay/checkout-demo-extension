@@ -1,5 +1,8 @@
 import * as Card from 'common/card';
 import { getEMIBankPlans } from 'checkoutstore/methods';
+import type { Flows } from 'razorpay/types/Preferences';
+import type { TransformParam, CardType } from 'common/types/types';
+import type { Tokens, EmiPlans } from 'emiV2/types';
 
 const transformerByMethod = {
   /**
@@ -11,10 +14,11 @@ const transformerByMethod = {
    *
    * @return {Object}
    */
-  card: (token, { emi, recurring }) => {
+  card: (token: Tokens, { emi, recurring }: Partial<TransformParam>) => {
     const { card } = token;
-    let { flows = [], issuer: bank, network, type, cobranding_partner } = card;
-    let networkCode = Card.findCodeByNetworkName(network);
+    const { flows = [], network, type, cobranding_partner } = card;
+    let { issuer: bank } = card;
+    const networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
       token.card.issuer = 'AMEX'; // Set issuer explicitly
@@ -29,11 +33,14 @@ const transformerByMethod = {
       bank = cobranding_partner;
     }
 
-    token.plans = bank && emi && card.emi && getEMIBankPlans(bank, type);
+    token.plans = (bank &&
+      emi &&
+      card.emi &&
+      getEMIBankPlans(bank, type)) as EmiPlans;
 
     token.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
-    token.debitPin = !recurring && Boolean(flows.pin);
+    token.debitPin = !recurring && Boolean((flows as Flows).pin);
 
     return token;
   },
@@ -48,10 +55,13 @@ const transformerByMethod = {
  *
  * @return {Array}
  */
-export const transform = (tokens, { amount, emi, recurring }) => {
+export const transform = (
+  tokens: Tokens[],
+  { amount, emi, recurring }: TransformParam
+) => {
   tokens.forEach((token) => {
-    if (token.method && transformerByMethod[token.method]) {
-      token = transformerByMethod[token.method](token, {
+    if (token.method && transformerByMethod[token.method as CardType]) {
+      token = transformerByMethod[token.method as CardType](token, {
         amount,
         emi,
         recurring,
@@ -69,7 +79,7 @@ export const transform = (tokens, { amount, emi, recurring }) => {
  *
  * @return {Array}
  */
-export const getSavedCards = (tokens) => {
+export const getSavedCards = (tokens: Tokens[]) => {
   if (!tokens) {
     return [];
   }

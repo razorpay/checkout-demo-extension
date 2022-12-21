@@ -371,7 +371,7 @@ export interface TokenItem {
   vpa?: any;
 }
 
-interface Card {
+export interface Card {
   entity: string;
   name: string;
   last4: string;
@@ -386,12 +386,15 @@ interface Card {
   expiry_year: number | string;
   flows: Flows;
   country: string;
+  cobranding_partner?: string | null;
+  networkCode?: string;
 }
 
-interface Flows {
+export interface Flows {
   otp: boolean;
   recurring: boolean;
   iframe: boolean;
+  pin?: string;
 }
 
 interface RecurringDetails {

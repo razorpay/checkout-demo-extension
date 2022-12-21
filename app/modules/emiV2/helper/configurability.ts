@@ -187,7 +187,7 @@ export function filterSavedCardsAgainstCustomBlock(
     // Match against cobranding partner if co branding config is there
     // and the token also has co branding partner
     let coBrandingMatches = hasCoBranding
-      ? coBrandingPartners.includes(token.card.cobranding_partner)
+      ? coBrandingPartners.includes(token.card.cobranding_partner as string)
       : true;
 
     // If issuer specifc config is there
