@@ -33,7 +33,7 @@
 
   // i18n
   import { locale, t } from 'svelte-i18n';
-  import { getLongBankName } from 'i18n';
+  import { formatTemplateWithLocale, getLongBankName } from 'i18n';
   import { isCAW, isRedesignV15 } from 'razorpay';
   import {
     CHANGE_BANK_BTN,
@@ -49,6 +49,7 @@
     BANK_ACCOUNT_DETAILS_TITLE,
     ACCOUNT_TYPE_HELP,
     ACCOUNT_TYPE_LABEL,
+    DOWNTIME_CALLOUT,
   } from 'ui/labels/emandate';
 
   // Utils
@@ -64,6 +65,9 @@
   } from 'netbanking/helper';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { AUTHENTICATE } from 'cta/i18n';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import { getDowntimesSeverity } from 'checkoutframe/downtimes/methodDowntimes';
+  import { METHODS } from 'checkoutframe/constants';
 
   const session = getSession();
 
@@ -201,6 +205,8 @@
       'bank_account[account_type]': $accountType,
       auth_type: $authType,
       bank: $selectedBank,
+      downtimeSeverity,
+      downtimeInstrument: getLongBankName($selectedBank, $locale),
     };
   }
 
@@ -215,6 +221,7 @@
 
   let bankName;
   let disableCTA = false;
+  let downtimeSeverity: boolean | string = false;
 
   $: {
     const defaultBankName = (banks[selectedBank] || {}).name;
@@ -230,6 +237,14 @@
     disableCTA =
       currentView === Views.AUTH_SELECTION ||
       (currentView === Views.BANK_DETAILS && isBankDetailsPageInvalid());
+  }
+
+  $: {
+    downtimeSeverity = getDowntimesSeverity(
+      METHODS.EMANDATE,
+      'bank',
+      $selectedBank
+    );
   }
 
   let active = false;
@@ -307,6 +322,21 @@
               </div>
             {/if}
           </div>
+          {#if !!downtimeSeverity}
+            <div class="downtime-wrapper">
+              <DowntimeCallout
+                showIcon={true}
+                severe={downtimeSeverity}
+                customMessage={formatTemplateWithLocale(
+                  DOWNTIME_CALLOUT,
+                  {
+                    instrument: getLongBankName($selectedBank, $locale),
+                  },
+                  $locale
+                )}
+              />
+            </div>
+          {/if}
 
           <!-- LABEL: Authenticate using -->
           <div class="legend">{$t(AUTH_TYPE_HEADER)}</div>

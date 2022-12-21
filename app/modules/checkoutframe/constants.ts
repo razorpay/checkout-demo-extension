@@ -7,4 +7,5 @@ export const METHODS = {
   EMI_PLANS: 'emiplans',
   NETBANKING: 'netbanking',
   FPX: 'fpx',
+  EMANDATE: 'emandate',
 };

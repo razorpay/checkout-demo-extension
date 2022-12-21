@@ -778,6 +778,8 @@ export default {
     name_help: 'Please enter a valid Name as per your account',
     name_label: 'Account Holder Name',
     bank_account_details_title: 'Bank Account Details',
+    downtime_callout:
+      'This payment authorisation might fail because {instrument} is facing technical difficulties.',
   },
   emi: {
     available_action: 'Pay with EMI',

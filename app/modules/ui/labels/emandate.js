@@ -21,3 +21,4 @@ export const NAME_HELP = 'emandate.name_help';
 export const ACCOUNT_TYPE_LABEL = 'emandate.account_type_label';
 export const ACCOUNT_TYPE_HELP = 'emandate.account_type_help';
 export const BANK_ACCOUNT_DETAILS_TITLE = 'emandate.bank_account_details_title';
+export const DOWNTIME_CALLOUT = 'emandate.downtime_callout';

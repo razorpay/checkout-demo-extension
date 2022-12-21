@@ -179,7 +179,7 @@
   $: corporateSelected = isCorporateCode($selectedBank);
   $: maxGridCount = recurring ? 3 : 6;
   $: {
-    translatedBanksArr = computeTranslatedBanks(filteredBanks);
+    translatedBanksArr = computeTranslatedBanks(filteredBanks, method);
   }
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(

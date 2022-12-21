@@ -68,12 +68,13 @@ const DOWNTIME_METHODS = {
   upi: 'upi',
   netbanking: 'netbanking',
   fpx: 'fpx',
+  emandate: 'emandate',
 };
 
 /**
  * Get downtimes from preferences.
  *
- * @return {{ upi, netbanking, cards, fpx}}
+ * @return {{ upi, netbanking, cards, fpx, emandate}}
  */
 export function getDowntimes() {
   const hasDowntimes = getPreferences('payment_downtime.items.length');

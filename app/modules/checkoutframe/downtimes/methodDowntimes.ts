@@ -6,7 +6,12 @@
  */
 
 import { getPreferences } from 'razorpay';
-import { copyMethodsIfNeeded, groupDowntimesByMethod } from '.';
+import {
+  checkDowntime,
+  copyMethodsIfNeeded,
+  getDowntimes,
+  groupDowntimesByMethod,
+} from '.';
 
 /**
  * Checks downtime for provided severity or scheduled,
@@ -183,3 +188,27 @@ export function getMethodDowntimes() {
     { high: [], low: [] }
   );
 }
+
+/**
+ * Get downtimes severity for a method
+ * @param {Method} method
+ * @param {String} selectedInstrument
+ * @param {String} selectedInstrumentValue
+ *
+ * @return {Downtime.Severe} severity - low, medium, high or ''
+ */
+export const getDowntimesSeverity = (
+  method = '',
+  selectedInstrument = 'bank',
+  selectedInstrumentValue = ''
+) => {
+  const downtimes: { [unit: string]: object } = getDowntimes();
+  const currentMethodDowntimes = downtimes[method];
+  const currentDowntimeSeverity = checkDowntime(
+    currentMethodDowntimes,
+    selectedInstrument,
+    selectedInstrumentValue
+  );
+
+  return currentDowntimeSeverity ? currentDowntimeSeverity : '';
+};

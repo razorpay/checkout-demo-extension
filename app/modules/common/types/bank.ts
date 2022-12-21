@@ -7,6 +7,7 @@ export interface TranslatedBankType {
   _key: string;
   disabledText?: string;
   logoCode?: string;
+  downtimeSeverity?: string;
 }
 
 export interface Instrument {

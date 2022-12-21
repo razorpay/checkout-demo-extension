@@ -106,6 +106,11 @@ const DOWNTIMES_DATA = {
     medium: [],
     low: [],
   },
+  emandate: {
+    high: [],
+    medium: [],
+    low: [],
+  },
 };
 
 describe('getMethodDowntimes method tests', () => {

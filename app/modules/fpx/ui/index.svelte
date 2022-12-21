@@ -47,6 +47,7 @@
   // Analytics
   import FPX_EVENTS from 'fpx/analytics/events';
   import { computeTranslatedBanks } from 'helper/bank';
+  import { METHODS } from 'checkoutframe/constants';
 
   /* --- props --- */
   export let banks: Banks = getMerchantMethods().fpx;
@@ -152,7 +153,7 @@
 
   // compute translatedBanksArr
   $: {
-    translatedBanksArr = computeTranslatedBanks(filteredBanks, true);
+    translatedBanksArr = computeTranslatedBanks(filteredBanks, METHODS.FPX);
   }
 
   onMount(() => {

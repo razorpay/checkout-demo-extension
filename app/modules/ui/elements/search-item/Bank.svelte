@@ -1,11 +1,15 @@
 <script lang="ts">
   import RazorpayConfig from 'common/RazorpayConfig';
   import { isRedesignV15 } from 'razorpay';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import { getDownTimeSeverityMessage } from 'checkoutframe/downtimes/utils';
+
   export let item: {
     name: string;
     code: string;
     disabledText?: string;
     logoCode: string;
+    downtimeSeverity?: Downtime.Severe;
   };
   let showLogo = true;
   let logoError = false;
@@ -31,7 +35,7 @@
   };
 </script>
 
-<div class="container">
+<div class="container" class:has-downtime={item.downtimeSeverity}>
   {#if isRedesignV15Enabled}
     <div class="logo-wrapper">
       {#if showLogo}
@@ -60,6 +64,15 @@
       <p class="disabled-text">{item.disabledText}</p>
     {/if}
   </div>
+  {#if !!item.downtimeSeverity}
+    <div class="downtime-wrapper">
+      <DowntimeCallout
+        showIcon={true}
+        severe={item.downtimeSeverity}
+        customMessage={getDownTimeSeverityMessage(item.name)}
+      />
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -67,6 +80,14 @@
     display: flex;
     align-items: center;
     height: 28px;
+  }
+  .container.has-downtime {
+    min-height: 28px;
+    height: auto;
+    flex-wrap: wrap;
+  }
+  .downtime-wrapper {
+    margin-top: 12px;
   }
   .logo-wrapper {
     width: 28px;
