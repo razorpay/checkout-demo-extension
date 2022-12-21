@@ -221,14 +221,16 @@ const config = {
       const base = ObjectUtils.clone(grouped);
       delete base.wallets;
 
-      return (grouped.wallets || []).map((wallet) => {
-        return Object.assign(
-          {
-            wallet,
-          },
-          base
-        );
-      });
+      return (Array.isArray(grouped?.wallets) ? grouped.wallets : []).map(
+        (wallet) => {
+          return Object.assign(
+            {
+              wallet,
+            },
+            base
+          );
+        }
+      );
     },
     isValid: (instrument) =>
       Boolean(instrument.wallets) && instrument.wallets.length > 0,
