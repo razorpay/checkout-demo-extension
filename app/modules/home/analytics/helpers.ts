@@ -36,7 +36,7 @@ type MetaType = {
   preferred: boolean;
 };
 
-type Ungrouped = {
+export type Ungrouped = {
   bank?: string;
   meta?: MetaType;
   issuer?: string;
@@ -46,6 +46,9 @@ type Ungrouped = {
   vendor_vpa?: string;
   app?: string;
   id?: string;
+  flow?: string;
+  vpa?: string;
+  method?: string;
 };
 
 // TODO: the InstrumentType need to updated respective to all the methods

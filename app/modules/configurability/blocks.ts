@@ -4,7 +4,12 @@ import {
 } from './instruments';
 import { getUniqueValues } from 'utils/array';
 import { capture as captureError, SEVERITY_LEVELS } from 'error-service';
-import type { Config, Block, Instruments } from 'configurability/types';
+import type {
+  Config,
+  Block,
+  Instruments,
+  PartialInstrumentKey,
+} from 'configurability/types';
 import type { ErrorParam, Tags } from 'error-service/types';
 
 /**
@@ -16,11 +21,11 @@ function sortAndUniqObj(obj: Instruments) {
   return (Object.keys(obj) as Array<keyof Instruments>)
     .sort()
     .reduce(function (result: Instruments, key) {
-      let value = obj[key];
+      let value = obj[key] as string;
       if (Array.isArray(value)) {
         value = getUniqueValues(value);
       }
-      result[key] = value;
+      result[key as PartialInstrumentKey] = value;
       return result;
     }, {} as Instruments);
 }
@@ -57,7 +62,7 @@ function _createBlock(code: string, config: Config = {}, validate = false) {
       instruments = removeDuplicateInstruments(instruments);
       block.instruments = (instruments as Instruments[])
         .map(validate ? validateKeysAndCreateInstrument : createInstrument)
-        .filter(Boolean);
+        .filter(Boolean) as Instruments[];
     }
 
     if (name) {
@@ -86,7 +91,7 @@ function _createBlock(code: string, config: Config = {}, validate = false) {
  *
  * @returns {Object}
  */
-export function createBlock(code: string, config: Config) {
+export function createBlock(code: string, config?: Config) {
   return _createBlock(code, config, false);
 }
 

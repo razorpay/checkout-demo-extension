@@ -3,6 +3,7 @@ import { getUniqueValues } from 'utils/array';
 import * as ObjectUtils from 'utils/object';
 import { isEmiV2 } from 'razorpay';
 import type { Block, SequencedBlockParam } from 'configurability/types';
+import type { Method } from 'types/types';
 
 /**
  * Transforms the list of blocks into the order defined in the
@@ -37,7 +38,9 @@ export function getSequencedBlocks(params: SequencedBlockParam) {
   );
 
   // Create a method block for all listed methods
-  const methodBlocks = methodsToList.map(createMethodBlock);
+  const methodBlocks = methodsToList.map((method) =>
+    createMethodBlock(method as Method)
+  );
 
   if (show_default_blocks) {
     // Extend the given sequence with our default sequence

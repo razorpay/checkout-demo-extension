@@ -1,6 +1,15 @@
 import { createInstrument, isInstrumentForEntireMethod } from './instruments';
 import { validateAndCreateBlock } from './blocks';
 import * as ObjectUtils from 'utils/object';
+import type {
+  Options,
+  Display,
+  Restrictions,
+  Block,
+  Instruments,
+  Hide,
+} from 'configurability/types';
+import type { Method } from 'types/types';
 
 /**
  * Translates the options
@@ -14,22 +23,22 @@ import * as ObjectUtils from 'utils/object';
  *      @prop {Array<Instruments>} instruments Hidden insturments
  *      @prop {Array<string>} methods Hidden methods
  */
-function _translate(options = {}, external) {
+function _translate(options = {}, external: boolean) {
   options = ObjectUtils.clone(options);
 
-  const { display = {}, restrictions = [] } = options;
+  const { display = {}, restrictions = [] } = options as Options;
   const {
     blocks = {},
     hide = [],
     preferences = {},
     sequence = [],
-  } = display || {};
-  const { allow = [] } = restrictions || {};
+  } = (display as Display) || {};
+  const { allow = [] } = (restrictions as Restrictions) || {};
 
   /**
    * Create blocks
    */
-  let includedBlocks = [];
+  const includedBlocks: Block[] = [];
 
   ObjectUtils.loop(blocks, (value, code) => {
     if (external) {
@@ -47,18 +56,21 @@ function _translate(options = {}, external) {
   /**
    * Create hidden instruments
    */
-  const allHiddenInstruments = hide.map(createInstrument).filter(Boolean);
+  const allHiddenInstruments = (hide as Hide[])
+    .map(createInstrument)
+    .filter(Boolean);
 
   const hiddenInstruments = allHiddenInstruments.filter(
-    (instrument) => !isInstrumentForEntireMethod(instrument)
+    (instrument: Instruments | undefined) =>
+      !isInstrumentForEntireMethod(instrument as Instruments)
   );
 
   /**
    * Create disabled methods
    */
   const hiddenMethods = allHiddenInstruments
-    .filter(isInstrumentForEntireMethod)
-    .map((instrument) => instrument.method);
+    .filter(isInstrumentForEntireMethod as any)
+    .map((instrument) => (instrument as Instruments).method) as Method[];
 
   /**
    * RESTRICTIONS
@@ -92,6 +104,6 @@ function _translate(options = {}, external) {
  *
  * @returns {Object}
  */
-export function translateExternal(options) {
+export function translateExternal(options: Options) {
   return _translate(options, true);
 }

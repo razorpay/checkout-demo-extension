@@ -1,5 +1,13 @@
 import InstrumentsConfig from './instruments-config';
 import { getPackageNameFromShortcode } from 'common/upi';
+import type {
+  InstrumentsConfigMethod,
+  Instruments,
+  InstrumentCreators,
+} from 'configurability/types';
+import type { Ungrouped } from 'home/analytics/helpers';
+import type { Method } from 'types/types';
+import type { Customer } from 'emiV2/types/tokens';
 
 /**
  * Adds a type and category to an instrument
@@ -7,7 +15,7 @@ import { getPackageNameFromShortcode } from 'common/upi';
  *
  * @returns {Instrument}
  */
-function addTypeAndCategory(instrument) {
+function addTypeAndCategory(instrument: Instruments) {
   instrument._type = 'instrument';
 
   if (isInstrumentForEntireMethod(instrument)) {
@@ -52,7 +60,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   intl_bank_transfer: [],
 };
 
-const INSTRUMENT_CREATORS = {
+const INSTRUMENT_CREATORS: InstrumentCreators = {
   default: (instrument) => instrument,
   upi: (instrument) => {
     if (instrument.app) {
@@ -61,7 +69,7 @@ const INSTRUMENT_CREATORS = {
     }
 
     if (instrument.apps) {
-      instrument.apps = instrument.apps.map((app) => {
+      instrument.apps = instrument.apps.map((app: string) => {
         return getPackageNameFromShortcode(app) || app;
       });
     }
@@ -76,14 +84,17 @@ const INSTRUMENT_CREATORS = {
  *
  * @returns {boolean}
  */
-function hasOnlyAllowedKeys(instrument) {
+function hasOnlyAllowedKeys(instrument: Instruments) {
   const { method } = instrument;
 
   if (!method) {
     return false;
   }
 
-  const allowedKeys = PUBLIC_API_INSTRUMENT_KEYS[method];
+  const allowedKeys =
+    PUBLIC_API_INSTRUMENT_KEYS[
+      method as keyof typeof PUBLIC_API_INSTRUMENT_KEYS
+    ];
 
   // If we don't have any specific whitelisted keys, reject this
   if (!allowedKeys) {
@@ -96,7 +107,9 @@ function hasOnlyAllowedKeys(instrument) {
   );
 
   // None of the instrumentKeys should be absent from allowedKeys
-  const anyAbsent = instrumentKeys.some((key) => !allowedKeys.includes(key));
+  const anyAbsent = instrumentKeys.some(
+    (key) => !(allowedKeys as string[]).includes(key)
+  );
 
   if (anyAbsent) {
     return false;
@@ -104,7 +117,7 @@ function hasOnlyAllowedKeys(instrument) {
 
   // All keys must be arrays
   const allArrays = instrumentKeys.every((key) =>
-    Array.isArray(instrument[key])
+    Array.isArray(instrument[key as keyof Instruments])
   );
 
   return allArrays;
@@ -116,14 +129,16 @@ function hasOnlyAllowedKeys(instrument) {
  *
  * @returns {Instrument|undefined}
  */
-export function createInstrument(config) {
+export function createInstrument(config: Instruments) {
   const { method } = config;
 
   if (!method) {
     return;
   }
 
-  const creator = INSTRUMENT_CREATORS[method] || INSTRUMENT_CREATORS.default;
+  const creator =
+    INSTRUMENT_CREATORS[method as keyof typeof INSTRUMENT_CREATORS] ||
+    INSTRUMENT_CREATORS.default;
 
   const instrument = addTypeAndCategory(creator(config));
 
@@ -137,7 +152,7 @@ export function createInstrument(config) {
  *
  * @return {Instrument|undefined}
  */
-export function validateKeysAndCreateInstrument(config) {
+export function validateKeysAndCreateInstrument(config: Instruments) {
   if (!hasOnlyAllowedKeys(config)) {
     return;
   }
@@ -152,9 +167,9 @@ export function validateKeysAndCreateInstrument(config) {
  *
  * @returns {boolean}
  */
-export function isInstrumentForEntireMethod(instrument) {
+export function isInstrumentForEntireMethod(instrument: Instruments) {
   const method = instrument.method;
-  const config = InstrumentsConfig[method];
+  const config = InstrumentsConfig[method as InstrumentsConfigMethod];
 
   if (!config) {
     return false;
@@ -174,14 +189,19 @@ export function isInstrumentForEntireMethod(instrument) {
  *
  * @returns {Object}
  */
-export function addInstrumentToPaymentData(instrument, payment, customer) {
+export function addInstrumentToPaymentData(
+  instrument: Instruments,
+  payment: unknown,
+  customer: Customer
+) {
   const method = instrument.method;
-  const config = InstrumentsConfig[method];
+  const config = InstrumentsConfig[method as InstrumentsConfigMethod];
 
   if (!config) {
     return payment;
   }
-  return config.getPaymentPayload(
+  // TODO: need to remove type any once instruments-config migrated to TS
+  return (config as any).getPaymentPayload(
     getExtendedSingleInstrument(instrument),
     payment,
     customer
@@ -194,8 +214,12 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
  *
  * @returns {Instrument}
  */
-export function getExtendedSingleInstrument(instrument) {
-  return Object.assign({}, instrument, instrument._ungrouped[0]);
+export function getExtendedSingleInstrument(instrument: Instruments) {
+  return Object.assign(
+    {},
+    instrument,
+    (instrument._ungrouped as Ungrouped[])[0]
+  );
 }
 
 /**
@@ -204,8 +228,10 @@ export function getExtendedSingleInstrument(instrument) {
  *
  * @returns {boolean}
  */
-export function isSavedCardInstrument(instrument) {
-  return ['card', 'emi'].includes(instrument.method) && instrument.token_id;
+export function isSavedCardInstrument(instrument: Instruments) {
+  return (
+    ['card', 'emi'].includes(instrument.method as Method) && instrument.token_id
+  );
 }
 
 /**
@@ -215,7 +241,7 @@ export function isSavedCardInstrument(instrument) {
  *
  * @returns {boolean}
  */
-export function isInstrumentGrouped(instrument) {
+export function isInstrumentGrouped(instrument: Instruments) {
   const isMethodInstrument = isInstrumentForEntireMethod(instrument);
 
   /**
@@ -225,7 +251,9 @@ export function isInstrumentGrouped(instrument) {
    *
    * TODO: Check for UPI in isMethodWithToken
    */
-  const isMethodWithToken = ['card', 'emi'].includes(instrument.method);
+  const isMethodWithToken = ['card', 'emi'].includes(
+    instrument.method as Method
+  );
 
   /**
    *  For emandate instrument view will always be grouped
@@ -261,7 +289,7 @@ export function isInstrumentGrouped(instrument) {
      * instrument with a VPA
      */
     if (instrument.flows.includes('collect')) {
-      let ungrouped = instrument._ungrouped;
+      const ungrouped = instrument._ungrouped as Ungrouped[];
 
       // If individual, check for VPA
       if (ungrouped.length === 1) {
@@ -281,5 +309,5 @@ export function isInstrumentGrouped(instrument) {
     }
   }
 
-  return instrument._ungrouped.length > 1;
+  return (instrument._ungrouped as Ungrouped[]).length > 1;
 }

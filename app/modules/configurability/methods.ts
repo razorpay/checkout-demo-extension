@@ -1,5 +1,7 @@
 import { createBlock } from './blocks';
 import { ungroupInstruments } from './ungroup';
+import type { Block } from 'configurability/types';
+import type { Method } from 'types/types';
 
 /**
  * Creates a method block
@@ -7,8 +9,8 @@ import { ungroupInstruments } from './ungroup';
  *
  * @returns {Block}
  */
-export function createMethodBlock(method) {
-  let block = createBlock(method);
+export function createMethodBlock(method: Method) {
+  let block = createBlock(method) as Block;
 
   block = Object.assign(block, {
     method,
@@ -24,15 +26,15 @@ export function createMethodBlock(method) {
  *
  * @returns {Array<Block>}
  */
-export function clusterRazorpayBlocks(blocks) {
-  const clustered = [];
-  let cluster = [];
+export function clusterRazorpayBlocks(blocks: Block[]) {
+  const clustered: Block[] = [];
+  let cluster: Block[] = [];
 
   function checkAndPushCluster() {
     if (cluster.length) {
       const rzpBlock = createBlock('rzp.cluster', {
         instruments: cluster,
-      });
+      }) as Block;
 
       clustered.push(rzpBlock);
 
@@ -59,5 +61,5 @@ export function clusterRazorpayBlocks(blocks) {
   // Push any pending clusters
   checkAndPushCluster();
 
-  return clustered.map(ungroupInstruments);
+  return clustered.map((block) => ungroupInstruments(block));
 }

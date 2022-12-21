@@ -5,7 +5,6 @@ import * as ObjectUtils from 'utils/object';
 import type {
   Block,
   Instruments,
-  Ungrouped,
   InstrumentsConfigMethod,
 } from 'configurability/types';
 import type { Customer } from 'emiV2/types/tokens';
@@ -19,7 +18,7 @@ import type { Customer } from 'emiV2/types/tokens';
  */
 export function getIndividualInstruments(
   instrument: Instruments,
-  customer: Customer
+  customer?: Customer
 ) {
   const method = instrument.method;
   const config = InstrumentsConfig[method as InstrumentsConfigMethod];
@@ -49,12 +48,15 @@ export function getIndividualInstruments(
  *
  * @returns {Block}
  */
-export function ungroupInstruments(block: Block, customer: Customer) {
+export function ungroupInstruments(block: Block, customer?: Customer) {
   const instruments = block.instruments as Instruments[];
-  const ungrouped: Ungrouped[] = [];
+  const ungrouped: Instruments[] = [];
 
   instruments.forEach((instrument) => {
-    const individuals = getIndividualInstruments(instrument, customer);
+    const individuals = getIndividualInstruments(
+      instrument,
+      customer
+    ) as Instruments;
 
     ungrouped.push(individuals);
   });
