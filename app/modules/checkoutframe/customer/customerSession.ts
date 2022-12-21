@@ -16,7 +16,7 @@ export function logoutUserOnClient(customer: Customer) {
   /**
    * can't use getView('topbar') because of circular dep
    */
-  session.topBar.setLogged(false);
+  session.topBar?.setLogged(false);
   removeLitePreferencesFromStorage(getOption('key'));
 }
 
