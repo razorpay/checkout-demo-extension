@@ -15,4 +15,5 @@ export type Instrument = {
   networks?: string[];
   types?: string[];
   iins?: string[];
+  cobranded_partners?: string[];
 };

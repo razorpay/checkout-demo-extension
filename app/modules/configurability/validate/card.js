@@ -31,6 +31,8 @@ export function validateCardInstrument(
     const type = features.type;
     const issuer = features.issuer;
     const country = features.country;
+    const cobranding_partner = features.cobranding_partner;
+
     let network;
     let iin;
 
@@ -51,13 +53,15 @@ export function validateCardInstrument(
       iin = getIin(cardNumberFromPayment);
     }
 
-    const { types, iins, issuers, networks, countries } = instrument;
+    const { types, iins, issuers, networks, countries, cobranded_partners } =
+      instrument;
 
     let isTypeValid = true;
     let isNetworkValid = true;
     let isIssuerValid = true;
     let isIinValid = true;
     let isCountryValid = true;
+    let isCoBrandingValid = true;
 
     if (iin && iins) {
       isIinValid = iins.includes(iin);
@@ -77,12 +81,25 @@ export function validateCardInstrument(
     if (country && countries) {
       isCountryValid = isCountryInAllowedList(country, countries);
     }
+
+    if (cobranded_partners) {
+      // If co branding config is there
+      // but the entered card does not have a cobranding partner assiciated
+      // invalidated the card
+      if (!cobranding_partner) {
+        isCoBrandingValid = false;
+      } else {
+        isCoBrandingValid = cobranded_partners.includes(cobranding_partner);
+      }
+    }
+
     return (
       isTypeValid &&
       isNetworkValid &&
       isIssuerValid &&
       isIinValid &&
-      isCountryValid
+      isCountryValid &&
+      isCoBrandingValid
     );
   });
 }

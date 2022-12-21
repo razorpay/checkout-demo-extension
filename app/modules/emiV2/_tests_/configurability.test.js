@@ -37,6 +37,15 @@ const emi_options = {
       merchant_payback: '2.45',
     },
   ],
+  onecard: [
+    {
+      duration: 3,
+      interest: 15,
+      subvention: 'customer',
+      min_amount: 300000,
+      merchant_payback: '2.45',
+    },
+  ],
 };
 
 let bankEMIOPtions = [
@@ -244,6 +253,77 @@ describe('Custom config instruments', () => {
     };
     expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
       JSON.stringify(expected)
+    );
+
+    const otherEMiOptions = [
+      {
+        code: 'onecard',
+      },
+      {
+        code: 'bajaj',
+      },
+    ];
+
+    expected = [
+      {
+        code: 'onecard',
+      },
+      {
+        code: 'bajaj',
+      },
+    ];
+
+    instrument = {
+      method: 'emi',
+    };
+
+    expect(JSON.stringify(expected)).toBe(
+      JSON.stringify(
+        filterCardlessProvidersAgainstCustomBlock(otherEMiOptions, instrument)
+      )
+    );
+
+    instrument = {
+      method: 'emi',
+      issuers: ['bajaj'],
+    };
+
+    expected = [
+      {
+        code: 'bajaj',
+      },
+    ];
+
+    expect(JSON.stringify(expected)).toBe(
+      JSON.stringify(
+        filterCardlessProvidersAgainstCustomBlock(otherEMiOptions, instrument)
+      )
+    );
+
+    instrument = {
+      method: 'emi',
+      cobranded_partners: ['onecard'],
+    };
+
+    expected = [
+      {
+        code: 'onecard',
+      },
+    ];
+
+    expect(JSON.stringify(expected)).toBe(
+      JSON.stringify(
+        filterCardlessProvidersAgainstCustomBlock(otherEMiOptions, instrument)
+      )
+    );
+
+    payload = {
+      emiBankList: bankEMIOPtions,
+      instrument,
+      emiBanksProviders: emi_options,
+    };
+    expect(JSON.stringify(filterEmiBanksAgainstCustomBlock(payload))).toBe(
+      JSON.stringify([])
     );
   });
 });

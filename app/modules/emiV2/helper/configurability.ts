@@ -33,14 +33,22 @@ export const filterCardlessProvidersAgainstCustomBlock = (
   // Since they are card emi and rest are cardless
   if (instrument.method === 'emi') {
     const issuers = instrument.issuers;
-    return providers.filter((bank) => {
-      // If there are no issuers present
+    const cobranded_partners = instrument.cobranded_partners;
+    const providerFilteredByIssuer = providers.filter((bank) => {
+      // If there are no issuers/cobranding partners present
       // match only card emi providers like onecard,bajaj etc
-      const issuerMatches = issuers
-        ? issuers.includes(bank.code)
-        : isOtherCardEmiProvider(bank.code);
+      // If cobranding/issuer is associated with the instrument match the current provider
+      // with co branding partner/issuer respectively
+      const issuerMatches =
+        issuers || cobranded_partners
+          ? issuers?.includes(bank.code) ||
+            cobranded_partners?.includes(bank.code)
+          : isOtherCardEmiProvider(bank.code);
+
       return issuerMatches;
     });
+
+    return providerFilteredByIssuer;
   }
 
   // If it's a cardless emi block we need to filter out
@@ -85,10 +93,18 @@ export const filterEmiBanksAgainstCustomBlock = (
   if (instrument.method === 'emi') {
     return emiBankList.filter((bank: EMIBANKS) => {
       const hasIssuers = Boolean(instrument.issuers);
+      const hasCoBranding = Boolean(instrument.cobranded_partners);
       const issuers = instrument.issuers || [];
       // If there are no issuers present match all the issuers
-      const issuerMatches =
+      let issuerMatches =
         hasIssuers && bank.code ? issuers.includes(bank.code) : true;
+
+      // If co-branding config is there we need to filter out only co-branding emi providers
+      // As we will map the card issuer if there are any issuer config there
+      if (hasCoBranding && instrument.cobranded_partners?.length) {
+        issuerMatches = false;
+      }
+
       return (
         issuerMatches &&
         !isOnlyCardlessProvider(emiBanksProviders, bank, cardlessEmiProviders)
@@ -146,6 +162,8 @@ export function filterSavedCardsAgainstCustomBlock(
     const hasIins = Boolean(instrument.iins);
     const issuers: string[] = instrument.issuers || [];
     const networks: string[] = instrument.networks || [];
+    const coBrandingPartners: string[] = instrument.cobranded_partners || [];
+    const hasCoBranding = instrument.cobranded_partners?.length;
 
     let hasTypes = Boolean(instrument.types);
     let types = instrument.types || [];
@@ -166,13 +184,26 @@ export function filterSavedCardsAgainstCustomBlock(
       ? issuers.includes(token.card.issuer)
       : true;
 
+    // Match against cobranding partner if co branding config is there
+    // and the token also has co branding partner
+    let coBrandingMatches = hasCoBranding
+      ? coBrandingPartners.includes(token.card.cobranding_partner)
+      : true;
+
+    // If issuer specifc config is there
+    // we need to filter out the cards that have co-branding partners but matches the issuer
+    // Eg. FDRL bank has co-branding enabled but the user only wants FDRL bank EMI and not onecard emi
+    if (!hasCoBranding && token.card.cobranding_partner && hasIssuers) {
+      coBrandingMatches = false;
+    }
+
     const networkMatches = hasNetworks
       ? networks.includes(token.card.network)
       : true;
 
     const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
-    return issuerMatches && networkMatches && typeMatches;
+    return issuerMatches && coBrandingMatches && networkMatches && typeMatches;
   });
   return eligibleTokens;
 }

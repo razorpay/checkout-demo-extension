@@ -88,6 +88,35 @@ describe('validate SavedCards', () => {
           created_at: 1577458420,
           expired_at: 1672511399,
         },
+        {
+          id: 'token_DxGzKR9hjdARiF',
+          entity: 'token',
+          token: '5XL7Oe8G9jWDqI',
+          bank: null,
+          wallet: null,
+          method: 'card',
+          consent_taken: false,
+          card: {
+            entity: 'card',
+            name: 'Siddharth',
+            last4: '8882',
+            network: 'MasterCard',
+            type: 'credit',
+            issuer: 'BARB',
+            international: false,
+            expiry_month: 12,
+            expiry_year: 2022,
+            flows: { otp: true, recurring: true, iframe: false },
+            cobranding_partner: 'onecard',
+          },
+          vpa: null,
+          recurring: false,
+          auth_type: null,
+          mrn: null,
+          used_at: 1577458421,
+          created_at: 1577458420,
+          expired_at: 1672511399,
+        },
       ],
     },
   });
@@ -97,7 +126,7 @@ describe('validate SavedCards', () => {
   tokens = getSavedCardsForEMI(currentCustomer);
 
   test('If user has saved cards', () => {
-    expect(tokens.length).toBe(2);
+    expect(tokens.length).toBe(3);
   });
 
   let instrument: Instrument = {
@@ -128,7 +157,7 @@ describe('validate SavedCards', () => {
     };
 
     filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
-    expect(filteredTokens.length).toBe(2);
+    expect(filteredTokens.length).toBe(3);
 
     instrument = {
       method: 'emi',
@@ -149,6 +178,31 @@ describe('validate SavedCards', () => {
       _type: 'instrument',
       section: 'custom',
       types: ['credit'],
+    };
+
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
+    expect(filteredTokens.length).toBe(2);
+
+    instrument = {
+      method: 'emi',
+      id: '12345',
+      skipCTAClick: false,
+      _type: 'instrument',
+      section: 'custom',
+      cobranded_partners: ['onecard'],
+    };
+
+    filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);
+    expect(filteredTokens.length).toBe(1);
+
+    instrument = {
+      method: 'emi',
+      id: '12345',
+      skipCTAClick: false,
+      _type: 'instrument',
+      section: 'custom',
+      cobranded_partners: ['onecard'],
+      issuers: ['BARB'],
     };
 
     filteredTokens = filterSavedCardsAgainstCustomBlock(tokens, instrument);

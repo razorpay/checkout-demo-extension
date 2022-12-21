@@ -17,6 +17,7 @@ export interface CardInstrument {
   section?: string;
   blockTitle?: string;
   countries?: string[];
+  cobranded_partners?: string[];
 }
 
 export interface BankInstrument {

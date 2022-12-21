@@ -532,6 +532,8 @@
       const issuers = instrument.issuers || [];
       const networks = instrument.networks || [];
       const countries = instrument.countries || [];
+      const coBrandingPartners: string[] = instrument.cobranded_partners || [];
+      const hasCoBranding = instrument.cobranded_partners?.length;
 
       let hasTypes = Boolean(instrument.types);
       let types = instrument.types || [];
@@ -552,9 +554,20 @@
           : true;
 
       // If there is no issuer present, it means match all issuers.
-      const issuerMatches = hasIssuers
+      // Match against issuers only if co branding config is not there
+      let issuerMatches = hasIssuers
         ? issuers.includes(token.card.issuer)
         : true;
+
+      // Match against cobranding partner if co branding config is there
+      // and the token also has co branding partner
+      let coBrandingMatches = hasCoBranding
+        ? coBrandingPartners.includes(token.card.cobranding_partner)
+        : true;
+
+      if (!hasCoBranding && token.card.cobranding_partner && hasIssuers) {
+        coBrandingMatches = false;
+      }
 
       const networkMatches = hasNetworks
         ? networks.includes(token.card.network)
@@ -562,7 +575,13 @@
 
       const typeMatches = hasTypes ? types.includes(token.card.type) : true;
 
-      return issuerMatches && networkMatches && typeMatches && countryMatches;
+      return (
+        issuerMatches &&
+        coBrandingMatches &&
+        networkMatches &&
+        typeMatches &&
+        countryMatches
+      );
     });
     return eligibleTokens;
   }

@@ -613,6 +613,57 @@ describe('Module: subtext/card', () => {
           'en'
         )
       );
+
+      instrument = {
+        method: 'card',
+        cobranded_partners: ['onecard'],
+      };
+
+      expect('Only onecard cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
+      );
+
+      instrument = {
+        method: 'card',
+        cobranded_partners: ['onecard'],
+        issuers: ['HDFC'],
+      };
+
+      expect('Only HDFC onecard cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
+      );
+
+      instrument = {
+        method: 'card',
+        cobranded_partners: ['onecard'],
+        networks: ['VISA'],
+      };
+
+      expect('Only onecard VISA cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
+      );
+
+      instrument = {
+        method: 'card',
+        cobranded_partners: ['onecard', 'slice'],
+        issuers: ['HDFC', 'ICIC'],
+      };
+
+      expect('Only select cards supported').toBe(
+        CardSubtext.generateSubtextForCardInstrument(
+          instrument as CardInstrument,
+          'en'
+        )
+      );
     });
   });
 });

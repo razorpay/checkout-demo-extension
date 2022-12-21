@@ -414,6 +414,7 @@ export default {
     select_networks_specific_issuers: 'select {issuers}',
     specific_bins_supported: 'Only {bins} accepted',
     supported: 'supported',
+    select_cobranding: 'select cobranding',
   },
   cardless_emi: {
     providers: {

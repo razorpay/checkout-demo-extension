@@ -42,18 +42,21 @@ export function generateSubtextForCardInstrument(
   const instrumentTypes = instrument.types || [];
   const instrumentIins = instrument.iins || [];
   const instrumentCountries = instrument.countries || [];
+  const instrumentCoBrandings = instrument.cobranded_partners || [];
 
   const issuersLength = instrumentIssuers.length;
   const networksLength = instrumentNetworks.length;
   const typesLength = instrumentTypes.length;
   const iinsLength = instrumentIins.length;
   const countriesLength = instrumentCountries.length;
+  const coBrandingsLength = instrumentCoBrandings.length;
 
   const supportAllIssuers = issuersLength === 0;
   const supportAllNetworks = networksLength === 0;
   const supportAllTypes = typesLength === 0;
   const supportAllIins = iinsLength === 0;
   const supportAllCountries = countriesLength === 0;
+  const supportAllCoBrandings = coBrandingsLength === 0;
   // If IINs are provided, use only IINs to generate subtext
   if (!supportAllIins) {
     if (iinsLength <= 3) {
@@ -84,13 +87,17 @@ export function generateSubtextForCardInstrument(
     if (!supportAllCountries) {
       countriesString = formatCountriesMessage(instrumentCountries);
     }
+    let coBrandingString;
+
     if (supportAllNetworks) {
       if (supportAllTypes) {
         if (supportAllCountries) {
-          return formatMessageWithLocale(
-            'card_subtext.all_cards_supported',
-            locale
-          );
+          if (supportAllCoBrandings) {
+            return formatMessageWithLocale(
+              'card_subtext.all_cards_supported',
+              locale
+            );
+          }
         }
       }
     } else if (networksLength <= 2) {
@@ -110,7 +117,23 @@ export function generateSubtextForCardInstrument(
       }
     }
 
+    if (!supportAllCoBrandings) {
+      if (coBrandingsLength <= 2) {
+        coBrandingString = generateTextFromList(
+          instrumentCoBrandings,
+          locale,
+          2
+        );
+      } else {
+        coBrandingString = formatMessageWithLocale(
+          'card_subtext.select_cobranding',
+          locale
+        );
+      }
+    }
+
     stringList = stringList.concat([
+      coBrandingString,
       networksString,
       typesString,
       countriesString,
@@ -129,6 +152,7 @@ export function generateSubtextForCardInstrument(
     const cardsString = formatMessageWithLocale('card_subtext.cards', locale);
     let networksString;
     let countriesString;
+    let coBrandingString;
 
     if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes, locale);
@@ -149,8 +173,17 @@ export function generateSubtextForCardInstrument(
       );
     }
 
+    if (supportAllCoBrandings) {
+      // do nothing
+    } else if (coBrandingsLength === 1) {
+      coBrandingString = instrumentCoBrandings[0];
+    } else {
+      issuersString = formatMessageWithLocale('card_subtext.select', locale);
+    }
+
     stringList = stringList.concat([
       issuersString,
+      coBrandingString,
       networksString,
       typesString,
       countriesString,
@@ -169,6 +202,7 @@ export function generateSubtextForCardInstrument(
     const cardsString = formatMessageWithLocale('card_subtext.cards', locale);
     let networksString;
     let countriesString;
+    let coBrandingString;
     if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes, locale);
     }
@@ -191,8 +225,17 @@ export function generateSubtextForCardInstrument(
       issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
+    if (supportAllCoBrandings) {
+      // Do nothing
+    } else if (coBrandingsLength === 1) {
+      coBrandingString = instrumentCoBrandings[0];
+    } else {
+      issuersString = formatMessageWithLocale('card_subtext.select', locale);
+    }
+
     stringList = stringList.concat([
       issuersString,
+      coBrandingString,
       networksString,
       typesString,
       countriesString,
