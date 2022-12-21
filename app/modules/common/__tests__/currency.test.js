@@ -18,6 +18,10 @@ describe('common/currency', () => {
     expect(formatAmountWithSymbol(12345, 'USD')).toBe('$ 123.45');
   });
 
+  test('Formats amount with symbol correctly for MYR', function () {
+    expect(formatAmountWithSymbol(10000000, 'MYR')).toBe('RM 1,00,000.00');
+  });
+
   test('Updates additional currencies and formats amount correctly', function () {
     updateCurrencies(additionalCurrencies);
 

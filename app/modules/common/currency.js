@@ -38,6 +38,20 @@ const removeDecimals =
 const makeDecimalComma = (str, comma = ',') => str.replace(/\./, comma);
 
 /**
+ * formats amount with commas for INR
+ * @param {number} amount
+ * @param {number} decimals
+ * @returns {string}
+ * eg, 123456.00 => 1,23,456.00
+ */
+const inrCommaFormatter = (amount, decimals) => {
+  return String(amount).replace(
+    new RegExp(`(.{1,2})(?=.(..)+(\\..{${decimals}})$)`, 'g'),
+    '$1,'
+  );
+};
+
+/**
  * Reference: https://www.thefinancials.com/Default.aspx?SubSectionID=curformat
  */
 const CURRENCY_FORMATTERS = {
@@ -97,11 +111,13 @@ const CURRENCY_FORMATTERS = {
 
   // 	#,##,###.##
   inr: (amount, decimals) => {
-    const amountStr = String(amount).replace(
-      new RegExp(`(.{1,2})(?=.(..)+(\\..{${decimals}})$)`, 'g'),
-      '$1,'
-    );
+    const amountStr = inrCommaFormatter(amount, decimals);
     return removeDecimals(decimals)(amountStr);
+  },
+
+  //  #,##,###.00 or #,##,###.##
+  myr: (amount, decimals) => {
+    return inrCommaFormatter(amount, decimals);
   },
 
   none: (amount) => String(amount),
@@ -607,6 +623,7 @@ const currenciesConfig = {
   },
 
   MYR: {
+    format: CURRENCY_FORMATTERS.myr,
     minor: 'sen',
     minimum: 10,
   },
