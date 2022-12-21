@@ -4454,7 +4454,7 @@ const preferences = {
     },
     features: { google_pay: true, save_vpa: true },
   },
-  basic: {
+  default: {
     options: {
       theme: { colors: '#528FF0' },
       image: null,
@@ -5141,7 +5141,32 @@ const preferences = {
       recurring: { card: { credit: ['MasterCard', 'Visa'] }, nach: false },
       upi_intent: true,
     },
+    experiments: {
+      checkout_redesign_v1_5: true,
+      upi_ux: 'variant_1',
+      emi_ux_revamp: true,
+      upi_qr_v2: true,
+      cb_redesign_v1_5: true,
+      recurring_redesign_v1_5: true,
+      reuse_upi_paymentId: true,
+      recurring_upi_intent_qr: false,
+      recurring_upi_all_psp: false,
+      banking_redesign_v15: false,
+      remove_default_tokenization_flag: true,
+      email_less_checkout: false,
+    },
+    org: {
+      isOrgRazorpay: true,
+      checkout_logo_url:
+        'https://rzp-1415-prod-dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpmeNFmd',
+    },
     global: true,
+    language_code: 'en',
+    merchant_brand_name: 'Razorpay',
+    merchant_country: 'IN',
+    merchant_currency: 'INR',
+    merchant_key: 'rzp_test_1DP5mmOlF5G5ag',
+    merchant_name: 'Razorpay',
     downtime: {
       netbanking: [
         {
@@ -5152,7 +5177,15 @@ const preferences = {
         },
       ],
     },
-    features: { google_pay: true, save_vpa: true },
+    features: {
+      google_pay: true,
+      phonepe_intent: true,
+      save_vpa: true,
+      redirect_to_zestmoney: true,
+      dcc: true,
+      show_mor_tnc: true,
+      show_email_on_checkout: true,
+    },
   },
   order_emandate: {
     options: {

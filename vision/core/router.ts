@@ -10,16 +10,9 @@ import {
   localCDNPath,
   mockAssetsPath,
 } from '../constant';
-
-type CustomRoute = {
-  url: string;
-  method: string;
-  setBody(body: any): void;
-  setResponse(response: any): void;
-  setHandler: (fn: (route: Route, request: Request) => void) => void;
-  handler: (route: Route, request: Request) => void;
-  options: { partialMatch?: boolean };
-};
+import { attachHandlers } from './handler';
+import { match } from 'path-to-regexp';
+import type { CustomRoute, Context } from './types';
 
 function delay(time = 1000) {
   return new Promise((resolve) => setTimeout(resolve, time));
@@ -27,74 +20,116 @@ function delay(time = 1000) {
 
 const routes: CustomRoute[] = [];
 
-function requestHandler(route: Route, request: Request) {
-  const url = request.url();
-  const method = request.method().toLowerCase();
-  if (method === 'get') {
-    if (
-      url.endsWith('favicon.ico') ||
-      url.endsWith('livereload.js?snipver=1')
-    ) {
-      return route.fulfill({
-        status: 204,
-      });
-    } else if (url.startsWith(fontPath)) {
-      return serveFile(
-        route,
-        path.join(appPath, 'fonts', url.slice(fontPath.length))
-      );
-    } else if (url.startsWith(cdnBuildPath)) {
-      return serveFile(
-        route,
-        path.join(appPath, 'dist/v1', url.slice(cdnBuildPath.length))
-      );
-    } else if (url.startsWith(cdnImagePath)) {
-      const cdnPath = url.slice(cdnImagePath.length);
-      return serveFile(
-        route,
-        path.join(appPath, 'images', cdnPath),
-        [
-          path.join(localCDNPath, cdnPath),
-          path.join(mockAssetsPath, cdnPath.split('/').slice(-1)[0]), // extract filename
-          path.join(appPath, 'images', 'bank/ICIC.gif'),
-        ] // TODO need better fallback images
-      );
-    } else if (url.startsWith(googleChartAPI)) {
-      return serveFile(route, path.join(mockAssetsPath, 'upiqr.png'));
-    } else if (url.startsWith('data:')) {
-      return route.continue();
-    }
-  } else if (method === 'post') {
-    if (url.startsWith('https://lumberjack.razorpay.com/')) {
-      return route.fulfill({
-        status: 204,
-      });
-    }
-  }
-  const matchedRoute = routes.find((r) => {
-    if (r.method === 'all' || r.method === method) {
-      if (r?.options?.partialMatch) {
-        return url.includes(r.url);
-      } else {
-        return r.url === url;
+function requestHandler(context: Context) {
+  return function (route: Route, request: Request) {
+    const url = request.url();
+    const method = request.method().toLowerCase();
+    if (method === 'get') {
+      if (
+        url.endsWith('favicon.ico') ||
+        url.endsWith('livereload.js?snipver=1')
+      ) {
+        return route.fulfill({
+          status: 204,
+        });
+      } else if (url.startsWith(fontPath)) {
+        return serveFile(
+          route,
+          path.join(appPath, 'fonts', url.slice(fontPath.length))
+        );
+      } else if (url.startsWith(cdnBuildPath)) {
+        return serveFile(
+          route,
+          path.join(appPath, 'dist/v1', url.slice(cdnBuildPath.length))
+        );
+      } else if (url.startsWith(cdnImagePath)) {
+        const cdnPath = url.slice(cdnImagePath.length);
+        return serveFile(
+          route,
+          path.join(appPath, 'images', cdnPath),
+          [
+            path.join(localCDNPath, cdnPath),
+            path.join(mockAssetsPath, cdnPath.split('/').slice(-1)[0]), // extract filename
+            path.join(appPath, 'images', 'bank/ICIC.gif'),
+          ] // TODO need better fallback images
+        );
+      } else if (url.startsWith(googleChartAPI)) {
+        return serveFile(route, path.join(mockAssetsPath, 'upiqr.png'));
+      } else if (url.startsWith('data:')) {
+        return route.continue();
+      }
+    } else if (method === 'post') {
+      if (url.startsWith('https://lumberjack.razorpay.com/')) {
+        return route.fulfill({
+          status: 204,
+        });
       }
     }
-  });
 
-  if (matchedRoute) {
-    return matchedRoute.handler(route, request);
-  }
+    const matchedRoute = routes.find((r) => {
+      if (r.method === 'all' || r.method === method) {
+        const { pathname } = new URL(url);
+        const matched = match(r.url)(pathname);
 
-  console.warn(`Unhandled request with url ${url}`);
-  route.fulfill({
-    status: 204,
-  });
+        if (matched) {
+          return true;
+        }
+      }
+    });
+
+    if (matchedRoute) {
+      let apiOverrides =
+        context?.apiOverrides?.[matchedRoute?.options?.id || ''] || {};
+
+      const {
+        response,
+        status_code = 200,
+        content_type = 'application/json',
+      } = matchedRoute.handler({
+        route,
+        request,
+        context,
+        name: context?.name || 'default',
+        overrides:
+          context?.apiOverrides?.[matchedRoute?.options?.id || ''] || {},
+      }) || {};
+
+      let updatedResponse = response;
+      // override only if json [may need to update accordingly]
+      if (typeof updatedResponse !== 'string') {
+        if (typeof apiOverrides === 'function') {
+          updatedResponse = apiOverrides(response);
+        } else if (apiOverrides && typeof apiOverrides === 'object') {
+          updatedResponse = { ...response, ...apiOverrides };
+        }
+      }
+      if (!response) {
+        return route.fulfill({
+          status: 204,
+        });
+      }
+
+      return route.fulfill({
+        body:
+          typeof updatedResponse === 'string'
+            ? updatedResponse
+            : JSON.stringify(updatedResponse),
+        status: status_code,
+        contentType: content_type,
+      });
+    }
+
+    console.warn(`Unhandled request with url ${url}`);
+    route.fulfill({
+      status: 204,
+    });
+  };
 }
 
-export async function createRouter(page: Page) {
-  await page.route(Boolean, requestHandler);
+export async function createRouter(page: Page, context: Context) {
+  await page.route(Boolean, requestHandler(context));
 
-  return {
+  const router = {
     get: add('get'),
     post: add('post'),
     put: add('put'),
@@ -106,7 +141,13 @@ export async function createRouter(page: Page) {
     clear() {
       routes.length = 0;
     },
+    async setContext(ctx) {
+      await page.route(Boolean, requestHandler(ctx));
+    },
   };
+  attachHandlers(router);
+
+  return router;
 }
 
 async function serveFile(
@@ -136,44 +177,20 @@ async function serveFile(
 function add(method) {
   return function (
     url: string,
-    body: any,
+    handler: CustomRoute['handler'],
     options: {
       partialMatch?: boolean;
+      id?: string;
     } = {}
   ) {
+    options.partialMatch = options.partialMatch || true;
+
     const self: CustomRoute = {
       url,
       method,
       options,
-      setBody(body) {
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        self.setResponse({
-          status: 200,
-          body,
-        });
-      },
-
-      setResponse(response) {
-        self.setHandler((route) => {
-          route.fulfill(response);
-        });
-      },
-
-      setHandler: (fn) => {
-        self.handler = fn;
-      },
-      handler: (route) => {
-        route.fulfill({
-          status: 204,
-        });
-      },
+      handler,
     };
-
-    if (typeof body !== 'undefined') {
-      self.setBody(body);
-    }
     routes.push(self);
     return self;
   };

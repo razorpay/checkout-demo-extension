@@ -1,11 +1,8 @@
 import { test, expect } from '../core';
-import { setPreference } from '../helper';
 import Options from '../mock/options';
-import Preferences from '../mock/preferences';
 
 test('basic test', async ({ page, util }) => {
   const options = Options();
-  setPreference(util.router, options, Preferences());
   await util.openCheckout({
     options,
   });

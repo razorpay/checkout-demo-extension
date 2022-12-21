@@ -64,4 +64,15 @@ const preferredMethodForTokenization = {
     },
   },
 };
-module.exports = { preferredInsturments, preferredMethodForTokenization };
+
+const p13n = {
+  default: preferredInsturments,
+};
+
+const getP13n = (type) => p13n[type];
+
+module.exports = {
+  preferredInsturments,
+  preferredMethodForTokenization,
+  getP13n,
+};
