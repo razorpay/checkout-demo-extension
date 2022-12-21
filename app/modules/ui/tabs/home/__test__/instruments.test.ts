@@ -1,6 +1,15 @@
-import { isInstrumentHidden } from '../instruments';
+import {
+  getInstrumentMeta,
+  getOrderedBlockData,
+  isInstrumentHidden,
+} from 'ui/tabs/home/instruments';
 import { trackPaypalRendered } from '../helpers';
 import { getCheckoutConfig } from 'razorpay';
+import { blocks } from 'checkoutstore/screens/home';
+import {
+  getInstrumentMetaTestCases,
+  getOrderedBlockDataTestCases,
+} from './__mocks__/data';
 
 jest.mock('razorpay', () => ({
   ...jest.requireActual('razorpay'),
@@ -12,7 +21,7 @@ const mockTrackRender = jest.fn();
 jest.mock('analytics', () => {
   return {
     Events: {
-      TrackRender: (event) => mockTrackRender(event),
+      TrackRender: (event: any) => mockTrackRender(event),
     },
     HomeEvents: {
       PAYPAL_RENDERED: 'paypal:render',
@@ -24,7 +33,7 @@ describe('isInstrumentHidden', () => {
   describe('UPI QR v2', () => {
     describe('shown_default_blocks', () => {
       test('UPI QR v2 should be hidden if show_default_blocks is set to false', () => {
-        getCheckoutConfig.mockImplementationOnce(() => {
+        (getCheckoutConfig as jest.Mock).mockImplementationOnce(() => {
           return {
             display: {
               blocks: {
@@ -55,7 +64,7 @@ describe('isInstrumentHidden', () => {
       });
 
       test('UPI QR v2 should be shown if show_default_blocks is set to true', () => {
-        getCheckoutConfig.mockImplementationOnce(() => {
+        (getCheckoutConfig as jest.Mock).mockImplementationOnce(() => {
           return {
             display: {
               blocks: {
@@ -89,10 +98,15 @@ describe('isInstrumentHidden', () => {
         const hidden = isInstrumentHidden({ method: 'upi', flow: 'main_qr' });
         expect(hidden).toBe(false);
       });
+
+      test('Should be false if instrument data is not passed correct', () => {
+        const hidden = isInstrumentHidden({});
+        expect(hidden).toBe(false);
+      });
     });
     describe('UPI method hidden', () => {
       test('UPI QR v2 should be hidden if upi method is hidden', () => {
-        getCheckoutConfig.mockImplementationOnce(() => {
+        (getCheckoutConfig as jest.Mock).mockImplementationOnce(() => {
           return {
             display: {
               hide: [{ method: 'upi' }],
@@ -112,7 +126,7 @@ describe('isInstrumentHidden', () => {
 
     describe('UPI flow hidden', () => {
       test('UPI QR v2 should be hidden if upi main_qr flow is hidden', () => {
-        getCheckoutConfig.mockImplementationOnce(() => {
+        (getCheckoutConfig as jest.Mock).mockImplementationOnce(() => {
           return {
             display: {
               hide: [{ method: 'upi', flow: 'main_qr' }],
@@ -212,5 +226,18 @@ describe('Testing trackPaypalRendered function in ./helper.js', () => {
 
     trackPaypalRendered(data);
     expect(mockTrackRender).not.toHaveBeenCalled();
+  });
+});
+
+describe('Testing getInstrumentMeta', () => {
+  test.each(getInstrumentMetaTestCases)('$name', ({ input, output, block }) => {
+    blocks.set(block);
+    expect(getInstrumentMeta(input)).toEqual(output);
+  });
+});
+
+describe('Testing getOrderedBlockData', () => {
+  test.each(getOrderedBlockDataTestCases)('$name', ({ input, output }) => {
+    expect(getOrderedBlockData(input)).toEqual(output);
   });
 });

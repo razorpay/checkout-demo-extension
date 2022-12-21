@@ -1,100 +1,65 @@
-import { getInstrumentDetails } from '../helpers';
+import { blocks } from 'checkoutstore/screens/home';
+import { getBanks } from 'razorpay';
+import {
+  getInstrumentDetails,
+  addConsentDetailsToInstrument,
+  getBlockTitle,
+  getSectionsDisplayed,
+  getBankText,
+  getAvailableMethods,
+} from 'ui/tabs/home/helpers';
+import {
+  addConsentDetailsToInstrumentTestCases,
+  getAvailableMethodsTestCases,
+  getBanktextTestCases,
+  getBlockTitleTestCases,
+  getInstrumentDetailsTestCases,
+  getSectionsDisplayedTestCases,
+} from './__mocks__/data';
+
+jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
+  getBanks: jest.fn(),
+}));
 
 describe('test #getInstrumentDetails', () => {
-  test('verify event data for card', () => {
-    const instrument = {
-      block: {
-        code: 'rzp.preferred',
-        _type: 'block',
-        title: 'Preferred Payment Methods',
-      },
-      consent_taken: false,
-      id: 'KHQYLuZRaoYX8e',
-      issuers: ['ICIC'],
-      meta: { preferred: true },
-      method: 'card',
-      networks: ['Visa'],
-      section: 'p13n',
-      skipCTAClick: false,
-      token_id: 'token_HMpQW2ILsIXGxA',
-      types: ['debit'],
-    };
-
-    expect(getInstrumentDetails(instrument)).toStrictEqual({
-      issuer: 'ICIC',
-      personalisation: true,
-      saved: true,
-      type: 'debit',
-      network: 'Visa',
-    });
+  test.each(getInstrumentDetailsTestCases)('$name', ({ input, output }) => {
+    expect(getInstrumentDetails(input)).toStrictEqual(output);
   });
-  test('verify event data for upi', () => {
-    const instrument = {
-      block: {
-        code: 'rzp.preferred',
-        _type: 'block',
-        title: 'Preferred Payment Methods',
-      },
-      flows: ['collect'],
-      id: 'b740feb2_rzp.preferred_0_0_upi_true',
-      meta: { preferred: true },
-      method: 'upi',
-      section: 'p13n',
-      skipCTAClick: false,
-      token_id: 'token_GpaXi2JbdnNQo4',
-      vpas: ['testupi@ybl'],
-    };
+});
 
-    expect(getInstrumentDetails(instrument)).toStrictEqual({
-      name: 'PhonePe',
-      personalisation: true,
-      saved: true,
-      type: 'collect',
-      vpa: '@ybl',
-    });
+describe('test #addConsentDetailsToInstrument', () => {
+  test.each(addConsentDetailsToInstrumentTestCases)('$name', ({ input }) => {
+    addConsentDetailsToInstrument(input.instrument, input.card);
+    expect(input.instrument.consent_taken).toStrictEqual(
+      input.card.consent_taken
+    );
   });
+});
 
-  test('verify event data for wallet', () => {
-    const instrument = {
-      block: {
-        code: 'rzp.preferred',
-        _type: 'block',
-        title: 'Preferred Payment Methods',
-      },
-      id: 'b740feb2_rzp.preferred_0_0_wallet_true',
-      meta: { preferred: true },
-      method: 'wallet',
-      section: 'p13n',
-      skipCTAClick: false,
-      wallets: ['FreeCharge'],
-    };
-
-    expect(getInstrumentDetails(instrument)).toStrictEqual({
-      name: 'FreeCharge',
-      personalisation: true,
-      saved: false,
-    });
+describe('test #getBlockTitle', () => {
+  // expect(getBlockTitle(instruments, 'en')).toBe('Cards, UPI & More');
+  test.each(getBlockTitleTestCases)('$name', ({ input, output }) => {
+    expect(getBlockTitle(input, 'en')).toBe(output);
   });
+});
 
-  test('verify event data for wallet', () => {
-    const instrument = {
-      block: {
-        code: 'rzp.preferred',
-        _type: 'block',
-        title: 'Preferred Payment Methods',
-      },
-      id: 'b740feb2_rzp.preferred_0_0_netbanking_true',
-      meta: { preferred: true },
-      method: 'netbanking',
-      section: 'p13n',
-      skipCTAClick: false,
-      banks: ['SBIN'],
-    };
+describe('test #getSectionsDisplayed', () => {
+  test.each(getSectionsDisplayedTestCases)('$name', ({ input, output }) => {
+    expect(getSectionsDisplayed(input)).toEqual(output);
+  });
+});
 
-    expect(getInstrumentDetails(instrument)).toStrictEqual({
-      name: 'SBIN',
-      personalisation: true,
-      saved: false,
-    });
+describe('test #getBankText', () => {
+  test.each(getBanktextTestCases)('$name', ({ input, output, banks }) => {
+    (getBanks as unknown as jest.Mock).mockReturnValue(banks);
+    expect(getBankText(input, true, false, 'en')).toBe(output);
+  });
+});
+
+describe('test #getAvailableMethods', () => {
+  test.each(getAvailableMethodsTestCases)('$name', ({ input, output }) => {
+    blocks.set(input);
+    expect(getAvailableMethods()).toEqual(output);
   });
 });

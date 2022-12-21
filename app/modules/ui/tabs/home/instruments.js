@@ -254,7 +254,7 @@ function getOrderedInstrumentData(instruments) {
  *  instruments: ReturnType<typeof getOrderedInstrumentData>
  * }}
  */
-function getOrderedBlockData(allBlocks) {
+export function getOrderedBlockData(allBlocks) {
   try {
     return allBlocks.reduce((blockData, currentBlock, index) => {
       const blockCategory = getSectionCategoryForBlock(currentBlock);

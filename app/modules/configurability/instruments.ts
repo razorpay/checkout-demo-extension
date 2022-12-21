@@ -5,9 +5,9 @@ import type {
   Instruments,
   InstrumentCreators,
 } from 'configurability/types';
-import type { Ungrouped } from 'home/analytics/helpers';
 import type { Method } from 'types/types';
 import type { Customer } from 'emiV2/types/tokens';
+import type { Ungrouped } from 'home/analytics/types';
 
 /**
  * Adds a type and category to an instrument

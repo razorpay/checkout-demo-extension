@@ -4,9 +4,17 @@ import {
   p13nInstrumentShown,
   specificMethodSelected,
   getCurrentScreen,
+  triggerInstAnalytics,
 } from 'home/analytics/helpers';
 import { CardsTracker } from 'card/analytics/events';
 import { METHODS } from 'checkoutframe/constants';
+import type { InstrumentType } from 'home/analytics/types';
+import { MiscTracker } from 'misc/analytics/events';
+import { Events } from 'analytics';
+import {
+  isInstrumentForEntireMethod,
+  isSavedCardInstrument,
+} from 'configurability/instruments';
 
 const { CARD } = METHODS;
 const savedCardInfo = {
@@ -22,7 +30,6 @@ const formattedCardInst = {
 
 jest.mock('card/analytics/events', () => {
   const originalModule = jest.requireActual('card/analytics/events');
-
   return {
     __esModule: true,
     ...originalModule,
@@ -30,7 +37,42 @@ jest.mock('card/analytics/events', () => {
       GEN_SHOWN: jest.fn(),
       P13N_SHOWN: jest.fn(),
       SELECTED: jest.fn(),
+      SAVED_CARD_SELECTED: jest.fn(),
     },
+  };
+});
+
+jest.mock('misc/analytics/events', () => {
+  const originalModule = jest.requireActual('misc/analytics/events');
+  return {
+    __esModule: true,
+    ...originalModule,
+    MiscTracker: {
+      METHOD_SELECTED: jest.fn(),
+      INSTRUMENT_SELECTED: jest.fn(),
+    },
+  };
+});
+
+jest.mock('analytics', () => {
+  const originalModule = jest.requireActual('analytics');
+  return {
+    ...originalModule,
+    __esModule: true,
+    Events: {
+      TrackMetric: jest.fn(),
+      TrackBehav: jest.fn(),
+    },
+  };
+});
+
+jest.mock('configurability/instruments', () => {
+  const originalModule = jest.requireActual('configurability/instruments');
+  return {
+    ...originalModule,
+    __esModule: true,
+    isInstrumentForEntireMethod: jest.fn(),
+    isSavedCardInstrument: jest.fn(),
   };
 });
 
@@ -101,5 +143,60 @@ describe('test getCurrentScreen method', () => {
   });
   it('should return L0 if the screen value is empty.', () => {
     expect(getCurrentScreen('')).toBe('L0');
+  });
+});
+
+describe('test triggerInstAnalytics', () => {
+  it('it should call MethodSelected and TrackBehav event', () => {
+    const instrument = {
+      _ungrouped: [
+        {
+          _type: 'method',
+          code: 'card',
+          method: 'card',
+        },
+      ],
+      _type: 'method',
+      code: 'card',
+      method: 'card',
+      id: '1d5e83cc_rzp.cluster_1_0_card_true',
+      section: 'generic',
+      blockTitle: 'Cards, UPI & More',
+    };
+    triggerInstAnalytics(instrument as InstrumentType);
+    expect(MiscTracker.METHOD_SELECTED).toBeCalled();
+    expect(Events.TrackMetric).toBeCalled();
+    expect(Events.TrackBehav).toBeCalledTimes(2);
+  });
+
+  it('it should call Instrument Selected and Save Card Selected Event with others', () => {
+    const instrument = {
+      _ungrouped: [
+        {
+          token_id: 'token_JsoqJcB2ltMhd7',
+          type: 'debit',
+          method: 'card',
+          id: 'KmeAFBLGXQRYj8',
+          meta: {
+            preferred: true,
+          },
+        },
+      ],
+      method: 'card',
+      id: 'KmeAFBLGXQRYj8',
+      token_id: 'token_JsoqJcB2ltMhd7',
+      section: 'p13n',
+      blockTitle: 'Preferred Payment Methods',
+    };
+    (isInstrumentForEntireMethod as unknown as jest.Mock).mockReturnValue(
+      false
+    );
+    (isSavedCardInstrument as unknown as jest.Mock).mockReturnValue(true);
+    triggerInstAnalytics(instrument as InstrumentType);
+    expect(MiscTracker.METHOD_SELECTED).toBeCalled();
+    expect(Events.TrackMetric).toBeCalled();
+    expect(Events.TrackBehav).toBeCalledTimes(2);
+    expect(MiscTracker.INSTRUMENT_SELECTED).toBeCalledTimes(1);
+    expect(CardsTracker.SAVED_CARD_SELECTED).toBeCalledTimes(1);
   });
 });
