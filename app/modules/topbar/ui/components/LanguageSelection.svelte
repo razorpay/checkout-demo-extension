@@ -13,21 +13,13 @@
   import { themeStore } from 'checkoutstore/theme';
   import { isOneClickCheckout } from 'razorpay';
   import LanguageIcon from './languageIcon';
-  import { isMerchantCountry } from 'checkoutstore/methods';
+  import { shouldUseVernacular } from 'checkoutstore/methods';
 
   export let color: string = $themeStore.textColor;
 
   const isOneCC = isOneClickCheckout();
-  const isMYMerchant = isMerchantCountry('MY');
 
   function handleAccountModal() {
-    /**
-     * Don't show language modal for MY merchants as we only support ENG for now.
-     * Should be removed once regional lang supports are added.
-     */
-    if (isMYMerchant) {
-      return;
-    }
     showAccountModal({
       variant: ACCOUNT_VARIANT.LANGUAGE_ONLY,
     });
@@ -39,25 +31,25 @@
   $: selectedLocale = $locale as string;
 </script>
 
-<div
-  data-test-id="vernacular-cta"
-  class="wrapper"
-  class:is-one-cc={isOneCC}
-  on:click|stopPropagation={handleAccountModal}
->
-  <span data-test-id="vernacular-text" class="selected-language">
-    {#if isOneCC || isMYMerchant}
-      {getLocaleName(selectedLocale)}
-    {:else}
-      <Icon icon={languageIcon} />
-    {/if}
-  </span>
-  {#if !isMYMerchant}
+{#if shouldUseVernacular()}
+  <div
+    data-test-id="vernacular-cta"
+    class="wrapper"
+    class:is-one-cc={isOneCC}
+    on:click|stopPropagation={handleAccountModal}
+  >
+    <span data-test-id="vernacular-text" class="selected-language">
+      {#if isOneCC}
+        {getLocaleName(selectedLocale)}
+      {:else}
+        <Icon icon={languageIcon} />
+      {/if}
+    </span>
     <span class="down-icon">
       <Icon icon={arrow_down('13', '13', color, '0 0 16 16')} />
     </span>
-  {/if}
-</div>
+  </div>
+{/if}
 
 <style>
   .wrapper {

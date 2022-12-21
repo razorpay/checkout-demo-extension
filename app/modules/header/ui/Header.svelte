@@ -25,6 +25,7 @@
   } from 'checkoutstore/dynamicfee';
   import { themeStore } from 'checkoutstore/theme';
   import LanguageSelection from 'topbar/ui/components/LanguageSelection.svelte';
+  import { shouldUseVernacular } from 'checkoutstore/methods';
 
   function setAmount(amount: number) {
     const session = getSession();
@@ -77,7 +78,11 @@
         </div>
       {/if}
       <div class="header-title-wrapper">
-        <p title={name} class="header-title">
+        <p
+          title={name}
+          class="header-title"
+          class:header-title-collapse={shouldUseVernacular()}
+        >
           {name}
         </p>
         {#if isRTBEnabled}
@@ -125,8 +130,11 @@
     }
 
     .header-title {
-      max-width: calc(100% - 86px);
       font-size: 18px;
+    }
+
+    .header-title-collapse {
+      max-width: calc(100% - 86px);
     }
 
     .modal-close {
