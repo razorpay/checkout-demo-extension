@@ -11,7 +11,7 @@ import {
 } from 'configurability/instruments';
 import { getInstrumentDetails } from 'ui/tabs/home/helpers';
 import { METHODS } from 'checkoutframe/constants';
-import { HOME_EVENTS } from 'analytics/home/events';
+import HomeEvents, { HOME_EVENTS } from 'analytics/home/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
 import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
@@ -122,7 +122,7 @@ export function triggerInstAnalytics(instrument: InstrumentType) {
       });
     }
   } catch {}
-  Events.TrackMetric(HOME_EVENTS.PAYMENT_INSTRUMENT_SELECTED, {
+  Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
     instrument,
   });
   Events.TrackBehav(HOME_EVENTS.PAYMENT_INSTRUMENT_SELECTED_V2, {
