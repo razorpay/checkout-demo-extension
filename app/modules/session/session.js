@@ -96,6 +96,7 @@ import { attemptCardlessEmiPayment } from 'emiV2/helper/prefillPayment';
 import { HomeTracker } from 'home/analytics/events';
 import { PaylaterTracker } from 'ui/tabs/paylater/analytics/events';
 import { WalletTracker } from 'wallet/analytics/events';
+import { showPostPaymentMessage } from 'post-payment';
 import {
   internationalTabRender,
   isInternationalAVSView,
@@ -338,7 +339,7 @@ function errorHandler(response) {
       return;
     }
   }
-
+  const tempPayload = this.payload;
   this.clearRequest();
   updateScore('failedPayment');
   Analytics.track('error', {
@@ -368,7 +369,23 @@ function errorHandler(response) {
 
   if (this.get('retry') === false && !this.get('redirect')) {
     this.hideOverlayMessage();
-    return this.modal.hide();
+    if (
+      error &&
+      error.metadata &&
+      error.metadata.payment_id &&
+      isEmailHidden() &&
+      RazorpayHelper.isRedesignV15()
+    ) {
+      showPostPaymentMessage({
+        response: { error },
+        requestPayload: tempPayload,
+      }).then(() => {
+        this.modal.hide();
+      });
+    } else {
+      this.modal.hide();
+    }
+    return;
   }
 
   let err_field = error.field;
@@ -756,25 +773,39 @@ function successHandler(response) {
     );
   }
   updateScore('paymentSuccess');
-  this.clearRequest();
-  // prevent dismiss event
-  this.modal.options.onhide = UTILS.returnAsIs;
 
-  // sending oncomplete event because CheckoutBridge.oncomplete
+  const postSuccessFlow = () => {
+    this.clearRequest();
+    // prevent dismiss event
+    this.modal.options.onhide = UTILS.returnAsIs;
 
-  function completeCheckoutFlow() {
-    Razorpay.sendMessage({ event: 'complete', data: response });
-    moengageAnalytics({
-      eventName: MOENGAGE_EVENTS.PAYMENT_COMPLETED,
-      eventData: {
-        ...storeGetter(moengageEventsData),
-        'Payment Complete': true,
-      },
-    });
-    this.hide();
+    // sending oncomplete event because CheckoutBridge.oncomplete
+
+    function completeCheckoutFlow() {
+      Razorpay.sendMessage({ event: 'complete', data: response });
+      moengageAnalytics({
+        eventName: MOENGAGE_EVENTS.PAYMENT_COMPLETED,
+        eventData: {
+          ...storeGetter(moengageEventsData),
+          'Payment Complete': true,
+        },
+      });
+      this.hide();
+    }
+    this.hideOverlayMessage();
+    completeCheckoutFlow.call(this);
+  };
+
+  if (isEmailHidden() && RazorpayHelper.isRedesignV15()) {
+    this.hideOverlayMessage();
+    showPostPaymentMessage({
+      response,
+      requestPayload: this.payload,
+    }).then(postSuccessFlow);
+    // show intermediate screen as promise after 10 second continue the flow
+  } else {
+    postSuccessFlow();
   }
-  this.hideOverlayMessage();
-  completeCheckoutFlow.call(this);
 }
 
 function cancel_upi(session) {

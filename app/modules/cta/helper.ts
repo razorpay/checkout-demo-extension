@@ -324,10 +324,14 @@ export function showCtaWithDefaultText() {
   showCta();
 }
 
-export function getCTAAmount(): string {
+export function getCTAAmount(space = false): string {
   const store = get(CTAHelper.store);
   return (
     store.rawAmount ||
-    formatAmountWithSymbol(store.amount || getAmount(), store.currency, false)
+    formatAmountWithSymbol(
+      store.amount || getAmount(),
+      store.currency || 'INR',
+      space
+    )
   );
 }

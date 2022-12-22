@@ -13,6 +13,7 @@ import {
 } from 'configurability/instruments';
 import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 import { findCountryCode } from 'common/countrycodes';
+import { HOME_VIEWS } from 'ui/tabs/home/constants';
 import { getDefaultCountryDialCodeInfo } from 'common/helper';
 
 export const getCustomerDetails = () => {
@@ -119,6 +120,8 @@ export const email = writable('');
 export function setEmail(value) {
   email.set(value);
 }
+
+export const homeView = writable(HOME_VIEWS.DETAILS);
 
 export const emiContact = writable('');
 

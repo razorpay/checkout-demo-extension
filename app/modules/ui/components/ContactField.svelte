@@ -1,6 +1,6 @@
 <script lang="ts">
   // Utils
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import * as _ from 'utils/_';
 
   // UI imports
@@ -33,6 +33,7 @@
   import { isContactValid } from 'one_click_checkout/common/details/store';
   import autotest from 'autotest';
   import { getIndErrLabel } from 'one_click_checkout/helper';
+  import { isMobile } from 'common/useragent';
   import {
     COUNTRY_CONFIG,
     COUNTRY_TO_PHONE_CODE_MAP,
@@ -40,7 +41,7 @@
 
   // Refs
   let countryField;
-  let phoneField;
+  let phoneField: HTMLInputElement;
 
   // Props
   export let country;
@@ -134,6 +135,14 @@
       phoneField.focus();
     }
   }
+
+  onMount(() => {
+    if (phoneField && isMobile()) {
+      setTimeout(() => {
+        phoneField.focus();
+      });
+    }
+  });
 
   function validateContact(country, phone) {
     const merchantCountryCode = getPreferences('merchant_country');

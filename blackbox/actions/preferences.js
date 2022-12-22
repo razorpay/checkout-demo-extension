@@ -63,6 +63,10 @@ async function sendPreferences({
 }
 
 function makePreferences(overrides) {
+  const isEmailOptional =
+    overrides && overrides.optional
+      ? overrides.optional.includes('email')
+      : false;
   return {
     options: {},
 
@@ -82,6 +86,8 @@ function makePreferences(overrides) {
     ...overrides,
     features: {
       save_vpa: true,
+      show_email_on_checkout: true,
+      email_optional_oncheckout: isEmailOptional,
       ...(overrides && overrides.features ? overrides.features : {}),
     },
   };

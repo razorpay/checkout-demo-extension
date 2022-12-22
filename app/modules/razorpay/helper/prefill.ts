@@ -1,5 +1,6 @@
-import { getOption, getOptionCurry, isContactEmailOptional } from './base';
+import { getOption, getOptionCurry } from './base';
 import { getMerchantOffers, isOfferForced } from './offer';
+import { isContactEmailOptional } from './optional';
 
 /**
  * prefill related

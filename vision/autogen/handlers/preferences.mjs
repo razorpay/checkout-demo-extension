@@ -24,6 +24,10 @@ export default function* handlePreferences({ options }) {
       merchant_key: options.key,
       mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
       optional: ['email'],
+      features: {
+        show_email_on_checkout: true,
+        email_optional_oncheckout: true,
+      },
     };
 
     /**
@@ -34,6 +38,10 @@ export default function* handlePreferences({ options }) {
       merchant_key: options.key,
       mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
       optional: ['contact', 'email'],
+      features: {
+        show_email_on_checkout: true,
+        email_optional_oncheckout: true,
+      },
     };
   }
 }
@@ -53,6 +61,10 @@ const BASE_PREFERENCES = {
   magic: true,
   blocked: false,
   activated: true,
+  features: {
+    show_email_on_checkout: true,
+    email_optional_oncheckout: false,
+  },
   methods: {
     entity: 'methods',
     card: true,

@@ -20,6 +20,7 @@
   import { Events } from 'analytics';
   import AccountEvents from 'account_modal/analytics';
   import { showAccountTab } from 'checkoutstore';
+  import SecuredByRazorpay from 'ui/components/SecuredByRazorpay.svelte';
 
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
@@ -80,21 +81,7 @@
             </div>
           {/if}
         </div>
-        <div class="d-flex {showMerchantPolicyBtn ? 'rzp-column' : 'rzp-row'}">
-          <span class={showMerchantPolicyBtn ? 'brand-text' : 'brand-text-row'}
-            >{$t(SECURED_BY)}</span
-          >
-          {#if logos.length}
-            <div class="d-flex align-center">
-              {#each logos as logo, index}
-                <Icon icon={logo} />
-                {#if index !== logos.length - 1}
-                  <div class="vertical-separator bg-gray" />
-                {/if}
-              {/each}
-            </div>
-          {/if}
-        </div>
+        <SecuredByRazorpay {logos} columnView={showMerchantPolicyBtn} />
       </div>
     </div>
     {#if showBottomSeparator}
@@ -103,7 +90,7 @@
   </div>
 {/if}
 
-<style>
+<style lang="scss">
   :global(.mobile) .account-tab.hide-account-tab {
     display: none;
   }
@@ -123,12 +110,6 @@
     height: unset;
     padding: 10px 16px;
   }
-  .brand-text {
-    font-size: var(--font-size-tiny);
-    font-weight: var(--font-weight-regular);
-    color: var(--tertiary-text-color);
-    margin-right: 4px;
-  }
   .account-section {
     cursor: pointer;
     font-size: var(--font-size-small);
@@ -144,13 +125,6 @@
     background-color: #e0e0e0;
   }
 
-  .brand-text-row {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--tertiary-text-color);
-    margin-right: 6px;
-  }
-
   .d-flex {
     display: flex;
   }
@@ -158,15 +132,7 @@
   .align-center {
     align-items: center;
   }
-  .rzp-column {
-    flex-direction: column;
-    align-items: flex-end;
-  }
 
-  .rzp-row {
-    flex-direction: row;
-    align-items: center;
-  }
   .account-toggle-icon {
     margin-left: 7px;
     display: flex;

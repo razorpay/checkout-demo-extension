@@ -14,6 +14,7 @@ import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
 import edit from './edit';
+import copy from './copy';
 import present from './present';
 import trustedBadge from './trusted_badge';
 import tickFilledDonate from './tick_filled_donate';
@@ -23,6 +24,7 @@ import question from './question';
 import donationHeart from './donate_heart';
 import message from './message';
 import lock from './lock';
+import circle_cross from './circle_cross';
 import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
@@ -70,6 +72,7 @@ const availIconNames = [
   'contact',
   'aadhaar',
   'edit',
+  'copy',
   'present',
   'trusted_badge',
   'tick_filled_donate',
@@ -79,6 +82,7 @@ const availIconNames = [
   'question',
   'message',
   'lock',
+  'circle_cross',
   'user_protect',
   'tick_flag',
   'new_window',
@@ -172,6 +176,9 @@ function getIconFn(iconName: IconSupported) {
     case 'edit':
       return edit;
 
+    case 'copy':
+      return copy;
+
     case 'present':
       return present;
 
@@ -198,6 +205,8 @@ function getIconFn(iconName: IconSupported) {
 
     case 'lock':
       return lock;
+    case 'circle_cross':
+      return circle_cross;
 
     case 'user_protect':
       return userProtect;

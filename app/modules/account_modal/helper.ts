@@ -11,7 +11,6 @@ export const getLogoByCountry = (country: countryCodesType) => {
   switch (country) {
     case COUNTRY_CODES.MY:
       return [curlec_logo];
-
     default:
       return [rzp_brand_logo];
   }

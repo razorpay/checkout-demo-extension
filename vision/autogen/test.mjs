@@ -256,7 +256,7 @@ async function newPage(browser, state) {
   // if running headed, increase default timeout
   // affects waiting for elements to appear etc
   // Set timeout as 5s for CI
-  context.setDefaultTimeout(HEADLESS ? 5e3 : 9e8);
+  context.setDefaultTimeout(HEADLESS ? 3e8 : 9e8);
 
   const page = await context.newPage();
 

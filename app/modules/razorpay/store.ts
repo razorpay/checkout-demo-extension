@@ -80,7 +80,7 @@ class RazorpayStore {
     if (!path) {
       return options;
     }
-    return get(options, path);
+    return options[path];
   };
 
   /**

@@ -5181,10 +5181,11 @@ const preferences = {
       google_pay: true,
       phonepe_intent: true,
       save_vpa: true,
+      show_email_on_checkout: true,
+      email_optional_oncheckout: false,
       redirect_to_zestmoney: true,
       dcc: true,
       show_mor_tnc: true,
-      show_email_on_checkout: true,
     },
   },
   order_emandate: {

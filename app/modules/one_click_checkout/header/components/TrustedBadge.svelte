@@ -16,10 +16,6 @@
   import arrow_down from 'one_click_checkout/coupons/icons/arrow_down';
   import info from 'ui/icons/payment-methods/info';
 
-  // Props Import
-  export let expanded = false;
-  export let sendAnalytics = true;
-
   // Analytics imports
   import { Events } from 'analytics';
   import RTBEvents from 'one_click_checkout/rtb_modal/analytics';
@@ -30,6 +26,11 @@
   import RtbIcon from 'rtb/ui/component/RTBIcon.svelte';
   import { isOneClickCheckout } from 'razorpay';
   import { getThemeMeta, themeStore } from 'checkoutstore/theme';
+
+  // Props Import
+  export let expanded = false;
+  export let sendAnalytics = true;
+  export let fullScreenHeader = false;
 
   const iconColor = isOneClickCheckout()
     ? getThemeMeta().textColor
@@ -54,7 +55,11 @@
 
 {#if trustedBadgeHighlights}
   {#if expanded}
-    <div class="rtb-expanded-wrapper" on:click={handleRTBClick}>
+    <div
+      class="rtb-expanded-wrapper"
+      class:full-screen-header={fullScreenHeader}
+      on:click={handleRTBClick}
+    >
       <div class="rtb-icon-wrapper">
         <RtbIcon height={16} width={16} />
       </div>
@@ -88,12 +93,21 @@
     align-items: center;
   }
 
+  .full-screen-header {
+    padding: 6px;
+
+    .rtb-text {
+      font-size: 11px;
+    }
+  }
+
   .rtb-expanded-wrapper :global(svg) {
     height: 8px;
     width: 8px;
   }
 
   .rtb-text {
+    color: var(--text-color);
     font-size: var(--font-size-tiny);
     line-height: 150%;
     font-weight: var(--font-weight-semibold);

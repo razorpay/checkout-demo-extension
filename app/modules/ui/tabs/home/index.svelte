@@ -49,6 +49,7 @@
     blocks,
     countryISOCode,
     isIndianCustomer,
+    homeView,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -246,6 +247,10 @@
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
   let view = HOME_VIEWS.DETAILS;
+
+  $: {
+    $homeView = view;
+  }
   let showSecuredByMessage;
 
   $: {

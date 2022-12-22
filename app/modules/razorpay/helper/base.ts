@@ -90,40 +90,6 @@ export function isPayout() {
 export const getCallbackUrl = getOptionCurry('callback_url');
 
 /**
- * optional
- */
-export function isContactOptional() {
-  return (getPreferences('optional') || []).indexOf('contact') !== -1;
-}
-
-export function isEmailOptional() {
-  return (getPreferences('optional') || []).indexOf('email') !== -1;
-}
-export function isContactEmailOptional() {
-  return isContactOptional() && isEmailOptional();
-}
-
-export function getOptionalObject() {
-  return {
-    contact: isContactOptional(),
-    email: isEmailOptional(),
-  };
-}
-
-// Hidden fields
-export function isContactHidden() {
-  return isContactOptional() && getOption('hidden.contact');
-}
-
-export function isEmailHidden() {
-  return isEmailOptional() && getOption('hidden.email');
-}
-
-export function isContactEmailHidden() {
-  return isContactHidden() && isEmailHidden();
-}
-
-/**
  * language code
  */
 function getConfigFromGetOption() {

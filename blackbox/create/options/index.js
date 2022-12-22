@@ -77,7 +77,12 @@ function makeTestPreferences(
   },
   { method }
 ) {
-  const preferences = {};
+  const preferences = {
+    features: {
+      show_email_on_checkout: true,
+      email_optional_oncheckout: false,
+    },
+  };
 
   if (feeBearer) {
     preferences.fee_bearer = true;
@@ -88,6 +93,7 @@ function makeTestPreferences(
 
     if (optionalEmail) {
       preferences.optional.push('email');
+      preferences.features.email_optional_oncheckout = true;
     }
 
     if (optionalContact) {
@@ -159,10 +165,16 @@ function makeOptionsAndPreferences(method, features = {}) {
     method,
   });
 
+  const prefFeatures = preferences.features;
+
   const maker = Makers[method];
 
   options = maker.makeOptions(features, options);
   preferences = maker.makePreferences(features, preferences);
+  preferences.features = {
+    ...prefFeatures,
+    ...(preferences.features || {}),
+  };
 
   return {
     options,

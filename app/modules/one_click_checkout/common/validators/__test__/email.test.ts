@@ -1,4 +1,5 @@
 const { isEmailOptional } = require('razorpay');
+import { country } from 'checkoutstore/screens/home';
 const {
   isDomainWhitelisted,
   isEmailValidRegex,
@@ -29,6 +30,9 @@ jest.mock('razorpay', () => {
   };
 });
 
+beforeEach(() => {
+  country.set('+91');
+});
 describe('email regex validator', () => {
   test('razor.razorpay.com fails regex', () => {
     expect(isEmailValidRegex('razor.razorpay.com')).toBe(false);
@@ -102,5 +106,10 @@ describe('optional email validation', () => {
     isEmailOptional.mockReturnValue(true);
 
     expect(validateEmail('goutam')).resolves.toBe(false);
+  });
+
+  test('international country code email should be required and resolved to false', async () => {
+    country.set('+1');
+    expect(validateEmail('')).resolves.toBe(false);
   });
 });

@@ -27,6 +27,7 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
+  import { fullScreenHeader } from 'header';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
@@ -156,7 +157,11 @@
         class:header-expanded={isOneCC ? $headerVisible : true}
       >
         {#if isRedesignV15Enabled}
-          <div id="redesign-header" class:offers-fade={$offerFade}>
+          <div
+            id="redesign-header"
+            class:offers-fade={$offerFade}
+            class:full-screen-header={$fullScreenHeader}
+          >
             <div id="header-redesign-v15-wrap" />
             <div id="topbar-redesign-v15-wrap" />
           </div>
@@ -269,6 +274,22 @@
 
   .mobile .one-cc-screen {
     min-height: auto;
+  }
+
+  #redesign-header.full-screen-header {
+    height: calc(100% - 12px);
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    box-shadow: 2px 2px 30px rgba(107, 108, 109, 0.1);
+    z-index: 0;
+
+    color: var(--text-color);
+    background: var(--primary-color);
+
+    #header-redesign-v15-wrap {
+      height: 100%;
+    }
   }
 
   .redesign {

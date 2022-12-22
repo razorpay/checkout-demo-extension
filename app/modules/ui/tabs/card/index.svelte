@@ -49,6 +49,7 @@
     phone,
     selectedInstrument,
     isIndianCustomer,
+    email,
   } from 'checkoutstore/screens/home';
 
   import { findCodeByNetworkName, isCountryInAllowedList } from 'common/card';
@@ -67,6 +68,7 @@
     getPrefillMethod,
     isOneClickCheckout,
     isEmiV2,
+    isEmailOptional,
   } from 'razorpay';
 
   import { shouldRememberCustomer, tabStore } from 'checkoutstore';
@@ -179,6 +181,16 @@
   let isSavedCardFormValid = false;
   let checkFormErrors: () => void;
   let onSubmit: any;
+  let showEmailField = false;
+  /**
+   * To show email field
+   * -> Non INR transaction (MCC/DCC)
+   * -> default currency of card is non INR
+   */
+  $: showEmailField = (isEmailOptional() &&
+    !get(email) &&
+    $defaultDCCCurrency &&
+    $defaultDCCCurrency !== 'INR') as boolean;
 
   const apps = getAppsForCards().map((code) => getAppProvider(code));
   const appsAvailable = apps.length;
@@ -1287,6 +1299,7 @@
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput}
             on:error={onCardError}
+            {showEmailField}
             {downtimeVisible}
             {downtimeSeverity}
             {downtimeInstrument}

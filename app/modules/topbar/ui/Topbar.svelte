@@ -96,4 +96,11 @@
   :global(.redesign) #topbar-new {
     box-shadow: 0px 7px 10px 0px rgba(23, 26, 30, 0.15);
   }
+
+  :global(#redesign-header.full-screen-header) #topbar-new {
+    border: 0;
+    box-shadow: none;
+    height: 60px;
+    padding: 24px 16px;
+  }
 </style>

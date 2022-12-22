@@ -31,6 +31,7 @@
     isContactAndEmailValid,
     isEmailValid,
     isContactValid,
+    isOptionalEmail,
   } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
   import {
@@ -240,7 +241,7 @@
     }
 
     validateEmail($email).then((value) => {
-      if (value || isEmailOptional()) {
+      if (value || $isOptionalEmail) {
         Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
           contact: $contact,
           email: $email,
@@ -301,7 +302,9 @@
         />
       </div>
     {/if}
-    {#if !isEmailHidden()}
+    <!-- if email is not optional then we need to show email field -->
+    <!-- optional email can manipulate based on country code -->
+    {#if !isEmailHidden() || !$isOptionalEmail}
       <div class="email-field">
         <EmailField
           bind:value={$email}

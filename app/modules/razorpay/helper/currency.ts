@@ -30,6 +30,16 @@ export function isInternational() {
   );
 }
 
+export function isIndianCurrency() {
+  const merchantBaseCurrency = getPreferences('merchant_currency') || 'INR';
+  // if option currency is INR
+  // or if option currency is not defined then we pick merchant base currency
+  return (
+    getOption('currency') === 'INR' ||
+    (!getOption('currency') && merchantBaseCurrency === 'INR')
+  );
+}
+
 export function isDCCEnabled() {
   return hasFeature('dcc', false);
 }

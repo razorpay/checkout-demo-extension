@@ -1,7 +1,8 @@
 import { EMAIL_REGEX } from 'common/constants';
 import { resolveMxRecords } from 'one_click_checkout/common/services/dns';
 import { WHITELISTED_DOMAINS } from 'one_click_checkout/common/constants';
-import { isEmailOptional } from 'razorpay';
+import { get } from 'svelte/store';
+import { isOptionalEmail } from '../details/store';
 
 /**
  * Function which checks if passed email has a valid regex
@@ -50,7 +51,7 @@ export const isDomainWhitelisted = (domain = '') => {
  * @returns {Promise} boolean flag which represents if email is valid or not
  */
 export const validateEmail = (email) => {
-  if (isEmailOptional() && !email) {
+  if (get(isOptionalEmail) && !email) {
     return Promise.resolve(true);
   }
 

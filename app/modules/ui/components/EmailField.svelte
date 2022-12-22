@@ -15,24 +15,28 @@
   import { t } from 'svelte-i18n';
 
   // store
-  import { isEmailValid } from 'one_click_checkout/common/details/store';
+  import {
+    isEmailValid,
+    isOptionalEmail,
+  } from 'one_click_checkout/common/details/store';
 
   // Props
   export let value: string;
 
   // Utils
-  import { isEmailOptional, isOneClickCheckout } from 'razorpay';
+  import { isOneClickCheckout } from 'razorpay';
   import { isEmailReadOnly } from 'checkoutframe/customer';
   import { validateEmail } from 'one_click_checkout/common/validators/email';
 
   import { debounce } from 'lib/utils';
   import autotest from 'autotest';
 
-  const isOptional = isEmailOptional();
-  const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
+  export let required = !$isOptionalEmail;
+
+  const EMAIL_REGEX = !required ? '.*' : EMAIL_PATTERN;
 
   // LABEL: Email (Optional) / Email
-  const label = isOptional ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
+  const label = !required ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
 
   // Form Validation for email - specifically for 1cc
   let validationText: string | null;
@@ -54,13 +58,14 @@
     name="email"
     type="email"
     {value}
-    required={!isOptional}
+    {required}
     pattern={EMAIL_REGEX}
     readonly={isEmailReadOnly()}
     label={$t(label)}
     icon=""
     on:input={(e) => (value = e.target?.value)}
     on:blur
+    on:input
     helpText={$t(EMAIL_HELP_TEXT)}
     autocomplete={isOneClickCheckout() ? 'email' : 'off'}
     {validationText}

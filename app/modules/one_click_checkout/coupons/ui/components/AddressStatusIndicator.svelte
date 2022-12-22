@@ -67,7 +67,7 @@
     <span id="address-serviceable-text">
       {$t(ADDRESS_WIDGET_SERVICEABLE_TEXT)}
     </span>
-    <Icon icon={circle_check('16', '14')} />
+    <Icon icon={circle_check('', '', '16', '14')} />
   </div>
 {:else if !serviceable}
   <div

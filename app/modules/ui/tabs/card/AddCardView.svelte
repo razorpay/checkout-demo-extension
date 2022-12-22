@@ -34,6 +34,7 @@
   import {
     methodInstrument,
     isIndianCustomer,
+    email,
   } from 'checkoutstore/screens/home';
 
   import {
@@ -84,11 +85,7 @@
   import * as _ from 'utils/_';
   import UseBankCardLabel from './UseBankCardLabel.svelte';
   import type { addCardMeta, CardFeatures, EMIPayload } from 'emiV2/types';
-  import {
-    formatTemplateWithLocale,
-    getShortBankName,
-    translateEmiTabName,
-  } from 'i18n';
+  import { formatTemplateWithLocale, translateEmiTabName } from 'i18n';
   import {
     EMI_NOT_SUPPORTED,
     ENTER_BANK_CARD_TO_AVAIL_EMI,
@@ -111,6 +108,8 @@
     trackAddCardDetailsError,
   } from 'emiV2/events/tracker';
   import { CardsTracker } from 'card/analytics/events';
+  import EmailField from 'ui/components/EmailField.svelte';
+  import { isEmailValid } from 'one_click_checkout/common/details/store';
 
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
@@ -126,6 +125,7 @@
   export let delayOTPExperiment;
   export let isCardSupportedForRecurring;
   export let emiPayload: EMIPayload;
+  export let showEmailField = false;
 
   const isRedesignV15Enabled = isRedesignV15();
 
@@ -568,6 +568,15 @@
     isFormValid = [numberField, cvvField, expiryField, nameField]
       .filter((field) => !!field)
       .every((field) => field.isValid());
+    return isFormValid;
+  }
+
+  $: {
+    // added isFormValid condition just for reactivity
+    if (showEmailField && typeof isFormValid === 'boolean') {
+      const isValidEmail = Boolean($email.length > 3) && $isEmailValid;
+      isFormValid = computeIsFormValid() && isValidEmail;
+    }
   }
 
   function trackCardNumberFilled() {
@@ -751,17 +760,17 @@
       </div>
     {/if}
   </div>
-  <div class="row remember-check">
-    <div>
-      {#if showRememberCardCheck}
+  {#if showRememberCardCheck}
+    <div class="row remember-check">
+      <div>
         <SecureCard
           bind:checked={$remember}
           on:change={trackRememberChecked}
           modalType="add-new-card"
         />
-      {/if}
+      </div>
     </div>
-  </div>
+  {/if}
   {#if $showNoCvvCheckbox}
     <div
       class="row maestro-card-block"
@@ -789,6 +798,18 @@
   {#if isNewEmiFlow && $selectedTab === 'debit'}
     <div class="add-contact-field">
       <PhoneNumber />
+    </div>
+  {/if}
+  {#if showEmailField}
+    <div>
+      <EmailField
+        on:input={() => {
+          tick().then(computeIsFormValid);
+        }}
+        required
+        bind:value={$email}
+        showValidations
+      />
     </div>
   {/if}
 </div>

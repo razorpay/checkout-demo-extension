@@ -1,5 +1,6 @@
 import Header from 'header/ui/Header.svelte';
 import { setHeaderBack } from './sessionInterface';
+import { fullScreenHeader } from './store';
 
 let header: Header | undefined;
 
@@ -39,3 +40,5 @@ export function destroyHeader() {
   header.$destroy();
   header = undefined;
 }
+
+export { fullScreenHeader };
