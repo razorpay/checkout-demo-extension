@@ -156,7 +156,7 @@
   $: $isContactValid = !validationText;
 
   $: {
-    if (phoneField) {
+    if (inAddress && phoneField) {
       phoneField.setValid($isContactValid);
     }
   }
