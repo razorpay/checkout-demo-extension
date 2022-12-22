@@ -16,6 +16,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import info from 'ui/icons/payment-methods/info';
   import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+  import ShippingOptionStrip from 'one_click_checkout/address/ui/elements/OptionStrip.svelte';
 
   // labels import
   import {
@@ -78,12 +79,13 @@
   } from 'one_click_checkout/merchant-analytics/store';
 
   // analytics imports
-  import { Events } from 'analytics';
+  import Analytics, { Events } from 'analytics';
   import {
     merchantAnalytics,
     moengageAnalytics,
   } from 'one_click_checkout/merchant-analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+  import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 
   // utils imports
   import { isIntlShippingEnabled } from 'razorpay';
@@ -126,6 +128,7 @@
   export let selectedCountryISO;
   export let currentView;
   export let addressWrapperEle: HTMLElement;
+  export let selectedShippingOption;
 
   let errors = {};
   let selectedTag = $formData.tag;
@@ -140,6 +143,8 @@
   let lastUpdateState = '';
   let INPUT_FORM = [];
   let showValidations = false;
+  let shippingMethods = [];
+  let showStrip = false;
 
   const isShippingAddress = addressType === ADDRESS_TYPES.SHIPPING_ADDRESS;
 
@@ -406,6 +411,11 @@
     }
   };
 
+  $: Analytics.setMeta(
+    OneClickCheckoutMetaProperties.COUNT_SHIPPING_OPTIONS,
+    shippingMethods.length ?? 0
+  );
+
   export function onUpdate(key, value, extra = null) {
     /**
      * onUpdate gets fired twice for every input change.
@@ -440,7 +450,11 @@
         INPUT_FORM[pinIndex][pinSubIndex].unserviceableText = '';
         toggleStateField({ disabled: false });
       }
+      showStrip = false;
       if (pinPattern.test(value)) {
+        if (value !== $formData.zipcode) {
+          $selectedShippingOption = null;
+        }
         showLoaderView();
         const payload = [
           {
@@ -454,10 +468,27 @@
           .then((res) => {
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             if (res && res[value]?.serviceability) {
-              const { cod_fee: codFee, shipping_fee: shippingFee } = res[value];
-              codChargeAmount.set(codFee);
-              dispatch('serviceabilityCheck', { newCharge: shippingFee });
-              isShippingAddedToAmount.set(true);
+              const {
+                cod_fee: codFee,
+                shipping_fee: shippingFee,
+                shipping_methods,
+              } = res[value];
+              shippingMethods = shipping_methods ? [...shipping_methods] : [];
+              if (!shippingMethods.length) {
+                $codChargeAmount = codFee;
+                dispatch('serviceabilityCheck', { newCharge: shippingFee });
+                isShippingAddedToAmount.set(true);
+                $selectedShippingOption = null;
+              } else if (shippingMethods.length === 1) {
+                // for > 1 cases, the overlay component adds the charges
+                $codChargeAmount = shippingMethods[0].cod_fee;
+                $selectedShippingOption = shippingMethods[0];
+                dispatch('serviceabilityCheck', {
+                  newCharge: shippingMethods[0].shipping_fee,
+                });
+                isShippingAddedToAmount.set(true);
+                showStrip = true;
+              }
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
               if (!isCityStateAutopopulateDisabled) {
@@ -475,10 +506,15 @@
             } else {
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 UNSERVICEABLE_LABEL;
+              showStrip = false;
               toggleStateField({ disabled: false });
               showPincodeUnserviceableToast($formData.zipcode);
             }
-            $formData.cod = res[value]?.cod;
+            if (!shippingMethods.length) {
+              $formData.cod = res[value]?.cod;
+            } else if (shippingMethods.length === 1) {
+              $formData.cod = shippingMethods[0].cod;
+            }
             if (isShippingAddress) {
               if (!res[value].city) {
                 Events.Track(AddressEvents.PINCODE_MISSING_CITY, {
@@ -500,6 +536,7 @@
             INPUT_FORM[pinIndex][pinSubIndex].disabled = false;
             toggleStateField({ disabled: false });
             showPincodeUnserviceableToast($formData.zipcode);
+            showStrip = false;
           })
           .finally(() => {
             hideLoaderView();
@@ -509,6 +546,7 @@
         toggleStateField({ disabled: false });
         codChargeAmount.set(0);
         resetCharges();
+        shippingMethods = [];
       }
     } else if (
       !checkServiceability &&
@@ -581,7 +619,6 @@
           ? SOURCE.OVERIDDEN
           : SOURCE.ENTERED_BEFORE_AUTOCOMPLETE,
       });
-
       const stateObj = findStateObj(
         INPUT_FORM[stateIndex][stateSubIndex].items,
         value
@@ -593,6 +630,7 @@
         !COUNTRY_CONFIG[$selectedCountryISO?.toUpperCase()]?.pattern &&
         stateObj?.state_code
       ) {
+        showStrip = false;
         const payload = [
           {
             state_code: stateCode,
@@ -604,11 +642,27 @@
         postServiceability(payload)
           .then((res) => {
             if (res && res[stateCode]?.serviceability) {
-              const { cod_fee: codFee, shipping_fee: shippingFee } =
-                res[stateCode];
-              codChargeAmount.set(codFee);
-              dispatch('serviceabilityCheck', { newCharge: shippingFee });
-              isShippingAddedToAmount.set(true);
+              const {
+                cod_fee: codFee,
+                shipping_fee: shippingFee,
+                shipping_methods,
+              } = res[stateCode];
+              shippingMethods = shipping_methods ? [...shipping_methods] : [];
+              if (!shippingMethods.length) {
+                $codChargeAmount = codFee;
+                dispatch('serviceabilityCheck', { newCharge: shippingFee });
+                isShippingAddedToAmount.set(true);
+                $selectedShippingOption = null;
+              } else if (shippingMethods.length === 1) {
+                // for > 1 cases, the overlay component adds the charges
+                $codChargeAmount = shippingMethods[0].cod_fee;
+                $selectedShippingOption = shippingMethods[0];
+                dispatch('serviceabilityCheck', {
+                  newCharge: shippingMethods[0].shipping_fee,
+                });
+                isShippingAddedToAmount.set(true);
+                showStrip = true;
+              }
               INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
                 SERVICEABLE_LABEL;
             } else {
@@ -616,8 +670,13 @@
                 UNSERVICEABLE_LABEL;
               toggleStateField({ disabled: false });
               showPincodeUnserviceableToast(stateCode);
+              showStrip = false;
             }
-            $formData.cod = res[stateCode]?.cod;
+            if (!shippingMethods.length) {
+              $formData.cod = res[stateCode]?.cod;
+            } else if (shippingMethods.length === 1) {
+              $formData.cod = shippingMethods[0].cod;
+            }
             if (isShippingAddress) {
               if (!res[stateCode].city) {
                 Events.Track(AddressEvents.PINCODE_MISSING_CITY, {
@@ -638,6 +697,7 @@
               UNSERVICEABLE_LABEL;
             toggleStateField({ disabled: false });
             showPincodeUnserviceableToast(stateCode);
+            showStrip = false;
           })
           .finally(() => {
             hideLoaderView();
@@ -725,9 +785,27 @@
       postServiceability(payload)
         .then((res) => {
           if (res && res[zipcode]?.serviceability) {
-            const { cod_fee: codFee, shipping_fee: shippingFee } = res[zipcode];
-            codChargeAmount.set(codFee);
-            dispatch('serviceabilityCheck', { newCharge: shippingFee });
+            const {
+              cod_fee: codFee,
+              shipping_fee: shippingFee,
+              shipping_methods,
+            } = res[zipcode];
+            shippingMethods = shipping_methods ? [...shipping_methods] : [];
+            if (!shippingMethods.length) {
+              $codChargeAmount = codFee;
+              dispatch('serviceabilityCheck', { newCharge: shippingFee });
+              isShippingAddedToAmount.set(true);
+              $selectedShippingOption = null;
+            } else if (shippingMethods.length === 1) {
+              // for > 1 cases, the overlay component adds the charges
+              $codChargeAmount = shippingMethods[0].cod_fee;
+              $selectedShippingOption = shippingMethods[0];
+              dispatch('serviceabilityCheck', {
+                newCharge: shippingMethods[0].shipping_fee,
+              });
+              isShippingAddedToAmount.set(true);
+              showStrip = true;
+            }
             INPUT_FORM[pinIndex][pinSubIndex].unserviceableText =
               SERVICEABLE_LABEL;
             if (!isCityStateAutopopulateDisabled) {
@@ -738,6 +816,12 @@
               UNSERVICEABLE_LABEL;
             toggleStateField({ disabled: false });
             showPincodeUnserviceableToast($formData.zipcode);
+            showStrip = false;
+          }
+          if (!shippingMethods.length) {
+            $formData.cod = res[zipcode]?.cod;
+          } else if (shippingMethods.length === 1) {
+            $formData.cod = shippingMethods[0].cod;
           }
         })
         .catch(() => {
@@ -745,6 +829,7 @@
             UNSERVICEABLE_LABEL;
           toggleStateField({ disabled: false });
           showPincodeUnserviceableToast($formData.zipcode);
+          showStrip = false;
         });
     }
 
@@ -885,6 +970,13 @@
       {showValidations}
       on:blur={onInputFieldBlur}
     />
+
+    {#if showStrip}
+      <ShippingOptionStrip
+        shippingMethod={shippingMethods[0]}
+        classes="mg-btm"
+      />
+    {/if}
 
     {#if shouldShowCheckbox($activeRoute?.name)}
       <SameBillingAndShipping

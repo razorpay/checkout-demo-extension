@@ -78,7 +78,7 @@
   const isMethodCOD = method === 'cod';
 
   $: {
-    _subtitle = getSubtitleForDisplay($locale);
+    $codChargeAmount, (_subtitle = getSubtitleForDisplay($locale));
     if (isMethodCOD && disabled) {
       _subtitle = '';
     }

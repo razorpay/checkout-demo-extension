@@ -11,6 +11,7 @@ import {
   isOneClickCheckout,
   isMandatoryLoginEnabled,
   scriptCouponApplied,
+  getSingleShippingExpVariant,
 } from 'razorpay';
 
 // Analytics imports
@@ -119,6 +120,11 @@ export function init1CCMetaData() {
     OneClickCheckoutMetaProperties.SCRIPT_EDITED_COUPON_APPLIED,
     scriptCouponApplied()
   );
+  Analytics.setMeta(
+    OneClickCheckoutMetaProperties.MULTIPLE_SHIPPING_EXPERIMENT,
+    getSingleShippingExpVariant()
+  );
+  Analytics.setMeta(OneClickCheckoutMetaProperties.COUNT_SHIPPING_OPTIONS, 0);
 }
 
 export function validatePrefilledDetails() {

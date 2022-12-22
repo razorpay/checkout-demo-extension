@@ -8,6 +8,7 @@ import {
   selectedAddress as selectedShippingAddress,
   selectedAddressId as selectedShippingAddressId,
   checkServiceabilityStatus,
+  selectedShippingOption,
 } from 'one_click_checkout/address/shipping_address/store';
 import {
   shippingCharge,
@@ -20,13 +21,14 @@ import { formatApiAddress } from 'one_click_checkout/address/helpersExtra';
 import { getThemeMeta } from 'checkoutstore/theme';
 
 // analytics import
-import { Events } from 'analytics';
+import Analytics, { Events } from 'analytics';
 import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 import AddressEvents from 'one_click_checkout/address/analytics';
 import {
   ACTIONS,
   CATEGORIES,
 } from 'one_click_checkout/merchant-analytics/constant';
+import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 
 // constant imports
 import {
@@ -84,10 +86,28 @@ export { showSavedAddressCta };
  */
 export function postAddressSelection(id = null, index = null) {
   const selectedAddress = get(selectedShippingAddress);
-  const { shipping_fee, cod_fee, zipcode, serviceability } = selectedAddress;
-  const shippingAmount = serviceability ? shipping_fee : 0;
+  const { shipping_fee, cod_fee, zipcode, serviceability, shipping_methods } =
+    selectedAddress;
+  let shippingAmount = serviceability ? shipping_fee : 0;
+  let codAmount = cod_fee ?? 0;
+  if (!shipping_methods || !Object.keys(shipping_methods)?.length) {
+    selectedShippingOption.set(null);
+    Analytics.setMeta(OneClickCheckoutMetaProperties.COUNT_SHIPPING_OPTIONS, 0);
+  } else if (shipping_methods?.length > 1) {
+    shippingAmount = 0;
+    codAmount = 0;
+    Analytics.setMeta(
+      OneClickCheckoutMetaProperties.COUNT_SHIPPING_OPTIONS,
+      shipping_methods.length
+    );
+  } else if (shipping_methods?.length === 1) {
+    selectedShippingOption.set(shipping_methods[0]);
+    shippingAmount = shipping_methods[0].shipping_fee;
+    codAmount = shipping_methods[0].cod_fee;
+    Analytics.setMeta(OneClickCheckoutMetaProperties.COUNT_SHIPPING_OPTIONS, 1);
+  }
   shippingCharge.set(shippingAmount || 0);
-  codChargeAmount.set(cod_fee);
+  codChargeAmount.set(codAmount);
   isShippingAddedToAmount.set(!!serviceability);
   if (id) {
     Events.TrackBehav(AddressEvents.SAVED_ADDRESS_SELECTED, {
@@ -109,7 +129,7 @@ export function postAddressSelection(id = null, index = null) {
  * loads addresses with serviceability data
  *
  */
-export function loadAddressesWithServiceability(onSavedAddress) {
+export function loadAddressesWithServiceability(onSavedAddress, predicate) {
   checkServiceabilityStatus.set(SERVICEABILITY_STATUS.LOADING);
   const addresses = get(savedAddresses);
   return new Promise((resolve, reject) => {
@@ -118,11 +138,17 @@ export function loadAddressesWithServiceability(onSavedAddress) {
         resolve();
         savedAddresses.set(_addresses);
         let latestAddress = _addresses[0];
+        if (predicate && !predicate()) {
+          return;
+        }
         selectedShippingAddressId.set(latestAddress.id);
         postAddressSelection();
       })
       .catch(() => {
         reject();
+        if (predicate && !predicate()) {
+          return;
+        }
         selectedShippingAddressId.set(addresses[0].id);
         postAddressSelection();
       })

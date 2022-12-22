@@ -322,21 +322,31 @@ export function thirdWatchCodServiceability(address) {
   });
 }
 
-export function updateOrder(shipping_address, billing_address) {
+export function updateOrder(
+  shipping_address,
+  billing_address,
+  shipping_method
+) {
   showLoaderView();
   const orderId = getOrderId();
-  // TODO: Add analytics
+  const data = {
+    customer_details: {
+      ...getContactPayload(),
+      shipping_address: formatAddress(shipping_address),
+      billing_address: formatAddress(billing_address),
+      device: getDevicePayload(),
+    },
+  };
+
+  if (shipping_method && Object.keys(shipping_method).length) {
+    const { id, name, description, shipping_fee, cod_fee } = shipping_method;
+    data.shipping_method = { id, name, description, shipping_fee, cod_fee };
+  }
+
   return new Promise((resolve, reject) => {
     fetch.patch({
       url: makeAuthUrl(`orders/1cc/${orderId}/customer`),
-      data: {
-        customer_details: {
-          ...getContactPayload(),
-          shipping_address: formatAddress(shipping_address),
-          billing_address: formatAddress(billing_address, 'billing_address'),
-          device: getDevicePayload(),
-        },
-      },
+      data,
       callback: (response) => {
         if (response.error) {
           reject(response.error);

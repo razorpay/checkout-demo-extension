@@ -10,6 +10,7 @@ export default {
   INITIAL_LOGGED_IN: 'initial_loggedIn',
   INITIAL_HAS_SAVED_ADDRESS: 'initial_hasSavedAddress',
   SCRIPT_EDITED_COUPON_APPLIED: 'script_editor_coupon_applied',
+  MULTIPLE_SHIPPING_EXPERIMENT: 'shipping_banner_experiment',
 
   /** Coupon code meta **/
   AVAILABLE_COUPONS_COUNT: 'available_coupons_count',
@@ -29,4 +30,5 @@ export default {
   COUNTRY_CODE: 'country_code',
   ADDRESS_ID: 'address_id',
   COUNTRY: 'country',
+  COUNT_SHIPPING_OPTIONS: 'count_of_shipping_options',
 };

@@ -46,7 +46,7 @@ async function handleCouponView(context) {
   const goToCouponsCta = await context.page.waitForSelector(
     '#coupons-available-container'
   );
-  await goToCouponsCta.click();
+  await goToCouponsCta.evaluate((cta) => cta.click());
 }
 
 async function handleApplyCouponReq(
@@ -178,8 +178,10 @@ async function handleRemoveCouponReq(context) {
 }
 
 async function removeCoupon(context) {
-  await context.page.waitForSelector('.coupon-remove-text');
-  await context.page.click('.coupon-remove-text');
+  const removeTxtBtn = await context.page.waitForSelector(
+    '.coupon-remove-text'
+  );
+  await removeTxtBtn.evaluate((btn) => btn.click());
 }
 
 async function handleRemoveCoupon(context, amount) {

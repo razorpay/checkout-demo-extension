@@ -12,6 +12,7 @@
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
   import GstinForm from 'one_click_checkout/gstin/ui/GstinForm.svelte';
   import CTA, { CTAState } from 'cta';
+  import ShippingMethods from 'one_click_checkout/coupons/ui/components/ShippingMethods.svelte';
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
@@ -19,6 +20,7 @@
   import {
     selectedAddress,
     selectedAddressId,
+    selectedShippingOption,
   } from 'one_click_checkout/address/shipping_address/store';
   import {
     appliedCoupon,
@@ -168,6 +170,7 @@
           address_country: $selectedAddress?.country,
           gstin_filled: !!$gstIn,
           instruction_filled: !!$orderInstruction,
+          shipping_title_selected: $selectedShippingOption?.name ?? '',
           meta: {
             is_saved_address: !!$savedAddresses?.length,
           },
@@ -305,6 +308,13 @@
     {#if $savedAddresses.length}
       <div class="widget-wrapper">
         <AddressWidget on:headerCtaClick={onAddressHeaderClick} />
+      </div>
+      <div class="separator" />
+    {/if}
+
+    {#if $savedAddresses?.length && $selectedAddress?.shipping_methods?.length > 1}
+      <div class="widget-wrapper" in:slide|local={{ duration: 500 }}>
+        <ShippingMethods options={$selectedAddress.shipping_methods} />
       </div>
       <div class="separator" />
     {/if}

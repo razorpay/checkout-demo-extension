@@ -135,7 +135,10 @@
       checkServiceability &&
       $checkServiceabilityStatus === SERVICEABILITY_STATUS.UNCHECKED
     ) {
-      loadAddressesWithServiceability(true);
+      loadAddressesWithServiceability(
+        true,
+        () => $activeRoute?.name === views.SAVED_ADDRESSES
+      );
     } else if (
       !$selectedAddressId ||
       addresses.findIndex((addr) => addr.id === $selectedAddressId) === -1

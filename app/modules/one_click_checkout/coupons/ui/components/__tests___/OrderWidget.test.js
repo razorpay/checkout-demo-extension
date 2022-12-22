@@ -20,6 +20,8 @@ import {
   isCouponApplied,
 } from 'one_click_checkout/coupons/store';
 import { SERVICEABILITY_STATUS } from 'one_click_checkout/address/constants';
+import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
+import { scriptCouponApplied } from 'razorpay';
 
 jest.mock('sessionmanager', () => ({
   getSession: jest.fn(() => ({
@@ -28,6 +30,26 @@ jest.mock('sessionmanager', () => ({
     setAmount: jest.fn(),
   })),
 }));
+
+jest.mock('razorpay', () => {
+  const originalModule = jest.requireActual('razorpay');
+  return {
+    __esModule: true,
+    ...originalModule,
+    scriptCouponApplied: jest.fn(),
+  };
+});
+
+const lineItem = [
+  {
+    sku: '1649842208776.2551-rowdy-force-joggers',
+    name: 'Rowdy Force Joggers',
+    price: '9900',
+    quantity: '1',
+    image_url: 'https://assets.therowdy.club/1649677174873appolive12.jpg',
+    variant_id: '1649842209479.307',
+  },
+];
 
 describe('Order widget tests', () => {
   initializeCharges(9900);
@@ -107,5 +129,27 @@ describe('Order widget tests', () => {
     expect(queryByTestId('shipping-amount')).not.toBeInTheDocument();
     expect(queryByText('Total Amount')).not.toBeInTheDocument();
     expect(queryByTestId('total-amount')).not.toBeInTheDocument();
+  });
+
+  it('Should show libe item if all conditions are satisfied', () => {
+    setLineItems(lineItem);
+    const { getByText } = render(OrderWidget);
+    expect(getByText('Rowdy Force Joggers')).toBeInTheDocument();
+  });
+
+  it('Should not show line items if total amount does not match', () => {
+    setLineItems(lineItem);
+    initializeCharges(19900);
+    const { queryByText } = render(OrderWidget);
+    expect(queryByText('Rowdy Force Joggers')).not.toBeInTheDocument();
+  });
+
+  it('Should show offer price if available', () => {
+    setLineItems([{ ...lineItem, offer_price: 4900 }]);
+    initializeCharges(4900);
+    scriptCouponApplied.mockImplementation(() => true);
+    const { getByText } = render(OrderWidget);
+
+    expect(getByText((content) => content.endsWith('49'))).toBeInTheDocument();
   });
 });

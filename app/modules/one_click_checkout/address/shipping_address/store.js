@@ -35,6 +35,8 @@ export const shouldSaveAddress = writable(null);
 
 export const showSavedAddressCta = writable(false);
 
+export const selectedShippingOption = writable(null);
+
 export const checkServiceabilityStatus = writable(
   SERVICEABILITY_STATUS.UNCHECKED
 );

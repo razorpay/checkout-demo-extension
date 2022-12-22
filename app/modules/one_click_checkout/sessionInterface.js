@@ -22,6 +22,7 @@ import {
   selectedCountryISO as selectedShippingCountryISO,
   newUserAddress,
   showCodLoader,
+  selectedShippingOption,
 } from 'one_click_checkout/address/shipping_address/store';
 import { isEditContactFlow } from 'one_click_checkout/store';
 import {
@@ -221,7 +222,7 @@ export function redirectToPaymentMethods(
 
   // If navigating from methods->details->methods we need not to update the order
   if (shouldUpdateOrder) {
-    updateOrder(address, billing_address)
+    updateOrder(address, billing_address, get(selectedShippingOption))
       .then(() => {
         if (address.cod) {
           showCodLoader.set(true);

@@ -81,7 +81,7 @@
   }
 
   .view-items-btn {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
   }
 </style>

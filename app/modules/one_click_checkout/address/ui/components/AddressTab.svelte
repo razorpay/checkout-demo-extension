@@ -49,6 +49,7 @@
     formatAddressToFormData,
     showShippingChargeAddedToast,
   } from 'one_click_checkout/address/helpersExtra';
+  import { getServiceabilityCache } from 'one_click_checkout/address/service';
 
   // constants imports
   import Resource from 'one_click_checkout/address/resource';
@@ -65,6 +66,7 @@
   import { INDIA_COUNTRY_CODE } from 'common/constants';
   import { CTA_LABEL } from 'cta/i18n';
   import { SELECTED_ADDRESS_DOM_ID } from 'one_click_checkout/address/constants';
+  import { pushShippingOptionsOverlay } from 'one_click_checkout/shipping_options';
 
   export let error;
   export let onSubmitCallback;
@@ -94,6 +96,7 @@
       shouldSaveAddress,
       newUserAddress,
       selectedCountryISO,
+      selectedShippingOption,
     },
   } = Resource[addressType];
   let isFormComplete = false;
@@ -261,8 +264,20 @@
         eventData: $moengageEventsData,
       });
     }
+    const shippingMethods =
+      $selectedAddress.shipping_methods ||
+      getServiceabilityCache($selectedAddress.zipcode)?.shipping_methods;
     $shouldOverrideVisibleState = false;
-    onSubmitCallback(addressCompleted);
+    if (
+      addressType === ADDRESS_TYPES.SHIPPING_ADDRESS &&
+      shippingMethods?.length > 1
+    ) {
+      pushShippingOptionsOverlay(shippingMethods, () =>
+        onSubmitCallback(addressCompleted)
+      );
+    } else {
+      onSubmitCallback(addressCompleted);
+    }
   }
 
   function onFormCompletion({ detail: { isComplete } }) {
@@ -355,6 +370,7 @@
           {selectedCountryISO}
           {currentView}
           {addressWrapperEle}
+          {selectedShippingOption}
           bind:this={addNewAddressRef}
         />
       {/if}

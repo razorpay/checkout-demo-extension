@@ -151,8 +151,10 @@ async function fillUserAddress(
   }
   if (!saveAddress && !internationalShippingEnabled) {
     await delay(200);
-    await context.page.waitForSelector('#address-consent-checkbox');
-    await context.page.click('#address-consent-checkbox');
+    const checkbox = await context.page.waitForSelector(
+      '#address-consent-checkbox'
+    );
+    await checkbox.evaluate((cb) => cb.click());
   }
   if (internationalPhoneNumber) {
     await delay(200);

@@ -18,6 +18,7 @@ import { SHIPPING_CHARGES_LABEL } from 'one_click_checkout/address/i18n/labels';
 import { formatTemplateWithLocale } from 'i18n';
 import { formatAmountWithSymbol } from 'common/currency';
 import { disabledMethods } from 'one_click_checkout/coupons/store';
+import { sortShippingOptions } from 'one_click_checkout/shipping_options/helpers';
 
 /**
  *
@@ -248,6 +249,7 @@ export const formatResults = (addresses = []) => {
         city,
         state,
         state_code,
+        shipping_methods,
       }
     ) => {
       acc[zipcode] = {
@@ -259,6 +261,16 @@ export const formatResults = (addresses = []) => {
         state,
         state_code,
       };
+
+      if (shipping_methods?.length) {
+        const sortedOptions = sortShippingOptions(shipping_methods);
+
+        acc[zipcode] = {
+          ...acc[zipcode],
+          shipping_methods: sortedOptions,
+        };
+      }
+
       return acc;
     },
     {}

@@ -10,6 +10,7 @@ import {
   shouldSaveAddress as shouldSaveShippingAddress,
   resetAddress as resetShippingAddress,
   selectedAddress as selectedShippingAddress,
+  selectedShippingOption,
 } from 'one_click_checkout/address/shipping_address/store';
 import {
   newUserAddress as newBillingAddress,
@@ -22,8 +23,18 @@ import { isCodApplicableOnCoupon } from 'one_click_checkout/address/helpersExtra
 import { disableCOD } from 'one_click_checkout/gift_card/store';
 
 export const isCodAvailable = derived(
-  [selectedShippingAddress, isCouponApplied, disableCOD],
-  ([$selectedShippingAddress, $isCouponApplied, $disableCOD]) => {
+  [
+    selectedShippingAddress,
+    isCouponApplied,
+    disableCOD,
+    selectedShippingOption,
+  ],
+  ([
+    $selectedShippingAddress,
+    $isCouponApplied,
+    $disableCOD,
+    $selectedShippingOption,
+  ]) => {
     if (
       (!isCodApplicableOnCoupon() &&
         $isCouponApplied &&
@@ -32,6 +43,11 @@ export const isCodAvailable = derived(
     ) {
       return false;
     }
+
+    if ($selectedShippingOption) {
+      return $selectedShippingOption.cod;
+    }
+
     return $selectedShippingAddress?.cod;
   }
 );

@@ -46,6 +46,6 @@ describe('CartItem tests', () => {
       props: { ...item, offer_price: 0 },
     });
 
-    expect(component.getByText('FREE')).toBeInTheDocument();
+    expect(component.getByText('Free')).toBeInTheDocument();
   });
 });

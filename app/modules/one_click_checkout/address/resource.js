@@ -13,6 +13,7 @@ import {
   shouldSaveAddress as shouldSaveShippingAddress,
   selectedCountryISO as selectedShippingCountryISO,
   resetAddress as resetShippingAddress,
+  selectedShippingOption,
 } from 'one_click_checkout/address/shipping_address/store';
 import {
   newUserAddress as newBillingAddress,
@@ -43,6 +44,7 @@ export default {
       shouldSaveAddress: shouldSaveShippingAddress,
       selectedCountryISO: selectedShippingCountryISO,
       resetAddress: resetShippingAddress,
+      selectedShippingOption,
     },
     type: ADDRESS_TYPES.SHIPPING_ADDRESS,
     formId: 'addressForm',

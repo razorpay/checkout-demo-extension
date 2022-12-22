@@ -95,3 +95,6 @@ export const disableEmailAsCookie = () => {
 
 export const isMoEngageAnalyticsEnabled = () =>
   getOption('enable_moengage_analytics');
+
+export const getSingleShippingExpVariant = () =>
+  getPreferences('1cc_multiple_shipping');

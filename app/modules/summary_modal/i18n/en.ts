@@ -6,7 +6,7 @@ export default {
   shipping_charges_label: 'Delivery Charges',
   cod_charges_label: 'COD Charges',
   coupon_discount_label: 'Coupon ({code})',
-  free_label: 'FREE',
+  free_label: 'Free',
   offer_label: 'Offer {offer_name}',
   script_coupon_discount_label: 'Discount on Price',
 };

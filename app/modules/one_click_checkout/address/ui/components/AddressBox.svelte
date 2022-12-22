@@ -1,9 +1,11 @@
 <script lang="ts">
   // svelte imports
   import { createEventDispatcher } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   // ui imports
   import EditIcon from 'one_click_checkout/address/ui/components/EditIcon.svelte';
+  import ShippingOptionStrip from 'one_click_checkout/address/ui/elements/OptionStrip.svelte';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -18,6 +20,8 @@
   // utils imports
   import { findCountryCode } from 'common/countrycodes';
   import { getI18nForTag } from 'one_click_checkout/address/helpersExtra';
+  import { formatAmountWithSymbol } from 'common/currency';
+  import { getCurrency } from 'razorpay';
 
   export let address;
   export let isSelected = false;
@@ -29,6 +33,7 @@
   const dispatch = createEventDispatcher();
   let phoneCode = '';
   let phoneNum = '';
+  const currency = getCurrency();
 
   $: isServiceable = !(!address.serviceability && checkServiceability);
 
@@ -97,6 +102,12 @@
           </div>
         {/if}
       </div>
+      {#if isServiceable && address.shipping_methods?.length === 1}
+        <ShippingOptionStrip
+          shippingMethod={address.shipping_methods[0]}
+          classes="mg-top"
+        />
+      {/if}
       <slot>
         {#if !isServiceable}
           <div
@@ -215,5 +226,14 @@
     font-weight: var(--font-weight-regular);
     line-height: 22px;
     color: var(--secondary-text-color);
+  }
+  .single-option {
+    width: 100%;
+    background: rgba(225, 234, 249, 0.7);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
   }
 </style>

@@ -464,6 +464,7 @@ export interface PreferencesObject {
   '1cc_cart_items_exp': string;
   '1cc_city_autopopulate_disable': any;
   '1cc_experiment': any;
+  '1cc_multiple_shipping': string;
   '1cc': OneCC;
   show_donation: boolean;
   customer: Customer;

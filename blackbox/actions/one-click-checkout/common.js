@@ -260,7 +260,7 @@ async function handleFeeSummary(context, features) {
     offerText,
   } = await getSummaryInfo(context, couponValid, codFee, features);
   if (!shippingFee) {
-    expect('FREE').toEqual(shippingAmount);
+    expect('Free').toEqual(shippingAmount);
   }
   expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
 
@@ -281,7 +281,7 @@ async function handleFeeSummary(context, features) {
   if (shippingFee) {
     expectedAmount += shippingFee / 100;
   } else {
-    expect(shippingAmount).toEqual('FREE');
+    expect(shippingAmount).toEqual('Free');
   }
 
   if (codFee) {

@@ -1,0 +1,3 @@
+export const DEFAULT_SHIPPING_OPTIONS_VISIBLE = 2;
+
+export const OVERLAY_MAX_HEIGHT = 290;

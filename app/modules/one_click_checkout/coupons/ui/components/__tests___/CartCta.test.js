@@ -1,4 +1,4 @@
-import { render, fireEvent, screen } from '@testing-library/svelte';
+import { render, fireEvent } from '@testing-library/svelte';
 import CartCta from 'one_click_checkout/coupons/ui/components/CartCta.svelte';
 import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
 

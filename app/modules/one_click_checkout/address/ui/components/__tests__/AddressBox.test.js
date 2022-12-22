@@ -1,4 +1,5 @@
 import { render } from '@testing-library/svelte';
+import { getSingleShippingExpVariant } from 'razorpay';
 import AddressBoxSvelte from '../AddressBox.svelte';
 
 const DEFAULT_ADDRESS = {
@@ -19,6 +20,31 @@ const DEFAULT_ADDRESS = {
   country: 'IN',
   contact: '+919353231953',
 };
+
+const shipping_methods = [
+  {
+    id: 'id2',
+    name: 'Standard Delivery',
+    description: '4-5 days delivery',
+    shipping_fee: 500,
+    cod: true,
+    cod_fee: 500,
+  },
+  {
+    id: 'id3',
+    name: 'Test Delivery',
+    description: '2 days delivery',
+    shipping_fee: 800,
+    cod: true,
+    cod_fee: 800,
+  },
+];
+
+jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
+  __esModule: true,
+  getSingleShippingExpVariant: jest.fn(),
+}));
 
 describe('Address box tests: Renders address', () => {
   it('should render shimmer when loading: true', async () => {
@@ -75,6 +101,59 @@ describe('Address box tests: Renders address', () => {
 
     const node = await el.findByTestId('address-box-unserviceability');
 
+    expect(node).toBeInTheDocument();
+  });
+
+  it('should render the delivery charge banner when only one shipping option is present', async () => {
+    getSingleShippingExpVariant.mockImplementation(() => 'VARIANT_A');
+    const address = {
+      ...DEFAULT_ADDRESS,
+      shipping_methods: [shipping_methods[0]],
+    };
+    const el = render(AddressBoxSvelte, {
+      loading: false,
+      address,
+      isEditable: true,
+    });
+    const node = await el.findByTestId('shipping-banner');
+    expect(node).toBeInTheDocument();
+  });
+
+  it('should not render the delivery charge banner when more than one shipping option is present', () => {
+    getSingleShippingExpVariant.mockImplementation(() => 'VARIANT_A');
+    const address = { ...DEFAULT_ADDRESS, shipping_methods };
+    const el = render(AddressBoxSvelte, {
+      loading: false,
+      address,
+      isEditable: true,
+    });
+    const node = el.queryByTestId('shipping-banner');
+    expect(node).not.toBeInTheDocument();
+  });
+
+  it('should not  render the delivery charge banner if exp variant is B and description not present', () => {
+    getSingleShippingExpVariant.mockImplementation(() => 'VARIANT_B');
+    const { description, ...optWithoutDesc } = shipping_methods[0];
+    const address = { ...DEFAULT_ADDRESS, shipping_methods: [optWithoutDesc] };
+    const el = render(AddressBoxSvelte, {
+      loading: false,
+      address,
+      isEditable: true,
+    });
+    const node = el.queryByTestId('shipping-banner');
+    expect(node).not.toBeInTheDocument();
+  });
+
+  it('should render the delivery charge banner if exp variant is A and description not present', () => {
+    getSingleShippingExpVariant.mockImplementation(() => 'VARIANT_A');
+    const { description, ...optWithoutDesc } = shipping_methods[0];
+    const address = { ...DEFAULT_ADDRESS, shipping_methods: [optWithoutDesc] };
+    const el = render(AddressBoxSvelte, {
+      loading: false,
+      address,
+      isEditable: true,
+    });
+    const node = el.queryByTestId('shipping-banner');
     expect(node).toBeInTheDocument();
   });
 });
