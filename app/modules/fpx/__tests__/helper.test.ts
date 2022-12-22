@@ -148,8 +148,8 @@ describe('module/fpx/helper', () => {
       expect(isRedirectEnabled).toBe(false);
     });
 
-    test('redirect = null: should return true', () => {
-      (getMerchantOption as jest.Mock).mockReturnValue(null);
+    test('redirect = undefined: should return true', () => {
+      (getMerchantOption as jest.Mock).mockReturnValue(undefined);
 
       const isRedirectEnabled = checkRedirectForFpx();
       expect(isRedirectEnabled).toBe(true);

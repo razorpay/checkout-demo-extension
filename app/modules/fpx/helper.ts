@@ -19,11 +19,8 @@ export function checkOffline(bankCode: string) {
  * checks whether redirect flow is supported on FPX or not
  * @returns {boolean}
  */
-export function checkRedirectForFpx() {
-  return (
-    getMerchantOption('redirect') || getMerchantOption('redirect') === null
-  );
-}
+export const checkRedirectForFpx = () =>
+  getMerchantOption('redirect') !== false;
 
 /**
  * handles CTA submit for FPX payment
