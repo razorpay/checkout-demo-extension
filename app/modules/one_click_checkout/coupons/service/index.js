@@ -3,6 +3,7 @@ import { Events } from 'analytics';
 import { timer } from 'utils/timer';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 import { getContactPayload } from 'one_click_checkout/store';
+import { getMerchantKey } from 'razorpay';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import { get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
@@ -21,7 +22,6 @@ let SHOPIFY_COUPON_PROMISE;
  * @returns {Array} a list of coupons for the specific merchant.
  */
 export async function getCoupons() {
-  const orderId = await getLazyOrderId();
   const payload = getContactPayload();
 
   const shopifyCheckoutPromise = getShopifyCheckoutPromise();
@@ -30,7 +30,7 @@ export async function getCoupons() {
     payload.reference_id = await shopifyCheckoutPromise;
     payload.reference_type = 'shopify';
   } else {
-    payload.reference_id = orderId;
+    payload.reference_id = await getLazyOrderId();
     payload.reference_type = 'order';
   }
 
@@ -46,12 +46,11 @@ export async function getCoupons() {
     CONTACT_FOR_COUPONS = payload.contact;
     EMAIL_FOR_COUPONS = payload.email;
 
+    payload.key_id = getMerchantKey();
+
     SHOPIFY_COUPON_PROMISE = new Promise((resolve, reject) => {
       fetch({
-        url: _.appendParamsToUrl(
-          makeAuthUrl('magic/checkout/coupons'),
-          payload
-        ),
+        url: _.appendParamsToUrl('/v1/magic/checkout/coupons', payload),
         callback: (response) => {
           Events.TrackMetric(CouponEvents.COUPONS_FETCH_END, {
             time: getDuration(),
