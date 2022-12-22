@@ -267,10 +267,16 @@ const fetchPrototype: FetchPrototype = {
 
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
+        let json = ObjectUtils.parse(xhr.responseText) as response;
+
         // using xhr.getResponseHeader because xhr.responseType is '' for all api calls
+
+        // checking content-type to be text and then double checking if response is really
+        // not json. This ensures that response is really not json. Some api send
+        // content-type as text/plain but send json in response.
         if (
-          xhr.getResponseHeader('content-type')?.includes('text') ||
-          typeof ObjectUtils.parse(xhr.responseText) === 'string'
+          (xhr.getResponseHeader('content-type')?.includes('text') && !json) ||
+          typeof json === 'string'
         ) {
           callback?.({
             status_code: xhr.status,
@@ -279,7 +285,6 @@ const fetchPrototype: FetchPrototype = {
           return;
         }
         if (xhr.responseText) {
-          let json = ObjectUtils.parse(xhr.responseText) as response;
           if (!json) {
             json = _.rzpError('Parsing error');
             json.xhr = {
