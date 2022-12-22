@@ -5212,6 +5212,7 @@ Session.prototype = {
       .then(function (data) {
         $('#overlay-close').show();
         setTimeout(function () {
+          closeErrorModal();
           hideOverlay($('#error-message'));
           self.submit({
             vpaVerified: true,
