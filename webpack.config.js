@@ -1,6 +1,10 @@
 const { merge } = require('webpack-merge');
 const parts = require('./webpack.parts');
 
+/**
+ * Common configs applicable to all entry points
+ */
+
 const common = (buildArgs) =>
   merge([
     parts.output,
@@ -16,11 +20,16 @@ const common = (buildArgs) =>
 
 const commonDevelopment = merge([]);
 
-const commonProduction = merge([
-  parts.minimize,
-  // parts.analyze, // uncomment this to run statoscope analyzer
-  // parts.compress, // uncomment this to generate brotli files via webpack
-]);
+const commonProduction = (buildArgs) =>
+  merge([
+    parts.minimize,
+    parts.compress(buildArgs),
+    // parts.analyze, // uncomment this to run statoscope analyzer
+  ]);
+
+/**
+ * Standard checkout related configs
+ */
 
 const standardCheckout = (buildArgs) =>
   merge([
@@ -36,6 +45,13 @@ const standardCheckout = (buildArgs) =>
 const standardCheckoutDevelopment = (buildArgs) =>
   merge([commonDevelopment, parts.devServer(buildArgs)]);
 
+const standardCheckoutProduction = (buildArgs) =>
+  merge([commonProduction(buildArgs)]);
+
+/**
+ * Custom checkout related configs
+ */
+
 const customCheckout = (buildArgs) =>
   merge([
     common(buildArgs),
@@ -47,6 +63,13 @@ const customCheckout = (buildArgs) =>
 
 const customCheckoutDevelopment = merge([commonDevelopment]);
 
+const customCheckoutProduction = (buildArgs) =>
+  merge([commonProduction(buildArgs)]);
+
+/**
+ * Build Args Utils
+ */
+
 function makeBuildArgs(args) {
   return {
     mode: args.mode,
@@ -54,8 +77,13 @@ function makeBuildArgs(args) {
     isProd: args.mode !== 'development',
     isBuild: args.env.WEBPACK_BUILD === true,
     proxyTarget: process.env.API_SERVER,
+    compress: process.env.COMPRESS === '1',
   };
 }
+
+/**
+ * Final webpack config exported
+ */
 
 module.exports = (_, args) => {
   const buildArgs = makeBuildArgs(args);
@@ -72,8 +100,11 @@ module.exports = (_, args) => {
       merge([customCheckout(buildArgs), customCheckoutDevelopment]),
     ],
     production: [
-      merge([standardCheckout(buildArgs), commonProduction]),
-      merge([customCheckout(buildArgs), commonProduction]),
+      merge([
+        standardCheckout(buildArgs),
+        standardCheckoutProduction(buildArgs),
+      ]),
+      merge([customCheckout(buildArgs), customCheckoutProduction(buildArgs)]),
     ],
   };
 

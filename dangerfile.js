@@ -3,7 +3,9 @@ import { danger, fail, warn, markdown } from 'danger';
 const {
   checkoutTSCoverage,
   oneCCTSCoverage,
-} = require('./scripts/ts-coverage-helper.js');
+} = require('./scripts/ts-coverage-helper');
+
+const { generateTableReport } = require('./scripts/bundle-size-report');
 
 const modifiedFiles = danger.git.modified_files;
 const newFiles = danger.git.created_files;
@@ -151,14 +153,29 @@ if (sessionJs) {
   );
 }
 
-const showTSCoverage = (project, coverage) => {
+const showTSCoverage = () => {
   markdown(`
-**${project}**
+## Typescript Coverage
+
+**One Click Checkout**
 | Metric                            | Coverage                                                |
 | ---------------------------------- | --------------------------------------------------- |
-| Typescript Coverage          | ${coverage}               |
+| Typescript Coverage          | ${oneCCTSCoverage}               |
+
+**Checkout**
+| Metric                            | Coverage                                                |
+| ---------------------------------- | --------------------------------------------------- |
+| Typescript Coverage          | ${checkoutTSCoverage}               |
 `);
 };
 
-showTSCoverage('One Click Checkout', oneCCTSCoverage);
-showTSCoverage('Checkout', checkoutTSCoverage);
+const showBundleSizeReport = () => {
+  markdown(`
+## Bundle Size Report
+
+${generateTableReport()}
+`);
+};
+
+showTSCoverage();
+showBundleSizeReport();

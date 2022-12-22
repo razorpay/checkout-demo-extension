@@ -4,7 +4,6 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const StatoscopeWebpackPlugin = require('@statoscope/webpack-plugin').default;
 const sveltePreprocess = require('svelte-preprocess');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const zlib = require('zlib');
 const CompressionPlugin = require('compression-webpack-plugin');
 const { everythingInPackage } = require('restrict-imports-loader');
 const mockExpressApp = require('./mock-api/router');
@@ -218,23 +217,16 @@ exports.css = {
   },
 };
 
-exports.compress = {
-  plugins: [
-    new CompressionPlugin({
-      filename: '[path][base].br',
-      algorithm: 'brotliCompress',
-      test: /\.(js|css)$/,
-      compressionOptions: {
-        params: {
-          [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-        },
-      },
-      threshold: 10240,
-      minRatio: 0.8,
-      deleteOriginalAssets: false,
-    }),
-  ],
-};
+exports.compress = (buildArgs) => ({
+  plugins: buildArgs.compress
+    ? [
+        new CompressionPlugin({
+          test: /\.(js|css)$/,
+          algorithm: 'gzip',
+        }),
+      ]
+    : [],
+});
 
 /**
  * Custom checkout is pure JS sdk, which shouldn't depend on Svelte

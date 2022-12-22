@@ -9,9 +9,59 @@ on:
     types: [opened, reopened, synchronize, labeled, unlabeled, review_requested, review_request_removed]
 
 jobs:
+  build-base:
+    name: Generate Base Build
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+      - name: Use Node v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.10.0
+      - name: Install Dependencies
+        run: npm ci
+      - name: Make Build
+        run: COMPRESS=1 npm run build
+      - name: Upload base stats
+        uses: actions/upload-artifact@v3
+        with:
+          name: base
+          path: |
+            ./app/dist/v1
+            !./app/dist/v1/**/*.map
+
+          retention-days: 1
+
+  build-pr:
+    name: Generate PR Build
+    runs-on: [ self-hosted ]
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.10.0
+      - name: Install Dependencies
+        run: npm ci
+      - name: Make Build
+        run: COMPRESS=1 npm run build
+      - name: Upload pr build
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr
+          path: |
+            ./app/dist/v1
+            !./app/dist/v1/**/*.map
+          retention-days: 1
+
   Danger:
     name: Run Danger JS
     runs-on: [self-hosted]
+    needs: [build-base, build-pr]
     env:
       # As Danger uses a bot to put comments on your pr you need to
       # use `secrets.CI_BOT_TOKEN` (Personal Access Token) to provide write access to bot.
@@ -22,6 +72,20 @@ jobs:
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
+
+      - name: Use Node v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.10.0
+
+      - name: Download stats
+        uses: actions/download-artifact@v3
+        with:
+          path: ./build
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: ./build
 
       - name: Danger
         uses: danger/danger-js@11.0.2
