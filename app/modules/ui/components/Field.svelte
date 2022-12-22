@@ -264,7 +264,7 @@
   }
 
   export function getRawValue() {
-    return formatterObj ? formatterObj.value : input.value;
+    return formatterObj?.value ?? input.value;
   }
 
   export function setValid(isValid) {
