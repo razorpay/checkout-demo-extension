@@ -9,6 +9,7 @@ import {
 import { isDCCEnabled, isInternational } from './currency';
 import { isHDFCVASMerchant } from './misc';
 import { isRecurringOrPreferredPayment } from './recurring';
+import { internetExplorer } from 'common/useragent';
 
 const demoMerchantKey = ['rzp_test_1DP5mmOlF5G5ag', 'rzp_live_ILgsfZCZoFIKMb'];
 
@@ -71,6 +72,10 @@ export const isRedesignV15 = (): boolean => {
     }
 
     if (isPayout()) {
+      allow = false;
+    }
+
+    if (internetExplorer) {
       allow = false;
     }
 
