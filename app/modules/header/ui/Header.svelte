@@ -103,7 +103,7 @@
       <div class="left-section">
         <span
           class="back"
-          class:show={$showBackArrow}
+          class:show={$showBackArrow && !getOption('theme.hide_topbar')}
           on:click={handleBackClick}
         >
           <Icon icon={back_arrow($themeStore.textColor)} />
