@@ -20,6 +20,8 @@ import fpx from 'fpx/i18n/en';
 
 import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
+
+import truecallerLang from 'truecaller/i18n/en';
 export default {
   app: {
     providers: {
@@ -1352,6 +1354,9 @@ export default {
     billingAddress: 'Address',
     international: 'Instant Bank Transfer',
     intl_bank_transfer: 'Local Currency Bank...',
+  },
+  truecaller: {
+    ...truecallerLang,
   },
   upi: {
     cancel_reason_back_action: 'Back',

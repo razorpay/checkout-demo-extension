@@ -50,6 +50,7 @@
   export let inAddress = false;
   export let validationText;
   export let showValidations = false;
+  export let showTruecallerIcon = false;
 
   const isRedesignV15Enabled = isRedesignV15();
 
@@ -240,6 +241,7 @@
     {validationText}
     {showValidations}
     attributes={{ ...autotest('contact') }}
+    {showTruecallerIcon}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

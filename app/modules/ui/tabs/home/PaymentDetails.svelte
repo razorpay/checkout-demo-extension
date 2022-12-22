@@ -12,6 +12,8 @@
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import TruecallerLogin from 'truecaller/ui/components/TruecallerLogin.svelte';
+  import TruecallerNotification from 'truecaller/ui/components/TruecallerNotification.svelte';
 
   // Store
   import {
@@ -71,6 +73,7 @@
     moengageAnalytics,
   } from 'one_click_checkout/merchant-analytics';
   import CouponEvents from 'one_click_checkout/coupons/analytics';
+  import { META_KEYS } from 'truecaller/analytics/events';
 
   // i18n imports
   import { t } from 'svelte-i18n';
@@ -102,11 +105,27 @@
 
   // controller imports
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import {
+    ERRORS,
+    setCustomer,
+    isTruecallerLoginEnabled,
+    TRUECALLER_VARIANT_NAMES,
+  } from 'truecaller';
+  import { truecallerPresent } from 'truecaller/store';
+
+  // type imports
+  import type {
+    TruecallerCheckResponse,
+    UserVerifySuccessApiResponse,
+  } from 'truecaller/types';
 
   // Props
   export let tpv = undefined;
   export let onSubmit = undefined;
   export let showValidations = false;
+  export let shouldUpdateEmail = false;
+
+  let truecallerLoginFailed = false;
 
   const order = getMerchantOrder();
   const accountName = getPrefillBankDetails('name');
@@ -115,6 +134,9 @@
   const isOneCCEnabled = isOneClickCheckout();
   const isRedesignV15Enabled = isRedesignV15();
   const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
+  const truecallerLoginEnabled = isTruecallerLoginEnabled(
+    TRUECALLER_VARIANT_NAMES.contact_screen
+  ).status;
   const userContact = $contact;
   $prevContact = {
     country: $country,
@@ -272,8 +294,33 @@
     }
     return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
+
+  export function onTruecallerLoginSuccess(
+    detail: UserVerifySuccessApiResponse
+  ) {
+    Analytics.setMeta(META_KEYS.LOGIN_SCREEN_SOURCE, 'contact_details');
+    setCustomer(detail);
+
+    if (!detail.email) {
+      shouldUpdateEmail = true;
+      return;
+    }
+
+    onSubmitClick();
+  }
+
+  export function onTruecallerLoginError(detail: any) {
+    const code = detail.code || '';
+
+    if (![ERRORS.TRUECALLER_LOGIN_DISABLED].includes(code)) {
+      truecallerLoginFailed = true;
+    }
+  }
 </script>
 
+{#if truecallerLoginFailed}
+  <TruecallerNotification />
+{/if}
 <div
   data-test-id="payment-details-block"
   class:details-wrapper={(isRedesignV15Enabled && !isOneClickCheckout()) ||
@@ -281,9 +328,18 @@
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
   {#if (isRedesignV15Enabled && !isOneClickCheckout()) || isEditDetailScreen}
-    <div class="contact-title">
-      <Icon icon={user} />
-      <span class="contact-text">{$t(CONTACT_LABEL)}</span>
+    <div class="contact-title-container">
+      <div class="contact-title">
+        <Icon icon={user} />
+        <span class="contact-text">{$t(CONTACT_LABEL)}</span>
+      </div>
+
+      {#if truecallerLoginEnabled && $truecallerPresent !== false}
+        <TruecallerLogin
+          on:success={(e) => onTruecallerLoginSuccess(e.detail)}
+          on:error={(e) => onTruecallerLoginError(e.detail)}
+        />
+      {/if}
     </div>
   {/if}
 
@@ -299,6 +355,7 @@
           on:countrySelect={handleCountrySelect}
           {showValidations}
           {validationText}
+          showTruecallerIcon={shouldUpdateEmail}
         />
       </div>
     {/if}
@@ -396,7 +453,6 @@
   .contact-title {
     display: flex;
     align-items: center;
-    padding-bottom: 8px;
   }
 
   .contact-text {
@@ -422,5 +478,12 @@
     .partial-payment-block {
       padding: 24px 0;
     }
+  }
+
+  .contact-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
   }
 </style>

@@ -14,11 +14,12 @@ export function show(props) {
     props,
   });
 }
-export function confirmClose() {
+export function confirmClose(props = {}) {
   return new Promise(function (resolve) {
     show({
       onPositiveClick: () => resolve(true),
       onNegativeClick: () => resolve(false),
+      ...props,
     });
   });
 }

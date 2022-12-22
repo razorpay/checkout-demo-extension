@@ -1,0 +1,25 @@
+export function Address(overrides = {}) {
+  return {
+    id: 'Km9NrjzxD5eN3d',
+    entity_id: 'Di8sLC2iGBXiyd',
+    entity_type: 'customer',
+    line1: 'SJR Cyber Laskar',
+    line2: 'Adugodi, Kormangala',
+    city: 'Bengaluru',
+    zipcode: '560030',
+    state: 'Karnataka',
+    country: 'in',
+    type: 'shipping_address',
+    primary: true,
+    deleted_at: null,
+    created_at: 1669789506,
+    updated_at: 1669789506,
+    contact: '+918888888888',
+    tag: '',
+    landmark: '',
+    name: 'Test',
+    source_id: null,
+    source_type: null,
+    ...overrides,
+  };
+}

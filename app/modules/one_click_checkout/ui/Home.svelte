@@ -16,8 +16,10 @@
   import { savedAddresses } from 'one_click_checkout/address/store';
   import { cartItems } from 'one_click_checkout/cart/store';
   import { cartAmount } from 'one_click_checkout/charges/store';
+  import { showTruecallerErrorMessage } from 'one_click_checkout/store';
 
   // Constants import
+  import { ERRORS } from 'truecaller';
   import routes from 'one_click_checkout/routing/routes';
   import { views } from 'one_click_checkout/routing/constants';
 
@@ -27,6 +29,8 @@
   import { onScrollToggleHeader } from 'one_click_checkout/header/helper';
   import { destroyTopbar } from 'one_click_checkout/topbar';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
+  import { initTruecaller } from 'one_click_checkout/controller';
+  import { shouldDisableAutoTrigger } from 'truecaller/store';
 
   // session imports
   import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
@@ -63,6 +67,21 @@
     setLineItems(
       getOption('cart')?.line_items || getMerchantOrder().line_items
     );
+
+    if (!$shouldDisableAutoTrigger) {
+      initTruecaller().catch((e) => {
+        const code = e.code || '';
+        if (
+          ![
+            ERRORS.TRUECALLER_NOT_FOUND,
+            ERRORS.TRUECALLER_LOGIN_DISABLED,
+          ].includes(code)
+        ) {
+          showTruecallerErrorMessage.set(true);
+        }
+      });
+    }
+
     Analytics.setMeta(
       OneClickCheckoutMetaProperties.INITIAL_LOGGED_IN,
       isUserLoggedIn()

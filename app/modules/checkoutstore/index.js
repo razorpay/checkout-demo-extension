@@ -13,7 +13,7 @@ import RazorpayStore, {
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { activeRoute } from 'one_click_checkout/routing/store';
-import { CTAHelper } from 'cta';
+import CTAHelper from 'cta/store';
 
 /** required for CTA */
 export const screenStore = writable('');
@@ -50,7 +50,10 @@ tabStore.subscribe((tab) => {
 });
 
 // can't move inside razorpay/helper as it consuming store
-export function shouldRememberCustomer(method = 'card') {
+export function shouldRememberCustomer(
+  method = 'card',
+  skipContactOptionalCheck = false
+) {
   /**
    * - For recurring due to RBI circular it's mandatory to
    *   collect explicit user consent to save card.
@@ -65,9 +68,12 @@ export function shouldRememberCustomer(method = 'card') {
   }
   if (
     !navigator.cookieEnabled ||
-    (method === 'card' && !getOption('features.cardsaving')) ||
-    (isContactOptional() && !get(phone))
+    (method === 'card' && !getOption('features.cardsaving'))
   ) {
+    return false;
+  }
+
+  if (!skipContactOptionalCheck && isContactOptional() && !get(phone)) {
     return false;
   }
 

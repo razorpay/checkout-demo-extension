@@ -39,3 +39,8 @@ export type FollowPath<T, P> = P extends `${infer U}.${infer R}`
   : unknown;
 
 export type ValueOf<T> = T[keyof T];
+
+/**
+ * Make particular property required and rest are optional
+ */
+export type MakeRequired<T, K extends keyof T> = Pick<T, K> & Partial<T>;

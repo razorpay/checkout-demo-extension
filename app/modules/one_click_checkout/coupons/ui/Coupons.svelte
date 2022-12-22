@@ -13,6 +13,7 @@
   import GstinForm from 'one_click_checkout/gstin/ui/GstinForm.svelte';
   import CTA, { CTAState } from 'cta';
   import ShippingMethods from 'one_click_checkout/coupons/ui/components/ShippingMethods.svelte';
+  import TruecallerNotification from 'truecaller/ui/components/TruecallerNotification.svelte';
 
   // store imports
   import { contact, email, country } from 'checkoutstore/screens/home';
@@ -37,6 +38,7 @@
   import {
     shouldShowCoupons,
     getCouponWidgetExperiment,
+    showTruecallerErrorMessage,
   } from 'one_click_checkout/store';
   import { isContactAndEmailValid } from 'one_click_checkout/common/details/store';
   import { shouldOverrideVisibleState } from 'one_click_checkout/header/store';
@@ -296,10 +298,23 @@
     x: -100,
     delay: 350,
   });
+
+  /**
+   * resets the variable to false when screen is destroyed to
+   * ensure that once it has been displayed, it doesn't appear again
+   */
+  onDestroy(() => {
+    if ($showTruecallerErrorMessage) {
+      $showTruecallerErrorMessage = false;
+    }
+  });
 </script>
 
 <Screen pad={false}>
   <div data-test-id="summary-screen" class="coupon-container">
+    {#if $showTruecallerErrorMessage}
+      <TruecallerNotification />
+    {/if}
     <div class="widget-wrapper">
       <ContactWidget {showValidations} />
     </div>

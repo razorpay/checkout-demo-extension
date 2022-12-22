@@ -61,6 +61,7 @@ export interface Prefill {
 
 export interface Features {
   cardsaving: boolean;
+  truecaller_login: boolean | null;
 }
 
 export interface Readonly {

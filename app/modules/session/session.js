@@ -12,7 +12,11 @@ import {
 } from 'checkoutframe/customer';
 import { init1CCMetaData } from 'one_click_checkout/helper';
 import { applyPrefilledCoupon } from 'one_click_checkout/coupons/helpers';
-import { openConsentOverlay, showAuthOverlay } from 'card/helper';
+import {
+  openConsentOverlay,
+  showAuthOverlay,
+  showTruecallerNecessaryCtaForPopup,
+} from 'card/helper';
 import { showConversionChargesCallout } from 'card/helper';
 import {
   matchLatestPaymentWith,
@@ -22,6 +26,7 @@ import {
   handleErrorModal,
   isPayloadIsOfQR,
   updateSubLinkContent,
+  initLoginForSavedCard,
 } from 'session/helper';
 import fetch from 'utils/fetch';
 import { upiUxV1dot1 } from 'upi/experiments';
@@ -116,6 +121,9 @@ import { moengageEventsData } from 'one_click_checkout/merchant-analytics/store'
 import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
 import { selectedPlan } from 'checkoutstore/emi';
 import { sendDismissEvent } from 'checkoutframe/helper';
+import { TRUECALLER_VARIANT_NAMES, stopVerificationPolling } from 'truecaller';
+import { shouldShowProceedOverlay } from 'truecaller/store';
+import { setTruecallerMetaData } from 'truecaller/analytics';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -862,6 +870,8 @@ Session.prototype = {
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
+  svelteCardTab: undefined,
+  otpView: undefined,
 
   /**
    * Update the amount in header.
@@ -1286,6 +1296,7 @@ Session.prototype = {
     if (RazorpayHelper.isRemoveDefaultTokenizationSupported()) {
       remember.set(false);
     }
+    setTruecallerMetaData();
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: Object.assign(
@@ -2239,6 +2250,10 @@ Session.prototype = {
   },
 
   secAction: function () {
+    this.otpView.updateScreen({
+      truecallerLoginFailed: false,
+    });
+
     if (this.headless && this.r._payment) {
       Analytics.track('native_otp:gotobank', {
         type: AnalyticsTypes.BEHAV,
@@ -2596,6 +2611,7 @@ Session.prototype = {
     if (screen !== 'otp' && this.screen === 'otp') {
       this.otpView.updateScreen({
         showCtaOneCC: false,
+        truecallerLoginFailed: false,
       });
     }
 
@@ -2700,6 +2716,7 @@ Session.prototype = {
       RazorpayHelper.isEmiV2()
     ) {
       let skipOTPFlow = false;
+      let isFromPreferredBlock = false;
       /**
        * tab is selected from p13n block which says 'EMI - Use your saved cards' ask otp always
        */
@@ -2720,7 +2737,16 @@ Session.prototype = {
         selectedInstrument &&
         selectedInstrument.method !== 'cardless_emi'
       ) {
-        this.askOTPForSavedCard();
+        if (this.tab === 'card') {
+          initLoginForSavedCard.call(
+            this,
+            isFromPreferredBlock
+              ? TRUECALLER_VARIANT_NAMES.preferred_methods
+              : TRUECALLER_VARIANT_NAMES.access_saved_cards
+          );
+        } else {
+          this.askOTPForSavedCard();
+        }
       } else {
         // render new EMI screen
         renderEmiOptions();
@@ -3443,8 +3469,10 @@ Session.prototype = {
     /**
      * tab is selected from p13n block which says 'Use your saved cards' ask otp always
      */
+    let isFromPreferredBlock = false;
     if (this.switchTabPayload && this.switchTabPayload.preferred) {
       skipOTPFlow = false;
+      isFromPreferredBlock = true;
     }
 
     if (!remember) {
@@ -3473,7 +3501,16 @@ Session.prototype = {
       this.screen !== 'card' &&
       !activeEmiPlan
     ) {
-      self.askOTPForSavedCard();
+      if (this.tab === 'card') {
+        initLoginForSavedCard.call(
+          self,
+          isFromPreferredBlock
+            ? TRUECALLER_VARIANT_NAMES.preferred_methods
+            : TRUECALLER_VARIANT_NAMES.access_saved_cards
+        );
+      } else {
+        self.askOTPForSavedCard();
+      }
     } else {
       self.setScreen('card');
     }
@@ -4373,6 +4410,10 @@ Session.prototype = {
   },
 
   onOtpSubmit: function () {
+    this.otpView.updateScreen({
+      truecallerLoginFailed: false,
+    });
+
     if (this.checkInvalid('#form-otp')) {
       return;
     }
@@ -4701,8 +4742,8 @@ Session.prototype = {
 
   /**
    * Attempts a payment
-   * @param {Event} e
-   * @param {Object} payload Overridden payload
+   * @param {Event} [e]
+   * @param {Object} [payload] Overridden payload
    */
   preSubmit: function (e, payload) {
     /**
@@ -5909,11 +5950,17 @@ Session.prototype = {
          */
         if (RazorpayHelper.isRecurringOrPreferredPayment()) {
           if (isDomesticCustomer) {
-            this.sendOTP();
+            initLoginForSavedCard.call(
+              this,
+              TRUECALLER_VARIANT_NAMES.add_new_card
+            );
             return;
           }
         } else {
-          this.sendOTP();
+          initLoginForSavedCard.call(
+            this,
+            TRUECALLER_VARIANT_NAMES.add_new_card
+          );
           return;
         }
       } else if (!this.headless) {
@@ -6062,6 +6109,15 @@ Session.prototype = {
         });
 
         request.nativeotp = true;
+      } else {
+        if (
+          storeGetter(shouldShowProceedOverlay) &&
+          !RazorpayHelper.getOption('redirect')
+        ) {
+          showTruecallerNecessaryCtaForPopup();
+          shouldShowProceedOverlay.set(false);
+          return;
+        }
       }
     }
     let isDynamicWalletFlow = discreet.WalletHelper.isDynamicWalletFlow();
@@ -6474,6 +6530,7 @@ Session.prototype = {
 
       es6components.destroyAll();
       this.cleanUpSvelteComponents();
+      stopVerificationPolling();
 
       try {
         this.delegator.destroy();

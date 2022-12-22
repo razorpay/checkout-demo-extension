@@ -20,6 +20,7 @@ import { highlightUPIIntentOnDesktop } from 'upi/experiments';
 import { get } from 'svelte/store';
 import { qrRenderState } from 'upi/ui/components/QRWrapper/store';
 import { checkOffline } from 'fpx/helper';
+import { isTruecallerLoginEnabled, TRUECALLER_VARIANT_NAMES } from 'truecaller';
 
 /**
  * Map of filter fn for each method
@@ -38,6 +39,15 @@ const METHOD_FILTERS = {
     }
 
     const logged = ObjectUtils.get(customer, 'logged');
+
+    if (
+      !logged &&
+      instrument.token_id === 'card' &&
+      isTruecallerLoginEnabled(TRUECALLER_VARIANT_NAMES.preferred_methods)
+        .status
+    ) {
+      return true;
+    }
 
     const allowedTypes = {
       credit: isCreditCardEnabled(),

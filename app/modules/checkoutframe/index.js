@@ -48,7 +48,7 @@ import {
 import feature_overrides from 'checkoutframe/overrideConfig';
 
 import { getElementById } from 'utils/doc';
-import { setBraveBrowser } from 'common/useragent';
+import { setBraveBrowser, setPrivateWindow } from 'common/useragent';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
 import {
@@ -70,7 +70,13 @@ import {
   setParamsForDdosProtection,
 } from 'checkoutframe/utils';
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
+
 import { initShopifyCheckout, clearShopifyCheckout } from './1cc-shopify';
+import {
+  isTruecallerLoginEnabledBeforePreferences,
+  MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER,
+} from 'truecaller';
+import { shouldDisableAutoTrigger } from 'truecaller/store';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -224,6 +230,7 @@ const setAnalyticsMeta = (message) => {
    */
   if (message.metadata) {
     setBraveBrowser(message.metadata.isBrave);
+    setPrivateWindow(message.metadata.isPrivate);
     if (message.metadata.affordability_widget_fid) {
       Events.setMeta(
         MetaProperties.AFFORDABILITY_WIDGET_FID,
@@ -519,6 +526,7 @@ function getPrefsPromisified(session) {
     // e
   }
 
+  const prefStartTime = Date.now();
   return new Promise((resolve) => {
     if (isMagicShopifyFlow()) {
       const litePrefs = getLitePreferencesFromStorage(
@@ -533,6 +541,12 @@ function getPrefsPromisified(session) {
       resolve
     );
   }).finally(() => {
+    const timeTakenToCompletePreferences = Math.abs(Date.now() - prefStartTime);
+    shouldDisableAutoTrigger.set(
+      timeTakenToCompletePreferences >
+        MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER
+    );
+
     if (loader) {
       _El.detach(loader);
       loader = null;
@@ -701,6 +715,33 @@ function getPreferencesParams(razorpayInstance) {
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
   }
+
+  try {
+    // We need to send truecaller=1 (when truecaller login is possible), and
+    // prefill=1 (when contact and email are prefilled by merchant).
+    // Backend generates truecaller request_id only when truecaller=1
+    // prefill=1 is being used to run experiment for prefilled and
+    // non prefilled sessions.
+    const truecallerEnabled =
+      isTruecallerLoginEnabledBeforePreferences().status;
+    if (truecallerEnabled) {
+      prefData.truecaller = 1;
+    }
+
+    // Before preferences we don't know if either of the contact or email
+    // or both are optional. So we assume that they are not optional
+    // and we just check if both of them are prefilled or not
+    if (
+      truecallerEnabled &&
+      getOption('prefill.contact') &&
+      getOption('prefill.email')
+    ) {
+      prefData.prefill = 1;
+    }
+  } catch (error) {
+    // no-op
+  }
+
   // TODO: make this a const
   const CREDExperiment = BrowserStorage.getItem('cred_offer_experiment');
   if (CREDExperiment) {

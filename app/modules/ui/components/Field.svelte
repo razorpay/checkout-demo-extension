@@ -11,6 +11,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { getIcons } from 'one_click_checkout/sessionInterface';
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
+  import truecallerHint from 'truecaller/ui/icons/hint';
   const { solid_down_arrow } = getIcons();
 
   import * as ObjectUtils from 'utils/object';
@@ -68,6 +69,7 @@
   export let errorValidationClasses = '';
   export let labelUpperClasses = '';
   export let showServicableIcon = false;
+  export let showTruecallerIcon = false;
   export let showDropDownIcon = false;
   export let isInvalid = false;
   export let attributes = {};
@@ -345,6 +347,11 @@
       <span class="servicibility-icon-wrapper">
         <Icon icon={circle_check()} />
       </span>
+    {/if}
+    {#if showTruecallerIcon}
+      <span class="truecaller-icon-wrapper"
+        ><Icon icon={truecallerHint()} /></span
+      >
     {/if}
     {#if showDropDownIcon}
       <span class="drop-down-icon-wrapper">
@@ -925,7 +932,8 @@
   }
 
   /* For the Icons needed for 1cc */
-  .servicibility-icon-wrapper {
+  .servicibility-icon-wrapper,
+  .truecaller-icon-wrapper {
     position: absolute;
     right: 14px;
     top: 24px;

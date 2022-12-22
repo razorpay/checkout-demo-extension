@@ -16,6 +16,8 @@ import CardTokenisationOverlaySvelte from 'ui/components/CardTokenisationOverlay
 import { getSession } from 'sessionmanager';
 import { isIndianCustomer } from 'checkoutstore/screens/home';
 import { shouldRememberCard } from 'ui/tabs/card/utils';
+import { shouldShowProceedOverlay } from 'truecaller/store';
+
 import type { Tokens } from 'razorpay/types/Preferences';
 import type { TokenisationOverlayProps } from 'card/types';
 
@@ -57,6 +59,20 @@ export const showAuthOverlay = () => {
     component: AuthOverlay,
     props: {
       onContinue: authOverlayOnContinue,
+    },
+  });
+};
+
+// truecaller necessary CTA overlay
+export const showTruecallerNecessaryCtaForPopup = () => {
+  const session = getSession();
+  pushOverlay({
+    component: AuthOverlay,
+    props: {
+      onContinue: () => {
+        popStack();
+        session.submit();
+      },
     },
   });
 };

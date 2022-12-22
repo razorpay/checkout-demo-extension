@@ -7,6 +7,7 @@ import * as _El from 'utils/DOM';
 import { querySelectorAll, form2obj } from 'utils/doc';
 import getAffordabilityWidgetFingerprint from 'utils/affordabilityWidgetFingerprint';
 import { isBraveBrowser, isMobile } from 'common/useragent';
+import { detectIncognito } from 'detectincognitojs';
 import { appendFormInput, flatten } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
@@ -15,6 +16,7 @@ import { MiscTracker } from 'misc/analytics/events';
 import { getOption } from 'razorpay';
 import type { Razorpay as RazorpayType } from 'types/types';
 import type { OptionObject } from 'razorpay/types/Options';
+import { subscribeToTruecallerEvent } from 'truecaller/subscriptions';
 // import { setupFreezeCheck } from './freeze';
 
 const RazorProto = _.prototypeOf(Razorpay);
@@ -234,6 +236,7 @@ function createTestRibbon(parent: HTMLDivElement) {
 
 let preloadedFrame: CheckoutFrame;
 let isBrave = false;
+let isPrivate = false;
 const affordabilityWidgetFid = getAffordabilityWidgetFingerprint();
 /**
  * in iframe isBraveBrowser doesn't work as expected to make sure we detect brave browser
@@ -243,6 +246,15 @@ const affordabilityWidgetFid = getAffordabilityWidgetFingerprint();
 isBraveBrowser().then((r) => {
   isBrave = r;
 });
+
+detectIncognito()
+  .then((result) => {
+    isPrivate = result.isPrivate;
+  })
+  .catch(() => {
+    // no-op
+  });
+
 function getPreloadedFrame(rzp?: RazorpayType) {
   if (preloadedFrame) {
     preloadedFrame.openRzp(rzp);
@@ -302,6 +314,7 @@ RazorProto.open = needBody(function (this: RazorpayType) {
   if (!this.metadata) {
     this.metadata = {
       isBrave,
+      isPrivate,
     };
     if (affordabilityWidgetFid) {
       this.metadata['affordability_widget_fid'] = affordabilityWidgetFid;
@@ -370,6 +383,8 @@ const initRazorpayCheckout = needBody(function () {
   } else {
     Events.Track(MiscEvents.INTL_MISSING);
   }
+
+  subscribeToTruecallerEvent();
 
   // Get the ball rolling in case we are in manual mode
   try {

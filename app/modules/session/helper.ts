@@ -12,6 +12,19 @@ import { trackDebitCardEligibilityChecked } from 'emiV2/events/tracker';
 import { isQRPaymentActive } from 'upi/helper';
 import { querySelector } from 'utils/doc';
 
+import {
+  triggerTruecallerIntent,
+  setCustomer,
+  TRUECALLER_VARIANT_NAMES,
+  ERRORS,
+} from 'truecaller';
+
+import { shouldShowProceedOverlay } from 'truecaller/store';
+import type { TruecallerVariantNames } from 'truecaller/types';
+
+import Analytics from 'analytics';
+import { META_KEYS } from 'truecaller/analytics/events';
+
 export function handleErrorModal(this: Session, message: string) {
   if (isEmiV2() && this.tab === 'emi') {
     /** If it's a new emi flow and payment method is emi
@@ -138,4 +151,49 @@ export function updateSubLinkContent(text: string) {
   if (subLink) {
     subLink.textContent = text;
   }
+}
+
+export function initLoginForSavedCard(
+  this: Session,
+  variant: TruecallerVariantNames
+) {
+  triggerTruecallerIntent({}, variant)
+    .then((data) => {
+      Analytics.setMeta(META_KEYS.LOGIN_SCREEN_SOURCE, variant);
+      setCustomer(data);
+
+      if (
+        variant === TRUECALLER_VARIANT_NAMES.access_saved_cards ||
+        variant === TRUECALLER_VARIANT_NAMES.preferred_methods
+      ) {
+        this.switchTab('card');
+        this.setScreen('card');
+        if (this.svelteCardTab) {
+          (this.svelteCardTab as any).showLandingView();
+        }
+      }
+
+      if (variant === TRUECALLER_VARIANT_NAMES.add_new_card) {
+        shouldShowProceedOverlay.set(true);
+        this.submit();
+      }
+    })
+    .catch((error) => {
+      if (
+        error?.code &&
+        ![
+          ERRORS.TRUECALLER_LOGIN_DISABLED,
+          ERRORS.TRUECALLER_NOT_FOUND,
+        ].includes(error.code) &&
+        this.otpView
+      ) {
+        (this.otpView as any).updateScreen({ truecallerLoginFailed: true });
+      }
+
+      if (variant === TRUECALLER_VARIANT_NAMES.add_new_card) {
+        this.sendOTP();
+      } else {
+        this.askOTPForSavedCard();
+      }
+    });
 }

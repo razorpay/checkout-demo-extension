@@ -6,7 +6,7 @@
   import { updateActionAreaContentAndCTA } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
-  import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
+  import ContactScreen from 'ui/tabs/home/ContactScreen.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import RTBBanner from 'rtb/ui/component/RTBBanner.svelte';
@@ -207,6 +207,7 @@
   } from 'home/analytics/helpers';
   import { P13NTracker } from 'misc/analytics/events';
   import { isCustomerWithIntlPhone } from 'helper/international';
+  import { patchCustomerEmail } from 'checkoutframe/customer/service';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -243,6 +244,8 @@
   let expSourceSet = false;
 
   let dccView = 'home-screen';
+
+  let shouldUpdateEmail = false;
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -1347,6 +1350,10 @@
   }
 
   function onPaymentDetailsSubmit() {
+    if (shouldUpdateEmail) {
+      patchCustomerEmail($email);
+    }
+
     if (session.checkCommonValidAndTrackIfInvalid()) {
       next();
     }
@@ -1361,11 +1368,11 @@
   >
     <div class="screen-main" class:screen-one-cc={isRedesignV15Enabled}>
       {#if view === HOME_VIEWS.DETAILS}
-        <PaymentDetails
+        <ContactScreen
           {tpv}
           bind:onSubmitClick={onPaymentDetailSubmit}
           bind:disabled={paymentDetailInvalid}
-          ctaV15={isRedesignV15Enabled}
+          bind:shouldUpdateEmail
           onSubmit={onPaymentDetailsSubmit}
         />
       {/if}

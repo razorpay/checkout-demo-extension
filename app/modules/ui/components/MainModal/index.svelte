@@ -80,6 +80,7 @@
         session.back();
       }
     });
+
     return () => unsub();
   });
 

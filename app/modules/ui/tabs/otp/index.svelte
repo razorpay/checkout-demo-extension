@@ -22,6 +22,7 @@
     isRazorpayOTP,
     ctaOneCCDisabled,
     disableCTA,
+    truecallerLoginFailed,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
@@ -67,6 +68,7 @@
   import CardBox from 'ui/elements/CardBox.svelte';
   import AccountTab from 'account_modal/ui/AccountTab.svelte';
   import OtpInput from 'otp/ui/OtpInput.svelte';
+  import TruecallerNotification from 'truecaller/ui/components/TruecallerNotification.svelte';
 
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
@@ -262,7 +264,13 @@
   class:loading={$loading}
   class:showable={addShowableClass}
   class:tab-content-one-cc={isOneCC}
+  class:truecaller-notification-visible={$truecallerLoginFailed}
 >
+  {#if $truecallerLoginFailed}
+    <div class="truecaller-notification-wrapper">
+      <TruecallerNotification />
+    </div>
+  {/if}
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
   <div
@@ -589,6 +597,10 @@
 
   .tab-content-one-cc {
     margin-top: 12px;
+  }
+
+  .truecaller-notification-visible {
+    margin-top: 0px;
   }
 
   .otp-heading {

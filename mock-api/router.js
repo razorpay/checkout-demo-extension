@@ -237,4 +237,20 @@ app.get('/v1/states/:countryCode', (req, res) => {
   res.json(states[req.query.countryCode || 'gb']);
 });
 
+// Truecaller routes
+let counter = 0;
+app.post('/v1/customers/truecaller/verify', async function (request, response) {
+  const { getVerifyPendingResponse, getVerifySuccessResponse } =
+    requireOnce('./mocks/truecaller');
+  await delay(300);
+
+  if (counter < 4) {
+    counter++;
+    response.send(getVerifyPendingResponse());
+  } else {
+    counter = 0;
+    response.send(getVerifySuccessResponse());
+  }
+});
+
 module.exports = app;

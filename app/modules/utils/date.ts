@@ -15,3 +15,14 @@ export function formatToMMSS(seconds: number) {
     seconds < 10 ? '0' : ''
   }${seconds}`;
 }
+
+export function getDayDiff(
+  oldMillisecTimestamp: number,
+  newMillisecTimestamp = Date.now()
+) {
+  return Math.abs(
+    Math.floor(
+      (newMillisecTimestamp - oldMillisecTimestamp) / (1000 * 60 * 60 * 24)
+    )
+  );
+}

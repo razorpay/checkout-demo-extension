@@ -155,6 +155,7 @@
     "@babel/runtime": "7.19.4",
     "@playwright/test": "1.27.1",
     "acorn": "^8.8.0",
+    "detectincognitojs": "^1.1.2",
     "node-sass": "^7.0.1",
     "playwright-chromium": "1.27.1"
   },

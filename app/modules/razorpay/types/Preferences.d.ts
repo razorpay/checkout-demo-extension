@@ -316,7 +316,7 @@ interface OneCC {
   };
 }
 
-interface Address {
+export interface Address {
   id: string;
   entity_id: string;
   entity_type: string;
@@ -402,7 +402,7 @@ interface RecurringDetails {
   failure_reason: any;
 }
 
-interface Customer {
+export interface Customer {
   addresses: Address[];
   '1cc_consent_banner_views': number;
   tokens: Tokens;
@@ -522,6 +522,9 @@ export interface PreferencesObject {
   line_items_total: number; // TODO confirm
   merchant_currency: string;
   merchant_country: string;
+  truecaller?: {
+    request_id: string;
+  };
 }
 
 export type Preferences = {

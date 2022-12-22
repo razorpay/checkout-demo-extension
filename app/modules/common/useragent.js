@@ -28,6 +28,7 @@ export const isWebView = AndroidWebView || iosWebView;
 export const Instagram = check(/Instagram/);
 export const samsungBrowser = check(/SamsungBrowser/);
 export let isBrave = false;
+export let isPrivate = false;
 
 /**
  * Facebook User-Agents:
@@ -112,6 +113,10 @@ export const isBraveBrowser = async () => {
 
 export const setBraveBrowser = (res = false) => {
   isBrave = res;
+};
+
+export const setPrivateWindow = (res = false) => {
+  isPrivate = res;
 };
 
 // Some stock android browsers that pause the checkout tab

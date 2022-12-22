@@ -172,6 +172,8 @@
   import { CardsTracker } from 'card/analytics/events';
   import { handleBackNavigation } from 'emiV2/helper/navigation';
   import { appliedOffer, isCardValidForOffer } from 'offers/store';
+  import { initLoginForSavedCard } from 'session/helper';
+  import { TRUECALLER_VARIANT_NAMES } from 'truecaller';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -1276,7 +1278,10 @@
                   showSavedCardsView();
                 } else {
                   Events.Track(CardEvents.SHOW_SAVED_CARDS);
-                  session.askOTPForSavedCard();
+                  initLoginForSavedCard.call(
+                    session,
+                    TRUECALLER_VARIANT_NAMES.access_saved_cards
+                  );
                 }
               }}
             />

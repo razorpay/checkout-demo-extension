@@ -75,6 +75,7 @@ RazorpayDefaults.prefill = {
 
 RazorpayDefaults.features = {
   cardsaving: true,
+  truecaller_login: null,
 };
 
 RazorpayDefaults.readonly = {

@@ -39,6 +39,9 @@
         document.body.appendChild(script);
       }
     </script>
+    <script>
+      window.opener = { handleMessage: function () {}, postMessage: function () {} };
+    </script>
     <script
       src="https://checkout.com/v1/checkout-frame.js"
       crossorigin

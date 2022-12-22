@@ -14027,6 +14027,10 @@ const preferences = {
     show_donation: false,
   },
   offers: {
+    truecaller: {
+      request_id:
+        '4ht75gduvny5nl6lv738omuyxwctw0vgttzc6hlxne9w2jjklk7iyqsmi9e9k',
+    },
     options: {
       theme: {
         color: null,
@@ -14041,7 +14045,6 @@ const preferences = {
     merchant_name: 'QA Checkout',
     mode: 'test',
     magic: true,
-    optional: ['contact'],
     blocked: false,
     activated: true,
     methods: {
