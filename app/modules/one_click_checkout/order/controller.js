@@ -6,6 +6,7 @@ import {
   isEmailValid,
 } from 'one_click_checkout/order/validators';
 import RazorpayStore, {
+  getMerchantKey,
   getOption,
   getOrderId,
   setShopifyOrderId,
@@ -63,6 +64,9 @@ export function createShopifyOrder(shopifyCheckoutPromise) {
     .then(Service.createShopifyOrder)
     .then(({ order_id, preferences }) => {
       setShopifyOrderId(order_id);
+      // since preferences is fetched using internal auth,
+      // microservice is returning rzp_test/rzp_live as key here
+      preferences.merchant_key = getMerchantKey();
       const session = getSession();
 
       if (session.isOpen) {
@@ -75,7 +79,7 @@ export function createShopifyOrder(shopifyCheckoutPromise) {
 
         Service.updateShopifyCartUrl({
           order_id,
-          cart_note: getOption('shopify_cart').cart.note ?? null,
+          cart_note: getOption('shopify_cart').note,
         });
       }
 

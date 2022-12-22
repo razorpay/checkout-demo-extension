@@ -4,12 +4,13 @@ import { getQueryParams } from '../utils/_';
 import { capture, SEVERITY_LEVELS } from '../error-service';
 
 function loadLitePreferences() {
-  const key_id = getQueryParams().magic_shopify_key;
+  const key_id =
+    getQueryParams().merchant_key || getQueryParams().magic_shopify_key;
 
   if (key_id) {
     return fetchPreferences({ key_id });
   }
-  return Promise.reject(new Error('magic_shopify_key missing'));
+  return Promise.reject(new Error('merchant_key missing'));
 }
 
 function init() {

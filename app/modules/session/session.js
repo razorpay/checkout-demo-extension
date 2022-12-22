@@ -6646,7 +6646,7 @@ Session.prototype = {
           );
         }
       } else if (shopifyCartOption) {
-        discreet.ChargesHelper.initialize(shopifyCartOption.cart.total_price);
+        discreet.ChargesHelper.initialize(shopifyCartOption.total_price);
       }
     }
 

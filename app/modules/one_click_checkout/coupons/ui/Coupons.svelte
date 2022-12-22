@@ -83,10 +83,7 @@
   import { getAnimationOptions } from 'svelte-utils';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { getPhoneNumberRegex } from 'one_click_checkout/helper';
-  import {
-    SHOPIFY_ORDER_PROMISE,
-    updateOrderWithCustomerDetails,
-  } from 'one_click_checkout/order/controller';
+  import { updateOrderWithCustomerDetails } from 'one_click_checkout/order/controller';
   import {
     getPrefilledContact,
     getPrefilledEmail,
@@ -112,14 +109,12 @@
   let ctaDisabled = false;
   let orderWidget;
   let showValidations = $contact || $email;
-  let showAmountVariant: CTAState['showAmountVariant'] = '';
   let couponsPromise: void | Promise<void>;
 
   $: ctaDisabled =
     ($savedAddresses.length && !$selectedAddress?.serviceability) ||
     !$isContactAndEmailValid ||
-    !$isGstInValid ||
-    showAmountVariant === 'loading';
+    !$isGstInValid;
 
   function onSubmitLoggedInUser() {
     updateCustomerConsent($customerConsentCheckboxState);
@@ -266,14 +261,6 @@
       promiseList.push(couponsPromise);
     }
 
-    // for magic shopify flows, order creation happens
-    // after UI is created
-    if (isMagicShopifyFlow()) {
-      showAmountVariant = 'loading';
-      SHOPIFY_ORDER_PROMISE.then(() => (showAmountVariant = ''));
-      promiseList.push(SHOPIFY_ORDER_PROMISE);
-    }
-
     merchantAnalytics({
       event: ACTIONS.PAGE_VIEW,
       category: CATEGORIES.COUPONS,
@@ -375,7 +362,6 @@
     label={CTA_LABEL}
     onSubmit={handleOnSubmit}
     {onViewDetailsClick}
-    {showAmountVariant}
   />
 </Screen>
 

@@ -140,7 +140,8 @@ function makeCheckoutUrl(rzp) {
   // load light version checkout-frame for magic checkout on shopify
   if (Razorpay.enableLite) {
     url = _.appendParamsToUrl(url, {
-      magic_shopify_key: RazorpayConfig.magic_shopify_key,
+      merchant_key: RazorpayConfig.merchant_key,
+      magic_shopify_key: RazorpayConfig.merchant_key, // staging api compatibility
     });
   }
 

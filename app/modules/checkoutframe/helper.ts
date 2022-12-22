@@ -114,7 +114,7 @@ export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
 }
 
 export function isMagicShopifyFlow() {
-  return !getOption('order_id') && Boolean(getQueryParams().magic_shopify_key);
+  return !getOption('order_id') && Boolean(getQueryParams().merchant_key);
 }
 
 export function sendDismissEvent(data: any) {

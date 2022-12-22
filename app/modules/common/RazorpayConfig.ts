@@ -3,7 +3,7 @@ const RazorpayConfig = {
   version: 'v1/',
   frameApi: '/',
   cdn: 'https://cdn.razorpay.com/',
-  magic_shopify_key: null,
+  merchant_key: null,
 };
 
 try {

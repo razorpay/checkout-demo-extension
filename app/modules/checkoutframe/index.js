@@ -391,7 +391,7 @@ export const handleMessage = function (message) {
     // Create shopify checkout_id when cart is passed instead.
     if (options.shopify_cart) {
       initShopifyCheckout({
-        body: options.shopify_cart,
+        body: { cart: options.shopify_cart },
         key_id: options.key,
       }).catch((e) => {
         Razorpay.sendMessage({ event: 'fault', data: e });
