@@ -48,12 +48,21 @@ export const checkoutOrderHandler: handlerType = ({ name }) => {
   };
 };
 
+export const deleteCheckoutOrderHandler: handlerType = ({ name }) => {
+  let response = getCheckoutOrderResponse[name];
+  if (!response) {
+    console.info(`No preference response found for context:${name}`);
+    return {
+      response: {},
+    };
+  }
+  return {
+    response,
+  };
+};
+
 export const checkoutOrderStatusHandler: handlerType = () => {
   return {
-    response: {
-      status: {
-        status: 'created',
-      },
-    },
+    response: {},
   };
 };

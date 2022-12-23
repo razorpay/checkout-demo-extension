@@ -28,6 +28,7 @@
   let label: string;
   let showFeeDetails = false;
   let timeout: ReturnType<typeof setTimeout>;
+  export let autoTooltip = true;
 
   const handleHideTooltip = () => {
     timeout ? clearTimeout(timeout) : null;
@@ -44,7 +45,9 @@
   onMount(() => {
     if (isDynamicFeeBearer() && !$showFeeBearerToolTip) {
       setMerchantMessage();
-      triggerToolTip();
+      if (autoTooltip) {
+        triggerToolTip();
+      }
       $showFeeBearerToolTip = true;
     }
   });

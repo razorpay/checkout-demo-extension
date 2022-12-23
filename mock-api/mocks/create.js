@@ -245,6 +245,21 @@ const ajax = {
       },
     },
   },
+  intent: {
+    type: 'intent',
+    method: 'upi',
+    provider: null,
+    gateway:
+      'eyJpdiI6Iis2OGRWNjNhSzV6V3Y0SUkrME1IR2c9PSIsInZhbHVlIjoicTJvZkF0TnlyR0dcL1hnYm9oaEE2ZElDTzB2UGNPeHpGc1dMWEhNTEIwanM9IiwibWFjIjoiYzkyYWQwZWQzNjk4YWY1NTZkNDFmMWNjOTk1Mjc1ZDU3OTAxNWE4ZWRmYTk2ZjQ5Y2I3NTEyZjY5YWUyNjY1ZCJ9',
+    data: {
+      intent_url:
+        'upi://pay?pa=upi@razopay&pn=hhgdhd&tr=Lbon0ZQBgtuiRdr&tn=razorpay&am=1&cu=INR&mc=5411',
+    },
+    request: {
+      url: 'https://beta-api.stage.razorpay.in/v1/payments/pay_Gl4bNBKNmFCEre/status?key_id=rzp_test_tLtZXhTdaphIKd',
+      method: 'GET',
+    },
+  },
   cred_intent: {
     type: 'intent',
     version: 1,
@@ -437,6 +452,40 @@ const ajax = {
       metadata: {},
     },
   },
+  default: {
+    type: 'first',
+    request: {
+      url: 'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag',
+      method: 'post',
+      content: {
+        action: 'authorize',
+        amount: 100,
+        method: 'wallet',
+        payment_id: 'GfP2XSCEReNSk4',
+        callback_url:
+          'https://api.razorpay.com/v1/payments/pay_GfP2XSCEReNSk4/callback/8ec08badbd9a9a14071511d2841bacd026e8c243/rzp_test_1DP5mmOlF5G5ag',
+        recurring: 0,
+      },
+    },
+    image: 'https://cdn.razorpay.com/logos/GS8xtzE45HDhNT_medium.png',
+    magic: false,
+    version: 1,
+    payment_id: 'pay_GcGmzHFHZZzq74',
+    gateway:
+      'eyJpdiI6IjhBM3dFWTkyZk5laHl2a0ZtRkZJZWc9PSIsInZhbHVlIjoiS2FaREFUZGo5QjZua0orUlFHVjRjQzk3TXNGbFdiVE9aZ3U5djRnN2VXTzRBd0t5Q3VTcEdRNndOM0FjcEVUOCIsIm1hYyI6IjY4OGRmOGUzNjhjNTM4YjBjODY0MGM2MGEwOTgwY2ZmMDQyNjljZGVjMDI5NzAwZmE1M2UzNmI4OTRkM2FkNTEifQ==',
+    contact: '+919257316342',
+    amount: '1.00',
+    formatted_amount: '₹ 1',
+    merchant: 'Razorpay',
+    merchant_id: '2aTeFCKTYWwfrF',
+    theme_color: '#528FF0',
+    nobranding: false,
+    org_logo: '',
+    org_name: 'Razorpay Software Private Ltd',
+    checkout_logo:
+      'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
+    custom_branding: false,
+  },
 };
 
 const checkout = {
@@ -481,11 +530,7 @@ const getAjax = (body) => {
   if (body.method === 'app' && ['trustly', 'poli'].includes(body.provider)) {
     return ajax.hdfc_first;
   }
-  return {
-    error: {
-      description: 'Unsupported payload/method',
-    },
-  };
+  return ajax.default;
 };
 
 const getCheckout = (body) => {

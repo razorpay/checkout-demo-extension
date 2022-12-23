@@ -26,6 +26,7 @@
   let timeout: ReturnType<typeof setTimeout>;
 
   export let visible = false;
+  export let autoTooltip = true;
   function triggerToolTip() {
     timeout ? clearTimeout(timeout) : null;
     showFeeDetails = true;
@@ -44,7 +45,8 @@
       $showFeeLabel &&
       isRedesignV15Enabled &&
       !isDynamicFeeBearer() &&
-      !$showFeeBearerToolTip
+      !$showFeeBearerToolTip &&
+      autoTooltip
     ) {
       triggerToolTip();
     }
@@ -56,7 +58,7 @@
 {#if isFeeBearer}
   {#if $showFeeLabel}
     {#if isDynamicFeeBearer()}
-      <DynamicFeeBearer />
+      <DynamicFeeBearer {autoTooltip} />
     {:else}
       <div class="label" use:clickOutside on:click_outside={handleHideTooltip}>
         <span on:click={triggerToolTip} class="fee-helper has-tooltip">

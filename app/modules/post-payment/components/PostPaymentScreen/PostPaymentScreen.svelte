@@ -3,7 +3,7 @@
   import { screenStore, tabStore } from 'checkoutstore';
   import CTA from 'cta';
   import { destroyHeader } from 'header';
-  import { getAmount, getMerchantName } from 'razorpay';
+  import { getAmount, getMerchantName, isCustomerFeeBearer } from 'razorpay';
   import { onMount } from 'svelte';
   import { hideTopbar } from 'topbar';
   import { getMethodName, getTimestamp } from './helper';
@@ -39,6 +39,14 @@
     copy: string;
   };
 
+  let fee = 0;
+  $: {
+    fee = +(data?.requestPayload?.fee || 0);
+    if (isNaN(fee)) {
+      fee = 0;
+    }
+  }
+
   /** post this component we close the checkout */
   onMount(() => {
     destroyHeader();
@@ -57,7 +65,10 @@
         <Icon icon={circle_cross('', '#fff')} />
       {/if}
     </div>
-    <div class="amount">{formatAmountWithCurrency(getAmount())}</div>
+    <div class="amount">
+      {formatAmountWithCurrency(getAmount() + fee)}
+    </div>
+
     <div class="status-text">
       {isSuccess ? 'Payment successful' : 'Payment failed'}
     </div>
@@ -66,7 +77,7 @@
     <div>
       <div class="merchant-title">
         <div>{getMerchantName()}</div>
-        <div><TrustedBadge expanded={false} /></div>
+        <div class="rtb-badge-container"><TrustedBadge expanded={false} /></div>
       </div>
       <div class="timestamp">{getTimestamp()}</div>
     </div>
@@ -225,5 +236,10 @@
       text-decoration-line: underline;
       color: #3f71d7;
     }
+  }
+
+  .rtb-badge-container {
+    height: 14px;
+    margin-left: 2px;
   }
 </style>

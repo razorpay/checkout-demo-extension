@@ -9,6 +9,7 @@ export interface PostPaymentScreenProps {
     };
     requestPayload: {
       method: keyof typeof methodNameMapping;
+      fee?: number;
     };
   };
 }

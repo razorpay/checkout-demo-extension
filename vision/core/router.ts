@@ -9,6 +9,8 @@ import {
   googleChartAPI,
   localCDNPath,
   mockAssetsPath,
+  mocksharpPage,
+  skipPath,
 } from '../constant';
 import { attachHandlers } from './handler';
 import { match } from 'path-to-regexp';
@@ -27,7 +29,8 @@ function requestHandler(context: Context) {
     if (method === 'get') {
       if (
         url.endsWith('favicon.ico') ||
-        url.endsWith('livereload.js?snipver=1')
+        url.endsWith('livereload.js?snipver=1') ||
+        skipPath.includes(url)
       ) {
         return route.fulfill({
           status: 204,
@@ -53,6 +56,8 @@ function requestHandler(context: Context) {
             path.join(appPath, 'images', 'bank/ICIC.gif'),
           ] // TODO need better fallback images
         );
+      } else if (url.includes(mocksharpPage)) {
+        return serveFile(route, path.join(mockAssetsPath, 'mockSFPage.html'));
       } else if (url.startsWith(googleChartAPI)) {
         return serveFile(route, path.join(mockAssetsPath, 'upiqr.png'));
       } else if (url.startsWith('data:')) {
@@ -63,6 +68,8 @@ function requestHandler(context: Context) {
         return route.fulfill({
           status: 204,
         });
+      } else if (url.includes(mocksharpPage)) {
+        return serveFile(route, path.join(mockAssetsPath, 'mockSFPage.html'));
       }
     }
 
@@ -103,7 +110,15 @@ function requestHandler(context: Context) {
           updatedResponse = { ...response, ...apiOverrides };
         }
       }
-      if (!response) {
+
+      if (matchedRoute?.options?.id && context) {
+        if (!context.apiResponse) {
+          context.apiResponse = {};
+        }
+        context.apiResponse[matchedRoute?.options?.id] = updatedResponse;
+      }
+
+      if (!updatedResponse) {
         return route.fulfill({
           status: 204,
         });
@@ -127,7 +142,8 @@ function requestHandler(context: Context) {
 }
 
 export async function createRouter(page: Page, context: Context) {
-  await page.route(Boolean, requestHandler(context));
+  let localContext = context;
+  await page.route(Boolean, requestHandler(localContext));
 
   const router = {
     get: add('get'),
@@ -141,8 +157,12 @@ export async function createRouter(page: Page, context: Context) {
     clear() {
       routes.length = 0;
     },
-    async setContext(ctx) {
+    async setContext(ctx: Context) {
+      localContext = ctx;
       await page.route(Boolean, requestHandler(ctx));
+    },
+    getContext() {
+      return localContext;
     },
   };
   attachHandlers(router);

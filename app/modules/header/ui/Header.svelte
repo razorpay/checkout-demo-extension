@@ -9,7 +9,12 @@
   import { isRTBEnabled as RTBEnabled } from 'rtb/helper';
   // session imports
   import { handleModalClose } from 'header/sessionInterface';
-  import { getAmount, getMerchantName, getOption } from 'razorpay';
+  import {
+    getAmount,
+    getMerchantName,
+    getOption,
+    isCustomerFeeBearer,
+  } from 'razorpay';
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
   import { showBackArrow } from 'header/store';
   import back_arrow from 'icons/back_arrow';
@@ -27,6 +32,7 @@
   import { getCTAAmount } from 'cta';
   import { TOTAL_AMOUNT } from 'header/i18n/label';
   import { shouldUseVernacular } from 'checkoutstore/methods';
+  import FeeLabel from 'ui/components/FeeLabel.svelte';
 
   function setAmount(amount: number) {
     const session = getSession();
@@ -93,6 +99,11 @@
       <div class="amount-container">
         <div>{$t(TOTAL_AMOUNT)}</div>
         <div class="amount">{getCTAAmount(true)}</div>
+        {#if isCustomerFeeBearer()}
+          <span class="fee-container">
+            <FeeLabel autoTooltip={false} />
+          </span>
+        {/if}
       </div>
     </div>
     <div class="secured-by-message">
@@ -424,6 +435,27 @@
     :global(svg) {
       height: 14px;
       width: 14px;
+    }
+  }
+
+  .fee-container {
+    :global(.fee) {
+      color: var(--text-color);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-body);
+      line-height: 130%;
+      opacity: 0.7;
+    }
+
+    :global(.dynamic-label) {
+      float: unset;
+
+      :global(.tooltip) {
+        left: 0px !important;
+      }
+    }
+    :global(.tooltip) {
+      top: -5px !important;
     }
   }
 </style>
