@@ -197,8 +197,7 @@
           label={input.label}
           validationText={errors[input.id] ? errors[input.id] : ''}
           on:blur={() => onBlur(input.id)}
-          on:input={({ detail: e }) =>
-            handleInput(input.id, e.target.textContent)}
+          on:input={(e) => handleInput(input.id, e.detail.target.value)}
           {showValidations}
         />
       {:else if input.autocomplete}
@@ -210,8 +209,7 @@
             suggestionsResource={input.suggestionsResource}
             validationText={errors[input.id] ? errors[input.id] : ''}
             onBlur={() => onBlur(input.id)}
-            onInput={({ detail: e }) =>
-              handleInput(input.id, e.target.textContent)}
+            onInput={(e) => handleInput(input.id, e.detail.target.value)}
             onSelect={input.onSelect}
             autofocus={true}
             handleValidation={onBlur}
@@ -225,7 +223,7 @@
             suggestionsResource={input.suggestionsResource}
             validationText={errors[input.id] ? errors[input.id] : ''}
             on:blur={() => onBlur(input.id)}
-            on:input={(e) => handleInput(input.id, e.detail.target.textContent)}
+            on:input={(e) => handleInput(input.id, e.detail.target.value)}
             on:select={input.onSelect}
             handleValidation={onBlur}
             {showValidations}

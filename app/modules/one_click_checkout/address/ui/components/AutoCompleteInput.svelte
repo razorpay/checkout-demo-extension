@@ -31,7 +31,7 @@
 
   function onInput({ detail: e }) {
     dispatch('input', e);
-    if (e.target.textContent.length > 3) {
+    if (e.target.value.length > 3) {
       fetchSuggestions();
     } else {
       suggestions = [];

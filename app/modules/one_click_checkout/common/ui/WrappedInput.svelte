@@ -9,7 +9,7 @@
   import { isOneClickCheckout } from 'razorpay';
   import { getScrollableParent } from 'one_click_checkout/helper';
 
-  export let id;
+  export let id: string;
   export let label = '';
   export let value = '';
   export let suggestions = [];
@@ -18,6 +18,8 @@
 
   let focused = false;
   let inputField;
+  let wrapperRef;
+  let height = 49;
 
   const dispatch = createEventDispatcher();
 
@@ -62,15 +64,21 @@
 
   function onInput(e) {
     const parentNode = getScrollableParent(e.target);
+
+    // Remove filled class which is added by global input event listener since it modifies CSS
+    wrapperRef.classList.remove('filled');
+
     if (parentNode) {
       const { bottom: parentBottom } = parentNode.getBoundingClientRect();
       const { bottom: targetBottom } = e.target.getBoundingClientRect();
       // if autocomplete input is at the end of screen, scroll it into view
       if (parentBottom - targetBottom < 100) {
-        inputField.scrollIntoView(true);
+        e.target.scrollIntoView(true);
       }
     }
 
+    // update height after input
+    height = e.target.scrollHeight;
     dispatch('input', e);
   }
 
@@ -81,12 +89,15 @@
   });
 </script>
 
-<div class="wrapper input-group" class:invalid={validationText}>
-  <div
+<div
+  class="wrapper input-group"
+  class:invalid={validationText}
+  bind:this={wrapperRef}
+>
+  <textarea
     {id}
     bind:this={inputField}
-    bind:textContent={value}
-    contenteditable
+    bind:value
     class="input"
     class:focused
     class:input-focused={focused}
@@ -94,11 +105,9 @@
     on:input={onInput}
     on:focus={onFocus}
     on:blur={onBlur}
-  >
-    {value}
-  </div>
+    style={`height: ${height}px`}
+  />
   <label
-    for="inputField"
     class="label"
     class:label-upper={value}
     class:label-error={validationText && (value || focused)}
@@ -140,6 +149,18 @@
     box-sizing: border-box;
     outline-style: none;
     position: relative;
+
+    resize: none;
+    overflow: hidden;
+
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+
+  .input::-webkit-scrollbar {
+    /* WebKit */
+    width: 0;
+    height: 0;
   }
 
   .input-focused {
@@ -222,20 +243,15 @@
     border: 1px solid var(--error-validation-color);
   }
 
-  .input-group .input:focus + .label {
+  .input:focus + .label {
     top: 0px;
-    padding: 0 4px;
+    background-color: transparent;
     font-size: var(--font-size-small);
-    left: 8px;
-    color: var(--highlight-color);
+    padding: 0px 4px;
+    left: 9px;
+    color: var(--primary-color);
     transition: all ease-out 0.2s;
-  }
-
-  .input-group .input:valid + .label {
-    top: -8px;
-    padding: 0 4px;
-    font-size: var(--font-size-small);
-    left: 8px;
+    background-color: #fff;
   }
 
   .label-upper {
