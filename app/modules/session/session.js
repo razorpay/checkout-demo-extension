@@ -82,7 +82,14 @@ import triggerErrorModal, {
 } from 'components/ErrorModal';
 import { getCardlessEMIProviders } from 'checkoutstore/methods';
 import { trackEmiFromCardScreen } from 'emiV2/events/tracker';
-import { isContactHidden, isEmailHidden, isEmiV2 } from 'razorpay';
+import {
+  getPreferences,
+  isIndianCurrency,
+  isContactHidden,
+  isEmailHidden,
+  isEmiV2,
+  getOption,
+} from 'razorpay';
 import {
   cardlessEmiCallBack,
   fetchCardlessEmiPlans,
@@ -124,6 +131,7 @@ import { sendDismissEvent } from 'checkoutframe/helper';
 import { TRUECALLER_VARIANT_NAMES, stopVerificationPolling } from 'truecaller';
 import { shouldShowProceedOverlay } from 'truecaller/store';
 import { setTruecallerMetaData } from 'truecaller/analytics';
+import { Events } from 'analytics';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1307,6 +1315,14 @@ Session.prototype = {
         discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
     });
+
+    if (!isEmailHidden()) {
+      Events.TrackApi('email_show', {
+        merchant_opted: getPreferences('features.show_email_on_checkout'),
+        international_payment: !isIndianCurrency(),
+        prefill: Boolean(getOption('prefill.email')),
+      });
+    }
     updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
     EventsV2.setContext(

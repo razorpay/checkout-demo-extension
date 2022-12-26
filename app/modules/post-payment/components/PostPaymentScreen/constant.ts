@@ -24,3 +24,14 @@ export const MONTHS = [
   'Nov',
   'Dec',
 ];
+
+export const ANALYTICS_EVENTS = {
+  RENDER_TRANSITIONARY_SCREEN: 'transitionary_screen',
+  CLICK_SUPPORT_LINK: 'click:support_link',
+  CLICK_COPY_PAYMENT_ID: 'click:copy_payment_id',
+};
+
+export const SUPPORT_URL = {
+  url: 'https://razorpay.com/support/',
+  text: 'razorpay.com/support',
+};

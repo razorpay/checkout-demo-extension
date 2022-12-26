@@ -16,6 +16,8 @@
   import { formatAmountWithCurrency } from 'helper/currency';
   import type { PostPaymentScreenProps } from './types';
   import circle_cross from 'ui/icons/payment-methods/circle_cross';
+  import { Events } from 'analytics';
+  import { ANALYTICS_EVENTS, SUPPORT_URL } from './constant';
 
   export let onComplete: () => void;
   export let data: PostPaymentScreenProps['data'];
@@ -49,6 +51,12 @@
 
   /** post this component we close the checkout */
   onMount(() => {
+    // track
+    Events.TrackRender(ANALYTICS_EVENTS.RENDER_TRANSITIONARY_SCREEN, {
+      payment_status: isSuccess ? 'successful' : 'failed',
+      payment_id: paymentId,
+      method: getMethodName(data?.requestPayload?.method) || '-',
+    });
     destroyHeader();
     hideTopbar();
     $screenStore = 'postPayment';
@@ -86,6 +94,7 @@
         class="details"
         on:click={() => {
           copyToClipboard('body', paymentId || '');
+          Events.TrackBehav(ANALYTICS_EVENTS.CLICK_COPY_PAYMENT_ID);
         }}
       >
         <div>{getMethodName(data?.requestPayload?.method) || '-'} |</div>
@@ -95,9 +104,16 @@
       <div class="info">
         <span class="info-icon"><InfoIcon variant={'disabled'} /></span>
         Copy ID and visit
-        <a href="https://razorpay.com/support/" target="_blank" rel="noopener"
-          >razorpay.com/support</a
-        > for queries
+        <a
+          href={SUPPORT_URL.url}
+          target="_blank"
+          rel="noopener"
+          on:click={() => {
+            Events.TrackBehav(ANALYTICS_EVENTS.CLICK_SUPPORT_LINK);
+          }}
+        >
+          {SUPPORT_URL.text}
+        </a> for queries
       </div>
     </div>
   </div>
@@ -241,5 +257,10 @@
   .rtb-badge-container {
     height: 14px;
     margin-left: 2px;
+  }
+
+  .payment-id {
+    max-width: 175px;
+    overflow: hidden;
   }
 </style>
