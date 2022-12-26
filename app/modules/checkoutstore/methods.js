@@ -668,7 +668,7 @@ export function isUPIFlowEnabled(method) {
   ) {
     return false;
   }
-  return isUPIBaseEnabled() && UPI_METHODS[method]();
+  return isUPIBaseEnabled() && UPI_METHODS[method]?.();
 }
 
 function intentEnabledInOption() {
