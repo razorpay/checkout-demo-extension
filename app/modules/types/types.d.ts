@@ -45,3 +45,5 @@ export type History = {
   setConfig: (config: any) => void;
   popUntil: (view: any) => void;
 };
+
+export type SessionType = any;

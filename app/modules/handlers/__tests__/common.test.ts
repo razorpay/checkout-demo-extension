@@ -109,7 +109,7 @@ describe('Test Actions for Paypal as Backup', () => {
 
     it('should return false if errorMetadata is empty object', () => {
       const errorMetadata = {};
-      expect(hasPaypalOptionInErrorMetadata(errorMetadata)).toBe(false);
+      expect(hasPaypalOptionInErrorMetadata(errorMetadata as any)).toBe(false);
     });
   });
 

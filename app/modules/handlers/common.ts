@@ -10,6 +10,8 @@ import {
   setHeading,
   setSecondaryLoadedCTA,
 } from 'components/ErrorModal';
+import type { ErrorMetadata } from 'handlers/types';
+import type { SessionType } from 'types/types';
 
 /**
  * Add subtext to passed in parent
@@ -17,7 +19,7 @@ import {
  * @param {HTMLElement} parent
  * @returns {string} id of the subtext
  */
-function addSubtextToActionArea(subText, parent) {
+function addSubtextToActionArea(subText: string, parent: HTMLElement) {
   const subTextId = `fd-st`;
   if (!subText || !parent) {
     return;
@@ -26,7 +28,10 @@ function addSubtextToActionArea(subText, parent) {
   existingSubText?.parentNode?.removeChild(existingSubText);
 
   const newSubText = document.createElement('div');
-  newSubText.style = `white-space: normal;padding: 0px 20px 10px 20px;line-height: 22px;font-size:12px`;
+  newSubText.setAttribute(
+    'style',
+    `white-space: normal;padding: 0px 20px 10px 20px;line-height: 22px;font-size:12px`
+  );
   newSubText.textContent = subText;
   // use the text converted to lowercase with space replaced by `-` as id
   newSubText.setAttribute('id', subTextId);
@@ -43,9 +48,10 @@ function addSubtextToActionArea(subText, parent) {
  * @param {string} replacerId id of item to used for replacement
  */
 function updateButton(
-  parent,
+  parent: HTMLElement,
   label = 'OK',
-  handleClick = (f) => f,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  handleClick = () => {},
   type = 'replace',
   replacerId = 'fd-hide'
 ) {
@@ -82,11 +88,11 @@ function updateButton(
  * @param {()=>void} [onClick] function to control the on-click. This will override the default hide functionality.
  */
 export function updateActionAreaContentAndCTA(
-  session,
-  buttonLabel,
-  subText,
-  avoidBackdropClick,
-  onClick
+  session: SessionType,
+  buttonLabel: string,
+  subText = '',
+  avoidBackdropClick: boolean,
+  onClick?: () => undefined
 ) {
   const onButtonClick = () => {
     // irrespective of the next action, revert the disabled actions on backdrop(if any)
@@ -112,7 +118,8 @@ export function updateActionAreaContentAndCTA(
     updatePrimaryCTA(buttonLabel, onButtonClick);
     return;
   }
-  const errorMessageContainer = document.querySelector('#error-message');
+  const errorMessageContainer: HTMLElement | null =
+    document.querySelector('#error-message');
   if (!errorMessageContainer) {
     return;
   }
@@ -132,7 +139,7 @@ export function updateActionAreaContentAndCTA(
  * @param {object} errorMetadata
  * @returns boolean
  */
-export function hasPaypalOptionInErrorMetadata(errorMetadata) {
+export function hasPaypalOptionInErrorMetadata(errorMetadata: ErrorMetadata) {
   if (!errorMetadata || typeof errorMetadata !== 'object') {
     return false;
   }
@@ -169,7 +176,11 @@ export function hasPaypalOptionInErrorMetadata(errorMetadata) {
  *
  * @param {object} errorMetadata
  */
-export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
+export function addRetryPaymentMethodOnErrorModal(
+  this: SessionType,
+  errorMetadata: ErrorMetadata
+) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const that = this;
   function handlePaypalClick() {
     that.hideErrorMessage();
@@ -209,7 +220,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
       'Pay With PayPal',
       '',
       true,
-      handlePaypalClick
+      handlePaypalClick as any
     );
 
     Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN, {
@@ -236,17 +247,22 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
 
     return;
   }
-  let errorMessageContainer = document.querySelector('#error-message');
+  const errorMessageContainer: HTMLElement | null =
+    document.querySelector('#error-message');
   if (!errorMessageContainer) {
     return;
   }
 
-  let existingPaypalContainer = document.querySelector('#fd-paypal-container');
+  const existingPaypalContainer = document.querySelector(
+    '#fd-paypal-container'
+  );
 
   if (!hasPaypalOptionInErrorMetadata(errorMetadata)) {
     // Remove Paypal container and show retry button
     if (existingPaypalContainer) {
-      existingPaypalContainer.parentNode.removeChild(existingPaypalContainer);
+      (existingPaypalContainer.parentNode as HTMLElement).removeChild(
+        existingPaypalContainer
+      );
     }
     if (errorMessageContainer.classList.contains('has-paypal')) {
       errorMessageContainer.classList.remove('has-paypal');
@@ -258,16 +274,18 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
   errorMessageContainer.classList.add('has-paypal');
 
   if (existingPaypalContainer) {
-    existingPaypalContainer.parentNode.removeChild(existingPaypalContainer);
+    (existingPaypalContainer.parentNode as HTMLElement).removeChild(
+      existingPaypalContainer
+    );
   }
 
   // Update error modal with paypal button
   if (hasPaypalOptionInErrorMetadata(errorMetadata)) {
-    let paypalContainer = document.createElement('div');
+    const paypalContainer = document.createElement('div');
     paypalContainer.setAttribute('id', 'fd-paypal-container');
 
     // create paypal button
-    let paypalBtn = document.createElement('button');
+    const paypalBtn = document.createElement('button');
     paypalBtn.classList.add('btn');
     paypalBtn.setAttribute('id', 'fd-paypal');
     paypalBtn.textContent = 'Pay With PayPal';
@@ -276,11 +294,11 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     paypalBtn.addEventListener('click', handlePaypalClick);
 
     // create cancel button
-    let cancelBtn = document.createElement('button');
+    const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     cancelBtn.style.textDecoration = 'underline';
     cancelBtn.setAttribute('id', 'fd-paypal-cancel');
-    let cancelBtnContainer = document.createElement('div');
+    const cancelBtnContainer = document.createElement('div');
     cancelBtnContainer.classList.add('error-cancel-btn-container');
     cancelBtnContainer.appendChild(cancelBtn);
     paypalContainer.appendChild(cancelBtnContainer);

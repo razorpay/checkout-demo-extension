@@ -1,9 +1,10 @@
 import { format } from 'i18n';
 import { updateLoadingCTA } from '../../../components/ErrorModal';
+import type { SessionType } from 'types/types';
 
 export function adoptSessionUI(
   paymentInstance: any,
-  session: any,
+  session: SessionType,
   config: UPI.PaymentProcessConfiguration
 ) {
   /**
