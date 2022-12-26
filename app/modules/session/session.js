@@ -5255,9 +5255,11 @@ Session.prototype = {
         setTimeout(function () {
           closeErrorModal();
           hideOverlay($('#error-message'));
-          self.submit({
-            vpaVerified: true,
-          });
+          if (self.payload) {
+            self.submit({
+              vpaVerified: true,
+            });
+          }
         }, 200);
         UPITracker.VPA_VERIFICATION_ENDED({
           response: data,
