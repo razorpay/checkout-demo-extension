@@ -36,7 +36,6 @@ const cdnUrl = RazorpayConfig.cdn;
 const fullPrefix = cdnUrl + 'acs/network/';
 
 export const getFullNetworkLogo = (code) => `${fullPrefix}${code}.svg`;
-
 /**
  * Strips everything but digits.
  * @param {String} cardNumber

@@ -23,6 +23,7 @@
     ctaOneCCDisabled,
     disableCTA,
     truecallerLoginFailed,
+    fallbackTabLogo,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
@@ -256,6 +257,11 @@
       });
     }
   }
+  let src: string;
+  $: src = $tabLogo;
+  function handleLogoError() {
+    src = src === $fallbackTabLogo ? '' : $fallbackTabLogo; //if fallback logo is same and would fail hide the image
+  }
 </script>
 
 <div
@@ -305,8 +311,13 @@
               {getOtpScreenHeading('default_login', $templateData, $locale)}
             </p>
           {/if}
-          {#if $tabLogo && isOneCC}
-            <img class="title-logo" alt="Logo" src={$tabLogo} />
+          {#if src && isOneCC}
+            <img
+              class="title-logo"
+              alt="Logo"
+              {src}
+              on:error={handleLogoError}
+            />
           {/if}
           <div class="otp-title">
             {#if isRazorpayOTPAndOneCC}

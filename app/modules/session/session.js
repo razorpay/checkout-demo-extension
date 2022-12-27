@@ -675,16 +675,19 @@ function askOTP(
             OtpService.markOtpSent(metadata.issuer || metadata.network);
 
             let bankLogo;
+            let networkLogo = discreet.Card.getFullNetworkLogo(
+              metadata.network
+            );
             if (metadata.issuer) {
               bankLogo = discreet.getFullBankLogo(metadata.issuer);
             } else if (metadata.network) {
-              bankLogo = discreet.Card.getFullNetworkLogo(metadata.network);
+              bankLogo = networkLogo;
             }
 
             if (bankLogo) {
               const logo = `<img class="native-otp-bank" src="${bankLogo}" onerror="this.style.opacity = 0;">`;
               $('#tab-title').rawHtml(logo);
-              thisSession.setOneCCTabLogo(bankLogo);
+              thisSession.setOneCCTabLogo(bankLogo, networkLogo);
             }
 
             view.updateScreen({
@@ -1562,10 +1565,11 @@ Session.prototype = {
     this.tabs[METHODS.PAYLATER] = this.payLaterView;
   },
 
-  setOneCCTabLogo: function (logo) {
+  setOneCCTabLogo: function (logo, fallbackLogo = '') {
     if (RazorpayHelper.isRedesignV15()) {
       this.otpView.updateScreen({
         tabLogo: logo,
+        fallbackTabLogo: fallbackLogo,
       });
     }
   },
