@@ -426,6 +426,10 @@ export function setBlocks(
     //if personalizationVersionId is set the use that otherwise use preferencesVersionId
     personalisation.version = personalizationVersionId || preferencesVersionId;
 
+    // when personalisation API fails we are setting default personalisation version
+    if (personalisation.shown && !personalisation.version) {
+      personalisation.version = 'v1';
+    }
     if (addPreferredInstrumentsBlock) {
       personalisation['instruments'] =
         orderedBlockData['rzp.preferred']?.instruments || {};

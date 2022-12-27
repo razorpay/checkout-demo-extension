@@ -22,29 +22,34 @@
   // helpers
   import { getSectionCategoryForBlock, setDynamicFees } from './helpers';
 
+  // types
+  import type { Block, Instruments } from 'ui/tabs/home/types';
+
   // Props
-  export let block;
+  export let block: Block;
 
   onMount(() => {
     block.instruments?.forEach((item) => {
-      genericMethodShown(item?.method as string);
+      genericMethodShown(item?.method );
     });
   });
 
   const dispatch = createEventDispatcher();
 
-  let title;
-  $: title = getTitleFromInstruments(block.instruments, $locale);
+  let title: string;
+  let section: string;
+  $: title = getTitleFromInstruments(block.instruments, $locale as string);
+  $: section = getSectionCategoryForBlock(block);
 
-  function getTitleFromInstruments(instruments, locale) {
+  function getTitleFromInstruments(instruments: Instruments[], locale: string) {
     const methods = instruments.map((instrument) => instrument.method);
 
-    const blockNames = methods.map((method) =>
+    const blockNames = methods.map((method: string) =>
       getTranslatedMethodPrefix(method, locale)
     );
 
     const names = blockNames.filter(
-      (name, index) => blockNames.indexOf(name) === index
+      (name: string, index: number) => blockNames.indexOf(name) === index
     );
 
     let name;
@@ -73,10 +78,14 @@
     {#each block.instruments as instrument, index (instrument.id)}
       <Method
         method={instrument.method}
-        {instrument}
+        instrument={{
+          ...instrument,
+          blockTitle: title,
+          section,
+        }}
         on:select={() => {
           setDynamicFees(instrument, 'rzpCluster');
-          instrument.section = getSectionCategoryForBlock(block);
+          instrument.section = section;
           instrument.blockTitle = title;
           dispatch('selectInstrument', instrument);
         }}

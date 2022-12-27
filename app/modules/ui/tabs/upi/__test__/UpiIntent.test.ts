@@ -51,6 +51,8 @@ jest.mock('analytics', () => ({
   ...jest.requireActual('analytics'),
   Events: {
     TrackRender: jest.fn(),
+    TrackMetric: jest.fn(),
+    TrackBehav: jest.fn(),
     setMeta: jest.fn(),
   },
   default: {

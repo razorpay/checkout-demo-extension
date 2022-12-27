@@ -34,5 +34,7 @@ export type InstrumentType = {
   flows?: string[];
   apps?: string[];
   _type?: string;
+  vpas?: string[];
+  vendor_vpa?: string;
   _ungrouped?: Array<Ungrouped>;
 };

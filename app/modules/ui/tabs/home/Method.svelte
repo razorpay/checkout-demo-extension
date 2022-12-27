@@ -49,13 +49,15 @@
   import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
   import { emiMethodClicked } from 'emiV2/events/tracker';
+  import { triggerInstAnalytics } from 'home/analytics/helpers';
+  import type { InstrumentType } from 'home/analytics/types';
 
   // Props
   export let method: string = null; // Name of the method
   export let icon = null; // Override: icon. Picked from method if not overridden.
   export let title = null; // Override: title. Picked from method if not overridden.
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
-  export let instrument = null;
+  export let instrument: InstrumentType | null = null;
   export let error = '';
   export let disabled = false;
   export let errorLabel = '';
@@ -186,11 +188,18 @@
     'cardless_emi.walnut_banner_text',
     $locale
   );
+
+  function onUPIAppSelect(data) {
+    const { app } = data.detail || {};
+    triggerInstAnalytics(
+      { ...(instrument as InstrumentType), apps: [app.app_name] } || {}
+    );
+  }
 </script>
 
 <SlottedOption
   className={`new-method has-tooltip ${
-    $selectedInstrumentId === instrument.id && 'selected'
+    $selectedInstrumentId === instrument?.id && 'selected'
   } ${uninteractive ? 'uninteractive' : ''}`}
   defaultStyles={false}
   on:click={onClick}
@@ -246,7 +255,12 @@
   <div slot="row">
     {#if method === 'upi' && upiTiles.status && upiTiles.variant === 'row'}
       <!-- This component has earli return and renders on demand -->
-      <UPIAppStack onOtherClick={select} {method} variant={upiTiles.variant} />
+      <UPIAppStack
+        onOtherClick={select}
+        on:select={onUPIAppSelect}
+        {method}
+        variant={upiTiles.variant}
+      />
     {/if}
   </div>
 </SlottedOption>

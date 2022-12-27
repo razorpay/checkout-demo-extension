@@ -146,7 +146,7 @@
   export let disabled = false;
   let validationText: string;
 
-  function trackContactFilled(e) {
+  function trackContactFilled(e: Event) {
     const valid = CONTACT_REGEX.test($contact);
     Analytics.track('contact:fill', {
       type: AnalyticsTypes.BEHAV,
@@ -159,7 +159,10 @@
     if (e.type === 'blur' && isOneCCEnabled) {
       onContactBlur();
     }
-    validationText = getValidationText();
+    validationText = getValidationText() || '';
+  }
+
+  function handleBlurContact(event: Event) {
     try {
       MiscTracker.CONTACT_NUMBER_FILLED({
         user: {
@@ -169,6 +172,7 @@
         },
       });
     } catch {}
+    trackContactFilled(event);
   }
 
   function onContactBlur() {
@@ -368,7 +372,7 @@
           bind:country={$country}
           bind:phone={$phone}
           isOptional={isContactOptional()}
-          on:blur={trackContactFilled}
+          on:blur={handleBlurContact}
           on:input={trackContactFilled}
           on:countrySelect={handleCountrySelect}
           {showValidations}

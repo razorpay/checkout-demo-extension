@@ -230,6 +230,19 @@ export function getInstrumentDetails(instrument) {
       }
 
       case 'upi': {
+        /* 
+          When UPI method has this keys ['flows', 'apps', 'token_id', 'vpas']
+          then it considered as UPI Instrument if it contains `apps`
+          we are setting type as intent and adding app name also for respective Instument event
+        */
+        if (instrument.apps?.[0]) {
+          return {
+            name: instrument.apps[0],
+            saved: false,
+            personalisation,
+            type: 'intent',
+          };
+        }
         const vpa = instrument?.vpas?.[0] || instrument?.vendor_vpa || '';
         return {
           name: getUpiName(instrument),

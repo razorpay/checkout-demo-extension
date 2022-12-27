@@ -148,7 +148,7 @@ const setAnalyticsMeta = (message) => {
       openedAt = openedAt * 1000;
     }
     Events.setMeta(MetaProperties.TIME_SINCE_OPEN, () => _.now() - openedAt);
-    AnalyticsV2State.checkoutInvokedTime = message.metadata.openedAt;
+    AnalyticsV2State.checkoutInvokedTime = openedAt;
   }
 
   /**

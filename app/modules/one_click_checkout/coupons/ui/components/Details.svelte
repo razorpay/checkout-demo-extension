@@ -38,6 +38,7 @@
   import { ERROR_USER_NOT_LOGGED_IN } from 'one_click_checkout/coupons/constants';
   import { otpReasons } from 'otp/constants';
   import { toggleHeader } from 'one_click_checkout/header/helper';
+  import { MiscTracker } from 'misc/analytics/events';
 
   // controller imports
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
@@ -76,6 +77,7 @@
         askForOTP(otpReasons.verify_coupon);
       }
     }
+    MiscTracker.CONTACT_DETAILS_PROCEED_CLICK();
   }
 </script>
 
