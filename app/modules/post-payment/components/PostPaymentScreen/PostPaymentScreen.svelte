@@ -1,6 +1,6 @@
 <script lang="ts">
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import { screenStore, tabStore } from 'checkoutstore';
+  import { screenStore, showBottomElement, tabStore } from 'checkoutstore';
   import CTA from 'cta';
   import { destroyHeader } from 'header';
   import { getAmount, getMerchantName, isCustomerFeeBearer } from 'razorpay';
@@ -57,6 +57,7 @@
       payment_id: paymentId,
       method: getMethodName(data?.requestPayload?.method) || '-',
     });
+    showBottomElement.set(false);
     destroyHeader();
     hideTopbar();
     $screenStore = 'postPayment';

@@ -8,6 +8,7 @@ import {
   getAmount,
   isRedesignV15,
   isEmiV2,
+  getCurrency,
 } from 'razorpay';
 import { CtaViews } from 'ui/labels/cta';
 
@@ -330,7 +331,7 @@ export function getCTAAmount(space = false): string {
     store.rawAmount ||
     formatAmountWithSymbol(
       store.amount || getAmount(),
-      store.currency || 'INR',
+      store.currency || getCurrency() || 'INR',
       space
     )
   );

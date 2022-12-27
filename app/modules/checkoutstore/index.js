@@ -15,6 +15,7 @@ import * as _ from 'utils/_';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import CTAHelper from 'cta/store';
 
+export const showBottomElement = writable(true);
 /** required for CTA */
 export const screenStore = writable('');
 export const tabStore = writable('');

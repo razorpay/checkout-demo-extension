@@ -32,6 +32,7 @@
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
   import { offerFade } from 'header/store';
+  import { showBottomElement } from 'checkoutstore';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const ctaStore = getStore();
@@ -232,7 +233,7 @@
                 />
               {/if}
             </div>
-            <div id="bottom" />
+            <div id="bottom" class:hidden={!$showBottomElement} />
 
             {#if isRedesignV15Enabled}
               <OneCCLoader />
