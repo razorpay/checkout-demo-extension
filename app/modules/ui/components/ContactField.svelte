@@ -38,6 +38,10 @@
     COUNTRY_CONFIG,
     COUNTRY_TO_PHONE_CODE_MAP,
   } from 'common/countrycodes';
+  import {
+    isTruecallerLoginEnabled,
+    TRUECALLER_VARIANT_NAMES,
+  } from 'truecaller';
 
   // Refs
   let countryField;
@@ -51,6 +55,10 @@
   export let validationText;
   export let showValidations = false;
   export let showTruecallerIcon = false;
+
+  const truecallerLoginEnabled = isTruecallerLoginEnabled(
+    TRUECALLER_VARIANT_NAMES.contact_screen
+  ).status;
 
   const isRedesignV15Enabled = isRedesignV15();
 
@@ -138,7 +146,7 @@
   }
 
   onMount(() => {
-    if (phoneField && isMobile()) {
+    if (phoneField && isMobile() && !truecallerLoginEnabled) {
       setTimeout(() => {
         phoneField.focus();
       });

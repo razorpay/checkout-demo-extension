@@ -1,4 +1,4 @@
-import { country } from 'checkoutstore/screens/home';
+import { country, email } from 'checkoutstore/screens/home';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
 import { isContactOptional, isEmailOptional } from 'razorpay';
 import { derived, writable } from 'svelte/store';
@@ -19,8 +19,9 @@ export const isOptionalEmail = derived([country], ([$country]) => {
 });
 
 export const isContactAndEmailValid = derived(
-  [isEmailValid, isContactValid, isOptionalEmail],
-  ([$isEmailValid, $isContactValid, $isOptionalEmail]) =>
-    ($isEmailValid || $isOptionalEmail) &&
-    ($isContactValid || isContactOptional())
+  [isEmailValid, isContactValid, isOptionalEmail, email],
+  ([$isEmailValid, $isContactValid, $isOptionalEmail, $email]) => {
+    const emailCheck = $email ? $isEmailValid : $isOptionalEmail;
+    return emailCheck && ($isContactValid || isContactOptional());
+  }
 );

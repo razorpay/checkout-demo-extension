@@ -72,11 +72,7 @@ import {
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
 
 import { initShopifyCheckout, clearShopifyCheckout } from './1cc-shopify';
-import {
-  isTruecallerLoginEnabledBeforePreferences,
-  MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER,
-} from 'truecaller';
-import { shouldDisableAutoTrigger } from 'truecaller/store';
+import { isTruecallerLoginEnabledBeforePreferences } from 'truecaller';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -526,7 +522,6 @@ function getPrefsPromisified(session) {
     // e
   }
 
-  const prefStartTime = Date.now();
   return new Promise((resolve) => {
     if (isMagicShopifyFlow()) {
       const litePrefs = getLitePreferencesFromStorage(
@@ -541,12 +536,6 @@ function getPrefsPromisified(session) {
       resolve
     );
   }).finally(() => {
-    const timeTakenToCompletePreferences = Math.abs(Date.now() - prefStartTime);
-    shouldDisableAutoTrigger.set(
-      timeTakenToCompletePreferences >
-        MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER
-    );
-
     if (loader) {
       _El.detach(loader);
       loader = null;

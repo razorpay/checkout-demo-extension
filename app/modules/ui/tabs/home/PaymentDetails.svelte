@@ -134,7 +134,7 @@
   const isOneCCEnabled = isOneClickCheckout();
   const isRedesignV15Enabled = isRedesignV15();
   const isEditDetailScreen = $activeRoute?.name === views.DETAILS;
-  const truecallerLoginEnabled = isTruecallerLoginEnabled(
+  let truecallerLoginEnabled = isTruecallerLoginEnabled(
     TRUECALLER_VARIANT_NAMES.contact_screen
   ).status;
   const userContact = $contact;
@@ -295,6 +295,20 @@
     return !CONTACT_REGEX.test($phone) ? $t(CONTACT_ERROR_LABEL) : null;
   }
 
+  function onTruecallerClick() {
+    truecallerLoginFailed = false;
+  }
+
+  /**
+   * re-evaluate truecaller login enable status post trigger
+   * - it could get disabled due to skip count reaching limit.
+   */
+  function postTruecallerTriggerStatusUpdate() {
+    truecallerLoginEnabled = isTruecallerLoginEnabled(
+      TRUECALLER_VARIANT_NAMES.contact_screen
+    ).status;
+  }
+
   export function onTruecallerLoginSuccess(
     detail: UserVerifySuccessApiResponse
   ) {
@@ -307,6 +321,7 @@
     }
 
     onSubmitClick();
+    postTruecallerTriggerStatusUpdate();
   }
 
   export function onTruecallerLoginError(detail: any) {
@@ -315,6 +330,8 @@
     if (![ERRORS.TRUECALLER_LOGIN_DISABLED].includes(code)) {
       truecallerLoginFailed = true;
     }
+
+    postTruecallerTriggerStatusUpdate();
   }
 </script>
 
@@ -336,6 +353,7 @@
 
       {#if truecallerLoginEnabled && $truecallerPresent !== false}
         <TruecallerLogin
+          on:click={() => onTruecallerClick()}
           on:success={(e) => onTruecallerLoginSuccess(e.detail)}
           on:error={(e) => onTruecallerLoginError(e.detail)}
         />

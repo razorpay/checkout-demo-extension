@@ -19,7 +19,10 @@
   import { showTruecallerErrorMessage } from 'one_click_checkout/store';
 
   // Constants import
-  import { ERRORS } from 'truecaller';
+  import {
+    ERRORS,
+    MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER,
+  } from 'truecaller';
   import routes from 'one_click_checkout/routing/routes';
   import { views } from 'one_click_checkout/routing/constants';
 
@@ -30,7 +33,6 @@
   import { destroyTopbar } from 'one_click_checkout/topbar';
   import { isUserLoggedIn } from 'one_click_checkout/common/helpers/customer';
   import { initTruecaller } from 'one_click_checkout/controller';
-  import { shouldDisableAutoTrigger } from 'truecaller/store';
 
   // session imports
   import { setLineItems } from 'one_click_checkout/cart/sessionInterface';
@@ -57,6 +59,8 @@
     updateMoengageEventsData,
   } from 'one_click_checkout/merchant-analytics/store';
   import { appliedCoupon } from 'one_click_checkout/coupons/store';
+  import { AnalyticsV2State } from 'analytics-v2';
+  import { EVENTS as TRUECALLER_EVENTS } from 'truecaller/analytics/events';
 
   let topbar;
   let isBackEnabled;
@@ -68,7 +72,17 @@
       getOption('cart')?.line_items || getMerchantOrder().line_items
     );
 
-    if (!$shouldDisableAutoTrigger) {
+    const timeTakenToMount = Math.abs(
+      Date.now() - AnalyticsV2State.checkoutInvokedTime
+    );
+
+    showTruecallerErrorMessage.set(false);
+    if (timeTakenToMount < MAX_TIME_TO_ENABLE_TRUECALLER_AUTO_TRIGGER) {
+      Events.TrackIntegration(
+        TRUECALLER_EVENTS.TRUE_CALLER_AUTO_TRIGGER_INVOKED,
+        { timeTakenToMount, success: true }
+      );
+
       initTruecaller().catch((e) => {
         const code = e.code || '';
         if (
@@ -80,6 +94,11 @@
           showTruecallerErrorMessage.set(true);
         }
       });
+    } else {
+      Events.TrackIntegration(
+        TRUECALLER_EVENTS.TRUE_CALLER_AUTO_TRIGGER_INVOKED,
+        { timeTakenToMount, success: false }
+      );
     }
 
     Analytics.setMeta(

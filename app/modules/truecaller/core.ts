@@ -11,6 +11,8 @@ import {
   TRUECALLER_POLLING_INTERVAL,
   TRUECALLER_MAX_PENDING_ATTEMPT_COUNT,
   TRUECALLER_VARIANT_NAMES,
+  TRUECALLER_CLIENT_REJECTION_CODES,
+  TRUECALLER_API_REJECTION_CODES,
 } from './constants';
 import { TRIGGER_TRUECALLER_INTENT_EVENT } from 'truecaller/constants';
 import {
@@ -191,8 +193,11 @@ function startVerificationPolling(
           if ('error' in error) {
             code = error.error.code;
           }
-          if (code === 'use_another_number') {
+          if (code === TRUECALLER_API_REJECTION_CODES.use_another_number) {
             Events.TrackBehav(EVENTS.USE_ANOTHER_NUMBER_CLICKED);
+          }
+          if (code === TRUECALLER_CLIENT_REJECTION_CODES.client_unresponsive) {
+            Events.TrackBehav(EVENTS.CLIENT_UNRESPONSIVE);
           }
           Events.TrackApi(EVENTS.TRUECALLER_VERIFICATION, {
             success: false,
@@ -253,7 +258,12 @@ function verifyLoginData(
     response.status === CUSTOMER_VERIFY_STATUS.REJECTED &&
     'code' in response
   ) {
-    if (['user_rejected', 'use_another_number'].includes(response.code)) {
+    if (
+      [
+        TRUECALLER_API_REJECTION_CODES.user_rejected,
+        TRUECALLER_API_REJECTION_CODES.use_another_number,
+      ].includes(response.code)
+    ) {
       truecallerUserMetric.update((userMetric: UserMetricStore) => {
         return {
           skipped_count: userMetric.skipped_count + 1,
@@ -265,10 +275,28 @@ function verifyLoginData(
     return onVerifyFailure(response);
   }
 
+  /**
+   * If after the timeout the response is still in pending state
+   * we assume that user did not proceed with Truecaller
+   * or
+   * user did not see the truecaller modal.
+   */
+  if (
+    'status' in response &&
+    response.status === CUSTOMER_VERIFY_STATUS.PENDING
+  ) {
+    return onVerifyFailure({
+      error: {
+        code: TRUECALLER_CLIENT_REJECTION_CODES.client_unresponsive,
+        description: '[truecaller] User did not proceed',
+      },
+    });
+  }
+
   onVerifyFailure({
     error: {
-      code: 'unhandled_error',
-      description: 'An unhandled error ocurred',
+      code: TRUECALLER_CLIENT_REJECTION_CODES.unhandled_error,
+      description: '[truecaller] An unhandled error ocurred',
     },
     response,
   });

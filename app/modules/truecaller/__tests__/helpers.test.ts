@@ -104,12 +104,12 @@ describe('isTruecallerLoginEnabled tests', () => {
 
       if (
         [
-          'features.truecaller.login',
-          'features.truecaller.login_mweb',
-          'features.truecaller.login_contact_screen',
-          'features.truecaller.login_home_screen',
-          'features.truecaller.login_saved_cards_screen',
-          'features.truecaller.login_add_new_card_screen',
+          'features.truecaller_login',
+          'features.truecaller_login_mweb',
+          'features.truecaller_login_contact_screen',
+          'features.truecaller_login_home_screen',
+          'features.truecaller_login_saved_cards_screen',
+          'features.truecaller_login_add_new_card_screen',
         ].includes(param)
       ) {
         return true;

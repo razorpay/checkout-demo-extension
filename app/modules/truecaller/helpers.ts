@@ -178,14 +178,14 @@ export function isTruecallerLoginEnabled(
   }
 
   // • Checkout Options check - Merchant level check (Global Flag)
-  if (!isFeatureEnabledByPreferences('features.truecaller.login')) {
+  if (!isFeatureEnabledByPreferences('features.truecaller_login')) {
     return truecallerDisabledResponse(
       TRUECALLER_DISABLED_REASONS.disabled_on_merchant_level
     );
   }
 
   // • Checkout Options check - Platform level check (mweb Flag)
-  if (!isFeatureEnabledByPreferences('features.truecaller.login_mweb')) {
+  if (!isFeatureEnabledByPreferences('features.truecaller_login_mweb')) {
     return truecallerDisabledResponse(
       TRUECALLER_DISABLED_REASONS.disabled_on_platform_level
     );

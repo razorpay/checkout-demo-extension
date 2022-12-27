@@ -12,6 +12,8 @@
 
   function onClick(e) {
     e.preventDefault();
+    dispatch('click');
+
     triggerTruecallerIntent({}, TRUECALLER_VARIANT_NAMES.contact_screen)
       .then((res) => dispatch('success', res))
       .catch((e) => dispatch('error', e));

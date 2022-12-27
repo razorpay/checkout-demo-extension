@@ -6,7 +6,6 @@ import { TRUECALLER_USER_METRIC_STORAGE_KEY_NAME } from './constants';
 
 import type { UserMetricStore, TruecallerPresentStore } from './types';
 
-export const shouldDisableAutoTrigger = writable<boolean>(false);
 export const truecallerAttemptCount = writable<number>(0);
 export const truecallerPresent = writable<TruecallerPresentStore>(null);
 export const truecallerUserMetric = writable<UserMetricStore>(

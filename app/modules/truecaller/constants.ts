@@ -1,3 +1,5 @@
+import type { UserVerifyTruecallerErrorApiResponse } from './types';
+
 export const TRUECALLER_POLLING_INTERVAL = 3000; // in ms
 export const TRUECALLER_MAX_PENDING_ATTEMPT_COUNT = 10;
 export const MIN_SKIP_COUNT_TO_DISABLE_TRUECALLER_LOGIN = 3;
@@ -78,7 +80,7 @@ export const TRUECALLER_VARIANT_NAMES = {
 
 export const TRUECALLER_LOGIN_VARIANTS_FEATURE_FLAG_AND_EXPERIMENT_MAPPINGS = {
   contact_screen: {
-    featureFlag: 'features.truecaller.login_contact_screen',
+    featureFlag: 'features.truecaller_login_contact_screen',
     onceCCExperimentFlag: 'experiments.truecaller_1cc_for_non_prefill',
     standardCheckoutExperimentFlag:
       'experiments.truecaller_standard_checkout_for_non_prefill',
@@ -88,7 +90,7 @@ export const TRUECALLER_LOGIN_VARIANTS_FEATURE_FLAG_AND_EXPERIMENT_MAPPINGS = {
     ],
   },
   preferred_methods: {
-    featureFlag: 'features.truecaller.login_home_screen',
+    featureFlag: 'features.truecaller_login_home_screen',
     onceCCExperimentFlag: 'experiments.truecaller_1cc_for_prefill',
     standardCheckoutExperimentFlag:
       'experiments.truecaller_standard_checkout_for_prefill',
@@ -100,7 +102,7 @@ export const TRUECALLER_LOGIN_VARIANTS_FEATURE_FLAG_AND_EXPERIMENT_MAPPINGS = {
   },
 
   access_saved_cards: {
-    featureFlag: 'features.truecaller.login_saved_cards_screen',
+    featureFlag: 'features.truecaller_login_saved_cards_screen',
     onceCCExperimentFlag: 'experiments.truecaller_1cc_for_prefill',
     standardCheckoutExperimentFlag:
       'experiments.truecaller_standard_checkout_for_prefill',
@@ -112,7 +114,7 @@ export const TRUECALLER_LOGIN_VARIANTS_FEATURE_FLAG_AND_EXPERIMENT_MAPPINGS = {
   },
 
   add_new_card: {
-    featureFlag: 'features.truecaller.login_add_new_card_screen',
+    featureFlag: 'features.truecaller_login_add_new_card_screen',
     onceCCExperimentFlag: 'experiments.truecaller_1cc_for_prefill',
     standardCheckoutExperimentFlag:
       'experiments.truecaller_standard_checkout_for_prefill',
@@ -123,4 +125,16 @@ export const TRUECALLER_LOGIN_VARIANTS_FEATURE_FLAG_AND_EXPERIMENT_MAPPINGS = {
       'home_and_access_saved_cards_and_add_card',
     ],
   },
+} as const;
+
+export const TRUECALLER_API_REJECTION_CODES: {
+  [K in UserVerifyTruecallerErrorApiResponse['code']]: K;
+} = {
+  use_another_number: 'use_another_number',
+  user_rejected: 'user_rejected',
+} as const;
+
+export const TRUECALLER_CLIENT_REJECTION_CODES = {
+  client_unresponsive: 'client_unresponsive',
+  unhandled_error: 'unhandled_error',
 } as const;

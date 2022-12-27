@@ -10,7 +10,7 @@ describe('buildTruecallerDeeplink tests', () => {
         ctaTextColor: '#000000',
       })
     ).toBe(
-      'truecallersdk://truesdk/web_verify?type=btmsheet&partnerKey=MMN4x1fd6bf2425fe426bb911b53abfd4ed50&partnerName=Razorpay%20Checkout&lang=hi&loginPrefix=proceed&loginSuffix=verifymobile&ctaPrefix=getstarted&ctaColor=%23fafafa&ctaTextColor=%23000000&btnShape=rectangular&skipOption=useanothernum&requestNonce=00000000'
+      'truecallersdk://truesdk/web_verify?type=btmsheet&partnerKey=BwwcFdf4727abe5e5441c81444ffc76764717&partnerName=Razorpay%20Checkout&lang=hi&loginPrefix=proceed&loginSuffix=verifymobile&ctaPrefix=getstarted&ctaColor=%23fafafa&ctaTextColor=%23000000&btnShape=rectangular&skipOption=useanothernum&requestNonce=00000000'
     );
   });
 });

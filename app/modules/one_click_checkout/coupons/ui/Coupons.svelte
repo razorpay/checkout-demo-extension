@@ -52,6 +52,7 @@
     moengageEventsData,
     updateMoengageEventsData,
   } from 'one_click_checkout/merchant-analytics/store';
+  import { isEmailValid } from '../../common/details/store';
 
   // controller imports
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
@@ -163,6 +164,7 @@
     }
 
     validateEmail($email).then((valid: boolean) => {
+      isEmailValid.set(valid);
       if (valid) {
         Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
         Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
