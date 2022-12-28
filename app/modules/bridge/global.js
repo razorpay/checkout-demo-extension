@@ -7,6 +7,7 @@ import { getUPIIntentApps } from 'checkoutstore/native';
 import { querySelector, querySelectorAll } from 'utils/doc';
 import * as _El from 'utils/DOM';
 import { backPressed } from './back';
+import Analytics from 'analytics';
 
 export function defineGlobals() {
   window.backPressed = backPressed;
@@ -20,13 +21,24 @@ export function defineGlobals() {
  * window.handleOTP is defined for OTPElf inside our mobile SDKs
  * this function is called when user is on checkout and the OTP from
  * Razorpay is received
- * @param  {String} otp Just OTP or the entrie SMS body
+ * @param  {String} message Just OTP or the entrie SMS body
  */
-function handleOTP(otp) {
+function handleOTP(message) {
+  let otp = '';
   /* Old OTPelf will now send the whole body of the
    * message instead of just OTP */
-  const matches = otp.match(/\b[0-9]{4}([0-9]{2})?\b/);
-  otp = matches ? matches[0] : '';
+  /* OTPelf have a regex check for supporting 6 or 8 digit of otp only */
+  const matches = message.match(/\b[0-9]{6}([0-9]{2})?\b/);
+  //todo: to remove else part once verified no 4 digit otp
+  if (matches && matches[0]) {
+    otp = matches[0];
+  } else {
+    const fourDigitMatches = message.match(/\b[0-9]{4}\b/);
+    otp = fourDigitMatches ? fourDigitMatches[0] : '';
+    if (otp) {
+      Analytics.track('autofilling_four_digit_otp');
+    }
+  }
   otp = String(otp).replace(/\D/g, '');
   const session = getSession();
   const otpEl = querySelector('#otp');
