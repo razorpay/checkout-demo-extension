@@ -78,6 +78,7 @@
     }
 
     // update height after input
+    // TO DO: the below solution does not work in our case, need to discuss the better sol forn it, to increase the height
     height = e.target.scrollHeight;
     dispatch('input', e);
   }

@@ -44,7 +44,7 @@
 
     dispatch('input', {
       target: {
-        textContent: line1,
+        value: line1,
       },
     });
     dispatch('select', { index: e.detail.index });
