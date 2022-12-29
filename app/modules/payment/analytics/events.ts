@@ -17,6 +17,7 @@ interface PaymentEventMap {
     };
     method: Method;
     instrument: Instrument;
+    redirect: boolean;
   };
   PAYMENT_INITIATED_SYSTEM: {
     method: Method;

@@ -63,10 +63,9 @@ function createRudderBeaconRequest({
 }): boolean {
   try {
     const payload = JSON.stringify(data);
-    const blob = new Blob([payload], { type: 'text/plain' });
     const isQueuedSuccessfully = navigator.sendBeacon(
       `${url}?writeKey=${key}`,
-      blob
+      payload
     );
 
     return isQueuedSuccessfully;

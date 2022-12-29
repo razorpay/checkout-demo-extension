@@ -224,17 +224,22 @@ function trackNewPayment(data, params, r, returnFunction = false) {
       immediately: true,
     });
     try {
-      const instrumentData = getInstrumentDataAfterSubmitClick(data);
-      AnalyticsV2State.selectedInstrumentForPayment = instrumentData;
-
-      PaymentTracker.SUBMIT({
-        block: AnalyticsV2State.selectedBlock,
-        ...instrumentData,
-      });
+      AnalyticsV2State.selectedInstrumentForPayment =
+        getInstrumentDataAfterSubmitClick(data);
     } catch {}
   }
 
   return returnFunction ? track : track();
+}
+
+function trackSubmitAnalyticsV2(redirect) {
+  try {
+    PaymentTracker.SUBMIT({
+      block: AnalyticsV2State.selectedBlock,
+      redirect,
+      ...AnalyticsV2State.selectedInstrumentForPayment,
+    });
+  } catch {}
 }
 
 export default function Payment(data, params = {}, r) {
@@ -449,6 +454,7 @@ export default function Payment(data, params = {}, r) {
   } else {
     this.generate(data);
   }
+  trackSubmitAnalyticsV2(!!this.checkRedirect(false));
 }
 
 Payment.prototype = {
@@ -464,7 +470,7 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkRedirect: function () {
+  checkRedirect: function (shouldRedirect = true) {
     // allow redirect flow for valid FPX flow
     const isValidFpxFlow = this.data.method === 'fpx' && checkRedirectForFpx();
     if (!this.iframe && (getOption('redirect') || isValidFpxFlow)) {
@@ -479,12 +485,14 @@ Payment.prototype = {
         (data.method === 'upi' && !isRazorpayFrame()) ||
         isValidFpxFlow
       ) {
-        docUtil.redirectTo({
-          url: makeRedirectUrl(this.feesRedirect),
-          content: data,
-          method: 'post',
-          target: getOption('target'),
-        });
+        if (shouldRedirect) {
+          docUtil.redirectTo({
+            url: makeRedirectUrl(this.feesRedirect),
+            content: data,
+            method: 'post',
+            target: getOption('target'),
+          });
+        }
         return true;
       }
     }
