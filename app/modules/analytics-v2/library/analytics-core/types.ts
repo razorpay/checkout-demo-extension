@@ -62,3 +62,7 @@ export interface CallbackPayloadMap {
 
 export type EventKeys = keyof typeof CORE_EVENTS;
 export type EventValues = typeof CORE_EVENTS[EventKeys];
+
+export type PluginOptions = {
+  enable: boolean;
+};

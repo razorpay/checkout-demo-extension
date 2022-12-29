@@ -329,7 +329,7 @@ RazorProto.open = needBody(function (this: RazorpayType) {
       prefill: {
         contact: getOption('prefill.contact'),
         email: getOption('prefill.email'),
-        method: getOption('prefll.method') || '',
+        method: getOption('prefill.method') || '',
       },
     });
   } catch {}

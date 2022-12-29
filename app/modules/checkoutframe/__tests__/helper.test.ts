@@ -6,6 +6,9 @@ import * as mock from './__mocks__/helper';
 jest.mock('razorpay', () => ({
   getAmount: jest.fn(() => {}),
   getOrderId: jest.fn(() => {}),
+  getOption: jest.fn(),
+  isRudderstackDisabled: jest.fn(() => false),
+  getCurrency: jest.fn(() => 'INR'),
 }));
 
 describe('Module: checkoutframe/helper', () => {

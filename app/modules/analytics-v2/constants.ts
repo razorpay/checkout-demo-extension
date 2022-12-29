@@ -8,6 +8,7 @@ export const ContextProperties = {
   ENV: 'checkout.env',
   EXP_CONFIGS: 'checkout.experimentConfigs',
   EXPERIMENTS: 'checkout.experiments',
+  CONFIG_LIST: 'checkout.config_list',
   FEATURES: 'checkout.features',
   CHECKOUT_ID: 'checkout.id',
   REFERRER_TYPE: 'checkout.referrerType',

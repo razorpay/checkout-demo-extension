@@ -8,6 +8,7 @@ import {
   Config,
   EventValues,
   PLUGIN_CALLBACK_TYPES,
+  PluginOptions,
 } from 'analytics-v2/library/analytics-core/types';
 import {
   makeContext,
@@ -180,5 +181,18 @@ export default class Analytics<
       ...this.state,
       context: unflatten(this.flattenedContext) as Context,
     };
+  }
+
+  /**
+   * configures plugin from options provided.
+   * Currently, enables/disables plugin
+   * @param {string} pluginName name of the plugin
+   * @param {PluginOptions} option
+   */
+  configurePlugin(pluginName: string, option: PluginOptions): void {
+    const { enable } = option;
+    if (this.state.plugins[pluginName]) {
+      this.state.plugins[pluginName].enabled = enable;
+    }
   }
 }

@@ -13,7 +13,7 @@ const analytics = new Analytics<ContextValues>({
         domainUrl: RUDDERSTACK_URL,
         key: RUDDERSTACK_KEY,
       }),
-      enabled: false,
+      enabled: true,
     },
   ],
 });

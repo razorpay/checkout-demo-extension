@@ -5,11 +5,19 @@ import {
   getExperimentsFromStorage,
   getRegisteredExperiments,
 } from 'experiments';
-import { getAmount, getOrderId, getOption } from 'razorpay';
+import {
+  getAmount,
+  getOrderId,
+  getOption,
+  isRudderstackDisabled,
+} from 'razorpay';
 import type { PreferencesObject } from 'razorpay/types/Preferences';
 import type { CustomObject } from 'types';
 import { getQueryParams } from 'utils/_';
 import { updateShopifyAbandonedCartUrl } from './1cc-shopify/service';
+import { PLUGINS } from 'analytics-v2/library/common/types';
+import { setInitialContext } from 'analytics-v2/helpers';
+import { getConfigFromOptions } from 'checkoutstore';
 
 /**
  * transforms experiment values received from preferences, based on the below mapping
@@ -49,6 +57,16 @@ function formatPrefExperiments(
  * @param preferences
  */
 export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
+  if (isRudderstackDisabled()) {
+    EventsV2.configurePlugin(PLUGINS.RUDDERSTACK_PLUGIN, { enable: false });
+    return;
+  }
+  setInitialContext();
+
+  EventsV2.setContext(
+    ContextProperties.CONFIG_LIST,
+    getConfigFromOptions() || preferences.checkout_config
+  );
   EventsV2.setContext(ContextProperties.AMOUNT, getAmount());
 
   Events.setMeta(MetaProperties.FEATURES, preferences.features);

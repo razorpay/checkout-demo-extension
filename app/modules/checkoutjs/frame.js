@@ -23,10 +23,11 @@ import { submitForm } from 'common/form';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { appendLoader } from 'common/loader';
-import { sendToAll, setInitialContext } from 'checkoutjs/analytics';
+import { sendToAll } from 'checkoutjs/analytics';
 import { cleanupFreezeCheck } from './freeze';
 import { merchantAnalytics } from 'one_click_checkout/merchant-analytics';
 import { uuid4 } from 'common/uuid';
+import { setInitialContext } from 'analytics-v2/helpers';
 
 const { screen, scrollTo } = global;
 
@@ -224,7 +225,7 @@ CheckoutFrame.prototype = {
       this.rzp = rzp;
     }
 
-    setInitialContext();
+    setInitialContext(this.rzp.getMode());
 
     if (parent) {
       _El.setStyle(el, 'minHeight', '530px');

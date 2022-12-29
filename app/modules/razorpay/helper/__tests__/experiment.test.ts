@@ -3,6 +3,7 @@ import { setupPreferences } from 'tests/setupPreferences';
 import {
   isRemoveDefaultTokenizationSupported,
   reusePaymentIdExperimentEnabled,
+  isRudderstackDisabled,
 } from '../experiment';
 
 let razorpayInstance = {
@@ -50,6 +51,32 @@ describe('Test for experiment of isRemoveDefaultTokenizationSupported', () => {
     });
 
     expect(isRemoveDefaultTokenizationSupported()).toBe(false);
+  });
+});
+
+describe('Test for experiment of isRudderstackDisabled', () => {
+  test('If this Experiment flag is not coming', () => {
+    expect(isRudderstackDisabled()).toBe(true);
+  });
+
+  test('If this Experiment flag is coming in preferences as true', () => {
+    setupPreferences('loggedIn', razorpayInstance, {
+      experiments: {
+        enable_rudderstack_plugin: true,
+      },
+    });
+
+    expect(isRudderstackDisabled()).toBe(false);
+  });
+
+  test('If this Experiment flag is coming in preferences as false', () => {
+    setupPreferences('loggedIn', razorpayInstance, {
+      experiments: {
+        enable_rudderstack_plugin: false,
+      },
+    });
+
+    expect(isRudderstackDisabled()).toBe(true);
   });
 });
 

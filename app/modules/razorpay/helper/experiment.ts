@@ -14,3 +14,7 @@ export function isRemoveDefaultTokenizationSupported() {
   );
   return tokenization_flag;
 }
+
+export function isRudderstackDisabled() {
+  return !getPreferences('experiments.enable_rudderstack_plugin');
+}

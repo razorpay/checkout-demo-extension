@@ -126,5 +126,6 @@ export const EventsV2 = {
   getState,
   Identify: AnalyticsV2.identify.bind(AnalyticsV2),
   Reset: AnalyticsV2.reset.bind(AnalyticsV2),
+  configurePlugin: AnalyticsV2.configurePlugin.bind(AnalyticsV2),
   createTrackMethodForModule,
 };

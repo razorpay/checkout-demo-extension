@@ -89,7 +89,7 @@ export function shouldRememberCustomer(
   return getOption('remember_customer');
 }
 
-function getConfigFromOptions() {
+export function getConfigFromOptions() {
   if (_.isNull(getOption('config'))) {
     return null;
   }
