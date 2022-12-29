@@ -3556,10 +3556,13 @@ Session.prototype = {
     if (smsHash) {
       params.sms_hash = smsHash;
     }
-    if (RazorpayHelper.isRedesignV15()) {
-      params.otp_reason = RazorpayHelper.isRedesignV15()
-        ? discreet.OTP_TEMPLATES.access_card
-        : '';
+    /**
+     * checkout sms template is different from magic
+     * as checkout template can have a hash for sdk to autoread message
+     * if we not send otp_reason it will pick checkout's default template
+     */
+    if (RazorpayHelper.isOneClickCheckout()) {
+      params.otp_reason = discreet.OTP_TEMPLATES.access_card;
     }
     customer.checkStatus(function () {
       /**
