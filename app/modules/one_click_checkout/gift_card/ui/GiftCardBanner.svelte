@@ -100,7 +100,7 @@
         </p>
         {#if $totalAppliedGCAmt}
           <div class="label-success">
-            <Icon icon={circle_check(12, 12)} />
+            <Icon icon={circle_check(undefined, undefined, '12', '12')} />
             <span class="amount" data-testid="amount">
               {`${formatAmountWithSymbol(
                 $totalAppliedGCAmt,
