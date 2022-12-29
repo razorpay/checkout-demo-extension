@@ -27,7 +27,7 @@
     data?.response?.razorpay_payment_id ||
     data?.response?.error?.metadata?.payment_id;
 
-  let TIMER = 10;
+  let TIMER = 5;
 
   const timerInstance = setInterval(() => {
     TIMER -= 1;

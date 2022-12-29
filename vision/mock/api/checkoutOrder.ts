@@ -63,6 +63,8 @@ export const deleteCheckoutOrderHandler: handlerType = ({ name }) => {
 
 export const checkoutOrderStatusHandler: handlerType = () => {
   return {
-    response: {},
+    response: {
+      status: 'created',
+    },
   };
 };

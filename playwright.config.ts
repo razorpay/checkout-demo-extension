@@ -12,7 +12,7 @@ const config: PlaywrightTestConfig = {
   expect: {
     toMatchSnapshot: {
       threshold: 0.1,
-      maxDiffPixelRatio: 0.02,
+      maxDiffPixelRatio: 0.01,
     },
   },
   testMatch: ['vision/**/**.spec.ts'],
