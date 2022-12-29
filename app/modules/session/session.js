@@ -3168,6 +3168,8 @@ Session.prototype = {
         } else if (!RazorpayHelper.getOption('theme.close_button')) {
           // close modal
           this.closeModal();
+        } else if (this.get('theme.show_back_always')) {
+          return this.modal.hide();
         }
       }
     } else {

@@ -120,6 +120,7 @@ RazorpayDefaults.theme = {
   image_frame: true,
   close_button: true,
   close_method_back: false,
+  show_back_always: false,
   hide_topbar: false,
   branding: '',
   debit_card: false,

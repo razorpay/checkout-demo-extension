@@ -99,6 +99,7 @@ export interface Theme {
   backdrop_color: string;
   image_padding: boolean;
   image_frame: boolean;
+  show_back_always: boolean;
   close_button: boolean;
   close_method_back: boolean;
   hide_topbar: boolean;
