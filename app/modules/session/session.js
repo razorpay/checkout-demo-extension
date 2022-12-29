@@ -5200,7 +5200,11 @@ Session.prototype = {
      * will not ask for international card as we don't tokenized them in backend
      */
     const isSavedCardScreen = this.svelteCardTab?.isOnSavedCardsScreen();
-    if (showTokenisationBenefitModal() && !AVSRequired) {
+    if (
+      data.method === 'card' &&
+      showTokenisationBenefitModal() &&
+      !AVSRequired
+    ) {
       if (this.tokenisationPopupShown) {
         this.tokenisationPopupShown = false;
       } else {
