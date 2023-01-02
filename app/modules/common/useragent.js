@@ -27,6 +27,7 @@ export const isWebView = AndroidWebView || iosWebView;
 
 export const Instagram = check(/Instagram/);
 export const samsungBrowser = check(/SamsungBrowser/);
+export const headlessChrome = check(/HeadlessChrome/);
 export let isBrave = false;
 export let isPrivate = false;
 

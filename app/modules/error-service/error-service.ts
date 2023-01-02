@@ -16,6 +16,7 @@ import type {
   ErrorParam,
   CaptureErrorOptions,
 } from 'error-service/types';
+import { headlessChrome } from 'common/useragent';
 /**
  * @param {String|Error|Object} error -
  * @param {Object} options
@@ -39,8 +40,9 @@ export const capture = (
      * don't track if its not prod
      * if its standard checkout library then check for domain
      * mode check is already available in tracker & availability module
+     * don't track if error is from headless chrome
      */
-    if (Track.props.library !== 'razorpayjs' && !IS_PROD) {
+    if ((Track.props.library !== 'razorpayjs' && !IS_PROD) || headlessChrome) {
       return;
     }
 
