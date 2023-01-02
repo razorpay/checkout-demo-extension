@@ -12,6 +12,7 @@ import {
   isMandatoryLoginEnabled,
   scriptCouponApplied,
   getSingleShippingExpVariant,
+  isEmailHidden,
 } from 'razorpay';
 
 // Analytics imports
@@ -128,12 +129,14 @@ export function init1CCMetaData() {
 }
 
 export function validatePrefilledDetails() {
-  if (!isOneClickCheckout()) {
-    return;
-  }
-
-  const [emailRegexValid, contactRegexValid] = validateEmailAndContact();
+  const [contactRegexValid, emailRegexValid] = validateEmailAndContact();
   validateEmail(get(email)).then((valid) => {
+    // if email is hidden and invalid we discard the email (as we don't give option to user to edit)
+    if (!valid && isEmailHidden()) {
+      email.set('');
+      isEmailValid.set(true);
+      return;
+    }
     isEmailValid.set(valid && emailRegexValid);
   });
   isContactValid.set(contactRegexValid);
