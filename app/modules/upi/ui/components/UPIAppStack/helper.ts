@@ -1,5 +1,6 @@
 import type { Writable } from 'svelte/store';
 import { showDowntimeAlert } from 'checkoutframe/downtimes/utils';
+import { UPI_APP_PAYMENT_SOURCES } from 'upi/constants';
 
 /**
  * This method aim is to see if downtime has to be handled
@@ -13,6 +14,8 @@ export const initiateNecessaryFlow = (
 ) => {
   const downtimeSevere = data.downtimeConfig && data.downtimeConfig.severe;
   const { app_name, name } = (data.app || {}) as UPI.AppConfiguration;
+
+  data.source = UPI_APP_PAYMENT_SOURCES.app_grid;
   /**
    * No Downtime? Proceed,
    * Else update the callback and trigger downtime

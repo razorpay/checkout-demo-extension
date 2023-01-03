@@ -209,6 +209,8 @@
   import { isCustomerWithIntlPhone } from 'helper/international';
   import { patchCustomerEmail } from 'checkoutframe/customer/service';
 
+  import { handlep13nUpiIntent } from 'upi/helper/p13n';
+
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
   validatePrefilledDetails();
@@ -1123,6 +1125,7 @@
 
   function deselectInstrument() {
     $selectedInstrumentId = null;
+    selectedMethod = '';
     dccView = 'home-screen';
     ctaV15Disabled = true;
   }
@@ -1285,6 +1288,9 @@
           inline: 'center',
         });
       }
+
+      handlep13nUpiIntent(instrument);
+
       // SKIP CTA click check
       if (instrument.skipCTAClick) {
         delete instrument.skipCTAClick;

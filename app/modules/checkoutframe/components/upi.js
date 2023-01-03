@@ -1,5 +1,4 @@
 import { setView, destroyView } from './';
-import { returnAsIs } from 'lib/utils';
 import Analytics from 'analytics';
 
 import { getSession } from 'sessionmanager';
@@ -39,18 +38,18 @@ export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
     .filter((app) => app.method === 'upi')
     .forEach((app) => {
-      if (shouldShowAllUPIApps()) {
-        saveUpiApps(app);
-      } else {
-        checkWebPaymentsForApp(app.package_name)
-          .then((status) => {
-            if (status === false) {
-              return;
-            }
+      checkWebPaymentsForApp(app.package_name)
+        .then((status) => {
+          if (status === false && !shouldShowAllUPIApps()) {
+            return;
+          }
+          saveUpiApps(app);
+        })
+        .catch(() => {
+          if (shouldShowAllUPIApps()) {
             saveUpiApps(app);
-          })
-          .catch(returnAsIs);
-      }
+          }
+        });
     });
 }
 

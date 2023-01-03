@@ -16,7 +16,7 @@
     trackNoFlowAppSelection,
     trackOtherSelection,
   } from 'upi/events';
-  import { OTHER_INTENT_APPS } from 'upi/constants';
+  import { OTHER_INTENT_APPS, UPI_APP_PAYMENT_SOURCES } from 'upi/constants';
   import { UPITracker } from 'upi/analytics/events';
   import { getSession } from 'sessionmanager';
   import { getCurrentScreen } from 'home/analytics/helpers';
@@ -58,6 +58,10 @@
   onMount(() => {
     trackUPIAppsShown(rowCol, session.screen as string);
   });
+
+  function isAppSelectedFromUpiAppStack() {
+    return $selectedUPIAppForPay.source === UPI_APP_PAYMENT_SOURCES.app_grid;
+  }
 
   function handleClick(
     app: UPI.AppConfiguration,
@@ -138,12 +142,13 @@
         >
           {#each apps as app, column}
             <AppTile
-              selected={$selectedUPIAppForPay.app?.shortcode === app.shortcode}
+              selected={$selectedUPIAppForPay.app?.shortcode ===
+                app.shortcode && isAppSelectedFromUpiAppStack()}
               variant={variant !== 'subText' ? 'square' : 'circle'}
               {app}
               onClick={() => handleClick(app, { row, column })}
             >
-              {#if $selectedUPIAppForPay?.app?.shortcode === app.shortcode && $selectedUPIAppForPay?.downtimeConfig?.severe}
+              {#if $selectedUPIAppForPay?.app?.shortcode === app.shortcode && $selectedUPIAppForPay?.downtimeConfig?.severe && isAppSelectedFromUpiAppStack()}
                 <div class="downtime-pointer" />
               {/if}
             </AppTile>
@@ -153,7 +158,7 @@
           {/if}
         </div>
         <div class="flex">
-          {#if $selectedUPIAppForPay?.downtimeConfig?.severe && $selectedUPIAppForPay?.position?.row === row}
+          {#if $selectedUPIAppForPay?.downtimeConfig?.severe && $selectedUPIAppForPay?.position?.row === row && isAppSelectedFromUpiAppStack()}
             <div class="upi-app-stack-downtime-callout">
               <DowntimeCallout
                 showIcon={true}

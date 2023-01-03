@@ -5,7 +5,10 @@
   import { getSession } from 'sessionmanager';
   import Icon from 'ui/elements/Icon.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { resetSelectedUPIAppForPay } from 'checkoutstore/screens/upi';
+  import {
+    resetSelectedUPIAppForPay,
+    selectedUPIAppForPay,
+  } from 'checkoutstore/screens/upi';
 
   // i18
   import { t, locale } from 'svelte-i18n';
@@ -25,6 +28,7 @@
 
   // helper imports
   import { isRedesignV15 } from 'razorpay';
+  import { UPI_APP_PAYMENT_SOURCES } from 'upi/constants';
 
   export let instrument;
 
@@ -35,11 +39,17 @@
 
   const handleContinue = () => {
     popStack();
+
+    if ($selectedUPIAppForPay.shouldShowDowntimeAlert) {
+      $selectedUPIAppForPay.shouldShowDowntimeAlert = false;
+    }
     session.submit();
   };
   const handleBack = () => {
     popStack();
-    resetSelectedUPIAppForPay();
+    if ($selectedInstrument.section !== UPI_APP_PAYMENT_SOURCES.p13n) {
+      resetSelectedUPIAppForPay();
+    }
   };
   onMount(() => {
     Events.setMeta(MetaProperties.DOWNTIME_ALERTSHOWN, true);

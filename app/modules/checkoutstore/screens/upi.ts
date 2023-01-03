@@ -2,6 +2,8 @@ import { isCtaShown, showCtaWithDefaultText, hideCta } from 'cta/helper';
 import { tick } from 'svelte';
 import { Writable, writable } from 'svelte/store';
 import { selectedInstrumentId } from './home';
+import { UPI_APP_PAYMENT_SOURCES } from 'upi/constants';
+
 export const intentVpaPrefill = writable('');
 export const intentVpaPrefilledFromPreferences = writable(false);
 
@@ -30,7 +32,11 @@ export function resetSelectedUPIAppForPay() {
 }
 
 selectedUPIAppForPay.subscribe((data: UPI.UpiAppForPay) => {
-  if (data.app && data.app.shortcode) {
+  if (
+    data.app &&
+    data.app.shortcode &&
+    data.source !== UPI_APP_PAYMENT_SOURCES.p13n
+  ) {
     selectedInstrumentId.set(null);
     /**
      * Why to tick here?

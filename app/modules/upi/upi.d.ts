@@ -87,6 +87,8 @@ declare namespace UPI {
 
   export type UpiAppForPay = Partial<{
     callbackOnPay: any;
+    source: string;
+    shouldShowDowntimeAlert: boolean;
     app: UPI.AppConfiguration;
     downtimeConfig: Downtime.Config;
     position: {

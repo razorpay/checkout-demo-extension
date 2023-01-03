@@ -425,3 +425,8 @@ export const APPS_SUPPORTING_AUTOPAY_INTENT = [
   PHONE_PE_PACKAGE_NAME,
   PAYTM_PACKAGE_NAME,
 ];
+
+export const UPI_APP_PAYMENT_SOURCES = {
+  p13n: 'p13n',
+  app_grid: 'app_grid',
+};
