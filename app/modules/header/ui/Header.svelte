@@ -306,10 +306,9 @@
     margin-bottom: 0;
     transition: height 0.2s, width 0.2s, margin-left 0.4s ease;
     position: relative;
+    overflow: hidden;
     img {
       vertical-align: initial;
-      border-radius: 2px;
-      box-shadow: 0px 0px 0px 2px var(--light-highlight-color);
       position: absolute;
       top: 0;
       left: 0;
@@ -321,7 +320,7 @@
   .dark-primary-color {
     #logo {
       &.merchant-initials,
-      img {
+      &.image-frame {
         box-shadow: 0px 0px 0px 2px #ffffff57;
       }
     }
@@ -331,8 +330,8 @@
   }
   #logo.image-frame {
     box-sizing: border-box;
-    background: none;
-    box-shadow: none;
+    background: #ffffff;
+    box-shadow: 0px 0px 0px 2px var(--light-highlight-color);
     padding: 0;
     width: 46px;
     height: 46px;
