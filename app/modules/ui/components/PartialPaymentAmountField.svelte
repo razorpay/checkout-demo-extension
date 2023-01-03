@@ -84,7 +84,9 @@
   $: {
     if (value) {
       if (valueInMinor >= minAmount && valueInMinor <= maxAmount) {
-        session.setAmount(value * 100);
+        session.setAmount(
+          Math.round(value * Math.pow(10, currencyConfig.decimals))
+        );
       }
     } else {
       session.setAmount(maxAmount);
