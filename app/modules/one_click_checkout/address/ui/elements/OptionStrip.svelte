@@ -69,6 +69,7 @@
 {#if showStrip}
   <div
     data-testid="shipping-banner"
+    data-test-id="shipping-banner"
     class={`single-option ${classes}`}
     in:slide|local={{ duration: 300 }}
   >

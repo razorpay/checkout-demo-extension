@@ -108,6 +108,7 @@ async function fillUserAddress(
     addLandmark = false,
     internationalShippingEnabled = false,
     internationalPhoneNumber = false,
+    shippingOptions = {},
   }
 ) {
   await context.page.waitForSelector('.address-new');
@@ -127,10 +128,17 @@ async function fillUserAddress(
       codFee,
       shippingFee,
       zipcode,
+      shippingOptions,
     });
-    if (shippingFee) {
+    if (shippingFee || shippingOptions?.[zipcode]?.length === 1) {
       await delay(400);
       await checkShippingToastVisible(context);
+      if (
+        shippingOptions?.[zipcode]?.length === 1 &&
+        shippingOptions[zipcode].description
+      ) {
+        await assertVisible('[data-test-id=shipping-banner]');
+      }
     }
   } else {
     await handlePincodes(context);

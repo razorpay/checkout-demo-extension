@@ -14,7 +14,12 @@
   const currency = getCurrency();
 </script>
 
-<div class="shipping-radio" class:bordered={fullWidth} class:selected={checked}>
+<div
+  id={`shipping-radio-${option.id}`}
+  class="shipping-radio"
+  class:bordered={fullWidth}
+  class:selected={checked}
+>
   <input
     id={option.id}
     type="radio"

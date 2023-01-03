@@ -23,8 +23,12 @@ const {
   proceedOneCC,
   mockPaymentSteps,
   handleShippingInfo,
+  assertShippingOptionsListActions,
 } = require('../../actions/one-click-checkout/common');
-const { fillUserAddress } = require('../../actions/one-click-checkout/address');
+const {
+  fillUserAddress,
+  assertUnserviceableAddress,
+} = require('../../actions/one-click-checkout/address');
 const {
   fillUserDetails,
 } = require('../../tests/homescreen/userDetailsActions');
@@ -51,6 +55,8 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     restrictCoupon,
     showCoupons,
     couponsDisabled,
+    shippingOptions,
+    multipleShipping,
   } = features;
 
   describe.each(
@@ -114,13 +120,10 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
             await handleVerifyOTPReq(context);
             await delay(400);
             handleApplyCouponReq(context, true, discountAmount);
-            handleShippingInfo(
-              context,
-              {
-                isCODEligible: true,
-              },
-              true
-            );
+            handleShippingInfo(context, {
+              isCODEligible: true,
+              shippingOptions,
+            });
             handleAvailableCouponReq(context, availableCoupons);
             await delay(400);
           } else {
@@ -145,9 +148,25 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
           saveAddress,
           serviceable,
           isCODEligible: true,
+          shippingOptions,
         });
-        await proceedOneCC(context);
+        await delay(400);
+        if (!serviceable) {
+          await assertUnserviceableAddress(context, true);
+          return;
+        }
+        if (multipleShipping) {
+          await proceedOneCC(context);
+          await assertShippingOptionsListActions(context, true, {
+            shippingOptions,
+            serviceable,
+          });
+        } else {
+          await proceedOneCC(context);
+        }
+        await delay(400);
         await mockPaymentSteps(context, options, features, true, method);
+        await delay(200);
       });
     }
   );

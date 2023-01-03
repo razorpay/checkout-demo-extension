@@ -23,6 +23,7 @@ const {
   login,
   goBack,
   checkSkipOTPHidden,
+  assertShippingOptionsListActions,
 } = require('../../actions/one-click-checkout/common');
 const {
   handleAddAddress,
@@ -67,6 +68,8 @@ const CONTACT_ERROR_LABEL = 'Enter a valid mobile number.';
  * @param {*} testFeatures.singleGC used to apply single gift card
  * @param {*} testFeatures.multipleGC used to apply multiple gift card
  * @param {*} testFeatures.restrictOffer used to check Offer & gift card flow
+ * @param {*} testFeatures.multipleShipping used to check whether to test for multiple shipping flows
+ * @param {*} testFeatures.shippingOptions used in case of multiple shipping to get the options for a zipcode
  */
 module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -98,6 +101,8 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
     consentBannerViews,
     internationalShippingEnabled,
     internationalPhoneNumber,
+    multipleShipping,
+    shippingOptions,
   } = features;
 
   describe.each(
@@ -167,13 +172,27 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
         // loggedIn address flows
         if (loggedIn) {
           if (addresses.length) {
-            await handleShippingInfo(context, { serviceable, isCODEligible });
+            await handleShippingInfo(context, {
+              serviceable,
+              isCODEligible,
+              shippingOptions,
+            });
+            await delay(400);
           }
 
           // default address is unserviceable at L0 screen
           if (!serviceable) {
             await assertUnserviceableAddress(context);
             return;
+          }
+
+          // default address has multiple shipping options
+          if (multipleShipping) {
+            await assertShippingOptionsListActions(context, false, {
+              shippingOptions,
+              serviceable,
+            });
+            await delay(100);
           }
 
           if (manageAddress) {
@@ -206,6 +225,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
                   zipcode: '560002',
                   addLandmark,
                   shippingFee,
+                  shippingOptions,
                 },
                 addresses
               );
@@ -295,9 +315,25 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
                 saveAddress,
                 isCODEligible,
                 serviceable,
+                shippingOptions,
               });
+
+              if (!serviceable) {
+                await delay(200);
+                await assertUnserviceableAddress(context, true);
+                return;
+              }
+
               await delay(400);
               await proceedOneCC(context);
+
+              if (multipleShipping) {
+                await assertShippingOptionsListActions(context, true, {
+                  shippingOptions,
+                  serviceable,
+                });
+                await delay(200);
+              }
             } else {
               if (mandatoryLogin) {
                 await checkSkipOTPHidden();
@@ -311,6 +347,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               await handleShippingInfo(context, {
                 serviceable,
                 isCODEligible,
+                shippingOptions,
               });
             }
           } else {
@@ -345,6 +382,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               internationalShippingEnabled,
               zipcode: internationalShippingEnabled ? '10001' : '560001',
               internationalPhoneNumber,
+              shippingOptions,
             });
 
             // unserviceable address in add address form
@@ -352,6 +390,16 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
               await delay(200);
               await assertUnserviceableAddress(context, true);
               return;
+            }
+
+            if (multipleShipping) {
+              await delay(200);
+              await proceedOneCC(context);
+              await assertShippingOptionsListActions(context, true, {
+                shippingOptions,
+                serviceable,
+              });
+              await delay(200);
             }
 
             if (addBillingAddress) {
@@ -366,6 +414,7 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
             if (
               saveAddress &&
               !mandatoryLogin &&
+              !multipleShipping &&
               (!addresses.length || skipAccessOTP)
             ) {
               await delay(400);
@@ -392,6 +441,19 @@ module.exports = function (testFeatures, methods = ['upi', 'card', 'cod']) {
 
         await delay(200);
         await proceedOneCC(context);
+
+        if (
+          multipleShipping &&
+          (addShippingAddress ||
+            (addresses.length && !skipAccessOTP && !loggedIn))
+        ) {
+          await delay(200);
+          await assertShippingOptionsListActions(context, true, {
+            shippingOptions,
+            serviceable,
+          });
+          await delay(200);
+        }
 
         if (loggedIn && !addresses.length) {
           await delay(400);

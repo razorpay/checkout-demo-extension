@@ -284,7 +284,7 @@ async function handleFeeSummary(context, features) {
     expect(shippingAmount).toEqual('Free');
   }
 
-  if (codFee) {
+  if (codFee && isSelectCOD) {
     expectedAmount += codFee / 100;
   }
 
@@ -304,7 +304,9 @@ async function handleFeeSummary(context, features) {
   }
 
   expect(formatTextToNumber(cartAmount)).toEqual(amount / 100);
-  expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
+  if (isSelectCOD && codFee > 0) {
+    expect(formatTextToNumber(codAmount)).toEqual(codFee / 100);
+  }
   expect(formatTextToNumber(totalAmount)).toEqual(expectedAmount);
 
   if (isSelectCOD) {
@@ -487,6 +489,7 @@ async function mockPaymentSteps(
 async function makeCodPayment(context, features) {
   await selectPaymentMethod(context, 'cod');
   await delay(200);
+  features.isSelectCOD = true;
   await proceedOneCC(context);
   await handleFeeSummary(context, features);
   await handleCODPayment(context);
@@ -536,6 +539,7 @@ function getShippingInfoResponse({
   codFee = 0,
   shippingFee = 0,
   zipcode = '560001',
+  shippingOptions = {},
 }) {
   const isNewYorkZipcode = zipcode === '10001';
   const resp = {
@@ -554,17 +558,37 @@ function getShippingInfoResponse({
     ],
   };
 
+  if (Object.keys(shippingOptions).length) {
+    resp.addresses[0].shipping_methods = shippingOptions[zipcode];
+  }
+
   return resp;
 }
 async function handleShippingInfo(context, options = {}) {
   let req = context.getRequest(`/v1/merchant/shipping_info`);
   const resp = getShippingInfoResponse(options);
-  const { shipping_fee, cod_fee } = resp.addresses[0];
+  const {
+    shipping_fee,
+    cod_fee,
+    shipping_methods = [],
+    serviceable,
+  } = resp.addresses[0];
   const state = {
     shippingFee: shipping_fee,
+    codFee: cod_fee,
   };
-  if (cod_fee) {
-    state.codFee = cod_fee;
+  if (serviceable) {
+    state.shippingFee = shipping_fee;
+    if (cod_fee) {
+      state.codFee = cod_fee;
+    }
+    if (shipping_methods.length === 1) {
+      state.shippingFee = shipping_methods[0].shipping_fee;
+      state.codFee = shipping_methods[0].cod_fee;
+    } else if (shipping_methods.length > 1) {
+      state.shippingFee = 0;
+      state.codFee = 0;
+    }
   }
   setState(context, state);
   if (!req) {
@@ -576,6 +600,32 @@ async function handleShippingInfo(context, options = {}) {
   }
   req.respond(makeJSONResponse(resp));
   context.resetRequest(req);
+}
+
+async function assertShippingOptionsListActions(
+  context,
+  isOverlay,
+  { shippingOptions = [], zipcode = '560001', serviceable }
+) {
+  if (!serviceable) {
+    return;
+  }
+
+  await assertVisible('.shipping-list');
+  const zipcodeOptions = shippingOptions[zipcode];
+  expect(zipcodeOptions.length).toBeGreaterThan(1);
+
+  setState(context, {
+    shippingFee: zipcodeOptions[0].shipping_fee,
+    codFee: zipcodeOptions[0].cod_fee,
+  });
+
+  if (isOverlay) {
+    const proceedCta = await context.page.waitForSelector(
+      '.shipping-cta-container .btn'
+    );
+    await proceedCta.evaluate((cta) => cta.click());
+  }
 }
 
 module.exports = {
@@ -600,4 +650,5 @@ module.exports = {
   mockPaymentSteps,
   closeModal,
   handleShippingInfo,
+  assertShippingOptionsListActions,
 };

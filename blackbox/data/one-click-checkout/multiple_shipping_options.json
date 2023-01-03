@@ -1,0 +1,38 @@
+{
+  "560001": [
+    {
+        "id": "id2",
+        "name": "Standard Delivery",
+        "description": "4-5 days delivery",
+        "shipping_fee": 2000,
+        "cod": true,
+        "cod_fee": 2000
+    },
+    {
+      "id": "id1",
+      "name": "Express Delivery",
+      "description": "2 days delivery",
+      "shipping_fee": 3000,
+      "cod": true,
+      "cod_fee": 3000
+    }
+  ],
+  "560002": [
+    {
+        "id": "id2",
+        "name": "Standard Delivery",
+        "description": "4-5 days delivery",
+        "shipping_fee": 2000,
+        "cod": true,
+        "cod_fee": 2000
+    },
+    {
+      "id": "id3",
+      "name": "Express Delivery",
+      "description": "2 days delivery",
+      "shipping_fee": 3000,
+      "cod": true,
+      "cod_fee": 3000
+    }
+  ]
+}
