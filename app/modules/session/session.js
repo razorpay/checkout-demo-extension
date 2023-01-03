@@ -4210,12 +4210,12 @@ Session.prototype = {
     return data;
   },
 
-  hide: function (confirmedCancel) {
+  hide: function (confirmedCancel, overlayProps = {}) {
     let self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
-        Confirm.confirmClose().then((confirmed) => {
+        Confirm.confirmClose(overlayProps).then((confirmed) => {
           if (confirmed) {
             if (isQRPaymentCancellable({}, true) === 2) {
               /**
@@ -4412,7 +4412,7 @@ Session.prototype = {
     }
   },
 
-  closeModal: function () {
+  closeModal: function (overlayProps = {}) {
     let session = this;
 
     // If we have navstack populated we need to clear the stack and the respective states
@@ -4430,7 +4430,7 @@ Session.prototype = {
         }
       });
     } else {
-      session.hide();
+      session.hide(false, overlayProps);
     }
   },
 

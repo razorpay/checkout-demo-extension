@@ -105,13 +105,20 @@ export const handleBack = () => {
     Events.TrackBehav(OneCCEvents.CLOSE_MODAL, {
       screen_name: getCurrentScreen(),
     });
-    Confirm.show({
-      heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
-      message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
-      onPositiveClick: function () {
-        session.closeModal();
-      },
-    });
+    if (session.getPayment()) {
+      session.closeModal({
+        heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
+        message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
+      });
+    } else {
+      Confirm.show({
+        heading: formatTemplateWithLocale(CONFIRM_CANCEL_HEADING, {}, locale),
+        message: formatTemplateWithLocale(CONFIRM_CANCEL_MESSAGE, {}, locale),
+        onPositiveClick: function () {
+          session.closeModal();
+        },
+      });
+    }
     return;
   }
   if (
