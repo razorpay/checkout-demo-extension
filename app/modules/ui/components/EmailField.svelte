@@ -31,12 +31,18 @@
   import { debounce } from 'lib/utils';
   import autotest from 'autotest';
 
-  export let required = !$isOptionalEmail;
+  export let required: boolean;
 
-  const EMAIL_REGEX = !required ? '.*' : EMAIL_PATTERN;
+  let EMAIL_REGEX = '';
+  let label = '';
 
-  // LABEL: Email (Optional) / Email
-  const label = !required ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
+  $: {
+    required = !$isOptionalEmail;
+    EMAIL_REGEX = !required ? '.*' : EMAIL_PATTERN;
+
+    // LABEL: Email (Optional) / Email
+    label = !required ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
+  }
 
   // Form Validation for email - specifically for 1cc
   let validationText: string | null;

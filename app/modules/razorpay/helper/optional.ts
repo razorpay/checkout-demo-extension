@@ -55,9 +55,13 @@ export function isContactHidden() {
 }
 
 export function isEmailHidden() {
-  const isEmailHiddenFromPreference = !getPreferences(
-    'features.show_email_on_checkout'
-  );
+  const { isOrgRazorpay } = getOrgDetails() || {};
+  const isEmailHiddenFromPreference =
+    !getPreferences('features.show_email_on_checkout') &&
+    isIndianCurrency() &&
+    !isOneClickCheckout() &&
+    isOrgRazorpay;
+
   const isEmailHiddenFromOption = getMerchantOption('hidden.email');
   const isEmailHidden =
     typeof isEmailHiddenFromOption === 'boolean'
