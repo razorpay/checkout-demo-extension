@@ -8,6 +8,10 @@ export interface Context {
   has_saved_cards: boolean;
 }
 
+export interface Tags {
+  merchant_url: string;
+}
+
 export interface StackFrame {
   function?: string;
   filename?: string;

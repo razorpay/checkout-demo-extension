@@ -4,6 +4,7 @@ import { isOneClickCheckout } from 'razorpay';
 import { SENTRY_CONFIG } from './constants';
 import { uuid4 } from 'common/uuid';
 import { getContext } from './context';
+import { getTags } from './tags';
 import { exceptionFromError } from './parser';
 
 const ERROR_TRACKING_URLS = [
@@ -62,6 +63,7 @@ export function captureError(error: Error) {
         // its possible we don't get enough data for context if error trigger before preference completion
         checkout: getContext(),
       },
+      tags: getTags(),
     };
 
     fetch.post({

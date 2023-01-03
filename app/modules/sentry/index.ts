@@ -1,4 +1,5 @@
 import { setContext } from './context';
+import { setTags } from './tags';
 import { SENTRY_CONFIG } from './constants';
 import { isOneClickCheckout } from 'razorpay';
 import type { Exception } from './interfaces';
@@ -40,6 +41,7 @@ function initSentry() {
       },
     });
     setContext();
+    setTags();
   } catch (e) {
     //e
   }
