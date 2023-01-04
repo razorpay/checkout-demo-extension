@@ -11,7 +11,7 @@
   import AddressWidget from 'one_click_checkout/coupons/ui/components/AddressWidget.svelte';
   import OrderWidget from 'one_click_checkout/coupons/ui/components/OrderWidget.svelte';
   import GstinForm from 'one_click_checkout/gstin/ui/GstinForm.svelte';
-  import CTA, { CTAState } from 'cta';
+  import CTA from 'cta';
   import ShippingMethods from 'one_click_checkout/coupons/ui/components/ShippingMethods.svelte';
   import TruecallerNotification from 'truecaller/ui/components/TruecallerNotification.svelte';
 
@@ -70,6 +70,7 @@
     merchantAnalytics,
     moengageAnalytics,
   } from 'one_click_checkout/merchant-analytics';
+  import { addMoengageUser } from 'one_click_checkout/merchant-analytics/helpers';
   import {
     CATEGORIES,
     ACTIONS,
@@ -148,6 +149,10 @@
       contact: $contact,
       email: $email,
     });
+
+    // everytime the contact changes, user has to go through L0 page
+    addMoengageUser($selectedAddress?.name);
+
     if (!isUserLoggedIn() && $isIndianCustomer) {
       updateOrderWithCustomerDetails();
       onSubmitLogoutUser();
@@ -229,7 +234,7 @@
         $isBillingSameAsShipping,
     });
 
-    if ($selectedAddressId !== null) {
+    if ($selectedAddressId) {
       const {
         name,
         formattedLine1,

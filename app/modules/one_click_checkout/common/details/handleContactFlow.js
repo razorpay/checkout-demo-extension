@@ -6,6 +6,8 @@ import { get } from 'svelte/store';
 import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
 import { setCustomerConsentStatus } from 'one_click_checkout/customer/controller';
+import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
+import { MOENGAGE_ACTIONS } from 'one_click_checkout/merchant-analytics/constant';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -28,9 +30,12 @@ export const handleContactFlow = (prevContact) => {
      * to trigger the reactive blocks in home/index.svelte that set the method blocks
      * based on customer details.
      */
-    prevCustomer.logout(false, () =>
-      customer.set(getCustomerByContact(get(contact)))
-    );
+    prevCustomer.logout(false, () => {
+      moengageAnalytics({
+        actionType: MOENGAGE_ACTIONS.DESTROY_SESSION,
+      });
+      customer.set(getCustomerByContact(get(contact)));
+    });
   }
   return true;
 };

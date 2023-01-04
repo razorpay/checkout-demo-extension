@@ -15,6 +15,7 @@
   // analytics imports
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
+  import { addMoengageUser } from 'one_click_checkout/merchant-analytics/helpers';
 
   // store imports
   import {
@@ -264,6 +265,7 @@
         eventData: $moengageEventsData,
       });
     }
+    addMoengageUser($selectedAddress?.name);
     const shippingMethods =
       $selectedAddress.shipping_methods ||
       getServiceabilityCache($selectedAddress.zipcode)?.shipping_methods;

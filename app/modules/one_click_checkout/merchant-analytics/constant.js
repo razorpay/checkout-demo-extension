@@ -45,3 +45,11 @@ export const MOENGAGE_EVENTS = {
   PAYMENT_METHOD_SELECTED: 'Payment_Method_Selected_MAGIC',
   PAYMENT_COMPLETED: 'Payment_Complete_MAGIC',
 };
+
+export const MOENGAGE_ACTIONS = {
+  ADD_USER: 'add_unique_user_id',
+  DESTROY_SESSION: 'destroy_session',
+  ADD_MOBILE: 'add_mobile',
+  ADD_EMAIL: 'add_email',
+  ADD_USERNAME: 'add_user_name',
+};

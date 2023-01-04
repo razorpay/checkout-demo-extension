@@ -37,7 +37,11 @@ import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 import CouponEvents from 'one_click_checkout/coupons/analytics';
 import OneCCEvents from 'one_click_checkout/analytics';
-import { MAGIC_FUNNEL } from 'one_click_checkout/merchant-analytics/constant';
+import {
+  MAGIC_FUNNEL,
+  MOENGAGE_ACTIONS,
+} from 'one_click_checkout/merchant-analytics/constant';
+import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
 import { emitMagicFunnelEvent } from 'one_click_checkout/merchant-analytics/MagicFunnel';
 
 // service imports
@@ -164,6 +168,9 @@ export function handleEditContact(logoutFlow = false) {
     isEditContactFlow.set(false);
     resetOrder(true);
     params.initialize = true;
+    moengageAnalytics({
+      actionType: MOENGAGE_ACTIONS.DESTROY_SESSION,
+    });
   } else {
     isEditContactFlow.set(true);
   }

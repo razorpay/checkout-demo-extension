@@ -54,12 +54,13 @@ export function merchantFBStandardAnalytics(data) {
 }
 
 export function moengageAnalytics(data) {
-  if (isOneClickCheckout() && isMoEngageAnalyticsEnabled()) {
-    Razorpay.sendMessage({
-      event: 'moengageevent',
-      data,
-    });
+  if (!isOneClickCheckout() || !isMoEngageAnalyticsEnabled()) {
+    return;
   }
+  Razorpay.sendMessage({
+    event: 'moengageevent',
+    data,
+  });
 }
 
 export function generateInitialMoengagePayload(data) {

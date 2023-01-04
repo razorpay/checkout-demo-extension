@@ -524,9 +524,15 @@ CheckoutFrame.prototype = {
   },
 
   onmoengageevent: function (data) {
-    const { eventData = {}, eventName } = data;
-    if (typeof window.Moengage?.track_event === 'function') {
+    const { eventData = {}, eventName, actionType, value } = data;
+    if (typeof window.Moengage?.track_event === 'function' && !actionType) {
       window.Moengage.track_event(eventName, eventData);
+      return;
+    }
+
+    if (actionType && typeof window.Moengage?.[actionType] === 'function') {
+      window.Moengage[actionType](value);
+      return;
     }
   },
 
