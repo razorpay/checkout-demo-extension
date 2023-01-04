@@ -1,20 +1,22 @@
+import type { PaymentData, LastOTPSent } from 'common/types/types';
+
 const OTP_EXPIRES_AFTER = {
   razorpay: 30000, // API expires an OTP after 5 minutes
-};
+} as const;
 
 const OTP_LIMIT = {
   razorpay: 4, // One OTP sent + 3 retries
-};
+} as const;
 
 const OTPS_SENT = {
   razorpay: 0,
 };
 
-const LAST_OTP_SENT_AT = {
+const LAST_OTP_SENT_AT: LastOTPSent = {
   razorpay: undefined,
 };
 
-const PAYMENT_DATA = {};
+const PAYMENT_DATA: PaymentData = {};
 
 /**
  * Marks the sending of an OTP.
@@ -22,17 +24,19 @@ const PAYMENT_DATA = {};
  *
  * @returns {boolean} Whether or not any more OTPs can be sent.
  */
-export const markOtpSent = (provider) => {
+export const markOtpSent = (provider: string) => {
   if (!provider) {
     return;
   }
 
   const now = Date.now();
 
-  const lastSentAt = LAST_OTP_SENT_AT[provider];
-  const expiresAfter = OTP_EXPIRES_AFTER[provider];
-  const otpLimit = OTP_LIMIT[provider] || Infinity;
-  let otpsSent = OTPS_SENT[provider] || 0;
+  const lastSentAt =
+    LAST_OTP_SENT_AT[provider as keyof typeof LAST_OTP_SENT_AT];
+  const expiresAfter =
+    OTP_EXPIRES_AFTER[provider as keyof typeof OTP_EXPIRES_AFTER];
+  const otpLimit = OTP_LIMIT[provider as keyof typeof OTP_LIMIT] || Infinity;
+  let otpsSent = OTPS_SENT[provider as keyof typeof OTPS_SENT] || 0;
 
   // Has the OTP expired by now?
   let hasOtpExpired = false;
@@ -47,8 +51,8 @@ export const markOtpSent = (provider) => {
     otpsSent++;
   }
 
-  OTPS_SENT[provider] = otpsSent;
-  LAST_OTP_SENT_AT[provider] = now;
+  OTPS_SENT[provider as keyof typeof OTPS_SENT] = otpsSent;
+  LAST_OTP_SENT_AT[provider as keyof typeof LAST_OTP_SENT_AT] = now;
 
   return otpsSent < otpLimit;
 };
@@ -59,17 +63,19 @@ export const markOtpSent = (provider) => {
  *
  * @returns {boolean}
  */
-export const canSendOtp = (provider) => {
+export const canSendOtp = (provider: string) => {
   if (!provider) {
     return;
   }
 
   const now = Date.now();
 
-  const lastSentAt = LAST_OTP_SENT_AT[provider];
-  const expiresAfter = OTP_EXPIRES_AFTER[provider];
-  const otpLimit = OTP_LIMIT[provider] || Infinity;
-  let otpsSent = OTPS_SENT[provider] || 0;
+  const lastSentAt =
+    LAST_OTP_SENT_AT[provider as keyof typeof LAST_OTP_SENT_AT];
+  const expiresAfter =
+    OTP_EXPIRES_AFTER[provider as keyof typeof OTP_EXPIRES_AFTER];
+  const otpLimit = OTP_LIMIT[provider as keyof typeof OTP_LIMIT] || Infinity;
+  const otpsSent = OTPS_SENT[provider as keyof typeof OTPS_SENT] || 0;
 
   // Has the OTP expired by now?
   let hasOtpExpired = false;
@@ -92,13 +98,13 @@ export const canSendOtp = (provider) => {
  * Resets the OTP count for the provider.
  * @param {string} provider
  */
-export const resetCount = (provider) => {
+export const resetCount = (provider: string) => {
   if (!provider) {
     return;
   }
 
-  OTPS_SENT[provider] = 0;
-  LAST_OTP_SENT_AT[provider] = undefined;
+  OTPS_SENT[provider as keyof typeof OTPS_SENT] = 0;
+  LAST_OTP_SENT_AT[provider as keyof typeof LAST_OTP_SENT_AT] = undefined;
 };
 
 /**
@@ -107,12 +113,12 @@ export const resetCount = (provider) => {
  *
  * @returns {number} count
  */
-export const getCount = (provider) => {
+export const getCount = (provider: string) => {
   if (!provider) {
     return 0;
   }
 
-  return OTPS_SENT[provider] || 0;
+  return OTPS_SENT[provider as keyof typeof OTPS_SENT] || 0;
 };
 
 /**
@@ -120,7 +126,7 @@ export const getCount = (provider) => {
  * @param {string} payment_id
  * @param {Object} data
  */
-export const setPaymentData = (payment_id, data = {}) => {
+export const setPaymentData = (payment_id: string, data = {}) => {
   if (!payment_id) {
     return;
   }
@@ -135,7 +141,7 @@ export const setPaymentData = (payment_id, data = {}) => {
  * @param {string} payment_id
  * @returns {*}
  */
-export const getPaymentData = (payment_id) => {
+export const getPaymentData = (payment_id: string) => {
   if (payment_id) {
     return PAYMENT_DATA[payment_id];
   }

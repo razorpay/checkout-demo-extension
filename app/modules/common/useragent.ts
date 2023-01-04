@@ -1,11 +1,11 @@
 const ua = navigator.userAgent;
 const vendor = navigator.vendor;
 
-export function check(ua_regex) {
+export function check(ua_regex: RegExp) {
   return ua_regex.test(ua);
 }
 
-export function checkVendor(regex) {
+export function checkVendor(regex: RegExp) {
   return regex.test(vendor);
 }
 
@@ -63,7 +63,7 @@ export const shouldRedirect =
   check(/Android 4/);
 
 export const shouldFixFixed = check(/iPhone/);
-let chromeVersion = ua.match(/Chrome\/(\d+)/);
+let chromeVersion: RegExpMatchArray | null | number = ua.match(/Chrome\/(\d+)/);
 if (chromeVersion) {
   chromeVersion = parseInt(chromeVersion[1], 10);
 }

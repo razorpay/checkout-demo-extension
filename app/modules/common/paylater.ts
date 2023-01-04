@@ -1,48 +1,15 @@
-import RazorpayConfig from 'common/RazorpayConfig';
 import * as ErrorService from 'error-service';
 import * as ObjectUtils from 'utils/object';
-
-const cdnUrl = RazorpayConfig.cdn;
-
-const prefix = cdnUrl + 'paylater/';
-const sqPrefix = cdnUrl + 'paylater-sq/';
-
-const config = {
-  epaylater: {
-    name: 'ePayLater',
-    display_name: 'ePayLater',
-  },
-  getsimpl: {
-    name: 'Simpl',
-    display_name: 'Simpl',
-  },
-  icic: {
-    name: 'ICICI Bank PayLater',
-    display_name: 'ICICI',
-  },
-  hdfc: {
-    name: 'FlexiPay by HDFC Bank',
-    display_name: 'FlexiPay',
-  },
-  lazypay: {
-    name: 'LazyPay',
-    display_name: 'LazyPay',
-  },
-  kkbk: {
-    name: 'kkbk',
-    display_name: 'Kotak Mahindra Bank',
-  },
-};
-
-// Order in which the paylater providers should come
-const PAYLATER_ORDER = [
-  'getsimpl',
-  'lazypay',
-  'icic',
-  'hdfc',
-  'epaylater',
-  'kkbk',
-];
+import {
+  config,
+  prefix,
+  sqPrefix,
+  PAYLATER_ORDER,
+  defaultConfig,
+} from 'ui/tabs/paylater/constants';
+import type { ErrorParam } from 'error-service/types';
+import type { PaylaterUpdatedConfig } from 'common/types/types';
+import type { Provider } from 'ui/tabs/paylater/types';
 
 /**
  * Create an provider object for rendering on PayLater screen.
@@ -51,7 +18,7 @@ const PAYLATER_ORDER = [
  *
  * @return {Object}
  */
-export const createProvider = (code, title) => {
+export const createProvider = (code: Provider, title: string) => {
   return {
     data: {
       code,
@@ -59,11 +26,6 @@ export const createProvider = (code, title) => {
     icon: 'https://cdn.razorpay.com/paylater-sq/' + code + '.svg',
     title,
   };
-};
-
-// Generate provider config
-const defaultConfig = {
-  min_amount: 300000,
 };
 
 const providers = ObjectUtils.map(config, (details, code) => {
@@ -79,7 +41,7 @@ const providers = ObjectUtils.map(config, (details, code) => {
   );
 });
 
-export const getProvider = (code) => providers[code];
+export const getProvider = (code: Provider) => providers[code];
 
 /**
  * Extends the config of the given with the updated config
@@ -88,7 +50,10 @@ export const getProvider = (code) => providers[code];
  *
  * @return {Object} New config of the provider
  */
-export const extendConfig = (provider, updatedConfig) => {
+export const extendConfig = (
+  provider: Provider,
+  updatedConfig: PaylaterUpdatedConfig
+) => {
   if (!providers[provider]) {
     return;
   }
@@ -103,12 +68,12 @@ export const extendConfig = (provider, updatedConfig) => {
  * @param {string} provider
  * @returns {string}
  */
-export const getImageUrl = (provider) => {
+export const getImageUrl = (provider: Provider): string => {
   try {
     const { logo } = getProvider(provider);
     return logo;
   } catch (error) {
-    ErrorService.capture(error, {
+    ErrorService.capture(error as ErrorParam, {
       severity: ErrorService.SEVERITY_LEVELS.S3,
     });
     return '';
@@ -121,13 +86,13 @@ export const getImageUrl = (provider) => {
  * @param {Array<string>} providers
  * @returns {Array<string>}
  */
-export const getPayLaterProvidersDisplayNames = (providers) => {
+export const getPayLaterProvidersDisplayNames = (providers: Provider[]) => {
   try {
     return PAYLATER_ORDER.filter((provider) =>
       providers.includes(provider)
     ).map((provider) => getProvider(provider)?.display_name);
   } catch (error) {
-    ErrorService.capture(error, {
+    ErrorService.capture(error as ErrorParam, {
       severity: ErrorService.SEVERITY_LEVELS.S3,
     });
     const defaultProviders = providers.map((p) => getProvider(p)?.display_name);

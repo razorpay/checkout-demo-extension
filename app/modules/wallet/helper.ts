@@ -2,6 +2,7 @@ import { getWallets } from 'checkoutstore/methods';
 import { ajaxRouteNotSupported } from 'common/useragent';
 import { getPreferences, getOption } from 'razorpay';
 import { isPowerWallet } from 'common/wallet';
+import type { WalletCode } from 'wallet/types';
 
 /*
  * Return true `dynamic_wallet_flow` flag is enabled in preferences and ajax route is supported.
@@ -42,7 +43,7 @@ export function validateAndFetchPrefilledWallet(): string {
  * @param code wallet code
  * @returns boolean
  */
-export function showPowerWallet(code: string): boolean {
+export function showPowerWallet(code: WalletCode): boolean {
   return !(
     getPreferences('dynamic_wallet_flow') &&
     ajaxRouteNotSupported &&

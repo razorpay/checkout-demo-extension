@@ -1,32 +1,13 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import * as ObjectUtils from 'utils/object';
 import * as Bridge from 'bridge';
+import type { Wallet, WalletCode } from 'wallet/types';
+import { list } from 'wallet/constants';
 
 const cdnUrl = RazorpayConfig.cdn;
 
 const prefix = cdnUrl + 'wallet/';
 const sqPrefix = cdnUrl + 'wallet-sq/';
-
-const list = {
-  // mpesa: ['Vodafone mPesa', 50],
-  airtelmoney: ['Airtel Money', 32],
-  amazonpay: ['Amazon Pay', 28],
-  citrus: ['Citrus Wallet', 32],
-  freecharge: ['Freecharge', 18],
-  jiomoney: ['JioMoney', 68],
-  mobikwik: ['Mobikwik', 20],
-  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
-  paypal: ['PayPal', 20],
-  paytm: ['Paytm', 18],
-  payumoney: ['PayUMoney', 18],
-  payzapp: ['PayZapp', 24],
-  phonepe: ['PhonePe', 20],
-  sbibuddy: ['SBI Buddy', 22],
-  zeta: ['Zeta', 25],
-  citibankrewards: ['Citibank Reward Points', 20],
-  itzcash: ['Itz Cash', 20],
-  paycash: ['PayCash', 20],
-};
 
 /**
  * Order to sort the wallets in
@@ -41,7 +22,7 @@ const WALLET_SORT_ORDER = [
   'jiomoney',
   'paytm',
   'paypal',
-];
+] as const;
 
 /**
  * Returns a sorted list of wallets
@@ -49,7 +30,11 @@ const WALLET_SORT_ORDER = [
  *
  * @returns {Array<Wallet>}
  */
-export function getSortedWallets(wallets) {
+export function getSortedWallets(
+  wallets: Array<
+    Omit<Wallet, 'code'> & { code: typeof WALLET_SORT_ORDER[number] }
+  >
+) {
   return wallets.sort((a, b) => {
     const containsA = WALLET_SORT_ORDER.includes(a.code);
     const containsB = WALLET_SORT_ORDER.includes(b.code);
@@ -71,7 +56,7 @@ export function getSortedWallets(wallets) {
 
 const powerWallets = ['mobikwik', 'freecharge', 'payumoney'];
 
-export const wallets = ObjectUtils.map(list, (details, code) => ({
+export const wallets = ObjectUtils.map(list, (details, code: WalletCode) => ({
   power: powerWallets.indexOf(code) !== -1,
   name: details[0],
   h: details[1],
@@ -80,8 +65,9 @@ export const wallets = ObjectUtils.map(list, (details, code) => ({
   sqLogo: sqPrefix + code + '.png',
 }));
 
-export const isPowerWallet = (code) => wallets[code] && wallets[code].power;
-export const getWallet = (code) => wallets[code];
+export const isPowerWallet = (code: WalletCode) =>
+  wallets[code] && wallets[code].power;
+export const getWallet = (code: WalletCode) => wallets[code];
 
 const walletToIntent = {
   phonepe: 'com.phonepe.app',
@@ -93,7 +79,8 @@ const walletToIntent = {
  *
  * @returns {string}
  */
-export const getPackageNameForWallet = (wallet) => walletToIntent[wallet];
+export const getPackageNameForWallet = (wallet: string) =>
+  walletToIntent[wallet as keyof typeof walletToIntent];
 
 /**
  * We want to turn some wallets into intent.
@@ -102,7 +89,7 @@ export const getPackageNameForWallet = (wallet) => walletToIntent[wallet];
  *
  * @returns {boolean}
  */
-export const shouldTurnWalletToIntent = (wallet, apps = []) => {
+export const shouldTurnWalletToIntent = (wallet: string, apps = []) => {
   /**
    * On iOS, PhonePe exists but doesn't support intent on wallet.
    * Do not allow intent in this case.
@@ -121,7 +108,9 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
   const walletPackage = getPackageNameForWallet(wallet);
 
   if (walletPackage) {
-    return apps.some((app) => app.package_name === walletPackage);
+    return apps.some(
+      (app: UPI.AppConfiguration) => app.package_name === walletPackage
+    );
   }
 
   return false;
