@@ -148,7 +148,9 @@
   onMount(() => {
     if (phoneField && isMobile() && !truecallerLoginEnabled) {
       setTimeout(() => {
-        phoneField.focus();
+        if (typeof phoneField?.focus === 'function') {
+          phoneField.focus();
+        }
       });
     }
   });
