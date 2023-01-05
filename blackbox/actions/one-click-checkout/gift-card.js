@@ -113,14 +113,14 @@ async function handleRemoveGC(context, giftCardNumber) {
   await delay(4000);
 }
 
+async function handleRemoveSingleGC(context) {
+  await handleRemoveGC(context);
+}
+
 async function handleRmvMultipleGC(context) {
   for (const { giftCardNumber } of giftCardList) {
     await handleRemoveGC(context, giftCardNumber);
   }
-}
-
-async function handleRemoveSingleGC(context) {
-  await handleRemoveGC(context);
 }
 
 async function checkCODDisabled(context) {
@@ -180,7 +180,6 @@ async function handleGiftCard(context, features) {
     await handleApplyMultipleGC(context);
     await handleRmvMultipleGC(context);
     await handleApplyCouponReq(context, restrictCoupon);
-    await handleApplyMultipleGC(context);
   }
   if (restrictCOD) {
     await checkCODDisabled(context);

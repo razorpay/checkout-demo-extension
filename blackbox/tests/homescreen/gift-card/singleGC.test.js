@@ -1,7 +1,7 @@
 const createAddressTest = require('../../../create/one-click-checkout/address');
 const addresses = require('../../../data/one-click-checkout/addresses.json');
 
-// Test case: Apply multiple Gift card with Net banking.
+// Test case: Apply Single Gift card with different payment methods
 createAddressTest({
   amount: 200 * 100,
   shippingFee: 50 * 100,
@@ -13,5 +13,5 @@ createAddressTest({
   isCODEligible: false,
   addLandmark: true,
   addresses,
-  multipleGC: true,
+  singleGC: true,
 });
