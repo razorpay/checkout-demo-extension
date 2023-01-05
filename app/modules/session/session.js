@@ -793,26 +793,32 @@ function successHandler(response) {
   }
   updateScore('paymentSuccess');
 
+  // sending oncomplete event because CheckoutBridge.oncomplete
+
+  function completeCheckoutFlow() {
+    Razorpay.sendMessage({ event: 'complete', data: response });
+    moengageAnalytics({
+      eventName: MOENGAGE_EVENTS.PAYMENT_COMPLETED,
+      eventData: {
+        ...storeGetter(moengageEventsData),
+        'Payment Complete': true,
+      },
+    });
+    this.hide();
+  }
   const postSuccessFlow = () => {
-    this.clearRequest();
-    // prevent dismiss event
-    this.modal.options.onhide = UTILS.returnAsIs;
+    try {
+      this.clearRequest();
+      if (this.modal && this.modal.options) {
+        // prevent dismiss event
+        this.modal.options.onhide = UTILS.returnAsIs;
+      }
 
-    // sending oncomplete event because CheckoutBridge.oncomplete
-
-    function completeCheckoutFlow() {
-      Razorpay.sendMessage({ event: 'complete', data: response });
-      moengageAnalytics({
-        eventName: MOENGAGE_EVENTS.PAYMENT_COMPLETED,
-        eventData: {
-          ...storeGetter(moengageEventsData),
-          'Payment Complete': true,
-        },
-      });
-      this.hide();
+      this.hideOverlayMessage();
+      completeCheckoutFlow.call(this);
+    } catch (e) {
+      //
     }
-    this.hideOverlayMessage();
-    completeCheckoutFlow.call(this);
   };
 
   if (isEmailHidden() && RazorpayHelper.isRedesignV15()) {
@@ -821,7 +827,7 @@ function successHandler(response) {
       response,
       requestPayload: this.payload,
     }).then(postSuccessFlow);
-    // show intermediate screen as promise after 10 second continue the flow
+    // show intermediate screen as promise after 5 second continue the flow
   } else {
     postSuccessFlow();
   }
