@@ -4,31 +4,32 @@ import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 
 import {
-  isPayout,
-  isInternational,
-  isASubscription,
-  getAmount,
-  getMerchantOrder,
-  getMerchantOrderDueAmount,
-  getOption,
-  getPreferences,
-  hasFeature,
-  getCallbackUrl,
-  getMerchantOrderAmount,
-  getOrderMethod,
-  getMerchantMethods,
-  getRecurringMethods,
-  isRecurring,
-  isIRCTC,
-  isCustomerFeeBearer,
-  isPartialPayment,
-  isOneClickCheckout,
-  getOrderId,
-  isSubscription,
-  isRecurringQRIntentExperimentEnabled,
   isEmiV2,
-  reusePaymentIdExperimentEnabled,
+  isIRCTC,
+  isPayout,
+  getAmount,
+  getOption,
+  hasFeature,
+  getOrderId,
+  isRecurring,
+  getPreferences,
+  getCallbackUrl,
+  getOrderMethod,
+  isSubscription,
+  isASubscription,
+  isInternational,
+  isPartialPayment,
+  getMerchantOrder,
   getMerchantOption,
+  getMerchantMethods,
+  isOneClickCheckout,
+  isCustomerFeeBearer,
+  getRecurringMethods,
+  getMerchantOrderAmount,
+  getMerchantOrderDueAmount,
+  isRecurringQRExperimentEnabled,
+  reusePaymentIdExperimentEnabled,
+  isRecurringIntentExperimentEnabled,
 } from 'razorpay';
 
 import {
@@ -576,7 +577,7 @@ const UPI_METHODS = {
       const shouldEnableQROnRecurring =
         shouldEnableQR &&
         getRecurringMethods()?.upi &&
-        isRecurringQRIntentExperimentEnabled();
+        isRecurringQRExperimentEnabled();
 
       if (isSubscription()) {
         return isASubscription('upi') && shouldEnableQROnRecurring;
@@ -595,7 +596,7 @@ const UPI_METHODS = {
 
     if (isRecurring()) {
       const shouldEnableIntentOnRecurring =
-        shouldEnableIntent && isRecurringQRIntentExperimentEnabled();
+        shouldEnableIntent && isRecurringIntentExperimentEnabled();
       if (isSubscription()) {
         return isASubscription('upi') && shouldEnableIntentOnRecurring;
       }

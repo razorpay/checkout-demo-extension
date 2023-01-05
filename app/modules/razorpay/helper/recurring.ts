@@ -44,13 +44,36 @@ export function isASubscription(method = null): boolean {
 }
 
 export const isMethodRestrictionEnabledForMerchant = () => {
-  return RECURRING_METHOD_RESTRICTION_KEYS.includes(getKey());
+  // After experiment rollout remove the hardcoded check
+  const isMerchantKeyPresent = RECURRING_METHOD_RESTRICTION_KEYS.includes(
+    getKey()
+  );
+  const isExperimentEnabled = getPreferences(
+    'experiments.recurring_payment_method_configuration'
+  );
+  return isExperimentEnabled || isMerchantKeyPresent;
 };
 
 // Autopay QR/Intent experiment
-export const isRecurringQRIntentExperimentEnabled = () => {
+// This Experiment is splited into two separate experiments,
+// Post those rollout recurring_upi_intent_qr will be deprecated
+const isRecurringQRIntentExperimentEnabled = () => {
   const allow = getPreferences('experiments.recurring_upi_intent_qr');
   return allow;
+};
+
+// Autopay Intent experiment
+export const isRecurringIntentExperimentEnabled = () => {
+  const isExperimentEnabled = getPreferences(
+    'experiments.recurring_upi_intent'
+  );
+  return isExperimentEnabled || isRecurringQRIntentExperimentEnabled();
+};
+
+// Autopay QR experiment
+export const isRecurringQRExperimentEnabled = () => {
+  const isExperimentEnabled = getPreferences('experiments.recurring_upi_qr');
+  return isExperimentEnabled || isRecurringQRIntentExperimentEnabled();
 };
 
 // Enables available PSP's on autopay intent if experiment is enabled
