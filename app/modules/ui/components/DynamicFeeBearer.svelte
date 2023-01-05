@@ -28,7 +28,7 @@
   let label: string;
   let showFeeDetails = false;
   let timeout: ReturnType<typeof setTimeout>;
-  export let autoTooltip = true;
+  export let fromHeader = false;
 
   const handleHideTooltip = () => {
     timeout ? clearTimeout(timeout) : null;
@@ -45,10 +45,10 @@
   onMount(() => {
     if (isDynamicFeeBearer() && !$showFeeBearerToolTip) {
       setMerchantMessage();
-      if (autoTooltip) {
+      if (!fromHeader) {
         triggerToolTip();
+        $showFeeBearerToolTip = true;
       }
-      $showFeeBearerToolTip = true;
     }
   });
 
@@ -105,10 +105,11 @@
       <span class="fee">Fee</span>
     {/if}
     <Tooltip
-      className={`dynamic-fee-tooltip ${
+      className={`dynamic-fee-tooltip ${fromHeader ? 'from-header' : ''} ${
         isRedesignV15Enabled ? 'checkout-redesign' : ''
       }`}
       align={isRedesignV15Enabled ? ['top', 'right'] : ['bottom', 'left']}
+      autoAlign={!fromHeader}
       shown={showFeeDetails}
     >
       <div>
@@ -155,7 +156,7 @@
   </span>
 </div>
 
-<style>
+<style lang="scss">
   .dynamic-label {
     float: right;
   }
@@ -208,6 +209,14 @@
     right: unset;
     width: 225px;
     background-color: #363636;
+  }
+
+  :global(.dynamic-fee-tooltip.tooltip.from-header) {
+    transform: translate(-50%, -80%);
+
+    &::before {
+      left: 50%;
+    }
   }
 
   :global(.checkout-redesign.tooltip.tooltip-top.tooltip-right) {

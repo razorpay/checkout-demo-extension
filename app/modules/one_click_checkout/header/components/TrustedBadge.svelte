@@ -93,17 +93,21 @@
     align-items: center;
   }
 
+  .rtb-expanded-wrapper :global(svg) {
+    height: 8px;
+    width: 8px;
+  }
+
   .full-screen-header {
     padding: 6px;
 
     .rtb-text {
       font-size: 11px;
     }
-  }
-
-  .rtb-expanded-wrapper :global(svg) {
-    height: 8px;
-    width: 8px;
+    :global(svg) {
+      height: 12px;
+      width: 12px;
+    }
   }
 
   .rtb-text {

@@ -123,6 +123,7 @@ export const COLORS = {
   TEXT_COLOR_BLACK: 'rgba(0, 0, 0, 0.85)',
   TEXT_COLOR_WHITE: '#FFFFFF',
   MAGIC_BRAND_COLOR: '#005bf2',
+  RAZORPAY_LOGO_COLOR: '#0C2651',
 };
 
 export const INDIA_COUNTRY_ISO_CODE = 'IN';

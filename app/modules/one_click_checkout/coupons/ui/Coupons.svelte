@@ -393,6 +393,7 @@
     showAmount
     label={CTA_LABEL}
     onSubmit={handleOnSubmit}
+    handleDisableState={false}
     {onViewDetailsClick}
   />
 </Screen>

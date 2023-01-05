@@ -208,6 +208,7 @@
   import { P13NTracker } from 'misc/analytics/events';
   import { isCustomerWithIntlPhone } from 'helper/international';
   import { patchCustomerEmail } from 'checkoutframe/customer/service';
+  import type { Props } from 'types/svelte';
 
   import { handlep13nUpiIntent } from 'upi/helper/p13n';
 
@@ -1302,19 +1303,11 @@
   let onPaymentDetailSubmit: () => void;
   let paymentDetailInvalid = false;
 
-  let CTAState: {
-    disabled: boolean;
-    label: string;
-    onViewDetailsClick?: () => void;
-    onSubmit?: () => void;
-    showAmount: boolean;
-    labelData?: Record<string, string>;
-    variant: 'disabled' | '';
-  } = {
+  let CTAState: Props<CTA> = {
     disabled: true,
     label: '',
     onSubmit: undefined,
-    showAmount: true,
+    showAmount: false,
     variant: '',
   };
 
@@ -1323,19 +1316,19 @@
       if (view !== HOME_VIEWS.DETAILS) {
         CTAState.onSubmit = undefined;
         CTAState.showAmount = true;
+        CTAState.variant = '';
         CTAState.disabled = isRedesignV15Enabled ? ctaV15Disabled : false;
-        if (selectedMethod) {
+        if (selectedMethod && isOneClickCheckout()) {
           CTAState.variant = '';
           CTAState.disabled = false;
-        } else {
-          if (isOneClickCheckout()) {
-            default1ccCTAState();
-          }
+        } else if (isOneClickCheckout()) {
+          default1ccCTAState();
         }
         CTAState.label =
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
       } else if (view === HOME_VIEWS.DETAILS) {
-        CTAState.showAmount = isPartialPayment || tpv;
+        CTAState.showAmount = Boolean(isPartialPayment || tpv);
+        CTAState.variant = 'shadowless';
         CTAState.onSubmit = onPaymentDetailSubmit;
         if (singleMethod) {
           const { label, labelData } = showPayViaSingleMethod(
@@ -1347,7 +1340,7 @@
           CTAState.label =
             !isOneCCEnabled && !isPartialPayment ? CTA_PROCEED : CTA_LABEL;
         }
-        CTAState.disabled = paymentDetailInvalid;
+        CTAState.disabled = false;
       }
       if (!getAmount()) {
         CTAState.label = AUTHENTICATE;

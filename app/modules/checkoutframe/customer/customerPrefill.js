@@ -103,7 +103,7 @@ export const isNameReadOnly = () =>
   getOption('readonly.name') && getOption('prefill.name');
 
 export function isContactReadOnly() {
-  return getOption('readonly.contact') && getPrefilledContact();
+  return Boolean(getOption('readonly.contact') && getPrefilledContact());
 }
 export function isEmailReadOnly() {
   return getOption('readonly.email') && getPrefilledEmail();

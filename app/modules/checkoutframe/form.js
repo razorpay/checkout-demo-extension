@@ -1,12 +1,19 @@
 import * as _El from 'utils/DOM';
 import { querySelector } from 'utils/doc';
 
-export const shake = () => {
-  const modal = querySelector('#modal-inner');
-  if (modal) {
-    _El.removeClass(modal, 'shake');
-    _El.offsetWidth(modal); // force reflow
-    _El.addClass(modal, 'shake');
+export const shake = (selector = '#modal-inner', animation = 'shake') => {
+  try {
+    const modal = querySelector(selector);
+    if (modal) {
+      _El.removeClass(modal, animation);
+      _El.offsetWidth(modal); // force reflow
+      _El.addClass(modal, animation);
+      setTimeout(() => {
+        _El.removeClass(modal, animation);
+      }, 400);
+    }
+  } catch (e) {
+    // No need to capture as no impact in UI
   }
 
   try {

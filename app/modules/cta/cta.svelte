@@ -1,11 +1,13 @@
 <script lang="ts">
   import { Events } from 'analytics';
+  import { shake as shakeForm } from 'checkoutframe/form';
   import CTAStore from './store';
   import CTAEvents from 'cta/analytics';
   import { getCurrentScreen } from 'one_click_checkout/analytics/helpers';
   import { getSession } from 'sessionmanager';
   import { showSummaryModal } from 'summary_modal';
   import { PAY_NOW_CTA_LABEL } from './i18n';
+  import type { CTAVariant } from './types';
 
   // Fake CTA
   export let screen: string | string[] = 'default';
@@ -15,7 +17,8 @@
   export let label = PAY_NOW_CTA_LABEL;
   export let labelData = {};
   export let showAmount = true;
-  export let variant: 'disabled' | '' = '';
+  export let handleDisableState = true;
+  export let variant: CTAVariant = '';
 
   function defaultCTAAction(e?: Event) {
     const session = getSession();
@@ -32,6 +35,15 @@
   export let onSubmit: (...args: any) => void = defaultCTAAction;
   export let onViewDetailsClick: () => void = defaultOnViewDetailsClick;
 
+  function handleSubmit(...args: any) {
+    if (handleDisableState && disabled) {
+      shakeForm('#redesign-v15-cta', 'x-shake');
+      return;
+    }
+    const submitAction = onSubmit || defaultCTAAction;
+    submitAction(...args);
+  }
+
   let key: string[] = [];
   $: {
     let tempScreen = !Array.isArray(screen) ? [screen] : screen;
@@ -47,12 +59,12 @@
   $: {
     CTAStore.setState(
       {
-        disabled,
+        disabled: handleDisableState ? false : disabled,
         show,
         showAmount,
         label: label || PAY_NOW_CTA_LABEL,
         variant,
-        onSubmit: onSubmit || defaultCTAAction,
+        onSubmit: handleSubmit,
         onViewDetailsClick: onViewDetailsClick || defaultOnViewDetailsClick,
         labelData,
       },

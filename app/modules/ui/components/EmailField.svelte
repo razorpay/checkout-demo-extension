@@ -48,14 +48,15 @@
   let validationText: string | null;
   export let showValidations = false;
 
-  const debouncedValidator = debounce((email) => {
-    validateEmail(email).then((isValid) => {
-      validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
-      $isEmailValid = isValid;
-    });
-  }, 200);
+  const debouncedValidator: (email: string, showValidation: boolean) => void =
+    debounce((email: string, showValidation) => {
+      validateEmail(email).then((isValid) => {
+        validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
+        $isEmailValid = showValidation ? isValid : true;
+      });
+    }, 200);
 
-  $: debouncedValidator(value);
+  $: debouncedValidator(value, showValidations);
 </script>
 
 <div>
@@ -75,7 +76,7 @@
     helpText={$t(EMAIL_HELP_TEXT)}
     autocomplete={isOneClickCheckout() ? 'email' : 'off'}
     {validationText}
-    {showValidations}
+    bind:showValidations
     attributes={{ ...autotest('email') }}
   />
   <!-- LABEL: Please enter a valid email. Example: you@example.com -->

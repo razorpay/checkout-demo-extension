@@ -93,7 +93,8 @@ describe('Test DynamicCurrencyConversion main component', () => {
 
     expect(getByText('USD')).toBeInTheDocument();
     expect(getByText('CAD')).toBeInTheDocument();
-    expect(getByText('$ 1')).toBeInTheDocument();
+    expect(getByText('$')).toBeInTheDocument();
+    expect(getByText('1')).toBeInTheDocument();
   });
   test('should failed to fetch currencies and update events', async () => {
     // send response for fetchCurrencies api

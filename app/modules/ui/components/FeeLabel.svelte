@@ -17,6 +17,7 @@
   } from 'razorpay';
 
   import { clickOutside } from 'one_click_checkout/helper';
+  import { HEADER_SIZE, fullScreenHeader } from 'header/store';
 
   const FEE_BEARER_VIEW_TIME = 4000;
   const isFeeBearer = isCustomerFeeBearer();
@@ -26,7 +27,7 @@
   let timeout: ReturnType<typeof setTimeout>;
 
   export let visible = false;
-  export let autoTooltip = true;
+  export let fromHeader = false;
   function triggerToolTip() {
     timeout ? clearTimeout(timeout) : null;
     showFeeDetails = true;
@@ -46,7 +47,7 @@
       isRedesignV15Enabled &&
       !isDynamicFeeBearer() &&
       !$showFeeBearerToolTip &&
-      autoTooltip
+      !fromHeader
     ) {
       triggerToolTip();
     }
@@ -58,15 +59,15 @@
 {#if isFeeBearer}
   {#if $showFeeLabel}
     {#if isDynamicFeeBearer()}
-      <DynamicFeeBearer {autoTooltip} />
+      <DynamicFeeBearer {fromHeader} />
     {:else}
       <div class="label" use:clickOutside on:click_outside={handleHideTooltip}>
         <span on:click={triggerToolTip} class="fee-helper has-tooltip">
           <span class="fee">+Fee</span>
           <Tooltip
-            className={`fee-tooltip ${
-              isRedesignV15Enabled ? 'checkout-redesign' : ''
-            }`}
+            className={`fee-tooltip${fromHeader ? ' from-header' : ''}${
+              $fullScreenHeader === HEADER_SIZE.MEDIUM ? ' medium-header' : ''
+            } ${isRedesignV15Enabled ? 'checkout-redesign' : ''}`}
             align={isRedesignV15Enabled ? ['top', 'right'] : ['bottom']}
             shown={showFeeDetails}
           >
@@ -96,6 +97,18 @@
   }
   .fee-helper {
     cursor: pointer;
+  }
+
+  :global(.fee-tooltip.tooltip.tooltip-top.tooltip-right.from-header:not(.medium-header)) {
+    transform: translateX(-43%) translateY(-100%);
+    max-width: 260px;
+
+    &::before {
+      left: 50%;
+    }
+  }
+  :global(.fee-tooltip.tooltip.tooltip-top.tooltip-right.medium-header) {
+    max-width: 260px;
   }
 
   :global(.fee-tooltip.tooltip.tooltip-bottom) {

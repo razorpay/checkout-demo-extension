@@ -1,6 +1,10 @@
 import Header from 'header/ui/Header.svelte';
 import { setHeaderBack } from './sessionInterface';
-import { fullScreenHeader } from './store';
+import {
+  fullScreenHeader,
+  getContactScreenInputCount,
+  headerVisible,
+} from './store';
 
 let header: Header | undefined;
 
@@ -24,6 +28,7 @@ export function showHeader(onBack: () => void) {
     header = undefined;
   }
   create();
+  headerVisible.set(true);
   if (header) {
     (header as Header).$on('goback', onBack);
   }
@@ -37,8 +42,9 @@ export function destroyHeader() {
   if (!header) {
     return;
   }
+  headerVisible.set(false);
   header.$destroy();
   header = undefined;
 }
 
-export { fullScreenHeader };
+export { fullScreenHeader, getContactScreenInputCount };

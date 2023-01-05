@@ -1,6 +1,6 @@
 <script lang="ts">
   // Utils
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import * as _ from 'utils/_';
 
   // UI imports
@@ -33,7 +33,6 @@
   import { isContactValid } from 'one_click_checkout/common/details/store';
   import autotest from 'autotest';
   import { getIndErrLabel } from 'one_click_checkout/helper';
-  import { isMobile } from 'common/useragent';
   import {
     COUNTRY_CONFIG,
     COUNTRY_TO_PHONE_CODE_MAP,
@@ -44,15 +43,15 @@
   } from 'truecaller';
 
   // Refs
-  let countryField;
-  let phoneField: HTMLInputElement;
+  let countryField: Field;
+  let phoneField: Field;
 
   // Props
-  export let country;
-  export let phone;
-  export let isOptional;
+  export let country: string;
+  export let phone: string;
+  export let isOptional: boolean;
   export let inAddress = false;
-  export let validationText;
+  export let validationText: string | null;
   export let showValidations = false;
   export let showTruecallerIcon = false;
 
@@ -114,7 +113,7 @@
     searchModalOpen = false;
   }
 
-  function downArrowHandler(event) {
+  function downArrowHandler(event: KeyboardEvent) {
     const DOWN_ARROW = 40;
     const key = _.getKeyFromEvent(event);
 
@@ -123,7 +122,7 @@
     }
   }
 
-  function openCountryCodeModal(event) {
+  function openCountryCodeModal(event: Event) {
     // Don't open the modal if contact is readonly
     if (isContactReadOnly()) {
       return;
@@ -145,17 +144,7 @@
     }
   }
 
-  onMount(() => {
-    if (phoneField && isMobile() && !truecallerLoginEnabled) {
-      setTimeout(() => {
-        if (typeof phoneField?.focus === 'function') {
-          phoneField.focus();
-        }
-      });
-    }
-  });
-
-  function validateContact(country, phone) {
+  function validateContact(country: string, phone: string) {
     const merchantCountryCode = getPreferences('merchant_country');
     if (country === INDIA_COUNTRY_CODE) {
       return !INDIAN_CONTACT_REGEX_WITH_ZERO.test(phone)
@@ -173,7 +162,7 @@
   }
 
   $: validationText = validateContact(country, phone);
-  $: $isContactValid = !validationText;
+  $: $isContactValid = showValidations ? !validationText : true;
 
   $: {
     if (inAddress && phoneField) {
@@ -249,7 +238,7 @@
       ? 'contact-validation-error'
       : ''}
     {validationText}
-    {showValidations}
+    bind:showValidations
     attributes={{ ...autotest('contact') }}
     {showTruecallerIcon}
   />

@@ -280,7 +280,7 @@ exports.devServer = (buildArgs) => ({
     devMiddleware: {
       writeToDisk: true,
     },
-    allowedHosts: 'localhost',
+    allowedHosts: 'all',
     static: {
       directory: path.resolve(__dirname, 'app'),
     },

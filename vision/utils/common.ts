@@ -1,33 +1,51 @@
-import { get } from '../../app/modules/utils/object';
-import type { Context } from '../core/types';
+import { Page, expect } from '@playwright/test';
+import type { Config } from '@playwright/test';
+import type { UtilFunction } from '../core/types';
 
-export function getPreferences(context: Context, path: string) {
-  const preference = context.apiResponse?.preferences;
-  return get(preference || {}, path);
-}
+/**
+ * helper must have UtilFunction type
+ */
 
-export function getOption(context: Context, path: string) {
-  const options = context.options || {};
-  return get(options || {}, path);
-}
+/**
+ *
+ * Redesign Footer CTA click
+ */
+export const clickCTA: UtilFunction = async ({ page }) => {
+  await page.click('#redesign-v15-cta');
+};
 
-export function isIndianCurrency(context: Context) {
-  const merchantBaseCurrency =
-    getPreferences(context, 'merchant_currency') || 'INR';
-  // if option currency is INR
-  // or if option currency is not defined then we pick merchant base currency
-  return (
-    getOption(context, 'currency') === 'INR' ||
-    (!getOption(context, 'currency') && merchantBaseCurrency === 'INR')
+/**
+ * Function needed to be call from L0 screen to nativate to particular method screen L1
+ */
+export const openMethodFromL0: UtilFunction<string> = async ({
+  page,
+  inputData,
+}) => {
+  if (inputData) {
+    await page.click(`button[method="${inputData}"]`);
+    await page.waitForTimeout(1000);
+  }
+};
+
+/**
+ * Match Screenshot
+ */
+export const matchScreenshot: UtilFunction<{
+  screenshotArgument?: Parameters<Page['screenshot']>[0];
+  matchScreenShortArgument?: Pick<
+    NonNullable<Config['expect']>,
+    'toMatchSnapshot'
+  >['toMatchSnapshot'];
+}> = async ({ page, inputData }) => {
+  await page.waitForTimeout(1000);
+  expect(await page.screenshot(inputData?.screenshotArgument)).toMatchSnapshot(
+    inputData?.matchScreenShortArgument
   );
-}
+};
 
-export const hasCart = (context: Context) =>
-  getOption(context, 'cart') && getOption(context, 'shopify_cart');
-
-// Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
-export const isOneClickCheckout = (context: Context) =>
-  Boolean(
-    (getPreferences(context, 'order.line_items_total') || hasCart(context)) &&
-      getPreferences(context, 'features.one_click_checkout')
-  );
+export const handleFeeBearerDialog: UtilFunction = async (utilData) => {
+  // fee-bearer
+  const { page } = utilData;
+  await matchScreenshot(utilData as Parameters<typeof matchScreenshot>[0]);
+  await page.click('.fee-bearer .btn');
+};

@@ -5,7 +5,7 @@ import {
   getPreferences,
   isIndianCurrency,
   isOneClickCheckout,
-} from '../utils/common';
+} from '../helpers/common';
 
 /**
  * helper must have UtilFunction type

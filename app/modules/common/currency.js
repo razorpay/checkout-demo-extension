@@ -1316,11 +1316,11 @@ export function formatAmountWithSymbol(amount, currency, space = true) {
   );
 }
 
-export function formatAmountWithSymbolRawHtml(amount, currency) {
+export function formatAmountWithSymbolRawHtml(amount, currency, space = true) {
   const config = getCurrencyConfig(currency);
-  return `<span dir="${config.dir || 'ltr'}">${
+  return `<span dir="${config.dir || 'ltr'}"><span class="currency-symbol">${
     displayCurrencies[currency]
-  } ${formatAmount(amount, currency)}</span>`;
+  }</span>${space ? ' ' : ''}${formatAmount(amount, currency)}</span>`;
 }
 
 export function displayAmount(

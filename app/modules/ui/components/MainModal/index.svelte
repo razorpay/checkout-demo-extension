@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { isMobile } from 'common/useragent';
+  import { isMobile, isMediumScreen } from 'common/useragent';
   import RazorpayStore, {
     getOption,
     isRedesignV15,
@@ -13,6 +13,8 @@
     getEMIBanks,
     getSingleMethod,
   } from 'checkoutstore/methods';
+  import { RTBExperiment } from 'rtb/store';
+  import { isRTBEnabled as RTBEnabled } from 'rtb/helper';
   import { getAmount, disableAnimation, bringInputIntoView } from './helper';
   import { returnAsIs } from 'lib/utils';
   import { getStore, MainCTA as CTA } from 'cta';
@@ -27,25 +29,69 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
-  import { fullScreenHeader } from 'header';
+  import { fullScreenHeader, getContactScreenInputCount } from 'header';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
-  import { offerFade } from 'header/store';
+  import {
+    HEADER_SIZE,
+    offerFade,
+    headerVisible as checkoutHeaderVisible,
+    bodyHeight,
+  } from 'header/store';
+  import { isMobileStore } from 'checkoutstore';
   import { showBottomElement } from 'checkoutstore';
+  import {
+    isContactValid,
+    isEmailValid,
+  } from 'one_click_checkout/common/details/store';
+  import { country } from 'checkoutstore/screens/home';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const ctaStore = getStore();
+  const isRTBEnabled = RTBEnabled($RTBExperiment);
   const noanim = disableAnimation();
   const isOneCC = isOneClickCheckout();
   const isLiveMode = RazorpayStore.razorpayInstance.isLiveMode();
   const isRedesignV15Enabled = isRedesignV15();
   let mobileDevice = isMobile();
+  let mediumScreenDevice = isMediumScreen();
   const orderMethod = getSingleMethod();
   export let onClose: any = returnAsIs;
   export let escape = true;
 
+  let bottomContainer: HTMLDivElement;
+  let bodyElement: HTMLDivElement;
+
   $: offerClasses = $computeOfferClass;
+
+  const FIELD_HEIGHT = 70;
+  const ERROR_MESSAGE_HEIGHT = 25;
+  const MEDIUM_HEADER_HEIGHT = '150px';
+
+  let fullScreenHeaderHeight = 'auto';
+  let baseHeight = 100;
+  $: {
+    if ($fullScreenHeader && $country) {
+      let initialBodyHeight = baseHeight;
+      // check for error state
+      if (!$isContactValid) {
+        initialBodyHeight += ERROR_MESSAGE_HEIGHT;
+      }
+      if (!$isEmailValid) {
+        initialBodyHeight += ERROR_MESSAGE_HEIGHT;
+      }
+      if (bottomContainer?.offsetHeight) {
+        initialBodyHeight += (bottomContainer?.offsetHeight || 0) + 10;
+      }
+
+      $bodyHeight = initialBodyHeight;
+      fullScreenHeaderHeight =
+        $fullScreenHeader === HEADER_SIZE.MEDIUM
+          ? MEDIUM_HEADER_HEIGHT
+          : `calc(100% - ${initialBodyHeight}px)`;
+    }
+  }
 
   function handleKeyInput(e: KeyboardEvent) {
     if ((e.which || e.keyCode) === 27) {
@@ -57,6 +103,8 @@
 
   function handleResize() {
     mobileDevice = isMobile();
+    mediumScreenDevice = isMediumScreen();
+    isMobileStore.set(mobileDevice);
     bringInputIntoView();
   }
 
@@ -67,6 +115,14 @@
   }
 
   onMount(() => {
+    /**
+     * (getContactScreenInputCount() - 1) * FIELD_HEIGHT = we are subtract one from field heigh as min height of body can contain one field atleast
+     * -10 is for reduce padding b/w body content and cta
+     */
+    baseHeight =
+      bodyElement?.offsetHeight -
+      10 +
+      (getContactScreenInputCount() - 1) * FIELD_HEIGHT;
     clearOldExperiments();
     window.addEventListener('resize', handleResize);
     if (escape) {
@@ -114,6 +170,7 @@
   class="mfix"
   class:redesign={isRedesignV15Enabled}
   class:mobile={mobileDevice}
+  class:medium-screen={mediumScreenDevice}
   class:irctc={isIRCTC()}
   class:test={!isLiveMode}
   class:notopbar={getOption('theme.hide_topbar')}
@@ -128,6 +185,7 @@
     class="mchild"
     class:full-height={!isEmbedded()}
     class:one-cc={isRedesignV15Enabled}
+    class:checkout-flow={isRedesignV15Enabled && !isOneCC}
     class:one-click-checkout={isOneCC}
   >
     <div id="modal-inner">
@@ -161,8 +219,13 @@
         {#if isRedesignV15Enabled}
           <div
             id="redesign-header"
+            class:no-rtb={!isRTBEnabled}
+            class:hidden={!$checkoutHeaderVisible}
             class:offers-fade={$offerFade}
             class:full-screen-header={$fullScreenHeader}
+            style={$fullScreenHeader
+              ? `max-height: ${fullScreenHeaderHeight}`
+              : ''}
           >
             <div id="header-redesign-v15-wrap" />
             <div id="topbar-redesign-v15-wrap" />
@@ -212,6 +275,7 @@
         <div
           id="body"
           class="sub"
+          bind:this={bodyElement}
           class:one-cc-screen={handleOneCCScreenHeight()}
         >
           <div id="topbar-wrap" />
@@ -233,7 +297,11 @@
                 />
               {/if}
             </div>
-            <div id="bottom" class:hidden={!$showBottomElement} />
+            <div
+              id="bottom"
+              bind:this={bottomContainer}
+              class:hidden={!$showBottomElement}
+            />
 
             {#if isRedesignV15Enabled}
               <OneCCLoader />
@@ -278,19 +346,41 @@
     min-height: auto;
   }
 
-  #redesign-header.full-screen-header {
-    height: calc(100% - 12px);
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: flex-end;
-    box-shadow: 2px 2px 30px rgba(107, 108, 109, 0.1);
-    z-index: 0;
+  :global(.mobile) .checkout-flow #redesign-header {
+    border-radius: 0;
+  }
 
-    color: var(--text-color);
-    background: var(--primary-color);
+  .checkout-flow {
+    #redesign-header {
+      border-radius: 8px;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      max-height: 80px;
+      min-height: fit-content;
+      height: 80px;
+      transition: all 0.5s;
+      background: var(--primary-color);
 
-    #header-redesign-v15-wrap {
-      height: 100%;
+      &.no-rtb {
+        height: 68px;
+      }
+    }
+
+    #redesign-header.full-screen-header {
+      height: calc(100% - 12px);
+      overflow: hidden;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: flex-end;
+      box-shadow: 2px 2px 30px rgba(107, 108, 109, 0.1);
+      z-index: 0;
+      color: var(--text-color);
+      background: var(--primary-color);
+
+      #header-redesign-v15-wrap {
+        height: 100%;
+      }
     }
   }
 

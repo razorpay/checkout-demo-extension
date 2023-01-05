@@ -74,13 +74,20 @@ export const androidBrowser = android && (chromeVersion || firefox); // Chrome o
 export const mobileQuery =
   '(max-device-height: 485px),(max-device-width: 485px)';
 
+// Medium screen query b/w 485 & 991px
+export const mediumScreenQuery = '(max-device-width: 991px)';
+
+export const matchMediaQuery = (query: string) => {
+  return global.matchMedia ? global.matchMedia(query)?.matches : true;
+};
+
 /**
  * This method works on device width and height to determine is mobile or not
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia Reference}
  * @returns {boolean}
  */
 export const isMobileByMediaQuery = () => {
-  return global.matchMedia ? global.matchMedia(mobileQuery)?.matches : true;
+  return matchMediaQuery(mobileQuery);
 };
 
 /**
@@ -96,6 +103,21 @@ export const isMobile = () => {
     (global.innerWidth && global.innerWidth < 485) ||
     shouldFixFixed ||
     isMobileByMediaQuery()
+  );
+};
+
+/**
+ * Says whether or not we're on medium screen or not i.e. b/w mobile and large screen
+ *
+ * This is a function instead of a constant because
+ * Firefox gives innerWidth as 0 on page load.
+ *
+ * @returns {boolean}
+ */
+export const isMediumScreen = () => {
+  return (
+    (global.innerWidth && global.innerWidth > 485 && global.innerWidth < 991) ||
+    (!isMobileByMediaQuery() && matchMediaQuery(mediumScreenQuery))
   );
 };
 

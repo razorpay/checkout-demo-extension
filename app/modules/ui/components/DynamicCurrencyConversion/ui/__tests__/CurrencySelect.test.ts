@@ -60,7 +60,8 @@ describe('Test DCC CurrencySelect component', () => {
       props: { ...componentProps, selectedCurrency: 'EUR' },
     });
     expect(getByText('Pay in EUR')).toBeInTheDocument();
-    expect(getByText('€ 1.09')).toBeInTheDocument();
+    expect(getByText(`€`)).toBeInTheDocument();
+    expect(getByText(`1.09`)).toBeInTheDocument();
   });
   test('should render other currency if selected currency is not in display currencies and show markup', () => {
     const { getByText, container } = render(CurrencySelect, {

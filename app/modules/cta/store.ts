@@ -1,17 +1,6 @@
 import { get, Writable, writable } from 'svelte/store';
 import { getAmount, getCurrency } from 'razorpay';
-
-export type CTAState = {
-  showAmount?: boolean;
-  showAmountVariant?: 'loading' | '';
-  show?: boolean;
-  label?: string;
-  disabled?: boolean;
-  labelData?: Record<string, string>;
-  variant?: 'disabled' | '';
-  onSubmit?: (...args: any) => void;
-  onViewDetailsClick?: () => void;
-};
+import type { CTAState } from './types';
 
 class CTAStore {
   store: Writable<{

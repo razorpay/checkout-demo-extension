@@ -124,6 +124,14 @@ for $i in (1..4) {
   animation-timing-function: ease-in-out;
 }
 
+.x-shake {
+  transform-origin: center;
+  animation-name: horizontalShake;
+  animation-duration: 400ms;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
 @keyframes shake {
   0% {
     transform: none;
@@ -150,6 +158,32 @@ for $i in (1..4) {
   }
 }
 
+@keyframes horizontalShake {
+  0% {
+    transform: none;
+  }
+
+  12.5% {
+    transform: translateX(-6px);
+  }
+
+  37.5% {
+    transform: translateX(5px);
+  }
+
+  62.5% {
+    transform: translateX(-3px);
+  }
+
+  87.5% {
+    transform: translateX(2px);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
 @keyframes instrument-skeleton {
   0% {
     transform: translateX(-100%);
@@ -159,3 +193,14 @@ for $i in (1..4) {
     transform: translateX(100%);
   }
 }
+
+[data-flip='invert'] {
+    transform: translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px)) scale(var(--dw), var(--dh));
+    transition-property: font-size;
+    transition-duration: 0.5s;
+  }
+[data-flip='play'] {
+    transform: none;
+    transition-property: transform, font-size;
+    transition-duration: 0.5s;
+  }

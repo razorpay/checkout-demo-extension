@@ -1,6 +1,7 @@
 <script lang="ts">
   // Utils imports
   import { isMethodEnabled } from 'checkoutstore/methods';
+  import { fullScreenHeader } from 'header';
   import { isRedesignV15 } from 'razorpay';
   import { isTopBarHidden } from 'topbar';
 
@@ -30,6 +31,7 @@
     class:resetMargin
     class:tab-content-one-cc={isRedesignV15()}
     class:no-top-bar={isTopBarHidden()}
+    class:overflow-hidden={$fullScreenHeader}
   >
     <slot />
   </div>
@@ -44,7 +46,11 @@
     margin-top: 0px;
   }
 
-  .no-top-bar{
+  .overflow-hidden {
+    overflow: hidden;
+  }
+
+  .no-top-bar {
     padding-top: 0px !important;
   }
 

@@ -13,12 +13,14 @@ test.describe('UPI QR V2 API', () => {
     await util.openCheckout({
       options,
     });
-    await page.waitForTimeout(200);
-    expect(await page.screenshot()).toMatchSnapshot({
-      maxDiffPixelRatio: 0.02,
-    }); // due to loading animation (screenshot might change)
+    await page.waitForTimeout(1000);
+    await util.matchScreenshot({
+      matchScreenShortArgument: {
+        maxDiffPixelRatio: 0.02,
+      },
+    }); // maxDiffPixelRatio due to loading animation (screenshot might change)
     await page.waitForTimeout(6000);
-    expect(await page.screenshot()).toMatchSnapshot();
+    await util.matchScreenshot();
 
     // 6 sec interval
     util.updateContext({
@@ -52,8 +54,8 @@ test.describe('UPI QR V2 API', () => {
     await util.openCheckout({
       options,
     });
-    await page.waitForTimeout(4000);
-    expect(await page.screenshot()).toMatchSnapshot();
+    await page.waitForTimeout(3500);
+    await util.matchScreenshot();
   });
 
   test('UPI QR V2 API - experiment disable', async ({ page, util }) => {
@@ -79,7 +81,7 @@ test.describe('UPI QR V2 API', () => {
     await util.openCheckout({
       options,
     });
-    await page.waitForTimeout(4000);
-    expect(await page.screenshot()).toMatchSnapshot();
+    await page.waitForTimeout(3500);
+    await util.matchScreenshot();
   });
 });

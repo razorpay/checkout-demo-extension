@@ -1,8 +1,7 @@
-import { screenStore } from 'checkoutstore';
+import { isMobileStore, screenStore } from 'checkoutstore';
 import { getTPV } from 'checkoutstore/methods';
-import { homeView, country } from 'checkoutstore/screens/home';
-import { isMobile } from 'common/useragent';
-import { INDIA_COUNTRY_CODE } from 'common/constants';
+import { homeView } from 'checkoutstore/screens/home';
+import { isMediumScreen } from 'common/useragent';
 import {
   isAddressEnabled,
   isContactHidden,
@@ -12,20 +11,46 @@ import {
 import { derived, writable } from 'svelte/store';
 import { HOME_VIEWS } from 'ui/tabs/home/constants';
 
+export enum HEADER_SIZE {
+  MINIMAL,
+  FULL_SCREEN,
+  MEDIUM,
+}
+
+/**
+ * It will be set true when any field from Field component is touched/focused.
+ */
+export const anyFieldTouched = writable(false);
+
+/**
+ * Used to store body height
+ */
+export const bodyHeight = writable<number>(0);
+
+export const headerVisible = writable(true);
+
 export const fullScreenHeader = derived(
-  [screenStore, homeView, country],
-  ([$screenStore, $homeView, $country]) => {
-    return (
-      $country === INDIA_COUNTRY_CODE &&
-      !isMobile() &&
+  [screenStore, homeView, isMobileStore, anyFieldTouched, bodyHeight],
+  (
+    [$screenStore, $homeView, $isMobileStore, $anyFieldTouched, $bodyHeight],
+    set
+  ) => {
+    const showFullScreen =
       $screenStore === '' &&
       $homeView === HOME_VIEWS.DETAILS &&
-      getContactScreenInputCount() === 1
-    );
+      getContactScreenInputCount() <= 2;
+    if (
+      ($anyFieldTouched && $isMobileStore) ||
+      $bodyHeight > (isMediumScreen() ? 300 : 340)
+    ) {
+      set(showFullScreen ? HEADER_SIZE.MEDIUM : HEADER_SIZE.MINIMAL);
+    } else {
+      set(showFullScreen ? HEADER_SIZE.FULL_SCREEN : HEADER_SIZE.MINIMAL);
+    }
   }
 );
 
-function getContactScreenInputCount() {
+export function getContactScreenInputCount(): number {
   const tpv = getTPV();
   return (
     Number(!isContactHidden()) +

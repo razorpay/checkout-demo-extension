@@ -2,6 +2,7 @@ import NetBanking from 'ui/tabs/netbanking/index.svelte';
 import { render } from '@testing-library/svelte';
 
 jest.mock('razorpay', () => ({
+  ...jest.requireActual('razorpay'),
   isRedesignV15: jest.fn(() => true),
   subscribe: jest.fn(() => {}),
   isOneClickCheckout: jest.fn(() => {}),
@@ -12,6 +13,7 @@ jest.mock('razorpay', () => ({
   isCAW: jest.fn(() => {}),
   hasMerchantPolicy: jest.fn(() => {}),
   getOption: jest.fn(() => {}),
+  getMerchantOrder: jest.fn(),
 }));
 
 jest.mock('one_click_checkout/sessionInterface', () => {

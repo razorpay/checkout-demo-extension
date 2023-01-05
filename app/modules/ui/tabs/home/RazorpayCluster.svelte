@@ -30,7 +30,7 @@
 
   onMount(() => {
     block.instruments?.forEach((item) => {
-      genericMethodShown(item?.method );
+      genericMethodShown(item?.method);
     });
   });
 

@@ -1,6 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
-import { displayAmount, formatAmountWithSymbol } from 'common/currency';
+import { displayAmount, formatAmountWithSymbolRawHtml } from 'common/currency';
 import {
   isOneClickCheckout,
   isCustomerFeeBearer,
@@ -325,14 +325,22 @@ export function showCtaWithDefaultText() {
   showCta();
 }
 
+/**
+ * get Amount shown in CTA
+ * @param {boolean} space whether to add space b/w currency symbol or not
+ * @return {string} html formatted Amount shown in footer with currency symbol
+ */
 export function getCTAAmount(space = false): string {
   const store = get(CTAHelper.store);
-  return (
-    store.rawAmount ||
-    formatAmountWithSymbol(
-      store.amount || getAmount(),
-      store.currency || getCurrency() || 'INR',
-      space
-    )
+  const formatAmount = formatAmountWithSymbolRawHtml(
+    store.amount || getAmount(),
+    store.currency || getCurrency() || 'INR',
+    space
   );
+  let rawAmount = store.rawAmount;
+  const tempRawAmount = rawAmount?.split(' ');
+  if (tempRawAmount && tempRawAmount.length > 1) {
+    rawAmount = `<span class="currency-symbol">${tempRawAmount[0]}</span> ${tempRawAmount[1]}`;
+  }
+  return rawAmount || formatAmount;
 }

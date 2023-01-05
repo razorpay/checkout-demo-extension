@@ -24,12 +24,13 @@
   } from 'actions/input';
   import { showAccountTab } from 'checkoutstore';
   import { createEventDispatcher, onMount } from 'svelte';
+  import { anyFieldTouched } from 'header/store';
 
   // Props
   export let id = '';
   export let type = 'text';
   export let name;
-  export let value = null;
+  export let value: string | null = null;
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
@@ -223,6 +224,7 @@
     focused = true;
     getPrediction();
     $showAccountTab = false;
+    anyFieldTouched.set(true);
   }
 
   function handleInputBlur(event) {

@@ -4,7 +4,8 @@
   import { CTA_LABEL, VIEW_DETAILS_LABEL } from 'cta/i18n';
 
   // helpers/store imports
-  import CTAStore, { CTAState } from 'cta/store';
+  import type { CTAState } from 'cta/types';
+  import CTAStore from 'cta/store';
   import {
     getAmount,
     getCurrency,
@@ -72,6 +73,7 @@
 
 <div
   class="cta-container"
+  class:no-shadow={state.variant === 'shadowless'}
   class:hidden={!state.show}
   class:with-amount={state.showAmount}
   class:reduce-amount-size={reduceAmountSize}
@@ -255,6 +257,9 @@
     .cta-container {
       padding: 10px 14px;
       box-shadow: 0px -10px 10px rgba(23, 26, 30, 0.15);
+    }
+    .cta-container.no-shadow {
+      box-shadow: none;
     }
     :global(.cta-btn),
     #redesign-v15-cta {

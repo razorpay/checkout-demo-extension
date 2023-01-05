@@ -388,6 +388,7 @@
     label={CTA_LABEL}
     variant={disabled ? 'disabled' : ''}
     showAmount
+    handleDisableState={false}
     {onSubmit}
   />
 </div>

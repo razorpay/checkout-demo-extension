@@ -332,7 +332,7 @@ async function checkInvalidOTP(context) {
   await assertVisible('[data-test-id=otp-error-msg]');
   expect(
     await context.page.$eval('#redesign-v15-cta', (el) => el.disabled)
-  ).toBe(true);
+  ).toBe(false);
 }
 
 async function checkSkipOTPHidden() {

@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises';
 import { Page } from '@playwright/test';
 import { checkoutPublic } from '../constant';
 import type { RouterType, UtilFunction } from './types';
-import * as helperFunctions from '../helper';
+import * as helperFunctions from '../utils';
 
 type Object<T = any> = { [x: string]: T };
 

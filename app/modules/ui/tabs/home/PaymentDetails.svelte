@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
 
   // UI imports
+  import { shake as shakeForm } from 'checkoutframe/form';
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import Address from 'ui/elements/Address.svelte';
   import MultiTpvOptions from 'ui/elements/MultiTpvOptions.svelte';
@@ -261,8 +262,12 @@
   const showAddress = isAddressEnabled() && !isPartialPayment();
 
   export function onSubmitClick() {
-    if (!CONTACT_REGEX.test($contact) && !isContactOptional()) {
+    if (
+      !$isContactValid ||
+      (!CONTACT_REGEX.test($contact) && !isContactOptional())
+    ) {
       showValidations = true;
+      shakeForm('#redesign-v15-cta', 'x-shake');
       return;
     }
 
@@ -281,6 +286,7 @@
         return;
       }
       showValidations = true;
+      shakeForm('#redesign-v15-cta', 'x-shake');
     });
   }
 
@@ -375,7 +381,9 @@
           on:blur={handleBlurContact}
           on:input={trackContactFilled}
           on:countrySelect={handleCountrySelect}
-          {showValidations}
+          showValidations={!$phone && isContactOptional()
+            ? false
+            : showValidations}
           {validationText}
           showTruecallerIcon={shouldUpdateEmail}
         />
@@ -484,6 +492,10 @@
   }
 
   :global(.redesign) {
+    .contact-field > :global(*) {
+      margin-bottom: 14px;
+    }
+
     .details-wrapper {
       padding: 20px;
     }

@@ -16,10 +16,10 @@
     isCustomerFeeBearer,
   } from 'razorpay';
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import { showBackArrow } from 'header/store';
+  import { HEADER_SIZE, showBackArrow } from 'header/store';
   import back_arrow from 'icons/back_arrow';
   import { showFeeLabel } from 'checkoutstore/fee';
-  import { createEventDispatcher, tick } from 'svelte';
+  import { createEventDispatcher, tick, onMount } from 'svelte';
   import {
     addCardView,
     dynamicFeeObject,
@@ -33,6 +33,41 @@
   import { TOTAL_AMOUNT } from 'header/i18n/label';
   import { shouldUseVernacular } from 'checkoutstore/methods';
   import FeeLabel from 'ui/components/FeeLabel.svelte';
+  import { flip } from 'utils/animate';
+
+  let fullScreen: boolean;
+  let merchantLogo: HTMLElement;
+  let logoTitleContainer: HTMLElement;
+  let headerTitle: HTMLElement;
+  let rtb: HTMLElement;
+  let closeButton: HTMLElement;
+  let vernacularButton: HTMLElement;
+  let animate = false;
+
+  onMount(() => {
+    setTimeout(() => {
+      animate = true;
+    }, 300);
+    const unsubscribe = fullScreenHeader.subscribe((value) => {
+      if (animate) {
+        flip(() => {
+          fullScreen = value === HEADER_SIZE.FULL_SCREEN;
+        }, [
+          merchantLogo,
+          headerTitle,
+          rtb,
+          closeButton,
+          vernacularButton,
+          logoTitleContainer,
+        ]);
+        animate = true;
+      } else {
+        fullScreen = value === HEADER_SIZE.FULL_SCREEN;
+      }
+    });
+
+    return unsubscribe;
+  });
 
   function setAmount(amount: number) {
     const session = getSession();
@@ -59,71 +94,29 @@
 </script>
 
 <div
-  class:full-screen={$fullScreenHeader}
+  class:full-screen={fullScreen}
+  class:medium-header={$fullScreenHeader === HEADER_SIZE.MEDIUM}
   id="header-wrapper"
   class:dark-primary-color={$themeStore.isDarkColor}
-  class:no-rtb={!isRTBEnabled && !$fullScreenHeader}
+  class:rtb-disabled={!isRTBEnabled}
+  class:no-rtb={!isRTBEnabled && $fullScreenHeader !== HEADER_SIZE.FULL_SCREEN}
 >
-  {#if $fullScreenHeader}
-    <div class="right-section">
-      {#if getOption('theme.close_button')}
-        <button class="modal-close" on:click={handleModalClose}>
-          <Icon icon={closeIcon} />
-        </button>
-      {/if}
-      <!-- TODO migrate this component to Header -->
-      <LanguageSelection />
-    </div>
-    <div class="full-screen-header-details">
-      <div
-        id="logo"
-        class="image-frame"
-        class:merchant-initials={!merchantImage}
+  <div class="header-container">
+    <div class="left-section">
+      <span
+        class="back"
+        class:show={($showBackArrow && !getOption('theme.hide_topbar')) ||
+          getOption('theme.show_back_always')}
+        on:click={handleBackClick}
       >
-        {#if merchantImage}
-          <img src={merchantImage} alt="" />
-        {:else}
-          {name.slice(0, 1).toUpperCase()}
-        {/if}
-      </div>
-      <div class="header-title-wrapper">
-        <p title={name} class="header-title">
-          {name}
-        </p>
-        {#if isRTBEnabled}
-          <div class="rtb-expanded-section">
-            <TrustedBadge expanded fullScreenHeader />
-          </div>
-        {/if}
-      </div>
-      <div class="amount-container">
-        <div>{$t(TOTAL_AMOUNT)}</div>
-        <div class="amount">{getCTAAmount(true)}</div>
-        {#if isCustomerFeeBearer()}
-          <span class="fee-container">
-            <FeeLabel autoTooltip={false} />
-          </span>
-        {/if}
-      </div>
-    </div>
-    <div class="secured-by-message">
-      <SecuredByRazorpay withPrimaryBackground />
-    </div>
-  {:else}
-    <div class="header-container">
-      <div class="left-section">
-        <span
-          class="back"
-          class:show={($showBackArrow && !getOption('theme.hide_topbar')) ||
-            getOption('theme.show_back_always')}
-          on:click={handleBackClick}
-        >
-          <Icon icon={back_arrow($themeStore.textColor)} />
-        </span>
+        <Icon icon={back_arrow($themeStore.textColor)} />
+      </span>
+      <div class="logo-title-container" bind:this={logoTitleContainer}>
         {#if merchantImage || name}
           <div
             id="logo"
-            class:image-frame={true}
+            class="image-frame"
+            bind:this={merchantLogo}
             class:merchant-initials={!merchantImage}
           >
             {#if merchantImage}
@@ -137,32 +130,62 @@
           <p
             title={name}
             class="header-title"
+            data-avoid-width-stretch={true}
+            bind:this={headerTitle}
             class:header-title-collapse={shouldUseVernacular()}
           >
             {name}
           </p>
           {#if isRTBEnabled}
-            <div class="rtb-expanded-section">
-              <TrustedBadge expanded />
+            <div class="rtb-expanded-section" bind:this={rtb}>
+              <TrustedBadge expanded fullScreenHeader={fullScreen} />
             </div>
           {/if}
         </div>
       </div>
-      <div class="right-section">
-        {#if getOption('theme.close_button')}
-          <button class="modal-close" on:click={handleModalClose}>
-            <Icon icon={closeIcon} />
-          </button>
-        {/if}
-        <!-- TODO migrate this component to Header -->
+      {#if $fullScreenHeader}
+        <div class="amount-container">
+          <div class="total-amount">{$t(TOTAL_AMOUNT)}</div>
+          <div class="amount-fee-container">
+            <div class="amount">{@html getCTAAmount(true)}</div>
+            {#if isCustomerFeeBearer()}
+              <span class="fee-container">
+                <FeeLabel fromHeader />
+              </span>
+            {/if}
+          </div>
+        </div>
+      {/if}
+    </div>
+    <div class="right-section">
+      {#if getOption('theme.close_button')}
+        <button
+          class="modal-close"
+          bind:this={closeButton}
+          on:click={handleModalClose}
+        >
+          <Icon icon={closeIcon} />
+        </button>
+      {/if}
+      <!-- TODO migrate this component to Header -->
+      <span bind:this={vernacularButton}>
         <LanguageSelection />
-      </div>
+      </span>
+    </div>
+  </div>
+
+  {#if $fullScreenHeader}
+    <div class="secured-by-message">
+      <SecuredByRazorpay lockIcon withPrimaryBackground />
     </div>
   {/if}
 </div>
 
 <style lang="scss">
   #header-wrapper {
+    border-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     box-shadow: 0px 4px 8px rgba(23, 26, 30, 0.15);
     position: sticky;
     z-index: 2;
@@ -172,6 +195,13 @@
     align-items: center;
     background-color: var(--primary-color);
     color: var(--text-color);
+    transition: box-shadow 0.5s;
+    transition-delay: 0.5s;
+
+    &.medium-header {
+      box-shadow: none;
+    }
+
     &.full-screen {
       height: calc(100% - 8px);
       display: flex;
@@ -195,28 +225,127 @@
       }
     }
   }
-  #header-wrapper.full-screen {
-    position: relative;
-    justify-content: center;
+
+  :global(.mobile) #header-wrapper {
+    border-radius: 0;
+
     .amount-container {
       margin-top: 36px;
-      text-align: center;
+    }
+  }
+
+  .amount-container {
+    margin-top: 26px;
+    text-align: center;
+
+    .total-amount {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .amount-fee-container {
+      .amount {
+        margin-top: 4px;
+        font-size: 28px;
+        line-height: 130%;
+        opacity: 1;
+        margin-bottom: 2px;
+      }
+
+      :global(.currency-symbol) {
+        font-size: 24px;
+      }
+
       & > div {
         font-weight: var(--font-weight-medium);
         font-size: var(--font-size-body);
         color: var(--text-color);
         opacity: 0.7;
       }
+    }
+  }
+
+  #header-wrapper.medium-header {
+    box-shadow: none;
+
+    .amount-container {
+      position: absolute;
+      bottom: -98px;
+      margin: 0 !important;
+      height: 70px;
+
+      & > div {
+        text-align: left;
+      }
+
+      .amount-fee-container {
+        display: flex;
+        align-items: baseline;
+      }
+
       .amount {
-        margin-top: 4px;
-        font-size: 28px;
-        line-height: 130%;
-        opacity: 1;
+        text-align: left;
+        font-size: 24px;
       }
     }
-    .full-screen-header-details {
-      height: 65%;
-      max-height: 290px;
+
+    .secured-by-message {
+      position: absolute;
+      right: 20px;
+      bottom: -60px;
+    }
+  }
+
+  :global(.medium-screen) #header-wrapper.full-screen {
+    #logo {
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      min-height: 56px;
+      margin-right: 0;
+      &.image-frame {
+        width: 56px;
+        height: 56px;
+      }
+      &.merchant-initials {
+        line-height: 56px;
+        font-size: 26px;
+      }
+    }
+
+    .header-title {
+      font-size: 18px;
+    }
+  }
+
+  #header-wrapper.full-screen {
+    .back {
+      left: 0;
+
+      & + .logo-title-container {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  #header-wrapper.full-screen.rtb-disabled {
+    .left-section,
+    .logo-title-container {
+      max-height: 220px;
+    }
+  }
+
+  #header-wrapper.full-screen {
+    position: relative;
+    justify-content: center;
+
+    .header-container {
+      height: 100%;
+    }
+
+    .left-section,
+    .logo-title-container {
+      height: 100%;
+      max-height: 245px;
       display: flex;
       align-items: center;
       flex-direction: column;
@@ -226,6 +355,7 @@
         max-width: 344px;
         margin-top: 18px;
         justify-content: flex-start;
+        height: auto;
       }
       .rtb-expanded-section {
         margin-top: 12px;
@@ -240,19 +370,21 @@
       flex-direction: row-reverse;
       height: auto;
       width: 66px;
-      top: 25px;
-      right: 16px;
-      padding-right: 4px;
+      top: 24px;
+      right: 0;
       box-sizing: border-box;
       .modal-close {
         align-self: center;
-        padding: 0;
-        height: 14px;
+        margin-right: -6px;
+        position: relative;
+        left: 2px;
       }
     }
     #logo {
       width: 64px;
       height: 64px;
+      min-width: 64px;
+      min-height: 64px;
       margin-right: 0;
       &.image-frame {
         width: 64px;
@@ -304,7 +436,6 @@
     width: 46px;
     height: 46px;
     margin-bottom: 0;
-    transition: height 0.2s, width 0.2s, margin-left 0.4s ease;
     position: relative;
     overflow: hidden;
     img {
@@ -356,11 +487,19 @@
     align-items: center;
     border-bottom: 0;
   }
-  .left-section {
+  .left-section,
+  .logo-title-container {
+    transform: translateX(0);
     width: 100%;
     display: flex;
     align-items: center;
+    transition: transform 0.4s ease;
   }
+
+  .back.show + .logo-title-container {
+    transform: translateX(25px);
+  }
+
   .right-section {
     position: absolute;
     right: 0;
@@ -370,17 +509,16 @@
     height: 100%;
   }
   .back {
+    z-index: 2;
     max-width: 0;
     margin: 0;
     overflow: hidden;
     transform: scale(0);
     transition: transform 0.4s ease;
     &.show {
+      position: absolute;
       transform: scale(1);
       max-width: 100%;
-      & + #logo {
-        margin-left: 10px;
-      }
     }
   }
   .back :global(svg) {
@@ -420,7 +558,6 @@
 
   .header-title-wrapper {
     display: flex;
-    flex: 1;
     flex-direction: column;
     align-items: flex-start;
     width: calc(100% - 70px);
@@ -451,11 +588,26 @@
       float: unset;
 
       :global(.tooltip) {
-        left: 0px !important;
+        left: 15px !important;
       }
     }
-    :global(.tooltip) {
+
+    :global(.tooltip.fee-tooltip.from-header.tooltip-top.tooltip-right) {
       top: -5px !important;
+    }
+  }
+  .medium-header .fee-container {
+    :global(.dynamic-label .tooltip) {
+      left: 0px !important;
+    }
+    :global(.dynamic-fee-tooltip.tooltip.from-header) {
+      transform: translate(16%, -61%);
+
+      &::before {
+        left: -5px;
+        transform: rotate(0deg);
+        top: calc(100% - 20px);
+      }
     }
   }
 </style>

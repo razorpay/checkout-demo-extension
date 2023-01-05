@@ -14,6 +14,7 @@ import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import { activeRoute } from 'one_click_checkout/routing/store';
 import CTAHelper from 'cta/store';
+import { isMobile } from 'common/useragent';
 
 export const showBottomElement = writable(true);
 /** required for CTA */
@@ -23,6 +24,7 @@ export const tabStore = writable('');
  * We are hiding account when input is focus in mobile device
  */
 export const showAccountTab = writable(true);
+export const isMobileStore = writable(isMobile());
 
 function updateActiveScreen(screenStore, tabStore) {
   if (!screenStore) {
