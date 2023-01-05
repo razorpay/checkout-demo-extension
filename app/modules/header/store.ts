@@ -1,7 +1,7 @@
 import { isMobileStore, screenStore } from 'checkoutstore';
 import { getTPV } from 'checkoutstore/methods';
 import { homeView } from 'checkoutstore/screens/home';
-import { isMediumScreen } from 'common/useragent';
+import { isMediumScreen, UCBrowser, isMIBrowser } from 'common/useragent';
 import {
   isAddressEnabled,
   isContactHidden,
@@ -41,7 +41,9 @@ export const fullScreenHeader = derived(
       getContactScreenInputCount() <= 2;
     if (
       ($anyFieldTouched && $isMobileStore) ||
-      $bodyHeight > (isMediumScreen() ? 300 : 340)
+      $bodyHeight > (isMediumScreen() ? 300 : 340) ||
+      UCBrowser ||
+      isMIBrowser
     ) {
       set(showFullScreen ? HEADER_SIZE.MEDIUM : HEADER_SIZE.MINIMAL);
     } else {

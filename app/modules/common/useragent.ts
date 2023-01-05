@@ -24,6 +24,9 @@ export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 export const iosWebView = check(/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/);
 export const isWebView = AndroidWebView || iosWebView;
+export const isMIBrowser =
+  ua.indexOf(' Mi ') !== -1 || ua.indexOf('MiuiBrowser/') !== -1;
+export const UCBrowser = ua.indexOf(' UCBrowser/') !== -1;
 
 export const Instagram = check(/Instagram/);
 export const samsungBrowser = check(/SamsungBrowser/);
