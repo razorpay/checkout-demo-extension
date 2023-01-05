@@ -1,10 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
-import {
-  getCustomerCountryISOCode,
-  personalisationVersionId,
-} from 'checkoutstore/screens/home';
+import { getCustomerCountryISOCode } from 'checkoutstore/screens/home';
 import fetch from 'utils/fetch';
 import { getAmount } from 'razorpay';
 import { setRTBVariant } from 'rtb/helper';
@@ -138,9 +135,6 @@ function getInstrumentsFromApi(customer) {
     fetch({
       url,
       callback: function (response) {
-        personalisationVersionId.set(
-          response?.preferred_methods?.[customerContact]?.versionID || ''
-        );
         Analytics.track('p13n:api_data', {
           type: AnalyticsTypes.METRIC,
           data: {

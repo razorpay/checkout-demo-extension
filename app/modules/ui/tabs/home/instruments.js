@@ -5,8 +5,6 @@ import {
   sequence,
   hiddenMethods,
   hiddenInstruments,
-  personalisationVersionId,
-  contact,
 } from 'checkoutstore/screens/home';
 import { getSession } from 'sessionmanager';
 import { updateBlocksForExperiments } from './helpers';
@@ -29,9 +27,9 @@ import { getBlockTitle } from 'ui/tabs/home/helpers';
 import { locale } from 'svelte-i18n';
 import { get } from 'svelte/store';
 import { MiscTracker } from 'misc/analytics/events';
-import { getPreferences } from 'razorpay';
 import { isOneClickCheckout, showGiftCard } from 'razorpay';
 import { GIFT_CARD_BLOCK } from 'one_click_checkout/gift_card/constants';
+import { AnalyticsV2State } from 'analytics-v2';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -417,14 +415,7 @@ export function setBlocks(
     personalisation.shown =
       addPreferredInstrumentsBlock && preferredBlock.instruments?.length > 0;
 
-    const personalizationVersionId = get(personalisationVersionId);
-
-    const preferencesVersionId =
-      getPreferences()?.preferred_methods?.[get(contact) || 'default']
-        ?.versionID;
-
-    //if personalizationVersionId is set the use that otherwise use preferencesVersionId
-    personalisation.version = personalizationVersionId || preferencesVersionId;
+    personalisation.version = AnalyticsV2State.personalisationVersionId;
 
     // when personalisation API fails we are setting default personalisation version
     if (personalisation.shown && !personalisation.version) {

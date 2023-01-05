@@ -12,4 +12,6 @@ export class AnalyticsV2State {
 
   // time at which checkout was invoked
   static checkoutInvokedTime: number = Date.now();
+
+  static personalisationVersionId = '';
 }

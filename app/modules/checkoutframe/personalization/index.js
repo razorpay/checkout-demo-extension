@@ -16,6 +16,7 @@ import {
 } from './constants';
 import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
+import { AnalyticsV2State } from 'analytics-v2';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -411,6 +412,11 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
       });
     }
 
+    // setting p13n version for analyticsV2
+    if (instruments?.length) {
+      AnalyticsV2State.personalisationVersionId =
+        source === 'storage' ? 'v1' : 'v2';
+    }
     // Sort instruments by their score
     instruments.sort((a, b) =>
       a.score > b.score ? -1 : ~~(a.score < b.score)

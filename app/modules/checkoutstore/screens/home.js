@@ -152,7 +152,6 @@ export const selectedInstrument = derived(
     $instruments.find((instrument) => instrument.id === $selectedInstrumentId)
 );
 
-export const personalisationVersionId = writable('');
 /**
  * Stores the instrument for which method is opened
  */
