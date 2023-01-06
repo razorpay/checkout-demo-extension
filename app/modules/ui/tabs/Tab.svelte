@@ -12,6 +12,7 @@
   export let shown = false;
   export let hasMessage = false;
   export let resetMargin = false;
+  export let onScreenContainerElement: HTMLDivElement;
 
   // Computed
   export let methodSupported;
@@ -31,6 +32,7 @@
     class:resetMargin
     class:tab-content-one-cc={isRedesignV15()}
     class:no-top-bar={isTopBarHidden()}
+    bind:this={onScreenContainerElement}
     class:overflow-hidden={$fullScreenHeader}
   >
     <slot />

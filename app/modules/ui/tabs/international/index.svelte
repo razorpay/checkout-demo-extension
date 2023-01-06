@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, afterUpdate } from 'svelte';
   import { get } from 'svelte/store';
 
   // Store
@@ -307,72 +307,87 @@
       });
     } catch {}
   });
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<Tab method="international" pad={false} overrideMethodCheck>
+<Tab
+  method="international"
+  pad={false}
+  overrideMethodCheck
+  bind:onScreenContainerElement
+>
   <div
     class="international-wrapper"
     class:international-one-cc={isRedesignV15Enabled}
   >
-    {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
-      <div
-        class="border-list collapsable"
-        class:screen-one-cc={isRedesignV15Enabled}
-      >
-        {#each filteredProviders as provider, i (provider.code)}
-          <SlottedRadioOption
-            name={provider.code}
-            selected={$selectedInternationalProvider === provider.code}
-            align="top"
-            on:click={() => handleProviderSelect(provider)}
-          >
-            <div
-              class="title-container"
-              slot="title"
-              bind:this={providerRefs[provider.code]}
-              id={`international-radio-${provider.code}`}
+    <div bind:this={onScreenContentElement}>
+      {#if currentView === VIEWS_MAP.SELECT_PROVIDERS}
+        <div
+          class="border-list collapsable"
+          class:screen-one-cc={isRedesignV15Enabled}
+        >
+          {#each filteredProviders as provider, i (provider.code)}
+            <SlottedRadioOption
+              name={provider.code}
+              selected={$selectedInternationalProvider === provider.code}
+              align="top"
+              on:click={() => handleProviderSelect(provider)}
             >
-              <span class="title"
-                >{getAppProviderName(provider.code, $locale)}</span
+              <div
+                class="title-container"
+                slot="title"
+                bind:this={providerRefs[provider.code]}
+                id={`international-radio-${provider.code}`}
               >
-              <span class="subtitle"
-                >{getAppProviderSubtext(provider.code, $locale)}</span
-              >
-            </div>
-            <i slot="icon" class="top">
-              <Icon icon={provider.logo} />
-            </i>
-          </SlottedRadioOption>
-        {/each}
-      </div>
-    {:else if currentView === VIEWS_MAP.NVS_FORM}
-      <div id="nvsContainer" class:screen-one-cc={isRedesignV15Enabled}>
-        {#if selectedProvider}
-          <div class="nvs-provider-info">
-            <Icon icon={selectedProvider.logo} />
-            <span class="provider-name">
-              {getAppProviderName(selectedProvider.code, $locale)}
-            </span>
-          </div>
-        {/if}
-        <div class="nvs-title">
-          {$t(AVS_HEADING)}
-          <span
-            on:click={() => {
-              showNVSInfo();
-            }}><Icon icon={icons.question} /></span
-          >
+                <span class="title"
+                  >{getAppProviderName(provider.code, $locale)}</span
+                >
+                <span class="subtitle"
+                  >{getAppProviderSubtext(provider.code, $locale)}</span
+                >
+              </div>
+              <i slot="icon" class="top">
+                <Icon icon={provider.logo} />
+              </i>
+            </SlottedRadioOption>
+          {/each}
         </div>
-        <BillingAddressVerificationForm
-          {filterCountries}
-          formType={FORM_TYPE.N_AVS}
-          value={$NVSFormData}
-          bind:checkFormErrors
-          on:input={handleAVSFormInput}
-          on:blur={handleAVSFormBlur}
-        />
-      </div>
-    {/if}
+      {:else if currentView === VIEWS_MAP.NVS_FORM}
+        <div id="nvsContainer" class:screen-one-cc={isRedesignV15Enabled}>
+          {#if selectedProvider}
+            <div class="nvs-provider-info">
+              <Icon icon={selectedProvider.logo} />
+              <span class="provider-name">
+                {getAppProviderName(selectedProvider.code, $locale)}
+              </span>
+            </div>
+          {/if}
+          <div class="nvs-title">
+            {$t(AVS_HEADING)}
+            <span
+              on:click={() => {
+                showNVSInfo();
+              }}><Icon icon={icons.question} /></span
+            >
+          </div>
+          <BillingAddressVerificationForm
+            {filterCountries}
+            formType={FORM_TYPE.N_AVS}
+            value={$NVSFormData}
+            bind:checkFormErrors
+            on:input={handleAVSFormInput}
+            on:blur={handleAVSFormBlur}
+          />
+        </div>
+      {/if}
+    </div>
     <CTA
       screen="international"
       tab="international"
@@ -392,7 +407,11 @@
       {/if}
     </Bottom>
   </div>
-  <AccountTab />
+  <AccountTab
+    {onScreenContainerOpacity}
+    {onScreenContentElement}
+    {onScreenContainerElement}
+  />
 </Tab>
 
 <style lang="scss">

@@ -297,6 +297,7 @@
                 />
               {/if}
             </div>
+            <div id="toast" />
             <div
               id="bottom"
               bind:this={bottomContainer}
@@ -329,6 +330,14 @@
 </div>
 
 <style lang="scss">
+  #toast {
+    position: relative;
+  }
+  #form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
   #logo.image-frame {
     background: none;
     box-shadow: none;

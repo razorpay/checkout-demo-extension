@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterUpdate } from 'svelte';
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
@@ -74,32 +75,46 @@
       } catch {}
     }
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<Tab method="paylater" pad={false}>
+<Tab method="paylater" pad={false} bind:onScreenContainerElement>
   <div class="paylater-container">
     <div class="paylater-wrapper" class:screen-one-cc={isRedesignV15()}>
-      <input type="hidden" name="provider" />
-      <input type="hidden" name="ott" />
-      <!-- LABEL: Select an Option -->
-      <h3 class="paylater-header">{$t(SELECT_OPTION_TITLE)}</h3>
-      <div class="options paylater-section">
-        {#each filteredProviders as provider, index (provider.title)}
-          <NextOption
-            attributes={{
-              'data-paylater': provider.data.code,
-              ...(!index && autotest('provider', provider.data.code)),
-            }}
-            tabindex={0}
-            {...provider}
-            on:select
-          >
-            {getPaylaterProviderName(provider.data.code, $locale)}
-          </NextOption>
-        {/each}
+      <div bind:this={onScreenContentElement}>
+        <input type="hidden" name="provider" />
+        <input type="hidden" name="ott" />
+        <!-- LABEL: Select an Option -->
+        <h3 class="paylater-header">{$t(SELECT_OPTION_TITLE)}</h3>
+        <div class="options paylater-section">
+          {#each filteredProviders as provider, index (provider.title)}
+            <NextOption
+              attributes={{
+                'data-paylater': provider.data.code,
+                ...(!index && autotest('provider', provider.data.code)),
+              }}
+              tabindex={0}
+              {...provider}
+              on:select
+            >
+              {getPaylaterProviderName(provider.data.code, $locale)}
+            </NextOption>
+          {/each}
+        </div>
       </div>
     </div>
-    <AccountTab />
+    <AccountTab
+      {onScreenContainerOpacity}
+      {onScreenContentElement}
+      {onScreenContainerElement}
+    />
   </div>
 </Tab>
 

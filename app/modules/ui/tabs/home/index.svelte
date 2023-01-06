@@ -29,7 +29,7 @@
   import { HOME_VIEWS } from './constants';
 
   // Svelte imports
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, afterUpdate } from 'svelte';
   import { slide, fly } from 'svelte/transition';
 
   // Store
@@ -1357,13 +1357,30 @@
       next();
     }
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
+<Tab
+  method="common"
+  overrideMethodCheck={true}
+  shown={showHome}
+  pad={false}
+  bind:onScreenContainerElement
+>
   <Screen
     bind:contentRef
     pad={false}
     removeAccountTab={view === HOME_VIEWS.DETAILS}
+    {onScreenContainerOpacity}
+    {onScreenContainerElement}
+    {onScreenContentElement}
   >
     <div class="screen-main" class:screen-one-cc={isRedesignV15Enabled}>
       {#if view === HOME_VIEWS.DETAILS}
@@ -1380,6 +1397,7 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
+          bind:this={onScreenContentElement}
         >
           <!-- We dont want it to show in 1cc flow-->
           {#if !isRedesignV15Enabled}

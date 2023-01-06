@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterUpdate, onDestroy } from 'svelte';
   // svelte imports
   import { get } from 'svelte/store';
 
@@ -58,6 +59,7 @@
     views as addressViews,
     ADDRESS_TYPES,
     ADDRESS_FORM_VIEWS,
+    views,
   } from 'one_click_checkout/address/constants';
   import {
     CATEGORIES,
@@ -331,6 +333,25 @@
       disabled = false;
     }
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  let isFixed = undefined;
+  let threshold = 52;
+  function handleFixed(event) {
+    isFixed = !event.detail.text;
+  }
+  afterUpdate(() => {
+    onScreenContainerElement = document.getElementById('form-home-1cc');
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+    threshold = currentView === views.SAVED_ADDRESSES ? 52 : 0;
+  });
+  onDestroy(() => {
+    onScreenContainerOpacity = '0';
+    isFixed = undefined;
+  });
 </script>
 
 <div class="address-tab">
@@ -341,7 +362,11 @@
     ]}
     bind:this={addressWrapperEle}
   >
-    <div class="address-section">
+    <div
+      class="address-section"
+      bind:this={onScreenContentElement}
+      class:isFixedStyle={!isFixed}
+    >
       <slot name="header" />
       <slot name="inner-header" />
       <div class="label-container">
@@ -377,9 +402,23 @@
         />
       {/if}
     </div>
+    {#if !isFixed}
+      <div class="isFixedStyleCheckbox">
+        <slot {isFixed} name="footer" />
+      </div>
+    {/if}
   </div>
-  <AccountTab showBottomSeparator={showAccBottomSeparator} />
-  <slot name="footer" />
+  <AccountTab
+    {onScreenContainerOpacity}
+    {onScreenContainerElement}
+    {onScreenContentElement}
+    showBottomSeparator={showAccBottomSeparator}
+    {threshold}
+    on:fixed={handleFixed}
+  />
+  {#if isFixed}
+    <slot {isFixed} name="footer" />
+  {/if}
   <CTA
     screen="home-1cc"
     tab={$activeRoute?.name}
@@ -406,7 +445,8 @@
   }
 
   .address-tab {
-    height: inherit;
+    /* height: inherit; */
+    background-color: white;
   }
 
   .label-container {
@@ -432,8 +472,9 @@
 
   .address-section {
     /* TODO: to replace left/right padding with variable */
-    padding: 0px 16px 16px;
+    padding: 0px 16px 16px 16px;
     min-height: 120%;
+    background-color: white;
   }
 
   .separator {
@@ -443,5 +484,11 @@
 
   .address-tab :global(.account-tab .bottom) {
     margin-bottom: 38px;
+  }
+  .isFixedStyle {
+    padding: 0px 16px 0px 16px;
+  }
+  .isFixedStyleCheckbox {
+    padding: 0px 16px 8px 16px;
   }
 </style>

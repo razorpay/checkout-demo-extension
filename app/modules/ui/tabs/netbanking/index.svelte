@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, afterUpdate } from 'svelte';
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
 
@@ -277,6 +277,14 @@
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
     Events.TrackRender(NETBANKING_EVENTS.SCREEN_LOAD_V2);
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
 <!-- TODO: remove override after fixing method check -->
@@ -285,96 +293,104 @@
   pad={false}
   overrideMethodCheck
   hasMessage={!!downtimeSeverity}
+  bind:onScreenContainerElement
 >
-  <Screen pad={false}>
+  <Screen
+    pad={false}
+    {onScreenContainerOpacity}
+    {onScreenContainerElement}
+    {onScreenContentElement}
+  >
     <div class:screen-one-cc={isRedesignV15Enabled}>
-      {#if isRedesignV15Enabled}
-        <h3 class="header-title">{$t(SELECT_BANK)}</h3>
-      {/if}
-      <div
-        id="netb-banks"
-        class="clear grid count-3"
-        class:netb-banks-one-cc={isRedesignV15Enabled}
-      >
-        {#each netbanks as { name, code } (code)}
-          <GridItem
-            name={getShortBankName(code, $locale)}
-            {code}
-            fullName={filteredBanks[code]}
-            bind:group={$selectedBank}
-          />
-        {/each}
-      </div>
-
-      <div class="pad">
-        <BankDropdownSelect
-          selectLabel={formatMessageWithLocale(
-            NETBANKING_SELECT_LABEL,
-            $locale
-          )}
-          selectHelpLabel={formatMessageWithLocale(
-            NETBANKING_SELECT_HELP,
-            $locale
-          )}
-          selectedBank={$selectedBank}
-          bankList={translatedBanksArr}
-          {downtimeSeverity}
-          {invalid}
-          on:click={showSearch}
-          on:keypress={({ detail }) => {
-            handleEnterOnBanking(detail);
-          }}
-          bind:this={bankSelect}
-        />
-      </div>
-      {#if showCorporateRadio}
+      <div bind:this={onScreenContentElement}>
+        {#if isRedesignV15Enabled}
+          <h3 class="header-title">{$t(SELECT_BANK)}</h3>
+        {/if}
         <div
-          class="pad ref-radiocontainer"
-          bind:this={radioContainer}
-          transition:fade={getAnimationOptions({ duration: 100 })}
+          id="netb-banks"
+          class="clear grid count-3"
+          class:netb-banks-one-cc={isRedesignV15Enabled}
         >
-          <!-- LABEL: Complete Payment Using -->
-          <label class="select-bank-type">{$t(SELECTION_RADIO_TEXT)}</label>
-          <div class="input-radio">
-            <input
-              type="radio"
-              id="nb_type_retail"
-              value="retail"
-              checked={!corporateSelected}
-              on:click={setRetailOption}
+          {#each netbanks as { name, code } (code)}
+            <GridItem
+              name={getShortBankName(code, $locale)}
+              {code}
+              fullName={filteredBanks[code]}
+              bind:group={$selectedBank}
             />
-            <label for="nb_type_retail">
-              <div class="radio-display" />
-              <!-- LABEL: Retail -->
-              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
-            </label>
-          </div>
-          <div class="input-radio">
-            <input
-              type="radio"
-              id="nb_type_corporate"
-              value="corporate"
-              checked={corporateSelected}
-              on:click={setCorporateOption}
-            />
-            <label for="nb_type_corporate">
-              <div class="radio-display" />
-              <!-- LABEL: Corporate -->
-              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
-            </label>
-          </div>
+          {/each}
         </div>
-      {/if}
-      <!-- Show downtime message if the selected bank is down -->
-      {#if !!downtimeSeverity}
-        <div class="downtime-wrapper">
-          <DowntimeCallout
-            showIcon={false}
-            severe={downtimeSeverity}
-            downtimeInstrument={$selectedBank}
+
+        <div class="pad">
+          <BankDropdownSelect
+            selectLabel={formatMessageWithLocale(
+              NETBANKING_SELECT_LABEL,
+              $locale
+            )}
+            selectHelpLabel={formatMessageWithLocale(
+              NETBANKING_SELECT_HELP,
+              $locale
+            )}
+            selectedBank={$selectedBank}
+            bankList={translatedBanksArr}
+            {downtimeSeverity}
+            {invalid}
+            on:click={showSearch}
+            on:keypress={({ detail }) => {
+              handleEnterOnBanking(detail);
+            }}
+            bind:this={bankSelect}
           />
         </div>
-      {/if}
+        {#if showCorporateRadio}
+          <div
+            class="pad ref-radiocontainer"
+            bind:this={radioContainer}
+            transition:fade={getAnimationOptions({ duration: 100 })}
+          >
+            <!-- LABEL: Complete Payment Using -->
+            <label class="select-bank-type">{$t(SELECTION_RADIO_TEXT)}</label>
+            <div class="input-radio">
+              <input
+                type="radio"
+                id="nb_type_retail"
+                value="retail"
+                checked={!corporateSelected}
+                on:click={setRetailOption}
+              />
+              <label for="nb_type_retail">
+                <div class="radio-display" />
+                <!-- LABEL: Retail -->
+                <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
+              </label>
+            </div>
+            <div class="input-radio">
+              <input
+                type="radio"
+                id="nb_type_corporate"
+                value="corporate"
+                checked={corporateSelected}
+                on:click={setCorporateOption}
+              />
+              <label for="nb_type_corporate">
+                <div class="radio-display" />
+                <!-- LABEL: Corporate -->
+                <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
+              </label>
+            </div>
+          </div>
+        {/if}
+        <!-- Show downtime message if the selected bank is down -->
+        {#if !!downtimeSeverity}
+          <div class="downtime-wrapper">
+            <DowntimeCallout
+              showIcon={false}
+              severe={downtimeSeverity}
+              downtimeInstrument={$selectedBank}
+            />
+          </div>
+        {/if}
+      </div>
     </div>
 
     {#if !recurring && !isRedesignV15Enabled}
@@ -415,7 +431,7 @@
   }
 
   .screen-one-cc {
-    min-height: 100%;
+    // min-height: 100%;
   }
 
   .netb-banks-one-cc {

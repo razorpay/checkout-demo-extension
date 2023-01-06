@@ -37,6 +37,7 @@
     data-testid="same-billing-address-checkbox"
     class="same-address-checkbox"
     class:checkbox-sticky={isFixed}
+    class:checkbox-non-Sticky={!isFixed}
   >
     <Checkbox
       {disabled}
@@ -51,6 +52,7 @@
 <style>
   .same-address-checkbox {
     background: white;
+    border-top: 1px solid var(--background-color-magic);
     display: inline-flex;
     align-items: center;
     margin-top: 16px;
@@ -70,5 +72,8 @@
     bottom: 0;
     width: calc(100% - 18px);
     padding: 12px 0 4px 16px;
+  }
+  .checkbox-non-Sticky {
+    border: none;
   }
 </style>

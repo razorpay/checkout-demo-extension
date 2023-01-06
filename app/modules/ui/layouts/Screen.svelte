@@ -51,6 +51,9 @@
   onMount(() => {
     onScroll();
   });
+  export let onScreenContainerElement: HTMLDivElement;
+  export let onScreenContentElement: HTMLDivElement;
+  export let onScreenContainerOpacity;
 </script>
 
 <div
@@ -64,7 +67,11 @@
 >
   <slot />
   {#if !removeAccountTab}
-    <AccountTab />
+    <AccountTab
+      {onScreenContainerOpacity}
+      {onScreenContainerElement}
+      {onScreenContentElement}
+    />
   {/if}
 </div>
 <div class="shadow shadow-top" />

@@ -83,5 +83,6 @@
   }
   .coupon-container {
     height: 100%;
+    background-color: white;
   }
 </style>

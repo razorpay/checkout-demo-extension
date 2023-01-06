@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { onMount, tick, onDestroy } from 'svelte';
+  import { onMount, tick, onDestroy, afterUpdate } from 'svelte';
   import { get } from 'svelte/store';
 
   // UI Imports
@@ -1235,206 +1235,221 @@
     handleBackNavigation();
     return false;
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<Tab method="card" pad={false} shown={isRenderedByNavstack} overrideMethodCheck>
-  <Screen pad={false}>
+<Tab
+  method="card"
+  pad={false}
+  shown={isRenderedByNavstack}
+  overrideMethodCheck
+  bind:onScreenContainerElement
+>
+  <Screen
+    pad={false}
+    {onScreenContainerOpacity}
+    {onScreenContainerElement}
+    {onScreenContentElement}
+  >
     <div bind:this={cardEle} class:screen-one-cc={isRedesignV15Enabled}>
-      {#if currentView === Views.ADD_CARD}
-        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
-          {#if showSavedCardsCta && !delayOTPExperiment && !showCardTab}
-            <div
-              id="show-saved-cards"
-              on:click={showSavedCardsView}
-              class="text-btn left-card"
-            >
+      <div bind:this={onScreenContentElement}>
+        {#if currentView === Views.ADD_CARD}
+          <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
+            {#if showSavedCardsCta && !delayOTPExperiment && !showCardTab}
               <div
-                class="cardtype"
-                class:multiple={savedCards && savedCards.length > 1}
-                cardtype={lastSavedCard && lastSavedCard.card.networkCode}
-              />
-              {#if showApps}
-                <!-- LABEL: Use saved cards on Razorpay -->
-                {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
-              {:else}
-                <!-- LABEL: Use saved cards -->
-                {$t(USE_SAVED_CARDS_BTN)}
-              {/if}
-            </div>
-          {/if}
-
-          {#if shouldShowSubtext}
-            <div class="pad instrument-subtext-description">
-              {instrumentSubtext}
-            </div>
-          {/if}
-
-          {#if delayOTPExperiment && $isIndianCustomer}
-            <!-- Show Trigger to use Saved Card -->
-            <SavedCardCTA
-              showSubTitle={!$customer.logged}
-              on:click={() => {
-                if ($customer.logged) {
-                  showSavedCardsView();
-                } else {
-                  Events.Track(CardEvents.SHOW_SAVED_CARDS);
-                  initLoginForSavedCard.call(
-                    session,
-                    TRUECALLER_VARIANT_NAMES.access_saved_cards
-                  );
-                }
-              }}
-            />
-          {/if}
-
-          {#if showRecurringCallout}
-            <div
-              class="pad"
-              transition:fly={getAnimationOptions({ duration: 250, y: -10 })}
-            >
-              <RecurringCardsCallout />
-            </div>
-          {/if}
-
-          <AddCardView
-            {tab}
-            bind:isFormValid={isAddNewCardFormValid}
-            {emiPayload}
-            faded={Boolean($selectedApp)}
-            on:focus={onAddCardViewFocused}
-            on:cardinput={onCardInput}
-            on:error={onCardError}
-            {showEmailField}
-            {downtimeVisible}
-            {downtimeSeverity}
-            {downtimeInstrument}
-            {delayOTPExperiment}
-            {isCardSupportedForRecurring}
-            {cardEle}
-          />
-          {#if showEmiCta}
-            <EmiActions
-              {showEmiCta}
-              {emiCtaView}
-              savedCount={allSavedCards.length}
-              on:click={handleEmiCtaClick}
-            />
-          {/if}
-          {#if showApps}
-            <!-- LABEL: Pay with cards on other apps -->
-            <ToggleHeading
-              class="pad"
-              on:click={toggleAppListOnAddNewCard}
-              expanded={appsListExpandedOnAddNewCard}
-            >
-              {$t(CARDS_SAVED_ON_APPS_LABEL)}
-            </ToggleHeading>
-            {#if appsListExpandedOnAddNewCard}
-              <div role="list" class="border-list">
-                <AppInstruments
-                  {apps}
-                  selectedApp={$selectedApp}
-                  on:select={(e) => setSelectedApp(e.detail)}
+                id="show-saved-cards"
+                on:click={showSavedCardsView}
+                class="text-btn left-card"
+              >
+                <div
+                  class="cardtype"
+                  class:multiple={savedCards && savedCards.length > 1}
+                  cardtype={lastSavedCard && lastSavedCard.card.networkCode}
                 />
+                {#if showApps}
+                  <!-- LABEL: Use saved cards on Razorpay -->
+                  {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
+                {:else}
+                  <!-- LABEL: Use saved cards -->
+                  {$t(USE_SAVED_CARDS_BTN)}
+                {/if}
               </div>
             {/if}
-          {/if}
-        </div>
-      {:else if currentView === Views.AVS}
-        <div id="avsContainer">
-          <div class="avs-card-info">
-            <div class="cardtype" cardtype={selectedCardNetwork} />
-            <span class="card-info"
-              >Card ending with <span class="last4">{last4}</span></span
-            >
-          </div>
-          <div class="avs-title">
-            {$t(AVS_HEADING)}
-            <span
-              on:click={() => {
-                showAVSInfo();
-              }}><Icon icon={icons.question} /></span
-            >
-          </div>
-          <BillingAddressVerificationForm
-            {filterCountries}
-            bind:checkFormErrors
-            value={$AVSBillingAddress}
-            on:input={handleAVSFormInput}
-            on:blur={handleAVSFormBlur}
-          />
-        </div>
-      {:else}
-        <div in:fade={getAnimationOptions({ duration: 100 })}>
-          {#if shouldShowSubtext}
-            <div class="pad instrument-subtext-description">
-              {instrumentSubtext}
-            </div>
-          {/if}
-
-          <!-- LABEL: Your saved cards -->
-          <h3 class:saved-card-header={isRedesignV15Enabled} class="pad">
-            {#if isOneClickCheckout()}
-              {$t(CARDS_SAVED_LABEL_ONE_CC)}
-            {:else if isRedesignV15Enabled}
-              {$t(CARD_SAVED_ON_RZP_LABEL_REDESIGN)}
-            {:else}
-              {$t(CARDS_SAVED_ON_RZP_LABEL)}
+            {#if shouldShowSubtext}
+              <div class="pad instrument-subtext-description">
+                {instrumentSubtext}
+              </div>
             {/if}
-          </h3>
-          <div id="saved-cards-container">
-            <SavedCards
+            {#if delayOTPExperiment && $isIndianCustomer}
+              <!-- Show Trigger to use Saved Card -->
+              <SavedCardCTA
+                showSubTitle={!$customer.logged}
+                on:click={() => {
+                  if ($customer.logged) {
+                    showSavedCardsView();
+                  } else {
+                    Events.Track(CardEvents.SHOW_SAVED_CARDS);
+                    initLoginForSavedCard.call(
+                      session,
+                      TRUECALLER_VARIANT_NAMES.access_saved_cards
+                    );
+                  }
+                }}
+              />
+            {/if}
+            {#if showRecurringCallout}
+              <div
+                class="pad"
+                transition:fly={getAnimationOptions({ duration: 250, y: -10 })}
+              >
+                <RecurringCardsCallout />
+              </div>
+            {/if}
+            <AddCardView
               {tab}
-              cards={savedCards}
-              bind:isFormValid={isSavedCardFormValid}
-              on:viewPlans={handleViewPlans}
+              bind:isFormValid={isAddNewCardFormValid}
+              {emiPayload}
+              faded={Boolean($selectedApp)}
+              on:focus={onAddCardViewFocused}
+              on:cardinput={onCardInput}
+              on:error={onCardError}
+              {showEmailField}
+              {downtimeVisible}
+              {downtimeSeverity}
+              {downtimeInstrument}
+              {delayOTPExperiment}
+              {isCardSupportedForRecurring}
+              {cardEle}
             />
-          </div>
-          <div
-            id="show-add-card"
-            class="text-btn left-card"
-            on:click={showAddCardView}
-          >
-            <!-- LABEL: Add another card -->
-            {$t(ADD_ANOTHER_CARD_BTN)}
-          </div>
-
-          {#if showApps}
-            <!-- LABEL: Pay with cards on other apps -->
-            <div class="apps-heading-container">
+            {#if showEmiCta}
+              <EmiActions
+                {showEmiCta}
+                {emiCtaView}
+                savedCount={allSavedCards.length}
+                on:click={handleEmiCtaClick}
+              />
+            {/if}
+            {#if showApps}
+              <!-- LABEL: Pay with cards on other apps -->
               <ToggleHeading
                 class="pad"
-                on:click={toggleAppListOnSavedCard}
-                expanded={appsListExpandedOnSavedCard}
+                on:click={toggleAppListOnAddNewCard}
+                expanded={appsListExpandedOnAddNewCard}
               >
                 {$t(CARDS_SAVED_ON_APPS_LABEL)}
               </ToggleHeading>
+              {#if appsListExpandedOnAddNewCard}
+                <div role="list" class="border-list">
+                  <AppInstruments
+                    {apps}
+                    selectedApp={$selectedApp}
+                    on:select={(e) => setSelectedApp(e.detail)}
+                  />
+                </div>
+              {/if}
+            {/if}
+          </div>
+        {:else if currentView === Views.AVS}
+          <div id="avsContainer">
+            <div class="avs-card-info">
+              <div class="cardtype" cardtype={selectedCardNetwork} />
+              <span class="card-info"
+                >Card ending with <span class="last4">{last4}</span></span
+              >
             </div>
-            {#if appsListExpandedOnSavedCard}
-              <div role="list" class="border-list">
-                <AppInstruments
-                  {apps}
-                  selectedApp={$selectedApp}
-                  on:select={(e) => setSelectedApp(e.detail)}
-                />
+            <div class="avs-title">
+              {$t(AVS_HEADING)}
+              <span
+                on:click={() => {
+                  showAVSInfo();
+                }}><Icon icon={icons.question} /></span
+              >
+            </div>
+            <BillingAddressVerificationForm
+              {filterCountries}
+              bind:checkFormErrors
+              value={$AVSBillingAddress}
+              on:input={handleAVSFormInput}
+              on:blur={handleAVSFormBlur}
+            />
+          </div>
+        {:else}
+          <div in:fade={getAnimationOptions({ duration: 100 })}>
+            {#if shouldShowSubtext}
+              <div class="pad instrument-subtext-description">
+                {instrumentSubtext}
               </div>
             {/if}
-          {/if}
-        </div>
-      {/if}
-      {#if showTnC}
-        <p class="pad tnc">
-          {$t(MERCHANT_OF_RECORD)}
-          <a
-            class="theme-highlight"
-            href="https://razorpay.com/mor_terms/"
-            target="_blank"
-            rel="noopener"
-          >
-            {$t(DCC_TERMS_AND_CONDITIONS)}.
-          </a>
-        </p>
-      {/if}
+            <!-- LABEL: Your saved cards -->
+            <h3 class:saved-card-header={isRedesignV15Enabled} class="pad">
+              {#if isOneClickCheckout()}
+                {$t(CARDS_SAVED_LABEL_ONE_CC)}
+              {:else if isRedesignV15Enabled}
+                {$t(CARD_SAVED_ON_RZP_LABEL_REDESIGN)}
+              {:else}
+                {$t(CARDS_SAVED_ON_RZP_LABEL)}
+              {/if}
+            </h3>
+            <div id="saved-cards-container">
+              <SavedCards
+                {tab}
+                cards={savedCards}
+                bind:isFormValid={isSavedCardFormValid}
+                on:viewPlans={handleViewPlans}
+              />
+            </div>
+            <div
+              id="show-add-card"
+              class="text-btn left-card"
+              on:click={showAddCardView}
+            >
+              <!-- LABEL: Add another card -->
+              {$t(ADD_ANOTHER_CARD_BTN)}
+            </div>
+            {#if showApps}
+              <!-- LABEL: Pay with cards on other apps -->
+              <div class="apps-heading-container">
+                <ToggleHeading
+                  class="pad"
+                  on:click={toggleAppListOnSavedCard}
+                  expanded={appsListExpandedOnSavedCard}
+                >
+                  {$t(CARDS_SAVED_ON_APPS_LABEL)}
+                </ToggleHeading>
+              </div>
+              {#if appsListExpandedOnSavedCard}
+                <div role="list" class="border-list">
+                  <AppInstruments
+                    {apps}
+                    selectedApp={$selectedApp}
+                    on:select={(e) => setSelectedApp(e.detail)}
+                  />
+                </div>
+              {/if}
+            {/if}
+          </div>
+        {/if}
+        {#if showTnC}
+          <p class="pad tnc">
+            {$t(MERCHANT_OF_RECORD)}
+            <a
+              class="theme-highlight"
+              href="https://razorpay.com/mor_terms/"
+              target="_blank"
+              rel="noopener"
+            >
+              {$t(DCC_TERMS_AND_CONDITIONS)}.
+            </a>
+          </p>
+        {/if}
+      </div>
     </div>
     <Bottom tab="card">
       {#if isDCCEnabled() && !isDynamicFeeBearer()}
@@ -1547,7 +1562,7 @@
     margin-top: 26px;
   }
   .screen-one-cc {
-    min-height: 100%;
+    // min-height: 100%;
   }
 
   .saved-card-header {

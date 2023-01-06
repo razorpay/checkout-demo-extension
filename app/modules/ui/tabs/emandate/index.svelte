@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterUpdate } from 'svelte';
   import { getSession } from 'sessionmanager';
 
   // UI Imports

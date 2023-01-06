@@ -5,8 +5,8 @@ let toast;
 /**
  * Creates a new Toast
  */
-function create(element) {
-  const target = document.getElementById(`form-${element}`);
+function create() {
+  const target = document.getElementById('toast');
   if (target) {
     toast = new Toast({
       target,
@@ -20,8 +20,7 @@ function create(element) {
  * @returns
  */
 export function showToast(options) {
-  const { screen } = options || {};
-  create(screen);
+  create();
   toast?.show(options);
 }
 

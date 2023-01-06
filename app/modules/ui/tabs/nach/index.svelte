@@ -1,7 +1,7 @@
 <script lang="ts">
   // Refs
   let fileInput;
-
+  import { afterUpdate } from 'svelte';
   // Utils imports
   import { getSession } from 'sessionmanager';
 

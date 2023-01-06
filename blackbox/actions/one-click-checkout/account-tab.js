@@ -2,7 +2,7 @@ const { getDataAttrSelector } = require('./common');
 
 async function openAccounTab(context) {
   const accountTabEle = await getDataAttrSelector(context, 'account-tab-btn');
-  await accountTabEle.click();
+  await accountTabEle.evaluate((b) => b.click());
 }
 
 async function openMerchantPolicyTab(context) {
@@ -10,7 +10,7 @@ async function openMerchantPolicyTab(context) {
     context,
     'merchant-policy-tab-btn'
   );
-  await aboutMerchantEle.click();
+  await aboutMerchantEle.evaluate((b) => b.click());
 }
 
 async function openVernacularFromAccountTab(context) {

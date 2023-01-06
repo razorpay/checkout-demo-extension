@@ -164,183 +164,189 @@
 </script>
 
 <!-- // TODO: showable logic -->
-<div
-  id="form-otp"
-  class="tab-content screen"
-  class:loading={$loading}
-  class:showable={addShowableClass}
-  class:tab-mg-1cc={isOneClickCheckout()}
-  class:resetMargin={!addShowableClass}
-  class:tab-content-one-cc={isOneClickCheckout()}
->
-  <!-- <div id="form-otp" class="tab-content screen" class:loading={$loading}> -->
-  <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
-  <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
-  <div class="otp-screen-contents" class:heading-1cc={isOneClickCheckout()}>
-    {#if otpPromptVisible && isDebitIssuer($mode)}
-      <EmiDetails />
-    {:else if otpPromptVisible && $ipAddress && $accessTime}
-      <CardBox
-        entity={($selectedInstrument && $selectedInstrument.token_id) ||
-          ($selectedCard && $selectedCard.id) ||
-          $cardNumber}
-      />
-    {/if}
-    <div class="otp-controls">
-      <div id="otp-prompt">
-        {#if $headingText}
-          <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
-            {getOtpScreenHeading($headingText, $templateData, $locale)}
-          </p>
-        {/if}
-        <!-- Align text to start only if in address context -->
-        {#if $loading}
-          <AsyncLoading>
-            {@html getOtpScreenTitle($textView, $templateData, $locale)}
-          </AsyncLoading>
-        {:else}
-          <div
-            class="otp-title"
-            class:mg-tp-20={isOneClickCheckout() && !$headingText}
-          >
-            {@html getOtpScreenTitle($textView, $templateData, $locale)}
-            {#if otpClasses.includes($textView)}
-              <span
-                data-test-id="edit-contact-otp"
-                class="edit-contact-btn"
-                on:click={() => handleEditContact()}
-              >
-                <Icon icon={edit_pen} />
-              </span>
-            {/if}
-          </div>
-        {/if}
-      </div>
-      {#if $addFunds}
-        <div id="add-funds" class="add-funds">
-          <!-- LABEL: Add Funds -->
-          <div
-            id="add-funds-action"
-            class="btn"
-            on:click={(event) => invoke('addFunds', event)}
-          >
-            {$t(ADD_FUNDS_LABEL)}
-          </div>
-
-          <div class="text-center" style="margin-top: 20px;">
-            <!-- LABEL: Try different payment method -->
-            <LinkButton
-              id="choose-payment-method"
-              on:click={(event) => invoke('chooseMethod', event)}
-            >
-              {$t(TRY_DIFFERENT_LABEL)}
-            </LinkButton>
-          </div>
-        </div>
-      {/if}
-
-      <div id="otp-section">
-        {#if $action}
-          {#if $action === 'paypal'}
-            <!-- LABEL: Pay with Paypal -->
-            <div
-              id="otp-action"
-              class="btn text-initial"
-              on:click={(event) => invoke('retryWithPaypal', event)}
-            >
-              {$t(PAY_WITH_PAYPAL_LABEL)}
-            </div>
-
-            <div class="otp-action-cancel">
-              <LinkButton
-                id="otp-sec"
-                on:click={(event) => invoke('cancelRetryWithPaypal', event)}
-              >
-                {$t(CANCEL_LABEL)}
-              </LinkButton>
-            </div>
-          {:else}
-            <!-- LABEL: Retry -->
-            <div
-              id="otp-action"
-              class="btn"
-              on:click={(event) => invoke('retry', event)}
-            >
-              {$t(RETRY_LABEL)}
-            </div>
-          {/if}
-        {/if}
-        <OTPInput
-          hidden={!showInput}
-          isError={$errorMessage}
-          onBlur={handleOnBlur}
+<div class="otp-screen">
+  <div
+    id="form-otp"
+    class="tab-content screen"
+    class:loading={$loading}
+    class:showable={addShowableClass}
+    class:tab-mg-1cc={isOneClickCheckout()}
+    class:resetMargin={!addShowableClass}
+    class:tab-content-one-cc={isOneClickCheckout()}
+  >
+    <!-- <div id="form-otp" class="tab-content screen" class:loading={$loading}> -->
+    <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
+    <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
+    <div class="otp-screen-contents" class:heading-1cc={isOneClickCheckout()}>
+      {#if otpPromptVisible && isDebitIssuer($mode)}
+        <EmiDetails />
+      {:else if otpPromptVisible && $ipAddress && $accessTime}
+        <CardBox
+          entity={($selectedInstrument && $selectedInstrument.token_id) ||
+            ($selectedCard && $selectedCard.id) ||
+            $cardNumber}
         />
-      </div>
-
-      <div
-        data-test-id="otp-error-msg"
-        class="error-message"
-        class:hidden={!showInput}
-      >
-        {$t($errorMessage)}
-      </div>
-
-      <div id="otp-sec-outer" class:compact>
-        <div class="otp-action-container">
-          {#if showInput}
-            {#if $allowResend}
-              <!-- LABEL: Resend OTP -->
-              <ResendButton id="otp-resend" on:resend={onResend} />
-            {/if}
-            {#if $allowSkip}
-              <LinkButton
-                id="otp-sec"
-                data-testId="otp-sec-skip-btn"
-                on:click={onSkip}
-              >
-                {$t(`otp.skip_text.${$skipTextLabel}`)}
-              </LinkButton>
-            {:else if $allowBack}
-              <!-- LABEL: Go Back -->
-              <LinkButton
-                id="otp-sec"
-                on:click={(event) => invoke('secondary', event)}
-              >
-                {$t(BACK_LABEL)}
-              </LinkButton>
-            {/if}
+      {/if}
+      <div class="otp-controls">
+        <div id="otp-prompt">
+          {#if $headingText}
+            <p class="otp-heading" class:heading-1cc={isOneClickCheckout()}>
+              {getOtpScreenHeading($headingText, $templateData, $locale)}
+            </p>
+          {/if}
+          <!-- Align text to start only if in address context -->
+          {#if $loading}
+            <AsyncLoading>
+              {@html getOtpScreenTitle($textView, $templateData, $locale)}
+            </AsyncLoading>
+          {:else}
+            <div
+              class="otp-title"
+              class:mg-tp-20={isOneClickCheckout() && !$headingText}
+            >
+              {@html getOtpScreenTitle($textView, $templateData, $locale)}
+              {#if otpClasses.includes($textView)}
+                <span
+                  data-test-id="edit-contact-otp"
+                  class="edit-contact-btn"
+                  on:click={() => handleEditContact()}
+                >
+                  <Icon icon={edit_pen} />
+                </span>
+              {/if}
+            </div>
           {/if}
         </div>
+        {#if $addFunds}
+          <div id="add-funds" class="add-funds">
+            <!-- LABEL: Add Funds -->
+            <div
+              id="add-funds-action"
+              class="btn"
+              on:click={(event) => invoke('addFunds', event)}
+            >
+              {$t(ADD_FUNDS_LABEL)}
+            </div>
+
+            <div class="text-center" style="margin-top: 20px;">
+              <!-- LABEL: Try different payment method -->
+              <LinkButton
+                id="choose-payment-method"
+                on:click={(event) => invoke('chooseMethod', event)}
+              >
+                {$t(TRY_DIFFERENT_LABEL)}
+              </LinkButton>
+            </div>
+          </div>
+        {/if}
+
+        <div id="otp-section">
+          {#if $action}
+            {#if $action === 'paypal'}
+              <!-- LABEL: Pay with Paypal -->
+              <div
+                id="otp-action"
+                class="btn text-initial"
+                on:click={(event) => invoke('retryWithPaypal', event)}
+              >
+                {$t(PAY_WITH_PAYPAL_LABEL)}
+              </div>
+
+              <div class="otp-action-cancel">
+                <LinkButton
+                  id="otp-sec"
+                  on:click={(event) => invoke('cancelRetryWithPaypal', event)}
+                >
+                  {$t(CANCEL_LABEL)}
+                </LinkButton>
+              </div>
+            {:else}
+              <!-- LABEL: Retry -->
+              <div
+                id="otp-action"
+                class="btn"
+                on:click={(event) => invoke('retry', event)}
+              >
+                {$t(RETRY_LABEL)}
+              </div>
+            {/if}
+          {/if}
+          <OTPInput
+            hidden={!showInput}
+            isError={$errorMessage}
+            onBlur={handleOnBlur}
+          />
+        </div>
+
+        <div
+          data-test-id="otp-error-msg"
+          class="error-message"
+          class:hidden={!showInput}
+        >
+          {$t($errorMessage)}
+        </div>
+
+        <div id="otp-sec-outer" class:compact>
+          <div class="otp-action-container">
+            {#if showInput}
+              {#if $allowResend}
+                <!-- LABEL: Resend OTP -->
+                <ResendButton id="otp-resend" on:resend={onResend} />
+              {/if}
+              {#if $allowSkip}
+                <LinkButton
+                  id="otp-sec"
+                  data-testId="otp-sec-skip-btn"
+                  on:click={onSkip}
+                >
+                  {$t(`otp.skip_text.${$skipTextLabel}`)}
+                </LinkButton>
+              {:else if $allowBack}
+                <!-- LABEL: Go Back -->
+                <LinkButton
+                  id="otp-sec"
+                  on:click={(event) => invoke('secondary', event)}
+                >
+                  {$t(BACK_LABEL)}
+                </LinkButton>
+              {/if}
+            {/if}
+          </div>
+        </div>
       </div>
+      {#if otpPromptVisible && $mode}
+        <TermsAndConditions mode={$mode} />
+      {/if}
+      {#if otpPromptVisible && $ipAddress && $accessTime}
+        <span class="security-text">
+          {getOtpScreenMiscText(
+            'security_text',
+            {
+              ipAddress: $ipAddress,
+              accessTime: getFormattedDateTime($accessTime),
+            },
+            $locale
+          )}
+        </span>
+      {/if}
     </div>
-    {#if otpPromptVisible && $mode}
-      <TermsAndConditions mode={$mode} />
-    {/if}
-    {#if otpPromptVisible && $ipAddress && $accessTime}
-      <span class="security-text">
-        {getOtpScreenMiscText(
-          'security_text',
-          {
-            ipAddress: $ipAddress,
-            accessTime: getFormattedDateTime($accessTime),
-          },
-          $locale
-        )}
-      </span>
-    {/if}
+    <CTA
+      screen="home-1cc"
+      tab={'otp'}
+      disabled={$disableCTA}
+      show={!$loading}
+      label={CTA_LABEL}
+      showAmount={false}
+      onSubmit={onOTPSubmit}
+    />
   </div>
-  <CTA
-    screen="home-1cc"
-    tab={'otp'}
-    disabled={$disableCTA}
-    show={!$loading}
-    label={CTA_LABEL}
-    showAmount={false}
-    onSubmit={onOTPSubmit}
-  />
 </div>
 
 <style>
+  .otp-screen {
+    height: 100%;
+    background-color: white;
+  }
   .otp-title {
     color: var(--primary-text-color);
     text-align: center;

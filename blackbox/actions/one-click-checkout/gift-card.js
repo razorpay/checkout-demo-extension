@@ -155,12 +155,12 @@ async function checkOfferDisabled(context, restrictOffer) {
 async function checkOfferEnabled(context, restrictOffer) {
   if (restrictOffer) {
     const selectOffer = await context.page.waitForSelector('.offer-action');
-    await selectOffer.click();
+    await selectOffer.evaluate((b) => b.click());
     await context.page.waitForSelector('.offers-list');
     const closeOfferBtn = await context.page.waitForSelector(
       '.close-offerlist'
     );
-    await closeOfferBtn.click();
+    await closeOfferBtn.evaluate((b) => b.click());
   }
 }
 

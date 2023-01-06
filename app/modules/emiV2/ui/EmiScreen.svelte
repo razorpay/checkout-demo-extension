@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
   import {
     selectedCardlessEmiProvider,
     emiMethod,
@@ -227,14 +227,23 @@
       selectEmiInstrumentForOffer(emiOptions);
     }
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerElement = document.getElementById('root');
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<div>
-  <div
-    class:tab-content-one-cc={isRedesignV15Enabled}
-    class="tab-content screen collapsible"
-    class:screen-one-cc={isRedesignV15Enabled}
-  >
+<div
+  class:tab-content-one-cc={isRedesignV15Enabled}
+  class="tab-content screen collapsible"
+  class:screen-one-cc={isRedesignV15Enabled}
+>
+  <div bind:this={onScreenContentElement}>
     {#if savedCards && savedCards.length > 0}
       <div class="saved-emi-cards-container">
         <SavedCards cards={savedCards} />
@@ -248,8 +257,13 @@
       }}
     />
   </div>
-  <AccountTab />
 </div>
+<AccountTab
+  {onScreenContainerOpacity}
+  {onScreenContentElement}
+  {onScreenContainerElement}
+/>
+
 <!-- 
   Hide the CTA if offer window is open or offer error overlay is in view 
   As with navtstack both offer CTA and screen CTA are coming into view
@@ -277,14 +291,14 @@
 {/if}
 
 <style>
+  .tab-content {
+    overflow-y: scroll;
+  }
   .tab-content-one-cc {
     margin-top: 0;
   }
   .saved-emi-cards-container {
     padding: 16px 14px;
     padding-bottom: 8px;
-  }
-  .screen-one-cc {
-    min-height: 110%;
   }
 </style>

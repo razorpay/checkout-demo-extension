@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { beforeUpdate, createEventDispatcher } from 'svelte';
   // UI Imports
   import Icon from 'ui/elements/Icon.svelte';
   import arrow_up from 'account_modal/icons/arrow_up';
@@ -20,7 +21,9 @@
   import { Events } from 'analytics';
   import AccountEvents from 'account_modal/analytics';
   import { showAccountTab } from 'checkoutstore';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import SecuredByRazorpay from 'ui/components/SecuredByRazorpay.svelte';
+  import AccountTabPlaceholder from './AccountTabPlaceholder.svelte';
 
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
@@ -44,50 +47,86 @@
     });
     showMerchantFrame();
   }
+  export let onScreenContainerElement: HTMLDivElement;
+  export let onScreenContainerOpacity;
+  export let onScreenContentElement: HTMLDivElement;
+  export let threshold = 0;
+
+  let accountTabVisible = true;
+  let fixed = false;
+
+  const dispatch = createEventDispatcher();
+
+  beforeUpdate(() => {
+    if (onScreenContainerOpacity === '1') {
+      fixed =
+        onScreenContentElement?.scrollHeight <=
+        onScreenContainerElement?.offsetHeight - threshold;
+    } else {
+      fixed = false;
+    }
+    if (
+      document.querySelector('#offers-container') &&
+      !document.querySelector('#offers-container')?.hidden
+    ) {
+      accountTabVisible = !fixed;
+    } else {
+      accountTabVisible = true;
+    }
+    showBottomSeparator = showBottomSeparator && !fixed;
+    showAccountTab.set(true);
+    dispatch('fixed', { text: fixed });
+  });
 </script>
 
-{#if isRedesignV15()}
-  <div class="account-tab" class:hide-account-tab={!$showAccountTab}>
-    <div class="separator" />
-    <div class="account-tab-container">
-      <div class="account-wrapper" class:no-foh={!showMerchantPolicyBtn}>
-        <div class="d-flex align-center">
-          <div
-            data-test-id="account-tab-btn"
-            class="account-section"
-            on:click={handleAccountModal}
-          >
-            {$t(ACCOUNT)}
-            <span class="account-toggle-icon">
-              <Icon
-                icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}
-              />
-            </span>
-          </div>
-          {#if showMerchantPolicyBtn}
-            <div class="divider" />
-
+{#if isRedesignV15() && accountTabVisible}
+  <svelte:component this={fixed ? Bottom : AccountTabPlaceholder}>
+    <div class="account-tab" class:hide-account-tab={!$showAccountTab}>
+      <div class="separator" />
+      <div class="account-tab-container">
+        <div class="account-wrapper" class:no-foh={!showMerchantPolicyBtn}>
+          <div class="d-flex align-center">
             <div
-              data-test-id="merchant-policy-tab-btn"
+              data-test-id="account-tab-btn"
               class="account-section"
-              on:click={showMerchantDetails}
+              on:click={handleAccountModal}
             >
-              {merchantPolicy.display_name}
-              <span class="merchant-toggle-icon">
+              {$t(ACCOUNT)}
+              <span class="account-toggle-icon">
                 <Icon
                   icon={arrow_up(10, 6, constantCSSVars['primary-text-color'])}
                 />
               </span>
             </div>
-          {/if}
+            {#if showMerchantPolicyBtn}
+              <div class="divider" />
+
+              <div
+                data-test-id="merchant-policy-tab-btn"
+                class="account-section"
+                on:click={showMerchantDetails}
+              >
+                {merchantPolicy.display_name}
+                <span class="merchant-toggle-icon">
+                  <Icon
+                    icon={arrow_up(
+                      10,
+                      6,
+                      constantCSSVars['primary-text-color']
+                    )}
+                  />
+                </span>
+              </div>
+            {/if}
+          </div>
+          <SecuredByRazorpay {logos} columnView={showMerchantPolicyBtn} />
         </div>
-        <SecuredByRazorpay {logos} columnView={showMerchantPolicyBtn} />
       </div>
+      {#if showBottomSeparator}
+        <div class="separator bottom" />
+      {/if}
     </div>
-    {#if showBottomSeparator}
-      <div class="separator bottom" />
-    {/if}
-  </div>
+  </svelte:component>
 {/if}
 
 <style lang="scss">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterUpdate } from 'svelte';
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import CTA, { showCta, hideCta } from 'cta';
@@ -213,55 +214,69 @@
       session.walletOffer
     );
   }
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
 </script>
 
-<Tab method="wallet" pad={false}>
+<Tab method="wallet" pad={false} bind:onScreenContainerElement>
   <div class="wallet-wrapper" class:wallet-one-cc={isRedesignV15Enabled}>
-    {#if isRedesignV15Enabled}
-      <h3 class="header-title">{$t(SELECT_WALLET)}</h3>
-    {/if}
-    <div class="border-list collapsable">
-      {#each filteredWallets as wallet, i (wallet.code)}
-        <SlottedRadioOption
-          name={wallet.code}
-          selected={$selectedWallet === wallet.code}
-          align="top"
-          on:click={() => onWalletSelection(wallet.code)}
-        >
-          <div
-            class="title-container"
-            slot="title"
-            bind:this={walletReferences[wallet.code]}
-            id={`wallet-radio-${wallet.code}`}
-            {...!i && autotest('wallet', wallet.code)}
+    <div bind:this={onScreenContentElement}>
+      {#if isRedesignV15Enabled}
+        <h3 class="header-title">{$t(SELECT_WALLET)}</h3>
+      {/if}
+      <div class="border-list collapsable">
+        {#each filteredWallets as wallet, i (wallet.code)}
+          <SlottedRadioOption
+            name={wallet.code}
+            selected={$selectedWallet === wallet.code}
+            align="top"
+            on:click={() => onWalletSelection(wallet.code)}
           >
-            <span class="title">{getWalletName(wallet.code, $locale)}</span>
-            <span class="subtitle"
-              >{getWalletSubtitle(wallet.code, $locale)}</span
+            <div
+              class="title-container"
+              slot="title"
+              bind:this={walletReferences[wallet.code]}
+              id={`wallet-radio-${wallet.code}`}
+              {...!i && autotest('wallet', wallet.code)}
             >
-          </div>
-          <div slot="body">
-            {#if $selectedWallet === wallet.code}
-              <div transition:slide={getAnimationOptions({ duration: 200 })}>
-                {#if getApplicableOffer(wallet.code)}
-                  <span class="offer">
-                    {getApplicableOffer(wallet.code).name}
-                  </span>
-                  <div class="offer-info">
-                    {getApplicableOffer(wallet.code).display_text}
-                  </div>
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <i slot="icon" class="top">
-            <Icon icon={wallet.sqLogo} />
-          </i>
-        </SlottedRadioOption>
-      {/each}
+              <span class="title">{getWalletName(wallet.code, $locale)}</span>
+              <span class="subtitle"
+                >{getWalletSubtitle(wallet.code, $locale)}</span
+              >
+            </div>
+            <div slot="body">
+              {#if $selectedWallet === wallet.code}
+                <div transition:slide={getAnimationOptions({ duration: 200 })}>
+                  {#if getApplicableOffer(wallet.code)}
+                    <span class="offer">
+                      {getApplicableOffer(wallet.code).name}
+                    </span>
+                    <div class="offer-info">
+                      {getApplicableOffer(wallet.code).display_text}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
+            </div>
+            <i slot="icon" class="top">
+              <Icon icon={wallet.sqLogo} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
+      </div>
     </div>
   </div>
-  <AccountTab />
+  <AccountTab
+    {onScreenContainerOpacity}
+    {onScreenContainerElement}
+    {onScreenContentElement}
+  />
   <CTA
     screen="wallet"
     tab="wallet"

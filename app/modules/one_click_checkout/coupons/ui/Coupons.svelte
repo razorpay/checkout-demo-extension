@@ -1,6 +1,6 @@
 <script lang="ts">
   // svelte imports
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, afterUpdate } from 'svelte';
   import { fly, slide } from 'svelte/transition';
   import { sineOut } from 'svelte/easing';
 
@@ -305,7 +305,15 @@
     x: -100,
     delay: 350,
   });
-
+  let onScreenContainerElement: HTMLDivElement;
+  let onScreenContentElement: HTMLDivElement;
+  let onScreenContainerOpacity;
+  afterUpdate(() => {
+    onScreenContainerElement = document.getElementById('form-home-1cc');
+    onScreenContainerOpacity = window.getComputedStyle(
+      onScreenContainerElement
+    ).opacity;
+  });
   /**
    * resets the variable to false when screen is destroyed to
    * ensure that once it has been displayed, it doesn't appear again
@@ -317,8 +325,17 @@
   });
 </script>
 
-<Screen pad={false}>
-  <div data-test-id="summary-screen" class="coupon-container">
+<Screen
+  pad={false}
+  {onScreenContainerOpacity}
+  {onScreenContainerElement}
+  {onScreenContentElement}
+>
+  <div
+    data-test-id="summary-screen"
+    class="coupon-container"
+    bind:this={onScreenContentElement}
+  >
     {#if $showTruecallerErrorMessage}
       <TruecallerNotification />
     {/if}

@@ -161,12 +161,12 @@
       </button>
     {/if}
   </div>
-  <div slot="footer">
+  <div slot="footer" let:isFixed>
     {#if isSavedAddrView}
       <SameBillingAndShipping
         shouldSaveAddress={false}
         on:toggle={trackSameBillingAndShippingCheckbox}
-        isFixed
+        {isFixed}
       />
     {/if}
   </div>
@@ -210,7 +210,6 @@
 
   div[slot='footer'] :global(.same-address-checkbox) {
     z-index: 1;
-    border-top: 1px solid var(--background-color-magic);
     padding-bottom: 10px;
   }
 </style>
