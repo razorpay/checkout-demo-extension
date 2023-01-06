@@ -220,7 +220,7 @@
     font-size: var(--font-size-body);
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
-    background-color: #f0f0f4;
+    background-color: var(--background-color-magic);
   }
   .container::-webkit-scrollbar {
     /* WebKit */

@@ -349,6 +349,7 @@
   <TruecallerNotification />
 {/if}
 <div
+  id="payment-details-block"
   data-test-id="payment-details-block"
   class:details-wrapper={(isRedesignV15Enabled && !isOneClickCheckout()) ||
     isEditDetailScreen}
@@ -463,6 +464,10 @@
 </div>
 
 <style lang="scss">
+  #payment-details-block {
+    height: 100%;
+    background-color: white;
+  }
   .details-wrapper {
     padding: 16px 16px 28px;
   }
