@@ -127,7 +127,11 @@ import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
 import { moengageEventsData } from 'one_click_checkout/merchant-analytics/store';
 import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
 import { selectedPlan } from 'checkoutstore/emi';
-import { sendDismissEvent } from 'checkoutframe/helper';
+import {
+  sendDismissEvent,
+  isMagicShopifyFlow,
+  isMagicWoocFlow,
+} from 'checkoutframe/helper';
 import { TRUECALLER_VARIANT_NAMES, stopVerificationPolling } from 'truecaller';
 import { shouldShowProceedOverlay } from 'truecaller/store';
 import { setTruecallerMetaData } from 'truecaller/analytics';
@@ -6764,15 +6768,23 @@ Session.prototype = {
     preferences = prefs;
 
     if (RazorpayHelper.isOneClickCheckout()) {
-      const shopifyCartOption = RazorpayHelper.getOption('shopify_cart');
       if (preferences.order) {
-        if (!shopifyCartOption) {
+        const initializeAndReset = !(isMagicShopifyFlow() || isMagicWoocFlow());
+        if (initializeAndReset) {
           discreet.ChargesHelper.initializeAndReset(
             parseInt(preferences.order.line_items_total)
           );
         }
-      } else if (shopifyCartOption) {
-        discreet.ChargesHelper.initialize(shopifyCartOption.total_price);
+      } else {
+        const cart = isMagicShopifyFlow()
+          ? RazorpayHelper.getOption('shopify_cart')
+          : isMagicWoocFlow()
+          ? RazorpayHelper.getOption('cart')
+          : null;
+
+        if (cart?.total_price) {
+          discreet.ChargesHelper.initialize(cart.total_price);
+        }
       }
     }
 

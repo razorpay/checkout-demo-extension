@@ -64,6 +64,7 @@ import {
 import {
   updateAnalyticsFromPreferences,
   isMagicShopifyFlow,
+  isMagicWoocFlow,
 } from 'checkoutframe/helper';
 import {
   markRelevantPreferencesPayload,
@@ -73,6 +74,10 @@ import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
 
 import { initShopifyCheckout, clearShopifyCheckout } from './1cc-shopify';
 import { isTruecallerLoginEnabledBeforePreferences } from 'truecaller';
+import {
+  initLazyOrderResolver,
+  lazyOrderResolver,
+} from 'one_click_checkout/order/controller';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -399,9 +404,54 @@ export const handleMessage = function (message) {
       }).catch((e) => {
         Razorpay.sendMessage({ event: 'fault', data: e });
       });
+    } else if (options.cart) {
+      initLazyOrderResolver();
     }
-
     fetchPrefs(session);
+  } else if (message.event === 'update_options') {
+    const keys = Object.keys(message.data ?? {});
+
+    const LAZY_OPTION_KEYS = [
+      'order_id',
+      'notes',
+      'description',
+      'callback_url',
+    ];
+
+    keys
+      .filter((key) => LAZY_OPTION_KEYS.includes(key))
+      .forEach((key) => {
+        const value = message.data[key];
+        if (key === 'order_id') {
+          const order_id = value;
+          const params = getPreferencesParams(session.r);
+          params.order_id = order_id;
+          Razorpay.payment.getPrefs(params, (preferences) => {
+            if (
+              preferences.error ||
+              (preferences.status_code && preferences.status_code !== 200)
+            ) {
+              Razorpay.sendMessage({
+                event: 'fault',
+                data: 'Error in fetching preferences',
+              });
+            } else {
+              lazyOrderResolver({ order_id, preferences });
+            }
+          });
+        } else {
+          if (key === 'notes' && _.isNonNullObject(value)) {
+            setNotes(value);
+          }
+          /**
+           * skipping order_id update in options because
+           * absence of order_id in options is one of predicate for load time flows.
+           * setting it in options may interfere the laodTime flow
+           * (isMagicShopifyFlow, isMagicWoocFlow)
+           */
+          setOption(key, value);
+        }
+      });
   }
 
   try {
@@ -523,7 +573,7 @@ function getPrefsPromisified(session) {
   }
 
   return new Promise((resolve) => {
-    if (isMagicShopifyFlow()) {
+    if (isMagicShopifyFlow() || isMagicWoocFlow()) {
       const litePrefs = getLitePreferencesFromStorage(
         getOption('key')
       )?.preferences;
@@ -549,7 +599,6 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
   performPrePrefsFetchOperations();
-
   getPrefsPromisified(session)
     .then((preferences) => {
       processPreferences(preferences, session);

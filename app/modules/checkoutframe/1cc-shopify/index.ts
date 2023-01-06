@@ -71,7 +71,7 @@ export function initShopifyCheckout({
 }) {
   SHOPIFY_CHECKOUT_PROMISE = createShopifyCheckout({ body, key_id });
 
-  return createShopifyOrder(SHOPIFY_CHECKOUT_PROMISE).catch((err) => {
+  return createShopifyOrder(SHOPIFY_CHECKOUT_PROMISE).catch((err: any) => {
     // @TODO move to common error processor util
     if (!err) {
       err = { message: ERROR_SHOPIFY_ORDER_FAILED };

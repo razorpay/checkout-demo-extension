@@ -9,7 +9,7 @@ import RazorpayStore, {
   getMerchantKey,
   getOption,
   getOrderId,
-  setShopifyOrderId,
+  setLazyOrderId,
 } from 'razorpay';
 import { getSession } from 'sessionmanager';
 
@@ -17,8 +17,34 @@ import { getSession } from 'sessionmanager';
  * resolves to order id
  * @type Promise<string>
  */
-export let SHOPIFY_ORDER_PROMISE;
+function setOrderWithPreferences({ order_id, preferences }) {
+  setLazyOrderId(order_id);
+  // since preferences is fetched using internal auth,
+  // microservice is returning rzp_test/rzp_live as key here
+  preferences.merchant_key = getMerchantKey();
+  const session = getSession();
+
+  if (session.isOpen) {
+    const razorpayInstance = session.r;
+    razorpayInstance.preferences = preferences;
+    RazorpayStore.updateInstance(razorpayInstance);
+
+    session.setPreferences(preferences);
+    session.setOffers();
+  }
+
+  return order_id;
+}
+
+export let LAZY_ORDER_PROMISE;
 let hash = null;
+
+export let lazyOrderResolver;
+export function initLazyOrderResolver() {
+  LAZY_ORDER_PROMISE = new Promise((resolve) => {
+    lazyOrderResolver = resolve;
+  }).then(setOrderWithPreferences);
+}
 
 export async function updateOrderWithCustomerDetails(
   payload = getDefaultCustomerDetails()
@@ -51,32 +77,22 @@ export async function updateOrderWithCustomerDetails(
  * @returns {string|Promise<string>}
  */
 export function getLazyOrderId() {
-  return getOrderId() || SHOPIFY_ORDER_PROMISE;
+  return getOrderId() || LAZY_ORDER_PROMISE;
 }
 
 export function clearShopifyOrder() {
-  SHOPIFY_ORDER_PROMISE = null;
-  setShopifyOrderId('');
+  LAZY_ORDER_PROMISE = null;
+  setLazyOrderId('');
 }
 
 export function createShopifyOrder(shopifyCheckoutPromise) {
-  SHOPIFY_ORDER_PROMISE = shopifyCheckoutPromise
+  LAZY_ORDER_PROMISE = shopifyCheckoutPromise
     .then(Service.createShopifyOrder)
-    .then(({ order_id, preferences }) => {
-      setShopifyOrderId(order_id);
-      // since preferences is fetched using internal auth,
-      // microservice is returning rzp_test/rzp_live as key here
-      preferences.merchant_key = getMerchantKey();
+    .then(setOrderWithPreferences)
+    .then((order_id) => {
       const session = getSession();
 
       if (session.isOpen) {
-        const razorpayInstance = session.r;
-        razorpayInstance.preferences = preferences;
-        RazorpayStore.updateInstance(razorpayInstance);
-
-        session.setPreferences(preferences);
-        session.setOffers();
-
         Service.updateShopifyCartUrl({
           order_id,
           cart_note: getOption('shopify_cart').note,
@@ -86,5 +102,5 @@ export function createShopifyOrder(shopifyCheckoutPromise) {
       return order_id;
     });
 
-  return SHOPIFY_ORDER_PROMISE;
+  return LAZY_ORDER_PROMISE;
 }

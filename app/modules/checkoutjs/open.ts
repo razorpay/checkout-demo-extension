@@ -278,6 +278,14 @@ function getPreloadedFrame(rzp?: RazorpayType) {
 
 RazorProto.postInit = function () {
   this.modal = { options: {} };
+  const baseSet = this.set;
+  this.set = (key: string, value: unknown) => {
+    const frame = this.checkoutFrame;
+    if (frame) {
+      frame.postMessage({ event: 'update_options', data: { [key]: value } });
+    }
+    baseSet(key, value);
+  };
 
   if (this.get('parent')) {
     this.open();

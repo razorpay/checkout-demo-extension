@@ -3,10 +3,9 @@ import { getOption, getPreferences } from './base';
 import { getMerchantOrder } from './preferences';
 import { isSubscription } from './recurring';
 
-let SHOPIFY_ORDER_ID: string; // this stores the lazily created order id in magic shopify flow
+let LAZY_ORDER_ID: string; // this stores the lazily created order id both magic shopify flow and wooc flow
 
-export const setShopifyOrderId = (orderId: string) =>
-  (SHOPIFY_ORDER_ID = orderId);
+export const setLazyOrderId = (orderId: string) => (LAZY_ORDER_ID = orderId);
 
 /**
  * order related
@@ -14,9 +13,7 @@ export const setShopifyOrderId = (orderId: string) =>
  * // if invoice then pick order Id from preference else from option
  */
 export const getOrderId = () =>
-  getPreferences('invoice.order_id') ||
-  getOption('order_id') ||
-  SHOPIFY_ORDER_ID;
+  getPreferences('invoice.order_id') || getOption('order_id') || LAZY_ORDER_ID;
 
 export const isInvoicePayment = () => !!getPreferences('invoice');
 

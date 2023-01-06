@@ -131,8 +131,15 @@ export function updateAnalyticsFromPreferences(preferences: PreferencesObject) {
   });
 }
 
+function isLiteModeFlow() {
+  return Boolean(getQueryParams().merchant_key) && !getOption('order_id');
+}
+
 export function isMagicShopifyFlow() {
-  return !getOption('order_id') && Boolean(getQueryParams().merchant_key);
+  return isLiteModeFlow() && getOption('shopify_cart');
+}
+export function isMagicWoocFlow() {
+  return isLiteModeFlow() && getOption('cart');
 }
 
 export function sendDismissEvent(data: any) {
