@@ -138,7 +138,7 @@ Customer.prototype = {
     this.tokens = data.tokens;
 
     if (!session.local && session.isOpen) {
-      session.topBar.setLogged(true);
+      session.topBar?.setLogged(true);
     }
     EventsV2.setContext(ContextProperties.USER_LOGGEDIN, true);
     Events.setMeta(MetaProperties.LOGGEDIN, true);

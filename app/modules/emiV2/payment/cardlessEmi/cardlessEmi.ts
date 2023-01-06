@@ -44,7 +44,7 @@ export const fetchCardlessEmiPlans = (params: CardlessParams = {}) => {
 
   const topbarImages = getImageUrl(providerCode);
 
-  session.topBar.setTitleOverride('otp', 'image', topbarImages);
+  session.topBar?.setTitleOverride('otp', 'image', topbarImages);
   session.setOneCCTabLogo(topbarImages);
 
   session.otpView.updateScreen({

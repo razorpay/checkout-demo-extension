@@ -1611,7 +1611,7 @@ Session.prototype = {
     let providerCode = CardlessEmiStore.providerCode;
     let plans = CardlessEmiStore.plans[providerCode];
 
-    this.topBar.setTitleOverride(
+    this.topBar?.setTitleOverride(
       'emiplans',
       'image',
       CardlessEmi.getImageUrl(providerCode)
@@ -1700,7 +1700,7 @@ Session.prototype = {
     let incorrectOtp = params.incorrect;
 
     let topbarImages = CardlessEmi.getImageUrl(providerCode);
-    this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.topBar?.setTitleOverride('otp', 'image', topbarImages);
     this.setOneCCTabLogo(topbarImages);
 
     let locale = I18n.getCurrentLocale();
@@ -1804,7 +1804,7 @@ Session.prototype = {
     let self = this;
 
     let topbarImages = PayLater.getImageUrl(providerCode);
-    this.topBar.setTitleOverride('otp', 'image', topbarImages);
+    this.topBar?.setTitleOverride('otp', 'image', topbarImages);
     this.setOneCCTabLogo(topbarImages);
 
     let params = {
@@ -2649,7 +2649,7 @@ Session.prototype = {
       let tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
       if (tabForTitle && this.topBar) {
-        this.topBar.setTab(tabForTitle);
+        this.topBar?.setTab(tabForTitle);
       }
     }
     /**
@@ -2737,7 +2737,7 @@ Session.prototype = {
       if (screen) {
         this.topBar?.show();
       } else if (!RazorpayHelper.isOneClickCheckout()) {
-        this.topBar.hide();
+        this.topBar?.hide();
       }
     }
     let screenEl = '#form-' + (screen || 'common');
@@ -3166,7 +3166,7 @@ Session.prototype = {
         discreet.OneClickCheckoutInterface.handleBack();
         this.switchTab('home-1cc');
         Cta.showCta();
-        this.topBar.hide();
+        this.topBar?.hide();
         if ($('#amount .original-amount')[0]) {
           $('#amount .original-amount')[0].removeAttribute('style');
         }
@@ -3359,10 +3359,10 @@ Session.prototype = {
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
-        this.topBar.setLogged(true);
+        this.topBar?.setLogged(true);
       }
 
-      this.topBar.setContact(contact);
+      this.topBar?.setContact(contact);
 
       let offer = this.getAppliedOffer();
       if (
@@ -3511,7 +3511,7 @@ Session.prototype = {
       return self.setScreen('card');
     }
 
-    this.topBar.setTitleOverride('otp', 'text', 'card');
+    this.topBar?.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
       skipTextLabel: RazorpayHelper.isOneClickCheckout()
@@ -3552,7 +3552,7 @@ Session.prototype = {
     let self = this;
     let customer = self.getCurrentCustomer();
 
-    this.topBar.setTitleOverride('otp', 'text', 'card');
+    this.topBar?.setTitleOverride('otp', 'text', 'card');
     this.otpView.updateScreen({
       skipTextLabel: RazorpayHelper.isOneClickCheckout()
         ? 'skip_saved_cards_one_cc'
@@ -6175,7 +6175,7 @@ Session.prototype = {
         skipTextLabel: 'resend_otp',
         allowSkip: false,
       });
-      this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
+      this.topBar?.setTitleOverride('otp', 'image', walletObj.logo);
       this.setOneCCTabLogo(walletObj.logo);
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),

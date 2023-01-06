@@ -6,6 +6,7 @@ import {
   isAddressEnabled,
   isContactHidden,
   isEmailHidden,
+  isOfferForced,
   isPartialPayment,
 } from 'razorpay';
 import { derived, writable } from 'svelte/store';
@@ -38,7 +39,8 @@ export const fullScreenHeader = derived(
     const showFullScreen =
       $screenStore === '' &&
       $homeView === HOME_VIEWS.DETAILS &&
-      getContactScreenInputCount() <= 2;
+      getContactScreenInputCount() <= 2 &&
+      !isOfferForced();
     if (
       ($anyFieldTouched && $isMobileStore) ||
       $bodyHeight > (isMediumScreen() ? 300 : 340) ||

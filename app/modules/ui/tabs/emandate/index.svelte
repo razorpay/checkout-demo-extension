@@ -119,7 +119,7 @@
   // set field directions
   const dir = getDirectionForField();
   // Set tab title overrides
-  session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
+  session.topBar?.setTitleOverride('netbanking', 'text', 'emandate_account');
 
   function setInitialState() {
     if (isPrefilledBankAvailable) {
