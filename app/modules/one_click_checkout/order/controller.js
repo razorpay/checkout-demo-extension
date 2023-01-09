@@ -1,6 +1,8 @@
 import { computeHash } from 'one_click_checkout/order/utils';
 import * as Service from 'one_click_checkout/order/service';
 import { getDefaultCustomerDetails } from 'one_click_checkout/order/helpers';
+import feature_overrides from 'checkoutframe/overrideConfig';
+
 import {
   isContactValid,
   isEmailValid,
@@ -24,12 +26,16 @@ function setOrderWithPreferences({ order_id, preferences }) {
   preferences.merchant_key = getMerchantKey();
   const session = getSession();
 
+  const updatedPrefs = {
+    feature_overrides,
+    ...preferences,
+  };
   if (session.isOpen) {
     const razorpayInstance = session.r;
-    razorpayInstance.preferences = preferences;
+    razorpayInstance.preferences = updatedPrefs;
     RazorpayStore.updateInstance(razorpayInstance);
 
-    session.setPreferences(preferences);
+    session.setPreferences(updatedPrefs);
     session.setOffers();
   }
 
