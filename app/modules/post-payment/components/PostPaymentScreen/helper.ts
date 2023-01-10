@@ -4,9 +4,9 @@ export function getTimestamp() {
   const date = new Date();
   return `${
     MONTHS[date.getMonth()]
-  } ${date.getDate()}, ${date.getFullYear()} | ${`0${date.getHours()}`.slice(
-    -2
-  )}:${`0${date.getMinutes()}`.slice(-2)} ${
+  } ${date.getDate()}, ${date.getFullYear()} | ${`0${
+    date.getHours() % 12 || 12
+  }`.slice(-2)}:${`0${date.getMinutes()}`.slice(-2)} ${
     date.getHours() >= 12 ? 'PM' : 'AM'
   }`;
 }

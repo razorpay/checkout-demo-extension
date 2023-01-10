@@ -32,12 +32,12 @@
   import autotest from 'autotest';
 
   export let required: boolean;
-
+  export let overrideOptionalFlag = false;
   let EMAIL_REGEX = '';
   let label = '';
 
   $: {
-    required = !$isOptionalEmail;
+    required = overrideOptionalFlag ? required : !$isOptionalEmail;
     EMAIL_REGEX = !required ? '.*' : EMAIL_PATTERN;
 
     // LABEL: Email (Optional) / Email

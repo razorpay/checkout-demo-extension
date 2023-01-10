@@ -200,7 +200,7 @@
   import { setNoCostAvailable } from 'emiV2/store';
   import { showGCErrMsg } from 'one_click_checkout/gift_card/helpers';
   import { isValidContact } from 'helper/validation';
-  import { showBackArrow } from 'header/store';
+  import { fullScreenHeader, HEADER_SIZE, showBackArrow } from 'header/store';
   import {
     p13nInstrumentShown,
     triggerInstAnalytics,
@@ -1328,7 +1328,8 @@
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
       } else if (view === HOME_VIEWS.DETAILS) {
         CTAState.showAmount = Boolean(isPartialPayment || tpv);
-        CTAState.variant = 'shadowless';
+        CTAState.variant =
+          $fullScreenHeader !== HEADER_SIZE.MINIMAL ? 'shadowless' : '';
         CTAState.onSubmit = onPaymentDetailSubmit;
         if (singleMethod) {
           const { label, labelData } = showPayViaSingleMethod(

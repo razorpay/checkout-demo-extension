@@ -515,7 +515,7 @@
     }
 
     .partial-payment-block {
-      padding: 24px 0;
+      padding: 0 0 24px 0;
     }
   }
 

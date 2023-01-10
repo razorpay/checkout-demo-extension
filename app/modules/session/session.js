@@ -359,7 +359,7 @@ function errorHandler(response) {
       return;
     }
   }
-  const tempPayload = this.payload;
+  const tempPayload = this.payload || this.lastPayloadValue;
   this.clearRequest();
   updateScore('failedPayment');
   Analytics.track('error', {
@@ -387,25 +387,33 @@ function errorHandler(response) {
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
 
-  if (this.get('retry') === false && !this.get('redirect')) {
-    this.hideOverlayMessage();
-    if (
-      error &&
-      error.metadata &&
-      error.metadata.payment_id &&
-      isEmailHidden() &&
-      RazorpayHelper.isRedesignV15()
-    ) {
-      showPostPaymentMessage({
-        response: { error },
-        requestPayload: tempPayload,
-      }).then(() => {
+  try {
+    if (this.get('retry') === false && !this.get('redirect')) {
+      this.hideOverlayMessage();
+      if (
+        error &&
+        error.metadata &&
+        error.metadata.payment_id &&
+        isEmailHidden() &&
+        RazorpayHelper.isRedesignV15()
+      ) {
+        showPostPaymentMessage({
+          response: { error },
+          requestPayload: tempPayload,
+        }).then(() => {
+          try {
+            this.modal.hide();
+          } catch (e) {
+            // e
+          }
+        });
+      } else {
         this.modal.hide();
-      });
-    } else {
-      this.modal.hide();
+      }
+      return;
     }
-    return;
+  } catch (e) {
+    // e
   }
 
   let err_field = error.field;
@@ -829,7 +837,7 @@ function successHandler(response) {
     this.hideOverlayMessage();
     showPostPaymentMessage({
       response,
-      requestPayload: this.payload,
+      requestPayload: this.payload || this.lastPayloadValue,
     }).then(postSuccessFlow);
     // show intermediate screen as promise after 5 second continue the flow
   } else {
@@ -4740,6 +4748,11 @@ Session.prototype = {
     }
 
     this.isResumedPayment = false;
+    /**
+     * lastPayloadValue contain payload data used before reset this.payload to null.
+     * This is consumed by postPaymentScreen in emailless checkout flow
+     */
+    this.lastPayloadValue = this.payload;
     this.payload = null;
     this.powerwallet = false;
 

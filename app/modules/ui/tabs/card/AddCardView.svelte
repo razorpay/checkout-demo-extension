@@ -801,12 +801,13 @@
     </div>
   {/if}
   {#if showEmailField}
-    <div>
+    <div class="email-field">
       <EmailField
         on:input={() => {
           tick().then(computeIsFormValid);
         }}
         required
+        overrideOptionalFlag
         bind:value={$email}
         showValidations
       />
@@ -931,5 +932,10 @@
 
   .add-contact-field {
     margin-top: 20px;
+  }
+
+  .email-field :global(label) {
+    font-size: var(--font-size-small);
+    line-height: 20px;
   }
 </style>

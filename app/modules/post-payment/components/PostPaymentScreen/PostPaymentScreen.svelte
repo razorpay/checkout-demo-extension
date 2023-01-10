@@ -18,6 +18,7 @@
   import circle_cross from 'ui/icons/payment-methods/circle_cross';
   import { Events } from 'analytics';
   import { ANALYTICS_EVENTS, SUPPORT_URL } from './constant';
+  import { appliedOffer } from 'offers/store';
 
   export let onComplete: () => void;
   export let data: PostPaymentScreenProps['data'];
@@ -42,6 +43,19 @@
   };
 
   let fee = 0;
+  let offerAmount = 0;
+
+  $: {
+    if (
+      $appliedOffer &&
+      $appliedOffer.original_amount &&
+      $appliedOffer.amount
+    ) {
+      offerAmount = $appliedOffer.original_amount - $appliedOffer.amount;
+    } else {
+      offerAmount = 0;
+    }
+  }
   $: {
     fee = +(data?.requestPayload?.fee || 0);
     if (isNaN(fee)) {
@@ -75,7 +89,11 @@
       {/if}
     </div>
     <div class="amount">
-      {formatAmountWithCurrency(getAmount() + fee)}
+      {formatAmountWithCurrency(
+        offerAmount > 0
+          ? $appliedOffer?.amount || getAmount()
+          : getAmount() + fee
+      )}
     </div>
 
     <div class="status-text">
