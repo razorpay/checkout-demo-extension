@@ -1,6 +1,7 @@
 import { updateActionAreaContentAndCTA } from './common';
 import { querySelector } from 'utils/doc';
 import type { SessionType } from 'types/types';
+import { setHeading } from 'components/ErrorModal';
 
 const AUTH_PENDING_MSG =
   'Payment is pending authorization. Request for authorization from approver.';
@@ -17,8 +18,8 @@ export function replaceRetryIfCorporateNetbanking(
 ) {
   if (message === AUTH_PENDING_MSG) {
     session.isCorporateBanking = true;
-
-    updateActionAreaContentAndCTA(session, 'OK', undefined, true);
+    setHeading('Payment Update');
+    updateActionAreaContentAndCTA(session, 'OK', message, true);
   } else {
     (querySelector('#fd-hide') as HTMLElement).focus();
   }
