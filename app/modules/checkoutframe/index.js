@@ -636,6 +636,14 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
+  try {
+    // update appsThatSupportWebPayments when specific
+    // upi apps needs to be shown in p13n
+    if (shouldShowAllUPIApps()) {
+      additionalSupportedPaymentApps();
+    }
+  } catch (error) {}
+
   checkForPossibleWebPayments();
 }
 
@@ -695,13 +703,6 @@ function setSessionPreferences(session, preferences) {
     }
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
-
-  try {
-    if (shouldShowAllUPIApps()) {
-      additionalSupportedPaymentApps();
-      checkForPossibleWebPayments();
-    }
-  } catch (error) {}
 
   initI18n().then(() => {
     session.render();
