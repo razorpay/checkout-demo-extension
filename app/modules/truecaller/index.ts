@@ -3,6 +3,7 @@ export {
   isTruecallerLoginEnabled,
   isTruecallerLoginEnabledBeforePreferences,
   getTruecallerLanguageCodeForCheckout,
+  generateTruecallerPreferenceParams,
 } from './helpers';
 export { setCustomer } from './customer';
 

@@ -115,10 +115,12 @@
   import { truecallerPresent } from 'truecaller/store';
 
   // type imports
-  import type {
-    TruecallerCheckResponse,
-    UserVerifySuccessApiResponse,
-  } from 'truecaller/types';
+  import type { UserVerifySuccessApiResponse } from 'truecaller/types';
+  import { getPrefilledEmail } from 'checkoutframe/customer';
+  import {
+    setDefaultSelectedAddress,
+    setSavedAddresses,
+  } from 'one_click_checkout/address/sessionInterface';
 
   // Props
   export let tpv = undefined;
@@ -322,16 +324,27 @@
   export function onTruecallerLoginSuccess(
     detail: UserVerifySuccessApiResponse
   ) {
+    postTruecallerTriggerStatusUpdate();
     Analytics.setMeta(META_KEYS.LOGIN_SCREEN_SOURCE, 'contact_details');
-    setCustomer(detail);
 
-    if (!detail.email) {
+    getPrefilledEmail()
+      ? setCustomer({
+          ...detail,
+          email: getPrefilledEmail(),
+        })
+      : setCustomer(detail);
+
+    if (isOneClickCheckout()) {
+      setSavedAddresses(detail.addresses);
+      setDefaultSelectedAddress();
+    }
+
+    if (!isEmailOptional() && !getPrefilledEmail() && !detail.email) {
       shouldUpdateEmail = true;
       return;
     }
 
     onSubmitClick();
-    postTruecallerTriggerStatusUpdate();
   }
 
   export function onTruecallerLoginError(detail: any) {

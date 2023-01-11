@@ -21,7 +21,7 @@ export function initTruecaller() {
     if (truecallerEnabled) {
       triggerTruecallerIntent({}, TRUECALLER_VARIANT_NAMES.contact_screen)
         .then((res) => {
-          Analytics.setMeta(META_KEYS.LOGIN_SOURCE, 'summary_screen');
+          Analytics.setMeta(META_KEYS.LOGIN_SCREEN_SOURCE, 'summary_screen');
           getPrefilledEmail()
             ? setCustomer({
                 ...res,

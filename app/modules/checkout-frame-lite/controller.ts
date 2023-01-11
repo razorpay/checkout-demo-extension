@@ -10,7 +10,7 @@ import { setParamsForDdosProtection } from '../checkoutframe/utils';
 import { BUILD_NUMBER, LIBRARY, PLATFORM } from '../common/constants';
 import type { Preferences } from '../razorpay/types/Preferences';
 import RazorpayConfig from 'common/RazorpayConfig';
-import { isTruecallerLoginEnabledBeforePreferences } from 'truecaller/helpers';
+import { generateTruecallerPreferenceParams } from 'truecaller/helpers';
 
 function fetchPrefsFromApi(options: any): Promise<Preferences> {
   setParamsForDdosProtection({});
@@ -22,8 +22,9 @@ function fetchPrefsFromApi(options: any): Promise<Preferences> {
     '_[build]': BUILD_NUMBER,
     '_[library]': LIBRARY,
     '_[platform]': PLATFORM,
-    truecaller: isTruecallerLoginEnabledBeforePreferences().status ? 1 : 0,
   };
+
+  Object.assign(params, generateTruecallerPreferenceParams());
 
   RazorpayConfig.api = '/';
 

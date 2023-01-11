@@ -16,6 +16,9 @@ import {
 import { getSession } from 'sessionmanager';
 import { getPreferencesParams } from 'checkoutframe/utils';
 import { isNonNullObject, unflatten } from 'utils/object';
+import { getOption } from 'razorpay/helper/base';
+import { generateTruecallerPreferenceParams } from 'truecaller/helpers';
+import { getLitePreferencesFromStorage } from 'checkout-frame-lite/service';
 
 export function updateOrder(payload) {
   const orderId = getOrderId();
@@ -50,6 +53,21 @@ export function updateOrder(payload) {
 export function createShopifyOrder(shopifyCheckoutId) {
   const session = getSession();
   const params = getPreferencesParams(session);
+
+  try {
+    /**
+     * Truecaller request_id should not be generated again
+     * if they were generated earlier for user (from cached prefs)
+     */
+    const cachedTruecallerReqId = getLitePreferencesFromStorage(
+      getOption('key')
+    )?.preferences.truecaller?.request_id;
+    if (!cachedTruecallerReqId) {
+      Object.assign(params, generateTruecallerPreferenceParams());
+    }
+  } catch (error) {
+    // no-op
+  }
 
   if (isNonNullObject(params)) {
     params['_[request_index]'] = Analytics.updateRequestIndex('preferences');

@@ -14,6 +14,7 @@ import RazorpayStore, {
   setLazyOrderId,
 } from 'razorpay';
 import { getSession } from 'sessionmanager';
+import { getLitePreferencesFromStorage } from 'checkout-frame-lite/service';
 
 /**
  * resolves to order id
@@ -30,6 +31,19 @@ function setOrderWithPreferences({ order_id, preferences }) {
     feature_overrides,
     ...preferences,
   };
+
+  /**
+   * use the cached truecaller id if present
+   */
+  const cachedTruecallerReqId = getLitePreferencesFromStorage(getOption('key'))
+    ?.preferences.truecaller?.request_id;
+  if (cachedTruecallerReqId) {
+    updatedPrefs.truecaller = {
+      ...updatedPrefs.truecaller,
+      request_id: cachedTruecallerReqId,
+    };
+  }
+
   if (session.isOpen) {
     const razorpayInstance = session.r;
     razorpayInstance.preferences = updatedPrefs;

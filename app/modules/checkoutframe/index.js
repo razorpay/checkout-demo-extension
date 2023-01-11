@@ -73,7 +73,7 @@ import {
 import { getLitePreferencesFromStorage } from '../checkout-frame-lite/service';
 
 import { initShopifyCheckout, clearShopifyCheckout } from './1cc-shopify';
-import { isTruecallerLoginEnabledBeforePreferences } from 'truecaller';
+import { generateTruecallerPreferenceParams } from 'truecaller';
 import {
   initLazyOrderResolver,
   lazyOrderResolver,
@@ -756,26 +756,15 @@ function getPreferencesParams(razorpayInstance) {
   }
 
   try {
-    // We need to send truecaller=1 (when truecaller login is possible), and
-    // prefill=1 (when contact and email are prefilled by merchant).
-    // Backend generates truecaller request_id only when truecaller=1
-    // prefill=1 is being used to run experiment for prefilled and
-    // non prefilled sessions.
-    const truecallerEnabled =
-      isTruecallerLoginEnabledBeforePreferences().status;
-    if (truecallerEnabled) {
-      prefData.truecaller = 1;
-    }
-
-    // Before preferences we don't know if either of the contact or email
-    // or both are optional. So we assume that they are not optional
-    // and we just check if both of them are prefilled or not
-    if (
-      truecallerEnabled &&
-      getOption('prefill.contact') &&
-      getOption('prefill.email')
-    ) {
-      prefData.prefill = 1;
+    /**
+     * Truecaller request_id should not be generated again
+     * if they were generated earlier for user (from cached prefs)
+     */
+    const cachedTruecallerReqId = getLitePreferencesFromStorage(
+      getOption('key')
+    )?.preferences.truecaller?.request_id;
+    if (!cachedTruecallerReqId) {
+      Object.assign(prefData, generateTruecallerPreferenceParams());
     }
   } catch (error) {
     // no-op

@@ -317,3 +317,32 @@ export function isExperimentEnabledForVariant(
     variantConfig.experimentVariants as unknown as Array<string | boolean>
   ).includes(getPreferences(variantConfig.standardCheckoutExperimentFlag));
 }
+
+export function generateTruecallerPreferenceParams() {
+  const result: { truecaller?: number; prefill?: number } = {};
+
+  // We need to send truecaller=1 (when truecaller login is possible), and
+  // prefill=1 (when contact and email are prefilled by merchant).
+  // Backend generates truecaller request_id only when truecaller=1
+  // prefill=1 is being used to run experiment for prefilled and
+  // non prefilled sessions.
+  const truecallerEnabled = isTruecallerLoginEnabledBeforePreferences().status;
+
+  if (truecallerEnabled) {
+    result.truecaller = 1;
+  }
+
+  // Before preferences we don't know if either of the contact or email
+  // or both are optional. So we assume that they are not optional
+  // and we just check if both of them are prefilled or not
+
+  if (
+    truecallerEnabled &&
+    getOption('prefill.contact') &&
+    getOption('prefill.email')
+  ) {
+    result.prefill = 1;
+  }
+
+  return result;
+}

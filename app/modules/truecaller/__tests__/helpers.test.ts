@@ -12,6 +12,7 @@ import {
   isTruecallerLoginEnabled,
   getTruecallerLanguageCodeForCheckout,
   getCurrentTruecallerRequestId,
+  generateTruecallerPreferenceParams,
 } from '../helpers';
 import {
   truecallerPresent,
@@ -242,6 +243,74 @@ describe('getCurrentTruecallerRequestId tests', () => {
     truecallerAttemptCount.set(111);
     expect(getCurrentTruecallerRequestId()).toBe(
       '4ht75gduvny5nl6lv738omuyxwctw0vgttzc6hlxne9w2jjklk7iyqsmi9e9k-11'
+    );
+  });
+});
+
+describe('generateTruecallerPreferenceParams tests', () => {
+  describe('when before preference check fails', () => {
+    beforeEach(() => {
+      (getOption as unknown as jest.Mock).mockImplementation((param) => {
+        if (['features.truecaller_login'].includes(param)) return false;
+
+        return jest.requireActual('razorpay').getOption(param);
+      });
+    });
+
+    test('should give empty result if truecaller check for before preferences fails', () => {
+      const actual = generateTruecallerPreferenceParams();
+      const expected = {};
+
+      expect(actual).toEqual(expected);
+    });
+  });
+
+  describe('when before preference check passes', () => {
+    beforeEach(() => {
+      (getOption as unknown as jest.Mock).mockImplementation((param) => {
+        if (['features.truecaller_login'].includes(param)) return true;
+
+        return jest.requireActual('razorpay').getOption(param);
+      });
+    });
+
+    test('should set truecaller param as 1', () => {
+      const actual = generateTruecallerPreferenceParams();
+      const expected = {
+        truecaller: 1,
+      };
+
+      expect(actual).toEqual(expected);
+    });
+
+    test.each`
+      prefillContact    | prefillEmail    | prefillExpected
+      ${'dummyContact'} | ${'dummyEmail'} | ${1}
+      ${'dummyContact'} | ${undefined}    | ${undefined}
+      ${undefined}      | ${'dummyEmail'} | ${undefined}
+      ${undefined}      | ${undefined}    | ${undefined}
+    `(
+      'should set prefill as $prefillExpected for contact - $prefillContact and email - $prefillEmail',
+      ({ prefillContact, prefillEmail, prefillExpected }) => {
+        // configure mocks
+        (getOption as unknown as jest.Mock).mockImplementation((param) => {
+          if (['features.truecaller_login'].includes(param)) return true;
+
+          if (param === 'prefill.contact') return prefillContact;
+          if (param === 'prefill.email') return prefillEmail;
+
+          return jest.requireActual('razorpay').getOption(param);
+        });
+
+        const actual = generateTruecallerPreferenceParams();
+
+        const expected = {
+          truecaller: 1,
+          prefill: prefillExpected,
+        };
+
+        expect(actual).toEqual(expected);
+      }
     );
   });
 });
