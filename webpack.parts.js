@@ -426,5 +426,5 @@ exports.persistentCache = (cacheName) => ({
 
 /** @type {import('webpack').Configuration} */
 exports.retryAsyncChunks = {
-  plugins: [new RetryChunkLoadPlugin({ maxRetries: 5, retryDelay: 100 })],
+  plugins: [new RetryChunkLoadPlugin({ maxRetries: 10, retryDelay: 200 })],
 };
