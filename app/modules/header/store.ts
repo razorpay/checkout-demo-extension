@@ -1,6 +1,7 @@
 import { isMobileStore, screenStore } from 'checkoutstore';
 import { getTPV } from 'checkoutstore/methods';
-import { homeView } from 'checkoutstore/screens/home';
+import { country, homeView } from 'checkoutstore/screens/home';
+import { INDIA_COUNTRY_CODE } from 'common/constants';
 import { isMediumScreen, UCBrowser, isMIBrowser } from 'common/useragent';
 import {
   isAddressEnabled,
@@ -9,7 +10,7 @@ import {
   isOfferForced,
   isPartialPayment,
 } from 'razorpay';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import { HOME_VIEWS } from 'ui/tabs/home/constants';
 
 export enum HEADER_SIZE {
@@ -56,9 +57,12 @@ export const fullScreenHeader = derived(
 
 export function getContactScreenInputCount(): number {
   const tpv = getTPV();
+  const countryCode = get(country);
   return (
     Number(!isContactHidden()) +
-    Number(!isEmailHidden()) +
+    Number(
+      !isEmailHidden() || (countryCode && countryCode !== INDIA_COUNTRY_CODE)
+    ) +
     Number(isPartialPayment()) * 2 +
     Number(isAddressEnabled() && !isPartialPayment()) * 4 +
     Number(Boolean(tpv && !tpv.invalid))

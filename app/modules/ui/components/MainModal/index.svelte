@@ -73,7 +73,8 @@
   let baseHeight = 100;
   $: {
     if ($fullScreenHeader && $country) {
-      let initialBodyHeight = baseHeight;
+      let initialBodyHeight =
+        baseHeight + (getContactScreenInputCount() - 1) * FIELD_HEIGHT;
       // check for error state
       if (!$isContactValid) {
         initialBodyHeight += ERROR_MESSAGE_HEIGHT;
@@ -116,13 +117,9 @@
 
   onMount(() => {
     /**
-     * (getContactScreenInputCount() - 1) * FIELD_HEIGHT = we are subtract one from field heigh as min height of body can contain one field atleast
      * -10 is for reduce padding b/w body content and cta
      */
-    baseHeight =
-      bodyElement?.offsetHeight -
-      10 +
-      (getContactScreenInputCount() - 1) * FIELD_HEIGHT;
+    baseHeight = bodyElement?.offsetHeight - 10;
     clearOldExperiments();
     window.addEventListener('resize', handleResize);
     if (escape) {
