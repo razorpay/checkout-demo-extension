@@ -2738,7 +2738,7 @@ Session.prototype = {
     screenStore.set(this.screen);
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
-    if (screen === 'home-1cc') {
+    if (screen === 'home-1cc' || screen === 'qr') {
       discreet.OffersStore.showOffers.set(false);
     } else {
       discreet.OffersStore.showOffers.set(true);
