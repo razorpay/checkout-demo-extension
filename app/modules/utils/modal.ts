@@ -1,4 +1,5 @@
 import $ from 'lib/$';
+import { clearStack } from 'navstack';
 import { resetQRState } from 'upi/ui/components/QR/store';
 
 export function Modal() {
@@ -44,6 +45,8 @@ export function Modal() {
         },
         this.options.animation ? 300 : 0
       );
+
+      clearStack();
 
       this.options.onhide();
     },

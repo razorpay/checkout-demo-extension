@@ -266,7 +266,7 @@
   export function onSubmitClick() {
     if (
       !$isContactValid ||
-      (!CONTACT_REGEX.test($contact) && !isContactOptional())
+      (Boolean(getValidationText()) && !isContactOptional())
     ) {
       showValidations = true;
       shakeForm('#redesign-v15-cta', 'x-shake');

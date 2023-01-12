@@ -155,4 +155,6 @@ export function controlledViaSession() {
 export function clearStack() {
   elementRef.set(null);
   elements.set([]);
+  overlays.set([]);
+  overlaysRef.set([]);
 }
