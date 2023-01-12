@@ -40,14 +40,14 @@
   const handleContinue = () => {
     popStack();
 
-    if ($selectedUPIAppForPay.shouldShowDowntimeAlert) {
+    if ($selectedUPIAppForPay?.shouldShowDowntimeAlert) {
       $selectedUPIAppForPay.shouldShowDowntimeAlert = false;
     }
     session.submit();
   };
   const handleBack = () => {
     popStack();
-    if ($selectedInstrument.section !== UPI_APP_PAYMENT_SOURCES.p13n) {
+    if ($selectedInstrument?.section !== UPI_APP_PAYMENT_SOURCES.p13n) {
       resetSelectedUPIAppForPay();
     }
   };
