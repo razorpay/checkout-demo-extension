@@ -6,6 +6,8 @@ export default {
   IS_THIRDWATCH_INSURED: 'is_thirdwatch_insured',
   IS_MANDATORY_SIGNUP: 'is_mandatory_signup',
   IS_ONE_CLICK_CHECKOUT: 'is_one_click_checkout_enabled',
+  /** set meta for 1cc for shopify and wooc load time flows where cart is passed and order_id is not passed */
+  IS_ONE_CLICK_CHECKOUT_LITE: 'is_one_click_checkout_enabled_lite',
   HAS_SAVED_ADDRESSES: 'has_saved_addresses',
   INITIAL_LOGGED_IN: 'initial_loggedIn',
   INITIAL_HAS_SAVED_ADDRESS: 'initial_hasSavedAddress',

@@ -136,10 +136,10 @@ function isLiteModeFlow() {
 }
 
 export function isMagicShopifyFlow() {
-  return isLiteModeFlow() && getOption('shopify_cart');
+  return isLiteModeFlow() && Boolean(getOption('shopify_cart'));
 }
 export function isMagicWoocFlow() {
-  return isLiteModeFlow() && getOption('cart');
+  return isLiteModeFlow() && Boolean(getOption('cart'));
 }
 
 export function sendDismissEvent(data: any) {

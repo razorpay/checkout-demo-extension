@@ -1233,8 +1233,6 @@ Session.prototype = {
       Analytics.setMeta('safari', true);
     }
 
-    Analytics.setMeta('is_mobile', discreet.UserAgent.isMobile());
-
     Analytics.setMeta('device.id', getDeviceId());
 
     if (window && window.screen) {

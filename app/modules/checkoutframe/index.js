@@ -10,10 +10,11 @@ import Razorpay, {
 import { flatten, RazorpayDefaults } from 'common/options';
 import { shouldRedirect } from 'common/useragent';
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
+import MetaPropertiesOneCC from 'one_click_checkout/analytics/metaProperties';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import * as ObjectUtils from 'utils/object';
-import RazorpayStore, { getOption, setOption } from 'razorpay';
+import RazorpayStore, { getOption, hasCart, setOption } from 'razorpay';
 import {
   processNativeMessage,
   shouldShowAllUPIApps,
@@ -360,6 +361,11 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'open' || options) {
+    Events.setMeta(
+      MetaPropertiesOneCC.IS_ONE_CLICK_CHECKOUT_LITE,
+      hasCart() && !getOption('order_id')
+    );
+
     if (isPrefetchPrefsFlowFor1cc || is1ccShopifyFlow) {
       /**
        * In the prefetch flow, instance creation is the first step and at that point we don't have all the
@@ -373,7 +379,7 @@ export const handleMessage = function (message) {
 
     // triggering the open event, adding a safe check for sdk
     if (Bridge.hasCheckoutBridge()) {
-      Track(session.r, MiscEvents.OPEN);
+      Events.Track(MiscEvents.OPEN);
     }
 
     if (!ObjectUtils.isEmpty(message._order)) {

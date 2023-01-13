@@ -1,6 +1,6 @@
 import Razorpay from 'common/Razorpay';
 import { makeUrl } from 'common/helper';
-import { Events, Track, MiscEvents } from 'analytics/index';
+import { Events, Track, MiscEvents, MetaProperties } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 import * as _El from 'utils/DOM';
@@ -13,10 +13,11 @@ import * as ObjectUtils from 'utils/object';
 import * as _ from 'utils/_';
 import Interface from 'common/interface';
 import { MiscTracker } from 'misc/analytics/events';
-import { getOption } from 'razorpay';
+import { getOption, hasCart } from 'razorpay';
 import type { Razorpay as RazorpayType } from 'types/types';
 import type { OptionObject } from 'razorpay/types/Options';
 import { subscribeToTruecallerEvent } from 'truecaller/subscriptions';
+import MetaPropertiesOneCC from '../one_click_checkout/analytics/metaProperties';
 // import { setupFreezeCheck } from './freeze';
 
 const RazorProto = _.prototypeOf(Razorpay);
@@ -331,7 +332,13 @@ RazorProto.open = needBody(function (this: RazorpayType) {
   this.metadata.openedAt = Date.now();
 
   const frame = (this.checkoutFrame = getPreloadedFrame(this));
-  Track(this, 'open', { meta: { is_mobile: isMobile() } });
+
+  Events.setMeta(
+    MetaPropertiesOneCC.IS_ONE_CLICK_CHECKOUT_LITE,
+    hasCart() && !getOption('order_id')
+  );
+  Events.Track(MiscEvents.OPEN);
+
   try {
     MiscTracker.INVOKED({
       prefill: {
@@ -384,6 +391,8 @@ RazorProto.close = function () {
 };
 
 const initRazorpayCheckout = needBody(function () {
+  Events.setMeta(MetaProperties.IS_MOBILE, isMobile());
+
   createFrameContainer();
 
   if (window.Intl) {

@@ -10,6 +10,7 @@ import * as _El from 'utils/DOM';
 import { body } from 'utils/doc';
 import * as _ from 'utils/_';
 import { captureSentryHttpFailure } from 'sentry/failure';
+import { isMobile } from 'common/useragent';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
@@ -172,4 +173,5 @@ export function initIframe() {
     MetaProperties.TIME_SINCE_INIT_IFRAME,
     () => Date.now() - INIT_TIME
   );
+  Analytics.setMeta(MetaProperties.IS_MOBILE, isMobile());
 }

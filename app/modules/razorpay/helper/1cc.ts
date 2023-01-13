@@ -6,7 +6,8 @@ import { isEmpty } from 'utils/object';
 import { getOption, getPreferences } from './base';
 import { getMerchantOrder } from './preferences';
 
-export const hasCart = () => getOption('cart') || getOption('shopify_cart');
+export const hasCart = () =>
+  Boolean(getOption('cart') || getOption('shopify_cart'));
 
 // Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
 export const isOneClickCheckout = () =>
