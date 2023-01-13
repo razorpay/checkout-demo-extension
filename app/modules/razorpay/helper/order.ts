@@ -5,7 +5,16 @@ import { isSubscription } from './recurring';
 
 let LAZY_ORDER_ID: string; // this stores the lazily created order id both magic shopify flow and wooc flow
 
-export const setLazyOrderId = (orderId: string) => (LAZY_ORDER_ID = orderId);
+export const setLazyOrderId = (orderId: string) => {
+  LAZY_ORDER_ID = orderId;
+  window.Razorpay.sendMessage({
+    event: 'event',
+    data: {
+      event: 'shopify.order',
+      data: { order_id: orderId },
+    },
+  });
+};
 
 /**
  * order related

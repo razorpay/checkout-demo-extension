@@ -14,7 +14,6 @@ import {
 import type { PreferencesObject } from 'razorpay/types/Preferences';
 import type { CustomObject } from 'types';
 import { getQueryParams } from 'utils/_';
-import { updateShopifyAbandonedCartUrl } from './1cc-shopify/service';
 import { PLUGINS } from 'analytics-v2/library/common/types';
 import { setInitialContext } from 'analytics-v2/helpers';
 import { getConfigFromOptions } from 'checkoutstore';
@@ -143,11 +142,6 @@ export function isMagicWoocFlow() {
 }
 
 export function sendDismissEvent(data: any) {
-  const orderId = getOrderId();
-  if (orderId && isMagicShopifyFlow()) {
-    updateShopifyAbandonedCartUrl(orderId);
-  }
-
   window.Razorpay.sendMessage({
     event: 'dismiss',
     data,
