@@ -1,0 +1,1 @@
+export { getPerformanceResourceTiming } from './core';

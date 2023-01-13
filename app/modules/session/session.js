@@ -136,6 +136,7 @@ import { TRUECALLER_VARIANT_NAMES, stopVerificationPolling } from 'truecaller';
 import { shouldShowProceedOverlay } from 'truecaller/store';
 import { setTruecallerMetaData } from 'truecaller/analytics';
 import { Events } from 'analytics';
+import { getPerformanceDataForCriticalCheckoutResources } from 'performance/helper';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -1336,6 +1337,14 @@ Session.prototype = {
         discreet.RTBHelper.getRTBAnalyticsPayload()
       ),
     });
+
+    try {
+      Events.TrackMetric('critical_resource_performance', {
+        resources: getPerformanceDataForCriticalCheckoutResources(),
+      });
+    } catch (error) {
+      // no-op
+    }
 
     if (!isEmailHidden()) {
       Events.TrackApi('email_show', {
