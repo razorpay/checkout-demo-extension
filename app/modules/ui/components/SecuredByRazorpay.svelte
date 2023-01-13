@@ -122,4 +122,14 @@
   .align-center {
     align-items: center;
   }
+
+  .vertical-separator {
+    height: 12px;
+    width: 1px;
+    margin: 0px 4px;
+  }
+
+  .bg-gray {
+    background-color: #ebebeb;
+  }
 </style>
