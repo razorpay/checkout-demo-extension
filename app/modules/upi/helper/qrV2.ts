@@ -3,7 +3,12 @@
  */
 
 import { getTPV } from 'checkoutstore/methods';
-import { getPreferences, isPartialPayment, isRecurring } from 'razorpay';
+import {
+  getPreferences,
+  isOneClickCheckout,
+  isPartialPayment,
+  isRecurring,
+} from 'razorpay';
 
 let anyV2APIAttemptFailed = false;
 
@@ -26,7 +31,8 @@ export function autoGenerateQREnabled(): boolean {
      * we hide the QR L0/L1 feature in those case
     */
   // adding partial payment flow
-  const isFlowEnabled = !isPartialPayment() && !getTPV() && !isRecurring();
+  const isFlowEnabled =
+    !isPartialPayment() && !getTPV() && !isRecurring() && !isOneClickCheckout();
   return (
     isExperimentEnable &&
     isFlowEnabled &&
