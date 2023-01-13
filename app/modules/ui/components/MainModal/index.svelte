@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { isMobile, isMediumScreen } from 'common/useragent';
   import RazorpayStore, {
     getOption,
@@ -29,7 +29,7 @@
 
   import LanguageSelector from './LanguageSelector.svelte';
   import { computeOfferClass } from 'offers/store';
-  import { fullScreenHeader, getContactScreenInputCount } from 'header';
+  import { fullScreenHeader } from 'header';
   import { headerVisible } from 'one_click_checkout/header/store';
   import { getSession } from 'sessionmanager';
   import autotest from 'autotest';
@@ -65,33 +65,37 @@
 
   $: offerClasses = $computeOfferClass;
 
-  const FIELD_HEIGHT = 70;
-  const ERROR_MESSAGE_HEIGHT = 25;
   const MEDIUM_HEADER_HEIGHT = '150px';
 
   let fullScreenHeaderHeight = 'auto';
-  let baseHeight = 100;
   $: {
-    if ($fullScreenHeader && $country) {
-      let initialBodyHeight =
-        baseHeight + (getContactScreenInputCount() - 1) * FIELD_HEIGHT;
-      // check for error state
-      if (!$isContactValid) {
-        initialBodyHeight += ERROR_MESSAGE_HEIGHT;
-      }
-      if (!$isEmailValid) {
-        initialBodyHeight += ERROR_MESSAGE_HEIGHT;
-      }
-      if (bottomContainer?.offsetHeight) {
-        initialBodyHeight += (bottomContainer?.offsetHeight || 0) + 10;
-      }
+    tick().then(() => {
+      if ($fullScreenHeader && $country) {
+        // add store to make it reactive
+        !$isContactValid || !$isEmailValid;
+        let initialBodyHeight = 400;
+        const paymentDetailBlock = document.getElementById(
+          'payment-details-block'
+        ) as HTMLDivElement;
+        /**
+         * get actual payment detail page height + 65px for CTA (-10px to reduce padding distance b/w content and cta)
+         * if we are not able to read detail page height then it fallback to 400px height
+         * causing header to load minimal header
+         */
+        if (paymentDetailBlock && paymentDetailBlock.offsetHeight) {
+          initialBodyHeight = paymentDetailBlock.offsetHeight + 55;
+        }
+        if (bottomContainer?.offsetHeight) {
+          initialBodyHeight += (bottomContainer?.offsetHeight || 0) + 10;
+        }
 
-      $bodyHeight = initialBodyHeight;
-      fullScreenHeaderHeight =
-        $fullScreenHeader === HEADER_SIZE.MEDIUM
-          ? MEDIUM_HEADER_HEIGHT
-          : `calc(100% - ${initialBodyHeight}px)`;
-    }
+        $bodyHeight = initialBodyHeight;
+        fullScreenHeaderHeight =
+          $fullScreenHeader === HEADER_SIZE.MEDIUM
+            ? MEDIUM_HEADER_HEIGHT
+            : `calc(100% - ${initialBodyHeight}px)`;
+      }
+    });
   }
 
   function handleKeyInput(e: KeyboardEvent) {
@@ -116,10 +120,6 @@
   }
 
   onMount(() => {
-    /**
-     * -10 is for reduce padding b/w body content and cta
-     */
-    baseHeight = bodyElement?.offsetHeight - 10;
     clearOldExperiments();
     window.addEventListener('resize', handleResize);
     if (escape) {

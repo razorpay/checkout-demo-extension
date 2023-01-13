@@ -57,6 +57,7 @@
     isRedesignV15,
     isEmailOptional,
     isOneClickCheckout,
+    isContactEmailHidden,
   } from 'razorpay';
   import { toggleHeader } from 'one_click_checkout/header/helper';
   import { getIcons } from 'one_click_checkout/sessionInterface';
@@ -362,27 +363,29 @@
   <TruecallerNotification />
 {/if}
 <div
-  id="payment-details-block"
   data-test-id="payment-details-block"
+  id="payment-details-block"
   class:details-wrapper={(isRedesignV15Enabled && !isOneClickCheckout()) ||
     isEditDetailScreen}
   in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}
 >
   {#if (isRedesignV15Enabled && !isOneClickCheckout()) || isEditDetailScreen}
-    <div class="contact-title-container">
-      <div class="contact-title">
-        <Icon icon={user} />
-        <span class="contact-text">{$t(CONTACT_LABEL)}</span>
-      </div>
+    {#if !isContactEmailHidden()}
+      <div class="contact-title-container">
+        <div class="contact-title">
+          <Icon icon={user} />
+          <span class="contact-text">{$t(CONTACT_LABEL)}</span>
+        </div>
 
-      {#if truecallerLoginEnabled && $truecallerPresent !== false}
-        <TruecallerLogin
-          on:click={() => onTruecallerClick()}
-          on:success={(e) => onTruecallerLoginSuccess(e.detail)}
-          on:error={(e) => onTruecallerLoginError(e.detail)}
-        />
-      {/if}
-    </div>
+        {#if truecallerLoginEnabled && $truecallerPresent !== false}
+          <TruecallerLogin
+            on:click={() => onTruecallerClick()}
+            on:success={(e) => onTruecallerLoginSuccess(e.detail)}
+            on:error={(e) => onTruecallerLoginError(e.detail)}
+          />
+        {/if}
+      </div>
+    {/if}
   {/if}
 
   <div class="details-block">
@@ -455,7 +458,10 @@
         </div>
       {/if}
     {:else}
-      <div class="multi-tpv-block">
+      <div
+        class="multi-tpv-block"
+        class:no-padding-top={isContactEmailHidden()}
+      >
         <MultiTpvOptions
           bank={tpv}
           {icons}
@@ -525,6 +531,10 @@
     .multi-tpv-block,
     .details-block {
       padding: 0;
+    }
+
+    .multi-tpv-block:not(.no-padding-top) {
+      padding-top: 24px;
     }
 
     .partial-payment-block {

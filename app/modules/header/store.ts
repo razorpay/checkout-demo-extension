@@ -48,7 +48,11 @@ export const fullScreenHeader = derived(
       UCBrowser ||
       isMIBrowser
     ) {
-      set(showFullScreen ? HEADER_SIZE.MEDIUM : HEADER_SIZE.MINIMAL);
+      set(
+        showFullScreen && $bodyHeight < 475
+          ? HEADER_SIZE.MEDIUM
+          : HEADER_SIZE.MINIMAL
+      );
     } else {
       set(showFullScreen ? HEADER_SIZE.FULL_SCREEN : HEADER_SIZE.MINIMAL);
     }
