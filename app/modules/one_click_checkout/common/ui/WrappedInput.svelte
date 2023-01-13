@@ -51,8 +51,8 @@
   }
 
   function onBlur(e) {
-    focused = false;
     setTimeout(() => {
+      focused = false;
       suggestions = [];
     }, 200);
     dispatch('blur', e);
@@ -119,7 +119,7 @@
   {#if validationText !== ''}
     <div class="input-validation-error">{validationText}</div>
   {/if}
-  {#if suggestions.length > 0}
+  {#if focused && suggestions.length > 0}
     <div
       class="suggestion-dropdown"
       class:dropdown-one-cc={isOneClickCheckout()}
