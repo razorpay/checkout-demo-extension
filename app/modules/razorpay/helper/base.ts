@@ -158,3 +158,10 @@ export const getMerchantName = () =>
   getPreferences('merchant_brand_name') ||
   getPreferences('merchant_name') ||
   '';
+
+const demoMerchantKey = ['rzp_test_1DP5mmOlF5G5ag', 'rzp_live_ILgsfZCZoFIKMb'];
+
+export function isDemoMerchant() {
+  const merchantKey = getOption('key');
+  return demoMerchantKey.includes(merchantKey);
+}

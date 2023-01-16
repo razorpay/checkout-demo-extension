@@ -47,12 +47,16 @@
   // Form Validation for email - specifically for 1cc
   let validationText: string | null;
   export let showValidations = false;
+  export let fromEditContactDetails = false;
 
   const debouncedValidator: (email: string, showValidation: boolean) => void =
     debounce((email: string, showValidation) => {
       validateEmail(email).then((isValid) => {
         validationText = !isValid ? $t(EMAIL_HELP_TEXT) : null;
-        $isEmailValid = showValidation ? isValid : true;
+        $isEmailValid =
+          showValidation || Boolean(fromEditContactDetails && email)
+            ? isValid
+            : true;
       });
     }, 200);
 

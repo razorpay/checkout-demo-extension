@@ -5,18 +5,12 @@ import {
   isPayout,
   hasMerchantPolicy,
   getOrgDetails,
+  isDemoMerchant,
 } from './base';
-import { isDCCEnabled, isInternational } from './currency';
+import { isDCCEnabled, isInternational } from './international';
 import { isHDFCVASMerchant } from './misc';
 import { isRecurringOrPreferredPayment } from './recurring';
 import { internetExplorer } from 'common/useragent';
-
-const demoMerchantKey = ['rzp_test_1DP5mmOlF5G5ag', 'rzp_live_ILgsfZCZoFIKMb'];
-
-function isDemoMerchant() {
-  const merchantKey = getOption('key');
-  return demoMerchantKey.includes(merchantKey);
-}
 
 /**
  * Enable redesign for

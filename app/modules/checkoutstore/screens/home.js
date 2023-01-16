@@ -121,7 +121,7 @@ export function setEmail(value) {
   email.set(value);
 }
 
-export const homeView = writable(HOME_VIEWS.DETAILS);
+export const homeView = writable(HOME_VIEWS.METHODS);
 
 export const emiContact = writable('');
 

@@ -4248,7 +4248,7 @@ Session.prototype = {
                */
               setTimeout(() => {
                 self.hide(confirmed);
-              }, 1000);
+              }, 400);
             } else {
               self.back(true);
             }

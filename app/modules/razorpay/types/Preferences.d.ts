@@ -68,10 +68,13 @@ interface Paylater {
 }
 
 interface App {
+  [appName: string]: number;
   cred: number;
   twid: number;
   trustly: number;
   poli: number;
+  sofort: number;
+  giropay: number;
 }
 
 interface EmiTypes {

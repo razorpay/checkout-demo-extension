@@ -1,7 +1,7 @@
 import type { Preferences } from 'razorpay/types/Preferences';
 import { entityWithAmount } from '../constant';
 import { getOption, getPreferences } from './base';
-import { hasFeature } from './preferences';
+import { getMerchantMethods, hasFeature } from './preferences';
 
 const i18nRegions = ['MY', 'IN'];
 /** currency related */
@@ -45,3 +45,15 @@ export function isDCCEnabled() {
 }
 
 /** end of currency related fn */
+
+export const INTERNATIONAL_APPS = {
+  TRUSTLY: 'trustly',
+  POLI: 'poli',
+  SOFORT: 'sofort',
+  GIROPAY: 'giropay',
+};
+
+export function isInternationalAppEnabled() {
+  const merchantApps = getMerchantMethods()?.app || {};
+  return Object.values(INTERNATIONAL_APPS).some((app) => merchantApps[app]);
+}

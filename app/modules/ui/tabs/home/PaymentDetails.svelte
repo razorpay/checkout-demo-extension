@@ -128,6 +128,7 @@
   export let onSubmit = undefined;
   export let showValidations = false;
   export let shouldUpdateEmail = false;
+  export let fromEditContactDetails = false;
 
   let truecallerLoginFailed = false;
 
@@ -275,7 +276,7 @@
     }
 
     validateEmail($email).then((value) => {
-      if (value || $isOptionalEmail) {
+      if (value || (!$email && $isOptionalEmail)) {
         Events.TrackBehav(ContactDetailsEvents.CONTACT_DETAILS_SUBMIT, {
           contact: $contact,
           email: $email,
@@ -414,6 +415,7 @@
           bind:value={$email}
           on:blur={trackEmailFilled}
           {showValidations}
+          {fromEditContactDetails}
         />
       </div>
     {/if}

@@ -1,4 +1,4 @@
-import { isInternational } from '../currency';
+import { isInternational } from '../international';
 import { getOption, getPreferences } from 'razorpay';
 
 jest.mock('../base', () => ({

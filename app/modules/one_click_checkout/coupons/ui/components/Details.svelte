@@ -103,7 +103,7 @@
       </div>
     {/if}
     <div class="details-fields-wrapper">
-      <PaymentDetails bind:disabled={ctaDisabled} />
+      <PaymentDetails fromEditContactDetails bind:disabled={ctaDisabled} />
     </div>
   </div>
   <button

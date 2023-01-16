@@ -3,8 +3,9 @@ import {
   getOption,
   getOrgDetails,
   getPreferences,
+  isDemoMerchant,
 } from './base';
-import { isIndianCurrency } from './currency';
+import { isIndianCurrency, isInternationalAppEnabled } from './international';
 import { isOneClickCheckout } from './1cc';
 import { isCAW, isRecurringOrPreferredPayment } from './recurring';
 
@@ -23,7 +24,7 @@ export function isContactOptional() {
  * true | true | true
  * false | true | true
  * if email_optional_oncheckout flag & show_email_on_checkout both true then we show optional email field on checkout
- * 1cc, recurring/subscription & international
+ * 1cc, recurring/subscription & international (mcc, bank transfer enabled [not for demo merchant])
  */
 export function isEmailOptional() {
   const { isOrgRazorpay } = getOrgDetails() || {};
@@ -38,6 +39,7 @@ export function isEmailOptional() {
       !getPreferences('features.email_optional_oncheckout')
     ) &&
       isIndianCurrency() &&
+      !(isInternationalAppEnabled() && !isDemoMerchant()) &&
       isNotRecurringOrCAW &&
       !isOneClickCheckout() &&
       isOrgRazorpay)

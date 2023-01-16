@@ -1,6 +1,6 @@
 import { getPreferences } from './base';
 import { isPartialPayment } from './preferences';
-import { isInternational } from './currency';
+import { isInternational } from './international';
 /**
  * Offers related helper function
  */
