@@ -2295,8 +2295,16 @@ Session.prototype = {
   },
 
   secAction: function () {
+    /**
+     *  setting resendTimeout store to initial value 0 once we skip the OTP
+     *  as it is again going to set in askOTP function of session.js whenever we trigger OTP
+     *  setting it 0 helping here bcoz everytime we are adding 30 * 1000 at the time of askOTP to current date
+     *  which in the end become constant value of initialSeconds in resendButton component
+     *  and timer doest not starting from initial
+     */
     this.otpView.updateScreen({
       truecallerLoginFailed: false,
+      resendTimeout: 0,
     });
 
     if (this.headless && this.r._payment) {
