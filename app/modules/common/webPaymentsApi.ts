@@ -19,6 +19,7 @@ export function additionalSupportedPaymentApps() {
     { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
     { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
     { package_name: PAYTM_PACKAGE_NAME, method: 'upi' },
+    { package_name: CRED_PACKAGE_NAME, method: 'app' },
   ];
 }
 
