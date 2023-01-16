@@ -73,7 +73,7 @@
               api: 'https://api-3.qa.razorpay.in/',
             },
           },
-        },        
+        },
         perf: {
           domain: 'checkout-2.perf.razorpay.in',
           Razorpay: {
@@ -82,8 +82,7 @@
               api: 'https://api-web-web.perf.razorpay.in/',
             },
           },
-        }
-        ,
+        },
         qa2: {
           domain: 'checkout-2.qa.razorpay.in',
           Razorpay: {
@@ -161,7 +160,10 @@
 
       var params = defaultParams;
 
-      if (params.subscription_id || params.order_id || params.invoice_id) {
+      if (
+        !params.magic &&
+        (params.subscription_id || params.order_id || params.invoice_id)
+      ) {
         delete params.key;
       }
 
