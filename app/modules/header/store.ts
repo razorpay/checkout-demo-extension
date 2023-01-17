@@ -2,7 +2,13 @@ import { isMobileStore, screenStore } from 'checkoutstore';
 import { getTPV } from 'checkoutstore/methods';
 import { country, homeView } from 'checkoutstore/screens/home';
 import { INDIA_COUNTRY_CODE } from 'common/constants';
-import { isMediumScreen, UCBrowser, isMIBrowser } from 'common/useragent';
+import {
+  isMediumScreen,
+  UCBrowser,
+  isMIBrowser,
+  iOS,
+  iosWebView,
+} from 'common/useragent';
 import {
   isAddressEnabled,
   isContactHidden,
@@ -43,7 +49,7 @@ export const fullScreenHeader = derived(
       getContactScreenInputCount() <= 2 &&
       !isOfferForced();
     if (
-      ($anyFieldTouched && $isMobileStore) ||
+      (($anyFieldTouched || iOS || iosWebView) && $isMobileStore) ||
       $bodyHeight > (isMediumScreen() ? 300 : 340) ||
       UCBrowser ||
       isMIBrowser
