@@ -51,6 +51,7 @@ export const RazorpayDefaults = {
   // cart used by magic checkout
   cart: null,
   shopify_cart: null, // cart.js response from shopify
+  ga_client_id: '', // google analytics client ID for S2S events
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

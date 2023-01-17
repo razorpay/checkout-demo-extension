@@ -3,6 +3,7 @@ import { timer } from 'utils/timer';
 import fetch from 'utils/fetch';
 // store imports
 import { getOrderId } from 'razorpay/helper/order';
+import { getOption } from 'razorpay/helper/base';
 import { makeAuthUrl } from 'common/makeAuthUrl';
 
 // Analytics imports
@@ -16,7 +17,6 @@ import {
 import { getSession } from 'sessionmanager';
 import { getPreferencesParams } from 'checkoutframe/utils';
 import { isNonNullObject, unflatten } from 'utils/object';
-import { getOption } from 'razorpay/helper/base';
 import { generateTruecallerPreferenceParams } from 'truecaller/helpers';
 import { getLitePreferencesFromStorage } from 'checkout-frame-lite/service';
 
@@ -85,6 +85,7 @@ export function createShopifyOrder(shopifyCheckoutId) {
       data: JSON.stringify({
         shopify_checkout_id: shopifyCheckoutId,
         preference_params: { ...unflatten(params), send_preferences: true },
+        ga_id: getOption('ga_client_id'),
       }),
       callback: (res) => {
         const success = res.status_code === 200;
