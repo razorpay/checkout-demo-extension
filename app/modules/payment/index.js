@@ -856,11 +856,6 @@ Payment.prototype = {
       return 1;
     }
 
-    try {
-      PaymentTracker.PAYMENT_INITIATED_SYSTEM(
-        AnalyticsV2State.selectedInstrumentForPayment
-      );
-    } catch {}
     const self = this;
 
     const makeAjaxCall = (persistentMode = false) => {
@@ -868,6 +863,11 @@ Payment.prototype = {
         url: makeUrl('payments/create/ajax'),
         data,
         callback: (response) => {
+          try {
+            PaymentTracker.PAYMENT_INITIATED_SYSTEM(
+              AnalyticsV2State.selectedInstrumentForPayment
+            );
+          } catch {}
           if (persistentMode) {
             PaymentState.setPersistentState(data, response);
           }
