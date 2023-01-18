@@ -38,7 +38,10 @@
   import { pushStack } from 'navstack';
   import EmiTabScreenSvelte from 'emiV2/ui/components/EmiTabsScreen/EmiTabsScreen.svelte';
   import { handleEmiPaymentV2 } from 'emiV2/payment';
-  import { emiOptionsRendered } from 'emiV2/events/tracker';
+  import {
+    emiOptionsRendered,
+    trackEmiProviderSelected,
+  } from 'emiV2/events/tracker';
   import Analytics from 'analytics';
   import { timer } from 'utils/timer';
   import {
@@ -201,6 +204,19 @@
         payloadData: {
           provider: selectedBankCode.code,
         },
+      });
+
+      // For redirect providers like Axio/Zestmoney we never reach the plans screen
+      // therefore we need to trigger the event here
+      // Since both Axio and Zestmoeny are cardless emi hence cardless->true and default_tab => cardless
+      trackEmiProviderSelected({
+        provider_name: selectedBankCode.name,
+        credit: false,
+        debit: false,
+        cardless: true,
+        debit_and_cardless: false,
+        tab_view: false,
+        default_tab: 'cardless',
       });
     }
   };
