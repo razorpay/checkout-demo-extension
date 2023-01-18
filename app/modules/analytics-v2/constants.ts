@@ -11,6 +11,7 @@ export const ContextProperties = {
   CONFIG_LIST: 'checkout.config_list',
   FEATURES: 'checkout.features',
   CHECKOUT_ID: 'checkout.id',
+  SCREEN_NAME: 'screen.name',
   REFERRER_TYPE: 'checkout.referrerType',
   INTEGRATION_NAME: 'checkout.integration.name',
   INTEGRATION_TYPE: 'checkout.integration.type',

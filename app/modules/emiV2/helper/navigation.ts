@@ -10,6 +10,8 @@ import { isEmiV2 } from 'razorpay';
 import { getSession } from 'sessionmanager';
 import { get } from 'svelte/store';
 import { timer } from 'utils/timer';
+import { EventsV2, ContextProperties } from 'analytics-v2';
+import { getCurrentScreen } from 'home/analytics/helpers';
 
 /**
  * Helper function to update the session.scree value
@@ -54,6 +56,10 @@ export const updateTabStore = (tab = '') => {
     },
   });
   Analytics.setMeta('tab', tab);
+  EventsV2.setContext(
+    ContextProperties.SCREEN_NAME,
+    getCurrentScreen(session.screen)
+  );
   Analytics.setMeta('timeSince.tab', getDuration());
   session.tab = tab;
   tabStore.set(tab);

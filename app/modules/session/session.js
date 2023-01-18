@@ -127,6 +127,7 @@ import { moengageAnalytics } from 'one_click_checkout/merchant-analytics';
 import { moengageEventsData } from 'one_click_checkout/merchant-analytics/store';
 import { MOENGAGE_EVENTS } from 'one_click_checkout/merchant-analytics/constant';
 import { selectedPlan } from 'checkoutstore/emi';
+import { getCurrentScreen } from 'home/analytics/helpers';
 import {
   sendDismissEvent,
   isMagicShopifyFlow,
@@ -2658,6 +2659,11 @@ Session.prototype = {
   },
 
   setScreen: function (screen, params) {
+    EventsV2.setContext(
+      ContextProperties.SCREEN_NAME,
+      getCurrentScreen(screen)
+    );
+
     let extraProps = params && params.extraProps;
 
     // Remove CTA for all cases, if moving away from otp screen
@@ -3317,6 +3323,7 @@ Session.prototype = {
     if (!this.isOpen) {
       return;
     }
+    EventsV2.setContext(ContextProperties.SCREEN_NAME, getCurrentScreen(tab));
     this.switchTabPayload = payload;
     this.tabsCount++;
     if (this.tabsCount > 5) {
@@ -3701,6 +3708,10 @@ Session.prototype = {
           to: nextScreen || '',
         },
       });
+      EventsV2.setContext(
+        ContextProperties.SCREEN_NAME,
+        getCurrentScreen(this.screen)
+      );
       Analytics.setMeta('screen', nextScreen);
       Analytics.setMeta('timeSince.screen', discreet.timer());
 
@@ -3862,6 +3873,10 @@ Session.prototype = {
           to: nextScreen || '',
         },
       });
+      EventsV2.setContext(
+        ContextProperties.SCREEN_NAME,
+        getCurrentScreen(this.screen)
+      );
       Analytics.setMeta('screen', nextScreen);
       Analytics.setMeta('timeSince.screen', discreet.timer());
 
