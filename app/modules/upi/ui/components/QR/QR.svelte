@@ -34,6 +34,7 @@
   import Analytics from 'analytics';
   import UPI_EVENTS from 'ui/tabs/upi/events';
   import { UPITracker } from 'upi/analytics/events';
+  import { updateQRAnalyticsV2State } from 'upi/events/trackers';
 
   // i18n
 
@@ -151,6 +152,7 @@
   }
 
   function handleSelectQR() {
+    updateQRAnalyticsV2State();
     UPITracker.SHOW_QR_CLICKED();
     createQRPayment();
   }

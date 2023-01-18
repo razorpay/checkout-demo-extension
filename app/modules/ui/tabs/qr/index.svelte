@@ -15,7 +15,6 @@
     isCustomerFeeBearer,
     getOptionalObject,
     isRedesignV15,
-    getCurrency,
   } from 'razorpay';
   import { showSummaryModal } from 'summary_modal';
 
@@ -52,7 +51,6 @@
   export let onSuccess;
 
   const session = getSession();
-  const currency = getCurrency();
 
   onMount(() => {
     init();

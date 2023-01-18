@@ -4,6 +4,9 @@ import type { CustomObject } from 'types';
 import { qrState } from 'upi/ui/components/QR/store';
 import { get } from 'svelte/store';
 import { TRACES, EVENTS } from './constants';
+import { UPITracker } from 'upi/analytics/events';
+import { AnalyticsV2State } from 'analytics-v2';
+import { METHODS } from 'checkoutframe/constants';
 
 function getScreenFromParent(parent: UPI.QRParent) {
   return parent === 'homeScreen' ? 'L0' : 'L1';
@@ -183,6 +186,18 @@ export const trackQRGenerate = (parent: UPI.QRParent) => {
   });
 };
 
+export const updateQRAnalyticsV2State = () => {
+  AnalyticsV2State.selectedInstrumentForPayment = {
+    method: {
+      name: METHODS.UPI,
+    },
+    instrument: {
+      name: 'qr',
+      type: 'intent',
+    },
+  };
+};
+
 /**
  * This event will trigger only for UPI-QR v2 API
  */
@@ -195,10 +210,12 @@ export const trackQRAutoGenerate = (parent: UPI.QRParent) => {
       CTA: getQRCTA(),
     },
   });
+  updateQRAnalyticsV2State();
 };
 
 export const renderQRSection = (parent: UPI.QRParent) => {
   qrAnalyticsPayload = {};
+  UPITracker.QR_SHOWN();
   Analytics.track(EVENTS.QR_SECTION_RENDERED, {
     type: AnalyticsTypes.RENDER,
     data: {

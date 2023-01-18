@@ -248,7 +248,10 @@ export function getInstrumentDetails(instrument) {
           name: getUpiName(instrument),
           saved: !!instrument.vpas && !!instrument.vpas[0],
           personalisation,
-          type: instrument.flows?.[0] || '',
+          type:
+            instrument?.flows?.[0] === 'qr'
+              ? 'intent'
+              : instrument.flows?.[0] || '',
           vpa: vpa ? `@${vpa.split('@')[1]}` : '',
         };
       }

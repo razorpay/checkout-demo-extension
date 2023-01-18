@@ -68,6 +68,10 @@ export const UPIEvents = {
     name: 'p13n_UPI_apps_shown',
     type: RENDER,
   },
+  QR_SHOWN: {
+    name: 'QR_shown',
+    type: RENDER,
+  },
 };
 
 interface UPIEventMap {
@@ -104,6 +108,7 @@ interface UPIEventMap {
   P13N_SHOWN: {
     instrument: Instrument;
   };
+  QR_SHOWN: undefined;
 }
 
 export const UPITracker = createTrackMethodForModule<UPIEventMap>(UPIEvents, {
