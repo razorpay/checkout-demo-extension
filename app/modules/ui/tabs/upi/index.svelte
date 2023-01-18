@@ -1128,7 +1128,7 @@
     padding: 0px 12px 12px;
   }
   .screen-one-cc {
-    /* min-height: 100%; */
+    min-height: 100%;
   }
 
   :global(#content.one-cc) .upi-container {

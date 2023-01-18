@@ -431,7 +431,7 @@
   }
 
   .screen-one-cc {
-    // min-height: 100%;
+    min-height: 100%;
   }
 
   .netb-banks-one-cc {

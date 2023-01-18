@@ -291,14 +291,14 @@
 {/if}
 
 <style>
-  .tab-content {
-    overflow-y: scroll;
-  }
   .tab-content-one-cc {
     margin-top: 0;
   }
   .saved-emi-cards-container {
     padding: 16px 14px;
     padding-bottom: 8px;
+  }
+  .screen-one-cc {
+    min-height: 110%;
   }
 </style>

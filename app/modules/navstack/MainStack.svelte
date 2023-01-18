@@ -36,14 +36,18 @@
 <style>
   #root {
     position: relative;
+
+    overflow: auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
   }
 
   #root.active {
-    flex-grow: 1;
-    height: inherit;
+    height: 100%;
+  }
+
+  #root > :global(*:first-child) {
+    overflow-y: auto;
+    height: 100%;
   }
 </style>

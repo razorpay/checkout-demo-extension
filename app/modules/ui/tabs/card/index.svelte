@@ -1562,7 +1562,7 @@
     margin-top: 26px;
   }
   .screen-one-cc {
-    // min-height: 100%;
+    min-height: 100%;
   }
 
   .saved-card-header {

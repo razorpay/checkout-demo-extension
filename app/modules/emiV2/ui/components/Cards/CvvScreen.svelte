@@ -127,7 +127,10 @@
     font-weight: 500;
     margin-left: 2px;
   }
-
+  .screen-one-cc {
+    flex-grow: 1;
+    min-height: 100%;
+  }
   :global(.cvv-container .know-more-text-saved-cards) {
     top: 0 !important;
   }
