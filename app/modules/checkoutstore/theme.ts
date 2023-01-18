@@ -5,6 +5,7 @@ import { setRootCSSVariable } from 'utils/CSSVar';
 import { isOneClickCheckout, shouldOverrideBrandColor } from 'razorpay';
 import { get, writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
+import { isValidHexColorCode } from 'utils/color';
 
 const {
   RAZORPAY_COLOR,
@@ -25,6 +26,7 @@ type Theme = {
   secondaryHighlightColor: string;
   icons: ReturnType<typeof _PaymentMethodIcons.getIcons>;
   highlightBorderColor: string;
+  lightTextColor: string;
   headerLogoBgColor: string;
   headerLogoTextColor: string;
   lightHighlightColor: string;
@@ -67,6 +69,9 @@ function getMagicIconColorVariations() {
 }
 
 export function setThemeColor(color: string) {
+  if (!isValidHexColorCode(color)) {
+    color = RAZORPAY_COLOR;
+  }
   const colorVariations = Color.getColorVariations(color) as {
     foregroundColor: string;
     backgroundColor: string;
@@ -98,6 +103,9 @@ export function setThemeColor(color: string) {
     ...colorVariations,
     ...getMagicIconColorVariations(),
   });
+  theme.lightTextColor = isDarkColor
+    ? 'rgba(255,255,255, 0.7)'
+    : 'rgba(0, 0, 0, 0.7)';
   theme.highlightBorderColor = Color.transparentify(theme.color, 40);
   theme.headerLogoBgColor = Color.transparentify(theme.color, 50);
   theme.headerLogoTextColor = Color.isDark(theme.headerLogoBgColor)
@@ -109,6 +117,7 @@ export function setThemeColor(color: string) {
   setRootCSSVariable({
     'primary-color': color,
     'text-color': theme.textColor,
+    'light-text-color': theme.lightTextColor,
     'highlight-color': theme.highlightColor,
     'light-highlight-color': theme.lightHighlightColor,
     'hover-state-color': theme.hoverStateColor,

@@ -239,7 +239,7 @@
     text-align: center;
 
     .total-amount {
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--light-text-color);
     }
 
     .amount-fee-container {
