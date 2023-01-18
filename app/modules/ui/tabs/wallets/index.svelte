@@ -5,7 +5,6 @@
   import CTA, { showCta, hideCta } from 'cta';
   import {
     methodInstrument,
-    selectedBlock,
     selectedInstrument,
   } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
@@ -36,14 +35,17 @@
   // Transitions
   import { slide } from 'svelte/transition';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import { SELECT_WALLET } from 'wallet/i18n/label';
+  import { SELECT_WALLET, SELECT_WALLET_TO_PROCEED } from 'wallet/i18n/label';
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
   import { WalletTracker } from 'wallet/analytics/events';
+  import WarningMessage from 'ui/components/WarningMessage.svelte';
 
   const session = getSession();
   const wallets = getWallets();
+
+  let isCTAClickInvalid = false;
 
   /**
    * consumed by redesign CTA online
@@ -227,6 +229,10 @@
 <Tab method="wallet" pad={false} bind:onScreenContainerElement>
   <div class="wallet-wrapper" class:wallet-one-cc={isRedesignV15Enabled}>
     <div bind:this={onScreenContentElement}>
+      <WarningMessage
+        show={isCTAClickInvalid}
+        message={$t(SELECT_WALLET_TO_PROCEED)}
+      />
       {#if isRedesignV15Enabled}
         <h3 class="header-title">{$t(SELECT_WALLET)}</h3>
       {/if}
@@ -278,6 +284,7 @@
     {onScreenContentElement}
   />
   <CTA
+    bind:isCTAClickInvalid
     screen="wallet"
     tab="wallet"
     disabled={CTAState.disabled}

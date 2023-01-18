@@ -1,39 +1,63 @@
 <script lang="ts">
   import { t } from 'svelte-i18n';
-  // UI imports
-  import Icon from 'ui/elements/Icon.svelte';
-  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
-  import { getSession } from 'sessionmanager';
   // Imports for RTB
   import { RTBExperiment } from 'rtb/store';
   import { isRTBEnabled as RTBEnabled } from 'rtb/helper';
   // session imports
+  import { getSession } from 'sessionmanager';
   import { handleModalClose } from 'header/sessionInterface';
+
+  import { createEventDispatcher, tick, onMount } from 'svelte';
+
+  import { TOTAL_AMOUNT } from 'header/i18n/label';
+  // helper
+  import { getCTAAmount } from 'cta';
   import {
     getAmount,
+    getCurrency,
     getMerchantName,
     getOption,
+    isContactEmailOptional,
     isCustomerFeeBearer,
+    isOfferForced,
   } from 'razorpay';
-  import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import { HEADER_SIZE, showBackArrow } from 'header/store';
-  import back_arrow from 'icons/back_arrow';
-  import { showFeeLabel } from 'checkoutstore/fee';
-  import { createEventDispatcher, tick, onMount } from 'svelte';
+  // utils
+  import { getTPV, shouldUseVernacular } from 'checkoutstore/methods';
+  import { flip } from 'utils/animate';
+  import {
+    formatAmountWithSymbol,
+    formatAmountWithSymbolRawHtml,
+  } from 'common/currency';
+  // Store
+  import {
+    computeShowBottomElementThatImpactHeader,
+    HEADER_SIZE,
+    showBackArrow,
+  } from 'header/store';
   import {
     addCardView,
     dynamicFeeObject,
     showFeesIncl,
   } from 'checkoutstore/dynamicfee';
+  import { showFeeLabel } from 'checkoutstore/fee';
   import { fullScreenHeader } from 'header/store';
   import { themeStore } from 'checkoutstore/theme';
+  import { appliedOffer } from 'offers/store';
+  import { getCardOffer } from 'checkoutframe/offers';
+  import { showBottomElement } from 'checkoutstore';
+  // UI import
+  import Icon from 'ui/elements/Icon.svelte';
+  import close from 'one_click_checkout/rtb_modal/icons/rtb_close';
+  import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
+  import back_arrow from 'icons/back_arrow';
   import LanguageSelection from 'topbar/ui/components/LanguageSelection.svelte';
   import SecuredByRazorpay from 'ui/components/SecuredByRazorpay.svelte';
-  import { getCTAAmount } from 'cta';
-  import { TOTAL_AMOUNT } from 'header/i18n/label';
-  import { shouldUseVernacular } from 'checkoutstore/methods';
   import FeeLabel from 'ui/components/FeeLabel.svelte';
-  import { flip } from 'utils/animate';
+  import CardOffer from 'ui/elements/CardOffer.svelte';
+  import TpvBankNew from 'ui/elements/TpvBank.new.svelte';
+  //
+  import type { TPVBank } from 'tpv/types/tpv';
+  import { getPrefillBankDetails } from 'netbanking/helper';
 
   let fullScreen: boolean;
   let merchantLogo: HTMLElement;
@@ -43,6 +67,23 @@
   let closeButton: HTMLElement;
   let vernacularButton: HTMLElement;
   let animate = false;
+
+  let offerAmount = 0;
+  let bottomEle = computeShowBottomElementThatImpactHeader();
+
+  const tpv = getTPV() as unknown as TPVBank;
+
+  $: {
+    if (
+      $appliedOffer &&
+      $appliedOffer.original_amount &&
+      $appliedOffer.amount
+    ) {
+      offerAmount = $appliedOffer.original_amount - $appliedOffer.amount;
+    } else {
+      offerAmount = 0;
+    }
+  }
 
   onMount(() => {
     setTimeout(() => {
@@ -99,6 +140,9 @@
   id="header-wrapper"
   class:dark-primary-color={$themeStore.isDarkColor}
   class:rtb-disabled={!isRTBEnabled}
+  class:with-offer={offerAmount > 0}
+  class:contain-bottom-element={bottomEle.total === 1 &&
+    !bottomEle.isOnlyTimeoutVisible}
   class:no-rtb={!isRTBEnabled && $fullScreenHeader !== HEADER_SIZE.FULL_SCREEN}
 >
   <div class="header-container">
@@ -147,13 +191,46 @@
         <div class="amount-container">
           <div class="total-amount">{$t(TOTAL_AMOUNT)}</div>
           <div class="amount-fee-container">
-            <div class="amount">{@html getCTAAmount(true)}</div>
+            {#if offerAmount > 0}
+              <span class="offer-original-amount">
+                {formatAmountWithSymbol(
+                  $appliedOffer?.original_amount || getAmount(),
+                  getCurrency(),
+                  true
+                )}
+              </span>
+            {/if}
+            <div class="amount">
+              {#if offerAmount > 0 && $appliedOffer?.amount}
+                {@html formatAmountWithSymbolRawHtml(
+                  $appliedOffer?.amount || getAmount(),
+                  getCurrency(),
+                  true
+                )}
+              {:else}
+                {@html getCTAAmount(true)}
+              {/if}
+            </div>
             {#if isCustomerFeeBearer()}
               <span class="fee-container">
                 <FeeLabel fromHeader />
               </span>
             {/if}
           </div>
+          {#if !$showBottomElement}
+            <div class="bottom-element-container">
+              {#if isOfferForced() && getCardOffer()}
+                <CardOffer offer={getCardOffer()} />
+              {/if}
+              {#if tpv && !tpv.invalid && tpv.method}
+                <TpvBankNew
+                  bank={tpv}
+                  accountName={getPrefillBankDetails('name')}
+                  showIfsc={isContactEmailOptional()}
+                />
+              {/if}
+            </div>
+          {/if}
         </div>
       {/if}
     </div>
@@ -235,11 +312,28 @@
   }
 
   .amount-container {
+    width: 100%;
+    max-width: 300px;
     margin-top: 26px;
     text-align: center;
 
+    :global(.card-offer),
+    :global(.customer-bank-details) {
+      color: #000000;
+      border-radius: 6px;
+    }
+
     .total-amount {
       color: var(--light-text-color);
+    }
+
+    .offer-original-amount {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-color);
+      opacity: 0.7;
+      text-decoration: line-through;
     }
 
     .amount-fee-container {
@@ -286,6 +380,10 @@
         text-align: left;
         font-size: 24px;
       }
+
+      :global(.currency-symbol) {
+        font-size: 20px;
+      }
     }
 
     .secured-by-message {
@@ -293,6 +391,10 @@
       right: 20px;
       bottom: -60px;
     }
+  }
+
+  #header-wrapper.medium-header.with-offer .amount-container .amount {
+    margin-left: 6px;
   }
 
   :global(.medium-screen) #header-wrapper.full-screen {
@@ -393,6 +495,22 @@
       &.merchant-initials {
         line-height: 64px;
       }
+    }
+  }
+
+  #header-wrapper.contain-bottom-element.full-screen {
+    .bottom-element-container {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+
+      & > :global(*) {
+        width: fit-content;
+      }
+    }
+
+    .left-section {
+      max-height: 270px;
     }
   }
 

@@ -34,6 +34,7 @@ jest.mock('cta', () => {
     isCtaShown: jest.fn(() => ({})),
     CTAHelper: { setActiveCTAScreen: jest.fn(() => ({})) },
     showCta: jest.fn(() => ({})),
+    setWithoutOffer: jest.fn(),
   };
 });
 

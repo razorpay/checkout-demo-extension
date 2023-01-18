@@ -10,7 +10,12 @@ const bankDetailsKeys = [
   'account_number',
   'account_type',
 ] as const;
-export function getPrefillBankDetails(key: string) {
+
+export function getPrefillBankDetails(key: undefined): Record<string, string>;
+export function getPrefillBankDetails(key: string): string;
+export function getPrefillBankDetails<T extends string | undefined = undefined>(
+  key?: T
+): Record<string, string> | string {
   const returnOptions: { [key: string]: string } = {};
   bankDetailsKeys.forEach((dataPoints) => {
     returnOptions[`prefill.bank_account[${dataPoints}]`] =

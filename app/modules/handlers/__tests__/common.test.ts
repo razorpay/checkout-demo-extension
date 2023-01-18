@@ -135,17 +135,16 @@ describe('Test Actions for Paypal as Backup', () => {
         order_id: 'test_order_id',
         payment_id: 'test_payment_id',
       };
-      addRetryPaymentMethodOnErrorModal(errorMetadata);
+      addRetryPaymentMethodOnErrorModal.call({} as any, errorMetadata);
       expect(document.querySelector('#fd-paypal-container')).toBeTruthy();
       expect(document.querySelector('#fd-paypal')).toBeTruthy();
       expect(document.querySelector('#fd-paypal-cancel')).toBeTruthy();
-
-      addRetryPaymentMethodOnErrorModal(null as any);
+      addRetryPaymentMethodOnErrorModal.call({} as any, null as any);
       expect(document.querySelector('#fd-paypal-container')).toBeFalsy();
       expect(document.querySelector('#fd-paypal')).toBeFalsy();
       expect(document.querySelector('#fd-paypal-cancel')).toBeFalsy();
 
-      addRetryPaymentMethodOnErrorModal(errorMetadata);
+      addRetryPaymentMethodOnErrorModal.call({} as any, errorMetadata);
       expect(document.querySelector('#fd-paypal-container')).toBeTruthy();
       expect(document.querySelector('#fd-paypal')).toBeTruthy();
       expect(document.querySelector('#fd-paypal-cancel')).toBeTruthy();
@@ -171,7 +170,7 @@ describe('Test Actions for Paypal as Backup', () => {
       (isRedesignV15 as unknown as jest.Mock).mockReturnValue(true);
       (isVisible as unknown as jest.Mock).mockReturnValue(true);
       const analytics = (Analytics.track = jest.fn());
-      addRetryPaymentMethodOnErrorModal(errorMetadata);
+      addRetryPaymentMethodOnErrorModal.call({} as any, errorMetadata);
 
       expect(analytics).toBeCalledTimes(3);
     });

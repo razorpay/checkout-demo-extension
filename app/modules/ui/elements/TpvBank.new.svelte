@@ -66,6 +66,7 @@
 
 <style lang="scss">
   .customer-bank-details {
+    align-items: center;
     background: linear-gradient(
       89.97deg,
       rgba(213, 232, 254, 0.7) -1.19%,
@@ -79,12 +80,14 @@
       font-weight: 700;
       text-transform: capitalize;
       margin: 0;
+      margin-right: 5px;
     }
     .text-uppercase {
       text-transform: uppercase;
     }
     .bank-account-wrapper {
       display: flex;
+      align-items: center;
       .bank-details {
         display: flex;
         img {

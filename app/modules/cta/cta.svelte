@@ -20,6 +20,14 @@
   export let handleDisableState = true;
   export let variant: CTAVariant = '';
 
+  export let isCTAClickInvalid = false;
+
+  $: {
+    if (!disabled) {
+      isCTAClickInvalid = false;
+    }
+  }
+
   function defaultCTAAction(e?: Event) {
     const session = getSession();
     session.preSubmit(e);
@@ -37,9 +45,11 @@
 
   function handleSubmit(...args: any) {
     if (handleDisableState && disabled) {
+      isCTAClickInvalid = true;
       shakeForm('#redesign-v15-cta', 'x-shake');
       return;
     }
+    isCTAClickInvalid = false;
     const submitAction = onSubmit || defaultCTAAction;
     submitAction(...args);
   }

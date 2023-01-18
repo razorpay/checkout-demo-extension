@@ -1,13 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   import DynamicFeeBearer from './DynamicFeeBearer.svelte';
 
   //Store imports
   import { showFeeLabel } from 'checkoutstore/fee';
-  import { showFeeBearerToolTip } from 'store/feebearer';
 
   import {
     getMerchantName,
@@ -40,18 +37,6 @@
     timeout ? clearTimeout(timeout) : null;
     showFeeDetails = false;
   };
-  onMount(() => {
-    if (
-      isFeeBearer &&
-      $showFeeLabel &&
-      isRedesignV15Enabled &&
-      !isDynamicFeeBearer() &&
-      !$showFeeBearerToolTip &&
-      !fromHeader
-    ) {
-      triggerToolTip();
-    }
-  });
 
   $: visible = isFeeBearer && $showFeeLabel;
 </script>

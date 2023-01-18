@@ -422,7 +422,10 @@
   </div>
 
   {#if isPartialPayment()}
-    <div class="partial-payment-block">
+    <div
+      class="partial-payment-block"
+      class:no-padding-top={isContactEmailHidden()}
+    >
       <PartialPaymentOptions {order} {showValidations} />
     </div>
   {/if}
@@ -541,6 +544,10 @@
 
     .partial-payment-block {
       padding: 0 0 24px 0;
+
+      &:not(.no-padding-top) {
+        padding-top: 24px;
+      }
     }
   }
 

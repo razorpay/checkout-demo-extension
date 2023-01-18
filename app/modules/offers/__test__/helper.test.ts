@@ -2,7 +2,7 @@ import {
   getAppliedOffer,
   getDiscountedAmount,
   isOfferApplicableOnIssuer,
-  showOffersOnSelectedCurrncy,
+  showOffersOnSelectedCurrency,
 } from '../helper';
 import { appliedOffer } from 'offers/store/store';
 import { tick } from 'svelte';
@@ -80,28 +80,28 @@ describe('#getDiscountedAmount', () => {
   });
 });
 
-describe('#showOffersOnSelectedCurrncy', () => {
+describe('#showOffersOnSelectedCurrency', () => {
   beforeEach(() => {
     appliedOffer.set(sampleOffer());
   });
-  test('test showOffersOnSelectedCurrncy with currency as empty string with no offers', async () => {
+  test('test showOffersOnSelectedCurrency with currency as empty string with no offers', async () => {
     await tick();
-    expect(showOffersOnSelectedCurrncy('')).toBeFalsy();
+    expect(showOffersOnSelectedCurrency('')).toBeFalsy();
   });
-  test('test showOffersOnSelectedCurrncy with currency as INR string with no offers', async () => {
+  test('test showOffersOnSelectedCurrency with currency as INR string with no offers', async () => {
     await tick();
-    expect(showOffersOnSelectedCurrncy('INR')).toBeFalsy();
+    expect(showOffersOnSelectedCurrency('INR')).toBeFalsy();
   });
-  test('test showOffersOnSelectedCurrncy with currency INR', async () => {
+  test('test showOffersOnSelectedCurrency with currency INR', async () => {
     await tick();
-    expect(showOffersOnSelectedCurrncy('INR')).toBeTruthy();
+    expect(showOffersOnSelectedCurrency('INR')).toBeTruthy();
   });
-  test('test showOffersOnSelectedCurrncy with currency USD', async () => {
+  test('test showOffersOnSelectedCurrency with currency USD', async () => {
     await tick();
-    expect(showOffersOnSelectedCurrncy('USD')).toBeFalsy();
+    expect(showOffersOnSelectedCurrency('USD')).toBeFalsy();
   });
-  test('test showOffersOnSelectedCurrncy with currency as empty string with offers', async () => {
+  test('test showOffersOnSelectedCurrency with currency as empty string with offers', async () => {
     await tick();
-    expect(showOffersOnSelectedCurrncy('')).toBeTruthy();
+    expect(showOffersOnSelectedCurrency('')).toBeTruthy();
   });
 });

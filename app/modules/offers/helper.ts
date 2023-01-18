@@ -44,7 +44,7 @@ export function getDiscountedAmount() {
   return (appliedOffer && appliedOffer.amount) || getAmount();
 }
 
-export const showOffersOnSelectedCurrncy = (currency: string) => {
+export const showOffersOnSelectedCurrency = (currency: string) => {
   /*
 Intentionally kept currency && currency.toUpperCase() 
 instead of currency?.toUpperCase()

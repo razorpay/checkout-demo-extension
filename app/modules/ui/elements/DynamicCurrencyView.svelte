@@ -18,7 +18,7 @@
     appliedOffer,
     showOffers,
   } from 'offers/store/store';
-  import { showOffersOnSelectedCurrncy } from 'offers/helper';
+  import { showOffersOnSelectedCurrency } from 'offers/helper';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
@@ -137,7 +137,7 @@
     // retrigger `computeOfferClass`
     appliedOffer.set($appliedOffer);
     const currency = (session.dccPayload?.currency || '') as string;
-    if (showOffersOnSelectedCurrncy(currency)) {
+    if (showOffersOnSelectedCurrency(currency)) {
       showOffers.set(true);
     } else {
       showOffers.set(false);

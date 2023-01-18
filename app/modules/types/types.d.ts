@@ -1,3 +1,6 @@
+import type WalletComponent from 'ui/tabs/wallets/index.svelte';
+import type Session from 'session';
+
 export type CustomObject<T> = {
   [key: string]: T;
 };
@@ -46,4 +49,9 @@ export type History = {
   popUntil: (view: any) => void;
 };
 
-export type SessionType = any;
+// TODO update type
+export type SessionType = Record<keyof Session, any> & {
+  isCorporateBanking: boolean;
+  walletTab: WalletComponent;
+  body: any; // TODO jquery api
+};

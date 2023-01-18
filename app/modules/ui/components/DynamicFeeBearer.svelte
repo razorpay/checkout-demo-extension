@@ -45,10 +45,6 @@
   onMount(() => {
     if (isDynamicFeeBearer() && !$showFeeBearerToolTip) {
       setMerchantMessage();
-      if (!fromHeader) {
-        triggerToolTip();
-        $showFeeBearerToolTip = true;
-      }
     }
   });
 

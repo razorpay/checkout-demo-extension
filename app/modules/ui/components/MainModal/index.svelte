@@ -77,13 +77,19 @@
         const paymentDetailBlock = document.getElementById(
           'payment-details-block'
         ) as HTMLDivElement;
+        const CTAContainer = document.querySelector(
+          '.cta-container'
+        ) as HTMLDivElement;
         /**
-         * get actual payment detail page height + 65px for CTA (-10px to reduce padding distance b/w content and cta)
+         * get actual payment detail page height + CTA height & (-10px to reduce padding distance b/w content and cta)
          * if we are not able to read detail page height then it fallback to 400px height
          * causing header to load minimal header
          */
         if (paymentDetailBlock && paymentDetailBlock.offsetHeight) {
-          initialBodyHeight = paymentDetailBlock.offsetHeight + 55;
+          initialBodyHeight =
+            paymentDetailBlock.offsetHeight +
+            (CTAContainer?.offsetHeight || 65) -
+            10;
         }
         if (bottomContainer?.offsetHeight) {
           initialBodyHeight += (bottomContainer?.offsetHeight || 0) + 10;
