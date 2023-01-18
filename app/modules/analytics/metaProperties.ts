@@ -19,6 +19,9 @@ export default {
   OPTIONAL_CONTACT: 'optional.contact',
   OPTIONAL_EMAIL: 'optional.email',
   P13N: 'p13n',
+  DONE_BY_P13N: 'doneByP13n',
+  DONE_BY_INSTRUMENT: 'doneByInstrument',
+  INSTRUMENT_META: 'instrumentMeta',
   P13N_USERIDENTIFIED: 'p13n.userIdentified',
   P13N_EXPERIMENT: 'p13n.experiment',
   /** user has saved card {Boolean} */

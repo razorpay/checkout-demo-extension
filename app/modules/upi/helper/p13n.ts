@@ -8,6 +8,8 @@ import {
   getDowntimeForUPIApp,
   definePlatformReturnMethodIdentifier,
 } from 'upi/helper';
+import { MetaProperties, Events } from 'analytics';
+import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 
 import type { InstrumentType } from 'home/analytics/types';
 
@@ -65,6 +67,17 @@ export function handlep13nUpiIntent(instrument: InstrumentType) {
         ...selectedUPIApp,
       });
     } else {
+      try {
+        // Adding same meta as added in session.js
+        Events.setMeta(MetaProperties.DONE_BY_P13N, true);
+        Events.setMeta(MetaProperties.DONE_BY_INSTRUMENT, true);
+        Events.setMeta(
+          MetaProperties.INSTRUMENT_META,
+          getInstrumentMeta(instrument)
+        );
+      } catch (error) {
+        // no-op
+      }
       handleUPIPayments({ action, app });
     }
   };
