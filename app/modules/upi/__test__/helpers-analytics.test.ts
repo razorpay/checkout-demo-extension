@@ -15,6 +15,7 @@ jest.mock('upi/analytics/events', () => {
     UPITracker: {
       UPI_OTHER_APPS_SCREEN_LOADED: jest.fn(),
       UPI_APPS_SHOWN: jest.fn(),
+      GEN_UPI_APPS_SHOWN: jest.fn(),
     },
   };
 });
@@ -127,10 +128,9 @@ describe('test trackUPIAppsShown method', () => {
     const screen = '';
     const instrument = [...instrumentList, { name: 'others' }];
     trackUPIAppsShown(rowCol, screen);
-    expect(UPITracker.UPI_APPS_SHOWN).toHaveBeenCalledTimes(1);
-    expect(UPITracker.UPI_APPS_SHOWN).toHaveBeenCalledWith({
+    expect(UPITracker.GEN_UPI_APPS_SHOWN).toHaveBeenCalledTimes(1);
+    expect(UPITracker.GEN_UPI_APPS_SHOWN).toHaveBeenCalledWith({
       instrument,
-      screen: 'L0',
     });
   });
   it('should trigger respective UPI analytics events for intent flow on L1 screen.', () => {
@@ -140,7 +140,6 @@ describe('test trackUPIAppsShown method', () => {
     expect(UPITracker.UPI_APPS_SHOWN).toHaveBeenCalledTimes(1);
     expect(UPITracker.UPI_APPS_SHOWN).toHaveBeenCalledWith({
       instrument,
-      screen: 'L1',
     });
   });
 });

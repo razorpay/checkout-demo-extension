@@ -19,7 +19,6 @@
   import { OTHER_INTENT_APPS, UPI_APP_PAYMENT_SOURCES } from 'upi/constants';
   import { UPITracker } from 'upi/analytics/events';
   import { getSession } from 'sessionmanager';
-  import { getCurrentScreen } from 'home/analytics/helpers';
   import { trackUPIAppsShown } from 'upi/analytics/helpers';
 
   const upiTiles = enableUPITiles();
@@ -98,7 +97,6 @@
       //   downtimeInstrument: app.app_name || app.shortcode,
       // };
       UPITracker.UPI_APP_SELECTED({
-        screen: getCurrentScreen(session.screen as string),
         instrument: {
           name: app?.shortcode,
           type: 'intent',

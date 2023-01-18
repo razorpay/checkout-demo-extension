@@ -40,6 +40,10 @@ export const UPIEvents = {
     name: 'QR_generated',
     type: API,
   },
+  GEN_UPI_APPS_SHOWN: {
+    name: 'gen_UPI_apps_shown',
+    type: RENDER,
+  },
   UPI_APPS_SHOWN: {
     name: 'UPI_apps_shown',
     type: RENDER,
@@ -80,12 +84,13 @@ interface UPIEventMap {
   VPA_VERIFICATION_ENDED: {
     response: Record<string, any>;
   };
+  GEN_UPI_APPS_SHOWN: {
+    instrument?: Instrument[];
+  };
   UPI_APPS_SHOWN: {
-    screen: string;
     instrument?: Instrument[];
   };
   UPI_APP_SELECTED: {
-    screen: string;
     instrument: Instrument;
   };
   UPI_OTHERS_SELECTED: undefined;

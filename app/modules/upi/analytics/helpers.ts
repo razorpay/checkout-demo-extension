@@ -8,7 +8,6 @@ import type { OtherAppsLoadEvent } from 'upi/analytics/types';
 import { getLastUpiUxErroredPaymentApp } from 'upi/helper/upiUx';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { getOtherAppsLabel } from 'common/upi';
-import { getCurrentScreen } from 'home/analytics/helpers';
 
 /**
  * trigger the analytics events during onload of other_apps screen loaded.
@@ -58,11 +57,11 @@ export const trackUPIAppsShown = (
     ?.map(({ shortcode }: UPI.AppConfiguration) => ({
       name: shortcode,
     }));
-  const eventProperties = {
-    screen: getCurrentScreen(screen),
-  };
   const eventPayload = instrumentList?.length
-    ? { ...eventProperties, instrument: instrumentList }
-    : eventProperties;
-  UPITracker.UPI_APPS_SHOWN(eventPayload);
+    ? { instrument: instrumentList }
+    : {};
+  // for L0 screen we are sending the event with section prefix and L1 screen we are sending the section in meta
+  screen === ''
+    ? UPITracker.GEN_UPI_APPS_SHOWN(eventPayload)
+    : UPITracker.UPI_APPS_SHOWN(eventPayload);
 };
