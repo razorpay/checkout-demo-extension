@@ -1,9 +1,7 @@
 import fs from 'fs/promises';
 import { execSync } from 'child_process';
-import { compare } from 'odiff-bin';
-// import pixelmatch from 'pixelmatch';
-// import { PNG } from 'pngjs';
 import { md5 } from './index.mjs';
+import { matchScreenshot } from './matchScreenshot.mjs';
 import { RECORD_MODE, HEADLESS, HistoryType } from './constants.mjs';
 
 const BASE_DIR = 'vision/autogen/screenshots/base/';
@@ -11,71 +9,17 @@ const TEMP_DIR = 'vision/autogen/screenshots/temp/';
 
 execSync(`rm -rf ${TEMP_DIR}/*; mkdir -p ${TEMP_DIR}`);
 
-async function matchScreenshot(firstImagePath, secondImagePath) {
-  const diffPath = secondImagePath.replace(/\.png$/, '') + `-diff.png`;
-  const { match, reason } = await compare(
-    firstImagePath,
-    secondImagePath,
-    diffPath
-  );
-  return match;
-  return doPixelMatch(firstImagePath, secondImagePath, diffPath);
-}
-
-function readImage(path) {
-  return new Promise((resolve) =>
-    fs.open(path).then((handle) => {
-      return handle
-        .createReadStream()
-        .pipe(new PNG())
-        .on('parsed', function () {
-          resolve(this);
-        });
-    })
-  );
-}
-
-async function doPixelMatch(firstImagePath, secondImagePath, diffPath) {
-  const [firstImage, secondImage] = await Promise.all([
-    readImage(firstImagePath),
-    readImage(secondImagePath),
-  ]);
-
-  if (
-    firstImage.width !== secondImage.width ||
-    firstImage.height !== secondImage.height
-  ) {
-    console.log(`dimension mismatch`);
-    return false;
-  }
-
-  const { width, height } = firstImage;
-  const diff = new PNG({ width, height });
-
-  const mismatchedPixels = pixelmatch(
-    firstImage.data,
-    secondImage.data,
-    diff.data,
-    width,
-    height
-  );
-
-  if (mismatchedPixels) {
-    const handle = await fs.open(diffPath, 'w+');
-    diff.pack().pipe(handle.createWriteStream());
-    return false;
-  }
-
-  return true;
-}
-
+const filesWritten = new Set();
 async function captureScreenshot(page) {
   const shotBuffer = await page.screenshot({
     fullPage: true,
   });
-  const name = md5(shotBuffer);
-  await fs.writeFile(`${TEMP_DIR}${name}.png`, shotBuffer);
-  return name;
+  const hash = md5(shotBuffer);
+  if (!filesWritten.has(hash)) {
+    filesWritten.add(hash);
+    await fs.writeFile(`${TEMP_DIR}/${hash}.png`, shotBuffer);
+  }
+  return { fileName: hash, buffer: shotBuffer };
 }
 
 function getMapPath(dir) {
@@ -162,27 +106,18 @@ export async function capture(pageState) {
   }
 
   referenceMap.newCount++;
-  const fileName = await captureScreenshot(page);
+  const { fileName, buffer } = await captureScreenshot(page);
   cursor.newKey = fileName;
 
   if (cursor.key) {
     const baseFilePath = `${BASE_DIR}${cursor.key}.png`;
     const filePath = `${TEMP_DIR}${fileName}.png`;
+    const diffPath = `${TEMP_DIR}diff-${fileName}.png`;
 
     // compare
-    const result = await matchScreenshot(baseFilePath, filePath);
+    const result = await matchScreenshot(baseFilePath, buffer, diffPath);
     if (result) {
       cursor.match = true;
-
-      // its possible for pixels to match despite md5 not matching
-      // restore base file in that case to avoid file changing in git diffs
-      if (cursor.key !== fileName) {
-        cursor.newKey = cursor.key;
-        await Promise.all([
-          fs.unlink(filePath),
-          fs.copyFile(baseFilePath, `${TEMP_DIR}${cursor.key}.png`),
-        ]);
-      }
     }
   }
 }
