@@ -3,10 +3,6 @@ import { createTrackMethodForModule, FUNNEL_NAMES } from 'analytics-v2';
 import type { Instrument, Method } from 'analytics-v2/types';
 
 export const CardsEvents = {
-  NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
-    name: 'native_otp_native_to_3DS_redirect_clicked',
-    type: BEHAV,
-  },
   NATIVE_OTP_SMS_RESEND_CLICKED: {
     name: 'native_otp_SMS_resend_clicked',
     type: BEHAV,
@@ -91,7 +87,6 @@ export const CardsEvents = {
     name: 'resend_otp_clicked',
     type: BEHAV,
   },
-  //TODO: Update prefix as per response of DE/Analytics team
   PAY_WITH_APPS_DISPLAYED: {
     name: 'pay_with_apps_displayed',
     type: RENDER,
@@ -107,9 +102,6 @@ export const CardsEvents = {
 };
 
 interface CardsEventMap {
-  NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED: {
-    instrument: Instrument;
-  };
   NATIVE_OTP_SMS_RESEND_CLICKED: {
     instrument: Instrument;
   };
@@ -148,7 +140,6 @@ interface CardsEventMap {
   CONSENT_BOX_SHOWN: {
     instrument: {
       saveCardConsent: boolean;
-      screenName: string;
     };
   };
   OTP_ENTERED: undefined;

@@ -24,7 +24,7 @@
   import { CardsTracker } from 'card/analytics/events';
 
   // Export statements
-  export let checked;
+  export let checked: boolean;
   export let savedcard;
   export let modalType: string;
   export let name = 'save';
@@ -89,7 +89,6 @@
     CardsTracker.CONSENT_BOX_SHOWN({
       instrument: {
         saveCardConsent: checked,
-        screenName: modalType,
       },
     });
   });

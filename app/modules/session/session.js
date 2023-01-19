@@ -2314,9 +2314,6 @@ Session.prototype = {
         immediately: true,
       });
 
-      CardsTracker.NATIVE_OTP_NATIVE_TO_3DS_REDIRECT_CLICKED({
-        instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
-      });
       this.hideTimer();
       this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
