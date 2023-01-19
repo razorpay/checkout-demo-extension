@@ -56,6 +56,10 @@ export const UPIEvents = {
     name: 'UPI_others_selected',
     type: BEHAV,
   },
+  VPA_COLLECT_REQUEST_SENT: {
+    name: 'VPA_collect_request_sent',
+    type: API,
+  },
   UPI_OTHER_APPS_SCREEN_LOADED: {
     name: 'UPI_other_apps_screen_loaded',
     type: RENDER,
@@ -108,6 +112,7 @@ interface UPIEventMap {
   P13N_SHOWN: {
     instrument: Instrument;
   };
+  VPA_COLLECT_REQUEST_SENT: undefined;
   QR_SHOWN: undefined;
 }
 

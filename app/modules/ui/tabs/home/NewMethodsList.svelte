@@ -38,6 +38,8 @@
   import QrWrapper from 'upi/ui/components/QRWrapper/QRWrapper.svelte';
   import { isRedesignV15 } from 'razorpay';
 
+  export let isHomeShown: boolean;
+
   onDestroy(() => {
     deselectInstrument();
   });
@@ -77,7 +79,7 @@
 
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
-    <RazorpayCluster {block} on:selectInstrument />
+    <RazorpayCluster {block} {isHomeShown} on:selectInstrument />
   {:else if block.code === 'rzp.giftcard'}
     <GiftCardBanner />
   {:else}

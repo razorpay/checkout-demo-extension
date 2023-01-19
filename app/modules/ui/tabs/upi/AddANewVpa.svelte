@@ -52,6 +52,13 @@
   // Refs
   export let vpaField = null;
 
+  const triggerAnalyticsOnSelect = () => {
+    if (selected) {
+      UPITracker.COLLECT_VPA_SELECTED();
+    }
+  };
+  $: selected, triggerAnalyticsOnSelect();
+
   const PATTERN_WITH_HANDLE = '.+@.+';
 
   const themeMeta = getThemeMeta();
@@ -152,7 +159,6 @@
   }
 
   function focusAfterTimeout() {
-    UPITracker.COLLECT_VPA_SELECTED();
     setTimeout(() => {
       if (vpaField && typeof vpaField.focus === 'function') {
         vpaField.focus();

@@ -5350,7 +5350,7 @@ Session.prototype = {
           'error.description'
         );
         UPITracker.VPA_VERIFICATION_ENDED({
-          response: vpaValidationError?.error,
+          response: vpaValidationError,
         });
         let errorMessage = errorDescription
           ? I18n.translateErrorDescription(
@@ -6400,6 +6400,9 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.pending', function (data) {
+        if (data?.vpa) {
+          UPITracker.VPA_COLLECT_REQUEST_SENT();
+        }
         if (data && data.flow === 'upi-intent') {
           Analytics.track('upi_pending', {
             data: {

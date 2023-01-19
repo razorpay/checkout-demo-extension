@@ -11,6 +11,8 @@ type Ungrouped = {
   token_id?: string;
   vendor_vpa?: string;
   app?: string;
+  vpas?: string[];
+  vendor_vpa?: string;
   id?: string;
   flow?: string;
   vpa?: string;

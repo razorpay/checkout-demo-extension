@@ -1,6 +1,6 @@
 <script lang="ts">
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // Store imports
   import { locale } from 'svelte-i18n';
@@ -27,12 +27,17 @@
 
   // Props
   export let block: Block;
+  export let isHomeShown: boolean;
 
-  onMount(() => {
-    block.instruments?.forEach((item) => {
-      genericMethodShown(item?.method);
-    });
-  });
+  const triggerAnalyticsOnShown = () => {
+    if (isHomeShown) {
+      block.instruments?.forEach((item) => {
+        genericMethodShown(item?.method);
+      });
+    }
+  };
+
+  $: isHomeShown, triggerAnalyticsOnShown();
 
   const dispatch = createEventDispatcher();
 

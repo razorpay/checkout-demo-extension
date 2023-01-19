@@ -1475,6 +1475,7 @@
             <NewMethodsList
               on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment}
+              isHomeShown={showHome}
             />
           </div>
         </div>
