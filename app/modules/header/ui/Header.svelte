@@ -271,8 +271,15 @@
     display: flex;
     align-items: center;
     background-color: var(--primary-color);
+    background-image: linear-gradient(
+      143.63deg,
+      rgba(255, 255, 255, 0.19) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    background-size: cover;
+    background-attachment: fixed;
     color: var(--text-color);
-    transition: box-shadow 0.5s;
+    transition: box-shadow 0.3s;
     transition-delay: 0.5s;
 
     &.medium-header {
@@ -280,6 +287,7 @@
     }
 
     &.full-screen {
+      transition: none;
       height: calc(100% - 8px);
       display: flex;
       align-items: center;
@@ -500,7 +508,7 @@
 
   #header-wrapper.contain-bottom-element.full-screen {
     .bottom-element-container {
-      margin-top: 10px;
+      margin: 10px 0;
       display: flex;
       justify-content: center;
 

@@ -1328,8 +1328,22 @@
           selectedMethod === 'cod' ? PLACE_ORDER_CTA_LABEL : PAY_NOW_CTA_LABEL;
       } else if (view === HOME_VIEWS.DETAILS) {
         CTAState.showAmount = Boolean(isPartialPayment || tpv);
-        CTAState.variant =
-          $fullScreenHeader !== HEADER_SIZE.MINIMAL ? 'shadowless' : '';
+        tick().then(() => {
+          if (view !== HOME_VIEWS.DETAILS) {
+            /** in case after tick view changes */
+            return;
+          }
+          // Compute bottom height after tick it renders
+          const bottom = document.getElementById('bottom') as HTMLDivElement;
+          const isBottomContainElements = (bottom?.offsetHeight || 0) > 0;
+          console.log(isBottomContainElements);
+          CTAState.variant =
+            $fullScreenHeader !== HEADER_SIZE.MINIMAL &&
+            !isBottomContainElements
+              ? 'shadowless'
+              : '';
+        });
+
         CTAState.onSubmit = onPaymentDetailSubmit;
         if (singleMethod) {
           const { label, labelData } = showPayViaSingleMethod(

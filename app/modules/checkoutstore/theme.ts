@@ -17,6 +17,8 @@ const {
 
 type Theme = {
   color: string;
+  ctaColor: string;
+  ctaTextColor: string;
   backgroundColor: string;
   foregroundColor: string;
   textColor: string;
@@ -79,6 +81,17 @@ export function setThemeColor(color: string) {
   const { backgroundColor, foregroundColor } = colorVariations;
 
   theme.color = color;
+  /**
+   * cta background color can vary based on if theme color is too light
+   * we override with razorpay default color
+   */
+  theme.ctaColor = Color.isLightColor(color) ? RAZORPAY_COLOR : color;
+  /**
+   * based on cta color we compute the text color again
+   */
+  theme.ctaTextColor = Color.isDark(theme.ctaColor)
+    ? TEXT_COLOR_WHITE
+    : TEXT_COLOR_BLACK;
   theme.backgroundColor = backgroundColor;
   theme.foregroundColor = foregroundColor;
   const isDarkColor = Color.isDark(color);
@@ -116,6 +129,8 @@ export function setThemeColor(color: string) {
 
   setRootCSSVariable({
     'primary-color': color,
+    'cta-color': theme.ctaColor,
+    'cta-text-color': theme.ctaTextColor,
     'text-color': theme.textColor,
     'light-text-color': theme.lightTextColor,
     'highlight-color': theme.highlightColor,

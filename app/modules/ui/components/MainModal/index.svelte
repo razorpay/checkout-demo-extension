@@ -372,6 +372,14 @@
       height: 80px;
       transition: all 0.5s;
       background: var(--primary-color);
+      position: relative;
+      background-image: linear-gradient(
+        143.63deg,
+        rgba(255, 255, 255, 0.19) 0%,
+        rgba(0, 0, 0, 0.1) 100%
+      );
+      background-size: cover;
+      background-attachment: fixed;
 
       &.no-rtb {
         height: 68px;
@@ -388,7 +396,7 @@
       box-shadow: 2px 2px 30px rgba(107, 108, 109, 0.1);
       z-index: 0;
       color: var(--text-color);
-      background: var(--primary-color);
+      background-color: var(--primary-color);
 
       #header-redesign-v15-wrap {
         height: 100%;

@@ -1,4 +1,5 @@
 import * as _El from 'utils/DOM';
+import { isValidHexColorCode } from 'utils/color';
 /*
  * All color inspection/manipulation functions go here
  */
@@ -379,4 +380,29 @@ export function getActiveStateColor(
   }
 
   return transparentify(variation, opacity);
+}
+
+/**
+ * https://stackoverflow.com/a/51567564/1303585
+ * @param {string } color hex color
+ * @returns {boolean}
+ */
+export function isLightColor(color: string) {
+  let hex = color.replace('#', '');
+  if (!isValidHexColorCode(color)) {
+    return false;
+  }
+  if (hex.length === 3) {
+    hex = hex
+      .split('')
+      .map(function (hex) {
+        return hex + hex;
+      })
+      .join('');
+  }
+  const cR = parseInt(hex.substring(0, 0 + 2), 16);
+  const cG = parseInt(hex.substring(2, 2 + 2), 16);
+  const cB = parseInt(hex.substring(4, 4 + 2), 16);
+  const brightness = (cR * 299 + cG * 587 + cB * 114) / 1000;
+  return brightness > 230;
 }

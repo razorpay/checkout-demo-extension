@@ -224,11 +224,11 @@
     border-radius: 5px;
 
     color: var(--text-color);
-    background: var(--primary-color);
+    background: var(--cta-color);
     background: linear-gradient(
       180deg,
       var(--background-color) 0%,
-      var(--primary-color) 100%
+      var(--cta-color) 100%
     );
   }
 
@@ -255,6 +255,7 @@
       margin-top: 2px;
     }
     .cta-container {
+      transition: box-shadow 0.4s;
       padding: 10px 14px;
       box-shadow: 0px -10px 10px rgba(23, 26, 30, 0.15);
     }
@@ -266,8 +267,8 @@
       padding: 14px 18px;
       font-size: var(--font-size-body);
       font-weight: var(--font-weight-semibold);
-      color: var(--text-color);
-      background: var(--primary-color);
+      color: var(--cta-text-color);
+      background: var(--cta-color);
       position: relative;
     }
     :global(.cta-btn::after),
