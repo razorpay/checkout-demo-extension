@@ -21,6 +21,7 @@ import {
   updateMoengageEventsData,
 } from 'one_click_checkout/merchant-analytics/store';
 import { get } from 'svelte/store';
+import { getSession } from 'sessionmanager';
 import type { InstrumentType } from 'home/analytics/types';
 
 const { CARD, NETBANKING, PAYLATER, UPI, EMI, WALLET } = METHODS;
@@ -55,12 +56,16 @@ export const genericMethodShown = (method: string): void => {
  * @param {InstrumentType} instrument
  */
 export const p13nInstrumentShown = (instrument: InstrumentType): void => {
+  const session = getSession();
   const { method } = instrument;
 
-  if (typeof (Tracker[method] as any)?.P13N_SHOWN === 'function') {
-    (Tracker[method] as any)?.P13N_SHOWN({
-      instrument: getInstrumentDetails(instrument),
-    });
+  if (session.screen === '') {
+    //TODO: need to remove any type, once we added analytics for all the methods
+    if (typeof (Tracker[method] as any)?.P13N_SHOWN === 'function') {
+      (Tracker[method] as any)?.P13N_SHOWN({
+        instrument: getInstrumentDetails(instrument),
+      });
+    }
   }
 };
 
@@ -80,15 +85,18 @@ export const specificMethodSelected = (instrument: InstrumentType): void => {
   }
 };
 
+export function setSelectedSection(section: string) {
+  if (section) {
+    EventsV2.setContext(ContextProperties.SECTION, getSelectedSection(section));
+  }
+}
+
 /**
  * trigger analytics events when a mothod or instrument is selected on p13n, custom or generic block on L0 screen.
  * @param {InstrumentType} instrument
  */
 export function triggerInstAnalytics(instrument: InstrumentType) {
-  EventsV2.setContext(
-    ContextProperties.SECTION,
-    getSelectedSection(instrument?.section)
-  );
+  setSelectedSection(instrument?.section);
   AnalyticsV2State.selectedBlock = {
     category: instrument.section,
     name: instrument.blockTitle || '',

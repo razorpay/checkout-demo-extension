@@ -712,7 +712,10 @@
       },
     });
     try {
-      if (event.detail.id !== 'new') {
+      if (
+        event.detail.id !== 'new' &&
+        event.detail.app !== OTHER_INTENT_APPS.package_name
+      ) {
         MiscTracker.INSTRUMENT_SELECTED({
           block: AnalyticsV2State.selectedBlock,
           method: {

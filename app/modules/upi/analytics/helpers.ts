@@ -3,11 +3,16 @@ import { Events } from 'analytics';
 import UPI_EVENTS from 'ui/tabs/upi/events';
 import { UPITracker } from 'upi/analytics/events';
 import type { OtherAppsLoadEvent } from 'upi/analytics/types';
+import { AnalyticsV2State } from 'analytics-v2';
 
 // helper imports
 import { getLastUpiUxErroredPaymentApp } from 'upi/helper/upiUx';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { getOtherAppsLabel } from 'common/upi';
+import { triggerInstAnalytics } from 'home/analytics/helpers';
+import { getInstrumentDetails } from 'ui/tabs/home/helpers';
+import { OTHER_INTENT_APPS } from 'upi/constants';
+import type { InstrumentType } from 'home/analytics/types';
 
 /**
  * trigger the analytics events during onload of other_apps screen loaded.
@@ -38,7 +43,11 @@ export const triggerAnalyticsOnLoad = (
       })),
     } as OtherAppsLoadEvent;
   }
-  UPITracker.UPI_OTHER_APPS_SCREEN_LOADED(eventPayload);
+  const { instrument } = AnalyticsV2State.selectedInstrumentForPayment;
+
+  if (instrument?.name === OTHER_INTENT_APPS.app_name) {
+    UPITracker.UPI_OTHER_APPS_SCREEN_LOADED(eventPayload);
+  }
 };
 
 /**
@@ -64,4 +73,24 @@ export const trackUPIAppsShown = (
   screen === ''
     ? UPITracker.GEN_UPI_APPS_SHOWN(eventPayload)
     : UPITracker.UPI_APPS_SHOWN(eventPayload);
+};
+
+export const trackUPIAppSelect = (
+  instrument: InstrumentType,
+  appName: string
+) => {
+  try {
+    const instrumentData = {
+      ...instrument,
+      apps: [appName],
+    };
+    if (appName !== OTHER_INTENT_APPS.app_name) {
+      triggerInstAnalytics(instrumentData);
+    } else {
+      AnalyticsV2State.selectedInstrumentForPayment = {
+        method: { name: instrumentData.method },
+        instrument: getInstrumentDetails(instrumentData),
+      };
+    }
+  } catch {}
 };

@@ -1,10 +1,14 @@
 import {
   triggerAnalyticsOnLoad,
   trackUPIAppsShown,
+  trackUPIAppSelect,
 } from 'upi/analytics/helpers';
 import { UPITracker } from 'upi/analytics/events';
 import { upiUxV1dot1 } from 'upi/experiments';
 import { getLastUpiUxErroredPaymentApp } from 'upi/helper/upiUx';
+import { AnalyticsV2State } from 'analytics-v2';
+import { triggerInstAnalytics } from 'home/analytics/helpers';
+import { OTHER_INTENT_APPS } from 'upi/constants';
 
 jest.mock('upi/analytics/events', () => {
   const originalModule = jest.requireActual('upi/analytics/events');
@@ -17,6 +21,16 @@ jest.mock('upi/analytics/events', () => {
       UPI_APPS_SHOWN: jest.fn(),
       GEN_UPI_APPS_SHOWN: jest.fn(),
     },
+  };
+});
+
+jest.mock('home/analytics/helpers', () => {
+  const originalModule = jest.requireActual('home/analytics/helpers');
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    triggerInstAnalytics: jest.fn(),
   };
 });
 
@@ -95,6 +109,19 @@ const instrumentList = showableApps.map(({ shortcode }) => ({
 }));
 
 describe('test triggerAnalyticsOnLoad method', () => {
+  beforeEach(() => {
+    AnalyticsV2State.selectedInstrumentForPayment = {
+      method: {
+        name: 'upi',
+      },
+      instrument: {
+        name: 'Others',
+        saved: false,
+        personalisation: false,
+        type: 'intent',
+      },
+    };
+  });
   it('should trigger respective UPI analytics events for intent flow on L1 screen.', () => {
     triggerAnalyticsOnLoad(showableApps);
     const instrument = [...instrumentList, { name: 'other_intent_upi_apps' }];
@@ -141,5 +168,57 @@ describe('test trackUPIAppsShown method', () => {
     expect(UPITracker.UPI_APPS_SHOWN).toHaveBeenCalledWith({
       instrument,
     });
+  });
+});
+describe('test trackUPIAppSelect method', () => {
+  it('should update the selected instrument on AnalyticsV2state.', () => {
+    const instrument = {
+      _ungrouped: [
+        {
+          _type: 'method',
+          code: 'upi',
+          method: 'upi',
+        },
+      ],
+      _type: 'method',
+      code: 'upi',
+      method: 'upi',
+      id: 'a4e2f58f_rzp.cluster_1_1_upi_true',
+      blockTitle: 'Cards, UPI & More',
+      section: 'generic',
+    };
+    trackUPIAppSelect(instrument, OTHER_INTENT_APPS.app_name);
+    expect(triggerInstAnalytics).not.toHaveBeenCalled();
+    expect(AnalyticsV2State.selectedInstrumentForPayment).toMatchObject({
+      method: {
+        name: 'upi',
+      },
+      instrument: {
+        name: 'Others',
+        saved: false,
+        personalisation: false,
+        type: 'intent',
+      },
+    });
+  });
+  it('should call triggerInstAnalytics for all UPI intent apps except other apps.', () => {
+    const appName = 'Google Pay';
+    const instrument = {
+      _ungrouped: [
+        {
+          _type: 'method',
+          code: 'upi',
+          method: 'upi',
+        },
+      ],
+      _type: 'method',
+      code: 'upi',
+      method: 'upi',
+      id: 'a4e2f58f_rzp.cluster_1_1_upi_true',
+      blockTitle: 'Cards, UPI & More',
+      section: 'generic',
+    };
+    trackUPIAppSelect(instrument, appName);
+    expect(triggerInstAnalytics).toHaveBeenCalledTimes(1);
   });
 });

@@ -55,7 +55,9 @@
   }
 
   onMount(() => {
-    trackUPIAppsShown(rowCol, session.screen as string);
+    if (variant === 'row') {
+      trackUPIAppsShown(rowCol, session.screen as string);
+    }
   });
 
   function isAppSelectedFromUpiAppStack() {

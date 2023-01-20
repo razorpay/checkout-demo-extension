@@ -49,7 +49,7 @@
   import NoCostLabel from 'components/Label/NoCostLabel.svelte';
   import { NO_COST_EMI_AVAILABLE } from 'ui/labels/offers';
   import { emiMethodClicked } from 'emiV2/events/tracker';
-  import { triggerInstAnalytics } from 'home/analytics/helpers';
+  import { trackUPIAppSelect } from 'upi/analytics/helpers';
   import type { InstrumentType } from 'home/analytics/types';
 
   // Props
@@ -191,9 +191,7 @@
 
   function onUPIAppSelect(data) {
     const { app } = data.detail || {};
-    triggerInstAnalytics(
-      { ...(instrument as InstrumentType), apps: [app.app_name] } || {}
-    );
+    trackUPIAppSelect(instrument as InstrumentType, app.app_name);
   }
 </script>
 

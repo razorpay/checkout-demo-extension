@@ -76,6 +76,15 @@ jest.mock('configurability/instruments', () => {
   };
 });
 
+jest.mock('sessionmanager', () => {
+  return {
+    __esModule: true,
+    getSession: jest.fn(() => ({
+      screen: '',
+    })),
+  };
+});
+
 describe('test getSelectedSection method', () => {
   it('should return gen keyword when the generic section is selected.', () => {
     expect(getSelectedSection('generic')).toBe('gen');
