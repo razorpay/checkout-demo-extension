@@ -1160,6 +1160,7 @@ export default {
     MC: 'MasterCard',
     RUPAY: 'RuPay',
     VISA: 'Visa',
+    UNP: 'UnionPay',
   },
   offers: {
     available_offers_header: 'Available Offers',

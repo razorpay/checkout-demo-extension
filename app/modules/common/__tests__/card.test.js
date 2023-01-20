@@ -10,6 +10,7 @@ const testCards = {
   maestro: '6799990100000000019',
   mastercard: '5555555555554444',
   visa: '4242424242424242',
+  unionpay: '6212345678901265',
 };
 
 const testCardsWithSpacing = {
@@ -29,6 +30,7 @@ describe('common/card', () => {
     expect(Card.getCardType(testCards.diners)).toBe('diners');
     expect(Card.getCardType(testCards.discover)).toBe('discover');
     expect(Card.getCardType(testCards.jcb)).toBe('jcb');
+    expect(Card.getCardType(testCards.unionpay)).toBe('unionpay');
 
     expect(Card.getCardType('')).toBe('');
     expect(Card.getCardType()).toBe('');
@@ -46,6 +48,7 @@ describe('common/card', () => {
     expect(Card.getNetworkFromCardNumber(testCards.diners)).toBe('diners');
     expect(Card.getNetworkFromCardNumber(testCards.discover)).toBe('discover');
     expect(Card.getNetworkFromCardNumber(testCards.jcb)).toBe('jcb');
+    expect(Card.getNetworkFromCardNumber(testCards.unionpay)).toBe('unionpay');
   });
 
   test('getCardMaxLen', function () {
@@ -57,6 +60,7 @@ describe('common/card', () => {
     expect(Card.getCardMaxLen(Card.getCardType(testCards.diners))).toBe(14);
     expect(Card.getCardMaxLen(Card.getCardType(testCards.discover))).toBe(16);
     expect(Card.getCardMaxLen(Card.getCardType(testCards.jcb))).toBe(16);
+    expect(Card.getCardMaxLen(Card.getCardType(testCards.unionpay))).toBe(19);
   });
 
   test('getCardSpacing', function () {
@@ -72,6 +76,7 @@ describe('common/card', () => {
     };
 
     expect(addSpacingToCard(testCards.maestro)).toBe(testCards.maestro);
+    expect(addSpacingToCard(testCards.unionpay)).toBe(testCards.unionpay);
     expect(addSpacingToCard(testCards.amex)).toBe(testCardsWithSpacing.amex);
     expect(addSpacingToCard(testCards.bajaj)).toBe(testCardsWithSpacing.bajaj);
     expect(addSpacingToCard(testCards.visa)).toBe(testCardsWithSpacing.visa);
@@ -84,6 +89,7 @@ describe('common/card', () => {
     expect(luhnCheck(testCards.visa)).toBe(true);
     expect(luhnCheck(testCards.mastercard)).toBe(true);
     expect(luhnCheck(testCards.maestro)).toBe(true);
+    expect(luhnCheck(testCards.unionpay)).toBe(true);
     expect(luhnCheck('4242424242424246')).toBe(false);
   });
 

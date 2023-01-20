@@ -94,7 +94,16 @@ const CARD_DESCRIPTION = (locale, cardType = '') => {
     return generateTextFromList(apps, locale, 4);
   }
   // Keep in order that we want to display
-  const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
+  const NW_ORDER = [
+    'VISA',
+    'MC',
+    'RUPAY',
+    'AMEX',
+    'DICL',
+    'MAES',
+    'JCB',
+    'UNP',
+  ];
 
   // Get all networks from preferences.
   const networksFromPrefs = getCardNetworks();

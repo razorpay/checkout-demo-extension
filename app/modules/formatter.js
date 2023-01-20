@@ -91,7 +91,10 @@ Formatter.rules = {
       if (!luhnCheck(value)) {
         return;
       }
-      if (this.type === 'maestro' && value.length === 16) {
+      if (
+        (this.type === 'maestro' || this.type === 'unionpay') &&
+        value.length === 16
+      ) {
         return true;
       }
       return value.length === (this.maxLen || Card.getCardMaxLen(this.type));

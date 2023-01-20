@@ -22,6 +22,7 @@ interface CardNetworks {
   MC: number;
   MAES: number;
   VISA: number;
+  UNP: number;
   JCB: number;
   RUPAY: number;
   BAJAJ: number;

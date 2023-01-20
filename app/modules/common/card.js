@@ -19,6 +19,7 @@ export const API_NETWORK_CODES_MAP = {
   MC: 'mastercard',
   RUPAY: 'rupay',
   VISA: 'visa',
+  UNP: 'unionpay',
 };
 
 export const networks = {
@@ -29,6 +30,7 @@ export const networks = {
   rupay: 'RuPay',
   visa: 'Visa',
   bajaj: 'Bajaj Finserv',
+  unionpay: 'Union Pay',
   unknown: 'unknown',
 };
 
@@ -130,6 +132,11 @@ const cardPatterns = [
     name: 'discover',
     regex: /^(65[1,3-9]|6011)/,
   },
+  // keep more specific unionpay above maestro
+  {
+    name: 'unionpay',
+    regex: /^62[0-9]{4,}$/,
+  },
   {
     name: 'maestro',
     regex: /^(6|5(0|[6-9])).{5}/,
@@ -157,6 +164,7 @@ const cardLengths = {
   amex: 15,
   diners: 14,
   maestro: 19,
+  unionpay: 19,
   '': 19,
 };
 
