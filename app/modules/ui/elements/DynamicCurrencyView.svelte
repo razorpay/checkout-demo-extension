@@ -67,6 +67,7 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import NativeRadio from './NativeRadio';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
+  import CurrencySelectFooter from 'ui/components/DynamicCurrencyConversion/ui/CurrencySelectFooter.svelte';
 
   import {
     isDCCEnabledForProvider,
@@ -519,6 +520,7 @@
       items: sortedCurrencies,
       keys: ['currency', 'name', 'symbol'],
       component: CurrencySearchItem,
+      footerComponent: CurrencySelectFooter,
       onSelect: (data) => {
         onSelect(data.currency);
       },

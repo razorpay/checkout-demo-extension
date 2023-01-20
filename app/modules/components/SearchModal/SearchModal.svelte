@@ -4,7 +4,7 @@
    */
 
   // Svelte imports
-  import { tick, onDestroy, onMount } from 'svelte';
+  import { tick, onDestroy, onMount, SvelteComponentTyped } from 'svelte';
   import { fade, fly } from 'svelte/transition';
 
   // UI imports
@@ -38,6 +38,13 @@
   export let all: string;
   export let onSelect = returnAsIs;
   export let onClose = returnAsIs;
+
+  /**
+   * Pass custom footer component for search modal
+   *
+   * @type {typeof SvelteComponentTyped | null}
+   */
+  export let footerComponent: typeof SvelteComponentTyped | null = null;
 
   const IDs = {
     overlay: `${identifier}_search_overlay`,
@@ -361,6 +368,12 @@
               />
             </div>
           {/each}
+        </div>
+      {/if}
+
+      {#if footerComponent}
+        <div class="list">
+          <svelte:component this={footerComponent} />
         </div>
       {/if}
     </div>

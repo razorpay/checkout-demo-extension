@@ -40,3 +40,5 @@ export enum EmitEvents {
    */
   currencyMetaFailed = 'currencyMetaFailed',
 }
+
+export const RAZORPAY_WEBSITE_LINK = 'https://razorpay.com';

@@ -16,6 +16,7 @@
   // ui elements
   import CurrencySelect from './CurrencySelect.svelte';
   import CurrencySelectDialog from './CurrencySelectDialog.svelte';
+  import CurrencySelectFooter from './CurrencySelectFooter.svelte';
   import triggerSearchModal from 'components/SearchModal';
 
   // analytics
@@ -205,6 +206,7 @@
       items: currenciesList,
       keys: ['currency', 'name', 'symbol'],
       component: CurrencySelectDialog,
+      footerComponent: CurrencySelectFooter,
       onSelect: (data: DCC.CurrencyListType[0]) => {
         trackers.trackCurrencySelectedFromDialog();
         dispatchEvents(EmitEvents.selectedCurrencyChange, {

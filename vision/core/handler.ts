@@ -5,6 +5,7 @@ import { getCustomerStatus } from '../mock/api/customer';
 import { patchCustomerData, resetOrder } from '../mock/api/order';
 import {
   createOtp,
+  otpSubmitHandler,
   truecallerVerifyCustomer,
   verifyOtp,
   verifyOtpOneCC,
@@ -24,6 +25,7 @@ import { createPaymentAjax } from '../mock/api/payments';
 import P13nHandler from '../mock/api/personalisation';
 import preferences from '../mock/api/preferences';
 import feeBearerHandler from '../mock/api/fee';
+import { cardIINHandler, paymentFlowsHandler } from '../mock/api/card';
 
 /**
  * Route mapping corresponds to key which is used for api override also
@@ -69,24 +71,29 @@ export const API_ROUTES_MAPPING = {
     method: 'post',
     handler: feeBearerHandler,
   },
-  //   customer_status: {
-  //     path: '/customers/status/:contact',
-  //     method: 'get',
-  //     handler: getCustomerStatus,
-  //   },
-  //   otp_create: {
-  //     path: '/otp/create',
-  //     handler: createOtp,
-  //     method: 'post',
-  //   },
-  //   otp_verify: {
-  //     path: '/otp/verify',
-  //     handler: verifyOtp,
-  //     method: 'post',
-  //   },
+  customer_status: {
+    path: '/customers/status/:contact',
+    method: 'get',
+    handler: getCustomerStatus,
+  },
+  otp_create: {
+    path: '/otp/create',
+    handler: createOtp,
+    method: 'post',
+  },
+  otp_verify: {
+    path: '/otp/verify',
+    handler: verifyOtp,
+    method: 'post',
+  },
   create_ajax: {
     path: '/payments/create/ajax',
     handler: createPaymentAjax,
+    method: 'post',
+  },
+  otpSubmit: {
+    path: '/checkout/:type/v1/payments/:paymentId/otp_submit/:token',
+    handler: otpSubmitHandler,
     method: 'post',
   },
   //   validate_account: {
@@ -134,6 +141,16 @@ export const API_ROUTES_MAPPING = {
   //     method: 'post',
   //     handler: checkCodEligibility,
   //   },
+  paymentFlows: {
+    path: '/payment/flows',
+    handler: paymentFlowsHandler,
+    method: 'get',
+  },
+  cardIIN: {
+    path: '/payment/iin',
+    handler: cardIINHandler,
+    method: 'get',
+  },
 } as const;
 
 export function attachHandlers(router) {

@@ -5,4 +5,5 @@
 export * from './common';
 export * from './netbanking';
 export * from './userDetails';
+export * from './card';
 export * from './wallet';

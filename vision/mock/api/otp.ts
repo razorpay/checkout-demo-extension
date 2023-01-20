@@ -1,3 +1,6 @@
+import { getOtpSubmit } from '../../../mock-api/mocks/otp';
+import type { handlerType } from '../../core/types';
+
 export function createOtp(route, request, context) {
   return {
     response: {
@@ -107,3 +110,9 @@ export function truecallerVerifyCustomer(route, request, context) {
     },
   };
 }
+
+export const otpSubmitHandler: handlerType = () => {
+  return {
+    response: getOtpSubmit('success'),
+  };
+};

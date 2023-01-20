@@ -738,6 +738,8 @@ export default {
     merchant_of_record:
       'By completing your order, you will checkout with Razorpay Inc. as the merchant of record and agree with the ',
     terms_and_conditions: 'terms and conditions',
+    compliance_footer:
+      'For further details on our services related to your native currency transaction, please visit our website',
   },
   debit_emi: {
     card_box_title: 'SELECTED DEBIT CARD',

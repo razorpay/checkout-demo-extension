@@ -73,7 +73,7 @@ export type CustomRoute = {
     name: string;
     overrides: Record<string, any>;
   }) => {
-    response: Record<string, any>;
+    response: Record<string, any> | string;
     status_code?: number;
     content_type?: string;
   };

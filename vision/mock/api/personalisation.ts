@@ -4,7 +4,7 @@ import type { handlerType } from '../../core/types';
 const P13nHandler: handlerType = function ({ name }) {
   let response = getP13n(name);
   if (!response) {
-    console.info(`No preference response found for context:${name}`);
+    console.info(`No personalization response found for context:${name}`);
     return {
       response: {},
     };
