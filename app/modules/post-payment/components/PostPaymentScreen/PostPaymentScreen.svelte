@@ -1,24 +1,37 @@
 <script lang="ts">
   import TrustedBadge from 'one_click_checkout/header/components/TrustedBadge.svelte';
-  import { screenStore, showBottomElement, tabStore } from 'checkoutstore';
-  import CTA from 'cta';
-  import { destroyHeader } from 'header';
-  import { getAmount, getMerchantName, isCustomerFeeBearer } from 'razorpay';
+  import { getAmount, getMerchantName } from 'razorpay';
   import { onMount } from 'svelte';
-  import { hideTopbar } from 'topbar';
   import { getMethodName, getTimestamp } from './helper';
   import Icon from 'ui/elements/Icon.svelte';
   import { getThemeMeta } from 'checkoutstore/theme';
   import InfoIcon from 'ui/elements/InfoIcon.svelte';
-  import SecuredByRazorpay from 'ui/components/SecuredByRazorpay.svelte';
   import { copyToClipboard } from 'common/clipboard';
   import circle_check from 'one_click_checkout/rtb_modal/icons/circle_check';
   import { formatAmountWithCurrency } from 'helper/currency';
   import type { PostPaymentScreenProps } from './types';
   import circle_cross from 'ui/icons/payment-methods/circle_cross';
   import { Events } from 'analytics';
-  import { ANALYTICS_EVENTS, SUPPORT_URL } from './constant';
+  import { ANALYTICS_EVENTS, SUPPORT_URL, VIEW_STATE } from './constant';
   import { appliedOffer } from 'offers/store';
+  import { fly } from 'svelte/transition';
+  import {
+    TIMER_CALLOUT,
+    PAYMENT_SUCCESS,
+    PAYMENT_FAILED,
+    VISIT,
+    FOR_QUERIES,
+  } from 'post-payment/i18n/label';
+  import { locale, t } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  let currentViewState = VIEW_STATE.MINIMAL;
+
+  $: isMinimal = currentViewState === VIEW_STATE.MINIMAL;
+
+  setTimeout(() => {
+    currentViewState = VIEW_STATE.FULL_SCREEN;
+  }, 1000);
 
   export let onComplete: () => void;
   export let data: PostPaymentScreenProps['data'];
@@ -28,7 +41,7 @@
     data?.response?.razorpay_payment_id ||
     data?.response?.error?.metadata?.payment_id;
 
-  let TIMER = 5;
+  let TIMER = 6;
 
   const timerInstance = setInterval(() => {
     TIMER -= 1;
@@ -71,83 +84,109 @@
       payment_id: paymentId,
       method: getMethodName(data?.requestPayload?.method) || '-',
     });
-    showBottomElement.set(false);
-    destroyHeader();
-    hideTopbar();
-    $screenStore = 'postPayment';
-    $tabStore = 'postPayment';
   });
 </script>
 
-<div class="screen-container">
-  <div class="status" class:success={isSuccess} class:failure={!isSuccess}>
-    <div class="status-icon">
-      {#if isSuccess}
-        <Icon icon={circle_check('', 'white', '72', '72')} />
-      {:else}
-        <Icon icon={circle_cross('', '#fff')} />
-      {/if}
-    </div>
-    <div class="amount">
-      {formatAmountWithCurrency(
-        offerAmount > 0
-          ? $appliedOffer?.amount || getAmount()
-          : getAmount() + fee
-      )}
-    </div>
-
-    <div class="status-text">
-      {isSuccess ? 'Payment successful' : 'Payment failed'}
-    </div>
-  </div>
-  <div class="payment-details">
-    <div>
-      <div class="merchant-title">
-        <div>{getMerchantName()}</div>
-        <div class="rtb-badge-container"><TrustedBadge expanded={false} /></div>
+<div class="overlay-container" class:minimal={isMinimal}>
+  <div
+    class="screen-container"
+    transition:fly|local={isMinimal
+      ? { duration: 200, y: 20, delay: 300 }
+      : { duration: 400 }}
+  >
+    <div class="status" class:success={isSuccess} class:failure={!isSuccess}>
+      <div class="status-icon">
+        {#if isSuccess}
+          <Icon icon={circle_check('', 'white', '72', '72')} />
+        {:else}
+          <Icon icon={circle_cross('', '#fff')} />
+        {/if}
       </div>
-      <div class="timestamp">{getTimestamp()}</div>
-    </div>
-    <div>
-      <div
-        class="details"
-        on:click={() => {
-          copyToClipboard('body', paymentId || '');
-          Events.TrackBehav(ANALYTICS_EVENTS.CLICK_COPY_PAYMENT_ID);
-        }}
-      >
-        <div>{getMethodName(data?.requestPayload?.method) || '-'} |</div>
-        <div class="payment-id">{paymentId}</div>
-        <div class="copy-icon"><Icon icon={copy} /></div>
+      <div class="status-text">
+        {isSuccess ? $t(PAYMENT_SUCCESS) : $t(PAYMENT_FAILED)}
       </div>
-      <div class="info">
-        <span class="info-icon"><InfoIcon variant={'disabled'} /></span>
-        Copy ID and visit
-        <a
-          href={SUPPORT_URL.url}
-          target="_blank"
-          rel="noopener"
+      <div class="amount">
+        {formatAmountWithCurrency(
+          offerAmount > 0
+            ? $appliedOffer?.amount || getAmount()
+            : getAmount() + fee
+        )}
+      </div>
+    </div>
+    <div class="payment-details">
+      <div>
+        <div class="merchant-title">
+          <div>{getMerchantName()}</div>
+          <div class="rtb-badge-container">
+            <TrustedBadge expanded={false} />
+          </div>
+        </div>
+        <div class="timestamp">{getTimestamp()}</div>
+      </div>
+      <div>
+        <div
+          class="details"
           on:click={() => {
-            Events.TrackBehav(ANALYTICS_EVENTS.CLICK_SUPPORT_LINK);
+            copyToClipboard('body', paymentId || '');
+            Events.TrackBehav(ANALYTICS_EVENTS.CLICK_COPY_PAYMENT_ID);
           }}
         >
-          {SUPPORT_URL.text}
-        </a> for queries
+          <div>{getMethodName(data?.requestPayload?.method) || '-'} |</div>
+          <div class="payment-id">{paymentId}</div>
+          <div class="copy-icon"><Icon icon={copy} /></div>
+        </div>
+        <div class="info">
+          <span class="info-icon"><InfoIcon variant={'disabled'} /></span>
+          {$t(VISIT)}
+          <a
+            href={SUPPORT_URL.url}
+            target="_blank"
+            rel="noopener"
+            on:click={() => {
+              Events.TrackBehav(ANALYTICS_EVENTS.CLICK_SUPPORT_LINK);
+            }}
+          >
+            {SUPPORT_URL.text}
+          </a>
+          {$t(FOR_QUERIES)}
+        </div>
+      </div>
+    </div>
+    <div class="branding">
+      <div class="redirecting">
+        {formatTemplateWithLocale(TIMER_CALLOUT, { TIMER }, $locale)}
       </div>
     </div>
   </div>
-  <div class="branding">
-    <SecuredByRazorpay />
-    <div class="redirecting">Redirecting in {TIMER} seconds...</div>
-  </div>
 </div>
-<CTA screen={$screenStore} tab={$tabStore} show={false} />
 
 <style lang="scss">
+  .overlay-container {
+    height: 100%;
+    background: transparent !important;
+    overflow: hidden;
+    top: 0;
+  }
   .screen-container {
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-height: 100%;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .minimal .screen-container {
+    transform: translateY(calc(100% - 273px));
+    overflow: hidden;
+
+    .status {
+      height: 273px;
+    }
+
+    .amount {
+      max-height: 0;
+      overflow: hidden;
+    }
   }
 
   .status {
@@ -172,7 +211,9 @@
     }
 
     .amount {
-      margin-top: 26px;
+      transition: max-height 0.5s ease-out 0.2s;
+      max-height: 100%;
+      margin-top: 20px;
       margin-bottom: 14px;
       font-weight: 500;
       font-size: 24px;
@@ -180,6 +221,7 @@
     }
 
     .status-text {
+      margin-top: 24px;
       font-size: 16px;
       font-weight: 600;
       line-height: 130%;
@@ -200,6 +242,8 @@
     cursor: pointer;
   }
   .payment-details {
+    background-color: #fff;
+    text-align: left;
     height: 140px;
     padding: 20px;
     display: flex;
@@ -259,7 +303,7 @@
   }
   .branding {
     display: flex;
-    height: 40px;
+    min-height: 40px;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
@@ -275,8 +319,17 @@
   }
 
   .rtb-badge-container {
-    height: 14px;
+    height: 20px;
     margin-left: 2px;
+
+    :global(.rtb-icon-wrapper) {
+      height: 20px;
+
+      :global(img) {
+        height: 20px;
+        width: 20px;
+      }
+    }
   }
 
   .payment-id {

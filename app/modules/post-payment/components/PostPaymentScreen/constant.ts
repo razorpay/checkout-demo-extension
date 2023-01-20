@@ -35,3 +35,8 @@ export const SUPPORT_URL = {
   url: 'https://razorpay.com/support/',
   text: 'razorpay.com/support',
 };
+
+export enum VIEW_STATE {
+  MINIMAL,
+  FULL_SCREEN,
+}

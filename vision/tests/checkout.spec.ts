@@ -6,6 +6,6 @@ test('basic test', async ({ page, util }) => {
   await util.openCheckout({
     options,
   });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000);
   expect(await page.screenshot()).toMatchSnapshot();
 });

@@ -17,6 +17,7 @@ import customer_consent_one_cc from 'one_click_checkout/customer/i18n/en';
 import giftcard from 'one_click_checkout/gift_card/i18n/en';
 import shipping_options from 'one_click_checkout/shipping_options/i18n/en';
 import fpx from 'fpx/i18n/en';
+import postPayment from 'post-payment/i18n/en';
 
 import upiLang from 'upi/i18n/en';
 import rtb from 'rtb/i18n/en';
@@ -1584,4 +1585,5 @@ export default {
   },
   customer_consent_one_cc,
   fpx,
+  postPayment,
 } as const;

@@ -53,7 +53,7 @@ test.describe('Email Less Checkout Feature', () => {
       await popup.waitForTimeout(1000);
       await handleResponse(testCase.handler);
       // post payment success message
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2500);
       await util.matchScreenshot();
     });
   }
