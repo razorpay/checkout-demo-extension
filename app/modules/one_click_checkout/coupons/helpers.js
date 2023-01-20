@@ -208,7 +208,7 @@ export function applyCouponCode(code, couponSource = '') {
           error_reason: error?.error?.reason,
           error_description: error?.error?.description,
         });
-        if (error.failure_code === ERROR_USER_NOT_LOGGED_IN) {
+        if (error?.failure_code === ERROR_USER_NOT_LOGGED_IN) {
           pushOverlay({
             component: Details,
           });
