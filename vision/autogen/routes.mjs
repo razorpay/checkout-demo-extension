@@ -18,20 +18,17 @@ export default router;
 
 router.origin('https://rudderstack.razorpay.com').ignore();
 router.origin('https://browser.sentry-cdn.com').ignore();
+router.origin('https://dns.google').ignore();
 
 const posRouter = router.origin('https://checkout.razorpay.com');
 const cdnRouter = router.origin('https://cdn.razorpay.com');
 const apiRouter = router.origin('https://api.razorpay.com');
 const googleChartRouter = router.origin('https://chart.googleapis.com');
-const googleDNSRouter = router.origin('https://dns.google');
 
 posRouter.get('/v1/:assetPath*', serveCheckout);
 cdnRouter.get('/:assetPath*', serveCdn);
 
 googleChartRouter.get('/chart', serveQR);
-googleDNSRouter.get('/:foo*', function* () {
-  yield { Status: 0 };
-});
 
 apiRouter.get('/v1/checkout/public', servePublicPage);
 apiRouter.get('/v1/preferences', handlePreferences);
