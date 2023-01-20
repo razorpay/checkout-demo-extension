@@ -6880,6 +6880,8 @@ Session.prototype = {
       }
 
       customer.customer_id = saved_customer.customer_id;
+    } else {
+      EventsV2.setContext(ContextProperties.USER_LOGGEDIN, false);
     }
     // Setting rtb_experiment based on prefs call for logged in users
     discreet.RTBHelper.setRTBVariant(preferences.rtb_experiment || {});

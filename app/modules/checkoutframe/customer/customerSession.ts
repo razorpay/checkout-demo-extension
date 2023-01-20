@@ -3,6 +3,7 @@ import { Customer, getCustomer } from './base';
 import { customer as customerStore } from 'checkoutstore/customer.js';
 import { removeLitePreferencesFromStorage } from 'checkout-frame-lite/controller';
 import { getOption } from 'razorpay';
+import { EventsV2, ContextProperties } from 'analytics-v2';
 
 /**
  * logout the customer instance on client by removing logged in status and clearing existing tokens
@@ -38,6 +39,7 @@ export function logUserOut(
   const session = getSession();
 
   function logoutSuccessCallback(data: any) {
+    EventsV2.setContext(ContextProperties.USER_LOGGEDIN, false);
     logoutUserOnClient(customer);
 
     callback && callback(data);
