@@ -2,14 +2,14 @@ import Topbar from 'topbar/ui/Topbar.svelte';
 import { setTopbarBack } from 'topbar/sessionInterface';
 import { getOption } from 'razorpay';
 
-let topbar;
+let topbar: Topbar | null;
 
 /**
  * Creates a Topbar
  */
 function create() {
   topbar = new Topbar({
-    target: document.querySelector('#topbar-redesign-v15-wrap'),
+    target: document.querySelector('#topbar-redesign-v15-wrap') as Element,
   });
 }
 
@@ -18,7 +18,9 @@ export function showTopbar() {
   if (!isTopBarHidden()) {
     create();
     setTopbarBack(topbar);
-    topbar.show();
+    if (topbar) {
+      topbar.show();
+    }
   }
 }
 
@@ -27,7 +29,9 @@ export function hideTopbar() {
     create();
     setTopbarBack(topbar);
   }
-  topbar.hide();
+  if (topbar) {
+    topbar.hide();
+  }
 }
 
 /**
