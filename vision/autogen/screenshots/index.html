@@ -61,7 +61,7 @@
 </html>
 
 <script>
-  const dir = location.href.includes('base') ? 'base' : 'temp';
+  const dir = location.href.includes('base') ? 'base' : 'test';
   const paths = [];
   fetch(`${dir}/map.json`)
     .then((res) => res.json())

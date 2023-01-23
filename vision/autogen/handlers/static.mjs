@@ -1,8 +1,12 @@
-import path from 'path';
+import { readFileSync } from 'fs';
+
+const cache = new Map();
 
 export class File {
   constructor(path) {
-    this.path = path;
+    const extension = path.split('.').pop();
+    this.body = readFileSync(path);
+    this.contentType = contentTypes[extension];
   }
 }
 
@@ -11,7 +15,7 @@ export function* servePublicPage() {
 }
 
 export function* serveCheckout({ params }) {
-  yield serveFile(`app/dist/v1/${params.assetPath.join('/')}`);
+  yield serveFile(`app/dist/v1/${params.any.join('/')}`);
 }
 
 export function* serveQR() {
@@ -19,7 +23,7 @@ export function* serveQR() {
 }
 
 export function* serveCdn({ params }) {
-  const path = params.assetPath.join('/');
+  const path = params.any.join('/');
   if (path === 'lato.woff2') {
     yield serveFile(`app/fonts/${path}`);
   } else if (path === 'static/assets/trustedbadge/rtb-live.svg') {
@@ -30,8 +34,20 @@ export function* serveCdn({ params }) {
   }
 }
 
-export function serveFile(pathToFile) {
+export function serveFile(path) {
+  if (cache.has(path)) {
+    return cache.get(path);
+  }
   try {
-    return new File(path.resolve(pathToFile));
+    return new File(path);
   } catch (e) {}
 }
+
+const contentTypes = {
+  png: 'image/png',
+  svg: 'image/svg+xml',
+  jpg: 'image/jpeg',
+  css: 'text/css',
+  html: 'text/html',
+  js: 'application/javascript',
+};

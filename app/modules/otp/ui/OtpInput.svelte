@@ -1,5 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onMount, onDestroy } from 'svelte';
+  import autotest from 'autotest';
   import {
     digits,
     disableCTA,
@@ -203,6 +204,7 @@
       on:blur={() => {
         $showAccountTab = true;
       }}
+      {...autotest(`otpDigit${i + 1}`)}
     />
   {/each}
 </div>

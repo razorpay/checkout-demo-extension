@@ -1,6 +1,5 @@
 import { match } from 'path-to-regexp';
-import { isSerializable, md5 } from './index.mjs';
-import { File } from '../handlers/static.mjs';
+import { File } from '#vision/autogen/handlers/static.mjs';
 
 const noop = () => [];
 
@@ -31,14 +30,29 @@ class OriginRouter {
   #cache = new Map();
   #disabled = false;
 
-  get = add('get', this.#routes);
-  post = add('post', this.#routes);
-  put = add('put', this.#routes);
-  patch = add('patch', this.#routes);
-  delete = add('delete', this.#routes);
-  head = add('head', this.#routes);
-  options = add('options', this.#routes);
-  all = add('all', this.#routes);
+  get = this.add('get');
+  post = this.add('post');
+  put = this.add('put');
+  patch = this.add('patch');
+  delete = this.add('delete');
+  head = this.add('head');
+  options = this.add('options');
+  all = this.add('all');
+
+  add(method) {
+    const router = this;
+    const routes = this.#routes;
+    method = method.toUpperCase();
+    return function (url, handler) {
+      routes.push({
+        method,
+        handler,
+        name: handler.name || `${method} ${url}`,
+        matcher: match(url),
+      });
+      return router;
+    };
+  }
 
   ignore() {
     this.#disabled = true;
@@ -58,11 +72,14 @@ class OriginRouter {
       if (method === route.method || route.method === 'ALL') {
         const match = route.matcher(pathname);
         if (match) {
-          return (state) => {
+          return (pageState) => {
             const values = route.handler({
+              response: responder({ request }),
               params: match.params,
               request,
-              ...state,
+              state: pageState.state,
+              selectResponse: pageState.selectResponse,
+              options: pageState.options,
             });
 
             const set = new Set();
@@ -73,32 +90,32 @@ class OriginRouter {
                 type: 'request',
                 url,
                 method,
-                name: route.name,
-                response: {},
               };
 
               if (value instanceof File) {
-                reqObj.response.path = value.path;
-                if (values.length === 1) {
-                  this.#cache.set(url, [reqObj]);
+                reqObj.response = {
+                  body: value.body,
+                };
+                if (value.contentType) {
+                  reqObj.response.contentType = value.contentType;
                 }
-              } else if (isSerializable(value)) {
-                reqObj.hash = md5(JSON.stringify([method, url, value]));
-                reqObj.value = value;
-                if (typeof value === 'string') {
-                  reqObj.response.contentType = 'text/html';
-                } else {
-                  reqObj.response.contentType = 'application/json';
-                  value = JSON.stringify(value);
-                }
-                reqObj.response.body = value;
-                if (!set.has(reqObj.hash)) {
-                  set.add(reqObj.hash);
-                } else {
-                  // TODO duplicate value returned
-                }
+              } else if (value instanceof HandlerResponse) {
+                reqObj.response = value.data;
+                reqObj.value = value.value;
+                reqObj.name = route.name;
+                reqObj.id = value.id;
+                reqObj.label = value.label;
               } else {
-                // TODO non-serializable value returned
+                if (reqObjs.length) {
+                  // TODO improve debugging
+                  throw new Error(
+                    'Request handler should return File or HandlerResponse'
+                  );
+                }
+                reqObj.response = {
+                  contentType: 'application/json',
+                  body: JSON.stringify(value),
+                };
               }
               reqObjs.push(reqObj);
             }
@@ -115,14 +132,65 @@ export function createRouter() {
   return new Router();
 }
 
-function add(method, routes) {
-  method = method.toUpperCase();
-  return function (url, handler) {
-    routes.push({
-      method,
-      handler,
-      name: url,
-      matcher: match(url),
-    });
-  };
+class HandlerResponse {
+  constructor(response) {
+    this.id = response.id;
+    this.label = response.label;
+    this.data = response.data;
+    this.value = response.value;
+  }
 }
+
+const responder = function ({ request }) {
+  const IDs = new Set();
+
+  function raw(response) {
+    if (IDs.has(response.id)) {
+      // TODO improve debugging
+      throw new Error('duplicate ID');
+    }
+    IDs.add(response.id);
+    return new HandlerResponse(response);
+  }
+  return {
+    raw,
+
+    json(response) {
+      return raw({
+        id: response.id,
+        label: response.label,
+        value: response.data,
+        data: {
+          contentType: 'application/json',
+          body: JSON.stringify(response.data),
+        },
+      });
+    },
+
+    jsonp(response) {
+      const cbName = new URLSearchParams(request.url()).get('callback');
+
+      return raw({
+        id: response.id,
+        label: response.label,
+        value: response.data,
+        data: {
+          contentType: 'text/javascript',
+          body: `/**/${cbName}(${JSON.stringify(response.data)});`,
+        },
+      });
+    },
+
+    html(response) {
+      return raw({
+        id: response.id,
+        label: response.label,
+        value: response.data,
+        data: {
+          contentType: 'text/html',
+          body: response.data,
+        },
+      });
+    },
+  };
+};

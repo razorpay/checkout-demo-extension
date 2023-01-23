@@ -2,12 +2,19 @@ import fs from 'fs/promises';
 import { execSync } from 'child_process';
 import { md5 } from './index.mjs';
 import { matchScreenshot } from './matchScreenshot.mjs';
-import { RECORD_MODE, HEADLESS, HistoryType } from './constants.mjs';
-
-const BASE_DIR = 'vision/autogen/screenshots/base/';
-const TEMP_DIR = 'vision/autogen/screenshots/temp/';
-
-execSync(`rm -rf ${TEMP_DIR}/*; mkdir -p ${TEMP_DIR}`);
+import {
+  getExistingRef,
+  getMapPath,
+  storeRef,
+  refStore,
+} from '#vision/autogen/utils/ref.mjs';
+import {
+  HistoryType,
+  RECORD_MODE,
+  HEADLESS,
+  TEST_DIR,
+  BASE_DIR,
+} from '#vision/autogen/utils/constants.mjs';
 
 const filesWritten = new Set();
 async function captureScreenshot(page) {
@@ -17,203 +24,161 @@ async function captureScreenshot(page) {
   const hash = md5(shotBuffer);
   if (!filesWritten.has(hash)) {
     filesWritten.add(hash);
-    await fs.writeFile(`${TEMP_DIR}/${hash}.png`, shotBuffer);
+    await fs.writeFile(`${TEST_DIR}/${hash}.png`, shotBuffer);
   }
   return { fileName: hash, buffer: shotBuffer };
 }
 
-function getMapPath(dir) {
-  return `${dir}map.json`;
-}
-
-async function getReferenceMap() {
-  try {
-    return JSON.parse(String(await fs.readFile(getMapPath(BASE_DIR))));
-  } catch (e) {
-    return {
-      count: 0,
-      snaps: [],
-      refs: {},
-    };
-  }
-}
-
-const referenceMap = await getReferenceMap();
-referenceMap.newCount = 0;
-referenceMap.newRefs = {};
-
-function updateCursor(state) {
-  let cursor = state.cursor || referenceMap;
-
-  const actions = state.history.slice(state.offset).filter((action) => {
-    if (action.hash) {
-      referenceMap.newRefs[action.hash] = {
-        url: action.url,
-        method: action.method,
-        value: action.value,
-      };
-    } else if (action.type === HistoryType.REQUEST) {
-      return false; // remove static files
+function getPathFromHistory(history) {
+  const paths = [];
+  const requests = [];
+  for (let action of history) {
+    if (
+      (action.type === HistoryType.REQUEST ||
+        action.type === HistoryType.OPTIONS) &&
+      action.name &&
+      action.id
+    ) {
+      const name = storeRef(action.name);
+      const id = storeRef(action.id);
+      requests.push(`${name}-${id}`);
+    } else if (
+      action.type === HistoryType.CLICK ||
+      action.type === HistoryType.FILL
+    ) {
+      if (requests.length) {
+        paths.push(requests.sort().join());
+        requests.length = 0;
+      }
+      const name = storeRef(action.name);
+      const variant = storeRef(action.variant);
+      const value = storeRef(action.value);
+      paths.push(`${name}-${variant}-${value}`);
     }
-    return true;
-  });
-  const existingSnap = cursor.snaps.find((existingSnap) => {
-    if (existingSnap.events.length === actions.length) {
-      return existingSnap.events.every((event, index) => {
-        const action = actions[index];
-        switch (action.type) {
-          case HistoryType.REQUEST:
-          case HistoryType.OPTIONS:
-            return action.hash === event;
-
-          default:
-            return (
-              action.name === event[0] &&
-              action.variant === event[1] &&
-              action.value === event[2]
-            );
-        }
-      });
-    }
-  });
-
-  if (existingSnap) {
-    cursor = existingSnap;
-  } else {
-    const snap = {
-      snaps: [],
-      events: actions.map((action) => {
-        return action.hash || [action.name, action.variant, action.value];
-      }),
-    };
-    cursor.snaps.push(snap);
-    cursor = snap;
   }
-
-  state.offset = state.history.length;
-  state.cursor = cursor;
-  return cursor;
+  if (requests.length) {
+    paths.push(requests.sort().join());
+  }
+  return paths.join();
 }
 
+const matching = new Set();
+const notMatching = new Set();
 export async function capture(pageState) {
   const { page, state } = pageState;
-
-  // insert new entries appeared in history
-  const cursor = updateCursor(state);
 
   if (!HEADLESS) {
     return;
   }
 
-  referenceMap.newCount++;
-  const { fileName, buffer } = await captureScreenshot(page);
-  cursor.newKey = fileName;
+  const path = getPathFromHistory(state.history);
 
-  if (cursor.key) {
-    const baseFilePath = `${BASE_DIR}${cursor.key}.png`;
-    const filePath = `${TEMP_DIR}${fileName}.png`;
-    const diffPath = `${TEMP_DIR}diff-${fileName}.png`;
+  if (refStore.test.shots[path]) {
+    throw new Error(`screenshot already exists for path ${path}`);
+  }
+
+  const { fileName, buffer } = await captureScreenshot(page);
+  refStore.test.shots[path] = fileName;
+
+  const refShot = refStore.shots[path];
+
+  if (refShot) {
+    const baseFilePath = `${BASE_DIR}/${refShot}.png`;
+    const diffPath = `${TEST_DIR}/diff-${fileName}.png`;
 
     // compare
     const result = await matchScreenshot(baseFilePath, buffer, diffPath);
     if (result) {
-      cursor.match = true;
+      matching.add(path);
+    } else {
+      notMatching.add(path);
     }
   }
 }
 
 export async function report() {
-  const { map, matched, notMatched, newShots } = mapFromReference(
-    referenceMap,
-    {
-      count: referenceMap.newCount,
-      snaps: [],
-      refs: referenceMap.newRefs,
-    }
-  );
-  const missing = referenceMap.count - matched.length - notMatched.length;
+  const baseCount = Object.keys(refStore.shots).length;
+  const testCount = Object.keys(refStore.test.shots).length;
+
+  const matched = matching.size;
+  const notMatched = notMatching.size;
+
+  const missing = baseCount - matched - notMatched;
+  const newShots = testCount - matched - notMatched;
 
   console.table({
     'Screenshots Matched': {
-      count: matched.length,
-      result: matched.length ? '✅' : '❌',
+      count: matched,
+      result: matched ? '✅' : '❌',
     },
     'Screenshots Not Matching': {
-      count: notMatched.length,
-      result: notMatched.length ? '❌' : '✅',
+      count: notMatched,
+      result: notMatched ? '❌' : '✅',
     },
     'Screenshots Missing': {
       count: missing,
       result: missing ? '⚠️' : '✅',
     },
     'New Screenshots': {
-      count: newShots.length,
-      result: newShots.length ? '⚠️' : '✅',
+      count: newShots,
+      result: newShots ? '⚠️' : '✅',
     },
   });
 
-  const testSuccess = !Boolean(missing + notMatched.length + newShots.length);
+  const testSuccess = !Boolean(missing + notMatched + newShots);
   console.log(`Test ${testSuccess ? 'was successful' : 'failed'}`);
 
-  map.matches = {
-    matched,
-    notMatched,
-    newShots,
-  };
-
-  await fs.writeFile(getMapPath(TEMP_DIR), JSON.stringify(map));
+  await fs.writeFile(getMapPath(TEST_DIR), JSON.stringify(await getTestMap()));
 
   if (RECORD_MODE) {
     execSync(
-      `rm -rf "${BASE_DIR}"; mv "${TEMP_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}*-diff.png`
+      `rm -rf "${BASE_DIR}"; mv "${TEST_DIR}" "${BASE_DIR}"; rm -rf ${BASE_DIR}/diff-*.png`
     );
   }
-
-  console.log(
-    `You can view results at http://localhost:8000/autotest${
-      RECORD_MODE ? '-base' : ''
-    }`
-  );
 
   return testSuccess ? 0 : 1;
 }
 
-function mapFromReference(referenceMap, map) {
-  let notMatched = [];
-  let matched = [];
-  let newShots = [];
+async function getTestMap() {
+  const { refs, shots } = refStore.test;
+  const maxNum = refs.size;
 
-  referenceMap.snaps.forEach((snap) => {
-    if (!snap.newKey) {
-      return;
-    }
-    if (snap.match) {
-      matched.push(snap.newKey);
-    } else if (snap.key) {
-      notMatched.push(snap.key);
+  const occurances = new Set();
+  const overflowing = new Set();
+  const idMap = Object.create(null);
+  const newShots = Object.create(null);
+  const newRefs = Array(maxNum);
+
+  for (let id of refs) {
+    if (id > maxNum) {
+      overflowing.add(id);
     } else {
-      newShots.push(snap.newKey);
+      occurances.add(id);
+      idMap[id] = id;
+      newRefs[id - 1] = refStore.refs[id - 1];
     }
+  }
 
-    const newSnap = {
-      key: snap.newKey,
-      events: snap.events,
-    };
-    map.snaps.push(newSnap);
-
-    if (snap.snaps) {
-      newSnap.snaps = [];
+  const overflowingItr = overflowing.values();
+  for (let i = 0; i < maxNum; i++) {
+    if (!occurances.has(i)) {
+      const nextOverflowing = overflowingItr.next().value;
+      if (nextOverflowing) {
+        idMap[nextOverflowing] = i + 1;
+        newRefs[i] = refStore.refs[nextOverflowing];
+      } else {
+        break;
+      }
     }
-    const subresult = mapFromReference(snap, newSnap);
-    notMatched = notMatched.concat(subresult.notMatched);
-    matched = matched.concat(subresult.matched);
-    newShots = newShots.concat(subresult.newShots);
+  }
+
+  Object.entries(shots).forEach(([path, shotName]) => {
+    const newPath = path.replace(/\d+/g, (match) => idMap[match]);
+    newShots[newPath] = shots[path];
   });
 
   return {
-    map,
-    matched,
-    notMatched,
-    newShots,
+    shots: newShots,
+    refs: newRefs,
   };
 }

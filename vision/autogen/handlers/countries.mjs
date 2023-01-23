@@ -1,4 +1,4 @@
-export default function* handleCountries() {
+export function* countries() {
   yield BASE_COUNTRIES;
 }
 

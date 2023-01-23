@@ -98,8 +98,9 @@ Standalone application runs on node server in development environment.
 - `npm run jest blackbox/${path to test} --testTimeout=${time in ms}` to run a particular test.
   - eg. npm run jest blackbox/tests/card/offers.test.js --testTimeout=30000
 - Set `headless` to true in [`jest-environment.js`](blackbox/jest-environment.js) to run future tests in headless mode.
-- `npm run autotest` to run automatically generated visual tests using remote playwright. Generated screenshots can be viewed at `http://localhost:8000/autotest`.
+- `npm run autotest` to run automatically generated visual tests. Generated screenshots can be viewed at `http://localhost:8000/autotest`.
 - Visit `http://localhost:8000/autotest-base` for reference screenshots.
+- Record new screenshots using `npm run autotest record`.
 - Failing screenshots from visual tests can be downloaded as [workflow artifacts](https://docs.github.com/en/actions/managing-workflow-runs/downloading-workflow-artifacts)
 
 Unit Tests are located in `test/unit` folder. `blackbox/sites` folder contains blackbox tests.

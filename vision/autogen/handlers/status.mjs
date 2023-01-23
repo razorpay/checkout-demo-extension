@@ -1,10 +1,6 @@
-import { JsonpResponse } from '#vision/autogen/utils/index.mjs';
-
-function* handleStatus({ request }) {
-  yield JsonpResponse(request, {
+export function* paymentStatus({ request, response }) {
+  yield response.jsonp({
     razorpay_payment_id: 'pay_KBkMjACVVy1CD1',
     http_status_code: 200,
   });
 }
-
-export default handleStatus;

@@ -79,12 +79,12 @@ body>span {
 <script>
   window.CheckoutBridge = {
     oncomplete(data) {
-      document.body.firstChild.innerHTML = JSON.stringify(JSON.parse(data), null, 4);
-      __CheckoutBridge_oncomplete();
+      document.body.firstChild.innerHTML = '';
+      __playwright_oncomplete(JSON.stringify(JSON.parse(data), null, 4));
     },
   };
 
-  getOptions().then(options => {
+  __playwright_getoptions().then(options => {
     handleMessage({ options });
   });
 </script>

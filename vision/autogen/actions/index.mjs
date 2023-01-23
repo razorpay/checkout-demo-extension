@@ -1,8 +1,5 @@
-export function* contact(state) {
-  let prefsResponse = JSON.parse(
-    state.history.find((entry) => entry.name === '/v1/preferences').response
-      .body
-  );
+export function* contact({ selectResponse }) {
+  const prefsResponse = selectResponse('preferences');
   const contactOptional = prefsResponse.optional?.includes('contact');
 
   if (!contactOptional) {
@@ -14,11 +11,8 @@ export function* method() {
   yield true;
 }
 
-export function* email(state) {
-  let prefsResponse = JSON.parse(
-    state.history.find((entry) => entry.name === '/v1/preferences').response
-      .body
-  );
+export function* email({ selectResponse }) {
+  const prefsResponse = selectResponse('preferences');
   const emailOptional = prefsResponse.optional?.includes('email');
 
   if (!emailOptional) {
@@ -68,4 +62,28 @@ export function* cardCvv() {
 
 export function* otp() {
   yield '123456';
+}
+
+export function* otpDigit1() {
+  yield '1';
+}
+
+export function* otpDigit2() {
+  yield '1';
+}
+
+export function* otpDigit3() {
+  yield '1';
+}
+
+export function* otpDigit4() {
+  yield '1';
+}
+
+export function* otpDigit5() {
+  yield '1';
+}
+
+export function* otpDigit6() {
+  yield '1';
 }

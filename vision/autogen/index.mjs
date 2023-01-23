@@ -1,9 +1,11 @@
+#!/usr/bin/env node
+
 import { REMOTE_RUN, HEADLESS, DEVTOOLS } from './utils/constants.mjs';
 import { chromium } from 'playwright-chromium';
 import ProcessQueue from './utils/ProcessQueue.mjs';
 import { init } from './test.mjs';
 
-ProcessQueue.MAX_CONCURRENT_PROCESS = HEADLESS ? 100 : 1;
+ProcessQueue.MAX_CONCURRENT_PROCESS = HEADLESS ? 30 : 1;
 
 let browser;
 

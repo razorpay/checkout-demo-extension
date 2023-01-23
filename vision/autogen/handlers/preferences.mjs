@@ -1,54 +1,65 @@
-export default function* handlePreferences({ options }) {
+export function* preferences({ options, response }) {
   if (options.key) {
-    yield {
-      ...BASE_PREFERENCES,
-      merchant_key: options.key,
-      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
-    };
+    yield response.json({
+      id: 'key',
+      label: 'Default preferences with key',
+      data: {
+        ...BASE_PREFERENCES,
+        merchant_key: options.key,
+        mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+      },
+    });
 
     /**
      * Optional contact
      */
-    yield {
-      ...BASE_PREFERENCES,
-      merchant_key: options.key,
-      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
-      optional: ['contact'],
-    };
+    yield response.json({
+      id: 'optional_contact',
+      label: 'Preferences with optional contact',
+      data: {
+        ...BASE_PREFERENCES,
+        merchant_key: options.key,
+        mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+        optional: ['contact'],
+      },
+    });
 
     /**
      * Optional Email
      */
-    yield {
-      ...BASE_PREFERENCES,
-      merchant_key: options.key,
-      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
-      optional: ['email'],
-      features: {
-        show_email_on_checkout: true,
-        email_optional_oncheckout: true,
+    yield response.json({
+      id: 'optional_email',
+      label: 'Preferences with optional email',
+      data: {
+        ...BASE_PREFERENCES,
+        merchant_key: options.key,
+        mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+        optional: ['email'],
       },
-    };
+    });
 
     /**
      * Optional Contact and Email
      */
-    yield {
-      ...BASE_PREFERENCES,
-      merchant_key: options.key,
-      mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
-      optional: ['contact', 'email'],
-      features: {
-        show_email_on_checkout: true,
-        email_optional_oncheckout: true,
+    yield response.json({
+      id: 'optional_contact_email',
+      label: 'Preferences with optional contact & email',
+      data: {
+        ...BASE_PREFERENCES,
+        merchant_key: options.key,
+        mode: options.key.startsWith('rzp_live_') ? 'live' : 'test',
+        optional: ['contact', 'email'],
+        features: {
+          show_email_on_checkout: true,
+          email_optional_oncheckout: true,
+        },
       },
-    };
+    });
   }
 }
 
 const BASE_PREFERENCES = {
   options: {
-    theme: { color: '#528FF0' },
     image: null,
     remember_customer: true,
   },
@@ -170,4 +181,7 @@ const BASE_PREFERENCES = {
   },
   rtb: true,
   rtb_experiment: { experiment: false },
+  experiments: {
+    checkout_redesign_v1_5: true,
+  },
 };

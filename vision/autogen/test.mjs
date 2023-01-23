@@ -1,11 +1,10 @@
 import router from './routes.mjs';
-import { delay, promisePair, isSerializable, md5 } from './utils/index.mjs';
+import { delay, promisePair } from './utils/index.mjs';
 import { HEADLESS, DEVTOOLS, HistoryType } from './utils/constants.mjs';
 import makeOptions from './handlers/options.mjs';
 import ProcessQueue from './utils/ProcessQueue.mjs';
 import { processNext, replay, newPageState } from './utils/process.mjs';
-import { report } from './utils/screenshot.mjs';
-const { createHash } = await import('node:crypto');
+import { capture, report } from './utils/screenshot.mjs';
 
 const pages = new WeakMap();
 
@@ -34,7 +33,14 @@ async function requestHandler(route, request) {
     respond: async (response) => {
       pendingRequest.ended = true;
       pageState.pendingRequests.delete(pendingRequest);
-      await route.fulfill(response);
+      try {
+        await route.fulfill(response);
+      } catch (e) {
+        console.error(e.message);
+        await route.fulfill({
+          status: 204,
+        });
+      }
       resolver();
     },
   };
@@ -68,14 +74,14 @@ async function respondEmpty(pendingRequest, state) {
 
 async function processRequest(pendingRequest, pageState) {
   const { url, method, request } = pendingRequest;
-  const { state, clientState } = pageState;
+  const { state } = pageState;
   const handler = router.match(request);
 
   if (!handler) {
     console.error(`handler missing for ${method} ${url}`);
     await respondEmpty(pendingRequest, state);
   } else {
-    const [firstResponse, ...responses] = handler(clientState);
+    const [firstResponse, ...responses] = handler(pageState);
 
     if (!firstResponse) {
       // handler exists but no action, we return 204
@@ -92,7 +98,7 @@ async function processRequest(pendingRequest, pageState) {
 
     // do not respond till dom actions get completed
     // except for files
-    if (firstResponse.hash) {
+    if (firstResponse.id) {
       await Promise.all(Array.from(pageState.pendingReplays));
     }
 
@@ -121,13 +127,24 @@ function appendRequest(history, reqObj) {
 
 async function runTestInPage(page, state) {
   const [pageClosure, markPageClosed] = promisePair();
+  const [elementsLoop, elementsLooped] = promisePair();
   const pageState = newPageState(page, state);
   pages.set(page, pageState);
 
-  await page.exposeFunction('getOptions', () => {
+  await page.exposeFunction('__playwright_getoptions', () => {
     return state.history[0].value;
   });
-  await page.exposeFunction('__CheckoutBridge_oncomplete', async (data) => {
+  await page.exposeFunction('__playwright_oncomplete', async (data) => {
+    state.done = true;
+    await elementsLoop;
+    await page.$eval(
+      'body > span',
+      (node, data) => {
+        node.innerHTML = data;
+      },
+      data
+    );
+    // await capture(pageState);
     markPageClosed();
   });
 
@@ -146,6 +163,7 @@ async function runTestInPage(page, state) {
   });
 
   await processNext(pageState, fork);
+  elementsLooped();
   await pageClosure;
   pages.delete(page);
 }
@@ -206,27 +224,30 @@ let browser; // shared browser instance
 
 export function init(_browser) {
   browser = _browser;
+  const IDs = new Set();
   for (let options of makeOptions()) {
-    if (isSerializable(options)) {
-      const hash = md5(JSON.stringify(options));
-      const state = {
-        offset: 0,
-        cursor: null, // needed to quickly jump to cursor in a fork
-        // indices: [], // remove cursor and re-enable indices to make `state` serializable as well
-        url: 'https://api.razorpay.com/v1/checkout/public',
-        history: [
-          {
-            type: HistoryType.OPTIONS,
-            value: options,
-            hash,
-          },
-        ],
-      };
-
-      fork(state, browser);
-    } else {
-      // TODO
+    if (!options.id) {
+      throw new Error('set id for options');
     }
+    if (IDs.has(options.id)) {
+      console.log(`check duplicate options`);
+      continue;
+    }
+    const state = {
+      offset: 0,
+      url: 'https://api.razorpay.com/v1/checkout/public',
+      history: [
+        {
+          type: HistoryType.OPTIONS,
+          name: 'options',
+          value: options.data,
+          label: options.label,
+          id: options.id,
+        },
+      ],
+    };
+
+    fork(state, browser);
   }
   ProcessQueue.then(async () => {
     const [result] = await Promise.all([report(), browser.close()]);
@@ -256,7 +277,7 @@ async function newPage(browser, state) {
   // if running headed, increase default timeout
   // affects waiting for elements to appear etc
   // Set timeout as 5s for CI
-  context.setDefaultTimeout(HEADLESS ? 3e8 : 9e8);
+  context.setDefaultTimeout(HEADLESS ? 30_000 : 9e8);
 
   const page = await context.newPage();
 

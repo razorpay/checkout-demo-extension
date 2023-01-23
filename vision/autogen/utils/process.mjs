@@ -3,14 +3,20 @@ import * as actions from '#vision/autogen/actions/index.mjs';
 import { delay, promisePair } from './index.mjs';
 import { HEADLESS, HistoryType } from './constants.mjs';
 
-const SELECTOR = '[autogen-name]:visible';
+const SELECTOR = '[autogen-name]:not(:disabled):visible';
 
-function getValues(element, state) {
+function getValues(element, pageState) {
   const handler = actions[element.name];
+  const handlerArgs = {
+    variant: element.variant,
+    state: pageState.state,
+    selectResponse: pageState.selectResponse,
+    options: pageState.options,
+  };
 
   const values = new Set();
 
-  for (let val of handler(state, element.variant)) {
+  for (let val of handler(handlerArgs)) {
     switch (element.action) {
       case HistoryType.FILL:
         values.add(String(val));
@@ -32,9 +38,12 @@ export function newPageState(page, state) {
     pendingRequests: new Set(),
     pendingReplays: new Set(),
     replayed: false,
-    clientState: {
-      options: state.history[0].value,
+    selectResponse: (name) => {
+      return state.history.find((his) => {
+        return his.type === HistoryType.REQUEST && his.name === name;
+      })?.value;
     },
+    options: state.history[0].value,
   };
 
   return pageState;
@@ -124,7 +133,7 @@ async function loopElements({ fork, elements, pageState, offset }) {
       group.set(element.name, elementActions);
     }
     elementActions.push(
-      ...getValues(element, state).map((value) => ({
+      ...getValues(element, pageState).map((value) => ({
         element,
         value,
       }))
@@ -219,11 +228,14 @@ function newHistory({ element, value }) {
 }
 
 export async function replay(historyObject, pageState) {
-  if (historyObject.type === HistoryType.CLICK && !historyObject.value) {
-    return; // no click is performed, so screenshot is unnecessary
+  if (!historyObject.value) {
+    return; // no action is performed, so screenshot is unnecessary
   }
 
   const { page } = pageState;
+
+  // delay responding to network requests triggered due to this action,
+  // until resolver is called. This is done for handled requests (non-files, 204s)
   const [closure, resolver] = promisePair();
 
   if (pageState.replayed) {
@@ -233,22 +245,28 @@ export async function replay(historyObject, pageState) {
     pageState.pendingReplays.add(closure);
   }
 
-  const targetElement = await page.locator(historyObject.selector);
-  if (!targetElement) {
-    throw `element not found during REPLAY ${historyObject.selector}`;
-  }
+  const element = await page.$(historyObject.selector);
+
   if (!HEADLESS) {
     await delay(500);
   }
 
-  switch (historyObject.type) {
-    case HistoryType.CLICK:
-      await targetElement.click();
-      break;
+  try {
+    switch (historyObject.type) {
+      case HistoryType.CLICK:
+        await element.click({
+          timeout: 0,
+        });
+        break;
 
-    case HistoryType.FILL:
-      await targetElement.fill(historyObject.value);
-      break;
+      case HistoryType.FILL:
+        await element.fill(historyObject.value, {
+          timeout: 0,
+        });
+        break;
+    }
+  } catch (e) {
+    return;
   }
 
   return resolver;

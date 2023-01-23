@@ -1,4 +1,4 @@
-export default function* handlePersonalisation() {
+export function* personalization() {
   yield BASE_PERSONALISATION;
 }
 
