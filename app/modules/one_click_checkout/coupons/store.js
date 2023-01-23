@@ -77,7 +77,7 @@ export function applyCouponInStore(code, response) {
  */
 export function updateFailureReasonInStore(response) {
   couponState.set('idle');
-  error.set(response.failure_reason);
+  error.set(response?.failure_reason);
   isCouponApplied.set(false);
   appliedCoupon.set('');
   amount.set(get(cartAmount));

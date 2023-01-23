@@ -72,7 +72,7 @@ export function applyCoupon(
       if (onInvalid) {
         onInvalid(error);
       }
-      const { reason, field } = error.error || {};
+      const { reason, field } = error?.error || {};
       if (reason === ERROR_INPUT_VALIDATION_FAILED && field === 'email') {
         updateFailureReasonInStore({
           failure_reason: formatMessageWithLocale(
