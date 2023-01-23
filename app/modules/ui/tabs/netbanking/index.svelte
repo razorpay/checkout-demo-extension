@@ -82,6 +82,7 @@
   import { getInstrumentsWithOrder } from 'common/helper';
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
+  import { getElementOpacity } from 'account_modal/utility';
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -281,9 +282,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

@@ -106,6 +106,7 @@
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
   import { UPITracker } from 'upi/analytics/events';
+  import { getElementOpacity } from 'account_modal/utility';
 
   // Props
   export let selectedApp = undefined;
@@ -864,9 +865,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

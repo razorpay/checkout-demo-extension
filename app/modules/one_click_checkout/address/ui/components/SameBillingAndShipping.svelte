@@ -34,6 +34,7 @@
 
 {#if isBillingAddressEnabled()}
   <div
+    id="same-address-checkbox-container"
     data-testid="same-billing-address-checkbox"
     class="same-address-checkbox"
     class:checkbox-sticky={isFixed}

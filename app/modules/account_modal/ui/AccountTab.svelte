@@ -24,6 +24,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SecuredByRazorpay from 'ui/components/SecuredByRazorpay.svelte';
   import AccountTabPlaceholder from './AccountTabPlaceholder.svelte';
+  import { isElement } from 'utils/_';
 
   const merchantPolicy = getPreferences('merchant_policy');
   const showMerchantPolicyBtn: boolean = hasMerchantPolicy();
@@ -58,10 +59,15 @@
   const dispatch = createEventDispatcher();
 
   beforeUpdate(() => {
+    if (!onScreenContainerOpacity || !isElement(onScreenContentElement)) {
+      return;
+    }
     if (onScreenContainerOpacity === '1') {
+      let accountTabHeight =
+        document.getElementsByClassName('account-tab')[0]?.clientHeight || 0;
       fixed =
-        onScreenContentElement?.scrollHeight <=
-        onScreenContainerElement?.offsetHeight - threshold;
+        onScreenContentElement.scrollHeight + accountTabHeight + threshold <=
+        onScreenContainerElement.offsetHeight;
     } else {
       fixed = false;
     }

@@ -58,6 +58,7 @@
   import { handleBackNavigation } from 'emiV2/helper/navigation';
   import { triggerAnalyticsOnShown } from 'emiV2/events/helpers';
   import { selectEmiInstrumentForOffer } from 'emiV2/helper/offers';
+  import { getElementOpacity } from 'account_modal/utility';
 
   let emiOptions: EMIOptionsMap = {};
   let savedCards: Tokens[] = [];
@@ -248,9 +249,7 @@
   let onScreenContainerOpacity;
   afterUpdate(() => {
     onScreenContainerElement = document.getElementById('root');
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

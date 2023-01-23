@@ -67,6 +67,7 @@
   } from './events';
   import { formatAmount, formatAmountWithCurrency } from 'helper/currency';
   import CTA from 'cta';
+  import { getElementOpacity } from 'account_modal/utility';
 
   const isRedesign = isRedesignV15();
 
@@ -232,9 +233,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

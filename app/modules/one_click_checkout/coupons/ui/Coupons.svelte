@@ -108,6 +108,7 @@
   import { CTA_LABEL } from 'cta/i18n';
   import { DELIVERY_ADDRESS_WIDGET_DOM_ID } from 'one_click_checkout/coupons/constants';
   import { isMagicShopifyFlow } from 'checkoutframe/helper';
+  import { getElementOpacity } from 'account_modal/utility';
 
   const showCoupons = shouldShowCoupons();
   const couponsWidgetExperiment = getCouponWidgetExperiment();
@@ -310,9 +311,7 @@
   let onScreenContainerOpacity;
   afterUpdate(() => {
     onScreenContainerElement = document.getElementById('form-home-1cc');
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
   /**
    * resets the variable to false when screen is destroyed to

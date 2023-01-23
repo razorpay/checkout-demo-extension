@@ -23,6 +23,7 @@
   import autotest from 'autotest';
   import { AnalyticsV2State } from 'analytics-v2';
   import { PaylaterTracker } from './analytics/events';
+  import { getElementOpacity } from 'account_modal/utility';
 
   const providers = getPayLaterProviders().map((providerObj) =>
     createProvider(providerObj.code, providerObj.name)
@@ -79,9 +80,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

@@ -211,6 +211,7 @@
   import type { Props } from 'types/svelte';
 
   import { handlep13nUpiIntent } from 'upi/helper/p13n';
+  import { getElementOpacity } from 'account_modal/utility';
 
   setEmail(getPrefilledEmail());
   setContact(getPrefilledContact());
@@ -1376,9 +1377,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

@@ -174,6 +174,7 @@
   import { appliedOffer, isCardValidForOffer } from 'offers/store';
   import { initLoginForSavedCard } from 'session/helper';
   import { TRUECALLER_VARIANT_NAMES } from 'truecaller';
+  import { getElementOpacity } from 'account_modal/utility';
 
   let delayOTPExperiment: boolean;
   let cardEle: Element;
@@ -1239,9 +1240,7 @@
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
   afterUpdate(() => {
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
   });
 </script>
 

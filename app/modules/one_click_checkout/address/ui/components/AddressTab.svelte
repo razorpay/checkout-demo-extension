@@ -70,6 +70,8 @@
   import { CTA_LABEL } from 'cta/i18n';
   import { SELECTED_ADDRESS_DOM_ID } from 'one_click_checkout/address/constants';
   import { pushShippingOptionsOverlay } from 'one_click_checkout/shipping_options';
+  import { getElementOpacity } from 'account_modal/utility';
+  import { isElement } from 'utils/_';
 
   export let error;
   export let onSubmitCallback;
@@ -336,21 +338,30 @@
   let onScreenContainerElement: HTMLDivElement;
   let onScreenContentElement: HTMLDivElement;
   let onScreenContainerOpacity;
-  let isFixed = undefined;
-  let threshold = 52;
+  let isFixed = true;
+  let threshold = 0;
   function handleFixed(event) {
     isFixed = !event.detail.text;
   }
   afterUpdate(() => {
     onScreenContainerElement = document.getElementById('form-home-1cc');
-    onScreenContainerOpacity = window.getComputedStyle(
-      onScreenContainerElement
-    ).opacity;
-    threshold = currentView === views.SAVED_ADDRESSES ? 52 : 0;
+    onScreenContainerOpacity = getElementOpacity(onScreenContainerElement);
+    var sameAddressCheckbox = document.getElementById(
+      'same-address-checkbox-container'
+    );
+    if (
+      currentView === views.SAVED_ADDRESSES &&
+      isElement(sameAddressCheckbox)
+    ) {
+      threshold = sameAddressCheckbox.clientHeight + 10;
+    } else {
+      threshold = 0;
+    }
   });
   onDestroy(() => {
     onScreenContainerOpacity = '0';
-    isFixed = undefined;
+    isFixed = true;
+    threshold = 0;
   });
 </script>
 
