@@ -1,7 +1,7 @@
 const makeOptionsAndPreferences = require('./options/index.js');
 const { getTestData } = require('../actions');
 const {
-  openCheckoutWithNewHomeScreen,
+  openCheckoutOnMobileWithNewHomeScreen,
   openSdkCheckoutWithNewHomeScreen,
 } = require('../tests/homescreen/open');
 const {
@@ -147,7 +147,7 @@ module.exports = function (testFeatures) {
       }
 
       const context = await (platform === 'web'
-        ? openCheckoutWithNewHomeScreen
+        ? openCheckoutOnMobileWithNewHomeScreen
         : openSdkCheckoutWithNewHomeScreen)({
         page,
         options,

@@ -16,15 +16,19 @@ const unsupportedAdapter = ['tezpay', 'paytm', 'whatsapp'];
 
 describe('checkPaymentAdapter - Custom Checkout UT', () => {
   beforeEach(async () => {
-    await initCustomCheckout({ page, mockPaymentRequest: true });
+    await initCustomCheckout({
+      page,
+      mockPaymentRequest: true,
+      emulate: 'Pixel 2',
+    });
   });
   afterEach(async () => {
     page.removeAllListeners('request');
   });
 
-  describe.each(supportedAdapter)('supported adapter case(%s)', adapter => {
+  describe.each(supportedAdapter)('supported adapter case(%s)', (adapter) => {
     test(`adapter - ${adapter}`, async () => {
-      const adapterStatus = await page.evaluate(async adapaterInput => {
+      const adapterStatus = await page.evaluate(async (adapaterInput) => {
         const rp = window.rp;
         let status = false;
         try {
@@ -39,22 +43,25 @@ describe('checkPaymentAdapter - Custom Checkout UT', () => {
     });
   });
 
-  describe.each(unsupportedAdapter)('unsupported adapter case(%s)', adapter => {
-    test(`adapter - ${adapter}`, async () => {
-      const adapterStatus = await page.evaluate(async adapaterInput => {
-        const rp = window.rp;
-        let status = false;
-        try {
-          await rp.checkPaymentAdapter(adapaterInput);
-          status = rp.paymentAdapters[adapaterInput];
-        } catch {
-          status = false;
-        }
-        return status;
-      }, adapter);
-      expect(adapterStatus).toBeFalsy();
-    });
-  });
+  describe.each(unsupportedAdapter)(
+    'unsupported adapter case(%s)',
+    (adapter) => {
+      test(`adapter - ${adapter}`, async () => {
+        const adapterStatus = await page.evaluate(async (adapaterInput) => {
+          const rp = window.rp;
+          let status = false;
+          try {
+            await rp.checkPaymentAdapter(adapaterInput);
+            status = rp.paymentAdapters[adapaterInput];
+          } catch {
+            status = false;
+          }
+          return status;
+        }, adapter);
+        expect(adapterStatus).toBeFalsy();
+      });
+    }
+  );
 
   test('isTezAvailable', async () => {
     const adapterStatus = await page.evaluate(async () => {

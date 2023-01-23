@@ -33,6 +33,8 @@ describe('Test adapters when PaymentRequest API exists', () => {
     }
     window.PaymentRequest =
       PaymentRequestMock as unknown as typeof window.PaymentRequest;
+
+    (constants as any).android = true;
   });
   afterEach(() => {
     jest.resetAllMocks();
@@ -56,6 +58,8 @@ describe('Test adapters when the UPI Apps are not exists', () => {
     }
     window.PaymentRequest =
       PaymentRequestMock as unknown as typeof window.PaymentRequest;
+
+    (constants as any).android = true;
   });
   test.each(adapters)(
     'should reject %s adapter',
@@ -101,6 +105,14 @@ describe('Test adapters when PaymentRequest API not exists', () => {
 describe('Test checkPaymentAdapter', () => {
   test('Test checkPaymentAdapter when PackageName not exists', async () => {
     await expect(checkPaymentAdapter('Test Pay')).rejects.toMatchObject({
+      description: NO_PAYMENT_ADAPTER_ERROR,
+    });
+  });
+  test('should not support on desktop', async () => {
+    (constants as any).android = false;
+    (constants as any).iOS = false;
+    (constants as any).isDesktop = () => Promise.resolve(true);
+    await expect(checkPaymentAdapter('com.phonepe.app')).rejects.toMatchObject({
       description: NO_PAYMENT_ADAPTER_ERROR,
     });
   });

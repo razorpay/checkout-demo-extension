@@ -1,6 +1,8 @@
 const makeOptionsAndPreferences = require('./options/index.js');
 const { getTestData } = require('../actions');
-const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
+const {
+  openCheckoutOnMobileWithNewHomeScreen,
+} = require('../tests/homescreen/open');
 const {
   // Generic
   verifyTimeout,
@@ -127,7 +129,7 @@ module.exports = function (testFeatures) {
         window.PaymentRequest = PaymentRequest;
       });
 
-      const context = await openCheckoutWithNewHomeScreen({
+      const context = await openCheckoutOnMobileWithNewHomeScreen({
         page,
         options,
         preferences,
@@ -175,7 +177,7 @@ module.exports = function (testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
-      await selectUPIApp(context, '1');
+      await selectUPIApp(context, '2');
       if (downtimeHigh || downtimeLow) {
         await verifyMethodWarned(context, 'upi', 'psp');
       }

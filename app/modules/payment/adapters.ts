@@ -5,7 +5,7 @@ import {
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
 } from 'upi/constants';
-import { isBraveBrowser, samsungBrowser } from 'common/useragent';
+import { isBraveBrowser, samsungBrowser, android, iOS } from 'common/useragent';
 
 export const supportedWebPaymentsMethodsForApp = {
   [PHONE_PE_PACKAGE_NAME]: 'https://mercury.phonepe.com/transact/pay',
@@ -29,7 +29,9 @@ export const ADAPTER_CHECKERS = {
 export function checkPaymentAdapter(adapter: string) {
   const checker = ADAPTER_CHECKERS[adapter as keyof typeof ADAPTER_CHECKERS];
 
-  if (checker) {
+  const PLATFORM_SUPPORTS_PAYMENT_APPS = android || iOS;
+
+  if (checker && PLATFORM_SUPPORTS_PAYMENT_APPS) {
     return checker();
   }
 
