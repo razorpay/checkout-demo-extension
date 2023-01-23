@@ -2175,6 +2175,11 @@ Session.prototype = {
     this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
       phone: getPhone(),
     });
+    const smsHash = getOption('send_sms_hash') && this.sms_hash;
+    let params = {};
+    if (smsHash) {
+      params.sms_hash = smsHash;
+    }
     this.askOTP(
       this.otpView,
       undefined,
@@ -2189,7 +2194,7 @@ Session.prototype = {
       function () {
         session.updateCustomerInStore();
       },
-      null,
+      params,
       otpTemplate
     );
     return;
@@ -3600,8 +3605,11 @@ Session.prototype = {
      * as checkout template can have a hash for sdk to autoread message
      * if we not send otp_reason it will pick checkout's default template
      */
+
     if (RazorpayHelper.isOneClickCheckout()) {
       params.otp_reason = discreet.OTP_TEMPLATES.access_card;
+    } else {
+      params.otp_reason = discreet.OTP_TEMPLATES.access_card_v2;
     }
     customer.checkStatus(function () {
       /**

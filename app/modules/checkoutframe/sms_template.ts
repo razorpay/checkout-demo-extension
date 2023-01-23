@@ -3,6 +3,7 @@ import { views } from 'one_click_checkout/routing/constants';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { OTP_TEMPLATES } from 'otp/constants';
 import type { History } from 'types/types';
+import { isOneClickCheckout } from 'razorpay';
 
 export function getDefaultOtpTemplate() {
   let template = (screensHistory as History).config[views.OTP].props
@@ -11,9 +12,13 @@ export function getDefaultOtpTemplate() {
   const session = getSession();
   if (session.tab !== 'home-1cc') {
     if (session.payload && session.payload.save) {
-      template = OTP_TEMPLATES.save_card;
+      template = isOneClickCheckout()
+        ? OTP_TEMPLATES.save_card
+        : OTP_TEMPLATES.save_card_v2;
     } else {
-      template = OTP_TEMPLATES.access_card;
+      template = isOneClickCheckout()
+        ? OTP_TEMPLATES.access_card
+        : OTP_TEMPLATES.access_card_v2;
     }
   }
 

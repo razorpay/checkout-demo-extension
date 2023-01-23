@@ -2,12 +2,13 @@ import { getSession } from 'sessionmanager';
 import * as smsTemplate from 'checkoutframe/sms_template';
 import * as history from 'one_click_checkout/routing/History';
 import * as views from 'one_click_checkout/routing/constants';
-import { isRedesignV15 } from 'razorpay/helper';
+import { isRedesignV15 } from 'razorpay';
 jest.mock('sessionmanager', () => ({
   getSession: jest.fn(() => {}),
 }));
-jest.mock('razorpay/helper', () => ({
+jest.mock('razorpay', () => ({
   isRedesignV15: jest.fn(() => {}),
+  isOneClickCheckout: jest.fn(() => false),
 }));
 
 Object.defineProperty(history, 'screensHistory', {
@@ -51,11 +52,11 @@ describe('Module: checkoutframe/sms_template', () => {
       },
     });
     (isRedesignV15 as unknown as jest.Mock).mockReturnValue(true);
-    expect(smsTemplate.getDefaultOtpTemplate()).toEqual('save_card');
+    expect(smsTemplate.getDefaultOtpTemplate()).toEqual('save_card_v2');
   });
   it('should return access_card when getSession returns empty object', () => {
     (getSession as unknown as jest.Mock).mockReturnValue({});
     (isRedesignV15 as unknown as jest.Mock).mockReturnValue(true);
-    expect(smsTemplate.getDefaultOtpTemplate()).toEqual('access_card');
+    expect(smsTemplate.getDefaultOtpTemplate()).toEqual('access_card_v2');
   });
 });

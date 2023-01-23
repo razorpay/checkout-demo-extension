@@ -23,6 +23,8 @@ export const OTP_TEMPLATES = {
   access_card: 'access_card',
   save_card: 'save_card',
   edit_contact: 'access_address',
+  access_card_v2: 'access_card_v2',
+  save_card_v2: 'save_card_v2',
 };
 
 export const RESEND_OTP_INTERVAL = 30 * 1000;
