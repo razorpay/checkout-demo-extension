@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { locale } from 'svelte-i18n';
-import { isRecurring, isSubscription } from 'razorpay';
+import { isRecurring, isSubscription, isOneClickCheckout } from 'razorpay';
 import { definePlatform } from 'upi/helper/upi';
 import * as UserAgent from 'common/useragent';
 import { INTERNATIONAL_APPS } from 'common/international';
@@ -170,7 +170,8 @@ export default [
   },
 
   function vernacular() {
-    return get(locale) !== 'en';
+    const lang = get(locale);
+    return lang && lang !== 'en';
   },
 
   function callback_url() {
@@ -224,5 +225,9 @@ export default [
 
   function without_retry() {
     return !getOption('retry');
+  },
+
+  function magic() {
+    return isOneClickCheckout();
   },
 ];
