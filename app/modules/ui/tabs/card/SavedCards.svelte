@@ -26,6 +26,8 @@
   import { MiscTracker } from 'misc/analytics/events';
   import { AnalyticsV2State } from 'analytics-v2';
   import { CardsTracker } from 'card/analytics/events';
+  import { flow } from 'card/constants';
+
   // Props
   export let cards = [];
   export let tab;
@@ -67,6 +69,7 @@
       },
     });
     try {
+      AnalyticsV2State.cardFlow = flow.SAVED_CARD_L1;
       CardsTracker.SAVED_CARD_SELECTED({
         instrument: {
           issuer: getCardMetadata(card.id)?.issuer,

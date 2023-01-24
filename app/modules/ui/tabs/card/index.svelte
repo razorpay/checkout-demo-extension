@@ -174,6 +174,8 @@
   import { appliedOffer, isCardValidForOffer } from 'offers/store';
   import { initLoginForSavedCard } from 'session/helper';
   import { TRUECALLER_VARIANT_NAMES } from 'truecaller';
+  import { flow } from 'card/constants';
+  import { AnalyticsV2State } from 'analytics-v2';
   import { getElementOpacity } from 'account_modal/utility';
 
   let delayOTPExperiment: boolean;
@@ -743,12 +745,30 @@
         } else if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
           viewToSet = Views.SAVED_CARDS;
         }
+        if (tabVisible) {
+          if (
+            viewToSet === Views.SAVED_CARDS &&
+            isSavedCardsEnabled &&
+            savedCards.length
+          ) {
+            Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
+            CardsTracker.SAVED_CARD_SCREEN({ savedCards: savedCards.length });
+          }
+          if (viewToSet === Views.ADD_CARD) {
+            CardsTracker.ADD_NEW_CARD_SCREEN();
+            Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
+            AnalyticsV2State.cardFlow = flow.ADD_NEW_CARD;
+          }
+        }
         setView(viewToSet);
       })
       .then(tick);
   }
 
   export function showAddCardView() {
+    AnalyticsV2State.cardFlow = flow.ADD_NEW_CARD;
+    Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
+    CardsTracker.ADD_NEW_CARD_SCREEN();
     /**
      * IMPORTANT NOTE
      * Need to set showSavedCardTooltip to false right before showing
@@ -1191,22 +1211,6 @@
 
   function toggleAppListOnSavedCard() {
     appsListExpandedOnSavedCard = !appsListExpandedOnSavedCard;
-  }
-
-  $: {
-    if (tabVisible) {
-      if (currentView === Views.ADD_CARD) {
-        Events.TrackRender(CardEvents.ADD_CARD_SCREEN_RENDERED);
-        CardsTracker.ADD_NEW_CARD_SCREEN();
-      } else if (
-        currentView === Views.SAVED_CARDS &&
-        isSavedCardsEnabled &&
-        savedCards.length
-      ) {
-        Events.TrackRender(CardEvents.SAVED_CARD_SCREEN_RENDERED);
-        CardsTracker.SAVED_CARD_SCREEN({ savedCards: savedCards.length });
-      }
-    }
   }
 
   export let emiPayload: EMIPayload;

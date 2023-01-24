@@ -29,6 +29,7 @@ import { MiscTracker } from 'misc/analytics/events';
 import { LOGIN_SOURCE_TYPES } from 'misc/analytics/constants';
 import { CardsTracker } from 'card/analytics/events';
 import { removeLitePreferencesFromStorage } from 'checkout-frame-lite/controller';
+import { otpReasons } from 'otp/constants';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -218,7 +219,9 @@ Customer.prototype = {
 
         if (customer.saved && !queryParams.skip_otp) {
           OtpService.markOtpSent('razorpay');
-          CardsTracker.OTP_SENT();
+          CardsTracker.OTP_SENT({
+            for: otpReasons.access_card,
+          });
         }
 
         if (data.tokens) {

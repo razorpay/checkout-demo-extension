@@ -36,6 +36,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { isDynamicFeeBearer, isRecurring, isRedesignV15 } from 'razorpay';
   import { getBankText } from '../home/helpers';
+  import { cardScreen } from 'card/constants';
 
   // Props
   export let card;
@@ -117,7 +118,9 @@
   }
 
   const trackCvvFilled = () => {
-    CardsTracker.CVV_FILLED();
+    CardsTracker.CVV_FILLED({
+      for: cardScreen.SAVED_CARD,
+    });
   };
 
   function handleClick(event, avoidFocus = false) {

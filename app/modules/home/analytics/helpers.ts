@@ -23,6 +23,7 @@ import {
 import { get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import type { InstrumentType } from 'home/analytics/types';
+import { flow } from 'card/constants';
 
 const { CARD, NETBANKING, PAYLATER, UPI, EMI, WALLET } = METHODS;
 const Tracker = {
@@ -121,6 +122,7 @@ export function triggerInstAnalytics(instrument: InstrumentType) {
     }
 
     if (instrument.method === CARD && isSavedCardInstrument(instrument)) {
+      AnalyticsV2State.cardFlow = flow.SAVED_CARD_L0;
       CardsTracker.SAVED_CARD_SELECTED({
         instrument: {
           network: instrument.networks?.[0],

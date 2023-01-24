@@ -72,7 +72,6 @@
   import CTA from 'cta';
   import { CTA_LABEL } from 'cta/i18n';
   import { isDebitIssuer } from 'common/bank';
-  import { CardsTracker } from 'card/analytics/events';
 
   const { edit_pen } = getIcons({ backgroundColor: getThemeColor() });
 
@@ -145,8 +144,6 @@
     } else {
       invoke('resend', event);
     }
-
-    CardsTracker.RESEND_OTP_CLICKED();
   }
 
   const handleOnBlur = () => {

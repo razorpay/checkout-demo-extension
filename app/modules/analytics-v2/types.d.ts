@@ -19,6 +19,7 @@ export interface Instrument {
   isNoCostEMI?: boolean;
   creditEmi?: boolean;
   debitEmi?: boolean;
+  consent_given?: boolean;
 }
 
 export interface Block {

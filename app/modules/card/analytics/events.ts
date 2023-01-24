@@ -99,6 +99,14 @@ export const CardsEvents = {
     name: 'pay_with_apps_payment_initiated',
     type: BEHAV,
   },
+  NATIVE_BANK_OTP_SCREEN: {
+    name: 'native_bank_otp_screen',
+    type: RENDER,
+  },
+  COMPLETE_ONBANKPAGE_CLICKED: {
+    name: 'complete_onbankpage_clicked',
+    type: BEHAV,
+  },
 };
 
 interface CardsEventMap {
@@ -109,17 +117,21 @@ interface CardsEventMap {
   NATIVE_OTP_FILLED: {
     method: Method;
     instrument: Instrument;
+    flow: string;
   };
   NATIVE_OTP_SENT: {
     method: Method;
     instrument: Instrument;
+    flow: string;
   };
   NAME_ENTERED: undefined;
   EXPIRY_ENTERED: undefined;
   CARD_NUMBER_ENTERED: undefined;
   ADD_NEW_CARD_SCREEN: undefined;
   SKIP_SAVED_CARD_CLICKED: undefined;
-  CVV_FILLED: undefined;
+  CVV_FILLED: {
+    for: string;
+  };
   SAVED_CARD_SCREEN: {
     savedCards: number;
   };
@@ -142,22 +154,38 @@ interface CardsEventMap {
       saveCardConsent: boolean;
     };
   };
-  OTP_ENTERED: undefined;
-  OTP_SCREEN: undefined;
-  OTP_SENT: undefined;
+  OTP_ENTERED: {
+    for: string;
+  };
+  OTP_SCREEN: {
+    for: string;
+  };
+  OTP_SENT: {
+    for: string;
+  };
   SAVED_CARD_SELECTED: {
     instrument: Instrument;
   };
   P13N_SHOWN: {
     instrument: Instrument;
   };
-  RESEND_OTP_CLICKED: undefined;
-  PAY_WITH_APPS_DISPLAYED: undefined;
+  RESEND_OTP_CLICKED: {
+    for: string;
+  };
+  PAY_WITH_APPS_DISPLAYED: {
+    instruments: Instrument[];
+  };
   PAY_WITH_APPS_PAYMENT_SELECTED: {
     instrument: Instrument;
   };
   PAY_WITH_APPS_PAYMENT_INITIATED: {
     instrument: Instrument;
+  };
+  NATIVE_BANK_OTP_SCREEN: {
+    flow: string;
+  };
+  COMPLETE_ONBANKPAGE_CLICKED: {
+    flow: string;
   };
 }
 

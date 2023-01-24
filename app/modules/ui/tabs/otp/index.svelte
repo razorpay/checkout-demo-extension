@@ -58,6 +58,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
+  import { trackCardOTPEntered, trackCardOTPResend } from 'card/helper/cards';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
@@ -87,6 +88,8 @@
   import { CardsTracker } from 'card/analytics/events';
   import { WalletTracker } from 'wallet/analytics/events';
   import { METHODS } from 'checkoutframe/constants';
+  import { otpReasons } from 'otp/constants';
+  import { NATIVE_OTP } from 'card/constants';
   import { AnalyticsV2State } from 'analytics-v2';
 
   // Props
@@ -100,6 +103,7 @@
   export let inputWidth;
   export let showInput;
 
+  let otpReason: string;
   let otpPromptVisible: boolean;
   let compact;
   let allowSkipButton = $allowSkip;
@@ -175,6 +179,22 @@
     }
   }
 
+  export function onShown(otpType: string) {
+    if (otpType === NATIVE_OTP) {
+      CardsTracker.NATIVE_BANK_OTP_SCREEN({
+        flow: AnalyticsV2State.cardFlow,
+      });
+    } else if (
+      otpType === otpReasons.save_card ||
+      otpType === otpReasons.access_card
+    ) {
+      otpReason = otpType;
+      CardsTracker.OTP_SCREEN({
+        for: otpType,
+      });
+    }
+  }
+
   export function trackInput() {
     $showAccountTab = true;
     if (!$otp) {
@@ -198,15 +218,9 @@
             name: (session.payload && session.payload.wallet) || '',
           },
         });
-      } else if (session.tab === 'card') {
-        if (session.headless) {
-          CardsTracker.NATIVE_OTP_FILLED(
-            AnalyticsV2State.selectedInstrumentForPayment
-          );
-        } else {
-          CardsTracker.OTP_ENTERED();
-        }
       }
+
+      trackCardOTPEntered(otpReason);
     }
 
     trackEmiOtpEntered();
@@ -235,19 +249,15 @@
     hideCta();
   }
 
-  function onResend(event) {
+  function onResend(event: Event) {
     Events.TrackBehav(otpEvents.OTP_RESEND_CLICK);
-    invoke('resend', event);
 
-    CardsTracker.RESEND_OTP_CLICKED();
+    trackCardOTPResend(otpReason);
+    invoke('resend', event);
   }
 
   $: {
-    const isCard = session?.tab === 'card';
     const isWallet = session?.tab === 'wallet';
-    if (showInput && isCard && !session.headless) {
-      CardsTracker.OTP_SCREEN();
-    }
     if (showInput && isWallet) {
       WalletTracker.OTP_SCREEN_LOADED({
         method: { name: METHODS.WALLET },
@@ -257,6 +267,7 @@
       });
     }
   }
+
   let src: string;
   $: src = $tabLogo;
   function handleLogoError() {
@@ -395,7 +406,7 @@
         <!-- LABEL: Please enter the OTP -->
 
         {#if isRazorpayOTPAndOneCC}
-          <OtpInput hidden={!showInput} isError={$errorMessage} />
+          <OtpInput hidden={!showInput} isError={$errorMessage} {otpReason} />
         {:else}
           <div
             id="otp-elem"

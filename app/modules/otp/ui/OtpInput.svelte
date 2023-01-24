@@ -18,12 +18,12 @@
   import { trackOtpEntered } from 'emiV2/events/tracker';
   import { getSession } from 'sessionmanager';
   import { showAccountTab } from 'checkoutstore';
-  import { CardsTracker } from 'card/analytics/events';
-  import { AnalyticsV2State } from 'analytics-v2';
+  import { trackCardOTPEntered } from 'card/helper/cards';
 
   export let hidden;
   export let isError;
   export let onBlur;
+  export let otpReason: string;
 
   let otpContainer;
   let focused = false;
@@ -56,15 +56,7 @@
         },
       });
 
-      if (session.tab === 'card') {
-        if (isHeadless()) {
-          CardsTracker.NATIVE_OTP_FILLED(
-            AnalyticsV2State.selectedInstrumentForPayment
-          );
-        } else {
-          CardsTracker.OTP_ENTERED();
-        }
-      }
+      trackCardOTPEntered(otpReason);
 
       // Track Razorpay otp entered for new emi flow
       if (isNewEmiFlow && session.tab === 'emi') {

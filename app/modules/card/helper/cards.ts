@@ -16,10 +16,13 @@ import CardTokenisationOverlaySvelte from 'ui/components/CardTokenisationOverlay
 import { getSession } from 'sessionmanager';
 import { isIndianCustomer } from 'checkoutstore/screens/home';
 import { shouldRememberCard } from 'ui/tabs/card/utils';
-import { shouldShowProceedOverlay } from 'truecaller/store';
-
+import { AnalyticsV2State } from 'analytics-v2';
+import { CardsTracker } from 'card/analytics/events';
+import { tabStore } from 'checkoutstore';
+import { isHeadless } from 'otp/sessionInterface';
 import type { Tokens } from 'razorpay/types/Preferences';
 import type { TokenisationOverlayProps } from 'card/types';
+import { METHODS } from 'checkoutframe/constants';
 
 export function delayLoginOTPExperiment() {
   /**
@@ -133,4 +136,37 @@ export const showTokenisationBenefitModal = (): boolean => {
 export const isOTPSupported = () => {
   const isDomesticCustomer = get(isIndianCustomer);
   return isDomesticCustomer;
+};
+
+export const trackCardOTPEntered = (otpReason: string) => {
+  try {
+    if (get(tabStore) === METHODS.CARD) {
+      if (isHeadless()) {
+        CardsTracker.NATIVE_OTP_FILLED({
+          ...AnalyticsV2State.selectedInstrumentForPayment,
+          flow: AnalyticsV2State.cardFlow,
+        });
+      } else {
+        CardsTracker.OTP_ENTERED({
+          for: otpReason,
+        });
+      }
+    }
+  } catch (e) {}
+};
+
+export const trackCardOTPResend = (otpReason: string) => {
+  try {
+    if (get(tabStore) === METHODS.CARD) {
+      if (isHeadless()) {
+        CardsTracker.NATIVE_OTP_SMS_RESEND_CLICKED({
+          instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
+        });
+      } else {
+        CardsTracker.RESEND_OTP_CLICKED({
+          for: otpReason,
+        });
+      }
+    }
+  } catch (e) {}
 };

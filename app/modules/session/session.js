@@ -138,6 +138,8 @@ import { shouldShowProceedOverlay } from 'truecaller/store';
 import { setTruecallerMetaData } from 'truecaller/analytics';
 import { Events } from 'analytics';
 import { getPerformanceDataForCriticalCheckoutResources } from 'performance/helper';
+import { COMPLETE_BANK_PAGE, NATIVE_OTP } from 'card/constants';
+import { otpReasons } from 'otp/constants';
 
 let emo = {};
 let ua = navigator.userAgent;
@@ -658,7 +660,7 @@ function askOTP(
   if (thisSession.headless) {
     if (paymentData.goToBank) {
       view.updateScreen({
-        skipTextLabel: 'complete_bank_page',
+        skipTextLabel: COMPLETE_BANK_PAGE,
       });
     }
     view.updateScreen({
@@ -676,9 +678,11 @@ function askOTP(
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
         if (thisSession.tab === 'card') {
-          CardsTracker.NATIVE_OTP_SENT(
-            AnalyticsV2State.selectedInstrumentForPayment
-          );
+          CardsTracker.NATIVE_OTP_SENT({
+            ...AnalyticsV2State.selectedInstrumentForPayment,
+            flow: AnalyticsV2State.cardFlow,
+          });
+          view.onShown(NATIVE_OTP);
         }
         textView = 'otp_sent_no_phone';
         if (_.isNonNullObject(origText)) {
@@ -2190,6 +2194,9 @@ Session.prototype = {
       true
     );
     let otpTemplate = discreet.OtpTemplatesHelper.getDefaultOtpTemplate();
+    CardsTracker.OTP_SENT({
+      for: otpTemplate,
+    });
     this.getCurrentCustomer().createOTP(
       function () {
         session.updateCustomerInStore();
@@ -2197,6 +2204,7 @@ Session.prototype = {
       params,
       otpTemplate
     );
+    this.otpView.onShown(otpReasons.save_card);
     return;
   },
 
@@ -2233,12 +2241,6 @@ Session.prototype = {
       type: AnalyticsTypes.BEHAV,
       data: resendEventData,
     });
-
-    if (this.payload?.method === 'card') {
-      CardsTracker.NATIVE_OTP_SMS_RESEND_CLICKED({
-        instrument: AnalyticsV2State.selectedInstrumentForPayment.instrument,
-      });
-    }
 
     if (this.headless) {
       this.otpView.updateScreen({
@@ -2317,6 +2319,9 @@ Session.prototype = {
       Analytics.track('native_otp:gotobank', {
         type: AnalyticsTypes.BEHAV,
         immediately: true,
+      });
+      CardsTracker.COMPLETE_ONBANKPAGE_CLICKED({
+        flow: AnalyticsV2State.cardFlow,
       });
 
       this.hideTimer();
@@ -3626,6 +3631,7 @@ Session.prototype = {
           undefined,
           true
         );
+        self.otpView.onShown(otpReasons.access_card);
       } else {
         if (RazorpayHelper.isEmiV2() && self.tab === 'emi') {
           // Need to set the current screen to emi manually

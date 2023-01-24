@@ -19,7 +19,10 @@
   import * as ObjectUtils from 'utils/object';
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
-  import { userConsentForTokenization } from 'checkoutstore/screens/card';
+  import {
+    userConsentForTokenization,
+    selectedCardFromHome,
+  } from 'checkoutstore/screens/card';
   import { customer } from 'checkoutstore/customer';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
@@ -30,7 +33,6 @@
 
   import { locale } from 'svelte-i18n';
 
-  import { selectedCardFromHome } from 'checkoutstore/screens/card';
   import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
   import { getThemeMeta } from 'checkoutstore/theme';
@@ -41,6 +43,7 @@
   // Other Imports
   import { isRedesignV15 } from 'razorpay';
   import { CardsTracker } from 'card/analytics/events';
+  import { cardScreen } from 'card/constants';
 
   let downtimeSeverity;
   let downtimeInstrument = '';
@@ -172,7 +175,9 @@
   }
 
   function trackCVVFilled() {
-    CardsTracker.CVV_FILLED();
+    CardsTracker.CVV_FILLED({
+      for: cardScreen.SAVED_CARD,
+    });
   }
 </script>
 

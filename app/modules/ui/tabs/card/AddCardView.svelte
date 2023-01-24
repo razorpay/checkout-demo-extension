@@ -110,6 +110,7 @@
   import { CardsTracker } from 'card/analytics/events';
   import EmailField from 'ui/components/EmailField.svelte';
   import { isEmailValid } from 'one_click_checkout/common/details/store';
+  import { cardScreen } from 'card/constants';
 
   export let isFormValid = false;
   const dispatch = createEventDispatcher();
@@ -637,7 +638,9 @@
         valid: cvvField.isValid(),
       },
     });
-    CardsTracker.CVV_FILLED();
+    CardsTracker.CVV_FILLED({
+      for: cardScreen.ADD_NEW_CARD,
+    });
   }
 
   function trackExpiryFilled() {

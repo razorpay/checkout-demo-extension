@@ -123,6 +123,7 @@ export function getInstrumentDataAfterSubmitClick(data) {
             issuer,
             personalisation,
             saved: !!data.token,
+            consent_given: !!data.save,
             network,
             type,
           },

@@ -36,6 +36,10 @@ otpView.prototype = {
     this.view.onBack();
   },
 
+  onShown(otpType) {
+    this.view.onShown(otpType);
+  },
+
   updateScreen(props) {
     ObjectUtils.loop(props, (val, prop) => {
       if (OtpScreenStore[prop]) {

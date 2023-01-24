@@ -34,7 +34,11 @@
   }
 
   onMount(() => {
-    CardsTracker.PAY_WITH_APPS_DISPLAYED();
+    CardsTracker.PAY_WITH_APPS_DISPLAYED({
+      instruments: apps.map((obj) => ({
+        name: obj.code,
+      })),
+    });
   });
 </script>
 

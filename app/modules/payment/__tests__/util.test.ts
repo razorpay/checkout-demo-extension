@@ -193,6 +193,7 @@ describe('Instrument Detail for Submit Event', () => {
         saved: false,
         network: '',
         type: '',
+        consent_given: false,
       },
     };
     const value = getInstrumentDataAfterSubmitClick(data);
@@ -275,6 +276,7 @@ describe('Instrument Detail for Submit Event', () => {
         saved: true,
         network: 'Visa',
         type: 'debit',
+        consent_given: false,
       },
     };
     const value = getInstrumentDataAfterSubmitClick(data);
