@@ -1,3 +1,5 @@
+const { getOffersList } = require('../../../actions/one-click-checkout/offers');
+
 function makeOptions(features, options) {
   const { orderId, callbackUrl, prefillContact } = features;
 
@@ -39,6 +41,8 @@ function makePreferences(features, preferences) {
     globalCustomer,
   } = features;
 
+  preferences.experiments = {};
+
   preferences.features = {
     one_click_checkout: true,
     one_cc_merchant_dashboard: true,
@@ -69,43 +73,7 @@ function makePreferences(features, preferences) {
   }
 
   if (offers) {
-    preferences.offers = [
-      {
-        original_amount: amount,
-        amount: amount - 20 * 100,
-        id: 'offer_DdMaQ3KHyKxcDN',
-        name: 'Card Offer VISA',
-        payment_method: 'card',
-        payment_network: 'VISA',
-        terms: `Offer terms and conditions`,
-        display_text: 'Display text for VISA Offer',
-      },
-      {
-        original_amount: amount,
-        amount: 0,
-        id: 'offer_DdOL4XeZosJh2t',
-        name: 'Card Offer - MasterCard 20',
-        payment_method: 'card',
-        payment_network: 'MC',
-        display_text: 'Display text for MC Offer',
-      },
-      {
-        original_amount: amount,
-        amount: amount - 20 * 100,
-        id: 'offer_Dcad1sICBaV2wI',
-        name: 'UPI Offer Name',
-        payment_method: 'upi',
-        display_text: 'UPI Offer Display Text',
-      },
-      {
-        original_amount: amount,
-        amount: 0,
-        id: 'offer_DcaetTeD4Gjcma',
-        name: 'UPI Offer Name 2',
-        payment_method: 'upi',
-        display_text: 'UPI Offer Display Text 2',
-      },
-    ];
+    preferences.offers = getOffersList({ amount });
   }
 
   if (globalCustomer) {

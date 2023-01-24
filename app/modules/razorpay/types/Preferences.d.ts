@@ -449,16 +449,7 @@ export interface PreferencesObject {
   rtb: boolean;
   rtb_experiment: RtbExperiment;
   force_offer?: boolean;
-  offers?: {
-    id: string;
-    name: string;
-    payment_method: string;
-    display_text: string;
-    type: string;
-    original_amount: number;
-    amount: number;
-    emi_subvention?: boolean;
-  }[];
+  offers?: Offers.OffersList;
   invoice: {
     order_id: string;
     url: string;

@@ -48,22 +48,15 @@ const {
   handleSaveVpaRequest,
   respondToUPIPaymentStatus,
 } = require('../../actions/upi-actions.js');
+const {
+  handleGetUpdatedOffers,
+} = require('../../actions/one-click-checkout/offers.js');
 
 // TODO: UPI Method disabled for now, due to a bug in the flow.
 module.exports = function (testFeatures = {}, methods = ['card']) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'one-click-checkout',
-    {
-      ...testFeatures,
-      offers: true,
-      amount: 200 * 100,
-      discountAmount: 10 * 100,
-      couponCode: 'WELCOME10',
-      showCoupons: true,
-      serviceable: true,
-      saveAddress: true,
-      shippingFee: testFeatures.shippingFee ? 1 * 100 : null,
-    }
+    testFeatures
   );
 
   describe.each(
@@ -77,6 +70,10 @@ module.exports = function (testFeatures = {}, methods = ['card']) {
     ({ preferences, title, options, method }) => {
       test(title, async () => {
         preferences.methods.upi = true;
+
+        preferences.experiments['1cc_offers_fix_exp'] = features.enableFixExp
+          ? 'true'
+          : null;
 
         const availableCoupons = [];
         const context = await openCheckoutWithNewHomeScreen({
@@ -108,6 +105,7 @@ module.exports = function (testFeatures = {}, methods = ['card']) {
         await handleVerifyOTPReq(context);
         await handleCustomerAddressReq(context);
         await handleUpdateOrderReq(context, options.order_id);
+        await handleGetUpdatedOffers(context, options.order_id, features);
         await handleThirdWatchReq(context);
 
         await selectPaymentMethod(context, method);

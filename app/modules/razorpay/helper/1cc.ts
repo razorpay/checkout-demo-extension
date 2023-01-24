@@ -1,8 +1,6 @@
 /**
  * 1cc
  */
-
-import { isEmpty } from 'utils/object';
 import { getOption, getPreferences } from './base';
 import { getMerchantOrder } from './preferences';
 
@@ -99,3 +97,6 @@ export const isMoEngageAnalyticsEnabled = () =>
 
 export const getSingleShippingExpVariant = () =>
   getPreferences('1cc_multiple_shipping');
+
+export const isOffersFixExpEnabled = () =>
+  getPreferences('experiments.1cc_offers_fix_exp');

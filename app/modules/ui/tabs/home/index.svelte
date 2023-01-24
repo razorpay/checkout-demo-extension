@@ -838,9 +838,6 @@
 
   export function codActions() {
     Analytics.setMeta(MetaPropertiesOneCC.IS_COD_ENABLED, $isCodAvailable);
-    if (isOneCCEnabled && getMerchantOffers()?.length) {
-      showMethodOffers.set(true);
-    }
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,

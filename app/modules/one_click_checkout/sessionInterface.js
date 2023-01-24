@@ -8,6 +8,10 @@ import {
   isUserLoggedIn,
 } from 'one_click_checkout/common/helpers/customer';
 import { navigator } from 'one_click_checkout/routing/helpers/routing';
+import {
+  showLoaderView,
+  hideLoaderView,
+} from 'one_click_checkout/loader/helper';
 
 // store imports
 import { get } from 'svelte/store';
@@ -49,6 +53,7 @@ import {
   updateOrder,
   thirdWatchCodServiceability,
 } from 'one_click_checkout/address/service';
+import { getOffersWithUpdatedAmount } from 'one_click_checkout/offers/service';
 
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
@@ -195,9 +200,8 @@ export function getMagicCSSVars() {
  * Redirecting the flow from 1cc to payment screens
  */
 export function redirectToPaymentMethods(
-  { shouldUpdateOrder, showSnackbar } = {
+  { shouldUpdateOrder } = {
     shouldUpdateOrder: true,
-    showSnackbar: true,
   }
 ) {
   const customer = getCustomerDetails();
@@ -238,37 +242,44 @@ export function redirectToPaymentMethods(
   if (shouldUpdateOrder) {
     updateOrder(address, billing_address, get(selectedShippingOption))
       .then(() => {
-        if (address.cod) {
-          showCodLoader.set(true);
-        }
-        emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENTS_SCREEN);
-        oneClickCheckoutRedirection(showSnackbar);
-        navigator.navigateTo({ path: views.METHODS });
-
-        thirdWatchCodServiceability(address)
-          .then((res) => {
-            session.homeTab.codActions();
-
-            if (addressType === 'saved') {
-              const newAddresses = get(savedAddresses).map((item) => {
-                if (item.id === address.id && item.cod) {
-                  item.cod = res?.cod;
-                }
-                return item;
-              });
-              savedAddresses.set(newAddresses);
-            } else {
-              const newAddressServiceability =
-                get(newUserAddress).cod && res?.cod;
-              newUserAddress.set({
-                ...get(newUserAddress),
-                cod: newAddressServiceability,
-              });
+        showLoaderView();
+        getOffersWithUpdatedAmount()
+          .then(() => {
+            if (address.cod) {
+              showCodLoader.set(true);
             }
-            showCodLoader.set(false);
+
+            thirdWatchCodServiceability(address)
+              .then((res) => {
+                session.homeTab.codActions();
+
+                if (addressType === 'saved') {
+                  const newAddresses = get(savedAddresses).map((item) => {
+                    if (item.id === address.id && item.cod) {
+                      item.cod = res?.cod;
+                    }
+                    return item;
+                  });
+                  savedAddresses.set(newAddresses);
+                } else {
+                  const newAddressServiceability =
+                    get(newUserAddress).cod && res?.cod;
+                  newUserAddress.set({
+                    ...get(newUserAddress),
+                    cod: newAddressServiceability,
+                  });
+                }
+                showCodLoader.set(false);
+              })
+              .catch(() => {
+                showCodLoader.set(false);
+              });
           })
-          .catch(() => {
-            showCodLoader.set(false);
+          .finally(() => {
+            hideLoaderView();
+            emitMagicFunnelEvent(MAGIC_FUNNEL.PAYMENTS_SCREEN);
+            oneClickCheckoutRedirection();
+            navigator.navigateTo({ path: views.METHODS });
           });
       })
       .catch(() => {

@@ -6,6 +6,7 @@ const {
   bundleUrl,
   rudderstackStageUrl,
   rudderstackProdUrl,
+  lumerjackVajraURL,
 } = require('../const');
 const { interceptor, delay } = require('../util');
 const { computed } = require('./options');
@@ -70,12 +71,14 @@ function checkoutRequestHandler(request) {
     });
   } else if (
     url.startsWith('https://lumberjack.razorpay.com') ||
-    url.includes(sentryUrl)
+    url.includes(sentryUrl) ||
+    url.startsWith(lumerjackVajraURL)
   ) {
     return request.respond({ status: 200 });
   } else if (
     url.startsWith(rudderstackStageUrl) ||
-    url.startsWith(rudderstackProdUrl)
+    url.startsWith(rudderstackProdUrl) ||
+    url.startsWith('https://chart.googleapis.com')
   ) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
