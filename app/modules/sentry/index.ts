@@ -4,6 +4,7 @@ import { SENTRY_CONFIG } from './constants';
 import { isOneClickCheckout } from 'razorpay';
 import type { Exception } from './interfaces';
 import { filterUnWantedExceptions } from './helper';
+import { ERROR_IGNORE_LIST } from 'error-service/constants';
 
 let errorTracked = false;
 
@@ -12,6 +13,7 @@ function initSentry() {
     const { SENTRY_RELEASE_VERSION, SENTRY_DSN, SENTRY_ENVIRONMENT } =
       SENTRY_CONFIG[isOneClickCheckout() ? 'magic' : 'standard'];
     window.Sentry.init({
+      ignoreErrors: [...ERROR_IGNORE_LIST.looseMatches],
       dsn: SENTRY_DSN,
       release: SENTRY_RELEASE_VERSION,
       environment: SENTRY_ENVIRONMENT,
