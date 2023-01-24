@@ -266,11 +266,14 @@
       case 'numberField':
         getComponentProps(expiryField, 'ref').focus();
         break;
-      case 'expiryField':
-        $cardName
-          ? getComponentProps(cvvField, 'ref')?.focus()
-          : getComponentProps(nameField, 'ref')?.focus();
+      case 'expiryField': {
+        if (!$cardName) {
+          getComponentProps(nameField, 'ref')?.focus();
+        } else if (cvvField && !cvvField.isValid()) {
+          getComponentProps(cvvField, 'ref')?.focus();
+        }
         break;
+      }
       default:
         return;
     }
