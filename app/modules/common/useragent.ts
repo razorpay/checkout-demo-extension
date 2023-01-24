@@ -19,7 +19,7 @@ export const linux = check(/Linux/);
 export const macOS = check(/Mac OS/);
 export const Safari =
   check(/^((?!chrome|android).)*safari/i) || checkVendor(/Apple/);
-export const firefox = check(/firefox/);
+export const firefox = check(/Firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 export const iosWebView = check(/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/);
