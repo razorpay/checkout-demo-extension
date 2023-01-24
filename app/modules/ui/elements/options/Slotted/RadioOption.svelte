@@ -94,6 +94,7 @@
   </Stack>
   <slot name="downtime" />
   <slot name="secure-card" />
+  <slot name="email-field" />
 </DynamicTag>
 
 <style>

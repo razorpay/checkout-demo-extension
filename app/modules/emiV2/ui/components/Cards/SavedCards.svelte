@@ -3,16 +3,16 @@
   import { selectedCard } from 'checkoutstore/screens/card';
   import { isCardTokenized } from 'ui/tabs/card/utils';
   import SavedCard from './SavedCard.svelte';
-  import type { Tokens } from 'emiV2/types';
   import { t } from 'svelte-i18n';
   import { SAVED_CARDS } from 'ui/labels/card';
   import { capture, SEVERITY_LEVELS } from 'error-service';
   import { getSession } from 'sessionmanager';
+  import type { TokenItem } from 'razorpay/types/Preferences';
 
-  export let cards: Tokens[];
+  export let cards: TokenItem[];
 
   const session = getSession();
-  const onSavedCardSelect = (token: Tokens) => {
+  const onSavedCardSelect = (token: TokenItem) => {
     try {
       let { card } = token;
       const coBrandingPartner: string = (card && card.cobranding_partner) || '';
@@ -55,6 +55,7 @@
 {#each cards as card, index (card.id)}
   <SavedCard
     card={card.card}
+    cardTokenData={card}
     isTokenised={isCardTokenized(card)}
     on:select={() => {
       onSavedCardSelect(card);

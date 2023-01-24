@@ -4,7 +4,7 @@ import type { OptionObject } from '../../app/modules/razorpay/types/Options';
 type NestedPartial<T> = {
   [P in keyof T]?: NestedPartial<T[P]>;
 };
-
+// now can be access via test util
 const Options = (overrides: NestedPartial<OptionObject> = {}) => {
   let merchantOptions = {
     key: MERCHANT_TEST_KEY,

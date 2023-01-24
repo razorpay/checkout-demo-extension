@@ -3,15 +3,10 @@
  */
 
 import { test } from '../../core';
-import Options from '../../mock/options';
 
 test.describe('DCC cards success cases', () => {
   test('Should load DCC UI', async ({ util, page }) => {
-    const options = Options({});
-
-    await util.openCheckout({
-      options,
-    });
+    await util.openCheckout();
     await page.waitForTimeout(1000);
     await util.fillContactDetails();
     await util.clickCTA();
@@ -30,11 +25,7 @@ test.describe('DCC cards success cases', () => {
     await util.matchScreenshot();
   });
   test('Should make payment in USD', async ({ util, page }) => {
-    const options = Options({});
-
-    await util.openCheckout({
-      options,
-    });
+    await util.openCheckout();
     await page.waitForTimeout(1000);
     await util.fillContactDetails();
     await util.clickCTA();

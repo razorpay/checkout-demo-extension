@@ -36,7 +36,13 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { isDynamicFeeBearer, isRecurring, isRedesignV15 } from 'razorpay';
   import { getBankText } from '../home/helpers';
+  import { email } from 'checkoutstore/screens/home';
+  import EmailField from 'ui/components/EmailField.svelte';
+  import { isEmailValid } from 'one_click_checkout/common/details/store';
+  import { ASK_EMAIL_SUBTITLE } from 'card/i18n/labels';
+  import { isEmailRequiredForSavedCard } from 'card/helper';
   import { cardScreen } from 'card/constants';
+  import type { TokenItem } from 'razorpay/types/Preferences';
 
   // Props
   export let card;
@@ -47,10 +53,12 @@
   export let selected: boolean;
   export let tab: string;
   export let isTokenised: boolean;
+  export let cardTokenData: TokenItem;
   export let isFormValid = true;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
+  let isEmailRequired = isEmailRequiredForSavedCard(cardTokenData);
   let attributes;
   let showOuter;
   let showCvv: boolean;
@@ -93,8 +101,21 @@
 
   $: showCvv = !noCvvChecked && selected;
 
+  function computeFormValid() {
+    const isEmailFieldVisible = selected && isEmailRequired;
+    /**
+     * check for cvv validation if visible
+     * check for email field validation only if visible
+     */
+    const isCVVFieldValid = !showCvv || (showCvv && cvvInput?.isValid());
+    const isEmailFieldValid =
+      !isEmailFieldVisible ||
+      (isEmailFieldVisible && Boolean($email) && Boolean($isEmailValid));
+    isFormValid = isCVVFieldValid && isEmailFieldValid;
+  }
+
   onMount(() => {
-    isFormValid = !showCvv || (showCvv && cvvInput?.isValid());
+    computeFormValid();
   });
 
   function handleAuthRadioChanged(event) {
@@ -123,6 +144,8 @@
     });
   };
 
+  $: $email, $isEmailValid, selected, computeFormValid();
+
   function handleClick(event, avoidFocus = false) {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', card.type);
@@ -130,6 +153,11 @@
     const payload = { cvv: cvvValue };
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then((_) => {
+      const isEmailFieldClicked = event?.target?.id === 'email';
+      if (isEmailFieldClicked) {
+        // prevent focus to move to cvv field if email field is clicked
+        return;
+      }
       if (typeof cvvInput?.focus === 'function' && !avoidFocus) {
         cvvInput.focus();
       }
@@ -178,7 +206,7 @@
           bind:value={cvvValue}
           on:input={(_) => {
             dispatch('cvvchange', { cvv: cvvValue });
-            isFormValid = showCvv && cvvInput?.isValid();
+            computeFormValid();
           }}
           bind:this={cvvInput}
           on:blur={trackCvvFilled}
@@ -215,6 +243,21 @@
       />
     </div>
   {/if}
+
+  {#if selected && isEmailRequired}
+    <div class="email-field">
+      <EmailField
+        required
+        overrideOptionalFlag
+        bind:value={$email}
+        showValidations
+      />
+      <p class="email-subtitle">
+        {$t(ASK_EMAIL_SUBTITLE)}
+      </p>
+    </div>
+  {/if}
+
   {#if showOuter && selected}
     <div class="saved-outer">
       {#if plans}
@@ -340,5 +383,18 @@
         font-size: 13px;
       }
     }
+  }
+
+  .email-subtitle {
+    font-size: 10px;
+    line-height: 13px;
+    color: rgba(22, 47, 86, 0.54);
+    margin: 0;
+    margin-top: 6px;
+  }
+
+  .email-field {
+    line-height: 1;
+    margin-bottom: 10px;
   }
 </style>

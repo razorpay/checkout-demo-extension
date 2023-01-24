@@ -1,17 +1,15 @@
-import { test, expect } from '../core';
-import Options from '../mock/options';
+import { test } from '../core';
 
 test.describe.configure({ mode: 'parallel' });
 test.describe('UPI QR V2 API', () => {
   test('UPI QR V2 API - success', async ({ page, util }) => {
-    const options = Options({
-      prefill: {
-        email: 'test@razorpay.com',
-        contact: '+919999999999',
-      },
-    });
     await util.openCheckout({
-      options,
+      options: util.prepareOptions({
+        prefill: {
+          email: 'test@razorpay.com',
+          contact: '+919999999999',
+        },
+      }),
     });
     await page.waitForTimeout(1000);
     await util.matchScreenshot({
@@ -35,12 +33,6 @@ test.describe('UPI QR V2 API', () => {
   });
 
   test('UPI QR V2 API - failure', async ({ page, util }) => {
-    const options = Options({
-      prefill: {
-        email: 'test@razorpay.com',
-        contact: '+919999999999',
-      },
-    });
     util.updateContext({
       apiOverrides: {
         checkoutOrder: () => {
@@ -52,20 +44,18 @@ test.describe('UPI QR V2 API', () => {
     });
 
     await util.openCheckout({
-      options,
+      options: util.prepareOptions({
+        prefill: {
+          email: 'test@razorpay.com',
+          contact: '+919999999999',
+        },
+      }),
     });
     await page.waitForTimeout(3500);
     await util.matchScreenshot();
   });
 
   test('UPI QR V2 API - experiment disable', async ({ page, util }) => {
-    const options = Options({
-      prefill: {
-        email: 'test@razorpay.com',
-        contact: '+919999999999',
-      },
-    });
-
     util.updateContext({
       apiOverrides: {
         preferences: (pref) => ({
@@ -79,7 +69,12 @@ test.describe('UPI QR V2 API', () => {
     });
 
     await util.openCheckout({
-      options,
+      options: util.prepareOptions({
+        prefill: {
+          email: 'test@razorpay.com',
+          contact: '+919999999999',
+        },
+      }),
     });
     await page.waitForTimeout(3500);
     await util.matchScreenshot();

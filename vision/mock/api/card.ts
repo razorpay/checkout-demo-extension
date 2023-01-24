@@ -3,7 +3,7 @@ import { getIin, getFlows } from '../../../mock-api/mocks/flows';
 
 export const cardIINHandler: handlerType = () => {
   return {
-    response: `Razorpay.jsonp0_1(${JSON.stringify(getIin())})`,
+    response: getIin(),
     status_code: 200,
   };
 };
@@ -17,7 +17,7 @@ export const paymentFlowsHandler: handlerType = ({ request }) => {
   });
 
   return {
-    response: `Razorpay.jsonp1_1(${JSON.stringify(getFlows(queryParams))})`,
+    response: getFlows(queryParams),
     status_code: 200,
   };
 };

@@ -1,11 +1,7 @@
 import { test } from '../../core';
-import Options from '../../mock/options';
 
 test('basic test', async ({ page, util }) => {
-  const options = Options();
-  await util.openCheckout({
-    options,
-  });
+  await util.openCheckout();
   await page.waitForTimeout(1000);
   await util.assertContactDetailPage();
   await util.fillContactDetails();

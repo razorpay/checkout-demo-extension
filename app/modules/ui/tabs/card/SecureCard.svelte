@@ -28,7 +28,7 @@
   export let savedcard;
   export let modalType: string;
   export let name = 'save';
-  export let cvvRef;
+  export let cvvRef: HTMLInputElement;
   export let network;
 
   // Function for showing the modal

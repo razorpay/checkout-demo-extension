@@ -1,5 +1,4 @@
 import { test, expect } from '../../core';
-import Options from '../../mock/options';
 import testCases from './header.testCases';
 
 function emailLessPreference(
@@ -70,14 +69,13 @@ function emailLessPreference(
 test.describe('Header Redesign Test suite', () => {
   for (const testCase of testCases) {
     test(testCase.title, async ({ page, util }) => {
-      const options = Options(testCase.options || {});
       util.updateContext({
         apiOverrides: {
           preferences: (pref) => emailLessPreference(pref, testCase),
         },
       });
       await util.openCheckout({
-        options,
+        options: util.prepareOptions(testCase.options || {}),
       });
       await page.waitForTimeout(1500);
       expect(await page.screenshot()).toMatchSnapshot();

@@ -2,6 +2,8 @@ import { get } from 'svelte/store';
 import { getCurrencies as getCurrenciesData, getCurrency } from 'razorpay';
 import { amountAfterOffer } from 'offers/store/store';
 import type { CurrenciesPayload } from 'card/types';
+import type { TokenItem } from 'razorpay/types/Preferences';
+import { email } from 'checkoutstore/screens/home';
 
 /**
  * Fetch all DCC currencies with /flows api
@@ -26,3 +28,9 @@ export const getCurrencies = ({
     currency: getCurrency(), // Entity currency
     provider,
   });
+
+export const isEmailRequiredForSavedCard = (savedCard: TokenItem) => {
+  return (
+    !get(email) && (savedCard?.dcc_enabled || savedCard?.card?.international)
+  );
+};

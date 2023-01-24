@@ -1,5 +1,4 @@
 import { test } from '../../core';
-import Options from '../../mock/options';
 import testCases from './testData';
 
 function emailLessPreference(
@@ -23,14 +22,13 @@ test.describe.configure({ mode: 'parallel' });
 test.describe('Email Less Checkout Feature', () => {
   for (const testCase of testCases) {
     test(testCase.title, async ({ page, util }) => {
-      const options = Options(testCase.options);
       util.updateContext({
         apiOverrides: {
           preferences: (pref) => emailLessPreference(pref, testCase),
         },
       });
       await util.openCheckout({
-        options,
+        options: util.prepareOptions(testCase.options),
       });
       await page.waitForTimeout(1000);
       await util.assertContactDetailPage();

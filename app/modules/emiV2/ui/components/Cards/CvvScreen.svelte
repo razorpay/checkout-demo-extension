@@ -17,10 +17,11 @@
   import { selectedPlan } from 'checkoutstore/emi';
   import { offerWindowOpen } from 'offers/store';
   import { handleBackNavigation } from 'emiV2/helper/navigation';
+  import type { TokenItem } from 'razorpay/types/Preferences';
 
   // const cardSelected = $selectedCard;
 
-  const { card } = $selectedCard;
+  const { card } = $selectedCard as unknown as TokenItem;
 
   function handleCvvChange(event) {
     $currentCvv = event.detail.cvv;
@@ -68,6 +69,7 @@
       <header>{$t(ENTER_CVV)}</header>
       <SavedCard
         {card}
+        cardTokenData={$selectedCard}
         isTokenised={isCardTokenized(card)}
         showCVV={true}
         cvvDigits={card.cvvDigits}

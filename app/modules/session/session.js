@@ -138,6 +138,8 @@ import { shouldShowProceedOverlay } from 'truecaller/store';
 import { setTruecallerMetaData } from 'truecaller/analytics';
 import { Events } from 'analytics';
 import { getPerformanceDataForCriticalCheckoutResources } from 'performance/helper';
+import { email } from 'checkoutstore/screens/home';
+import { isEmailValid } from 'one_click_checkout/common/details/store';
 import { COMPLETE_BANK_PAGE, NATIVE_OTP } from 'card/constants';
 import { otpReasons } from 'otp/constants';
 
@@ -5204,6 +5206,7 @@ Session.prototype = {
           '.instrument'
         );
         let cvvInput = instrumentInDom.querySelector('.cvv-input');
+        let emailField = instrumentInDom.querySelector('#email');
 
         if (cvvInput) {
           if (cvvInput.value.length === cvvInput.maxLength) {
@@ -5213,6 +5216,14 @@ Session.prototype = {
             updateScore('clickOnSubmitWithoutDetails');
             return Form.shake();
           }
+        }
+        if (
+          (emailField && !discreet.storeGetter(email)) ||
+          !discreet.storeGetter(isEmailValid)
+        ) {
+          emailField.focus();
+          updateScore('clickOnSubmitWithoutDetails');
+          return Form.shake();
         }
       } else if (selectedInstrument.method === 'cod') {
         // Show order summary when payment method=cod

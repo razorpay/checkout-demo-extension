@@ -1,3 +1,4 @@
+import type { Locator } from 'playwright-chromium';
 import type { UtilFunction } from '../core/types';
 
 /**
@@ -22,7 +23,49 @@ export const enterCardDetails: UtilFunction<{
 
   await page.locator('#card_number').type(cardNumber);
   await page.locator('#card_expiry').type(inputData.cardExpiry || '12/55');
-  await page.locator('#card_name').type(inputData.cardName || 'SakshiJain');
+  await page.locator('#card_name').type(inputData.cardName || 'Test user');
   await page.locator('#card_cvv').type(amex ? '7373' : '111');
   await page.waitForTimeout(500);
+};
+
+export const selectSavedCard: UtilFunction<{
+  index?: number;
+  last4?: string;
+  fill?: {
+    cvv?: string;
+  };
+  screen?: 'L0' | 'card';
+}> = async ({ page, inputData = { index: 0, screen: 'card' } }) => {
+  const { index = 0, last4, fill, screen = 'card' } = inputData;
+  let selectedSavedCard: Locator;
+  if (screen === 'L0') {
+    if (last4) {
+      selectedSavedCard = page.locator(
+        'div[data-block="rzp.preferred"] button.slotted-radio',
+        {
+          has: page.locator(`text=- ${last4}`),
+        }
+      );
+    } else {
+      selectedSavedCard = page
+        .locator('div[data-block="rzp.preferred"] button.slotted-radio')
+        .nth(index);
+    }
+  } else {
+    if (last4) {
+      selectedSavedCard = page.locator('#saved-cards-container .saved-card', {
+        has: page.locator(`text=- ${last4}`),
+      });
+    } else {
+      selectedSavedCard = page
+        .locator('#saved-cards-container .saved-card')
+        .nth(index);
+    }
+  }
+  await selectedSavedCard.click();
+  if (fill) {
+    if (fill.cvv) {
+      await selectedSavedCard.locator('input[name*="cvv"]').type(fill.cvv);
+    }
+  }
 };

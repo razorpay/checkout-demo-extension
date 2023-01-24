@@ -129,6 +129,7 @@
 {#each cards as card (card.id)}
   <SavedCard
     card={card.card}
+    cardTokenData={card}
     isTokenised={isCardTokenized(card)}
     debitPin={card.debitPin}
     token={card.token}

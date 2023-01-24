@@ -4,13 +4,13 @@ import { Page } from '@playwright/test';
 import { checkoutPublic } from '../constant';
 import type { RouterType, UtilFunction } from './types';
 import * as helperFunctions from '../utils';
-
-type Object<T = any> = { [x: string]: T };
+import Options from '../mock/options';
 
 type getUserInputType<fx extends UtilFunction> = Parameters<fx>[0]['inputData'];
 
 type UtilMethods = {
   [x in keyof typeof helperFunctions]: ReturnType<
+    // @ts-ignore
     typeof bindUtilFunction<getUserInputType<typeof helperFunctions[x]>>
   >;
 };
@@ -51,7 +51,9 @@ export default function makeUtil({
     {} as UtilMethods
   );
   return {
-    async openCheckout({ options = {} }: { options: Object }) {
+    prepareOptions: Options,
+    async openCheckout(param?: { options?: Parameters<typeof Options>[0] }) {
+      const { options = Options() } = param || {};
       const body = await getHostIndex();
       await page.route(
         checkoutPublic,

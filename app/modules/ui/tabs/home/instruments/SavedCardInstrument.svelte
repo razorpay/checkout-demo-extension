@@ -18,7 +18,7 @@
   import { isCardTokenized } from 'ui/tabs/card/utils.js';
   import * as ObjectUtils from 'utils/object';
   // Store
-  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { email, selectedInstrumentId } from 'checkoutstore/screens/home';
   import {
     userConsentForTokenization,
     selectedCardFromHome,
@@ -30,24 +30,28 @@
 
   // i18n
   import { getInstrumentTitle } from 'i18n';
-
-  import { locale } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
 
   import * as _El from 'utils/DOM';
   import { querySelector } from 'utils/doc';
   import { getThemeMeta } from 'checkoutstore/theme';
-  // Props
-  export let instrument = {};
-  export let name = 'instrument';
 
   // Other Imports
   import { isRedesignV15 } from 'razorpay';
   import { CardsTracker } from 'card/analytics/events';
+  import EmailField from 'ui/components/EmailField.svelte';
+  import type { Instrument } from 'card/types';
+  import { ASK_EMAIL_SUBTITLE } from 'card/i18n/labels';
+  import { isEmailRequiredForSavedCard } from 'card/helper';
   import { cardScreen } from 'card/constants';
 
-  let downtimeSeverity;
+  // Props
+  export let instrument: Partial<Instrument> = {};
+  export let name = 'instrument';
+
+  let downtimeSeverity: string | boolean;
   let downtimeInstrument = '';
-  let cvvRef;
+  let cvvRef: HTMLInputElement;
   let collectCardTokenisationConsent = false;
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
@@ -59,19 +63,20 @@
 
   const isRedesignV15Enabled = isRedesignV15();
 
-  function getIcon(card) {
+  function getIcon(card?: { network: string }) {
     if (card && card.network && card.network !== 'unknown') {
       return getNetworkIcon(findCodeByNetworkName(card.network));
     }
     return themeMeta.icons.card;
   }
 
-  let title;
-  let icon;
-  let isTokenised;
+  let title: string;
+  let icon: string;
+  let isTokenised: boolean;
   let hasCvv = false;
   let cvvLength = 3;
   let cardKnown = false;
+  let isEmailRequired = false;
 
   const savedCards = ObjectUtils.get($customer, 'tokens.items', []);
   const savedCard = savedCards.find(
@@ -79,6 +84,8 @@
   );
 
   if (savedCard) {
+    isEmailRequired = isEmailRequiredForSavedCard(savedCard);
+
     // User is logged in
     const card = savedCard.card || {};
     const networkCode = findCodeByNetworkName(card.network);
@@ -130,7 +137,7 @@
   }
   $: collectCardTokenisationConsent = selected && !isTokenised;
 
-  function selectionHandler() {
+  function selectionHandler(e) {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', savedCard?.card?.type);
     }
@@ -140,6 +147,11 @@
     }
     if (hasCvv) {
       setTimeout(() => {
+        const isEmailFieldClicked = e?.target?.id === 'email';
+        if (isEmailFieldClicked) {
+          // prevent focus to move to cvv field if email field is clicked
+          return;
+        }
         // Focus on the input field
         const instrumentInDom = _El.closest(
           querySelector(`.home-methods input[value="${instrument.id}"]`),
@@ -159,7 +171,14 @@
     }
   }
 
-  let additionalCvvProps = {
+  let additionalCvvProps: {
+    placeholder: string;
+    label: string;
+    labelClasses?: string;
+    elemClasses?: string;
+    inputFieldClasses?: string;
+    labelUpperClasses?: string;
+  } = {
     placeholder: 'CVV',
     label: '',
   };
@@ -229,6 +248,21 @@
       />
     {/if}
   </div>
+  <div slot="email-field">
+    {#if selected && isEmailRequired}
+      <div class="email-field">
+        <EmailField
+          required
+          overrideOptionalFlag
+          bind:value={$email}
+          showValidations
+        />
+        <p class="email-subtitle">
+          {$t(ASK_EMAIL_SUBTITLE)}
+        </p>
+      </div>
+    {/if}
+  </div>
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
       <DowntimeCallout
@@ -271,5 +305,16 @@
     color: red;
     font-size: 16px;
     font-weight: 500;
+  }
+
+  .email-subtitle {
+    font-size: 10px;
+    line-height: 13px;
+    color: rgba(22, 47, 86, 0.54);
+    margin: 0;
+    margin-top: 6px;
+  }
+  .email-field {
+    margin-top: 12px;
   }
 </style>

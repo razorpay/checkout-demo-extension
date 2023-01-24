@@ -85,6 +85,8 @@ function requestHandler(context: Context) {
     });
 
     if (matchedRoute) {
+      const url = new URL(request.url());
+      const callbackId = url.searchParams.get('callback');
       let apiOverrides =
         context?.apiOverrides?.[matchedRoute?.options?.id || ''] || {};
 
@@ -101,7 +103,7 @@ function requestHandler(context: Context) {
           context?.apiOverrides?.[matchedRoute?.options?.id || ''] || {},
       }) || {};
 
-      let updatedResponse = response;
+      let updatedResponse: Record<string, any> | string = response;
       // override only if json [may need to update accordingly]
       if (typeof updatedResponse !== 'string') {
         if (typeof apiOverrides === 'function') {
@@ -122,6 +124,10 @@ function requestHandler(context: Context) {
         return route.fulfill({
           status: 204,
         });
+      }
+
+      if (callbackId && callbackId.includes('jsonp')) {
+        updatedResponse = `${callbackId}(${JSON.stringify(updatedResponse)})`;
       }
 
       return route.fulfill({
