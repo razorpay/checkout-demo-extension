@@ -223,7 +223,9 @@
 
     if (bankCode) {
       NetbankingTracker.BANK_OPTION_SELECTED({
-        name: bankCode,
+        instrument: {
+          name: bankCode,
+        },
       });
       try {
         MiscTracker.INSTRUMENT_SELECTED({
@@ -267,7 +269,9 @@
         instruments: getInstrumentsWithOrder(netbanks, 'netbanking'),
       });
       NetbankingTracker.BANK_OPTIONS_SHOWN({
-        instruments: getInstrumentsWithOrder(netbanks, 'netbanking'),
+        instruments: Object.values(
+          getInstrumentsWithOrder(netbanks, 'netbanking')
+        ),
       });
     } catch {}
     Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);

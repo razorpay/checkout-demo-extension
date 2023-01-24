@@ -33,15 +33,10 @@ interface NetbankingEventMap {
         instrument: Instrument;
       };
   BANK_OPTIONS_SHOWN: {
-    instruments: {
-      [key: number]: {
-        name: string;
-        order: number;
-      };
-    };
+    instruments: Instrument[];
   };
   BANK_OPTION_SELECTED: {
-    name: string;
+    instrument: Instrument;
   };
   P13N_SHOWN: {
     instrument: Instrument;
