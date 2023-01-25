@@ -865,6 +865,8 @@ export default {
       'A processing fee of ₹{fee} + GST will be applicable on the successful EMI transactions.',
     axis_conveninence_fee:
       'A processing fee of 1% or ₹100, whichever is higher, would be charged by the bank for each EMI order.',
+    yesb_convenience_fee_msg:
+      'A processing fee of 1% would be charged by the bank for each EMI transaction.',
     starting_from_label: 'Starting from {amount}%',
     entered_number_ineligible: 'Entered number is ineligible',
     ineligible_contact_message:

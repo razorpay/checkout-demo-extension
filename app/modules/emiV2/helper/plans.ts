@@ -26,6 +26,7 @@ import {
   FULL_AMOUNT_EMI_MESSAGE,
   ICICI_BANK_EMI,
   PROCESSING_FEE_MSG,
+  YESB_PROCESSING_FEE,
 } from 'ui/labels/emi';
 import {
   banksWithConvenienveFee,
@@ -37,16 +38,53 @@ import { getMerchantMethods } from 'razorpay';
 import { capture, SEVERITY_LEVELS } from 'error-service';
 
 /**
+ * Processing fee for SBI emi plans with duration of 18 and 24 months should 199
+ * Need to add this additional check till the BE dependency is resolved
+ * @param bank
+ * @param duration
+ * @returns
+ */
+export const isCustomProcessingFeePresent = (
+  bank: string,
+  duration: number
+) => {
+  return (
+    bank === EmiBanksCode.SBIN_BANK_CODE && (duration === 18 || duration === 24)
+  );
+};
+
+/**
  * Helper function to get the processing fee to be shown in emi plans description
  * As of now most banks have ₹99
  * Except RBL and Kotak DC bank they have ₹199 processing fee
  * @param {string} bank name of the bank to get processing fee for
  */
-export const getProcessingFeeForEmi = (bank: string): string => {
-  if (banksWithUpdatedFee.includes(bank)) {
+// TODO: Move the approach to BE driven processing fees once updated
+export const getProcessingFeeForEmi = (
+  bank: string,
+  duration?: number
+): string => {
+  if (
+    banksWithUpdatedFee.includes(bank) ||
+    (duration && isCustomProcessingFeePresent(bank, duration))
+  ) {
     return '199';
   }
   return '99';
+};
+
+/**
+ * Helper function to check if we need to hide processing fee for specific plan
+ * Eg: For SBI CC EMI plan with 3 month duration there is no processing fee
+ * @param {string} bank
+ * @param {number} duration
+ * @returns {boolean}
+ */
+export const isProcessingFeeAvailableForPlan = (
+  bank: string,
+  duration: number
+) => {
+  return bank === EmiBanksCode.SBIN_BANK_CODE && duration !== 3;
 };
 
 /**
@@ -149,7 +187,8 @@ export const handlePlanDescription = (
   bank: string,
   amount: string,
   amountPerMonth: string,
-  locale: string
+  locale: string,
+  duration: number
 ) => {
   const descriptionText: string[] = [];
   // Adding the plan description split as provided by product team
@@ -172,7 +211,10 @@ export const handlePlanDescription = (
         locale
       )
     );
-  } else if (bank === EmiBanksCode.ICICI_BANK_CODE) {
+  } else if (
+    bank === EmiBanksCode.ICICI_BANK_CODE ||
+    bank === EmiBanksCode.SBIN_BANK_CODE
+  ) {
     descriptionText.push(
       formatTemplateWithLocale(ICICI_BANK_EMI, { amount }, locale)
     );
@@ -187,12 +229,19 @@ export const handlePlanDescription = (
     descriptionText.push(
       formatTemplateWithLocale(AXIS_CONVENINENCE_FEE, {}, locale)
     );
-  } else if (banksWithConvenienveFee.includes(bank)) {
+  } else if (bank === EmiBanksCode.YES_BANK_CODE) {
+    descriptionText.push(
+      formatTemplateWithLocale(YESB_PROCESSING_FEE, {}, locale)
+    );
+  } else if (
+    banksWithConvenienveFee.includes(bank) ||
+    isProcessingFeeAvailableForPlan(bank, duration)
+  ) {
     descriptionText.push(
       formatTemplateWithLocale(
         CONVENIENCE_FEE_MSG,
         {
-          fee: getProcessingFeeForEmi(bank),
+          fee: getProcessingFeeForEmi(bank, duration),
         },
         locale
       )

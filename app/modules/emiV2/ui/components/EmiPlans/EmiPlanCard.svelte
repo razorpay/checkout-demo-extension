@@ -112,7 +112,8 @@
       $selectedTab === 'debit' ? `${bank}_DC` : bank,
       formattedAmount,
       formattedAmountPerMonth,
-      $locale
+      $locale,
+      plan.duration
     );
   }
 

@@ -20,6 +20,7 @@ const RBL_BANK_CODE = 'RATN';
 const ONE_CARD_CODE = 'onecard';
 const INDB_DEBIT_CODE = 'INDB_DC';
 const INDB_BANK_CODE = 'INDB';
+const YES_BANK_CODE = 'YESB';
 
 export const EmiBanksCode = {
   HDFC_BANK_CODE,
@@ -34,6 +35,7 @@ export const EmiBanksCode = {
   RBL_BANK_CODE,
   INDB_DEBIT_CODE,
   INDB_BANK_CODE,
+  YES_BANK_CODE,
 };
 
 // Constants
@@ -100,7 +102,6 @@ export const tabValues = {
 export const banksWithConvenienveFee: string[] = [
   HDFC_BANK_DEBIT_CODE,
   HDFC_BANK_CODE,
-  SBIN_BANK_CODE,
   ICICI_BANK_CODE,
   ICICI_BANK_DEBIT_CODE,
   KOTAK_BANK_CODE,

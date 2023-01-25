@@ -3,7 +3,12 @@ import {
   isNoCostAVailableForToken,
   isNoCostPlan,
 } from 'emiV2/helper/label';
-import { getProcessingFeeForEmi } from 'emiV2/helper/plans';
+import {
+  getProcessingFeeForEmi,
+  handlePlanDescription,
+  isCustomProcessingFeePresent,
+  isProcessingFeeAvailableForPlan,
+} from 'emiV2/helper/plans';
 import { isNoCostAvailable } from 'emiV2/store';
 import type { EmiPlan, EmiPlanObject, EmiPlans } from 'emiV2/types';
 
@@ -18,6 +23,18 @@ describe('Validate: getProcessingFeeForEmi', () => {
 
     bank = 'SBIN';
     expect(getProcessingFeeForEmi(bank)).toBe('99');
+
+    bank = 'SBIN';
+    expect(getProcessingFeeForEmi(bank, 3)).not.toBe('199');
+
+    bank = 'SBIN';
+    expect(getProcessingFeeForEmi(bank, 18)).not.toBe('99');
+
+    bank = 'SBIN';
+    expect(getProcessingFeeForEmi(bank, 24)).not.toBe('99');
+
+    bank = 'SBIN';
+    expect(getProcessingFeeForEmi(bank, 24)).toBe('199');
   });
 });
 
@@ -100,4 +117,71 @@ describe('Validate: fincNoCostEmiPlan', () => {
 
   planObject['3'].subvention = 'customer';
   expect(fincNoCostEmiPlan(planObject)).toBe(false);
+});
+
+describe('Validate: isCustomProcessingFeePresent', () => {
+  expect(isCustomProcessingFeePresent('SBIN', 18)).toBe(true);
+  expect(isCustomProcessingFeePresent('SBIN', 12)).toBe(false);
+  expect(isCustomProcessingFeePresent('HDFC', 12)).toBe(false);
+});
+
+describe('Validate: isProcessingFeeAvailableForPlan', () => {
+  expect(isProcessingFeeAvailableForPlan('SBIN', 3)).toBe(false);
+  expect(isProcessingFeeAvailableForPlan('SBIN', 6)).toBe(true);
+  expect(isProcessingFeeAvailableForPlan('HDFC', 6)).toBe(false);
+});
+
+describe('Validate: handlePlanDescription', () => {
+  let bank = 'SBIN';
+  let duration = 3;
+  const amount = '1000000';
+  const amountPerMonth = '10000';
+  let descriptionText = handlePlanDescription(
+    bank,
+    amount,
+    amountPerMonth,
+    'en',
+    duration
+  );
+  expect(descriptionText.length).toBe(1);
+
+  duration = 6;
+  descriptionText = handlePlanDescription(
+    bank,
+    amount,
+    amountPerMonth,
+    'en',
+    duration
+  );
+  expect(descriptionText.length).toBe(2);
+
+  bank = 'HDFC';
+  descriptionText = handlePlanDescription(
+    bank,
+    amount,
+    amountPerMonth,
+    'en',
+    duration
+  );
+  expect(descriptionText.length).toBe(2);
+
+  bank = 'YESB';
+  descriptionText = handlePlanDescription(
+    bank,
+    amount,
+    amountPerMonth,
+    'en',
+    duration
+  );
+  expect(descriptionText.length).toBe(2);
+
+  bank = 'CITI';
+  descriptionText = handlePlanDescription(
+    bank,
+    amount,
+    amountPerMonth,
+    'en',
+    duration
+  );
+  expect(descriptionText.length).toBe(1);
 });
