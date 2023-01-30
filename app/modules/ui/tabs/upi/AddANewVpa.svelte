@@ -282,7 +282,7 @@
                   return {
                     value,
                     maxLeftPositionOfDropdown: 180,
-                    suggestions: predictions.map((x) => `@${x}`),
+                    suggestions: predictions.map((x) => `@${x}`).slice(0, 3),
                     onSelect: (data) => {
                       return `${currentVaue.substr(0, atIndex)}${data}`;
                     },

@@ -46,6 +46,7 @@
     isEmailValid,
   } from 'one_click_checkout/common/details/store';
   import { country } from 'checkoutstore/screens/home';
+  import { locale } from 'svelte-i18n';
 
   const emiBanks = getEMIBanks() as { BAJAJ: any };
   const ctaStore = getStore();
@@ -70,7 +71,7 @@
   let fullScreenHeaderHeight = 'auto';
   $: {
     tick().then(() => {
-      if ($fullScreenHeader && $country) {
+      if ($fullScreenHeader && $country && $locale) {
         // add store to make it reactive
         !$isContactValid || !$isEmailValid;
         let initialBodyHeight = 400;
