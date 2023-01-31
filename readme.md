@@ -2,7 +2,7 @@
 
 Override pay button on merchant's webpage to open Razorpay checkout.
 
-![Extension on website](https://github.com/razorpay/checkout-demo-extension/blob/master/assets/images/screenshot1.png?raw=true)
+![Extension on website](https://github.com/razorpay/checkout-demo-extension/blob/master/assets/images/cover-ss.png?raw=true)
 
 ### Installation
 
