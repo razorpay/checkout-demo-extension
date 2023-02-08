@@ -219,7 +219,7 @@ function createRecordFromElement(element) {
   }
   record.y = bBox.y;
   record.x = bBox.x;
-  record.text = text;
+  record.text = text.replace(/[^0-9.]/g, "");
   return record;
 }
 
@@ -239,6 +239,7 @@ function canBePrice(record) {
   if (
     record.y > 600 ||
     record.fontSize == undefined ||
+    !/\d/.test(record.text) ||
     !record.text.match(
       /(^(US ){0,1}(rs\.|Rs\.|RS\.|\$|₹|INR|RM|USD|CAD|C\$){0,1}(\s){0,1}[\d,]+(\.\d+){0,1}(\s){0,1}(AED){0,1}$)/
     )
@@ -285,6 +286,6 @@ export const scrapeAmountFromPage = () => {
     return a.fontSize < b.fontSize ? 1 : -1;
   });
 
-  let priceInNumbers = recordsSortedByFontSize[0]?.text.replace(/[^0-9.]/g, "");
+  let priceInNumbers = recordsSortedByFontSize[0]?.text;
   return priceInNumbers;
 };

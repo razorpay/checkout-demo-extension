@@ -2,7 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const coreConfig = {
-  mode: "development",
+  mode: "production",
   output: {
     path: path.resolve(__dirname, "dist"), // output folder
     filename: "[name].bundle.js",
@@ -45,7 +45,7 @@ const coreConfig = {
           {
             loader: "file-loader",
             options: {
-              name: "images/[hash]-[name].[ext]",
+              name: "assets/images/[hash]-[name].[ext]",
             },
           },
         ],
@@ -73,12 +73,20 @@ module.exports = [
   },
   {
     ...coreConfig,
+    output: {
+      path: path.resolve(__dirname, "dist/scripts"), // output folder
+      filename: "[name].bundle.js",
+    },
     entry: {
       content: "./scripts/content.js",
     },
   },
   {
     ...coreConfig,
+    output: {
+      path: path.resolve(__dirname, "dist/scripts"), // output folder
+      filename: "[name].bundle.js",
+    },
     entry: {
       background: "./scripts/background.js",
     },

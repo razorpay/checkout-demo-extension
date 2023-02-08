@@ -105,7 +105,7 @@ export const COUNTRY_CONFIG = {
     name: "Test Malaysian Merchant",
     key: {
       test: "rzp_test_rLRCKMrfIRVgEg",
-      live: "rzp_live_fQOafVJoJqscJ6",
+      live: "",
     },
     currency: "MYR",
     prefill: {
@@ -116,7 +116,7 @@ export const COUNTRY_CONFIG = {
     name: "Test Indian Merchant",
     key: {
       test: "rzp_test_xdw1idaxNNcenU",
-      live: "rzp_live_ILgsfZCZoFIKMb",
+      live: "",
     },
     currency: "INR",
     prefill: {
