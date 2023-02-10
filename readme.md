@@ -6,11 +6,11 @@ Override pay button on merchant's webpage to open Razorpay checkout.
 
 ### Installation
 
-1. Clone this repo locally or download it as a zip file.
+1. Head over to this [link](https://github.com/razorpay/checkout-demo-extension/blob/master/extension.zip) and click on the download button. Unzip the downloaded zip folder.
 2. Open the Extension Management page by navigating to [`chrome://extensions`](chrome://extensions).
 3. The Extension Management page can also be opened by clicking on the Chrome menu, hovering over More Tools then selecting Extensions.
 4. Enable Developer Mode by clicking the toggle switch next to Developer mode.
-5. Click the Load Unpacked button and select the downloaded/cloned extension directory (`checkout-demo-extension`).
+5. Click the Load Unpacked button and select the unzipped extension directory.
 6. After you load it, you should get the below extension in your chrome extension list.
    ![Extension in chrome://extensions](https://github.com/razorpay/checkout-demo-extension/blob/master/assets/images/chrome-extensions-ss.png?raw=true)
 
