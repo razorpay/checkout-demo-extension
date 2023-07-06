@@ -47,6 +47,11 @@ export const createOptions = (country) => {
       label: "Key",
       value: countryConfig.key.test,
     },
+    order_id: {
+      type: "input",
+      id: "order_id",
+      label: "Order Id",
+    },
     name: {
       type: "input",
       id: "name",

@@ -289,3 +289,229 @@ export const scrapeAmountFromPage = () => {
   let priceInNumbers = recordsSortedByFontSize[0]?.text;
   return priceInNumbers;
 };
+
+export const scrapeNameFromPage = () => {
+  let domain = window.location.hostname;
+
+  // Remove path and query string
+  domain = domain.split("/")[0];
+
+  // Remove subdomain
+  const parts = domain.split(".");
+  domain = parts[parts.length - 2];
+
+  return domain.charAt(0).toUpperCase() + domain.slice(1);
+};
+
+function isImageSourceValid(url, callback) {
+  let image = new Image();
+
+  image.onload = function () {
+    callback(true);
+  };
+
+  image.onerror = function () {
+    callback(false);
+  };
+
+  image.src = url;
+}
+
+function getFaviconSource() {
+  let links = document.getElementsByTagName("link");
+  for (let i = 0; i < links.length; i++) {
+    let link = links[i];
+    if (
+      link.getAttribute("rel") === "icon" ||
+      link.getAttribute("rel") === "shortcut icon"
+    ) {
+      let faviconSource = link.getAttribute("href");
+      if (faviconSource[0] === "/") {
+        faviconSource = `${location.protocol}//${location.host}${faviconSource}`;
+      }
+      return faviconSource;
+    }
+  }
+  return null; // Return null if no favicon source is found
+}
+
+export const scrapeLogoFromPage = () => {
+  return new Promise((resolve, reject) => {
+    const favIconSource = getFaviconSource();
+
+    isImageSourceValid(favIconSource, (valid) => {
+      if (valid) {
+        resolve(favIconSource);
+      } else {
+        const testIcon = `${location.protocol}//${location.host}/favicon.ico`;
+        isImageSourceValid(testIcon, (valid) => {
+          if (valid) resolve(testIcon);
+          else resolve("");
+        });
+      }
+    });
+  });
+};
+
+function rgbToHex(rgb) {
+  var regex = /(\d{1,3}),(\d{1,3}),(\d{1,3})/;
+  var match = rgb.match(regex);
+
+  if (match) {
+    var r = parseInt(match[1], 10);
+    var g = parseInt(match[2], 10);
+    var b = parseInt(match[3], 10);
+
+    var hexR = r.toString(16).padStart(2, "0");
+    var hexG = g.toString(16).padStart(2, "0");
+    var hexB = b.toString(16).padStart(2, "0");
+
+    return "#" + hexR + hexG + hexB;
+  }
+
+  return null; // Return null if the input is not a valid RGB string
+}
+
+const createCanvas = (image, callback) => {
+  image.onload = function () {
+    // Create a canvas element to draw the image
+    let canvas = document.createElement("canvas");
+    let context = canvas.getContext("2d");
+
+    // Set canvas dimensions to match the image
+    canvas.width = image.width;
+    canvas.height = image.height;
+
+    // Draw the image onto the canvas
+    context.drawImage(image, 0, 0);
+
+    // Get the pixel data from the canvas
+    let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    let pixels = imageData.data;
+
+    // Count the color frequencies
+    let colorFrequencies = {};
+    for (let i = 0; i < pixels.length; i += 4) {
+      let r = pixels[i];
+      let g = pixels[i + 1];
+      let b = pixels[i + 2];
+      let color = "rgb(" + r + "," + g + "," + b + ")";
+
+      if (colorFrequencies[color]) {
+        colorFrequencies[color]++;
+      } else {
+        colorFrequencies[color] = 1;
+      }
+    }
+
+    // Find the color with the highest frequency
+    let maxFrequency = 0;
+    let mostUsedColor = "";
+    for (let color in colorFrequencies) {
+      if (
+        colorFrequencies[color] > maxFrequency &&
+        color !== "rgb(255,255,255)"
+      ) {
+        maxFrequency = colorFrequencies[color];
+        mostUsedColor = color;
+      }
+    }
+
+    callback(rgbToHex(mostUsedColor));
+  };
+};
+
+export const scrapeColourFromImage = (imageUrl) => {
+  return new Promise((resolve, reject) => {
+    if (imageUrl.includes(window.location.origin)) {
+      let image = new Image();
+      image.src = imageUrl;
+
+      createCanvas(image, (res) => {
+        resolve(res);
+      });
+    } else {
+      return fetch("https://cors-anywhere.herokuapp.com/" + imageUrl)
+        .then(function (response) {
+          return response.blob();
+        })
+        .then(function (blob) {
+          let image = new Image();
+          let imageUrl = URL.createObjectURL(blob);
+          image.src = imageUrl;
+
+          createCanvas(image, (res) => {
+            resolve(res);
+          });
+        });
+    }
+  });
+};
+
+const scrapeProductImage = () => {
+  // Find all image elements in the parsed HTML content
+  const images = document.getElementsByTagName("img");
+  // .filter(filterContentInsideViewport);
+
+  // Initialize variables to hold the largest image and its size
+  let largestImage = null;
+  let largestSize = 0;
+
+  // Iterate through the images and find the largest one
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+    const width = image.naturalWidth || image.offsetWidth;
+    const height = image.naturalHeight || image.offsetHeight;
+    const imageSize = width * height;
+
+    // Compare the current image size with the largest size found so far
+    if (imageSize > largestSize) {
+      largestImage = image;
+      largestSize = imageSize;
+    }
+  }
+
+  return largestImage?.src || "";
+};
+
+const scrapeProductName = () => {
+  let name = document.title;
+
+  // discard characters after hyphen or colon, in most cases this will just have site info which we don't want
+  name = name.split(/[-:|]/)[0];
+
+  // remove keywords like Buy
+  return name.replace("/buy/i", "").slice(0, 128);
+};
+
+export const scrapeLineItem = () => {
+  return {
+    name: scrapeProductName(),
+    image_url: scrapeProductImage(),
+    quantity: 1,
+  };
+};
+
+export const createOrder = (data, line_item) => {
+  const payload = {
+    currency: "INR",
+    amount: data.amount,
+    line_items_total: data.amount,
+    line_items: [
+      {
+        ...line_item,
+        price: data.amount,
+      },
+    ],
+  };
+  return fetch("https://demo-shopping-app.onrender.com/payment/orders", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  }).then((res) => {
+    return res.json();
+  });
+};

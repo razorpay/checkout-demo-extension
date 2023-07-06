@@ -174,6 +174,24 @@ const StandardCheckout = () => {
         }
       }
     );
+
+    chrome.runtime.sendMessage(
+      {
+        from: "popup",
+        type: EVENT_TYPES.GET_ORDER_ID,
+      },
+      (response) => {
+        setOptions((options) => {
+          return {
+            ...options,
+            order_id: {
+              ...options.order_id,
+              value: response,
+            },
+          };
+        });
+      }
+    );
   };
 
   useEffect(() => {

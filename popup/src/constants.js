@@ -1,6 +1,3 @@
-import stdCxLogo from "./assets/ic-std-cx.svg";
-import magicCxLogo from "./assets/ic-magic-cx.svg";
-
 export const SUPPORTED_CURRENCIES = [
   "AED",
   "ALL",
@@ -115,7 +112,7 @@ export const COUNTRY_CONFIG = {
   IN: {
     name: "Test Indian Merchant",
     key: {
-      test: "rzp_test_xdw1idaxNNcenU",
+      test: "rzp_test_1DP5mmOlF5G5ag",
       live: "",
     },
     currency: "INR",
@@ -124,19 +121,6 @@ export const COUNTRY_CONFIG = {
     },
   },
 };
-
-export const MENU = [
-  {
-    id: "standard-cx",
-    icon: stdCxLogo,
-    label: "Standard Checkout",
-  },
-  {
-    id: "magic-cx",
-    icon: magicCxLogo,
-    label: "Magic Checkout",
-  },
-];
 
 export const TIMEZONE_TO_COUNTRY = {
   "Asia/Kolkata": "India",

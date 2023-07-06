@@ -1,7 +1,12 @@
 import { EVENT_TYPES } from "../constants";
 import {
+  createOrder,
   querySelectorFallback,
   scrapeAmountFromPage,
+  scrapeColourFromImage,
+  scrapeLineItem,
+  scrapeLogoFromPage,
+  scrapeNameFromPage,
   showModal,
   showToast,
 } from "./utils";
@@ -127,34 +132,50 @@ function handleDomClick(ev) {
   }
 }
 
-function sendScrapedAmount() {
-  const amount = +scrapeAmountFromPage();
-  chrome.runtime.sendMessage({
-    from: "content",
-    type: EVENT_TYPES.SET_AMOUNT,
-    value: amount || "",
+async function sendScrapedData() {
+  const data = {
+    amount: +scrapeAmountFromPage() || "",
+    name: scrapeNameFromPage() || "",
+  };
+
+  data.image = await scrapeLogoFromPage();
+  data.color = await scrapeColourFromImage(data.image);
+
+  createOrder(data, scrapeLineItem()).then((res) => {
+    chrome.runtime.sendMessage({
+      from: "content",
+      type: EVENT_TYPES.SET_ORDER_ID,
+      value: res.id,
+    });
   });
 
-  return amount;
+  console.log("🚀 ~ sendScrapedData ~ data:", data);
+  chrome.runtime.sendMessage({
+    from: "content",
+    type: EVENT_TYPES.SET_SCRAPED_DATA,
+    value: data,
+  });
+
+  return Promise.resolve(data);
 }
 
 document.onreadystatechange = () => {
   // scrape and send amount after page load is completed
   if (document.readyState === "complete") {
-    const amount = sendScrapedAmount();
-
-    // in some specific cases, dom load event fires but the page is still not rendered
-    // handling this by setting a timeout of 2s to scrape amount
-    if (!amount) {
-      setTimeout(() => {
-        sendScrapedAmount();
-      }, 2000);
-    }
+    sendScrapedData().then((data) => {
+      // in some specific cases, dom load event fires but the page is still not rendered
+      // handling this by setting a timeout of 2s to scrape amount
+      if (!data.amount) {
+        setTimeout(() => {
+          sendScrapedData();
+        }, 2000);
+      }
+    });
   }
 };
 // fallback if complete event fires very late
 setTimeout(() => {
-  sendScrapedAmount();
+  sendScrapedData();
 }, 2000);
 
 document.addEventListener(
