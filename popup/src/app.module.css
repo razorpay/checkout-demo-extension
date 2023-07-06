@@ -2,6 +2,7 @@
   display: flex;
   min-height: 300px;
   max-height: 600px;
+  position: relative;
 }
 
 .screen {
@@ -15,4 +16,18 @@
   border-bottom: 1px solid #dedede;
   padding-bottom: 6px;
   margin-bottom: 20px;
+}
+
+.inactive {
+  opacity: 0.5;
+}
+
+.clickBlocker {
+  cursor: not-allowed;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
 }

@@ -548,3 +548,18 @@ export const createOrder = (data, line_item) => {
     return res.json();
   });
 };
+
+export const getDataFromStorage = (key) => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([key], (result) => {
+      resolve(result[key]);
+    });
+  });
+};
+
+export const setDataInStorage = (data) => {
+  const url = document.location.href.split("?")[0];
+  chrome.storage.local.set({
+    [url]: data,
+  });
+};

@@ -1,6 +1,7 @@
 import { DEFAULT_CX_OPTIONS, EVENT_TYPES } from "../constants";
 import {
   createOrder,
+  getDataFromStorage,
   querySelectorFallback,
   scrapeAmountFromPage,
   scrapeCTAsFromPage,
@@ -8,18 +9,24 @@ import {
   scrapeLineItem,
   scrapeLogoFromPage,
   scrapeNameFromPage,
+  setDataInStorage,
   showModal,
   showToast,
 } from "./utils";
 
 let options = DEFAULT_CX_OPTIONS;
 let enableInspector = false;
+let enableExtension = true;
 
 /**
  * responsible for creating razorpay instance and opening checkout
  * @param {ClickEvent} ev
  */
 function handleClick(ev) {
+  if (!enableExtension) {
+    return;
+  }
+
   ev.stopPropagation();
   ev.preventDefault();
   delete options.selector;
@@ -55,6 +62,15 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
         }
         removeAndAddListener(options.selector, msg.options.selector);
         options = msg.options;
+        break;
+
+      case EVENT_TYPES.TOGGLE_EXTENSION:
+        if (msg.value) {
+          enableExtension = true;
+        } else {
+          enableExtension = false;
+        }
+        refresh();
         break;
 
       case EVENT_TYPES.TOGGLE_INSPECTOR:
@@ -173,15 +189,23 @@ async function sendScrapedData() {
   return Promise.resolve(data);
 }
 
+function autoSelectCTAs() {
+  const ctas = scrapeCTAsFromPage();
+
+  for (let i = 0; i < ctas.length; ++i) {
+    ctas[i].element?.addEventListener("click", handleClick);
+  }
+}
+
+function refresh() {
+  autoSelectCTAs();
+  sendScrapedData();
+}
+
 document.onreadystatechange = () => {
   // scrape and send amount after page load is completed
   if (document.readyState === "complete") {
-    const ctas = scrapeCTAsFromPage();
-
-    for (let i = 0; i < ctas.length; ++i) {
-      ctas[i].element?.addEventListener("click", handleClick);
-    }
-
+    autoSelectCTAs();
     sendScrapedData().then((data) => {
       // in some specific cases, dom load event fires but the page is still not rendered
       // handling this by setting a timeout of 2s to scrape amount
@@ -197,6 +221,10 @@ document.onreadystatechange = () => {
 setTimeout(() => {
   sendScrapedData();
 }, 2000);
+
+getDataFromStorage("enableExtension").then((res) => {
+  enableExtension = res;
+});
 
 document.addEventListener(
   "click",

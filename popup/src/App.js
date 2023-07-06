@@ -4,12 +4,14 @@ import MagicCheckout from "./modules/MagicCheckout";
 import ComingSoon from "./modules/ComingSoon";
 import CrossBorder from "./modules/CrossBorder";
 import Sidebar from "./components/Sidebar";
+import ToggleSwitch from "./components/ToggleSwitch";
 
 import styles from "./app.module.css";
 import { EVENT_TYPES, MENU } from "../../constants";
 
 const App = () => {
   const [activeMenu, setActiveMenu] = useState(MENU[0]);
+  const [enableExtension, setEnableExtension] = useState(true);
 
   useEffect(() => {
     chrome.runtime.sendMessage(
@@ -24,6 +26,10 @@ const App = () => {
         }
       }
     );
+
+    chrome.storage.local.get(["enableExtension"]).then((result) => {
+      setEnableExtension(result?.enableExtension);
+    });
   }, []);
 
   const onMenuClick = (menu) => {
@@ -47,14 +53,46 @@ const App = () => {
         return <ComingSoon />;
     }
   };
+
+  const handleSwitchChange = (value) => {
+    setEnableExtension(value);
+    chrome.storage.local.set({
+      ["enableExtension"]: value,
+    });
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          from: "popup",
+          type: EVENT_TYPES.TOGGLE_EXTENSION,
+          value,
+        });
+      }
+    );
+  };
+
   return (
-    <div className={styles.container}>
-      <Sidebar onChange={onMenuClick} menu={MENU} activeMenu={activeMenu} />
-      <div className={styles.screen}>
-        <p className={styles.activeLabel}>{activeMenu.label}</p>
-        {renderScreen()}
+    <>
+      <div
+        className={`${styles.container} ${!enableExtension && styles.inactive}`}
+      >
+        {!enableExtension && <div className={styles.clickBlocker} />}
+        <Sidebar onChange={onMenuClick} menu={MENU} activeMenu={activeMenu} />
+        <div className={styles.screen}>
+          <p className={styles.activeLabel}>{activeMenu.label}</p>
+          {renderScreen()}
+        </div>
       </div>
-    </div>
+      <div className={styles.toggleBar}>
+        <ToggleSwitch
+          enable={enableExtension}
+          handleChange={handleSwitchChange}
+        />
+      </div>
+    </>
   );
 };
 
