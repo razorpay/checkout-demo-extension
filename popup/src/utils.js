@@ -39,14 +39,14 @@ export const translateOptions = (options, selector) => {
   return translatedOptions;
 };
 
-export const createOptions = (country) => {
+export const createOptions = (country, offers) => {
   const countryConfig = COUNTRY_CONFIG[country];
   return {
     key: {
       type: "input",
       id: "key",
       label: "Key",
-      value: countryConfig.key.test,
+      value: offers ? "" : countryConfig.key.test,
     },
     order_id: {
       type: "input",
@@ -158,4 +158,19 @@ export function handleScrapeDataResponse(options, response) {
       value: response["theme.color"],
     },
   };
+}
+
+export function sendChromeMessage(payload) {
+  chrome.tabs.query(
+    {
+      active: true,
+      currentWindow: true,
+    },
+    (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        from: "popup",
+        ...payload,
+      });
+    }
+  );
 }

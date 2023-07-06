@@ -525,7 +525,7 @@ export const scrapeLineItem = () => {
   };
 };
 
-export const createOrder = (data, line_item) => {
+export const createOrder = (data, line_item, activeProduct) => {
   const payload = {
     currency: "INR",
     amount: data.amount / 100,
@@ -537,6 +537,10 @@ export const createOrder = (data, line_item) => {
       },
     ],
   };
+
+  if (activeProduct === "offers") {
+    payload.enableOffers = true;
+  }
   return fetch("https://demo-shopping-app.onrender.com/payment/orders", {
     method: "POST",
     headers: {

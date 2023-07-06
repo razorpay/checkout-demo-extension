@@ -1,10 +1,12 @@
 .switch-container {
   padding: 7px;
-  background-color: #b5cdf4;
+  background-color: #2941bc;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  position: relative;
 }
+
 .react-switch-checkbox {
   height: 0;
   width: 0;
@@ -19,7 +21,7 @@
   cursor: pointer;
   width: 60px;
   height: 20px;
-  background: grey;
+  background: #b8b8b8;
   border-radius: 100px;
   position: relative;
   transition: background-color 0.2s;
@@ -35,7 +37,7 @@
   height: 16px;
   border-radius: 45px;
   transition: 0.2s;
-  background: #fff;
+  background: #2941bc;
   box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
 }
 
@@ -50,4 +52,5 @@
 
 .switch-text {
   margin-right: 14px;
+  color: white;
 }

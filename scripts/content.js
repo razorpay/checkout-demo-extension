@@ -1,4 +1,4 @@
-import { DEFAULT_CX_OPTIONS, EVENT_TYPES } from "../constants";
+import { DEFAULT_CX_OPTIONS, EVENT_TYPES, MENU } from "../constants";
 import {
   createOrder,
   getDataFromStorage,
@@ -9,7 +9,6 @@ import {
   scrapeLineItem,
   scrapeLogoFromPage,
   scrapeNameFromPage,
-  setDataInStorage,
   showModal,
   showToast,
 } from "./utils";
@@ -17,7 +16,7 @@ import {
 let options = DEFAULT_CX_OPTIONS;
 let enableInspector = false;
 let enableExtension = true;
-
+let activeProduct = MENU[0].id;
 /**
  * responsible for creating razorpay instance and opening checkout
  * @param {ClickEvent} ev
@@ -38,6 +37,13 @@ function handleClick(ev) {
   if (!options.amount) {
     options.amount = 100;
   }
+
+  console.log("🚀 ~ handleClick ~ activeProduct:", activeProduct);
+  // delete order id for standard checkout
+  if (activeProduct === "standard-cx") {
+    delete options.order_id;
+  }
+
   const rzp = new Razorpay(options);
 
   // rzp.on("payment.failed", function (error) {
@@ -76,6 +82,11 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
       case EVENT_TYPES.TOGGLE_INSPECTOR:
         handleInspector(msg);
         options = msg.options;
+        break;
+
+      case EVENT_TYPES.SET_ACTIVE_PRODUCT:
+        activeProduct = msg.value;
+        refresh();
         break;
 
       default:
@@ -171,7 +182,11 @@ async function sendScrapedData() {
     ...data,
   };
 
-  createOrder(data, scrapeLineItem()).then((res) => {
+  createOrder(data, scrapeLineItem(), activeProduct).then((res) => {
+    options = {
+      ...options,
+      order_id: res.id,
+    };
     chrome.runtime.sendMessage({
       from: "content",
       type: EVENT_TYPES.SET_ORDER_ID,
@@ -218,12 +233,18 @@ document.onreadystatechange = () => {
   }
 };
 // fallback if complete event fires very late
-setTimeout(() => {
-  sendScrapedData();
-}, 2000);
+// setTimeout(() => {
+//   sendScrapedData();
+// }, 2000);
 
 getDataFromStorage("enableExtension").then((res) => {
   enableExtension = res;
+});
+
+getDataFromStorage("activeMenu").then((res) => {
+  console.log("🚀 ~ getDataFromStorage ~ res:", res);
+  activeProduct = res || MENU[0].id;
+  refresh();
 });
 
 document.addEventListener(

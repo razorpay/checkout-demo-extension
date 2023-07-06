@@ -16,7 +16,7 @@ const ToggleSwitch = ({ handleChange, enable }) => {
         type="checkbox"
       />
       <label
-        style={{ background: enable && "#0460f8" }}
+        style={{ background: enable && "#fff" }}
         className="react-switch-label"
         htmlFor={`react-switch-new`}
       >

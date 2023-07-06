@@ -5,27 +5,24 @@ import ComingSoon from "./modules/ComingSoon";
 import CrossBorder from "./modules/CrossBorder";
 import Sidebar from "./components/Sidebar";
 import ToggleSwitch from "./components/ToggleSwitch";
+import rzplogo from "./assets/rzp-logo-text.svg";
 
 import styles from "./app.module.css";
 import { EVENT_TYPES, MENU } from "../../constants";
+import { sendChromeMessage } from "./utils";
+import Offers from "./modules/Offers";
 
 const App = () => {
   const [activeMenu, setActiveMenu] = useState(MENU[0]);
   const [enableExtension, setEnableExtension] = useState(true);
 
   useEffect(() => {
-    chrome.runtime.sendMessage(
-      {
-        from: "popup",
-        type: EVENT_TYPES.GET_ACTIVE_PRODUCT,
-      },
-      (response) => {
-        let menuIndex = MENU.findIndex((item) => item.id === response);
-        if (menuIndex !== -1) {
-          setActiveMenu(MENU[menuIndex]);
-        }
+    chrome.storage.local.get(["activeMenu"]).then((result) => {
+      let menuIndex = MENU.findIndex((item) => item.id === result?.activeMenu);
+      if (menuIndex !== -1) {
+        setActiveMenu(MENU[menuIndex]);
       }
-    );
+    });
 
     chrome.storage.local.get(["enableExtension"]).then((result) => {
       setEnableExtension(result?.enableExtension);
@@ -34,10 +31,14 @@ const App = () => {
 
   const onMenuClick = (menu) => {
     setActiveMenu(menu);
-    chrome.runtime.sendMessage({
-      from: "popup",
+
+    sendChromeMessage({
       type: EVENT_TYPES.SET_ACTIVE_PRODUCT,
       value: menu.id,
+    });
+
+    chrome.storage.local.set({
+      ["activeMenu"]: menu.id,
     });
   };
 
@@ -49,6 +50,8 @@ const App = () => {
         return <MagicCheckout />;
       case "cross-border":
         return <CrossBorder />;
+      case "offers":
+        return <Offers />;
       default:
         return <ComingSoon />;
     }
@@ -87,6 +90,7 @@ const App = () => {
         </div>
       </div>
       <div className={styles.toggleBar}>
+        <img className={styles.logo} src={rzplogo} />
         <ToggleSwitch
           enable={enableExtension}
           handleChange={handleSwitchChange}

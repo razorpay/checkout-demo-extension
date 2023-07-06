@@ -1,18 +1,7 @@
 .container {
   width: 40px;
-  background-image: url(https://cdn.razorpay.com/static/assets/extension/bg.svg);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 40%;
   position: relative;
-}
-
-.logo {
-  position: absolute;
-  bottom: 44px;
-  transform: rotate(-90deg);
-  height: 20px;
-  left: -31px;
+  background-color: #2941bc;
 }
 
 .logoContainer {

@@ -1,8 +1,7 @@
-import { EVENT_TYPES, MENU } from "../constants";
+import { EVENT_TYPES } from "../constants";
 
 let scrapedData = {};
 let order_id = "";
-let activeProduct = MENU[0].id;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.from === "content") {
@@ -24,16 +23,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       case EVENT_TYPES.GET_ORDER_ID: {
         sendResponse(order_id);
-        break;
-      }
-
-      case EVENT_TYPES.SET_ACTIVE_PRODUCT: {
-        activeProduct = message.value;
-        break;
-      }
-
-      case EVENT_TYPES.GET_ACTIVE_PRODUCT: {
-        sendResponse(activeProduct);
         break;
       }
     }
