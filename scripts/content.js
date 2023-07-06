@@ -237,7 +237,7 @@ document.onreadystatechange = () => {
 // }, 2000);
 
 getDataFromStorage("enableExtension").then((res) => {
-  enableExtension = res;
+  enableExtension = typeof res === "boolean" ? res : true;
 });
 
 getDataFromStorage("activeMenu").then((res) => {

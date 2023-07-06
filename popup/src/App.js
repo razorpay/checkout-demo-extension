@@ -25,7 +25,11 @@ const App = () => {
     });
 
     chrome.storage.local.get(["enableExtension"]).then((result) => {
-      setEnableExtension(result?.enableExtension || true);
+      setEnableExtension(
+        typeof result?.enableExtension === "boolean"
+          ? result?.enableExtension
+          : true
+      );
     });
   }, []);
 
