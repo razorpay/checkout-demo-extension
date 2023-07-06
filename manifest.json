@@ -1,6 +1,6 @@
 {
   "name": "RZP Checkout Demo",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Override pay button on merchant's webpage to open Razorpay checkout",
   "manifest_version": 3,
   "author": "Tarun Khanna",
