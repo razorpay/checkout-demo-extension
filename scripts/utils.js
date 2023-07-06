@@ -529,17 +529,18 @@ export const createOrder = (data, line_item, activeProduct) => {
   const payload = {
     currency: "INR",
     amount: data.amount / 100,
-    line_items_total: data.amount / 100,
-    line_items: [
-      {
-        ...line_item,
-        price: data.amount / 100,
-      },
-    ],
   };
 
   if (activeProduct === "offers") {
     payload.enableOffers = true;
+  } else if (activeProduct === "magic-cx") {
+    payload.line_items_total = data.amount / 100;
+    payload.line_items = [
+      {
+        ...line_item,
+        price: data.amount / 100,
+      },
+    ];
   }
   return fetch("https://demo-shopping-app.onrender.com/payment/orders", {
     method: "POST",

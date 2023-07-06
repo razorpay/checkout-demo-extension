@@ -38,9 +38,8 @@ function handleClick(ev) {
     options.amount = 100;
   }
 
-  console.log("🚀 ~ handleClick ~ activeProduct:", activeProduct);
   // delete order id for standard checkout
-  if (activeProduct === "standard-cx") {
+  if (activeProduct === "standard-cx" || activeProduct === "cross-border") {
     delete options.order_id;
   }
 
@@ -242,7 +241,6 @@ getDataFromStorage("enableExtension").then((res) => {
 });
 
 getDataFromStorage("activeMenu").then((res) => {
-  console.log("🚀 ~ getDataFromStorage ~ res:", res);
   activeProduct = res || MENU[0].id;
   refresh();
 });
