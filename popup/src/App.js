@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import StandardCheckout from "./modules/StandardCheckout";
 import MagicCheckout from "./modules/MagicCheckout";
 import ComingSoon from "./modules/ComingSoon";
+import CrossBorder from "./modules/CrossBorder";
 import Sidebar from "./components/Sidebar";
 
 import styles from "./app.module.css";
@@ -40,6 +41,8 @@ const App = () => {
         return <StandardCheckout />;
       case "magic-cx":
         return <MagicCheckout />;
+      case "cross-border":
+        return <CrossBorder />;
       default:
         return <ComingSoon />;
     }

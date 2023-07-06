@@ -16,10 +16,10 @@ import { COUNTRY_CONFIG, COUNTRY_TO_ISO, getCountry } from "../../constants";
 import Accordian from "../../components/Accordian";
 import styles from "./index.module.css";
 
-const MagicCheckout = () => {
+const CrossBorder = () => {
   const [selector, setSelector] = useState("");
-  const [options, setOptions] = useState(createOptions(getCountry()));
-  const [country, setCountry] = useState(getCountry());
+  const [options, setOptions] = useState(createOptions(COUNTRY_TO_ISO.USA));
+  const [country, setCountry] = useState(COUNTRY_TO_ISO.USA);
   const [mode, setMode] = useState("test");
   const optionsInStorage = useRef(false);
   const tabUrl = useRef("");
@@ -124,32 +124,10 @@ const MagicCheckout = () => {
       },
       (response) => {
         if (!optionsInStorage.current) {
-          setOptions((options) => {
-            const tempOptions = handleScrapeDataResponse(options, response);
-            sendOptions(tempOptions, selector);
-            return tempOptions;
-          });
-        }
-      }
-    );
-
-    chrome.runtime.sendMessage(
-      {
-        from: "popup",
-        type: EVENT_TYPES.GET_ORDER_ID,
-      },
-      (response) => {
-        setOptions((options) => {
-          const tempOptions = {
-            ...options,
-            order_id: {
-              ...options.order_id,
-              value: response,
-            },
-          };
+          const tempOptions = handleScrapeDataResponse(options, response);
+          setOptions(tempOptions);
           sendOptions(tempOptions, selector);
-          return tempOptions;
-        });
+        }
       }
     );
   };
@@ -267,4 +245,4 @@ const MagicCheckout = () => {
   );
 };
 
-export default MagicCheckout;
+export default CrossBorder;

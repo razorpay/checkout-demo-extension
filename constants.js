@@ -1,5 +1,7 @@
 import stdCxLogo from "./popup/src/assets/ic-std-cx.svg";
 import magicCxLogo from "./popup/src/assets/ic-magic-cx.svg";
+import crossborderLogo from "./popup/src/assets/ic-cross-border.svg";
+import offersLogo from "./popup/src/assets/ic-offers.svg";
 
 export const EVENT_TYPES = {
   SET_OPTIONS: "SET_OPTIONS",
@@ -23,4 +25,20 @@ export const MENU = [
     icon: magicCxLogo,
     label: "Magic Checkout",
   },
+  {
+    id: "cross-border",
+    icon: crossborderLogo,
+    label: "Cross Border",
+  },
+  {
+    id: "offers",
+    icon: offersLogo,
+    label: "Offers",
+  },
 ];
+
+export const DEFAULT_CX_OPTIONS = {
+  key: "rzp_test_1DP5mmOlF5G5ag",
+  amount: 100,
+  currency: "INR",
+};

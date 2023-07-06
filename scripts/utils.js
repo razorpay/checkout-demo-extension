@@ -209,7 +209,7 @@ export function showModal(data) {
   });
 }
 
-function createRecordFromElement(element) {
+function createRecordFromElement(element, extractOnlyNumbers = true) {
   const text = element.textContent.trim();
   let record = {};
   const bBox = element.getBoundingClientRect();
@@ -219,7 +219,13 @@ function createRecordFromElement(element) {
   }
   record.y = bBox.y;
   record.x = bBox.x;
-  record.text = text.replace(/[^0-9.]/g, "");
+  record.height = bBox.height;
+  record.width = bBox.width;
+  record.text = extractOnlyNumbers
+    ? text.replace(/[^0-9.]/g, "")
+    : text.toLowerCase();
+  record.element = element;
+
   return record;
 }
 
@@ -230,6 +236,13 @@ function filterContentInsideViewport(elem) {
     elem.y > window.innerHeight ||
     elem.y < 0
   ) {
+    return false;
+  }
+  return true;
+}
+
+function filterSmallCTAs(elem) {
+  if (elem.width > 300 || elem.height > 100) {
     return false;
   }
   return true;
@@ -289,6 +302,26 @@ export const scrapeAmountFromPage = () => {
   let priceInNumbers = recordsSortedByFontSize[0]?.text;
   return priceInNumbers;
 };
+
+const filterByCTAtext = (element) => {
+  if (element.text?.includes("buy") || element.text?.includes("cart")) {
+    return true;
+  }
+};
+
+export const scrapeCTAsFromPage = () => {
+  var elements = [...document.querySelectorAll("button, div")];
+
+  let records = elements
+    .map((ele) => createRecordFromElement(ele, false))
+    .filter(filterContentInsideViewport)
+    .filter(filterByCTAtext)
+    .filter(filterSmallCTAs);
+
+  return records;
+};
+
+scrapeCTAsFromPage();
 
 export const scrapeNameFromPage = () => {
   let domain = window.location.hostname;
@@ -495,12 +528,12 @@ export const scrapeLineItem = () => {
 export const createOrder = (data, line_item) => {
   const payload = {
     currency: "INR",
-    amount: data.amount,
-    line_items_total: data.amount,
+    amount: data.amount / 100,
+    line_items_total: data.amount / 100,
     line_items: [
       {
         ...line_item,
-        price: data.amount,
+        price: data.amount / 100,
       },
     ],
   };

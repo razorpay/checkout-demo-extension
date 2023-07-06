@@ -1,3 +1,4 @@
+import { EVENT_TYPES } from "../../constants";
 import { COUNTRY_CONFIG, SUPPORTED_CURRENCIES } from "./constants";
 
 export function unflattenObject(data) {
@@ -95,3 +96,66 @@ export const createOptions = (country) => {
     },
   };
 };
+
+export const sendOptions = (options, selector, showToast = false) => {
+  let translatedOptions = translateOptions(options, selector);
+
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          from: "popup",
+          type: EVENT_TYPES.SET_OPTIONS,
+          options: translatedOptions,
+          showToast,
+        });
+        resolve();
+      }
+    );
+  });
+};
+
+export const handlePagePicker = (options, selector) => {
+  let translatedOptions = translateOptions(options, selector);
+  chrome.tabs.query(
+    {
+      active: true,
+      currentWindow: true,
+    },
+    (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        from: "popup",
+        type: EVENT_TYPES.TOGGLE_INSPECTOR,
+        enableInspector: true,
+        options: translatedOptions,
+      });
+      window.close();
+    }
+  );
+};
+
+export function handleScrapeDataResponse(options, response) {
+  return {
+    ...options,
+    amount: {
+      ...options.amount,
+      value: response.amount / 100,
+    },
+    image: {
+      ...options.image,
+      value: response.image,
+    },
+    name: {
+      ...options.name,
+      value: response.name,
+    },
+    ["theme.color"]: {
+      ...["theme.color"],
+      value: response["theme.color"],
+    },
+  };
+}

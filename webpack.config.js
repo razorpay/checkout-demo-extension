@@ -5,6 +5,7 @@ const coreConfig = {
   mode: "production",
   output: {
     path: path.resolve(__dirname, "dist"), // output folder
+    publicPath: "",
     filename: "[name].bundle.js",
   },
   devtool: "inline-source-map",
@@ -76,6 +77,7 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "dist/scripts"), // output folder
       filename: "[name].bundle.js",
+      publicPath: "",
     },
     entry: {
       content: "./scripts/content.js",
@@ -86,6 +88,7 @@ module.exports = [
     output: {
       path: path.resolve(__dirname, "dist/scripts"), // output folder
       filename: "[name].bundle.js",
+      publicPath: "",
     },
     entry: {
       background: "./scripts/background.js",

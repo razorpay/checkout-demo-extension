@@ -120,6 +120,17 @@ export const COUNTRY_CONFIG = {
       contact: "8888888888",
     },
   },
+  USA: {
+    name: "Test USA Merchant",
+    key: {
+      test: "rzp_test_1DP5mmOlF5G5ag",
+      live: "",
+    },
+    currency: "USD",
+    prefill: {
+      contact: "5555551234",
+    },
+  },
 };
 
 export const TIMEZONE_TO_COUNTRY = {
@@ -132,6 +143,7 @@ export const TIMEZONE_TO_COUNTRY = {
 export const COUNTRY_TO_ISO = {
   India: "IN",
   Malaysia: "MY",
+  USA: "USA",
 };
 
 export const getCountry = () => {

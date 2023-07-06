@@ -1,8 +1,9 @@
-import { EVENT_TYPES } from "../constants";
+import { DEFAULT_CX_OPTIONS, EVENT_TYPES } from "../constants";
 import {
   createOrder,
   querySelectorFallback,
   scrapeAmountFromPage,
+  scrapeCTAsFromPage,
   scrapeColourFromImage,
   scrapeLineItem,
   scrapeLogoFromPage,
@@ -11,7 +12,7 @@ import {
   showToast,
 } from "./utils";
 
-let options = {};
+let options = DEFAULT_CX_OPTIONS;
 let enableInspector = false;
 
 /**
@@ -26,6 +27,10 @@ function handleClick(ev) {
   options.handler = (response) => {
     showModal({ state: "success", ...response });
   };
+
+  if (!options.amount) {
+    options.amount = 100;
+  }
   const rzp = new Razorpay(options);
 
   // rzp.on("payment.failed", function (error) {
@@ -45,7 +50,9 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
   if (msg.from === "popup") {
     switch (msg.type) {
       case EVENT_TYPES.SET_OPTIONS:
-        showToast({ text: "Saved !" });
+        if (msg.showToast) {
+          showToast({ text: "Saved !" });
+        }
         removeAndAddListener(options.selector, msg.options.selector);
         options = msg.options;
         break;
@@ -53,6 +60,8 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
       case EVENT_TYPES.TOGGLE_INSPECTOR:
         handleInspector(msg);
         options = msg.options;
+        break;
+
       default:
         break;
     }
@@ -134,12 +143,17 @@ function handleDomClick(ev) {
 
 async function sendScrapedData() {
   const data = {
-    amount: +scrapeAmountFromPage() || "",
+    amount: +scrapeAmountFromPage() * 100 || 100,
     name: scrapeNameFromPage() || "",
   };
 
   data.image = await scrapeLogoFromPage();
-  data.color = await scrapeColourFromImage(data.image);
+  data["theme.color"] = await scrapeColourFromImage(data.image);
+
+  options = {
+    ...options,
+    ...data,
+  };
 
   createOrder(data, scrapeLineItem()).then((res) => {
     chrome.runtime.sendMessage({
@@ -162,6 +176,12 @@ async function sendScrapedData() {
 document.onreadystatechange = () => {
   // scrape and send amount after page load is completed
   if (document.readyState === "complete") {
+    const ctas = scrapeCTAsFromPage();
+
+    for (let i = 0; i < ctas.length; ++i) {
+      ctas[i].element?.addEventListener("click", handleClick);
+    }
+
     sendScrapedData().then((data) => {
       // in some specific cases, dom load event fires but the page is still not rendered
       // handling this by setting a timeout of 2s to scrape amount

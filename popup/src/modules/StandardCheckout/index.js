@@ -2,7 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { EVENT_TYPES } from "../../../../constants";
 import Input from "../../components/Input";
 import Datalist from "../../components/Datalist";
-import { createOptions, translateOptions } from "../../utils";
+import {
+  createOptions,
+  handlePagePicker,
+  handleScrapeDataResponse,
+  sendOptions,
+  translateOptions,
+} from "../../utils";
 import rzpLogo from "../../assets/rzp-logo.svg";
 import inspectIcon from "../../assets/ic-inspect.svg";
 import resetIcon from "../../assets/ic-reset.svg";
@@ -38,21 +44,9 @@ const StandardCheckout = () => {
       },
     });
 
-    let translatedOptions = translateOptions(options, selector);
-    chrome.tabs.query(
-      {
-        active: true,
-        currentWindow: true,
-      },
-      (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          from: "popup",
-          type: EVENT_TYPES.SET_OPTIONS,
-          options: translatedOptions,
-        });
-        window.close();
-      }
-    );
+    sendOptions(options, selector, true).then(() => {
+      window.close();
+    });
   };
 
   const resetHandler = () => {
@@ -98,25 +92,6 @@ const StandardCheckout = () => {
     });
   };
 
-  const handlePagePicker = () => {
-    let translatedOptions = translateOptions(options, selector);
-    chrome.tabs.query(
-      {
-        active: true,
-        currentWindow: true,
-      },
-      (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          from: "popup",
-          type: EVENT_TYPES.TOGGLE_INSPECTOR,
-          enableInspector: true,
-          options: translatedOptions,
-        });
-        window.close();
-      }
-    );
-  };
-
   const renderInputs = () => {
     return Object.keys(options).map((key) => {
       let input = options[key];
@@ -149,28 +124,9 @@ const StandardCheckout = () => {
       },
       (response) => {
         if (!optionsInStorage.current) {
-          setOptions((options) => {
-            return {
-              ...options,
-              ...response,
-              amount: {
-                ...options.amount,
-                value: response.amount,
-              },
-              image: {
-                ...options.image,
-                value: response.image,
-              },
-              name: {
-                ...options.name,
-                value: response.name,
-              },
-              ["theme.color"]: {
-                ...["theme.color"],
-                value: response.color,
-              },
-            };
-          });
+          const tempOptions = handleScrapeDataResponse(options, response);
+          setOptions(tempOptions);
+          sendOptions(tempOptions, selector);
         }
       }
     );
@@ -223,7 +179,7 @@ const StandardCheckout = () => {
         <button
           type="button"
           className={styles.pagePickerBtn}
-          onClick={handlePagePicker}
+          onClick={() => handlePagePicker(options, selector)}
         >
           Pick from page
           <img src={inspectIcon} className={styles.inspectIcon} />
