@@ -304,9 +304,7 @@ export const scrapeAmountFromPage = () => {
 };
 
 const filterByCTAtext = (element) => {
-  if (element.text?.includes("buy") || element.text?.includes("cart")) {
-    return true;
-  }
+  return /(buy|cart|add|bag)/i.test(element.text);
 };
 
 export const scrapeCTAsFromPage = () => {
