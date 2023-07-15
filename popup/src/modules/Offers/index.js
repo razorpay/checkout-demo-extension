@@ -1,20 +1,21 @@
 import React, { useEffect, useState, useRef } from "react";
 import { EVENT_TYPES } from "../../../../constants";
-import Input from "../../components/Input";
-import Datalist from "../../components/Datalist";
 import {
   createOptions,
   handlePagePicker,
   handleScrapeDataResponse,
   sendOptions,
-  translateOptions,
 } from "../../utils";
-import rzpLogo from "../../assets/rzp-logo.svg";
-import inspectIcon from "../../assets/ic-inspect.svg";
-import resetIcon from "../../assets/ic-reset.svg";
-import { COUNTRY_CONFIG, COUNTRY_TO_ISO, getCountry } from "../../constants";
+import { COUNTRY_CONFIG, getCountry } from "../../constants";
 import Accordian from "../../components/Accordian";
 import styles from "./index.module.css";
+import {
+  CheckoutOptions,
+  CountrySelect,
+  FooterCta,
+  Mode,
+  Picker,
+} from "../../components";
 
 const Offers = () => {
   const [selector, setSelector] = useState("");
@@ -89,30 +90,6 @@ const Offers = () => {
               : COUNTRY_CONFIG[_country].key.test,
         },
       };
-    });
-  };
-
-  const renderInputs = () => {
-    return Object.keys(options).map((key) => {
-      let input = options[key];
-      switch (input.type) {
-        case "input":
-          return (
-            <Input
-              {...input}
-              key={input.id}
-              onChange={(ev) => onInputChange(ev.target.value, key)}
-            />
-          );
-        case "datalist":
-          return (
-            <Datalist
-              {...input}
-              key={input.id}
-              onChange={(val) => onInputChange(val, key)}
-            />
-          );
-      }
     });
   };
 
@@ -194,55 +171,19 @@ const Offers = () => {
 
   return (
     <div className={styles.container}>
-      <div className="header">
-        <label className="header" htmlFor="selector">
-          Add Selector for button
-        </label>
-        <button
-          type="button"
-          className={styles.pagePickerBtn}
-          onClick={() => handlePagePicker(options, selector)}
-        >
-          Pick from page
-          <img src={inspectIcon} className={styles.inspectIcon} />
-        </button>
-      </div>
-      <input
-        value={selector}
-        onChange={(ev) => {
+      <Picker
+        onInputChange={(ev) => {
           setSelector(ev.target.value);
         }}
+        onPagePick={() => handlePagePicker(options, selector)}
+        selector={selector}
       />
       <div className={styles.selectContainer}>
         <div className={`${styles.column} ${styles.countrySelect}`}>
-          <label className="header" htmlFor="country">
-            Country
-          </label>
-          <select
-            onChange={countryChangeHandler}
-            name="country"
-            id="country"
-            value={country}
-          >
-            {Object.entries(COUNTRY_TO_ISO).map(([key, value]) => (
-              <option value={value}>{key}</option>
-            ))}
-          </select>
+          <CountrySelect onChange={countryChangeHandler} country={country} />
         </div>
         <div className={styles.column}>
-          <label className="header" htmlFor="merchant-mode">
-            Mode
-          </label>
-          <select
-            onChange={mxModeHandler}
-            name="mode"
-            id="merchant-mode"
-            className={styles.mxModeSelect}
-            value={mode}
-          >
-            <option value="test">Test</option>
-            <option value="live">Live</option>
-          </select>
+          <Mode mode={mode} onChange={mxModeHandler} />
         </div>
       </div>
 
@@ -250,19 +191,12 @@ const Offers = () => {
         containerStyle={styles.accordianContainer}
         title="Modify Checkout Options"
       >
-        <div className={styles.optionsBox}>{renderInputs()}</div>
+        <div className={styles.optionsBox}>
+          <CheckoutOptions options={options} onInputChange={onInputChange} />
+        </div>
       </Accordian>
 
-      <div className={styles.btnContainer}>
-        <button className={styles.resetBtn} onClick={resetHandler}>
-          <img src={resetIcon} />
-          Reset
-        </button>
-        <button className={styles.submitBtn} onClick={submitHandler}>
-          <img className={styles.rzpBtnLogo} src={rzpLogo} />
-          Submit
-        </button>
-      </div>
+      <FooterCta onSubmit={submitHandler} onReset={resetHandler} />
     </div>
   );
 };
