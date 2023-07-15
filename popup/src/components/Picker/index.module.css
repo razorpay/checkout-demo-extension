@@ -1,0 +1,9 @@
+.inspectIcon {
+  height: 14px;
+  margin-left: 4px;
+}
+.pagePickerBtn {
+  display: flex;
+  color: #0460f8;
+  font-weight: 500;
+}
