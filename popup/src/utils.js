@@ -154,7 +154,7 @@ export function handleScrapeDataResponse(options, response) {
       value: response.name,
     },
     ["theme.color"]: {
-      ...["theme.color"],
+      ...options["theme.color"],
       value: response["theme.color"],
     },
   };
