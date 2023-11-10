@@ -101,7 +101,7 @@ export const COUNTRY_CONFIG = {
   MY: {
     name: "Test Malaysian Merchant",
     key: {
-      test: "rzp_test_rLRCKMrfIRVgEg",
+      test: "rzp_test_dNAQLTh6f5XgYW",
       live: "",
     },
     currency: "MYR",
