@@ -32,5 +32,26 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "overrides": {
+    "js-yaml": "4.3.2",
+    "qs": "6.16.0",
+    "websocket-driver": "0.7.5",
+    "@babel/runtime": "7.26.10",
+    "http-proxy-middleware": "2.0.10",
+    "ws": "8.21.0",
+    "follow-redirects": "1.16.0",
+    "brace-expansion": "1.1.18",
+    "picomatch": "2.3.2",
+    "node-forge": "1.4.0",
+    "path-to-regexp": "0.1.13",
+    "cross-spawn": "7.0.5",
+    "braces": "3.0.3",
+    "body-parser": "1.20.6",
+    "cookie": "0.7.2",
+    "serve-static": "1.16.3",
+    "send": "0.19.2",
+    "express": "4.22.3",
+    "webpack-dev-middleware": "5.3.4"
   }
 }
