@@ -56,7 +56,7 @@
     "postcss": "8.5.23",
     "@babel/helpers": "7.29.2",
     "@babel/plugin-transform-modules-systemjs": "7.29.4",
-    "lodash": "4.18.0",
+    "lodash": "4.18.1",
     "on-headers": "1.1.0"
   }
 }
