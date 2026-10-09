@@ -3777,7 +3777,10 @@
                           source: r.source,
                           time: Date.now(),
                         });
-                      a.ownerWindow.postMessage(o, "*");
+                      a.ownerWindow.postMessage(
+                        o,
+                        new URL(document.referrer).origin
+                      );
                     }
                   },
                 },
@@ -8513,6 +8516,7 @@
               allow: "otp-credentials",
             };
             this.el = ie.setAttributes(ie.create("iframe"), e);
+            this.targetOrigin = new URL(this.el.src).origin;
           }
           return this.el;
         },
@@ -8724,7 +8728,7 @@
             void 0 === n ||
             null === (r = n.contentWindow) ||
             void 0 === r ||
-            r.postMessage(o, "*");
+            r.postMessage(o, this.targetOrigin);
         },
         onmessage: function (e) {
           var t = e.data;
